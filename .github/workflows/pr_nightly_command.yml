@@ -56,7 +56,7 @@ jobs:
           sudo apt-get install gh -y
 
       - name: Checkout repository
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           token: ${{ secrets.PAT_TOKEN }}
           sparse-checkout: |

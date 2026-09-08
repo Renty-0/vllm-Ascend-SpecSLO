@@ -31,7 +31,7 @@ jobs:
         # container, but our current self-hosted runner image only mounts
         # older Node toolchains under /__e. Keep linkcheck on v6 until the
         # runner fleet is upgraded.
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v7.0.1
 
       - name: Collect changed docs files
         id: changed-docs

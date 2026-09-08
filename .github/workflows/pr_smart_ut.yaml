@@ -47,7 +47,7 @@ jobs:
       test_groups: ${{ steps.scope.outputs.test_groups || steps.noop.outputs.test_groups }}
       matched_modules: ${{ steps.scope.outputs.matched_modules || steps.noop.outputs.matched_modules }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
 
