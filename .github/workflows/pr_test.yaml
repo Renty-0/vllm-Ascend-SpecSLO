@@ -79,7 +79,7 @@ jobs:
           echo "✓ PR title prefix is valid"
 
       - name: Checkout vllm-project/vllm-ascend repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
 
@@ -112,7 +112,7 @@ jobs:
       - run: echo "::add-matcher::$RUNNER_TEMP/mypy.json"
 
       - name: Checkout vllm-project/vllm repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           repository: vllm-project/vllm
           path: ./vllm-empty
@@ -248,10 +248,10 @@ jobs:
       TORCH_DEVICE_BACKEND_AUTOLOAD: 0
     steps:
       - name: Checkout vllm-ascend-hust
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
 
       - name: Checkout paired vllm-hust
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           repository: vLLM-HUST/vllm-hust
           ref: main

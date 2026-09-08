@@ -133,7 +133,7 @@ jobs:
         run: exit 1
 
       - name: Checkout repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           token: ${{ secrets.PAT_TOKEN }}
           fetch-depth: 0

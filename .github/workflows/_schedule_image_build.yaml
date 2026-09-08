@@ -130,14 +130,14 @@ jobs:
           fi
         fi
 
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
       if: ${{ github.event_name == 'workflow_dispatch' && inputs.vllm_ascend_commit != '' }}
       with:
         fetch-depth: 0
         persist-credentials: false
         ref: ${{ inputs.vllm_ascend_commit }}
 
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
       if: ${{ github.event_name != 'workflow_dispatch' }}
       with:
         submodules: recursive
@@ -145,7 +145,7 @@ jobs:
         persist-credentials: false
         ref: ${{ inputs.branch_ref }}
 
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
       if: ${{ github.event_name == 'workflow_dispatch' && inputs.workflow_dispatch_tag != '' }}
       with:
         submodules: recursive
@@ -153,7 +153,7 @@ jobs:
         persist-credentials: false
         ref: ${{ inputs.workflow_dispatch_tag }}
 
-    - uses: actions/checkout@v7
+    - uses: actions/checkout@v7.0.1
       if: ${{ github.event_name == 'workflow_dispatch' && inputs.workflow_dispatch_tag == '' && inputs.vllm_ascend_commit == '' }}
       with:
         submodules: recursive
@@ -299,14 +299,14 @@ jobs:
     if: ${{ inputs.should_push && !inputs.temp_only }}
     steps:
       - name: Checkout branch
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         if: ${{ github.event_name != 'workflow_dispatch' || (github.event_name == 'workflow_dispatch' && inputs.workflow_dispatch_tag == '') }}
         with:
           submodules: recursive
           ref: ${{ inputs.branch_ref }}
 
       - name: Checkout tag
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.workflow_dispatch_tag != '' }}
         with:
           submodules: recursive

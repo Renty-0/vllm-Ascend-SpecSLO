@@ -168,7 +168,7 @@ jobs:
       publish_to_benchmark_repo: ${{ steps.parse-command.outputs.PUBLISH_TO_BENCHMARK_REPO }}
     steps:
       - name: Checkout workflow scripts
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 1
           persist-credentials: false
@@ -549,7 +549,7 @@ jobs:
 
       - name: Checkout workflow ref
         if: ${{ github.event_name != 'workflow_dispatch' }}
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           ssh-key: ${{ secrets.VLLM_ASCEND_HUST_BENCHMARK_SSH_KEY }}
@@ -558,7 +558,7 @@ jobs:
 
       - name: Checkout manual benchmark repo history
         if: ${{ github.event_name == 'workflow_dispatch' && env.ASCEND_HUST_LOCAL_CHECKOUT == '1' }}
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           ssh-key: ${{ secrets.VLLM_ASCEND_HUST_BENCHMARK_SSH_KEY }}
@@ -575,7 +575,7 @@ jobs:
 
       - name: Checkout manual benchmark target
         if: ${{ github.event_name == 'workflow_dispatch' && env.ASCEND_HUST_LOCAL_CHECKOUT != '1' }}
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           repository: ${{ env.ASCEND_HUST_REPOSITORY }}
           ref: ${{ env.ASCEND_HUST_REF }}
@@ -630,7 +630,7 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Checkout vllm-hust repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           repository: vLLM-HUST/vllm-hust
           ref: ${{ env.VLLM_HUST_REF }}
@@ -638,7 +638,7 @@ jobs:
           persist-credentials: false
 
       - name: Checkout benchmark repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           repository: vLLM-HUST/vllm-hust-benchmark
           ref: ${{ env.VLLM_HUST_BENCHMARK_REF }}
@@ -698,7 +698,7 @@ jobs:
           echo "SAME_SPEC_SPEC_FILE=$resolved_spec_file" >> "$GITHUB_ENV"
 
       - name: Checkout ascend-runtime-manager repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           repository: vLLM-HUST/ascend-runtime-manager
           ref: ${{ env.HUST_ASCEND_MANAGER_REF }}
@@ -721,7 +721,7 @@ jobs:
           fi
 
       - name: Checkout website repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           repository: vLLM-HUST/vllm-hust-website
           path: vllm-hust-website
@@ -1624,7 +1624,7 @@ jobs:
           chmod 600 "$HOME/.ssh/config"
 
       - name: Checkout cleanup scripts
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 1
           ssh-key: ${{ secrets.VLLM_ASCEND_HUST_BENCHMARK_SSH_KEY }}

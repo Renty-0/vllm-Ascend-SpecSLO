@@ -91,7 +91,7 @@ jobs:
         }
     steps:
       - name: Checkout vllm-project/vllm-ascend repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 0
           submodules: recursive
@@ -116,7 +116,7 @@ jobs:
           echo "MAIN2MAIN_TEST_CASES=${CASES}" >> "$GITHUB_ENV"
 
       - name: Checkout vllm-project/vllm repo
-        uses: actions/checkout@v7
+        uses: actions/checkout@v7.0.1
         with:
           repository: vllm-project/vllm
           ref: ${{ env.TARGET_COMMIT != '' && env.TARGET_COMMIT || 'main' }}
