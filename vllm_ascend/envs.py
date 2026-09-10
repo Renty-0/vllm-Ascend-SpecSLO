@@ -28,6 +28,65 @@ from typing import Any
 # begin-env-vars-definition
 
 env_variables: dict[str, Callable[[], Any]] = {
+    # Optional local output directory for PEARL/SpecSLO NPU traces. Default:
+    # None (disabled). Non-sensitive; opt-in diagnostic overhead only.
+    "VLLM_ASCEND_PEARL_NPU_PROFILE_DIR": lambda: os.getenv("VLLM_ASCEND_PEARL_NPU_PROFILE_DIR"),
+    # Trace rank: -1 selects all workers; otherwise a non-negative world rank.
+    # Default None lets the execution path choose. Non-sensitive.
+    "VLLM_ASCEND_PEARL_NPU_PROFILE_RANK": lambda: (
+        int(os.environ["VLLM_ASCEND_PEARL_NPU_PROFILE_RANK"])
+        if "VLLM_ASCEND_PEARL_NPU_PROFILE_RANK" in os.environ else None
+    ),
+    # PEARL/SpecSLO experimental diagnostics and compatibility switches.
+    # All are non-sensitive. Production defaults keep diagnostics disabled
+    # and select the native packed-tree/ACLGraph route.
+    "VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE", "0"))
+    ),
+    "VLLM_ASCEND_PEARL_VERBOSE": lambda: bool(int(os.getenv("VLLM_ASCEND_PEARL_VERBOSE", "0"))),
+    "VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS", "0"))
+    ),
+    "VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE", "0"))
+    ),
+    "VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE", "0"))
+    ),
+    "VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY", "0"))
+    ),
+    "VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS", "0"))
+    ),
+    # Comma-separated request indices for bounded scheduler tracing.
+    "VLLM_ASCEND_SPECRHYTHM_TRACE_REQUEST": lambda: os.getenv(
+        "VLLM_ASCEND_SPECRHYTHM_TRACE_REQUEST", ""
+    ),
+    "VLLM_ASCEND_SPECRHYTHM_TREE_GRAPH": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_TREE_GRAPH", "1"))
+    ),
+    "VLLM_ASCEND_SPECRHYTHM_USE_FIA": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_USE_FIA", "0"))
+    ),
+    "VLLM_ASCEND_SPECRHYTHM_VALIDATE_MAILBOX": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_VALIDATE_MAILBOX", "0"))
+    ),
+    "VLLM_ASCEND_SPECRHYTHM_FORCE_STEPWISE_TARGET": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_FORCE_STEPWISE_TARGET", "0"))
+    ),
+    "VLLM_ASCEND_SPECRHYTHM_STEPWISE_TARGET_FIA": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_STEPWISE_TARGET_FIA", "0"))
+    ),
+    "VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET", "0"))
+    ),
+    "VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH", "0"))
+    ),
+    "VLLM_ASCEND_USE_NATIVE_QWEN2_ROPE": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_USE_NATIVE_QWEN2_ROPE", "0"))
+    ),
     # max compile thread number for package building. Usually, it is set to
     # the number of CPU cores. If not set, the default value is None, which
     # means all number of CPU cores will be used.

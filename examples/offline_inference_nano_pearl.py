@@ -7,6 +7,7 @@ import argparse
 import json
 
 from vllm_ascend.spec_decode.pearl import PEARLConfig, PEARLEngine, SamplingParams
+from vllm_ascend.spec_decode.pearl.roofline import parse_roofline_argument
 
 
 def parse_args() -> argparse.Namespace:
@@ -34,7 +35,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--spec-rhythm-acceptance-ema-alpha", type=float, default=0.2)
     parser.add_argument("--spec-rhythm-request-max-gamma", type=int)
     parser.add_argument("--spec-rhythm-draft-token-budget", type=int)
-    parser.add_argument("--spec-rhythm-roofline", type=json.loads)
+    parser.add_argument("--spec-rhythm-tree-width", type=int, default=1)
+    parser.add_argument("--spec-rhythm-tree-depth", type=int, default=1)
+    parser.add_argument("--spec-rhythm-roofline", type=parse_roofline_argument)
+    parser.add_argument(
+        "--spec-rhythm-verification-budget",
+        type=int,
+        help="Fixed global SpecRhythm candidate-token budget B.",
+    )
     parser.add_argument("--disable-cpu-binding", action="store_true")
     parser.add_argument("--enforce-eager", action="store_true")
     parser.add_argument("--mode", choices=("pearl", "target-ar", "bench"), default="pearl")
@@ -76,7 +84,10 @@ def main() -> None:
         spec_rhythm_acceptance_floor=args.spec_rhythm_acceptance_floor,
         spec_rhythm_acceptance_ema_alpha=args.spec_rhythm_acceptance_ema_alpha,
         spec_rhythm_roofline=args.spec_rhythm_roofline,
+        spec_rhythm_verification_budget=args.spec_rhythm_verification_budget,
         spec_rhythm_draft_token_budget=args.spec_rhythm_draft_token_budget,
+        spec_rhythm_tree_width=args.spec_rhythm_tree_width,
+        spec_rhythm_tree_depth=args.spec_rhythm_tree_depth,
         profile_decode_steps=args.profile_decode_steps,
         stop_after_profiled_decode_steps=args.profile_only,
         worker_timeout_seconds=args.worker_timeout_seconds,

@@ -13,7 +13,7 @@ only as the CPU test fallback.
 
 from __future__ import annotations
 
-import os
+from collections.abc import Sequence
 from copy import deepcopy
 from dataclasses import dataclass
 from math import ceil
@@ -29,13 +29,14 @@ from vllm.model_executor.layers.rotary_embedding import get_rope
 
 from vllm_ascend import envs as ascend_envs
 from vllm_ascend.device.device_op import DeviceOperator
+from vllm_ascend.spec_decode.pearl.mc2 import (
+    MC2Profile,
+    matmul_allreduce_add_rmsnorm_or_fallback,
+    resolve_hccl_comm_name,
+)
 from vllm_ascend.spec_decode.pearl.native_graph import (
     run_native_fused_infer_attention,
     run_native_paged_attention,
-)
-from vllm_ascend.spec_decode.pearl.mc2 import (
-    matmul_allreduce_add_rmsnorm_or_fallback,
-    resolve_hccl_comm_name,
 )
 
 PAGED_ATTENTION_BLOCK_SIZE = 128
@@ -47,6 +48,49 @@ MIN_PAGED_ATTENTION_BLOCKS = 16
 SUPPORTED_NATIVE_ARCHITECTURES = frozenset(("LlamaForCausalLM", "Qwen2ForCausalLM", "Qwen3ForCausalLM"))
 TENSOR_CORE_TILE_SIZE = 128
 ACL_FORMAT_FRACTAL_NZ = 29
+
+# TP3 is intentionally opt-in: older Ascend CANN releases reject the fused
+# communicator during allocation.  Once a worker sees one failure, keep the
+# ordinary HCCL path for all later layers instead of retrying every matmul.
+_TP3_MM_ALL_REDUCE_DISABLED = False
+
+
+def _is_contiguous_linear_tree_plan(plan: object) -> bool:
+    """Return whether a selected tree is one ordinary contiguous causal chain."""
+    parents = [int(value) for value in plan.parent_indices.detach().cpu().tolist()]
+    positions = [int(value) for value in plan.positions.detach().cpu().tolist()]
+    cache_positions = getattr(plan, "cache_positions", None)
+    if cache_positions is None:
+        cache_positions = plan.positions
+    cache_positions = [int(value) for value in cache_positions.detach().cpu().tolist()]
+    if not positions:
+        return False
+    prefix_len = int(getattr(plan, "prefix_len", positions[0]))
+    expected_positions = list(range(prefix_len, prefix_len + len(parents) + 1))
+    return (
+        parents == [-1, *range(max(0, len(parents) - 1))]
+        and positions == expected_positions
+        and cache_positions == expected_positions
+    )
+
+
+def _use_native_fused_mm_all_reduce(tp_size: int, device_type: str) -> bool:
+    """Match vLLM-Ascend's opt-in contract for the standalone model.
+
+    Merely having the torch-npu symbol does not establish that the active
+    communicator/shape can allocate MC2 resources.  In particular, unit and
+    functional graph runs must not silently enter a fused collective which
+    was never requested or qualified.
+    """
+
+    if device_type != "npu":
+        return False
+    if tp_size == 3:
+        return bool(
+            ascend_envs.VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE
+            and not _TP3_MM_ALL_REDUCE_DISABLED
+        )
+    return bool(tp_size in (2, 4, 8) and ascend_envs.VLLM_ASCEND_ENABLE_MATMUL_ALLREDUCE)
 
 
 def _divide(numerator: int, denominator: int) -> int:
@@ -131,6 +175,27 @@ class NativeAttentionMetadata:
     request_block_tables: torch.Tensor | None = None
     attention_mask: torch.Tensor | None = None
     use_fused_infer_attention: bool = False
+    # Keep the packed 2-D mask for an independent dense oracle. FIA takes a
+    # request-major 4-D envelope, never additional query/token rows.
+    tree_attention: bool = False
+    tree_attention_mask: torch.Tensor | None = None
+
+
+def make_tree_fia_mask(mask_rows: Sequence[torch.Tensor]) -> torch.Tensor:
+    """Pack heterogeneous request masks without padding physical queries."""
+    if not mask_rows or any(mask.ndim != 2 or mask.shape[0] == 0 for mask in mask_rows):
+        raise ValueError("Tree FIA needs non-empty two-dimensional request masks")
+    columns = mask_rows[0].shape[1]
+    if any(mask.shape[1] != columns for mask in mask_rows):
+        raise ValueError("Tree FIA request masks must share the cache capacity")
+    result = torch.ones(
+        (len(mask_rows), 1, max(mask.shape[0] for mask in mask_rows), columns),
+        dtype=torch.bool,
+        device=mask_rows[0].device,
+    )
+    for index, mask in enumerate(mask_rows):
+        result[index, 0, : mask.shape[0]].copy_(mask)
+    return result
 
 
 class NativeRMSNorm(nn.Module):
@@ -178,6 +243,7 @@ class NativeRMSNorm(nn.Module):
         context: NativeTPContext,
         *,
         projection_bias: torch.Tensor | None = None,
+        profile: MC2Profile | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Fuse TP projection, all-reduce, residual add and RMSNorm when available."""
         if projection_bias is not None:
@@ -203,6 +269,7 @@ class NativeRMSNorm(nn.Module):
             epsilon=self.eps,
             process_group=context.group,
             use_fused=True,
+            profile=profile,
         )
 
 
@@ -316,6 +383,43 @@ class NativeRowLinear(nn.Module):
             self.bias.data.zero_()
 
     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
+        # vLLM-Ascend's production row-parallel path fuses the local matrix
+        # multiply and TP all-reduce.  Native PEARL used separate F.linear and
+        # dist.all_reduce calls, which leaves a large synchronization bubble
+        # on TP3 target workers.  Keep the ordinary path for CPU tests,
+        # unsupported CANN builds, and biased layers whose ABI is unavailable.
+        global _TP3_MM_ALL_REDUCE_DISABLED
+        fused_mm_reduce = getattr(torch_npu, "npu_mm_all_reduce_base", None)
+        allow_tp3_fused = self.context.size == 3 and _use_native_fused_mm_all_reduce(
+            self.context.size, hidden_states.device.type
+        )
+        if (
+            _use_native_fused_mm_all_reduce(self.context.size, hidden_states.device.type)
+            and fused_mm_reduce is not None
+        ):
+            hcomm_info = resolve_hccl_comm_name(
+                self.context.group,
+                device=hidden_states.device,
+                rank=self.context.rank,
+            )
+            if hcomm_info:
+                try:
+                    return fused_mm_reduce(
+                        hidden_states,
+                        self.weight.t(),
+                        hcomm_info,
+                        bias=self.bias,
+                    )
+                except (RuntimeError, ValueError) as error:
+                    if allow_tp3_fused:
+                        _TP3_MM_ALL_REDUCE_DISABLED = True
+                        if ascend_envs.VLLM_ASCEND_PEARL_VERBOSE:
+                            print(
+                                f"[PEARL] disabling TP3 fused mm+all-reduce after CANN rejection: {error}",
+                                flush=True,
+                            )
+                    else:
+                        raise
         output = F.linear(hidden_states, self.weight, self.bias)
         if self.context.size > 1:
             dist.all_reduce(output, group=self.context.group)
@@ -346,8 +450,27 @@ class NativeVocabEmbedding(nn.Module):
 
 
 class NativeLMHead(NativeVocabEmbedding):
+    def __init__(
+        self,
+        vocab_size: int,
+        hidden_size: int,
+        context: NativeTPContext,
+        *,
+        track_cache_finiteness: bool = False,
+    ) -> None:
+        super().__init__(vocab_size, hidden_size, context)
+        self.track_cache_finiteness = track_cache_finiteness
+        self.register_buffer("logits_nonfinite", torch.zeros((), dtype=torch.bool), persistent=False)
+
+    def _track_logits(self, logits: torch.Tensor) -> None:
+        if self.track_cache_finiteness:
+            # Inspect only real local logits, before any synthetic -inf used
+            # to exclude empty vocabulary shards from the TP argmax.
+            self.logits_nonfinite.logical_or_(~torch.isfinite(logits).all())
+
     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
         local_logits = F.linear(hidden_states, self.weight)
+        self._track_logits(local_logits)
         if self.context.size == 1:
             return local_logits
         gathered_logits = [torch.empty_like(local_logits) for _ in range(self.context.size)]
@@ -371,6 +494,7 @@ class NativeLMHead(NativeVocabEmbedding):
             # much smaller logits tensor.
             local_logits = F.linear(hidden_states, self.weight)
             local_logits = local_logits[:, :local_vocabulary_size]
+            self._track_logits(local_logits)
             local_values, local_token_ids = local_logits.max(dim=-1)
             local_token_ids += self.vocab_start
         if self.context.size == 1:
@@ -401,21 +525,18 @@ class NativeLMHead(NativeVocabEmbedding):
                 dtype=torch.float32,
                 device=hidden_states.device,
             )
-            local_token_ids = torch.zeros(
-                hidden_states.shape[0], dtype=torch.long, device=hidden_states.device
-            )
+            local_token_ids = torch.zeros(hidden_states.shape[0], dtype=torch.long, device=hidden_states.device)
             local_logsumexp = local_values
         else:
             local_logits = F.linear(hidden_states, self.weight)[:, :local_vocabulary_size]
+            self._track_logits(local_logits)
             local_values, local_token_ids = local_logits.float().max(dim=-1)
             local_token_ids += self.vocab_start
             local_logsumexp = torch.logsumexp(local_logits.float(), dim=-1)
         if self.context.size == 1:
             return local_token_ids, (local_values - local_logsumexp).exp()
 
-        local_summary = torch.stack(
-            (local_values, local_token_ids.float(), local_logsumexp), dim=-1
-        )
+        local_summary = torch.stack((local_values, local_token_ids.float(), local_logsumexp), dim=-1)
         gathered = [torch.empty_like(local_summary) for _ in range(self.context.size)]
         dist.all_gather(gathered, local_summary, group=self.context.group)
         summaries = torch.stack(gathered, dim=1)
@@ -449,7 +570,7 @@ class NativeRotaryEmbedding(nn.Module):
         self.use_production_rope = (
             use_production_rope
             and hasattr(torch.ops.vllm, "npu_rotary_embedding")
-            and os.environ.get("VLLM_ASCEND_USE_NATIVE_QWEN2_ROPE", "0") == "0"
+            and not ascend_envs.VLLM_ASCEND_USE_NATIVE_QWEN2_ROPE
         )
 
     def forward(
@@ -491,6 +612,7 @@ class NativeAttention(nn.Module):
     def __init__(self, config, context: NativeTPContext) -> None:
         super().__init__()
         self.context = context
+        self.track_cache_finiteness = bool(getattr(config, "pearl_track_cache_finiteness", False))
         architecture = getattr(config, "architectures", ("Qwen2ForCausalLM",))[0]
         self.head_dim = getattr(config, "head_dim", config.hidden_size // config.num_attention_heads)
         self.num_heads = _divide(config.num_attention_heads, context.size)
@@ -523,9 +645,7 @@ class NativeAttention(nn.Module):
                 self.head_dim,
                 config.max_position_embeddings,
                 getattr(config, "rope_theta", (rope_parameters or {}).get("rope_theta", 10_000.0)),
-                use_production_rope=bool(
-                    getattr(config, "pearl_use_production_rope", False)
-                ),
+                use_production_rope=bool(getattr(config, "pearl_use_production_rope", False)),
             )
         else:
             self.rotary_emb = get_rope(
@@ -585,8 +705,17 @@ class NativeAttention(nn.Module):
         cache_shape = (
             paged_cache_shape if self.uses_paged_attention else (num_blocks * block_size,) + paged_cache_shape[2:]
         )
-        self.key_cache = torch.empty(cache_shape, dtype=self.qkv_proj.weight.dtype, device=device)
-        self.value_cache = torch.empty_like(self.key_cache)
+        # FULL-mask FIA still multiplies blocked value columns by zero. A NaN
+        # from uninitialized scratch/hole storage is not masked by 0 * NaN.
+        # Initialize once; subsequent valid writes and KV moves stay finite.
+        # Never sanitize valid model NaNs: the tree commit guard rejects them.
+        self.key_cache = torch.zeros(cache_shape, dtype=self.qkv_proj.weight.dtype, device=device)
+        self.value_cache = torch.zeros_like(self.key_cache)
+        previous_flag = getattr(self, "tree_cache_nonfinite", None)
+        if isinstance(previous_flag, torch.Tensor) and previous_flag.device == device:
+            previous_flag.zero_()
+        else:
+            self.tree_cache_nonfinite = torch.zeros((), dtype=torch.bool, device=device)
         if num_blocks >= required_blocks:
             self.block_table = torch.arange(required_blocks, dtype=torch.int32, device=device).view(
                 max_num_seqs, self.blocks_per_sequence
@@ -634,7 +763,7 @@ class NativeAttention(nn.Module):
             query=query,
             key_cache=self.key_cache.view(self.key_cache.shape[0], self.block_size, -1),
             value_cache=self.value_cache.view(self.value_cache.shape[0], self.block_size, -1),
-            attention_mask=metadata.attention_mask,
+            attention_mask=metadata.tree_attention_mask if metadata.tree_attention else metadata.attention_mask,
             block_table=metadata.request_block_tables,
             block_size=self.block_size,
             actual_seq_lengths_q=list(metadata.actual_seq_lengths_q),
@@ -643,6 +772,7 @@ class NativeAttention(nn.Module):
             num_heads=self.num_heads,
             scale=self.scale,
             output=attended,
+            tree_attention=metadata.tree_attention,
         )
         return attended
 
@@ -654,12 +784,8 @@ class NativeAttention(nn.Module):
             context_length = int(metadata.context_lens[offset].item())
             if metadata.block_tables.ndim != 2:
                 raise ValueError("Dense attention requires a 2-D physical block table")
-            logical_positions = torch.arange(
-                context_length, dtype=torch.long, device=query.device
-            )
-            logical_blocks = torch.div(
-                logical_positions, self.block_size, rounding_mode="floor"
-            )
+            logical_positions = torch.arange(context_length, dtype=torch.long, device=query.device)
+            logical_blocks = torch.div(logical_positions, self.block_size, rounding_mode="floor")
             physical_blocks = metadata.block_tables[offset].index_select(0, logical_blocks)
             slots = physical_blocks.to(torch.long) * self.block_size + logical_positions.remainder(self.block_size)
             if self.uses_paged_attention:
@@ -673,17 +799,37 @@ class NativeAttention(nn.Module):
             keys = keys.transpose(0, 1).repeat_interleave(repeat_factor, dim=0)
             values = values.transpose(0, 1).repeat_interleave(repeat_factor, dim=0)
             attention_mask = None
+            attention_query = query[offset].unsqueeze(0).unsqueeze(2)
             if metadata.attention_mask is not None:
                 if metadata.attention_mask.ndim != 2 or offset >= metadata.attention_mask.shape[0]:
                     raise ValueError("Tree attention mask rows must match packed query rows")
                 # PEARL tree masks use True=blocked, while SDPA uses True=keep.
-                visible = (~metadata.attention_mask[offset, :context_length].to(torch.bool)).view(
-                    1, 1, 1, -1
-                )
+                visible = (~metadata.attention_mask[offset, :context_length].to(torch.bool)).view(1, 1, 1, -1)
+                # Tree graph context buckets can read allocated but unwritten
+                # KV slots, including NaNs. An additive/boolean SDPA mask alone
+                # does not make NaN * 0 safe. Sanitize blocked K/V before the
+                # score/value matrix products; this also protects eager sibling
+                # masking from stale cache data after a rejected proposal.
+                key_visible = visible.view(1, context_length, 1)
+                keys = torch.where(key_visible, keys, 0)
+                values = torch.where(key_visible, values, 0)
                 attention_mask = visible
+                # With BF16 SDPA on Ascend, merely adding fully masked tail
+                # columns (e.g. 260 -> 512 for ACLGraph) can change reduction
+                # rounding enough to alter intermediate KV/hidden states. The
+                # graph itself matches same-shape eager; the padding does not.
+                # FP32 inputs on BOTH eager and graph paths are a diagnostic
+                # implementation, not a guarantee of padding invariance: the
+                # 2026-09-10 NPU boundary regression still found drift. Keep
+                # strict graph validation/fallback; do not infer accumulation
+                # precision solely from the public tensor dtype.
+                # Ordinary paged/FIA attention is intentionally unaffected.
+                attention_query = attention_query.float()
+                keys = keys.float()
+                values = values.float()
             attended[offset] = (
                 F.scaled_dot_product_attention(
-                    query[offset].unsqueeze(0).unsqueeze(2),
+                    attention_query,
                     keys.unsqueeze(0),
                     values.unsqueeze(0),
                     attn_mask=attention_mask,
@@ -742,6 +888,13 @@ class NativeAttention(nn.Module):
             value = value.view(-1, self.num_kv_heads, self.head_dim)
             query, key = self.rotary_emb(positions, query, key)
         metadata = attention_metadata or self._default_metadata(positions)
+        track_finiteness = self.track_cache_finiteness or metadata.tree_attention
+        if track_finiteness:
+            # Device-resident sticky state is compatible with graph replay.
+            # One host check for all layers occurs at the collective commit
+            # preflight, not one synchronization per attention layer.
+            nonfinite = ~(torch.isfinite(query).all() & torch.isfinite(key).all() & torch.isfinite(value).all())
+            self.tree_cache_nonfinite.logical_or_(nonfinite)
         self._write_to_cache(metadata.slot_mapping, key, value)
 
         if metadata.use_fused_infer_attention:
@@ -750,6 +903,8 @@ class NativeAttention(nn.Module):
             attended = self._paged_attention(query, metadata)
         else:
             attended = self._dense_attention(query, metadata)
+        if track_finiteness:
+            self.tree_cache_nonfinite.logical_or_(~torch.isfinite(attended).all())
         attended = attended.flatten(1)
         if return_pre_projection:
             return attended
@@ -789,6 +944,7 @@ class NativeQwen2DecoderLayer(nn.Module):
         self.mlp = NativeQwen2MLP(config, context)
         self.context = context
         self.enable_mc2 = bool(getattr(config, "pearl_enable_mc2", False))
+        self.mc2_profile = getattr(config, "pearl_mc2_profile", None)
 
     def forward(
         self,
@@ -815,12 +971,14 @@ class NativeQwen2DecoderLayer(nn.Module):
                 self.self_attn.o_proj.weight,
                 self.context,
                 projection_bias=self.self_attn.o_proj.bias,
+                profile=self.mc2_profile,
             )
         else:
             hidden_states = self.self_attn(positions, hidden_states, attention_metadata)
             hidden_states, residual = self.post_attention_layernorm(hidden_states, residual)
         hidden_states = self.mlp(hidden_states)
         return hidden_states, residual
+
 
 class NativeQwen2ForCausalLM(nn.Module):
     """Upstream-supported decoder model with a persistent paged KV cache."""
@@ -837,10 +995,17 @@ class NativeQwen2ForCausalLM(nn.Module):
         super().__init__()
         self.config = config
         self.context = context
+        self.track_cache_finiteness = bool(getattr(config, "pearl_track_cache_finiteness", False))
+        self.register_buffer("output_nonfinite", torch.zeros((), dtype=torch.bool), persistent=False)
         self.embed_tokens = NativeVocabEmbedding(config.vocab_size, config.hidden_size, context)
         self.layers = nn.ModuleList(NativeQwen2DecoderLayer(config, context) for _ in range(config.num_hidden_layers))
         self.norm = NativeRMSNorm(config.hidden_size, config.rms_norm_eps)
-        self.lm_head = NativeLMHead(config.vocab_size, config.hidden_size, context)
+        self.lm_head = NativeLMHead(
+            config.vocab_size,
+            config.hidden_size,
+            context,
+            track_cache_finiteness=self.track_cache_finiteness,
+        )
         self.register_buffer("attention_mask", None, persistent=False)
         if getattr(config, "tie_word_embeddings", False):
             self.lm_head.weight = self.embed_tokens.weight
@@ -852,6 +1017,15 @@ class NativeQwen2ForCausalLM(nn.Module):
         block_size: int = PAGED_ATTENTION_BLOCK_SIZE,
         num_cache_blocks: int | None = None,
     ) -> None:
+        if max_model_len <= 0 or max_num_seqs <= 0:
+            raise ValueError("Native PEARL cache dimensions must be positive.")
+        # Tree metadata is assembled at the model level, while the physical
+        # KV pages live in each attention layer. Keep the dimensions on the
+        # owner as well so native tree masks do not depend on a test-only
+        # attribute injected by callers.
+        self.max_model_len = int(max_model_len)
+        self.max_num_seqs = int(max_num_seqs)
+        self.block_size = int(block_size)
         for layer in self.layers:
             layer.self_attn.configure_cache(
                 max_model_len,
@@ -859,6 +1033,11 @@ class NativeQwen2ForCausalLM(nn.Module):
                 block_size=block_size,
                 num_cache_blocks=num_cache_blocks,
             )
+        # Only a complete physical-cache reinitialization permits clearing a
+        # sticky fault. Keep flag storage stable for captured graph operators.
+        # Any graph referring to the reallocated KV itself must be discarded.
+        self.output_nonfinite.zero_()
+        self.lm_head.logits_nonfinite.zero_()
         if self.embed_tokens.weight.device.type == "npu" and self.attention_mask is None:
             self.attention_mask = torch.triu(
                 torch.ones(2048, 2048, dtype=torch.int8, device=self.embed_tokens.weight.device),
@@ -955,14 +1134,19 @@ class NativeQwen2ForCausalLM(nn.Module):
         root_token_ids: list[int],
         draft_token_ids: list[list[int]],
         block_tables: list[list[int]] | torch.Tensor,
+        sequence_ids: Sequence[int] | None = None,
+        *,
+        allow_causal_fast_path: bool = True,
     ) -> tuple[torch.Tensor, torch.Tensor, NativeAttentionMetadata]:
         """Pack request-local tree queries for a target forward.
 
         Each request contributes one root query followed by its draft nodes.
-        The target model writes all K/V entries into unique cache positions and
-        uses the request-local tree masks in dense/eager attention.  This is a
-        correctness path for tree verification; linear PEARL keeps its faster
-        FIA/ACLGraph path unchanged.
+        The target model writes all K/V entries into unique physical cache
+        positions while RoPE receives the logical depth positions.  The
+        request-local mask is indexed by physical slots, so sibling branches
+        cannot read one another. NPU uses the production FULL-mask FIA
+        contract; the 2-D mask remains available for the independent dense
+        reference. Linear PEARL keeps its causal FIA contract unchanged.
         """
         if not plans or len(plans) != len(root_token_ids) or len(plans) != len(draft_token_ids):
             raise ValueError("tree plans, root tokens and draft rows must have equal non-zero length")
@@ -970,19 +1154,27 @@ class NativeQwen2ForCausalLM(nn.Module):
             physical_tables = block_tables.to(device=self.embed_tokens.weight.device, dtype=torch.int32)
         else:
             physical_tables = torch.tensor(block_tables, dtype=torch.int32, device=self.embed_tokens.weight.device)
+        request_ids = list(range(len(plans))) if sequence_ids is None else [int(value) for value in sequence_ids]
+        if len(request_ids) != len(plans) or len(set(request_ids)) != len(request_ids):
+            raise ValueError("tree sequence IDs must be unique and row-aligned")
         attention = self.layers[0].self_attn
-        if physical_tables.ndim != 2 or physical_tables.shape[0] < len(plans):
+        if physical_tables.ndim != 2 or not request_ids or max(request_ids, default=-1) >= physical_tables.shape[0]:
             raise ValueError("tree block tables must contain one row per request")
         input_ids: list[int] = []
-        positions: list[int] = []
-        sequence_ids: list[int] = []
+        logical_positions: list[int] = []
+        physical_positions: list[int] = []
+        packed_sequence_ids: list[int] = []
         mask_rows: list[torch.Tensor] = []
         query_lengths: list[int] = []
         sequence_lens: list[int] = []
-        for sequence_id, (plan, root_token, candidates) in enumerate(
-            zip(plans, root_token_ids, draft_token_ids)
+        all_linear = bool(allow_causal_fast_path)
+        for sequence_id, (plan, root_token, candidates) in zip(
+            request_ids, zip(plans, root_token_ids, draft_token_ids)
         ):
-            expected_nodes = int(plan.width) * int(plan.depth)
+            # A selected ancestor-closed tree can have fewer physical nodes
+            # than its exploration envelope (width * depth). Verification must
+            # pack only those selected nodes, not restore discarded candidates.
+            expected_nodes = int(plan.parent_indices.numel())
             if len(candidates) != expected_nodes:
                 raise ValueError("draft row length does not match its tree plan")
             cache_positions = getattr(plan, "cache_positions", None)
@@ -992,40 +1184,141 @@ class NativeQwen2ForCausalLM(nn.Module):
             if len(cache_positions) != expected_nodes + 1 or len(set(cache_positions)) != len(cache_positions):
                 raise ValueError("tree cache positions must be unique and include the root")
             input_ids.extend([int(root_token), *map(int, candidates)])
-            positions.extend(cache_positions)
-            sequence_ids.extend([sequence_id] * (expected_nodes + 1))
+            plan_positions = [int(value) for value in plan.positions.detach().cpu().tolist()]
+            if len(plan_positions) != len(cache_positions):
+                raise ValueError("tree logical/cache positions must have equal length")
+            logical_positions.extend(plan_positions)
+            physical_positions.extend(cache_positions)
+            packed_sequence_ids.extend([sequence_id] * (expected_nodes + 1))
             mask = plan.attention_mask
             if tuple(mask.shape) != (expected_nodes + 1, self.max_model_len):
                 raise ValueError("tree attention mask shape does not match its plan")
             mask_rows.append(mask.to(device=self.embed_tokens.weight.device, dtype=torch.bool))
             query_lengths.append(expected_nodes + 1)
             sequence_lens.append(max(cache_positions) + 1)
-        if any(position >= self.max_model_len for position in positions):
+            all_linear = all_linear and _is_contiguous_linear_tree_plan(plan)
+        if any(position >= self.max_model_len for position in physical_positions):
             raise ValueError("tree cache position exceeds max_model_len")
         device = self.embed_tokens.weight.device
-        sequence_tensor = torch.tensor(sequence_ids, dtype=torch.long, device=device)
-        position_tensor = torch.tensor(positions, dtype=torch.long, device=device)
-        logical_blocks = torch.div(position_tensor, attention.block_size, rounding_mode="floor")
+        if device.type == "npu" and attention.uses_paged_attention and all_linear:
+            # Before the first sibling is selected, a tree is exactly one
+            # contiguous causal chain per request. Reuse the ordinary TND FIA
+            # contract instead of constructing a 4-D FULL tree mask. The
+            # guard deliberately excludes eager scratch layouts, whose
+            # physical slots are non-contiguous until promotion/compaction.
+            causal_positions, causal_metadata = self.make_attention_metadata(
+                packed_sequence_ids,
+                logical_positions,
+                physical_tables,
+                use_fused_infer_attention=True,
+            )
+            return (
+                torch.tensor(input_ids, dtype=torch.long, device=device),
+                causal_positions,
+                causal_metadata,
+            )
+        sequence_tensor = torch.tensor(packed_sequence_ids, dtype=torch.long, device=device)
+        position_tensor = torch.tensor(logical_positions, dtype=torch.long, device=device)
+        physical_position_tensor = torch.tensor(physical_positions, dtype=torch.long, device=device)
+        logical_blocks = torch.div(physical_position_tensor, attention.block_size, rounding_mode="floor")
         physical_blocks = physical_tables[sequence_tensor, logical_blocks]
         if (physical_blocks < 0).any():
             raise RuntimeError("tree target forward referenced an unallocated KV cache page")
-        slot_mapping = physical_blocks * attention.block_size + position_tensor.remainder(attention.block_size)
+        slot_mapping = physical_blocks * attention.block_size + physical_position_tensor.remainder(attention.block_size)
         cumulative: list[int] = []
         for length in query_lengths:
             cumulative.append((cumulative[-1] if cumulative else 0) + length)
         token_tables = physical_tables.index_select(0, sequence_tensor)
+        request_tensor = torch.tensor(request_ids, dtype=torch.long, device=device)
         tree_mask = torch.cat(mask_rows, dim=0)
         metadata = NativeAttentionMetadata(
             slot_mapping=slot_mapping.to(torch.int32),
-            context_lens=(position_tensor + 1).to(torch.int32),
+            # Dense tree attention reads this vector on the host to choose the
+            # valid physical KV prefix. Keep it CPU-resident so ACLGraph
+            # capture never performs ``NPU tensor.item()`` on a captured
+            # stream; slot/block tensors remain device-resident.
+            context_lens=torch.tensor(
+                [int(value) + 1 for value in physical_positions],
+                dtype=torch.int32,
+            ),
             block_tables=token_tables,
             actual_seq_lengths_q=tuple(cumulative),
             sequence_lens=tuple(sequence_lens),
-            request_block_tables=physical_tables[: len(plans)],
+            request_block_tables=physical_tables.index_select(0, request_tensor),
             attention_mask=tree_mask,
-            use_fused_infer_attention=False,
+            use_fused_infer_attention=device.type == "npu" and attention.uses_paged_attention,
+            tree_attention=True,
+            tree_attention_mask=make_tree_fia_mask(mask_rows),
         )
         return torch.tensor(input_ids, dtype=torch.long, device=device), position_tensor, metadata
+
+    def make_tree_level_attention_metadata(
+        self,
+        plan: object,
+        sequence_id: int,
+        node_indices: Sequence[int],
+        input_token_ids: Sequence[int],
+        block_tables: list[list[int]] | torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor, NativeAttentionMetadata]:
+        """Pack one tree level for draft-side autoregressive expansion.
+
+        A tree draft cannot use the linear causal mask: sibling branches must
+        not see one another.  This helper keeps the query rows at their fixed
+        tree cache positions and selects the corresponding blocked-mask rows,
+        allowing the draft worker to expand the spine one level at a time.
+        """
+        indices = [int(value) for value in node_indices]
+        token_ids = [int(value) for value in input_token_ids]
+        if not indices or len(indices) != len(token_ids):
+            raise ValueError("tree level must contain at least one node")
+        expected_nodes = int(plan.parent_indices.numel())
+        if any(index < -1 or index >= expected_nodes for index in indices):
+            raise ValueError("tree level node index is outside the plan")
+        cache_positions = getattr(plan, "cache_positions", None)
+        if cache_positions is None:
+            cache_positions = plan.positions
+        logical_positions = [int(plan.positions[index + 1 if index >= 0 else 0].item()) for index in indices]
+        physical_positions = [int(cache_positions[index + 1 if index >= 0 else 0].item()) for index in indices]
+        device = self.embed_tokens.weight.device
+        physical_tables = (
+            block_tables.to(device=device, dtype=torch.int32)
+            if isinstance(block_tables, torch.Tensor)
+            else torch.tensor(block_tables, dtype=torch.int32, device=device)
+        )
+        if physical_tables.ndim != 2 or not 0 <= int(sequence_id) < physical_tables.shape[0]:
+            raise ValueError("tree level block tables do not cover the request")
+        attention = self.layers[0].self_attn
+        logical_blocks = torch.div(
+            torch.tensor(physical_positions, dtype=torch.long, device=device),
+            attention.block_size,
+            rounding_mode="floor",
+        )
+        physical_blocks = physical_tables[int(sequence_id), logical_blocks]
+        if (physical_blocks < 0).any():
+            raise RuntimeError("tree level referenced an unallocated KV cache page")
+        position_tensor = torch.tensor(logical_positions, dtype=torch.long, device=device)
+        physical_position_tensor = torch.tensor(physical_positions, dtype=torch.long, device=device)
+        slot_mapping = physical_blocks * attention.block_size + physical_position_tensor.remainder(attention.block_size)
+        mask_rows = []
+        for index in indices:
+            row = plan.attention_mask[index + 1 if index >= 0 else 0]
+            mask_rows.append(row.to(device=device, dtype=torch.bool))
+        metadata = NativeAttentionMetadata(
+            slot_mapping=slot_mapping.to(torch.int32),
+            context_lens=torch.tensor(
+                [int(value) + 1 for value in physical_positions],
+                dtype=torch.int32,
+            ),
+            block_tables=physical_tables[int(sequence_id)].expand(len(indices), -1),
+            actual_seq_lengths_q=(len(indices),),
+            sequence_lens=(max(physical_positions) + 1,),
+            request_block_tables=physical_tables[int(sequence_id) : int(sequence_id) + 1],
+            attention_mask=torch.stack(mask_rows),
+            use_fused_infer_attention=device.type == "npu" and attention.uses_paged_attention,
+            tree_attention=True,
+            tree_attention_mask=make_tree_fia_mask([torch.stack(mask_rows)]),
+        )
+        return torch.tensor(token_ids, dtype=torch.long, device=device), position_tensor, metadata
 
     def forward(
         self,
@@ -1037,7 +1330,11 @@ class NativeQwen2ForCausalLM(nn.Module):
         residual = None
         for layer in self.layers:
             hidden_states, residual = layer(positions, hidden_states, residual, attention_metadata)
+        if self.track_cache_finiteness:
+            self.output_nonfinite.logical_or_(~(torch.isfinite(hidden_states).all() & torch.isfinite(residual).all()))
         hidden_states, _ = self.norm(hidden_states, residual)
+        if self.track_cache_finiteness:
+            self.output_nonfinite.logical_or_(~torch.isfinite(hidden_states).all())
         return hidden_states
 
     def compute_logits(self, hidden_states: torch.Tensor) -> torch.Tensor:

@@ -9,6 +9,36 @@ from vllm_ascend.spec_decode.pearl.api import (
     SamplingParams,
     logger,
 )
+from vllm_ascend.spec_decode.pearl.capabilities import collect_specslo_capabilities
+from vllm_ascend.spec_decode.pearl.distill import (
+    PearlDistillationConfig,
+    PearlDistillationMetrics,
+    collect_pearl_teacher_trace,
+    load_pearl_distillation_checkpoint,
+    pearl_distillation_loss,
+    save_pearl_distillation_checkpoint,
+    train_pearl_distillation_step,
+    write_pearl_teacher_trace,
+)
+from vllm_ascend.spec_decode.pearl.http_server import (
+    SpecSLOChatMessage,
+    SpecSLOChatRequest,
+    SpecSLOCompletionRequest,
+    SpecSLOGenerationHandle,
+    SpecSLOGenerationResult,
+    SpecSLOHTTPService,
+    create_specslo_app,
+)
+from vllm_ascend.spec_decode.pearl.mc2 import (
+    MC2Capability,
+    MC2Profile,
+    MC2Qualification,
+    capability_dict,
+    detect_mc2_capability,
+    matmul_allreduce_add_rmsnorm_or_fallback,
+    normalize_mc2_profile,
+    resolve_hccl_comm_name,
+)
 from vllm_ascend.spec_decode.pearl.protocol import (
     PearlProposalBatch,
     PearlVerificationBatch,
@@ -33,19 +63,8 @@ from vllm_ascend.spec_decode.pearl.spec_rhythm import (
 )
 from vllm_ascend.spec_decode.pearl.state import PearlPhase, PearlRequestState, advance_request_states
 from vllm_ascend.spec_decode.pearl.topology import PearlProcessGroups, PearlTopology
-from vllm_ascend.spec_decode.pearl.verifier import PearlTargetVerifier
-from vllm_ascend.spec_decode.pearl.vocab import PearlVocabProjection
-from vllm_ascend.spec_decode.pearl.distill import (
-    PearlDistillationConfig,
-    PearlDistillationMetrics,
-    collect_pearl_teacher_trace,
-    load_pearl_distillation_checkpoint,
-    pearl_distillation_loss,
-    save_pearl_distillation_checkpoint,
-    train_pearl_distillation_step,
-    write_pearl_teacher_trace,
-)
 from vllm_ascend.spec_decode.pearl.tree import (
+    SpecRhythmTreeCoordinator,
     TreeCandidateSelection,
     TreeSpeculationPlan,
     TreeVerificationOutput,
@@ -53,19 +72,17 @@ from vllm_ascend.spec_decode.pearl.tree import (
     build_tree_speculation_plan,
     make_spine_first_parents,
     select_tree_candidates,
-    SpecRhythmTreeCoordinator,
     tree_budget_from_spec_rhythm,
     verify_greedy_tree,
     verify_greedy_tree_batch,
+    verify_sampled_tree,
 )
-from vllm_ascend.spec_decode.pearl.mc2 import (
-    MC2Capability,
-    capability_dict,
-    detect_mc2_capability,
-    matmul_allreduce_add_rmsnorm_or_fallback,
-    resolve_hccl_comm_name,
+from vllm_ascend.spec_decode.pearl.v1_client import (
+    SpecSLOV1EngineCoreClient,
+    sampling_params_from_v1,
 )
-from vllm_ascend.spec_decode.pearl.capabilities import collect_specslo_capabilities
+from vllm_ascend.spec_decode.pearl.verifier import PearlTargetVerifier
+from vllm_ascend.spec_decode.pearl.vocab import PearlVocabProjection
 from vllm_ascend.spec_decode.tree_kv import (
     TreeKVCompactionPlan,
     build_tree_kv_compaction_plan,
@@ -105,10 +122,14 @@ __all__ = [
     "tree_budget_from_spec_rhythm",
     "verify_greedy_tree",
     "verify_greedy_tree_batch",
+    "verify_sampled_tree",
     "MC2Capability",
+    "MC2Profile",
+    "MC2Qualification",
     "capability_dict",
     "detect_mc2_capability",
     "matmul_allreduce_add_rmsnorm_or_fallback",
+    "normalize_mc2_profile",
     "resolve_hccl_comm_name",
     "TreeKVCompactionPlan",
     "build_tree_kv_compaction_plan",
@@ -125,8 +146,17 @@ __all__ = [
     "SpecRhythmSchedule",
     "SpecRhythmScheduler",
     "SpecRhythmTreeCoordinator",
+    "SpecSLOChatMessage",
+    "SpecSLOChatRequest",
+    "SpecSLOCompletionRequest",
+    "SpecSLOGenerationHandle",
+    "SpecSLOGenerationResult",
+    "SpecSLOHTTPService",
+    "SpecSLOV1EngineCoreClient",
+    "create_specslo_app",
     "advance_request_states",
     "broadcast_proposals",
     "broadcast_verifications",
     "logger",
+    "sampling_params_from_v1",
 ]

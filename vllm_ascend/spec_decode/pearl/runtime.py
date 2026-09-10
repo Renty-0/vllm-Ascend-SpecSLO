@@ -4,10 +4,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from time import perf_counter
-from typing import Any, Callable
+from typing import Any
 
 import torch
 
@@ -17,9 +18,9 @@ from vllm_ascend.spec_decode.pearl.protocol import (
     broadcast_proposals,
     broadcast_verifications,
 )
+from vllm_ascend.spec_decode.pearl.spec_rhythm import SpecRhythmSchedule, SpecRhythmScheduler
 from vllm_ascend.spec_decode.pearl.topology import PearlProcessGroups
 from vllm_ascend.spec_decode.pearl.verifier import PearlTargetVerifier
-from vllm_ascend.spec_decode.pearl.spec_rhythm import SpecRhythmSchedule, SpecRhythmScheduler
 
 
 @dataclass(frozen=True)
@@ -92,6 +93,14 @@ class PearlDualBatchResult:
     draft_result: Any
     target_result: Any
     elapsed_seconds: float
+    draft_elapsed_seconds: float = 0.0
+    target_elapsed_seconds: float = 0.0
+    overlap_seconds: float = 0.0
+
+    @property
+    def overlapped(self) -> bool:
+        """Whether both model workers were active during one wall-clock window."""
+        return self.overlap_seconds > 0.0
 
 
 class PearlDualModelScheduler:
@@ -129,16 +138,31 @@ class PearlDualModelScheduler:
             batch_size=batch_size,
         )
         started = perf_counter()
+
+        def invoke(runner: Callable[[SpecRhythmSchedule, str], Any], role: str):
+            started = perf_counter()
+            result = runner(schedule, role)
+            return result, started, perf_counter()
+
         with ThreadPoolExecutor(max_workers=2, thread_name_prefix="pearl") as pool:
-            draft_future = pool.submit(self.draft_runner, schedule, "draft")
-            target_future = pool.submit(self.target_runner, schedule, "target")
-            draft_result = draft_future.result()
-            target_result = target_future.result()
+            draft_future = pool.submit(invoke, self.draft_runner, "draft")
+            target_future = pool.submit(invoke, self.target_runner, "target")
+            draft_result, draft_started, draft_finished = draft_future.result()
+            target_result, target_started, target_finished = target_future.result()
+        overlap = max(
+            0.0,
+            min(draft_finished, target_finished) - max(draft_started, target_started),
+        )
+        elapsed_seconds = perf_counter() - started
+        self.scheduler.advance_cycle(elapsed_seconds * 1000.0)
         return PearlDualBatchResult(
             schedule=schedule,
             draft_result=draft_result,
             target_result=target_result,
-            elapsed_seconds=perf_counter() - started,
+            elapsed_seconds=elapsed_seconds,
+            draft_elapsed_seconds=draft_finished - draft_started,
+            target_elapsed_seconds=target_finished - target_started,
+            overlap_seconds=overlap,
         )
 
     def finish_verification(self, request_index: int, **kwargs: Any) -> Any:

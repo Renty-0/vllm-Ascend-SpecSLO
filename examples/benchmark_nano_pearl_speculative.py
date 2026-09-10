@@ -14,6 +14,14 @@ from dataclasses import replace
 from pathlib import Path
 
 
+def _parse_roofline_argument(value: str):
+    # Keep CLI parsing/help independent of the heavy model/worker imports
+    # unless this optional profile argument is actually used.
+    from vllm_ascend.spec_decode.pearl.roofline import parse_roofline_argument
+
+    return parse_roofline_argument(value)
+
+
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--draft-model", required=True)
@@ -28,7 +36,10 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--prefill-chunk-size",
         type=int,
-        help="Limit packed prefill requests without changing the decode batch size.",
+        help=(
+            "Limit packed prefill requests without changing the decode batch size. "
+            "In continuous mode this may be larger than the decode batch."
+        ),
     )
     parser.add_argument(
         "--num-pearl-steps",
@@ -100,23 +111,110 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Balance decode rounds across all resident continuous requests.",
     )
     parser.add_argument("--enable-spec-rhythm", action="store_true")
+    parser.add_argument(
+        "--spec-rhythm-online-prefill",
+        action="store_true",
+        help="Prefill only the initial decode bucket and prefill later arrivals on admission.",
+    )
+    parser.add_argument(
+        "--spec-rhythm-merge-ready-homes",
+        action="store_true",
+        help=(
+            "Merge both ready logical homes into one target forward. This is "
+            "an opt-in throughput probe; the default follows the paper's "
+            "alternating dual-batch schedule."
+        ),
+    )
+    parser.add_argument(
+        "--spec-rhythm-stable-graphs",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help=(
+            "Use fixed paged-attention graph buckets for SpecRhythm. Disable only for explicit dynamic-FIA experiments."
+        ),
+    )
+    parser.add_argument(
+        "--spec-rhythm-slo-priority",
+        action="store_true",
+        help="Allow a bounded priority burst for ready requests that have exceeded their TPOT SLO.",
+    )
+    parser.add_argument(
+        "--spec-rhythm-priority-burst",
+        type=int,
+        default=2,
+        help="Maximum consecutive target rounds granted to an urgent ready home.",
+    )
+    parser.add_argument(
+        "--spec-rhythm-target-fallback-max-batch",
+        type=int,
+        default=0,
+        help=(
+            "Use exact target-only token steps while the resident SpecRhythm batch "
+            "is at or below this size (0 disables it)."
+        ),
+    )
+    parser.add_argument(
+        "--spec-rhythm-max-target-batch",
+        type=int,
+        default=0,
+        help=(
+            "Cap rows in one SpecRhythm target verification forward. Zero keeps "
+            "the default one-home cap; smaller values reduce TPOT at the cost "
+            "of more verification rounds."
+        ),
+    )
     parser.add_argument("--spec-rhythm-min-gamma", type=int, default=1)
     parser.add_argument("--spec-rhythm-max-eager-tokens", type=int, default=0)
+    parser.add_argument(
+        "--spec-rhythm-auto-eager-tokens",
+        action="store_true",
+        help=(
+            "Enable rolling eager proposals up to the fixed gamma. Per-request "
+            "manifest gamma values still provide the tighter cap."
+        ),
+    )
     parser.add_argument("--spec-rhythm-urgency-threshold", type=float, default=0.75)
     parser.add_argument("--spec-rhythm-acceptance-floor", type=float, default=0.4)
     parser.add_argument("--spec-rhythm-acceptance-ema-alpha", type=float, default=0.2)
     parser.add_argument(
+        "--spec-rhythm-cpu-verdict",
+        action="store_true",
+        help=(
+            "Build the tiny greedy verification verdict on CPU and copy back "
+            "only two integers per request. Useful for measuring control-plane "
+            "overhead on Ascend; disabled by default."
+        ),
+    )
+    parser.add_argument(
         "--spec-rhythm-roofline",
-        type=json.loads,
-        help='JSON batch/context candidate-token budgets, e.g. {"64:1": 192}.',
+        type=_parse_roofline_argument,
+        help="Legacy JSON budgets or a strict measured profile JSON file path.",
+    )
+    parser.add_argument(
+        "--spec-rhythm-verification-budget",
+        type=int,
+        help="Fixed global candidate-token budget B; overrides gamma-derived roofline.",
     )
     parser.add_argument("--spec-rhythm-draft-token-budget", type=int)
+    parser.add_argument("--spec-rhythm-tree-width", type=int, default=1)
+    parser.add_argument("--spec-rhythm-tree-depth", type=int, default=1)
     parser.add_argument("--spec-rhythm-request-max-gamma", type=int)
     parser.add_argument("--slo-tpot-ms", type=float)
     parser.add_argument("--slo-class")
     parser.add_argument("--pad-finished-requests", action="store_true")
     parser.add_argument("--draft-use-paged-attention", action="store_true")
     parser.add_argument("--target-use-paged-attention", action="store_true")
+    parser.add_argument(
+        "--enable-mc2",
+        action="store_true",
+        help=(
+            "Fuse TP projection, HCCL all-reduce, residual add and RMSNorm when the Ascend MC2 extension is available."
+        ),
+    )
+    parser.add_argument(
+        "--mc2-profile",
+        help="Identity-bound MC2 numerical/performance qualification JSON.",
+    )
     parser.add_argument(
         "--draft-use-production-rope",
         action=argparse.BooleanOptionalAction,
@@ -162,15 +260,9 @@ def _load_prompts(
     if prompt is not None:
         return [prompt] * max_samples, None, None
     if request_manifest is not None:
-        rows = [
-            json.loads(line)
-            for line in Path(request_manifest).read_text(encoding="utf-8").splitlines()
-            if line
-        ]
+        rows = [json.loads(line) for line in Path(request_manifest).read_text(encoding="utf-8").splitlines() if line]
         if len(rows) < max_samples:
-            raise ValueError(
-                f"Request manifest contains {len(rows)} rows, but {max_samples} were requested."
-            )
+            raise ValueError(f"Request manifest contains {len(rows)} rows, but {max_samples} were requested.")
         selected = rows[:max_samples]
         return (
             [str(row["prompt"]) for row in selected],
@@ -209,15 +301,10 @@ def _parse_target_graph_post_counts(
     for value in values:
         try:
             batch_size_text, post_counts_text = value.split(":", 1)
-            post_counts = tuple(
-                int(item) for item in post_counts_text.split(",") if item
-            )
+            post_counts = tuple(int(item) for item in post_counts_text.split(",") if item)
             parsed.append((int(batch_size_text), post_counts))
         except ValueError as error:
-            raise ValueError(
-                "--target-verification-graph-post-counts must use "
-                "BATCH:COUNT,COUNT,..."
-            ) from error
+            raise ValueError("--target-verification-graph-post-counts must use BATCH:COUNT,COUNT,...") from error
     return tuple(parsed)
 
 
@@ -235,6 +322,12 @@ def main(argv: Sequence[str] | None = None) -> None:
         raise ValueError("--warmup-max-tokens must be positive.")
     if args.warmup_runs < 0:
         raise ValueError("--warmup-runs must be non-negative.")
+    if args.spec_rhythm_priority_burst <= 0:
+        raise ValueError("--spec-rhythm-priority-burst must be positive.")
+    if args.spec_rhythm_target_fallback_max_batch < 0:
+        raise ValueError("--spec-rhythm-target-fallback-max-batch must be non-negative.")
+    if args.spec_rhythm_max_target_batch < 0:
+        raise ValueError("--spec-rhythm-max-target-batch must be non-negative.")
     if args.profile_decode_steps < 0:
         raise ValueError("--profile-decode-steps must be non-negative.")
     if args.profile_only and args.profile_decode_steps == 0:
@@ -244,24 +337,35 @@ def main(argv: Sequence[str] | None = None) -> None:
     if args.num_pearl_steps is not None and args.enable_continuous_batching:
         raise ValueError("Fixed-step PEARL does not support continuous batching.")
     max_batch_size = max(args.batch_sizes)
-    target_graph_post_counts = _parse_target_graph_post_counts(
-        args.target_verification_graph_post_counts
-    )
-
+    target_graph_post_counts = _parse_target_graph_post_counts(args.target_verification_graph_post_counts)
+    if args.spec_rhythm_auto_eager_tokens and args.gamma <= 0:
+        raise ValueError("--spec-rhythm-auto-eager-tokens requires a positive fixed --gamma.")
     from vllm_ascend.spec_decode.pearl import PEARLConfig, PEARLEngine, SamplingParams
 
     prompt_count = args.num_prompts or max_batch_size
     max_warmup_count = args.warmup_prompts or max_batch_size
-    load_count = (
-        max(prompt_count, args.warmup_prompt_offset + max_warmup_count)
-        if args.warmup_runs
-        else prompt_count
-    )
+    load_count = max(prompt_count, args.warmup_prompt_offset + max_warmup_count) if args.warmup_runs else prompt_count
     prompts, request_max_tokens, request_metadata = _load_prompts(
         args.prompt,
         args.gsm8k,
         args.request_manifest,
         load_count,
+    )
+    request_has_slo = bool(
+        args.slo_tpot_ms is not None
+        or args.slo_class is not None
+        or (
+            request_metadata
+            and any(row.get("slo_tpot_ms") is not None or row.get("slo_class") is not None for row in request_metadata)
+        )
+    )
+    # SpecSLO's rolling-eager stage is mandatory when the workload carries a
+    # TPOT/class constraint.  An explicit CLI cap still wins; zero means the
+    # bounded default of one gamma window for a constrained workload.
+    effective_eager_cap = (
+        args.gamma
+        if args.spec_rhythm_auto_eager_tokens
+        else (args.spec_rhythm_max_eager_tokens or (args.gamma if args.enable_spec_rhythm and request_has_slo else 0))
     )
     config = PEARLConfig(
         draft_model_path=args.draft_model,
@@ -273,11 +377,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         max_num_batched_tokens=args.max_model_len * max_batch_size,
         max_num_seqs=max_batch_size,
         prefill_chunk_size=args.prefill_chunk_size,
-        max_num_queued_seqs=(
-            prompt_count
-            if args.enable_continuous_batching or args.enable_spec_rhythm
-            else None
-        ),
+        max_num_queued_seqs=(prompt_count if args.enable_continuous_batching or args.enable_spec_rhythm else None),
         max_model_len=args.max_model_len,
         gpu_memory_utilization=args.gpu_memory_utilization,
         num_kvcache_blocks=args.num_kvcache_blocks,
@@ -286,23 +386,32 @@ def main(argv: Sequence[str] | None = None) -> None:
         target_verification_graph_post_counts=target_graph_post_counts,
         auto_gamma_profile_sequence_length=args.auto_gamma_profile_sequence_length,
         enable_prefix_caching=args.enable_prefix_caching,
-        enable_continuous_batching=(
-            args.enable_continuous_batching or args.enable_spec_rhythm
-        ),
-        enable_preemptive_scheduling=(
-            args.enable_preemptive_scheduling or args.enable_spec_rhythm
-        ),
+        enable_continuous_batching=(args.enable_continuous_batching or args.enable_spec_rhythm),
+        enable_preemptive_scheduling=(args.enable_preemptive_scheduling or args.enable_spec_rhythm),
         enable_spec_rhythm=args.enable_spec_rhythm,
+        spec_rhythm_online_prefill=args.spec_rhythm_online_prefill,
+        spec_rhythm_merge_ready_homes=args.spec_rhythm_merge_ready_homes,
+        spec_rhythm_stable_graphs=args.spec_rhythm_stable_graphs,
+        spec_rhythm_priority_mode=args.spec_rhythm_slo_priority,
+        spec_rhythm_priority_burst=args.spec_rhythm_priority_burst,
+        spec_rhythm_target_fallback_max_batch=args.spec_rhythm_target_fallback_max_batch,
+        spec_rhythm_max_target_batch=args.spec_rhythm_max_target_batch,
         spec_rhythm_min_gamma=args.spec_rhythm_min_gamma,
-        spec_rhythm_max_eager_tokens=args.spec_rhythm_max_eager_tokens,
+        spec_rhythm_max_eager_tokens=effective_eager_cap,
         spec_rhythm_urgency_threshold=args.spec_rhythm_urgency_threshold,
         spec_rhythm_acceptance_floor=args.spec_rhythm_acceptance_floor,
         spec_rhythm_acceptance_ema_alpha=args.spec_rhythm_acceptance_ema_alpha,
+        spec_rhythm_cpu_verdict=args.spec_rhythm_cpu_verdict,
         spec_rhythm_roofline=args.spec_rhythm_roofline,
+        spec_rhythm_verification_budget=args.spec_rhythm_verification_budget,
         spec_rhythm_draft_token_budget=args.spec_rhythm_draft_token_budget,
+        spec_rhythm_tree_width=args.spec_rhythm_tree_width,
+        spec_rhythm_tree_depth=args.spec_rhythm_tree_depth,
         pad_finished_requests=args.pad_finished_requests,
         draft_use_paged_attention=args.draft_use_paged_attention,
         target_use_paged_attention=args.target_use_paged_attention,
+        enable_mc2=args.enable_mc2,
+        mc2_profile=args.mc2_profile,
         draft_use_production_rope=args.draft_use_production_rope,
         target_use_production_rope=args.target_use_production_rope,
         precompile_decode_graphs=args.precompile_decode_graphs,
@@ -321,16 +430,8 @@ def main(argv: Sequence[str] | None = None) -> None:
                 max_tokens=int(row["max_tokens"]),
                 ignore_eos=True,
                 request_id=row.get("request_id"),
-                arrival_ts=(
-                    float(row["arrival_ts"])
-                    if row.get("arrival_ts") is not None
-                    else None
-                ),
-                slo_tpot_ms=(
-                    float(row["slo_tpot_ms"])
-                    if row.get("slo_tpot_ms") is not None
-                    else None
-                ),
+                arrival_ts=(float(row["arrival_ts"]) if row.get("arrival_ts") is not None else None),
+                slo_tpot_ms=(float(row["slo_tpot_ms"]) if row.get("slo_tpot_ms") is not None else None),
                 slo_class=row.get("slo_class"),
                 spec_rhythm_max_gamma=(
                     int(row["per_request_gamma"])
@@ -369,21 +470,31 @@ def main(argv: Sequence[str] | None = None) -> None:
 
     results = []
     with PEARLEngine(config) as engine:
-        first_formatted_prompt = engine.tokenizer.apply_chat_template(
-            [{"role": "user", "content": prompts[0]}],
-            tokenize=False,
-            add_generation_prompt=True,
-        )
-        first_prompt_token_ids = list(engine.tokenizer.encode(first_formatted_prompt))
+        # Match the production baseline: tokenize before starting the arrival
+        # trace, then include enqueue/IPC/generation in the measured window.
+        tokenized_prompts = [
+            list(
+                engine.tokenizer.encode(
+                    engine.tokenizer.apply_chat_template(
+                        [{"role": "user", "content": prompt}],
+                        tokenize=False,
+                        add_generation_prompt=True,
+                    )
+                )
+            )
+            for prompt in prompts
+        ]
+        first_prompt_token_ids = tokenized_prompts[0]
         for batch_size in args.batch_sizes:
             engine.configure_decode_profiling(0)
-            measured_prompts = prompts[: args.num_prompts or batch_size]
+            measured_prompts = tokenized_prompts[: args.num_prompts or batch_size]
             measured_sampling_params = (
-                sampling_params[: len(measured_prompts)]
-                if isinstance(sampling_params, list)
-                else sampling_params
+                sampling_params[: len(measured_prompts)] if isinstance(sampling_params, list) else sampling_params
             )
-            def materialize_arrivals(params):
+
+            measured_count = len(measured_prompts)
+
+            def materialize_arrivals(params, measured_count=measured_count):
                 if request_metadata is None:
                     return params
                 arrival_origin = time.time()
@@ -393,18 +504,18 @@ def main(argv: Sequence[str] | None = None) -> None:
                         arrival_ts=(
                             float(row["arrival_ts"])
                             if row.get("arrival_ts") is not None
-                            else arrival_origin
-                            + float(row.get("arrival_offset_sec", 0.0))
+                            else arrival_origin + float(row.get("arrival_offset_sec", 0.0))
                         ),
                     )
                     for value, row in zip(
                         params,
-                        request_metadata[: len(measured_prompts)],
+                        request_metadata[:measured_count],
                     )
                 ]
+
             warmup_count = args.warmup_prompts or batch_size
             warmup_start = args.warmup_prompt_offset
-            warmup_prompts = prompts[warmup_start : warmup_start + warmup_count]
+            warmup_prompts = tokenized_prompts[warmup_start : warmup_start + warmup_count]
             current_warmup_params = (
                 warmup_sampling_params[warmup_start : warmup_start + warmup_count]
                 if isinstance(warmup_sampling_params, list)
@@ -434,12 +545,12 @@ def main(argv: Sequence[str] | None = None) -> None:
                 args.profile_decode_steps,
                 args.profile_only,
             )
+            started = time.perf_counter()
             _add_requests(
                 engine,
                 measured_prompts,
                 materialize_arrivals(measured_sampling_params),
             )
-            started = time.perf_counter()
             if args.num_pearl_steps is None:
                 _, num_tokens, _, inference_elapsed = engine.generate()
             else:
@@ -463,6 +574,10 @@ def main(argv: Sequence[str] | None = None) -> None:
                         1 if args.enable_continuous_batching else math.ceil(len(measured_prompts) / batch_size)
                     ),
                     "output_tokens": output_tokens,
+                    "prompt_token_ids_sha256": hashlib.sha256(
+                        json.dumps(measured_prompts, separators=(",", ":")).encode()
+                    ).hexdigest(),
+                    "e2e_timing_scope": "arrival origin, enqueue, worker IPC, prefill and decode; inputs pretokenized",
                     "inference_elapsed_seconds": inference_elapsed,
                     "e2e_elapsed_seconds": e2e_elapsed,
                     "inference_throughput_tokens_per_second": output_tokens / inference_elapsed,
@@ -471,15 +586,10 @@ def main(argv: Sequence[str] | None = None) -> None:
                     "mean_accept_tokens": sum(metric["mean_accept_tokens"] for metric in metrics) / len(metrics),
                     "selected_gamma": metrics[0]["gamma"],
                     "decode_rounds": sum(metric["round_count"] for metric in chunk_metrics),
-                    "prefill_elapsed_seconds": sum(
-                        metric["prefill_elapsed_seconds"] for metric in chunk_metrics
-                    ),
-                    "decode_elapsed_seconds": sum(
-                        metric["decode_elapsed_seconds"] for metric in chunk_metrics
-                    ),
-                    "request_verification_rounds": [
-                        metric["verification_rounds"] for metric in metrics
-                    ],
+                    "prefill_elapsed_seconds": sum(metric["prefill_elapsed_seconds"] for metric in chunk_metrics),
+                    "decode_elapsed_seconds": sum(metric["decode_elapsed_seconds"] for metric in chunk_metrics),
+                    "slo": _summarize_slo_metrics(metrics, inference_elapsed, e2e_elapsed),
+                    "request_verification_rounds": [metric["verification_rounds"] for metric in metrics],
                     "decode_phase_seconds": decode_phase_seconds,
                     "aclgraph_captures": max(metric["aclgraph_captures"] for metric in metrics),
                     "aclgraph_capture_attempts": max(metric["aclgraph_capture_attempts"] for metric in metrics),
@@ -500,12 +610,16 @@ def main(argv: Sequence[str] | None = None) -> None:
                     "output_token_ids_sha256": hashlib.sha256(
                         json.dumps(output_token_rows, separators=(",", ":")).encode()
                     ).hexdigest(),
+                    # Retain rows for semantic regression against target-only;
+                    # the hash remains the compact report-level check.
+                    "output_token_ids": output_token_rows,
                     "first_output_token_ids": metrics[0]["completion_token_ids"],
                 }
             )
 
     payload = {
-        "backend": "nano-pearl-native-speculative",
+        "backend": ("specslo-native-specrhythm" if args.enable_spec_rhythm else "nano-pearl-native-speculative"),
+        "policy": "SpecSLO/SpecRhythm" if args.enable_spec_rhythm else "nano-PEARL",
         "draft_model": args.draft_model,
         "target_model": args.target_model,
         "draft_tensor_parallel_size": args.draft_tp_size,
@@ -535,29 +649,38 @@ def main(argv: Sequence[str] | None = None) -> None:
         "prefill_chunk_size": args.prefill_chunk_size,
         "enforce_eager": args.enforce_eager,
         "enable_prefix_caching": args.enable_prefix_caching,
-        "enable_continuous_batching": (
-            args.enable_continuous_batching or args.enable_spec_rhythm
-        ),
-        "enable_preemptive_scheduling": (
-            args.enable_preemptive_scheduling or args.enable_spec_rhythm
-        ),
+        "enable_continuous_batching": (args.enable_continuous_batching or args.enable_spec_rhythm),
+        "enable_preemptive_scheduling": (args.enable_preemptive_scheduling or args.enable_spec_rhythm),
         "enable_spec_rhythm": args.enable_spec_rhythm,
+        "spec_rhythm_online_prefill": args.spec_rhythm_online_prefill,
+        "spec_rhythm_merge_ready_homes": args.spec_rhythm_merge_ready_homes,
+        "spec_rhythm_stable_graphs": args.spec_rhythm_stable_graphs,
+        "spec_rhythm_priority_mode": args.spec_rhythm_slo_priority,
+        "spec_rhythm_priority_mode_resolved": (args.spec_rhythm_slo_priority or request_has_slo),
+        "spec_rhythm_priority_burst": args.spec_rhythm_priority_burst,
+        "spec_rhythm_target_fallback_max_batch": args.spec_rhythm_target_fallback_max_batch,
+        "spec_rhythm_max_target_batch": args.spec_rhythm_max_target_batch,
         "spec_rhythm_min_gamma": args.spec_rhythm_min_gamma,
-        "spec_rhythm_max_eager_tokens": args.spec_rhythm_max_eager_tokens,
+        "spec_rhythm_max_eager_tokens": effective_eager_cap,
+        "spec_rhythm_slo_adaptive": request_has_slo,
+        "spec_rhythm_auto_eager_tokens": args.spec_rhythm_auto_eager_tokens,
         "spec_rhythm_roofline": args.spec_rhythm_roofline,
+        "spec_rhythm_verification_budget": args.spec_rhythm_verification_budget,
         "spec_rhythm_draft_token_budget": args.spec_rhythm_draft_token_budget,
+        "spec_rhythm_tree_width": args.spec_rhythm_tree_width,
+        "spec_rhythm_tree_depth": args.spec_rhythm_tree_depth,
         "pad_finished_requests": args.pad_finished_requests,
         "draft_use_paged_attention": args.draft_use_paged_attention,
         "target_use_paged_attention": args.target_use_paged_attention,
+        "enable_mc2": args.enable_mc2,
+        "mc2_profile": args.mc2_profile,
         "draft_use_production_rope": args.draft_use_production_rope,
         "target_use_production_rope": args.target_use_production_rope,
         "precompile_decode_graphs": args.precompile_decode_graphs,
         "enable_cpu_binding": not args.disable_cpu_binding,
         "max_tokens": args.max_tokens,
         "request_manifest": args.request_manifest,
-        "requested_output_tokens": (
-            sum(request_max_tokens[:prompt_count]) if request_max_tokens is not None else None
-        ),
+        "requested_output_tokens": (sum(request_max_tokens[:prompt_count]) if request_max_tokens is not None else None),
         "num_pearl_steps": args.num_pearl_steps,
         "warmup_prompts": args.warmup_prompts,
         "warmup_prompt_offset": args.warmup_prompt_offset,
@@ -572,6 +695,69 @@ def main(argv: Sequence[str] | None = None) -> None:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(f"{output}\n", encoding="utf-8")
     print(output)
+
+
+def _summarize_slo_metrics(metrics, inference_elapsed: float, e2e_elapsed: float):
+    """Aggregate per-request TPOT attainment and Goodput for a workload run."""
+    constrained = [metric for metric in metrics if metric.get("slo_tpot_ms") is not None]
+    if not constrained:
+        return {
+            "constrained_requests": 0,
+            "attained_requests": None,
+            "attainment": None,
+            "goodput_tokens": None,
+            "goodput_tokens_per_inference_second": None,
+            "goodput_tokens_per_e2e_second": None,
+            "by_class": {},
+        }
+    attained = sum(bool(metric.get("slo_attained")) for metric in constrained)
+    goodput_tokens = sum(int(metric.get("slo_goodput_tokens", 0)) for metric in constrained)
+    by_class = {}
+    for slo_class in sorted({metric.get("slo_class") or "unspecified" for metric in constrained}):
+        class_metrics = [metric for metric in constrained if (metric.get("slo_class") or "unspecified") == slo_class]
+        class_attained = sum(bool(metric.get("slo_attained")) for metric in class_metrics)
+        class_goodput = sum(int(metric.get("slo_goodput_tokens", 0)) for metric in class_metrics)
+        by_class[slo_class] = {
+            "requests": len(class_metrics),
+            "attained_requests": class_attained,
+            "attainment": class_attained / len(class_metrics),
+            "goodput_tokens": class_goodput,
+            "mean_tpot_ms": sum(float(metric.get("observed_tpot_ms", 0.0)) for metric in class_metrics)
+            / len(class_metrics),
+        }
+    summary = {
+        "constrained_requests": len(constrained),
+        "attained_requests": attained,
+        "attainment": attained / len(constrained),
+        "goodput_tokens": goodput_tokens,
+        "goodput_tokens_per_inference_second": (goodput_tokens / inference_elapsed if inference_elapsed > 0 else 0.0),
+        "goodput_tokens_per_e2e_second": (goodput_tokens / e2e_elapsed if e2e_elapsed > 0 else 0.0),
+        "by_class": by_class,
+    }
+    # Keep historical N-1 accounting separate from the paper's N denominator.
+    # Linear/legacy results lacking paper fields are explicitly incomplete,
+    # never converted by guessing their timing convention.
+    from examples.specslo_slo_metrics import summarize_slo_rows
+
+    request_rows = [
+        {
+            "request_id": metric.get("request_id"),
+            "output_tokens": len(metric["completion_token_ids"]),
+            "slo_class": metric.get("slo_class"),
+            "slo_tpot_ms": metric["slo_tpot_ms"],
+            "observed_tpot_ms": metric.get("observed_tpot_ms"),
+            "paper_tpot_ms": metric.get("paper_tpot_ms"),
+        }
+        for metric in constrained
+    ]
+    summary["paper"] = summarize_slo_rows(
+        request_rows,
+        tpot_field="paper_tpot_ms",
+        definition="same_decode_elapsed_ms / output_tokens",
+        elapsed_seconds=e2e_elapsed,
+    )
+    summary["request_metrics"] = request_rows
+    return summary
 
 
 def _aggregate_decode_profile(worker_metrics_by_chunk, batch_size: int):
@@ -599,14 +785,10 @@ def _aggregate_decode_profile(worker_metrics_by_chunk, batch_size: int):
         draft_workers = [worker for worker in workers if worker["is_draft_rank"]]
         target_workers = [worker for worker in workers if not worker["is_draft_rank"]]
         draft_compute = max(worker["worker_profile_draft_compute_seconds"] for worker in draft_workers)
-        draft_to_target = max(
-            worker["worker_profile_draft_to_target_communication_seconds"] for worker in workers
-        )
+        draft_to_target = max(worker["worker_profile_draft_to_target_communication_seconds"] for worker in workers)
         target_compute = max(worker["worker_profile_target_compute_seconds"] for worker in target_workers)
         target_verdict = max(worker["worker_profile_target_verdict_seconds"] for worker in target_workers)
-        target_to_draft = max(
-            worker["worker_profile_target_to_draft_communication_seconds"] for worker in workers
-        )
+        target_to_draft = max(worker["worker_profile_target_to_draft_communication_seconds"] for worker in workers)
         wait_sync = max(worker["worker_profile_wait_sync_seconds"] for worker in workers)
         state_update = max(worker["worker_profile_state_update_seconds"] for worker in workers)
         totals["draft_compute"] += draft_compute
@@ -650,8 +832,7 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
         {
             "rank": int(worker["rank"]),
             **{
-                f"{name}_delta": int(worker[name])
-                - int(before_by_rank.get(int(worker["rank"]), {}).get(name, 0))
+                f"{name}_delta": int(worker[name]) - int(before_by_rank.get(int(worker["rank"]), {}).get(name, 0))
                 for name in counter_names
             },
         }

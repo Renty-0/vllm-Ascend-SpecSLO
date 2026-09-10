@@ -35,7 +35,13 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--num-kvcache-blocks", type=int, default=-1)
     parser.add_argument("--prefill-chunk-size", type=int)
     parser.add_argument("--worker-timeout-seconds", type=float, default=300.0)
+    parser.add_argument("--seed", type=int)
     parser.add_argument("--enforce-eager", action="store_true")
+    parser.add_argument(
+        "--target-use-paged-attention",
+        action="store_true",
+        help="Use the native paged-attention cache for the target model.",
+    )
     parser.add_argument("--enable-prefix-caching", action="store_true")
     parser.add_argument("--output-json")
     prompt_group = parser.add_mutually_exclusive_group(required=True)
@@ -90,6 +96,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         num_kvcache_blocks=args.num_kvcache_blocks,
         enable_prefix_caching=args.enable_prefix_caching,
         enforce_eager=args.enforce_eager,
+        target_use_paged_attention=args.target_use_paged_attention,
+        seed=args.seed,
         gamma=4,
         worker_timeout_seconds=args.worker_timeout_seconds,
     )
@@ -137,6 +145,10 @@ def main(argv: Sequence[str] | None = None) -> None:
                     "output_token_ids_sha256": hashlib.sha256(
                         json.dumps(output_token_rows, separators=(",", ":")).encode()
                     ).hexdigest(),
+                    # Keep the complete rows in the native regression payload
+                    # so speculative runs can be checked at the first
+                    # divergent token, not only by an aggregate hash.
+                    "output_token_ids": output_token_rows,
                     "first_output_token_ids": engine.last_metrics[0]["completion_token_ids"],
                 }
             )

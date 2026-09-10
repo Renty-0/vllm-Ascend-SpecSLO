@@ -1,18 +1,19 @@
 # SPDX-License-Identifier: Apache-2.0
 
-import torch
 import pytest
+import torch
 
 from vllm_ascend.spec_decode.pearl.spec_rhythm import SpecRhythmBudgetPlan
 from vllm_ascend.spec_decode.pearl.tree import (
+    SpecRhythmTreeCoordinator,
     build_tree_attention_mask,
     build_tree_speculation_plan,
     make_spine_first_parents,
     select_tree_candidates,
-    SpecRhythmTreeCoordinator,
     tree_budget_from_spec_rhythm,
     verify_greedy_tree,
     verify_greedy_tree_batch,
+    verify_sampled_tree,
 )
 from vllm_ascend.spec_decode.tree_kv import build_tree_kv_compaction_plan
 
@@ -79,9 +80,7 @@ def test_tree_coordinator_uses_budget_to_choose_depth():
         draft_token_budget=4,
         allocated_draft_tokens=3,
     )
-    tree = SpecRhythmTreeCoordinator(width=2, max_depth=3).for_request(
-        plan, 2, prefix_len=2, max_model_len=8
-    )
+    tree = SpecRhythmTreeCoordinator(width=2, max_depth=3).for_request(plan, 2, prefix_len=2, max_model_len=8)
     assert tree is not None
     assert (tree.width, tree.depth, tree.candidate_budget) == (2, 2, 3)
 
@@ -97,6 +96,53 @@ def test_device_tree_verifier_follows_ancestor_chain_and_bonus():
     )
     assert result.token_ids.tolist() == [10, 11, 7]
     assert result.accepted_node_indices.tolist() == [0, 1]
+
+
+def test_device_tree_verifier_selects_bonus_from_accepted_sibling_frontier():
+    # Nodes 0 and 1 are the first-level siblings.  The target chooses node 1
+    # and its output row (query root + query node) supplies the bonus token.
+    result = verify_greedy_tree(
+        torch.tensor([10, 20]),
+        torch.tensor([-1, -1], dtype=torch.int32),
+        torch.tensor([20, 0, 77]),
+        torch.tensor(0),
+        max_depth=1,
+    )
+    assert result.token_ids.tolist() == [20, 77]
+    assert result.accepted_node_indices.tolist() == [1]
+
+
+def test_sampled_tree_commits_the_target_sample_on_hit_and_miss():
+    hit = verify_sampled_tree(
+        torch.tensor([10, 20]),
+        torch.tensor([-1, -1], dtype=torch.int32),
+        torch.tensor([20, 0, 77]),
+        torch.tensor(0),
+        max_depth=1,
+    )
+    miss = verify_sampled_tree(
+        torch.tensor([10, 20]),
+        torch.tensor([-1, -1], dtype=torch.int32),
+        torch.tensor([30, 0, 0]),
+        torch.tensor(0),
+        max_depth=1,
+    )
+    assert hit.token_ids.tolist() == [20, 77]
+    assert hit.accepted_node_indices.tolist() == [1]
+    assert miss.token_ids.tolist() == [30, -1]
+    assert miss.accepted_node_indices.tolist() == [-1]
+
+
+def test_device_tree_verifier_handles_short_variable_budget_without_index_error():
+    result = verify_greedy_tree(
+        torch.tensor([10]),
+        torch.tensor([-1], dtype=torch.int32),
+        torch.tensor([10, 42]),
+        torch.tensor(0),
+        max_depth=3,
+    )
+    assert result.token_ids.tolist() == [10, 42, -1, -1]
+    assert result.accepted_node_indices.tolist() == [0, -1, -1]
 
 
 def test_device_tree_verifier_rejects_first_token_without_host_traversal():
@@ -137,3 +183,18 @@ def test_variable_width_tree_batch_and_kv_compaction_plan():
         destination_start=200,
     )
     assert shifted.destination_slots.tolist() == [200, 201]
+
+
+def test_variable_width_tree_batch_accepts_dynamic_frontier_rows():
+    result = verify_greedy_tree_batch(
+        torch.tensor([10, 20, 30]),
+        torch.tensor([-1, -1, -1], dtype=torch.int32),
+        [1, 2],
+        # Request 0: root -> node 0 -> bonus 41.
+        # Request 1: root selects sibling node 1 -> bonus 42.
+        torch.tensor([10, 41, 30, 0, 42]),
+        torch.tensor([0, 0]),
+        max_depth=2,
+    )
+    assert result.token_ids.tolist() == [[10, 41, -1], [30, 42, -1]]
+    assert result.accepted_node_indices.tolist() == [[0, -1], [1, -1]]
