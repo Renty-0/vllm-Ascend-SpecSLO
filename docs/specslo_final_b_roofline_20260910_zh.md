@@ -25,6 +25,9 @@ reset/capture 后出现过 TP3 stream 停滞，这种生命周期也不符合生
 ## B_roof 结果
 
 B 是当前 logical verify slot 内的 candidate token 总预算，不是 per-request gamma。
+`gamma`/单请求 `max_gamma` 仅限制某个请求的树候选数；调度器先查本表
+得到固定总 B，再根据 SLO 紧迫度与接受收益在请求间分配不同的
+候选数；任何 gamma 参数都不能扩大 B。
 
 | active / verify rows | 512 | 1024 | 1536 | 2048 | 2560 | 3072 |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |

@@ -39,7 +39,7 @@ KV 写入和 guarded commit 的生产实现。
 | 功能 | atc26v0 当前状态 | Ascend-SpecSLO 状态 | 验证方式 |
 | --- | --- | --- | --- |
 | Draft/target 分离与异构 TP | nano-PEARL 运行时 | native HCCL worker 已实现 | PEARL native 单测、TP1+TP3 smoke |
-| 自适应 gamma | PEARL 基础策略 | SpecRhythm roofline + acceptance EMA + SLO urgency | `test_spec_rhythm_native.py` |
+| 个体候选预算 | PEARL 的固定 gamma 只作为参考 | 实测全局 `B_roof` 下按 acceptance EMA + SLO urgency 动态分配；`gamma` 仅是单请求候选上限，不是 B | `test_spec_rhythm_native.py` / strict roofline 线上消费回归 |
 | 双批次节奏 | ST-Spec probe | native SpecRhythm pipeline 已执行 draft/target 两角色 | native engine profile counters |
 | rolling eager continuation | probe 元数据 | proposal lifecycle、full-accept promotion、reject invalidation 已执行 | controller/native 单测 |
 | 非二次幂 TP | padding 实验功能 | Q/KV/MLP/vocab padding 与逻辑裁剪已实现 | config/weight loader、NPU smoke |
@@ -112,9 +112,10 @@ SpecRhythm 主循环会：
   已通过数值生成、tree verifier、KV compaction、HCCL 双组播和 ACLGraph replay。
   仍需在每个支持模型、长上下文、多请求和生产 workload 上完成端到端吞吐回归；
   短 smoke 不等同于完整性能验收；
-- 通用 vLLM V1 服务进程自动创建跨模型 HCCL worker。当前
-  `PearlDualModelScheduler` 已能并行调度两个外部 worker 回调并提交验证生命周期，
-  仍需接入具体上游 V1 worker 生命周期；
+- 文本生成范围的 V1 `EngineCoreRequest`/`EngineCoreOutputs` 适配、持久双模型
+  HCCL worker 和 OpenAI-compatible HTTP/SSE 生命周期已完成。多模态、LoRA、
+  pooling、logprobs、structured output 和自定义 logits processors 不属于
+  当前 SpecSLO 文本生成算法范围，生产入口会显式拒绝，不会静默改变语义；
 - PEARL-2 的 teacher rollout、JSONL 数据管线、蒸馏 loss、optimizer step 与 checkpoint
   格式已经可运行，仍需大规模训练和权重质量回归；
 - CANN 各版本动态 graph bucket 的内存上限、长上下文和多租户抢占矩阵。
