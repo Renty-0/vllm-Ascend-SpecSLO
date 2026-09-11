@@ -59,7 +59,7 @@ from vllm_ascend.spec_decode.pearl.topology import PearlProcessGroups, PearlTopo
 from vllm_ascend.spec_decode.pearl.tree import (
     TreeSpeculationPlan,
     TreeVerificationOutput,
-    build_tree_speculation_plan,
+    cached_cpu_tree_speculation_plan,
     pack_selected_tree_plan,
     tree_primary_path,
     verify_greedy_tree_batch,
@@ -1849,13 +1849,12 @@ class NativePearlEngine:
     ) -> TreeSpeculationPlan:
         """Keep scheduler-only tree topology on the host until model packing."""
         prefix_len = max(0, len(state.token_ids) - 1)
-        return build_tree_speculation_plan(
+        return cached_cpu_tree_speculation_plan(
             self.config.spec_rhythm_tree_width,
             self.config.spec_rhythm_tree_depth,
             prefix_len,
             self.config.max_model_len,
             candidate_budget=int(budget),
-            device="cpu",
         )
 
     def _deliver_committed_tokens(self, index, params, state) -> None:
@@ -1912,13 +1911,12 @@ class NativePearlEngine:
         expected_prefix = int(parent_plan.prefix_len) + path_len + 1
         if expected_prefix != base_prefix + path_len + 1:
             raise RuntimeError("SpecRhythm eager tree parent prefix does not match request state")
-        return build_tree_speculation_plan(
+        return cached_cpu_tree_speculation_plan(
             self.config.spec_rhythm_tree_width,
             self.config.spec_rhythm_tree_depth,
             expected_prefix,
             self.config.max_model_len,
             candidate_budget=int(budget),
-            device="cpu",
         )
 
     def _exchange_spec_rhythm_tree_candidates(
@@ -3137,38 +3135,57 @@ class NativePearlEngine:
                 pending_draft_mappings: list[tuple[int, torch.Tensor]] = []
                 normal_publish_sources: list[torch.Tensor] = []
                 normal_publish_destinations: list[torch.Tensor] = []
-                for index, ticket, tree_plan, row in zip(work_indices, tickets, work_plans, candidate_rows):
+                for work_row, (index, ticket, tree_plan, row) in enumerate(
+                    zip(work_indices, tickets, work_plans, candidate_rows)
+                ):
                     expected = int(tree_plan.width) * int(tree_plan.depth) + 1
                     if not row:
                         cursor += expected
                         continue
                     ticket.gamma = len(row)
                     published_tickets.append(ticket)
-                    selection = selected_rows[work_indices.index(index)]
+                    selection = selected_rows[work_row]
                     packed_plan = pack_selected_tree_plan(tree_plan, selection)
                     if self.is_draft and mapping is not None:
-                        source = mapping[cursor : cursor + expected].index_select(
-                            0,
-                            torch.tensor([0, *[node + 1 for node in selection]], dtype=torch.long, device=self.device),
-                        )
+                        identity_selection = list(selection) == list(range(len(selection)))
+                        if identity_selection:
+                            # Spine-first prefix selection is already stored
+                            # in the exact packed order.  Keep a view of those
+                            # slots instead of launching an index_select and
+                            # constructing a device index tensor per request.
+                            source = mapping[cursor : cursor + len(selection) + 1]
+                        else:
+                            source = mapping[cursor : cursor + expected].index_select(
+                                0,
+                                torch.tensor(
+                                    [0, *[node + 1 for node in selection]],
+                                    dtype=torch.long,
+                                    device=self.device,
+                                ),
+                            )
                         if not ticket.eager:
                             counters["spec_rhythm_draft_publish_rows"] += 1
-                            destination = torch.tensor(
-                                self._cache_slot_mapping(
-                                    [index] * (len(selection) + 1),
-                                    list(range(packed_plan.prefix_len, packed_plan.prefix_len + len(selection) + 1)),
-                                ),
-                                dtype=torch.int32,
-                                device=self.device,
-                            )
                             # An identity prefix already occupies the packed
                             # logical slots: exploratory root,node0,... map to
                             # exactly the same paged positions as the refined
                             # plan. Avoid sweeping every model layer merely to
                             # copy those K/V rows onto themselves.
-                            if list(selection) == list(range(len(selection))):
+                            if identity_selection:
                                 counters["spec_rhythm_draft_publish_skipped_rows"] += 1
                             else:
+                                destination = torch.tensor(
+                                    self._cache_slot_mapping(
+                                        [index] * (len(selection) + 1),
+                                        list(
+                                            range(
+                                                packed_plan.prefix_len,
+                                                packed_plan.prefix_len + len(selection) + 1,
+                                            )
+                                        ),
+                                    ),
+                                    dtype=torch.int32,
+                                    device=self.device,
+                                )
                                 normal_publish_sources.append(source)
                                 normal_publish_destinations.append(destination)
                                 source = destination
@@ -3189,7 +3206,7 @@ class NativePearlEngine:
                                 int(parent_row[node]) for node in tree_primary_path(parent_plan)
                             ),
                             "eager_frontier_token": (
-                                frontier_rows[work_indices.index(index)] if frontier_rows is not None else None
+                                frontier_rows[work_row] if frontier_rows is not None else None
                             ),
                             "eager_dependency_length": path_len,
                         }
@@ -3197,7 +3214,7 @@ class NativePearlEngine:
                         "ticket": ticket,
                         "plan": packed_plan,
                         "row": row,
-                        "confidence": confidence_rows[work_indices.index(index)],
+                        "confidence": confidence_rows[work_row],
                         **eager_metadata,
                     }
                     cursor += expected
@@ -3374,7 +3391,7 @@ class NativePearlEngine:
             # a second device/host fence in every decode cycle.
             preflight_failed = torch.maximum(
                 preflight_failed,
-                self._spec_rhythm_nonfinite_flag().reshape(1).to(dtype=torch.int64),
+                self._spec_rhythm_nonfinite_flag(include_layer_cache=False).reshape(1).to(dtype=torch.int64),
             )
             dist.all_reduce(preflight_failed, op=dist.ReduceOp.MAX)
             # One scalar synchronization at the collective commit boundary.
@@ -4997,7 +5014,7 @@ class NativePearlEngine:
                     0, request_sequence_tensor
                 ),
                 attention_mask=packed_mask.to(device=self.device),
-                use_fused_infer_attention=bool(attention.uses_paged_attention),
+                use_fused_infer_attention=bool(getattr(attention, "uses_paged_attention", False)),
                 tree_attention=True,
                 tree_attention_mask=tree_mask.to(device=self.device),
             )
@@ -5932,13 +5949,24 @@ class NativePearlEngine:
             )
         dist.barrier(group=self.groups.target_group)
 
-    def _spec_rhythm_nonfinite_flag(self) -> torch.Tensor:
-        """Aggregate graph-resident health flags without a host synchronization."""
+    def _spec_rhythm_nonfinite_flag(self, *, include_layer_cache: bool = True) -> torch.Tensor:
+        """Aggregate graph-resident health flags without a host synchronization.
+
+        Layer-cache flags are needed by prefill admission. Tree decode does
+        not update them: its full-model hidden/logit boundary owns the dynamic
+        guard, while KV compaction only copies storage that already passed a
+        prior vote. The commit path can therefore avoid stacking one stale
+        scalar per decoder layer.
+        """
         model = getattr(self, "model", None)
         flags: list[torch.Tensor] = []
         if model is not None:
             owners_and_names = [(model, "output_nonfinite"), (getattr(model, "lm_head", None), "logits_nonfinite")]
-            owners_and_names.extend((layer.self_attn, "tree_cache_nonfinite") for layer in getattr(model, "layers", ()))
+            if include_layer_cache:
+                owners_and_names.extend(
+                    (layer.self_attn, "tree_cache_nonfinite")
+                    for layer in getattr(model, "layers", ())
+                )
             for owner, name in owners_and_names:
                 flag = getattr(owner, name, None)
                 if isinstance(flag, torch.Tensor):

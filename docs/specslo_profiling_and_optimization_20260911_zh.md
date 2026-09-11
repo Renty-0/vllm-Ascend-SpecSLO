@@ -11,10 +11,11 @@
 - 树状 target verification 全程使用 ACLGraph，失败捕获、容量回退和 shape 回退均为 0；
 - TP1 draft 与 TP3 target 存在真实设备计算重叠，而不是只在 Python 时间线上看起来并行。
 
-当前尚未达到最终性能目标。Qwen3-0.6B TP1 + Qwen3-32B TP3 的三次生产路径中位吞吐为
-**167.785 token/s**，相对生产 vLLM-Ascend Qwen3-32B TP4 target-only 的
-**141.663 token/s** 为 **1.1844x**。首要目标“超过 baseline”已在该短 workload 上
-达到，但 **1.3x 尚未达到**，也不能由该短回归外推到 RPS/Goodput 验收矩阵。
+在固定短回归 workload 上，Qwen3-0.6B TP1 + Qwen3-32B TP3 的最新同卡三次生产路径
+吞吐为 **183.447 / 184.405 / 184.858 token/s**，中位 **184.405 token/s**；相对生产
+vLLM-Ascend Qwen3-32B TP4 target-only 的 **141.663 token/s** 为 **1.3017x**。
+因此短回归的 1.3x 吞吐门槛已经达到。这个结论不外推到 RPS/Goodput 验收矩阵；后者仍需
+使用 6:2:2 SLO workload 独立测量 TPOT 达成率与 Goodput。
 
 ## 2. 固定测量条件与证据边界
 
@@ -111,38 +112,60 @@ TP3 target-only 完全一致。
 - 新增 Graph runtime validation、task update/skip 计数；
 - host profile 已进一步拆分 scheduler 与 commit/state 子阶段。
 
+### 4.5 本轮树计划、发布与数值检查优化
+
+- 缓存只由 width/depth 决定的 spine-first 拓扑及稀疏可见坐标，attention mask 从逐元素
+  Python 赋值改成一次索引写；
+- CPU `cache_positions` 唯一性检查改用小整数集合，避免为 2x2 小树启动
+  `torch.unique`；
+- 全量 identity selection 直接复用已物理打包的计划；publish 直接保留 KV mapping
+  slice view，不再为每个请求创建 NPU index tensor 并执行 `index_select`；
+- normal proposal 本来就在目标逻辑槽位时，不再构造 destination tensor 或扫过全部层做
+  self-copy；publish 循环同时消除了三处 `work_indices.index()` 二次扫描；
+- 新增上限 64 项的只读 CPU plan geometry LRU。同一 prefix 几何跨请求、warmup 和服务
+  连续批次复用 parents/positions/cache_positions/FULL mask，预算只创建轻量 dataclass
+  视图；
+- 普通 prefill 继续逐层检查 KV 写入；完整 tree Graph 则在 decoder hidden/residual、norm
+  输出和真实 logits 边界做 sticky 非有限值检查，并在 commit consensus 前投票。这样移除
+  Qwen3-32B 每次 tree replay 中 64 层 x 2 次重复 `isfinite+reduce`，但不允许坏 token
+  被提交；decode commit 也不再重复聚合 admission 阶段已经全局投票的逐层 flag。
+
+对应实现：`tree.py` 的 `_spine_first_topology()`、
+`cached_cpu_tree_speculation_plan()`、`pack_selected_tree_plan()`；`native_model.py` 的
+`NativeAttention.forward()`；`native_engine.py` 的 `_spec_rhythm_tree_plan()`、
+`_spec_rhythm_tree_eager_plan()`、proposal publish 循环和
+`_spec_rhythm_nonfinite_flag()`。
+
 ## 5. 当前耗时画像
 
 ### 5.1 生产路径低扰动 host timeline
 
-最新一次用于归因的样本吞吐为 166.254 token/s（1.1736x baseline），输出 hash 一致且
-零 Graph fallback。该单次结果用于时间归因，不替代三次中位生产结果。
+最新同卡三次低扰动样本的中位吞吐为 184.405 token/s（1.3017x baseline），输出 hash
+一致且零 Graph fallback。
 
 在同时存在 target 和 draft 工作的周期内，中位耗时如下：
 
 | 阶段 | 中位耗时/step |
 | --- | ---: |
-| 完整 cycle | 43.209 ms |
-| Scheduler 总计 | 2.216 ms |
+| 完整 cycle | 37.456 ms |
+| Scheduler 总计 | 0.429 ms |
 | ├─ roof/B 查询 | 0.017 ms |
 | ├─ dual-batch plan | 0.062 ms |
 | ├─ budget shaping | 0.123 ms |
-| └─ tree plan/ticket 构造 | **2.014 ms** |
-| Draft compute host window | 22.861 ms |
-| Target compute host window | 33.888 ms |
-| Draft/Target host window overlap | 22.802 ms |
-| Draft -> Target collective 临界跨度 | 0.479 ms |
-| Target verdict | 0.456 ms |
-| Target -> Draft collective 临界跨度 | 1.799 ms |
-| State update 总计 | 3.072 ms |
-| ├─ preflight | 0.634 ms |
-| ├─ commit consensus | **2.182 ms** |
+| └─ tree plan/ticket 构造 | **0.211 ms** |
+| Draft compute host window | 20.613 ms |
+| Target compute host window | 30.561 ms |
+| Draft/Target host window overlap | 20.461 ms |
+| State update 总计 | 2.454 ms |
+| ├─ commit consensus | **1.566 ms** |
 | ├─ KV compaction | 0.032 ms |
 | └─ request commit | 0.279 ms |
 
-这组数据证明目前最大的两个非模型程序热点是 tree plan/ticket 构造和全局 commit
-consensus，不是 roofline 查表或预算算法本身。证据：
-`tree-b8-B8-host-subphases-v30.json`。
+相对 v30，完整 cycle 中位降低 5.753 ms，tree plan/ticket 降低 89.5%，target 与 draft
+窗口也因移除 Graph 内逐层诊断 reduction 分别缩短约 3.33 ms 和 2.25 ms。当前最大的
+非模型热点已经收敛为全局 commit consensus，而不是 scheduler。证据：
+`tree-b8-B8-cached-plans-3run-v35.json`。最终代码另在 NPU 4--7 做了一次跨卡功能 smoke，
+输出 hash/Graph 门禁通过；因卡位不同，其 179.253 token/s 不参与同卡倍率计算。
 
 ### 5.2 同步细分 profile
 
@@ -193,7 +216,7 @@ timeline 中 target 每步比 draft 长约 11 ms，尾部尚未被普通 draft �
 
 | B | 三次中位吞吐 | 相对 TP4 baseline | 结论 |
 | ---: | ---: | ---: | --- |
-| 8 | 167.785 | 1.1844x | 当前固定调优点 |
+| 8 | 184.405 | 1.3017x | 当前固定调优点；最新代码 |
 | 10 | 150.256 | 1.0607x | 否决 |
 | 12 | 146.277 | 1.0326x | 否决 |
 | 16 | 157.996 | 1.1153x | 否决 |
@@ -201,6 +224,10 @@ timeline 中 target 每步比 draft 长约 11 ms，尾部尚未被普通 draft �
 B10/B12/B16 会触发非前缀候选选择、draft KV move 和 target KV compaction，同时接受率
 下降。当前差距不是靠放宽 B 就能弥补。正式 B 只在执行架构发生大变化后按论文流程重测，
 不因每次普通源码修改反复校准。
+
+本轮还额外探测了真正分支树 width/depth=2/3、B=12：单次为 164.856 token/s，虽将
+有效 tree round 从 14 降到 12，但多候选计算和两轮非 identity KV compaction 抵消了
+收益，因此未采用。证据：`tree-b8-B12-w2d3-probe-v33.json`。
 
 ### 6.2 FULL FIA Graph 中跳过二维 mask copy
 
@@ -217,29 +244,26 @@ FULL FIA 实际消费 4D `tree_attention_mask`，因此尝试不捕获/复制 2D
 
 ## 7. 接下来要解决的问题（按优先级）
 
-1. **tree plan/ticket 构造 2.014 ms/step**：继续拆解 `_spec_rhythm_tree_plan`、
-   eager plan、NPU tensor/attention-mask 创建和重复 rank-local 工作；优先消除重复构造与
-   隐式同步，再决定是否缓存静态拓扑。
-2. **commit consensus 2.182 ms/step**：区分 health-flag 聚合 kernel、world
+1. **commit consensus 约 1.3--1.6 ms/step**：继续区分 health-flag 聚合 kernel、world
    all-reduce 和 D2H scalar fence。必须保留 fail-before-commit 语义，候选方案是共享/分层
    sticky flag 或将 consensus 搭载已有 correction 边界，而不是删除数值保护。
-3. **target 未覆盖尾部约 11 ms/step**：在 SLO workload 上验证 rolling eager
+2. **target 未覆盖尾部约 10 ms/step**：在 SLO workload 上验证 rolling eager
    continuation 是否真的填充该窗口；不能用普通无 SLO 短测中 eager=0 的结果宣称论文
    continuation 已产生性能收益。
-4. **target MatMul 与 TP3 HCCL all-reduce**：在程序热点收敛后做 shape 级 roofline，
+3. **target MatMul 与 TP3 HCCL all-reduce**：在程序热点收敛后做 shape 级 roofline，
    设计/筛选 rank-3 kernel、通信与计算融合或 model-runner compile 融合。
-5. **最终验收**：架构有显著变化后重新执行正式 B profiling，再跑 RPS=2/4、
+4. **最终验收**：架构有显著变化后重新执行正式 B profiling，再跑 RPS=2/4、
    batch=8/16/32/64、SLO 6:2:2 的完整 TPOT attainment/Goodput 矩阵。最终门槛仍是
    attainment 稳定不低于 80%，Goodput 至少为 TP4 baseline 的 1.3x。
 
 ## 8. 当前回归状态
 
-- 本阶段相关 spec-decode 回归：288 passed；
-- 新增 host 子阶段统计后的聚焦回归：171 passed；
+- 本轮新增优化的聚焦回归：272 passed；
+- spec-decode CPU 全量回归：901 passed，13 skipped；
 - 实际改动文件 Ruff：全部通过；
-- 生产短测输出与 native TP3 target-only hash 一致；
+- 同卡三轮生产短测输出与 native TP3 target-only hash 一致；
 - Graph failed/capacity/shape fallback 均为 0；
 - `aclgraph_runtime_validation_replays` 为 0。
 
-本文是继续优化前的检查点。下一轮不得把同步 profile 的吞吐当生产吞吐，不得把 host
-collective span 当纯网络时间，也不得在未重跑完整 SLO workload 前宣称达到 1.3x。
+短吞吐回归已经达到 1.3x；不得把该结论替代尚未执行的完整 SLO Goodput 验收，也不得把
+host collective span 当纯网络时间。

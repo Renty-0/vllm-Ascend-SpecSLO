@@ -8,6 +8,7 @@ from vllm_ascend.spec_decode.pearl.tree import (
     SpecRhythmTreeCoordinator,
     build_tree_attention_mask,
     build_tree_speculation_plan,
+    cached_cpu_tree_speculation_plan,
     make_spine_first_parents,
     select_tree_candidates,
     tree_budget_from_spec_rhythm,
@@ -38,6 +39,22 @@ def test_tree_plan_positions_and_budget():
     assert torch.equal(plan.parent_indices, make_spine_first_parents(2, 3))
     assert plan.cache_positions is not None
     assert plan.cache_positions.tolist() == list(range(4, 11))
+
+
+def test_cached_cpu_tree_plan_reuses_read_only_geometry_across_budgets():
+    smaller = cached_cpu_tree_speculation_plan(2, 2, 7, 64, candidate_budget=2)
+    full = cached_cpu_tree_speculation_plan(2, 2, 7, 64, candidate_budget=4)
+    repeated = cached_cpu_tree_speculation_plan(2, 2, 7, 64, candidate_budget=2)
+    different_prefix = cached_cpu_tree_speculation_plan(2, 2, 8, 64, candidate_budget=2)
+
+    assert smaller.candidate_budget == repeated.candidate_budget == 2
+    assert full.candidate_budget == 4
+    assert smaller is not full
+    assert smaller.parent_indices is full.parent_indices
+    assert smaller.positions is full.positions
+    assert smaller.attention_mask is full.attention_mask
+    assert smaller.cache_positions is full.cache_positions
+    assert different_prefix.attention_mask is not smaller.attention_mask
 
 
 def test_selection_preserves_ancestor_chain():

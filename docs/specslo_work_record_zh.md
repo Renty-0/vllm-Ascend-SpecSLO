@@ -556,3 +556,36 @@ target MatMul 和 TP3 HCCL all-reduce 确认为后续算子层热点。
 
 完整配置、数据、阶段定义、证据路径和下一步问题见
 [SpecSLO 程序级 Profiling 与性能优化记录](specslo_profiling_and_optimization_20260911_zh.md)。
+
+### 6.9 2026-09-11：短回归吞吐达到 1.3x
+
+在不改变 B=8、tree width/depth=2/2、TP1+TP3 拓扑和 Graph 硬门禁的前提下，本轮针对
+程序级 profiling 的两个新增结论完成了以下优化：
+
+1. spine-first 拓扑及可见坐标缓存，mask 祖先关系改为一次索引写；CPU 小树唯一性检查
+   不再调用 `torch.unique`；
+2. 已完整物理打包的 identity tree 不再重建，proposal publish 不再创建逐请求 NPU
+   index/destination tensor，也不再做 KV self-copy；
+3. normal/eager plan 复用上限 64 项的只读 CPU geometry LRU，预算变化只创建轻量计划
+   视图；
+4. prefill 保留逐层 KV 非有限值检查；完整 tree decode 改在模型输出和真实 logits 边界
+   检查，并继续在全局 commit consensus 之前失败。decode commit 不再聚合 admission 已经
+   投票通过且 decode 不再更新的逐层 flag。
+
+同卡三轮 E2E 吞吐为 183.447、184.405、184.858 token/s，中位 184.405 token/s；相对
+vLLM-Ascend Qwen3-32B TP4 target-only 141.663 token/s 为 **1.3017x**。三轮输出 SHA256
+均为 `3204949b4f0aecb1b4a5398994b38d008c21bb30163c03073c245bb46d74e3b1`，Graph
+failed/capacity/shape fallback 均为 0。稳定 cycle 中位由 v30 的 43.209 ms 降至
+37.456 ms，scheduler 由 2.216 ms 降至 0.429 ms，tree plan/ticket 由 2.014 ms 降至
+0.211 ms，target/draft host window 由 33.888/22.861 ms 降至 30.561/20.613 ms；真实
+overlap 仍为 20.461 ms。
+
+采用的同卡证据为
+`tree-b8-B8-cached-plans-3run-v35.json`。最终代码因原 NPU 1--3 被外部 PID 占用，另在
+NPU 4--7 完成一次功能 smoke：输出 hash 一致、84 次 Graph replay、三类 fallback 为 0；
+其吞吐不与旧卡位 baseline 混算。width/depth=2/3、B=12 探针仅 164.856 token/s，已
+否决，不写入生产默认值。
+
+上述 1.3017x 仅回答固定 8 prompt x 16 output token 的短吞吐回归。论文式 RPS=2/4、
+batch=8/16/32/64、严格/常规/宽松 6:2:2 的 TPOT attainment 与 Goodput 验收仍是独立
+阶段，不能用本节替代。

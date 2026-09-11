@@ -862,8 +862,17 @@ class NativeAttention(nn.Module):
             raise RuntimeError("Configure the PEARL KV cache before running the model.")
         qkv = self.qkv_proj(hidden_states)
         metadata = attention_metadata or self._default_metadata(positions)
-        track_finiteness = self.track_cache_finiteness or metadata.tree_attention
-        if track_finiteness:
+        # Ordinary prefill checks each cache write because no later tree
+        # output boundary is guaranteed before its first token is committed.
+        # Tree decode, however, executes the complete decoder and LM head
+        # before the shared commit vote.  Its model-level hidden/residual and
+        # real-logit sticky flags cover every value that can affect a
+        # committed token.  Repeating two full-tensor isfinite reductions in
+        # every decoder layer added 128 reductions to a 64-layer graph and
+        # serialized the TP3 critical path without strengthening that commit
+        # boundary.
+        track_layer_finiteness = self.track_cache_finiteness and not metadata.tree_attention
+        if track_layer_finiteness:
             # Q, K and V are slices (plus finite normalization/RoPE
             # transforms) of this fused projection. Checking the projection
             # once and the attention result once preserves the per-layer
@@ -904,7 +913,7 @@ class NativeAttention(nn.Module):
             attended = self._paged_attention(query, metadata)
         else:
             attended = self._dense_attention(query, metadata)
-        if track_finiteness:
+        if track_layer_finiteness:
             self.tree_cache_nonfinite.logical_or_(~torch.isfinite(attended).all())
         attended = attended.flatten(1)
         if return_pre_projection:

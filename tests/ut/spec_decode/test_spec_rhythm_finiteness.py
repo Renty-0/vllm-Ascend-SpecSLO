@@ -19,6 +19,7 @@ from vllm_ascend.spec_decode.pearl.native_engine import NativePearlEngine, Pearl
 from vllm_ascend.spec_decode.pearl.native_model import NativeLMHead, NativeQwen2ForCausalLM, NativeTPContext
 from vllm_ascend.spec_decode.pearl.roofline import ProfiledRoofline
 from vllm_ascend.spec_decode.pearl.topology import PearlTopology
+from vllm_ascend.spec_decode.pearl.tree import build_tree_speculation_plan
 
 
 def _model(track=True):
@@ -82,6 +83,30 @@ def test_ordinary_prefill_metadata_tracks_nonfinite_cache_writes():
     model(torch.tensor([1, 2]), positions, metadata)
     assert model.layers[0].self_attn.tree_cache_nonfinite
     assert not torch.isfinite(model.layers[0].self_attn.key_cache).all()
+
+
+@torch.inference_mode()
+def test_tree_decode_fault_is_caught_at_model_boundary_without_layer_reductions():
+    model = _model()
+    plan = build_tree_speculation_plan(2, 2, 0, 16)
+    input_ids, positions, metadata = model.make_tree_attention_metadata(
+        [plan],
+        [1],
+        [[2, 3, 4, 5]],
+        model.layers[0].self_attn.block_table,
+    )
+    handle = model.layers[0].self_attn.qkv_proj.register_forward_hook(
+        lambda module, args, output: torch.full_like(output, float("nan"))
+    )
+    try:
+        hidden = model(input_ids, positions, metadata)
+        model.compute_greedy_tokens(hidden, 31)
+    finally:
+        handle.remove()
+    assert not model.layers[0].self_attn.tree_cache_nonfinite
+    assert model.output_nonfinite
+    assert model.lm_head.logits_nonfinite
+    assert _engine(model)._spec_rhythm_nonfinite_flag()
 
 
 @pytest.mark.parametrize("stage", ["mlp", "norm", "head"])
@@ -163,6 +188,17 @@ def test_sticky_flag_survives_traced_replay_and_release_until_full_cache_reiniti
     assert model.layers[0].self_attn.tree_cache_nonfinite is attention_flag and not attention_flag
     assert not model.layers[0].self_attn.key_cache.any()
     assert not engine._spec_rhythm_nonfinite_flag()
+
+
+def test_decode_boundary_omits_layer_flags_already_voted_at_prefill():
+    model = _model()
+    engine = _engine(model)
+    model.layers[0].self_attn.tree_cache_nonfinite.fill_(True)
+
+    assert engine._spec_rhythm_nonfinite_flag()
+    assert not engine._spec_rhythm_nonfinite_flag(include_layer_cache=False)
+    model.output_nonfinite.fill_(True)
+    assert engine._spec_rhythm_nonfinite_flag(include_layer_cache=False)
 
 
 @pytest.mark.parametrize("bad_rank", [0, 1, 2, 3])

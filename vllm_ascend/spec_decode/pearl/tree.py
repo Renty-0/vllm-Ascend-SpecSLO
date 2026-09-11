@@ -12,7 +12,8 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 import torch
@@ -21,15 +22,39 @@ if TYPE_CHECKING:
     from vllm_ascend.spec_decode.pearl.spec_rhythm import SpecRhythmBudgetPlan
 
 
-def make_spine_first_parents(width: int, depth: int, device: torch.device | str | None = None) -> torch.Tensor:
-    """Return contiguous spine-first parent indices for a uniform tree."""
+@lru_cache(maxsize=64)
+def _spine_first_topology(width: int, depth: int) -> tuple[tuple[int, ...], tuple[int, ...], tuple[int, ...]]:
+    """Cache immutable topology and sparse query-visibility coordinates."""
 
     if width < 1 or depth < 1:
         raise ValueError("tree width and depth must be positive")
-    parents = [-1] + list(range(depth - 1))
-    for level in range(depth):
-        parent = -1 if level == 0 else level - 1
-        parents.extend([parent] * (width - 1))
+    parents = (
+        -1,
+        *range(depth - 1),
+        *(
+            parent
+            for level in range(depth)
+            for parent in [-1 if level == 0 else level - 1] * (width - 1)
+        ),
+    )
+    visible_rows = [0]
+    visible_offsets = [0]
+    for node in range(len(parents)):
+        row = node + 1
+        visible_rows.append(row)
+        visible_offsets.append(0)
+        current = node
+        while current >= 0:
+            visible_rows.append(row)
+            visible_offsets.append(current + 1)
+            current = parents[current]
+    return parents, tuple(visible_rows), tuple(visible_offsets)
+
+
+def make_spine_first_parents(width: int, depth: int, device: torch.device | str | None = None) -> torch.Tensor:
+    """Return contiguous spine-first parent indices for a uniform tree."""
+
+    parents, _, _ = _spine_first_topology(width, depth)
     return torch.tensor(parents, dtype=torch.int32, device=device)
 
 
@@ -58,19 +83,17 @@ def build_tree_attention_mask(
     query_len = 1 + width * depth
     if prefix_len + query_len > max_model_len:
         raise ValueError("tree query positions exceed max_model_len")
-    parents = make_spine_first_parents(width, depth).tolist()
+    parents, visible_rows, visible_offsets = _spine_first_topology(width, depth)
     levels = _node_levels(width, depth)
     query_len = 1 + width * depth
     mask = torch.ones((query_len, max_model_len), dtype=torch.bool, device=device)
     mask[:, :prefix_len] = False
-    mask[0, prefix_len] = False
-    for node, parent in enumerate(parents):
-        row = node + 1
-        mask[row, prefix_len] = False
-        current = node
-        while current >= 0:
-            mask[row, prefix_len + current + 1] = False
-            current = parents[current]
+    # Set root/self/ancestor visibility in one indexed write.  The former
+    # scalar Python loop dominated small-tree scheduler time because each
+    # tensor assignment dispatched separately even for a CPU plan.
+    row_indices = torch.tensor(visible_rows, dtype=torch.long, device=device)
+    column_indices = torch.tensor(visible_offsets, dtype=torch.long, device=device)
+    mask[row_indices, column_indices + prefix_len] = False
     # ``levels`` is intentionally computed above as a validation of the
     # spine-first layout; positions are exposed by TreeSpeculationPlan.
     assert len(levels) == len(parents)
@@ -109,7 +132,17 @@ class TreeSpeculationPlan:
         assert self.cache_positions is not None
         if self.cache_positions.numel() != node_count + 1:
             raise ValueError("cache_positions must include root and every tree node")
-        if self.cache_positions.ndim != 1 or self.cache_positions.unique().numel() != self.cache_positions.numel():
+        if self.cache_positions.ndim != 1:
+            raise ValueError("cache_positions must be unique within one tree")
+        if self.cache_positions.device.type == "cpu":
+            # Tiny scheduler-owned trees are faster to validate as Python
+            # integers than through ``torch.unique`` (which dominates plan
+            # construction for the common 2x2 topology).
+            positions = self.cache_positions.tolist()
+            cache_positions_are_unique = len(set(positions)) == len(positions)
+        else:
+            cache_positions_are_unique = self.cache_positions.unique().numel() == self.cache_positions.numel()
+        if not cache_positions_are_unique:
             raise ValueError("cache_positions must be unique within one tree")
 
 
@@ -131,6 +164,11 @@ def pack_selected_tree_plan(
     parents = plan.parent_indices.detach().cpu().tolist()
     if not indices or indices != sorted(set(indices)) or indices[0] < 0 or indices[-1] >= len(parents):
         raise ValueError("selected tree indices must be unique and topologically ordered")
+    if indices == list(range(len(parents))) and plan.candidate_budget == len(parents):
+        # The plan is already physically packed.  Rebuilding its parent,
+        # position and full-width mask tensors is a pure identity operation
+        # on the hot target path.
+        return plan
     remap = {old: new for new, old in enumerate(indices)}
     if any(parents[index] != -1 and parents[index] not in remap for index in indices):
         raise ValueError("selected tree is not ancestor closed")
@@ -208,6 +246,57 @@ def build_tree_speculation_plan(
             device=device,
         ),
     )
+
+
+@lru_cache(maxsize=64)
+def _cached_cpu_tree_geometry(
+    width: int,
+    depth: int,
+    prefix_len: int,
+    max_model_len: int,
+) -> TreeSpeculationPlan:
+    """Return one read-only CPU tensor template for a tree geometry."""
+
+    return build_tree_speculation_plan(
+        width,
+        depth,
+        prefix_len,
+        max_model_len,
+        device="cpu",
+    )
+
+
+def cached_cpu_tree_speculation_plan(
+    width: int,
+    depth: int,
+    prefix_len: int,
+    max_model_len: int,
+    *,
+    candidate_budget: int,
+) -> TreeSpeculationPlan:
+    """Reuse immutable scheduler tensors for repeated prefix geometries.
+
+    Request lengths recur across continuous batches and benchmark/server
+    warmups. Parent IDs, logical/physical positions and the FULL mask depend
+    on the integer prefix but not on request identity or token values. The
+    small bounded cache therefore avoids rebuilding those tensors on every
+    rank while keeping device/model-runner inputs unchanged.
+
+    Cached tensors are shared read-only. Execution paths that need a subset
+    use :func:`pack_selected_tree_plan`, which allocates a new plan unless the
+    selection is already the complete identity tree.
+    """
+
+    template = _cached_cpu_tree_geometry(
+        int(width),
+        int(depth),
+        int(prefix_len),
+        int(max_model_len),
+    )
+    budget = int(candidate_budget)
+    if budget == template.candidate_budget:
+        return template
+    return replace(template, candidate_budget=budget)
 
 
 @dataclass(frozen=True)
@@ -552,6 +641,7 @@ __all__ = [
     "SpecRhythmTreeCoordinator",
     "build_tree_attention_mask",
     "build_tree_speculation_plan",
+    "cached_cpu_tree_speculation_plan",
     "make_spine_first_parents",
     "select_tree_candidates",
     "tree_budget_from_spec_rhythm",
