@@ -534,3 +534,25 @@ B=5，实际按请求分为 `[2,1,1,1]`，候选总数正好为 5；随后 batch
 workload 对比 TP4 vLLM-Ascend，统计 TPOT 达成率与 Goodput。1.3× 尚未在本节宣称。
 TP3 fused MC2 已经实测否决，生产使用数值合格的 matmul+HCCL；跨 dense/PA 与 FIA
 raw BF16 logits 仍作为跨后端诊断差异保留，不影响同 FIA Graph/eager 的接受标准。
+
+### 6.8 2026-09-11：程序级 profiling 检查点
+
+进入算子调优前，本轮先建立低扰动 host timeline、同步阶段 profile 和 CANN device
+trace 三层证据，并修复首次尾部 Graph shape 会重复执行完整 32B eager reference 的
+运行时校验 bug。修复后 Qwen3-0.6B TP1 + Qwen3-32B TP3 在固定 B8 短回归中的三次
+中位吞吐为 167.785 token/s，相对生产 vLLM-Ascend TP4 target-only 的
+141.663 token/s 为 1.1844x；输出与 native TP3 target-only 完全一致，Graph 三类
+fallback 和额外 runtime validation replay 均为 0。1.3x 尚未达到。
+
+新细分表明：稳态 scheduler 的约 2.216 ms 中约 2.014 ms 用于 tree plan/ticket
+构造；state update 的约 3.072 ms 中约 2.182 ms 用于 commit consensus。target
+compute 约 33.888 ms、draft 约 22.861 ms，host 窗口重叠约 22.802 ms，但仍有约
+11 ms target 尾部未被普通 draft 覆盖。CANN trace 证明存在真实设备 overlap，同时将
+target MatMul 和 TP3 HCCL all-reduce 确认为后续算子层热点。
+
+简单增大 B10/B12/B16 和跳过 FULL FIA 的二维 mask copy 均未提升性能，后者已撤销。
+当前优先继续拆解 tree plan 构造、commit consensus 和 rolling eager 尾部覆盖；发生
+显著执行架构变化后才重新按论文流程校准最终 B，而不是每次源码修改都重测。
+
+完整配置、数据、阶段定义、证据路径和下一步问题见
+[SpecSLO 程序级 Profiling 与性能优化记录](specslo_profiling_and_optimization_20260911_zh.md)。

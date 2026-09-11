@@ -181,6 +181,31 @@ def _move_tensor_slots(
             flat.index_copy_(0, destination_slots, source_values)
 
 
+def _move_npu_kv_pair_slots(
+    key_cache: torch.Tensor,
+    value_cache: torch.Tensor,
+    source_slots: torch.Tensor,
+    destination_slots: torch.Tensor,
+) -> None:
+    """Gather an overlapping-safe K/V pair and scatter it with one NPU op."""
+    key_values = torch.index_select(key_cache.flatten(0, 1), 0, source_slots)
+    value_values = torch.index_select(value_cache.flatten(0, 1), 0, source_slots)
+    torch_npu._npu_reshape_and_cache(
+        key=key_values,
+        value=value_values,
+        key_cache=key_cache,
+        value_cache=value_cache,
+        slot_indices=destination_slots.to(torch.int32),
+    )
+
+
+def _is_npu_kv_pair(layer_cache: tuple[torch.Tensor, ...] | list[torch.Tensor]) -> bool:
+    return len(layer_cache) == 2 and all(
+        isinstance(cache, torch.Tensor) and cache.device.type == "npu"
+        for cache in layer_cache
+    )
+
+
 def move_kv_cache_slots(
     kv_caches: Iterable[torch.Tensor | tuple[torch.Tensor, ...] | list[torch.Tensor]],
     source_slots: torch.Tensor,
@@ -197,6 +222,13 @@ def move_kv_cache_slots(
         if isinstance(layer_cache, torch.Tensor):
             _move_tensor_slots(
                 layer_cache, source_slots, destination_slots, packed_kv=True
+            )
+        elif _is_npu_kv_pair(layer_cache):
+            _move_npu_kv_pair_slots(
+                layer_cache[0],
+                layer_cache[1],
+                source_slots,
+                destination_slots,
             )
         else:
             for cache in layer_cache:

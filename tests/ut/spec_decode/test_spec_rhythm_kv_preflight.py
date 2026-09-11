@@ -368,7 +368,7 @@ def _distributed_preflight_worker(rank, world_size, store_path, result_queue):
                 target_calls.append((args, output))
                 return output
 
-            def verdict(output, plans):
+            def verdict(output, plans, target_compute_ms=0.0):
                 if output is None:
                     # The protocol fixture supplies the same valid target
                     # verdict to nonleader ranks without model/TP transport.
@@ -381,7 +381,7 @@ def _distributed_preflight_worker(rank, world_size, store_path, result_queue):
                         [int(plan.candidate_budget) for plan in plans],
                         max(plan.depth for plan in plans),
                     )
-                return harness.verdict(output, plans)
+                return harness.verdict(output, plans, target_compute_ms)
 
             harness.engine.target_tree_forward = target
             harness.engine._broadcast_spec_rhythm_tree_verdict = verdict

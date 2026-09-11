@@ -9,8 +9,10 @@ import pytest
 import torch
 
 from examples.benchmark_nano_pearl_speculative import (
+    _aggregate_decode_host_profile,
     _aggregate_decode_profile,
     _parse_target_graph_post_counts,
+    _require_no_graph_fallback,
     _worker_aclgraph_deltas,
 )
 from examples.benchmark_nano_pearl_speculative import (
@@ -277,10 +279,11 @@ def test_tree_verdict_target_leader_broadcasts_to_target_and_draft_groups():
     )
 
     with patch("vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast") as broadcast:
-        tokens, accepted = engine._broadcast_spec_rhythm_tree_verdict(output, [plan])
+        tokens, accepted, target_ms = engine._broadcast_spec_rhythm_tree_verdict(output, [plan])
 
     assert tokens == [[10, 11, 12]]
     assert accepted == [[0, -1]]
+    assert target_ms == 0.0
     assert [call.kwargs["group"] for call in broadcast.call_args_list] == [
         engine.groups.target_group,
         engine.groups.correction_group,
@@ -1961,6 +1964,7 @@ def test_public_pearl_config_maps_upstream_fields_to_native_runtime():
             target_verification_graph_post_counts=((8, (0, 4, 8)),),
             enable_cpu_binding=False,
             profile_decode_steps=5,
+            profile_host_decode_steps=7,
         )
 
     native = config.to_native()
@@ -1999,6 +2003,7 @@ def test_public_pearl_config_maps_upstream_fields_to_native_runtime():
     assert native.precompile_decode_graphs is True
     assert native.enable_cpu_binding is False
     assert native.profile_decode_steps == 5
+    assert native.profile_host_decode_steps == 7
 
 
 def test_public_pearl_config_rejects_nonpositive_worker_timeout():
@@ -2019,6 +2024,11 @@ def test_public_pearl_config_requires_continuous_batching_for_preemption():
 def test_public_pearl_config_rejects_negative_profile_decode_steps():
     with pytest.raises(ValueError, match="profile_decode_steps"):
         PEARLConfig("draft", "target", profile_decode_steps=-1)
+
+
+def test_public_pearl_config_rejects_negative_host_profile_decode_steps():
+    with pytest.raises(ValueError, match="profile_host_decode_steps"):
+        PEARLConfig("draft", "target", profile_host_decode_steps=-1)
 
 
 def test_public_pearl_config_requires_steps_for_profiling_only():
@@ -2150,9 +2160,9 @@ def test_public_engine_configures_decode_profiling_on_every_worker():
     engine._send_all = MagicMock()
     engine._receive_all = MagicMock(return_value=[("configured", 0), ("configured", 1)])
 
-    engine.configure_decode_profiling(5, True)
+    engine.configure_decode_profiling(5, True, 7)
 
-    engine._send_all.assert_called_once_with(("configure_decode_profiling", 5, True, None))
+    engine._send_all.assert_called_once_with(("configure_decode_profiling", 5, True, 7))
     engine._receive_all.assert_called_once_with("worker profiling configuration")
 
 
@@ -2284,6 +2294,7 @@ def test_public_engine_aggregates_aclgraph_metrics_from_every_worker():
         "aclgraph_failed_captures": 6,
         "aclgraph_capacity_fallbacks": 9,
         "aclgraph_shape_fallbacks": 11,
+        "worker_spec_rhythm_draft_materialized_nodes": 7,
     }
     engine._receive_all = MagicMock(
         return_value=[
@@ -2300,6 +2311,7 @@ def test_public_engine_aggregates_aclgraph_metrics_from_every_worker():
     assert engine.last_metrics[0]["aclgraph_failed_captures"] == 6
     assert engine.last_metrics[0]["aclgraph_capacity_fallbacks"] == 9
     assert engine.last_metrics[0]["aclgraph_shape_fallbacks"] == 11
+    assert engine.last_metrics[0]["worker_spec_rhythm_draft_materialized_nodes"] == 7
     assert engine.last_worker_metrics_by_chunk == [
         {
             "batch_size": 1,
@@ -2322,6 +2334,8 @@ def test_decode_profile_aggregates_only_full_batch_chunks_per_step():
             "worker_profile_target_to_draft_communication_seconds": 0.05 * scale,
             "worker_profile_wait_sync_seconds": 0.06 * scale,
             "worker_profile_state_update_seconds": 0.07 * scale,
+            "worker_profile_detail_commit_consensus_seconds": 0.08 * scale,
+            "worker_profile_detail_kv_compaction_seconds": 0.09 * scale,
         }
 
     chunks = [
@@ -2348,6 +2362,81 @@ def test_decode_profile_aggregates_only_full_batch_chunks_per_step():
             "wait_sync_state_update": 195.0,
         }
     )
+    assert profile["detail_milliseconds_per_decode_step"] == pytest.approx(
+        {"commit_consensus": 120.0, "kv_compaction": 135.0}
+    )
+
+
+def test_host_decode_profile_merges_rank_local_timestamps_without_sync():
+    def trace(rank, is_draft, *, draft=(1.01, 1.03), target=(1.012, 1.052)):
+        return {
+            "rank": rank,
+            "is_draft_rank": int(is_draft),
+            "worker_host_timeline": [
+                {
+                    "step": 0,
+                    "rank": rank,
+                    "is_draft_rank": int(is_draft),
+                    "cycle_start_seconds": 1.0,
+                    "scheduler_roof_end_seconds": 1.002,
+                    "scheduler_plan_end_seconds": 1.005,
+                    "scheduler_budget_end_seconds": 1.007,
+                    "scheduler_end_seconds": 1.01,
+                    "draft_start_seconds": draft[0],
+                    "draft_end_seconds": draft[1],
+                    "target_start_seconds": target[0],
+                    "target_end_seconds": target[1],
+                    "exchange_start_seconds": 1.052,
+                    "exchange_end_seconds": 1.057 + rank * 0.001,
+                    "verdict_start_seconds": 1.057,
+                    "verdict_end_seconds": 1.059,
+                    "correction_start_seconds": 1.059,
+                    "correction_end_seconds": 1.063 + rank * 0.001,
+                    "state_start_seconds": 1.064,
+                    "state_preflight_end_seconds": 1.0645,
+                    "state_consensus_end_seconds": 1.065,
+                    "state_compaction_end_seconds": 1.0652,
+                    "state_request_commit_end_seconds": 1.066,
+                    "state_end_seconds": 1.066,
+                    "cycle_end_seconds": 1.07 + rank * 0.001,
+                    "target_requests": 4,
+                    "draft_requests": 4,
+                    "verify_candidates": 8,
+                }
+            ],
+        }
+
+    profile = _aggregate_decode_host_profile(
+        [
+            {
+                "batch_size": 8,
+                "worker_metrics": [
+                    trace(0, True),
+                    trace(1, False),
+                    trace(2, False),
+                    trace(3, False),
+                ],
+            }
+        ],
+        batch_size=8,
+    )
+
+    cycle = profile["cycles"][0]
+    assert cycle["cycle_wall_ms"] == pytest.approx(73.0)
+    assert cycle["scheduler_roof_critical_ms"] == pytest.approx(2.0)
+    assert cycle["scheduler_plan_critical_ms"] == pytest.approx(3.0)
+    assert cycle["scheduler_budget_critical_ms"] == pytest.approx(2.0)
+    assert cycle["scheduler_tree_plan_critical_ms"] == pytest.approx(3.0)
+    assert cycle["draft_compute_host_ms"] == pytest.approx(20.0)
+    assert cycle["target_compute_host_ms"] == pytest.approx(40.0)
+    assert cycle["host_compute_overlap_ms"] == pytest.approx(18.0)
+    assert cycle["draft_to_target_critical_ms"] == pytest.approx(8.0)
+    assert cycle["target_to_draft_critical_ms"] == pytest.approx(7.0)
+    assert cycle["state_update_critical_ms"] == pytest.approx(2.0)
+    assert cycle["state_preflight_critical_ms"] == pytest.approx(0.5)
+    assert cycle["state_consensus_critical_ms"] == pytest.approx(0.5)
+    assert cycle["state_compaction_critical_ms"] == pytest.approx(0.2)
+    assert cycle["state_request_commit_critical_ms"] == pytest.approx(0.8)
 
 
 def test_worker_aclgraph_deltas_match_workers_by_rank():
@@ -2415,8 +2504,42 @@ def test_worker_aclgraph_deltas_count_cold_measurement_without_warmup():
             "aclgraph_failed_captures_delta": 0,
             "aclgraph_capacity_fallbacks_delta": 0,
             "aclgraph_shape_fallbacks_delta": 0,
+            "aclgraph_runtime_validation_replays_delta": 0,
         }
     ]
+
+
+def test_graph_only_benchmark_gate_accepts_active_workers_without_fallback():
+    deltas = [
+        {
+            "rank": rank,
+            "aclgraph_captures_delta": int(rank == 0),
+            "aclgraph_replays_delta": 4,
+            "aclgraph_failed_captures_delta": 0,
+            "aclgraph_capacity_fallbacks_delta": 0,
+            "aclgraph_shape_fallbacks_delta": 0,
+        }
+        for rank in range(4)
+    ]
+    _require_no_graph_fallback(deltas)
+
+
+@pytest.mark.parametrize("failure", ["fallback", "inactive"])
+def test_graph_only_benchmark_gate_rejects_any_rank_without_graph_contract(failure):
+    delta = {
+        "rank": 2,
+        "aclgraph_captures_delta": 0,
+        "aclgraph_replays_delta": 3,
+        "aclgraph_failed_captures_delta": 0,
+        "aclgraph_capacity_fallbacks_delta": 0,
+        "aclgraph_shape_fallbacks_delta": 0,
+    }
+    if failure == "fallback":
+        delta["aclgraph_shape_fallbacks_delta"] = 1
+    else:
+        delta["aclgraph_replays_delta"] = 0
+    with pytest.raises(RuntimeError, match="Graph-only benchmark invariant failed"):
+        _require_no_graph_fallback([delta])
 
 
 def test_greedy_verdict_finds_first_mismatch_in_packed_mixed_windows():

@@ -80,6 +80,52 @@ def bucket_tree_attention_metadata(metadata, *, block_size: int):
     )
 
 
+def bucket_tree_fia_attention_metadata(metadata, *, block_size: int):
+    """Stabilize FULL-mask FIA KV lengths without adding query rows.
+
+    FIA receives sequence lengths as host literals embedded in every captured
+    attention task. Updating those literals one layer at a time dominates tiny
+    tree replays. Within a power-of-two context bucket the request-local FULL
+    mask is already the source of truth, so masked tail pages may safely share
+    a valid dummy page and every request can use one stable KV extent.
+    """
+    if (
+        not metadata.use_fused_infer_attention
+        or not getattr(metadata, "tree_attention", False)
+    ):
+        return metadata
+    mask = getattr(metadata, "tree_attention_mask", None)
+    tables = metadata.request_block_tables
+    lengths = tuple(int(value) for value in metadata.sequence_lens)
+    if (
+        block_size <= 0
+        or mask is None
+        or mask.ndim != 4
+        or mask.dtype != torch.bool
+        or tables is None
+        or tables.ndim != 2
+        or not lengths
+        or len(lengths) != mask.shape[0]
+        or tables.shape[0] != len(lengths)
+        or any(value <= 0 for value in lengths)
+    ):
+        raise ValueError("Tree FIA bucketing requires aligned positive lengths, FULL mask and page tables")
+    capacity = min(int(mask.shape[-1]), int(tables.shape[1]) * block_size)
+    maximum_length = max(lengths)
+    if maximum_length > capacity:
+        raise ValueError("Tree FIA context length exceeds its mask or block-table capacity")
+    bucket = min(1 << (maximum_length - 1).bit_length(), capacity)
+    positions = torch.arange(mask.shape[-1], device=mask.device)
+    actual_lengths = torch.tensor(lengths, device=mask.device)
+    tail_mask = positions.view(1, 1, 1, -1) >= actual_lengths.view(-1, 1, 1, 1)
+    return replace(
+        metadata,
+        sequence_lens=(bucket,) * len(lengths),
+        request_block_tables=tables.clamp_min(0),
+        tree_attention_mask=mask | tail_mask,
+    )
+
+
 @dataclass
 class NativePagedAttentionGraphTask:
     query: torch.Tensor
@@ -447,6 +493,9 @@ class NativeACLGraphRunner:
         self.failed_capture_count = 0
         self.capacity_fallback_count = 0
         self.shape_fallback_count = 0
+        self.task_update_replay_count = 0
+        self.task_update_skip_replay_count = 0
+        self.runtime_validation_replay_count = 0
         self.disabled_entry_keys: set[tuple[str, int]] = set()
         self.expected_fia_batch_size: int | None = None
         self.last_fia_shape: tuple[int, ...] = ()
@@ -646,6 +695,12 @@ class NativeACLGraphRunner:
                     size, getattr(metadata, "tree_attention_mask", None), metadata.request_block_tables,
                     metadata.actual_seq_lengths_q, metadata.sequence_lens, block_size,
                 )
+            attention_metadatas = [
+                bucket_tree_fia_attention_metadata(
+                    metadata, block_size=block_size
+                )
+                for metadata in attention_metadatas
+            ]
             shape_signature = tuple(
                 (
                     tuple(metadata.tree_attention_mask.shape),
@@ -656,7 +711,17 @@ class NativeACLGraphRunner:
             )
             # Query/KV *values* are updated with the FIA task. Only static
             # buffer shapes and the FULL-mask operator contract form the key.
-            attention_key = f"tree-fia-full:buffers:{shape_signature}"
+            kv_buckets = tuple(
+                metadata.sequence_lens for metadata in attention_metadatas
+            )
+            query_partitions = tuple(
+                metadata.actual_seq_lengths_q for metadata in attention_metadatas
+            )
+            attention_key = (
+                "tree-fia-full:"
+                f"query-partitions:{query_partitions}|"
+                f"kv-buckets:{kv_buckets}|buffers:{shape_signature}"
+            )
         elif all(attention_modes):
             attention_key = "fia"
         elif any(metadata.attention_mask is not None for metadata in attention_metadatas):
@@ -708,16 +773,32 @@ class NativeACLGraphRunner:
                 reference_metadatas=reference_metadatas,
                 output_kind=output_kind,
             )
+        task_lengths_unchanged = (
+            entry.actual_seq_lengths_q
+            == tuple(metadata.actual_seq_lengths_q for metadata in attention_metadatas)
+            and entry.sequence_lens
+            == tuple(metadata.sequence_lens for metadata in attention_metadatas)
+        )
         self._copy_target_inputs(entry, input_ids, positions, attention_metadatas)
         assert self.update_stream is not None
         current_stream = torch.npu.current_stream()
-        self.update_stream.wait_stream(current_stream)
-        self._update_target_attention_tasks(entry)
-        current_stream.wait_stream(self.update_stream)
+        if task_lengths_unchanged:
+            # Graph-owned input buffers were copied on current_stream. FIA's
+            # host literal lengths are unchanged, so rebuilding every layer's
+            # task is redundant. Refresh only the captured external events.
+            for task in entry.tasks:
+                task.event.record(current_stream)
+            self.task_update_skip_replay_count += 1
+        else:
+            self.update_stream.wait_stream(current_stream)
+            self._update_target_attention_tasks(entry)
+            current_stream.wait_stream(self.update_stream)
+            self.task_update_replay_count += 1
         entry.graph.replay()
         self.replay_count += 1
         self.last_target_execution = NativeGraphExecution("replay", replay_executed=True)
         if not entry.runtime_validated:
+            self.runtime_validation_replay_count += 1
             torch.npu.synchronize()
             graph_outputs = tuple(value.clone() for value in entry.outputs)
             reference_outputs = self._execute_target(
@@ -854,6 +935,12 @@ class NativeACLGraphRunner:
                 bool(metadata.use_fused_infer_attention and getattr(metadata, "tree_attention", False))
                 for metadata in captured_metadatas
             ),
+            # Capture already executes a real replay and compares it against
+            # the eager reference below.  A second eager 32B forward on the
+            # first *later* replay used to turn tail shapes into 180-190 ms
+            # decode stalls. Keep that changed-input qualification available
+            # as an explicit diagnostic, never on the production hot path.
+            runtime_validated=not envs.VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS,
         )
         self.target_entries[entry_key] = entry
         current_stream = torch.npu.current_stream()

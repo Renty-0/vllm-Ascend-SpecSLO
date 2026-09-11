@@ -5,6 +5,7 @@ These tests do not claim to exercise the Ascend graph runtime. Hardware graph
 replay/numerical regression remains a separate end-to-end acceptance gate.
 """
 
+import os
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -14,6 +15,7 @@ import torch
 from vllm_ascend.spec_decode.pearl.native_graph import (
     NativeACLGraphRunner,
     bucket_tree_attention_metadata,
+    bucket_tree_fia_attention_metadata,
 )
 from vllm_ascend.spec_decode.pearl.native_model import (
     NativeAttention,
@@ -79,6 +81,33 @@ def test_tree_bucket_caps_non_power_of_two_context_capacity():
 def test_tree_bucket_rejects_invalid_context_lengths(lengths):
     with pytest.raises(ValueError, match="context length"):
         bucket_tree_attention_metadata(_metadata(lengths), block_size=4)
+
+
+def test_tree_fia_bucket_uses_full_mask_and_valid_dummy_tail_pages():
+    counts = (2, 3)
+    mask = torch.zeros((2, 1, 3, 32), dtype=torch.bool)
+    tables = torch.tensor([[3, 4, 5, -1, -1, -1, -1, -1]] * 2, dtype=torch.int32)
+    metadata = NativeAttentionMetadata(
+        slot_mapping=torch.arange(5, dtype=torch.int32),
+        context_lens=torch.tensor([12, 12, 13, 13, 13], dtype=torch.int32),
+        block_tables=tables.repeat_interleave(torch.tensor(counts), dim=0),
+        actual_seq_lengths_q=(2, 5),
+        sequence_lens=(12, 13),
+        request_block_tables=tables,
+        attention_mask=torch.zeros((5, 32), dtype=torch.bool),
+        use_fused_infer_attention=True,
+        tree_attention=True,
+        tree_attention_mask=mask,
+    )
+
+    bucketed = bucket_tree_fia_attention_metadata(metadata, block_size=4)
+
+    assert bucketed.sequence_lens == (16, 16)
+    assert bucketed.request_block_tables.min() == 0
+    assert bucketed.tree_attention_mask[0, :, :, 12:].all()
+    assert bucketed.tree_attention_mask[1, :, :, 13:].all()
+    assert not bucketed.tree_attention_mask[0, :, :, :12].any()
+    assert metadata.request_block_tables[0, 3] == -1
 
 
 def test_dense_bucket_matches_exact_context_with_nan_padding_and_masked_sibling():
@@ -225,6 +254,32 @@ def test_target_graph_reports_capture_then_real_replay_and_copies_new_mask():
         assert entry.attention_masks[0][0, 6]
         assert runner.capture_count == 1
         assert runner.replay_count == 2
+        # One eager reference plus one capture-body invocation; there is no
+        # third full-model call on the first production replay.
+        assert runner._execute_target.call_count == 2
+        assert entry.runtime_validated
+        assert runner.runtime_validation_replay_count == 0
+
+
+def test_target_graph_changed_input_runtime_validation_is_explicit_diagnostic():
+    runner = _runner()
+    runner._execute_target = MagicMock(return_value=(torch.tensor([1, 2]),))
+    runner._update_target_attention_tasks = MagicMock()
+    with (
+        patch.dict(os.environ, {"VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS": "1"}),
+        patch("torch.npu.NPUGraph", return_value=MagicMock()),
+        patch("torch.npu.graph", return_value=MagicMock()),
+        patch("torch.npu.current_stream", return_value=MagicMock()),
+        patch("torch.npu.synchronize"),
+    ):
+        _target_call(runner, _metadata((5, 6)))
+        entry = next(iter(runner.target_entries.values()))
+        assert not entry.runtime_validated
+        _target_call(runner, _metadata((6, 7)))
+
+    assert entry.runtime_validated
+    assert runner._execute_target.call_count == 3
+    assert runner.runtime_validation_replay_count == 1
 
 
 def test_target_graph_validation_failure_reports_eager_return_after_replay():

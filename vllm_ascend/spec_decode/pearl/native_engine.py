@@ -19,6 +19,7 @@ import os
 import time
 from collections import deque
 from collections.abc import Callable, Mapping, Sequence
+from contextlib import nullcontext
 from dataclasses import dataclass, replace
 from typing import Any
 
@@ -34,9 +35,11 @@ from vllm_ascend.spec_decode.pearl.native_cache import NativeCacheAllocation, Na
 from vllm_ascend.spec_decode.pearl.native_graph import NativeACLGraphRunner
 from vllm_ascend.spec_decode.pearl.native_model import (
     PAGED_ATTENTION_BLOCK_SIZE,
+    NativeAttentionMetadata,
     NativeTPContext,
     build_native_model,
     load_native_model_weights,
+    make_tree_fia_mask,
 )
 from vllm_ascend.spec_decode.pearl.qwen_pair import validate_model_pair
 from vllm_ascend.spec_decode.pearl.roofline import (
@@ -78,6 +81,13 @@ PREEMPTIVE_SCHEDULING_PRIOR_ROUNDS = 8
 PREEMPTIVE_SCHEDULING_RECENT_ROUNDS = 32
 
 logger = logging.getLogger("vllm_ascend.spec_decode.pearl.native")
+
+
+def _trace_region(owner: object, name: str):
+    """Emit nested host ranges only while the heavyweight NPU trace is active."""
+    if getattr(owner, "_active_tree_profiler", None) is None:
+        return nullcontext()
+    return torch.profiler.record_function(name)
 
 
 def _set_default_npu_environment(target_tp_size: int | None = None) -> None:
@@ -476,6 +486,7 @@ class NativePearlConfig:
     precompile_decode_graphs: bool = False
     enable_cpu_binding: bool = True
     profile_decode_steps: int = 0
+    profile_host_decode_steps: int = 0
     stop_after_profiled_decode_steps: bool = False
     enforce_eager: bool = False
     enable_mc2: bool = False
@@ -599,6 +610,8 @@ class NativePearlConfig:
                 raise ValueError("PEARL decode graph precompilation exceeds max_aclgraph_entries.")
         if self.profile_decode_steps < 0:
             raise ValueError("PEARL profile_decode_steps must be non-negative.")
+        if self.profile_host_decode_steps < 0:
+            raise ValueError("PEARL profile_host_decode_steps must be non-negative.")
         if self.stop_after_profiled_decode_steps and self.profile_decode_steps == 0:
             raise ValueError("PEARL profiling-only execution requires profile_decode_steps to be positive.")
         if self.mc2_profile is not None:
@@ -709,6 +722,16 @@ class NativePearlEngine:
             config.kvcache_block_size,
             num_cache_blocks,
         )
+        # Layer KV tensors are allocated once for the engine lifetime. Keep a
+        # validated view so the decode commit path does not rescan every model
+        # layer before every tree move. CPU protocol harnesses construct the
+        # engine with ``__new__`` and exercise the uncached validation path.
+        self._tree_layer_caches = self._collect_tree_layer_caches()
+        self._tree_cache_capacity = min(
+            int(cache.shape[0]) * int(cache.shape[1])
+            for pair in self._tree_layer_caches
+            for cache in pair
+        )
         attention = self.model.layers[0].self_attn
         assert attention.key_cache is not None
         self.prefix_cache = NativePrefixCache(
@@ -730,6 +753,8 @@ class NativePearlEngine:
         )
         self.last_worker_decode_phase_seconds: dict[str, float] = {}
         self.last_worker_decode_profile_seconds: dict[str, float] = {}
+        self.last_worker_decode_profile_detail_seconds: dict[str, float] = {}
+        self.last_worker_decode_host_timeline: list[dict[str, int | float]] = []
         self.last_worker_profiled_decode_steps = 0
         self.last_worker_decode_counters: dict[str, int] = {}
         self.greedy_verification_layouts: dict[
@@ -754,7 +779,7 @@ class NativePearlEngine:
             self._precompile_decode_graphs()
         dist.barrier()
 
-    def graph_metrics(self) -> dict[str, int | float]:
+    def graph_metrics(self) -> dict[str, Any]:
         """Return this worker's cumulative ACLGraph counters."""
         metrics: dict[str, int | float] = {
             "rank": self.rank,
@@ -771,6 +796,9 @@ class NativePearlEngine:
             "aclgraph_failed_captures": self.graph_runner.failed_capture_count,
             "aclgraph_capacity_fallbacks": self.graph_runner.capacity_fallback_count,
             "aclgraph_shape_fallbacks": self.graph_runner.shape_fallback_count,
+            "aclgraph_task_update_replays": self.graph_runner.task_update_replay_count,
+            "aclgraph_task_update_skipped_replays": self.graph_runner.task_update_skip_replay_count,
+            "aclgraph_runtime_validation_replays": self.graph_runner.runtime_validation_replay_count,
             "aclgraph_expected_fia_batch_size": (
                 self.graph_runner.expected_fia_batch_size
                 if self.graph_runner.expected_fia_batch_size is not None
@@ -789,22 +817,33 @@ class NativePearlEngine:
                 for phase, seconds in self.last_worker_decode_profile_seconds.items()
             }
         )
+        metrics.update(
+            {
+                f"worker_profile_detail_{phase}_seconds": seconds
+                for phase, seconds in self.last_worker_decode_profile_detail_seconds.items()
+            }
+        )
         metrics.update({f"worker_{name}": value for name, value in self.last_worker_decode_counters.items()})
+        metrics["worker_host_timeline"] = list(self.last_worker_decode_host_timeline)
         return metrics
 
     def configure_decode_profiling(
         self,
         profile_decode_steps: int,
         stop_after_profiled_decode_steps: bool = False,
+        profile_host_decode_steps: int = 0,
     ) -> None:
         """Change decode profiling between requests without reloading the models."""
         if profile_decode_steps < 0:
             raise ValueError("PEARL profile_decode_steps must be non-negative.")
+        if profile_host_decode_steps < 0:
+            raise ValueError("PEARL profile_host_decode_steps must be non-negative.")
         if stop_after_profiled_decode_steps and profile_decode_steps == 0:
             raise ValueError("PEARL profiling-only execution requires profile_decode_steps to be positive.")
         self.config = replace(
             self.config,
             profile_decode_steps=profile_decode_steps,
+            profile_host_decode_steps=profile_host_decode_steps,
             stop_after_profiled_decode_steps=stop_after_profiled_decode_steps,
         )
 
@@ -1430,6 +1469,7 @@ class NativePearlEngine:
         decode_elapsed = time.perf_counter() - started
         self.last_worker_decode_phase_seconds = dict(decode_phase_seconds)
         self.last_worker_decode_profile_seconds = dict(decode_profile_seconds)
+        self.last_worker_decode_profile_detail_seconds = {}
         self.last_worker_profiled_decode_steps = profiled_decode_steps
         self.last_worker_decode_counters = {
             "target_verification_tokens": target_verification_tokens,
@@ -1781,19 +1821,16 @@ class NativePearlEngine:
         capacity: int | None = None
         model = getattr(self, "model", None)
         if model is not None:
-            if bool(self._spec_rhythm_nonfinite_flag().item()):
-                raise RuntimeError("SpecRhythm model produced nonfinite Q/K/V or output; discard this cache")
-            for layer in model.layers:
-                attention = layer.self_attn
-                for cache in (attention.key_cache, attention.value_cache):
-                    if not isinstance(cache, torch.Tensor) or cache.ndim != 4:
-                        raise RuntimeError("SpecRhythm tree KV preflight requires allocated paged layer caches")
-                    if cache.device != expected_device:
-                        raise RuntimeError("SpecRhythm tree KV cache is on the wrong device")
-                    slots = int(cache.shape[0]) * int(cache.shape[1])
-                    capacity = slots if capacity is None else min(capacity, slots)
-            if capacity is None:
-                raise RuntimeError("SpecRhythm tree KV preflight requires at least one layer cache")
+            cached_capacity = getattr(self, "_tree_cache_capacity", None)
+            if cached_capacity is not None:
+                capacity = int(cached_capacity)
+            else:
+                layer_caches = self._collect_tree_layer_caches()
+                capacity = min(
+                    int(cache.shape[0]) * int(cache.shape[1])
+                    for pair in layer_caches
+                    for cache in pair
+                )
         slot_values = torch.cat([mapping.to(dtype=torch.long) for _, mapping, _ in checked]).detach().cpu().tolist()
         cursor = 0
         for label, _, count in checked:
@@ -1891,16 +1928,25 @@ class NativePearlEngine:
         frontier_tokens: Sequence[int | None] | None = None,
         confidences: Sequence[float] | None = None,
         selected_indices: Sequence[Sequence[int]] | None = None,
+        draft_compute_ms: float = 0.0,
     ) -> torch.Tensor | None:
-        """Broadcast active tree nodes through the proposal verification group."""
+        """Broadcast active tree nodes and the measured draft window.
+
+        Carrying the role-local duration in this existing envelope avoids an
+        extra world all-reduce in every production decode cycle.  Float64
+        represents both vocabulary IDs and the millisecond observation exactly
+        enough for the deterministic host-side EMA.
+        """
         if not plans:
             return None
+        if not math.isfinite(draft_compute_ms) or draft_compute_ms < 0:
+            raise ValueError("draft tree compute time must be finite and non-negative")
         capacities = [int(plan.width * plan.depth) for plan in plans]
         # One extra scalar per row carries the draft-predicted frontier token
         # used to validate a rolling eager continuation.  ``-1`` marks a
         # normal proposal and is never a valid vocabulary id in this control
         # envelope.
-        message_size = 2 * sum(capacities) + 3 * len(plans)
+        message_size = 2 * sum(capacities) + 3 * len(plans) + 1
         if self.rank == self.topology.draft_leader_rank:
             if candidate_rows is None or len(candidate_rows) != len(plans):
                 raise RuntimeError("draft tree worker did not produce all candidate rows")
@@ -1923,6 +1969,7 @@ class NativePearlEngine:
             if confidences is None or len(confidences) != len(plans):
                 raise RuntimeError("tree proposal confidence must be row-aligned")
             values.extend(float(value) for value in confidences)
+            values.append(float(draft_compute_ms))
             if len(values) != message_size:
                 raise RuntimeError("tree proposal envelope has an invalid active-node size")
             # Float64 represents vocabulary IDs exactly and carries the same
@@ -1941,9 +1988,9 @@ class NativePearlEngine:
     def _split_tree_candidates(
         message: torch.Tensor,
         plans: Sequence[TreeSpeculationPlan],
-    ) -> tuple[list[list[int]], list[int | None], list[float], list[list[int]]]:
+    ) -> tuple[list[list[int]], list[int | None], list[float], list[list[int]], float]:
         capacities = [int(plan.width * plan.depth) for plan in plans]
-        if message.ndim != 1 or message.numel() != 2 * sum(capacities) + 3 * len(plans):
+        if message.ndim != 1 or message.numel() != 2 * sum(capacities) + 3 * len(plans) + 1:
             raise RuntimeError("tree proposal envelope does not match its plan")
         values = message.detach().cpu().tolist()
         rows: list[list[int]] = []
@@ -1959,22 +2006,36 @@ class NativePearlEngine:
             selected_rows.append([int(value) for value in values[cursor : cursor + count]])
             cursor += capacity
         frontier_values = values[cursor : cursor + len(plans)]
-        confidences = [float(value) for value in values[cursor + len(plans) :]]
+        confidence_start = cursor + len(plans)
+        confidence_end = confidence_start + len(plans)
+        confidences = [float(value) for value in values[confidence_start:confidence_end]]
+        draft_compute_ms = float(values[confidence_end])
         if any(not math.isfinite(value) or not 0 <= value <= 1 for value in confidences):
             raise RuntimeError("tree proposal contains invalid confidence")
-        return rows, [int(value) if value >= 0 else None for value in frontier_values], confidences, selected_rows
+        if not math.isfinite(draft_compute_ms) or draft_compute_ms < 0:
+            raise RuntimeError("tree proposal contains invalid draft compute time")
+        return (
+            rows,
+            [int(value) if value >= 0 else None for value in frontier_values],
+            confidences,
+            selected_rows,
+            draft_compute_ms,
+        )
 
     def _broadcast_spec_rhythm_tree_verdict(
         self,
         output: TreeVerificationOutput | None,
         plans: Sequence[TreeSpeculationPlan],
-    ) -> tuple[list[list[int]], list[list[int]]]:
-        """Replicate tree path tokens to target ranks and draft ranks."""
+        target_compute_ms: float = 0.0,
+    ) -> tuple[list[list[int]], list[list[int]], float]:
+        """Replicate tree verdict and target-window observation to all ranks."""
         if not plans:
-            return [], []
+            return [], [], 0.0
+        if not math.isfinite(target_compute_ms) or target_compute_ms < 0:
+            raise ValueError("target tree compute time must be finite and non-negative")
         depth = max(int(plan.depth) for plan in plans)
         batch = len(plans)
-        width = batch * (depth + 1 + depth)
+        width = batch * (depth + 1 + depth) + 1
         is_target_leader = self.rank == self.topology.target_leader_rank
         if is_target_leader:
             if output is None:
@@ -1984,7 +2045,15 @@ class NativePearlEngine:
             if tuple(output.accepted_node_indices.shape) != (batch, depth):
                 raise RuntimeError("tree verifier output has an invalid acceptance shape")
             message = torch.cat(
-                (output.token_ids.to(torch.long).reshape(-1), output.accepted_node_indices.to(torch.long).reshape(-1))
+                (
+                    output.token_ids.to(torch.long).reshape(-1),
+                    output.accepted_node_indices.to(torch.long).reshape(-1),
+                    torch.tensor(
+                        [round(target_compute_ms * 1000.0)],
+                        dtype=torch.long,
+                        device=self.device,
+                    ),
+                )
             )
         else:
             message = torch.empty(width, dtype=torch.long, device=self.device)
@@ -2004,12 +2073,13 @@ class NativePearlEngine:
                 src=self.topology.target_leader_rank,
                 group=self.groups.correction_group,
             )
-        values = message.reshape(-1)
+        values = message[:-1].reshape(-1)
         token_values = values[: batch * (depth + 1)].reshape(batch, depth + 1)
         accepted_values = values[batch * (depth + 1) :].reshape(batch, depth)
         return (
             [[int(value) for value in row] for row in token_values.cpu().tolist()],
             [[int(value) for value in row] for row in accepted_values.cpu().tolist()],
+            float(message[-1].cpu().item()) / 1000.0,
         )
 
     def _validate_spec_rhythm_target_graph(
@@ -2140,6 +2210,13 @@ class NativePearlEngine:
             "spec_rhythm_target_query_tokens": 0,
             "spec_rhythm_draft_model_calls": 0,
             "spec_rhythm_draft_graph_calls": 0,
+            "spec_rhythm_draft_materialized_nodes": 0,
+            "spec_rhythm_draft_publish_rows": 0,
+            "spec_rhythm_draft_publish_moved_rows": 0,
+            "spec_rhythm_draft_publish_skipped_rows": 0,
+            "spec_rhythm_kv_compaction_rows": 0,
+            "spec_rhythm_kv_compaction_skipped_rows": 0,
+            "spec_rhythm_kv_compaction_rounds": 0,
             "spec_rhythm_live_admitted_requests": 0,
             "spec_rhythm_aborted_requests": 0,
             # The rank-local role calls are deliberately ordered so draft
@@ -2151,6 +2228,11 @@ class NativePearlEngine:
         last_cycle_ms = 0.0
         window_estimator = DraftWindowEstimator(self.config.spec_rhythm_acceptance_ema_alpha)
         decode_timeline = []
+        # Rank-local timestamps are deliberately separate from the existing
+        # synchronized fine profile.  They add no NPU fence/collective and are
+        # therefore suitable for locating queue or graph-lifecycle stalls in
+        # the production execution path.
+        host_timeline: list[dict[str, int | float]] = []
         npu_profiler = None
         if envs.VLLM_ASCEND_PEARL_NPU_PROFILE_DIR:
             profile_rank = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_RANK
@@ -2176,6 +2258,81 @@ class NativePearlEngine:
             "broadcast": 0.0,
             "state_update": 0.0,
         }
+        decode_profile_seconds = {
+            "draft_compute": 0.0,
+            "draft_to_target_communication": 0.0,
+            "target_compute": 0.0,
+            "target_verdict": 0.0,
+            "target_to_draft_communication": 0.0,
+            "wait_sync": 0.0,
+            "state_update": 0.0,
+        }
+        decode_profile_detail_seconds = {
+            "scheduler_plan": 0.0,
+            "draft_tree_setup": 0.0,
+            "draft_tree_level_compute": 0.0,
+            "draft_tree_topk": 0.0,
+            "draft_tree_materialize_metadata": 0.0,
+            "draft_tree_materialize_compute": 0.0,
+            "target_tree_setup": 0.0,
+            "target_tree_metadata": 0.0,
+            "target_tree_model": 0.0,
+            "target_tree_output": 0.0,
+            "draft_postprocess": 0.0,
+            "profile_timeline_collective": 0.0,
+            "proposal_publish": 0.0,
+            "commit_preflight": 0.0,
+            "commit_consensus": 0.0,
+            "kv_compaction": 0.0,
+            "request_commit": 0.0,
+            "cycle_accounting": 0.0,
+        }
+        profiled_decode_steps = 0
+
+        def profile_begin(enabled: bool) -> float | None:
+            """Start an intrusive, explicitly bounded profile interval.
+
+            Synchronization is rank-local.  In particular, a target rank must
+            not wait for the draft rank here: doing so would destroy the very
+            cross-device overlap this profile is intended to measure.
+            """
+            if not enabled:
+                return None
+            torch.npu.synchronize()
+            return time.perf_counter()
+
+        def profile_end(started_at: float | None, phase: str) -> float:
+            if started_at is None:
+                return 0.0
+            torch.npu.synchronize()
+            elapsed = time.perf_counter() - started_at
+            decode_profile_seconds[phase] += elapsed
+            return elapsed
+
+        def profile_detail_end(started_at: float | None, phase: str) -> float:
+            """Finish a nested diagnostic interval without broad-phase accounting."""
+            if started_at is None:
+                return 0.0
+            torch.npu.synchronize()
+            elapsed = time.perf_counter() - started_at
+            decode_profile_detail_seconds[phase] += elapsed
+            return elapsed
+
+        def finish_profile_round(started_at: float | None, accounted_before: float) -> None:
+            """Charge the unclassified critical-path tail to wait/sync.
+
+            ``profile_end`` measures role-local model and transport intervals.
+            Everything else on the rank's cycle critical path -- scheduler
+            gaps, host/device synchronizations and control collectives -- is
+            intentionally exposed as residual wait/sync instead of vanishing
+            from the profile.
+            """
+            if started_at is None:
+                return
+            torch.npu.synchronize()
+            total = time.perf_counter() - started_at
+            accounted = sum(decode_profile_seconds.values()) - accounted_before
+            decode_profile_seconds["wait_sync"] += max(0.0, total - accounted)
 
         def receive_live_admissions(*, block: bool) -> bool:
             """Append controller-synchronized HTTP arrivals at a cycle fence."""
@@ -2342,7 +2499,7 @@ class NativePearlEngine:
             )
             return closed
 
-        def run_profiled_target_only(indices: Sequence[int]) -> list[int]:
+        def run_profiled_target_only(indices: Sequence[int], *, profile_this_round: bool) -> list[int]:
             """Advance one logical home when the measured candidate roof is zero.
 
             Both model partitions consume the current committed token so their
@@ -2359,6 +2516,8 @@ class NativePearlEngine:
             )
             positions = [len(local_states[index].token_ids) - 1 for index in rows]
             target_execution: dict[str, Any] | None = None
+            compute_phase = "draft_compute" if self.is_draft else "target_compute"
+            compute_profile_started = profile_begin(profile_this_round)
             if self.is_draft:
                 self._run_device_packed_hidden(
                     input_ids,
@@ -2403,6 +2562,8 @@ class NativePearlEngine:
                         and self.graph_runner.last_target_execution.used_aclgraph
                     ),
                 }
+            profile_end(compute_profile_started, compute_phase)
+            correction_profile_started = profile_begin(profile_this_round)
             torch.npu.synchronize()
             self._vote_spec_rhythm_prefill_finiteness()
             self._validate_spec_rhythm_target_graph(
@@ -2411,7 +2572,9 @@ class NativePearlEngine:
                 target_only=True,
             )
             dist.broadcast(token_ids, src=self.topology.target_leader_rank)
-            return [int(value) for value in token_ids.cpu().tolist()]
+            values = [int(value) for value in token_ids.cpu().tolist()]
+            profile_end(correction_profile_started, "target_to_draft_communication")
+            return values
 
         def complete_target_only_cycle(
             target_indices: Sequence[int],
@@ -2419,10 +2582,14 @@ class NativePearlEngine:
             cycle_started: float,
             unprofiled: bool,
             target_home: int | None,
+            profile_this_round: bool,
+            profile_round_started: float | None,
+            profile_accounted_before: float,
         ) -> None:
             """Finish one AR fallback cycle and keep both model KV states aligned."""
-            nonlocal active, live_open, last_cycle_ms, round_count
+            nonlocal active, live_open, last_cycle_ms, round_count, profiled_decode_steps
             rows = [int(index) for index in target_indices]
+            state_profile_started = profile_begin(profile_this_round)
             invalidated_eager = 0
             for index in active:
                 invalidated_eager += int(index in controller.staged_eager)
@@ -2432,7 +2599,9 @@ class NativePearlEngine:
                         cache_mappings.pop(ticket.proposal_id, None)
                 controller.invalidate_request(index)
             counters["spec_rhythm_tree_eager_invalidated"] += invalidated_eager
-            tokens = run_profiled_target_only(rows)
+            profile_end(state_profile_started, "state_update")
+            tokens = run_profiled_target_only(rows, profile_this_round=profile_this_round)
+            state_profile_started = profile_begin(profile_this_round)
             finished: list[int] = []
             for index, token in zip(rows, tokens):
                 for state in (draft_states[index], target_states[index]):
@@ -2486,6 +2655,10 @@ class NativePearlEngine:
                     counters.get("spec_rhythm_unprofiled_target_only_fallback_tokens", 0) + len(tokens)
                 )
             counters["spec_rhythm_tree_rounds"] += 1
+            profile_end(state_profile_started, "state_update")
+            finish_profile_round(profile_round_started, profile_accounted_before)
+            if profile_this_round:
+                profiled_decode_steps += 1
             round_count += 1
             if npu_profiler is not None:
                 npu_profiler.step()
@@ -2506,6 +2679,18 @@ class NativePearlEngine:
             if live_open:
                 live_open = not admit_available()
             cycle_started = time.perf_counter()
+            host_trace: dict[str, int | float] | None = None
+            if round_count < self.config.profile_host_decode_steps:
+                host_trace = {
+                    "step": round_count,
+                    "rank": self.rank,
+                    "is_draft_rank": int(self.is_draft),
+                    "cycle_start_seconds": cycle_started,
+                }
+            profile_this_round = round_count < self.config.profile_decode_steps
+            profile_round_started = profile_begin(profile_this_round)
+            profile_accounted_before = sum(decode_profile_seconds.values())
+            scheduler_profile_started = time.perf_counter() if profile_this_round else None
             projected_wait_ms = max(last_cycle_ms * 2.0, 1e-6)
             roof_context_len = max(len(local_states[index].token_ids) for index in active)
             strict_profile = shaper.roofline if isinstance(shaper.roofline, ProfiledRoofline) else None
@@ -2538,6 +2723,8 @@ class NativePearlEngine:
                         unprofiled_target_only = True
             else:
                 verification_roof = shaper.verification_roof(len(active), roof_context_len)
+            if host_trace is not None:
+                host_trace["scheduler_roof_end_seconds"] = time.perf_counter()
             if verification_roof == 0:
                 # A zero is a measured AR-envelope result, never a missing
                 # profile key.  Discard speculative state before running one
@@ -2559,6 +2746,9 @@ class NativePearlEngine:
                     cycle_started=cycle_started,
                     unprofiled=unprofiled_target_only,
                     target_home=home,
+                    profile_this_round=profile_this_round,
+                    profile_round_started=profile_round_started,
+                    profile_accounted_before=profile_accounted_before,
                 )
                 continue
             shrink = self._bound_spec_rhythm_tree_ready(controller, payloads, cache_mappings, active, verification_roof)
@@ -2574,6 +2764,8 @@ class NativePearlEngine:
                 priority_burst=self.config.spec_rhythm_priority_burst,
                 merge_ready_homes=self.config.spec_rhythm_merge_ready_homes,
             )
+            if host_trace is not None:
+                host_trace["scheduler_plan_end_seconds"] = time.perf_counter()
             target_indices = list(plan.target_request_indices)
             if (
                 target_indices
@@ -2590,6 +2782,9 @@ class NativePearlEngine:
                     cycle_started=cycle_started,
                     unprofiled=True,
                     target_home=plan.target_home_batch_id,
+                    profile_this_round=profile_this_round,
+                    profile_round_started=profile_round_started,
+                    profile_accounted_before=profile_accounted_before,
                 )
                 continue
             target_payloads = [payloads[controller.ready[index].proposal_id] for index in target_indices]
@@ -2664,6 +2859,8 @@ class NativePearlEngine:
                 eager_token_cap=effective_eager_cap or None,
                 verification_roof=verification_roof,
             )
+            if host_trace is not None:
+                host_trace["scheduler_budget_end_seconds"] = time.perf_counter()
             counters["spec_rhythm_last_verification_roof"] = budget_plan.verification_roof
             counters["spec_rhythm_unused_verification_tokens"] = int(budget_plan.unused_verification_tokens)
             normal_budgets = dict(budget_plan.normal_budgets)
@@ -2695,7 +2892,20 @@ class NativePearlEngine:
                 controller.new_ticket(index, gamma=budget, eager=is_eager)
                 for index, budget, is_eager in zip(work_indices, work_budgets, work_eager)
             ]
+            profile_detail_end(scheduler_profile_started, "scheduler_plan")
+            if host_trace is not None:
+                host_trace["scheduler_end_seconds"] = time.perf_counter()
+                host_trace["target_requests"] = len(target_indices)
+                host_trace["draft_requests"] = len(work_plans)
+                host_trace["verify_candidates"] = actual_candidates
+            # Keep instrumentation out of the public worker-call signature so
+            # protocol harnesses and alternate workers remain drop-in
+            # compatible. Native forwards consult this rank-local flag only
+            # during an explicitly bounded profile window.
+            self._profile_tree_subphases = profile_this_round
+            self._defer_tree_materialization = True
             draft_started = time.perf_counter()
+            draft_profile_started = profile_begin(profile_this_round and self.is_draft and bool(work_plans))
             draft_tree_kwargs: dict[str, Any] = {
                 "eager_parent_sources": eager_parent_sources,
             }
@@ -2718,18 +2928,19 @@ class NativePearlEngine:
                     if work_plans
                     else None
                 )
-            phase_seconds["draft"] += time.perf_counter() - draft_started
             if draft_output is not None:
                 torch.npu.synchronize()
                 counters["spec_rhythm_draft_model_calls"] += draft_output.get("model_calls", 0)
                 counters["spec_rhythm_draft_graph_calls"] += draft_output.get("graph_calls", 0)
-            draft_ended = time.perf_counter()
+                for phase, seconds in draft_output.get("profile_seconds", {}).items():
+                    decode_profile_detail_seconds[phase] += float(seconds)
             # Role-local functions early-return on the other model's ranks.
             # Launch target(A) before receiving draft(B): both device groups
             # run independently until the step-end publication/commit fence.
             target_plans = [payload["plan"] for payload in target_payloads]
             target_rows = [payload["row"] for payload in target_payloads]
             target_started = time.perf_counter()
+            target_profile_started = profile_begin(profile_this_round and not self.is_draft and bool(target_indices))
             target_tree_kwargs: dict[str, Any] = {
                 "sequence_ids": target_indices,
                 "return_logits": False,
@@ -2753,11 +2964,15 @@ class NativePearlEngine:
                     if target_indices
                     else None
                 )
+            profile_end(target_profile_started, "target_compute")
             phase_seconds["target"] += time.perf_counter() - target_started
             if target_output is not None:
                 torch.npu.synchronize()
                 counters["spec_rhythm_target_query_tokens"] += target_output["query_count"]
+                for phase, seconds in target_output.get("profile_seconds", {}).items():
+                    decode_profile_detail_seconds[phase] += float(seconds)
             target_ended = time.perf_counter()
+            draft_postprocess_profile_started = profile_begin(profile_this_round)
             self._validate_spec_rhythm_target_graph(target_output, has_target_work=bool(target_indices))
             local_rows = None if draft_output is None else draft_output["draft_token_ids"]
             selected_indices = None
@@ -2784,7 +2999,10 @@ class NativePearlEngine:
                         acceptance_rate=runtime.acceptance_ema,
                         minimum_candidates=0 if work_eager[row_id] else 1,
                     )
-                refined = select_global_tree_candidates(exploratory, budget_plan.verification_roof)
+                with _trace_region(self, "SpecSLO/GlobalCandidateSelection"):
+                    refined = select_global_tree_candidates(
+                        exploratory, budget_plan.verification_roof
+                    )
                 for row_id, index in enumerate(work_indices):
                     indices = refined.selected_indices[index]
                     selected_indices.append(list(indices))
@@ -2794,8 +3012,42 @@ class NativePearlEngine:
                         if indices
                         else 0.0
                     )
+                if draft_output.get("materialization_deferred", False):
+                    with _trace_region(self, "SpecSLO/SelectedDraftKVMaterialize"):
+                        materialized = self.materialize_selected_tree_kv(
+                            work_plans,
+                            draft_output["draft_token_ids"],
+                            selected_indices,
+                            work_indices,
+                        )
+                    if materialized is not None:
+                        torch.npu.synchronize()
+                        counters["spec_rhythm_draft_model_calls"] += materialized.get(
+                            "model_calls", 0
+                        )
+                        counters["spec_rhythm_draft_graph_calls"] += materialized.get(
+                            "graph_calls", 0
+                        )
+                        counters["spec_rhythm_draft_materialized_nodes"] += int(
+                            materialized.get("materialized_nodes", 0)
+                        )
+                        for phase, seconds in materialized.get(
+                            "profile_seconds", {}
+                        ).items():
+                            decode_profile_detail_seconds[phase] += float(seconds)
                 local_rows = selected_rows
+            profile_detail_end(draft_postprocess_profile_started, "draft_postprocess")
+            profile_end(draft_profile_started, "draft_compute")
+            draft_ended = time.perf_counter()
+            if host_trace is not None:
+                host_trace["draft_start_seconds"] = draft_started
+                host_trace["draft_end_seconds"] = draft_ended
+                host_trace["target_start_seconds"] = target_started
+                host_trace["target_end_seconds"] = target_ended
+            if self.is_draft:
+                phase_seconds["draft"] += draft_ended - draft_started
             exchange_started = time.perf_counter()
+            exchange_profile_started = profile_begin(profile_this_round and bool(work_plans))
             frontier_rows = (
                 [draft_output["eager_frontier_tokens"].get(index) for index in work_indices]
                 if draft_output is not None
@@ -2807,34 +3059,56 @@ class NativePearlEngine:
                     work_plans,
                     frontier_rows,
                     confidences,
-                    selected_indices,
+                    selected_indices=selected_indices,
+                    draft_compute_ms=(
+                        (draft_ended - draft_started) * 1000.0
+                        if self.rank == self.topology.draft_leader_rank and work_plans
+                        else 0.0
+                    ),
                 )
-            phase_seconds["exchange"] += time.perf_counter() - exchange_started
-            timing_values = [
-                (draft_ended - draft_started) * 1000.0
-                if self.rank == self.topology.draft_leader_rank and work_plans
-                else 0.0,
-                (target_ended - target_started) * 1000.0
-                if self.rank == self.topology.target_leader_rank and target_indices
-                else 0.0,
-                draft_started if self.rank == self.topology.draft_leader_rank and work_plans else 0.0,
-                draft_ended if self.rank == self.topology.draft_leader_rank and work_plans else 0.0,
-                target_started if self.rank == self.topology.target_leader_rank and target_indices else 0.0,
-                target_ended if self.rank == self.topology.target_leader_rank and target_indices else 0.0,
-            ]
-            # HCCL reduction does not implement float64. Preserve clock
-            # precision with integer microseconds rather than float32
-            # absolute timestamps (which lose subsecond precision).
-            timing = torch.tensor(
-                [round(value * (1000 if index < 2 else 1_000_000)) for index, value in enumerate(timing_values)],
-                dtype=torch.int64,
-                device=self.device,
-            )
-            dist.all_reduce(timing)
-            draft_ms, target_ms, ds, de, ts, te = [
-                value / (1000 if index < 2 else 1_000_000) for index, value in enumerate(timing.cpu().tolist())
-            ]
-            if len(decode_timeline) < self.config.profile_decode_steps:
+            profile_end(exchange_profile_started, "draft_to_target_communication")
+            exchange_ended = time.perf_counter()
+            phase_seconds["exchange"] += exchange_ended - exchange_started
+            if host_trace is not None:
+                host_trace["exchange_start_seconds"] = exchange_started
+                host_trace["exchange_end_seconds"] = exchange_ended
+            draft_ms = 0.0
+            candidate_rows = frontier_rows = confidence_rows = selected_rows = None
+            if work_plans:
+                assert message is not None
+                candidate_rows, frontier_rows, confidence_rows, selected_rows, draft_ms = (
+                    self._split_tree_candidates(message, work_plans)
+                )
+            if profile_this_round:
+                timeline_profile_started = profile_begin(True)
+                timing_values = [
+                    (draft_ended - draft_started) * 1000.0
+                    if self.rank == self.topology.draft_leader_rank and work_plans
+                    else 0.0,
+                    (target_ended - target_started) * 1000.0
+                    if self.rank == self.topology.target_leader_rank and target_indices
+                    else 0.0,
+                    draft_started if self.rank == self.topology.draft_leader_rank and work_plans else 0.0,
+                    draft_ended if self.rank == self.topology.draft_leader_rank and work_plans else 0.0,
+                    target_started if self.rank == self.topology.target_leader_rank and target_indices else 0.0,
+                    target_ended if self.rank == self.topology.target_leader_rank and target_indices else 0.0,
+                ]
+                # The global timestamp envelope exists only for explicit
+                # profiling. Production W observations ride the existing
+                # proposal/verdict messages and add no collective here.
+                timing = torch.tensor(
+                    [
+                        round(value * (1000 if index < 2 else 1_000_000))
+                        for index, value in enumerate(timing_values)
+                    ],
+                    dtype=torch.int64,
+                    device=self.device,
+                )
+                dist.all_reduce(timing)
+                _, _, ds, de, ts, te = [
+                    value / (1000 if index < 2 else 1_000_000)
+                    for index, value in enumerate(timing.cpu().tolist())
+                ]
                 decode_timeline.append(
                     {
                         "step": round_count,
@@ -2850,20 +3124,19 @@ class NativePearlEngine:
                         "eager_requests": len(eager_budgets),
                     }
                 )
-            window_estimator.observe(
-                draft_compute_ms=draft_ms,
-                drafted_tokens=len(work_plans) * exploration_cost,
-                target_verify_ms=target_ms,
-            )
+                profile_detail_end(timeline_profile_started, "profile_timeline_collective")
+            publish_profile_started = profile_begin(profile_this_round)
             if work_plans:
                 counters["spec_rhythm_allocated_draft_tokens"] += sum(int(plan.candidate_budget) for plan in work_plans)
-                assert message is not None
-                candidate_rows, frontier_rows, confidence_rows, selected_rows = self._split_tree_candidates(
-                    message, work_plans
-                )
+                assert candidate_rows is not None
+                assert confidence_rows is not None
+                assert selected_rows is not None
                 mapping = None if draft_output is None else draft_output["cache_slot_mapping"]
                 cursor = 0
                 published_tickets = []
+                pending_draft_mappings: list[tuple[int, torch.Tensor]] = []
+                normal_publish_sources: list[torch.Tensor] = []
+                normal_publish_destinations: list[torch.Tensor] = []
                 for index, ticket, tree_plan, row in zip(work_indices, tickets, work_plans, candidate_rows):
                     expected = int(tree_plan.width) * int(tree_plan.depth) + 1
                     if not row:
@@ -2879,6 +3152,7 @@ class NativePearlEngine:
                             torch.tensor([0, *[node + 1 for node in selection]], dtype=torch.long, device=self.device),
                         )
                         if not ticket.eager:
+                            counters["spec_rhythm_draft_publish_rows"] += 1
                             destination = torch.tensor(
                                 self._cache_slot_mapping(
                                     [index] * (len(selection) + 1),
@@ -2887,9 +3161,19 @@ class NativePearlEngine:
                                 dtype=torch.int32,
                                 device=self.device,
                             )
-                            self._move_tree_cache_slots(source, destination)
-                            source = destination
-                        cache_mappings[ticket.proposal_id] = source
+                            # An identity prefix already occupies the packed
+                            # logical slots: exploratory root,node0,... map to
+                            # exactly the same paged positions as the refined
+                            # plan. Avoid sweeping every model layer merely to
+                            # copy those K/V rows onto themselves.
+                            if list(selection) == list(range(len(selection))):
+                                counters["spec_rhythm_draft_publish_skipped_rows"] += 1
+                            else:
+                                normal_publish_sources.append(source)
+                                normal_publish_destinations.append(destination)
+                                source = destination
+                                counters["spec_rhythm_draft_publish_moved_rows"] += 1
+                        pending_draft_mappings.append((ticket.proposal_id, source))
                     eager_metadata: dict[str, Any] = {}
                     if ticket.eager:
                         parent_ticket = controller.ready.get(index)
@@ -2917,13 +3201,27 @@ class NativePearlEngine:
                         **eager_metadata,
                     }
                     cursor += expected
+                # The exploratory trees share a model-lifetime layer layout.
+                # Move all normal proposals with one K/V layer sweep instead
+                # of one complete sweep per request. Eager proposals retain
+                # their ahead-of-turn slots until promotion validation.
+                if normal_publish_sources:
+                    self._move_tree_cache_slots(
+                        torch.cat(normal_publish_sources),
+                        torch.cat(normal_publish_destinations),
+                    )
+                cache_mappings.update(pending_draft_mappings)
                 controller.publish(published_tickets)
                 counters["spec_rhythm_tree_nodes"] += sum(ticket.gamma for ticket in published_tickets)
                 counters["spec_rhythm_unused_verification_tokens"] = budget_plan.verification_roof - sum(
                     ticket.gamma for ticket in published_tickets
                 )
+            profile_detail_end(publish_profile_started, "proposal_publish")
+            if host_trace is not None:
+                host_trace["publish_end_seconds"] = time.perf_counter()
 
             if not target_indices:
+                accounting_profile_started = profile_begin(profile_this_round)
                 dist.barrier()
                 elapsed_tensor = torch.tensor(
                     [time.perf_counter() - cycle_started if self.rank == self.topology.target_leader_rank else 0.0],
@@ -2934,39 +3232,95 @@ class NativePearlEngine:
                 last_cycle_ms = float(elapsed_tensor.cpu().item()) * 1000.0
                 for index in active:
                     states[index].add_decode_time(last_cycle_ms)
+                profile_detail_end(accounting_profile_started, "cycle_accounting")
+                if host_trace is not None:
+                    host_trace["cycle_end_seconds"] = time.perf_counter()
+                    host_timeline.append(host_trace)
+                finish_profile_round(profile_round_started, profile_accounted_before)
+                if profile_this_round:
+                    profiled_decode_steps += 1
                 round_count += 1
                 if npu_profiler is not None:
                     npu_profiler.step()
                 continue
             target_verdict: TreeVerificationOutput | None = None
+            verdict_host_started = time.perf_counter() if host_trace is not None else None
+            verdict_profile_started = profile_begin(
+                profile_this_round and self.rank == self.topology.target_leader_rank
+            )
             if self.rank == self.topology.target_leader_rank:
                 assert target_output is not None
-                target_parents = torch.cat(
-                    [plan.parent_indices[: int(plan.candidate_budget)].to(self.device) for plan in target_plans]
-                )
-                draft_tokens = torch.tensor(
-                    [
-                        token
-                        for row, plan in zip(target_rows, target_plans)
-                        for token in row[: int(plan.candidate_budget)]
-                    ],
-                    dtype=torch.long,
-                    device=self.device,
-                )
-                target_verdict = self.verify_tree_outputs(
-                    draft_tokens,
-                    target_parents,
-                    target_output["target_query_token_ids"],
-                    target_output["bonus_token_ids"],
-                    [int(plan.candidate_budget) for plan in target_plans],
-                    max(int(plan.depth) for plan in target_plans),
-                )
+                if self.config.spec_rhythm_cpu_verdict:
+                    # Target rows already contain the root query and every
+                    # active-node successor, including the accepted-frontier
+                    # bonus.  Copy that one compact tensor to the host, walk
+                    # the tiny trees as Python integers, then publish both
+                    # result matrices with one H2D transfer.  The former CPU
+                    # diagnostic rebuilt several torch tensors, launched the
+                    # generic per-row tensor verifier and copied two results
+                    # back separately (~4 ms at B=8).
+                    target_verdict = self._verify_tree_outputs_host(
+                        target_rows,
+                        target_plans,
+                        target_output["target_query_token_ids"],
+                        max(int(plan.depth) for plan in target_plans),
+                        self.device,
+                    )
+                else:
+                    target_parents = torch.cat(
+                        [
+                            plan.parent_indices[: int(plan.candidate_budget)].to(self.device)
+                            for plan in target_plans
+                        ]
+                    )
+                    draft_tokens = torch.tensor(
+                        [
+                            token
+                            for row, plan in zip(target_rows, target_plans)
+                            for token in row[: int(plan.candidate_budget)]
+                        ],
+                        dtype=torch.long,
+                        device=self.device,
+                    )
+                    target_verdict = self.verify_tree_outputs(
+                        draft_tokens,
+                        target_parents,
+                        target_output["target_query_token_ids"],
+                        target_output["bonus_token_ids"],
+                        [int(plan.candidate_budget) for plan in target_plans],
+                        max(int(plan.depth) for plan in target_plans),
+                    )
+            profile_end(verdict_profile_started, "target_verdict")
+            if host_trace is not None:
+                host_trace["verdict_start_seconds"] = verdict_host_started or 0.0
+                host_trace["verdict_end_seconds"] = time.perf_counter()
             broadcast_started = time.perf_counter()
+            correction_profile_started = profile_begin(profile_this_round)
             with torch.profiler.record_function("SpecSLO/TargetToDraft"):
-                output_rows, accepted_rows = self._broadcast_spec_rhythm_tree_verdict(target_verdict, target_plans)
-            phase_seconds["broadcast"] += time.perf_counter() - broadcast_started
+                output_rows, accepted_rows, target_ms = self._broadcast_spec_rhythm_tree_verdict(
+                    target_verdict,
+                    target_plans,
+                    (
+                        (target_ended - target_started) * 1000.0
+                        if self.rank == self.topology.target_leader_rank
+                        else 0.0
+                    ),
+                )
+            profile_end(correction_profile_started, "target_to_draft_communication")
+            broadcast_ended = time.perf_counter()
+            phase_seconds["broadcast"] += broadcast_ended - broadcast_started
+            if host_trace is not None:
+                host_trace["correction_start_seconds"] = broadcast_started
+                host_trace["correction_end_seconds"] = broadcast_ended
+            window_estimator.observe(
+                draft_compute_ms=draft_ms,
+                drafted_tokens=len(work_plans) * exploration_cost,
+                target_verify_ms=target_ms,
+            )
             state_started = time.perf_counter()
+            state_profile_started = profile_begin(profile_this_round)
             finished: list[int] = []
+            preflight_profile_started = time.perf_counter() if profile_this_round else None
             # Validate the whole step before mutating its first request.
             # Capture local errors so every rank still reaches the same vote.
             # A stale row or bad mapping on one rank must not let its peers
@@ -3006,24 +3360,74 @@ class NativePearlEngine:
                 )
             except Exception as error:
                 preflight_error = error
+            if host_trace is not None:
+                host_trace["state_preflight_end_seconds"] = time.perf_counter()
+            profile_detail_end(preflight_profile_started, "commit_preflight")
+            consensus_profile_started = time.perf_counter() if profile_this_round else None
             preflight_failed = torch.tensor(
                 [int(preflight_error is not None)],
                 dtype=torch.int64,
                 device=self.device,
             )
+            # Fold the graph-resident numerical health bit into the existing
+            # commit vote. The former ``flag.item()`` in local preflight added
+            # a second device/host fence in every decode cycle.
+            preflight_failed = torch.maximum(
+                preflight_failed,
+                self._spec_rhythm_nonfinite_flag().reshape(1).to(dtype=torch.int64),
+            )
             dist.all_reduce(preflight_failed, op=dist.ReduceOp.MAX)
             # One scalar synchronization at the collective commit boundary.
             # Earlier forward/transport failures abort the worker, and later
             # hardware/OOM failures during KV moves are not transactional.
-            if preflight_failed.cpu().tolist()[0] or preflight_error is not None:
+            preflight_failed_value = int(preflight_failed.cpu().item())
+            if host_trace is not None:
+                host_trace["state_consensus_end_seconds"] = time.perf_counter()
+            profile_detail_end(consensus_profile_started, "commit_consensus")
+            if preflight_failed_value or preflight_error is not None:
                 if preflight_error is not None:
                     raise RuntimeError(
                         f"SpecRhythm tree commit preflight failed on rank {self.rank}: {preflight_error}"
                     ) from preflight_error
                 raise RuntimeError(
-                    "SpecRhythm tree commit preflight failed on another rank; this step was not committed"
+                    "SpecRhythm tree commit preflight failed on another rank; this step was not committed "
+                    "(the shared vote also carries numerical-health failures)"
                 )
+            compaction_profile_started = time.perf_counter() if profile_this_round else None
             cache_mappings.update(pending_cache_mappings)
+            # Compact every verified request in one fixed-shape layer sweep.
+            # The former per-request call launched K/V gather+scatter for all
+            # model layers N times per cycle (512 scatter launches at B8/TP3).
+            # Preflight has already validated all mappings, so batching here
+            # preserves the same commit boundary and physical destinations.
+            compact_proposal_ids = [payload["ticket"].proposal_id for payload in target_payloads]
+            if any(proposal_id not in cache_mappings for proposal_id in compact_proposal_ids):
+                raise RuntimeError("SpecRhythm verified tree is missing its preflighted KV mapping")
+            rows_to_compact = [
+                row
+                for row, plan in enumerate(target_plans)
+                if self._tree_row_requires_kv_compaction(
+                    accepted_rows[row],
+                    int(plan.candidate_budget),
+                )
+            ]
+            counters["spec_rhythm_kv_compaction_rows"] += len(rows_to_compact)
+            counters["spec_rhythm_kv_compaction_skipped_rows"] += len(target_plans) - len(rows_to_compact)
+            if rows_to_compact:
+                self.compact_tree_round(
+                    torch.cat([cache_mappings[compact_proposal_ids[row]] for row in rows_to_compact]),
+                    torch.tensor(
+                        [accepted_rows[row] for row in rows_to_compact],
+                        dtype=torch.int32,
+                        device=self.device,
+                    ),
+                    [int(target_plans[row].candidate_budget) for row in rows_to_compact],
+                )
+                counters["spec_rhythm_kv_compaction_rounds"] += 1
+            if host_trace is not None:
+                host_trace["state_compaction_end_seconds"] = time.perf_counter()
+            profile_detail_end(compaction_profile_started, "kv_compaction")
+            request_commit_profile_started = time.perf_counter() if profile_this_round else None
             for row, index in enumerate(target_indices):
                 tree_plan = target_plans[row]
                 was_first_decode_token = states[index].delivered_tokens == 0
@@ -3093,11 +3497,7 @@ class NativePearlEngine:
                     first_decode_indices.add(index)
                 payloads.pop(current_ticket.proposal_id, None)
                 if current_ticket.proposal_id in cache_mappings:
-                    self.compact_tree_round(
-                        cache_mappings.pop(current_ticket.proposal_id).to(device=self.device),
-                        torch.tensor(accepted_rows[row], dtype=torch.int32, device=self.device).reshape(1, -1),
-                        [proposed_count],
-                    )
+                    cache_mappings.pop(current_ticket.proposal_id)
                 if eager_ticket is not None and promoted is None:
                     counters["spec_rhythm_tree_eager_invalidated"] += 1
                     payloads.pop(eager_ticket.proposal_id, None)
@@ -3120,7 +3520,14 @@ class NativePearlEngine:
                 if _finished(local_states[index], self.eos_token_ids):
                     finished.append(index)
                 self._deliver_committed_tokens(index, request_params[index], local_states[index])
+            if host_trace is not None:
+                host_trace["state_request_commit_end_seconds"] = time.perf_counter()
+            profile_detail_end(request_commit_profile_started, "request_commit")
             phase_seconds["state_update"] += time.perf_counter() - state_started
+            profile_end(state_profile_started, "state_update")
+            if host_trace is not None:
+                host_trace["state_end_seconds"] = time.perf_counter()
+            accounting_profile_started = time.perf_counter() if profile_this_round else None
             elapsed_tensor = torch.tensor(
                 [time.perf_counter() - cycle_started if self.rank == self.topology.target_leader_rank else 0.0],
                 dtype=torch.float64,
@@ -3146,7 +3553,15 @@ class NativePearlEngine:
                 live_open = not admit_available()
             else:
                 admit_available(poll_live=False)
+            profile_detail_end(accounting_profile_started, "cycle_accounting")
             counters["spec_rhythm_tree_rounds"] += 1
+            if host_trace is not None:
+                host_trace["state_start_seconds"] = state_started
+                host_trace["cycle_end_seconds"] = time.perf_counter()
+                host_timeline.append(host_trace)
+            finish_profile_round(profile_round_started, profile_accounted_before)
+            if profile_this_round:
+                profiled_decode_steps += 1
             round_count += 1
             if npu_profiler is not None:
                 npu_profiler.step()
@@ -3156,10 +3571,14 @@ class NativePearlEngine:
         if npu_profiler is not None:
             npu_profiler.stop()
             self._active_tree_profiler = None
+        self._profile_tree_subphases = False
+        self._defer_tree_materialization = False
         decode_elapsed = time.perf_counter() - started
         self.last_worker_decode_phase_seconds = phase_seconds
-        self.last_worker_decode_profile_seconds = {}
-        self.last_worker_profiled_decode_steps = 0
+        self.last_worker_decode_profile_seconds = dict(decode_profile_seconds)
+        self.last_worker_decode_profile_detail_seconds = dict(decode_profile_detail_seconds)
+        self.last_worker_decode_host_timeline = host_timeline
+        self.last_worker_profiled_decode_steps = profiled_decode_steps
         self.last_worker_decode_counters = counters
         self._release_cache()
         if self.rank != self.topology.target_leader_rank:
@@ -3974,6 +4393,7 @@ class NativePearlEngine:
         decode_elapsed = time.perf_counter() - started
         self.last_worker_decode_phase_seconds = dict(phase_seconds)
         self.last_worker_decode_profile_seconds = dict(decode_profile_seconds)
+        self.last_worker_decode_profile_detail_seconds = {}
         self.last_worker_profiled_decode_steps = profiled_decode_steps
         self.last_worker_decode_counters = dict(counters)
         self.last_worker_decode_counters.update(
@@ -4219,6 +4639,7 @@ class NativePearlEngine:
         draft_token_ids: Sequence[Sequence[int]],
         sequence_ids: Sequence[int] | None = None,
         return_logits: bool = True,
+        profile_subphases: bool = False,
         *,
         temperatures: Sequence[float] | None = None,
         top_ps: Sequence[float] | None = None,
@@ -4234,6 +4655,29 @@ class NativePearlEngine:
         """
         if self.is_draft:
             return None
+        profile_subphases = profile_subphases or bool(
+            getattr(self, "_profile_tree_subphases", False)
+        )
+        profile_seconds = {
+            "target_tree_setup": 0.0,
+            "target_tree_metadata": 0.0,
+            "target_tree_model": 0.0,
+            "target_tree_output": 0.0,
+        }
+
+        def profile_start() -> float | None:
+            if not profile_subphases:
+                return None
+            torch.npu.synchronize()
+            return time.perf_counter()
+
+        def profile_stop(started_at: float | None, phase: str) -> None:
+            if started_at is None:
+                return
+            torch.npu.synchronize()
+            profile_seconds[phase] += time.perf_counter() - started_at
+
+        setup_started = profile_start()
         plan_list = list(plans)
         roots = [int(value) for value in root_token_ids]
         candidates = [list(map(int, row)) for row in draft_token_ids]
@@ -4276,6 +4720,8 @@ class NativePearlEngine:
             local_positions = [int(value) for value in cache_positions.detach().cpu().tolist()]
             sequence_ids.extend([sequence_id] * len(local_positions))
             positions.extend(local_positions)
+        profile_stop(setup_started, "target_tree_setup")
+        metadata_started = profile_start()
         self._ensure_cache_capacity(sequence_ids, positions)
         input_ids, packed_positions, metadata = self.model.make_tree_attention_metadata(
             plan_list,
@@ -4283,7 +4729,15 @@ class NativePearlEngine:
             padded_candidates,
             self.cache_allocation.block_tables,
             sequence_ids=request_ids,
+            # A dynamically shaped tree may happen to select only its primary
+            # chain in one cycle.  Switching that cycle to causal FIA changes
+            # the graph/operator contract and reintroduces per-layer task
+            # updates for every new context length.  Keep verification on one
+            # FULL-mask FIA path; graph-local KV bucketing masks its tail and
+            # preserves the exact selected tree semantics.
+            allow_causal_fast_path=False,
         )
+        profile_stop(metadata_started, "target_tree_metadata")
         # Tree masks are dense request-local masks, so they cannot use the
         # linear FIA contract.  They can nevertheless be captured by the
         # ordinary target ACLGraph when the complete packed tree shape is
@@ -4308,6 +4762,7 @@ class NativePearlEngine:
         # token on the following cycle.  For heterogeneous-vocabulary pairs,
         # sample/argmax only from the common prefix validated at startup.
         verification_vocabulary_size = getattr(self, "draft_vocab_size", self.target_vocab_size)
+        model_started = profile_start()
         if tree_graph_enabled and stochastic:
             target_logits = self.graph_runner.run_tree_logits(
                 input_ids,
@@ -4350,6 +4805,7 @@ class NativePearlEngine:
                 # used, but do not run a second vocabulary projection in
                 # every cycle.
                 target_logits = self.model.compute_logits(hidden_states) if return_logits else None
+        profile_stop(model_started, "target_tree_model")
         if stochastic and dist.is_initialized():
             # All target TP ranks must advance from the same sampled token.
             # Sampling independently on identical logits is still divergent
@@ -4359,6 +4815,7 @@ class NativePearlEngine:
                 src=self.topology.target_leader_rank,
                 group=self.groups.target_group,
             )
+        output_started = profile_start()
         target_token_rows: list[torch.Tensor] = []
         target_query_rows: list[torch.Tensor] = []
         bonus_rows: list[torch.Tensor] = []
@@ -4383,6 +4840,7 @@ class NativePearlEngine:
             target_query_rows.append(row[: active_count + 1])
             bonus_rows.append(row[active_count])
             cursor += node_count + 1
+        profile_stop(output_started, "target_tree_output")
         return {
             "target_token_ids": torch.cat(target_token_rows),
             "target_query_token_ids": torch.cat(target_query_rows),
@@ -4394,6 +4852,7 @@ class NativePearlEngine:
             "cache_slot_mapping": metadata.slot_mapping,
             "query_count": int(input_ids.numel()),
             "tree_count": len(plan_list),
+            "profile_seconds": profile_seconds,
         }
 
     @staticmethod
@@ -4431,29 +4890,265 @@ class NativePearlEngine:
         return replace(plan, cache_positions=slots, attention_mask=mask)
 
     def _pack_tree_draft_level(self, requests):
-        """Pack one query per normal/eager request into a common model call."""
+        """Pack one or more query nodes per request into a common model call."""
+        # The generic helper below is intentionally retained as the CPU
+        # oracle.  On NPU it performs several tiny tensor constructions, a
+        # device-side ``physical_blocks < 0`` check and one mask transfer per
+        # request before concatenating everything again.  Profiling the B=8
+        # tree loop showed that control path taking 6--8 ms for a model call
+        # whose graph replay is only a few milliseconds.  Build the same
+        # request-major FIA envelope from the authoritative host allocation
+        # and transfer each packed field once instead.
+        if self.device.type == "npu":
+            if not requests:
+                raise ValueError("tree draft level requires at least one request")
+            if self.cache_allocation is None or self.cache_block_tables is None:
+                raise RuntimeError("Allocate a draft PEARL cache before packing a tree level")
+            attention = self.model.layers[0].self_attn
+            block_size = int(attention.block_size)
+            host_tables = self.cache_allocation.block_tables
+            if isinstance(host_tables, torch.Tensor):
+                host_tables = host_tables.detach().cpu().tolist()
+
+            input_values: list[int] = []
+            logical_positions: list[int] = []
+            physical_positions: list[int] = []
+            slot_values: list[int] = []
+            query_sequence_ids: list[int] = []
+            request_sequence_ids: list[int] = []
+            query_lengths: list[int] = []
+            sequence_lens: list[int] = []
+            mask_rows: list[torch.Tensor] = []
+            cumulative_query_lengths: list[int] = []
+
+            for plan, request_id, node_indices, token_ids in requests:
+                indices = (
+                    [int(node_indices)]
+                    if isinstance(node_indices, int)
+                    else [int(value) for value in node_indices]
+                )
+                tokens = (
+                    [int(token_ids)]
+                    if isinstance(token_ids, int)
+                    else [int(value) for value in token_ids]
+                )
+                if not indices or len(indices) != len(tokens):
+                    raise ValueError("tree level must contain aligned query nodes and tokens")
+                expected_nodes = int(plan.parent_indices.numel())
+                if any(index < -1 or index >= expected_nodes for index in indices):
+                    raise ValueError("tree level node index is outside the plan")
+                request_id = int(request_id)
+                if not 0 <= request_id < len(host_tables):
+                    raise ValueError("tree level block tables do not cover the request")
+                cache_positions = getattr(plan, "cache_positions", None)
+                if cache_positions is None:
+                    cache_positions = plan.positions
+                row_logical = [
+                    int(plan.positions[index + 1 if index >= 0 else 0])
+                    for index in indices
+                ]
+                row_physical = [
+                    int(cache_positions[index + 1 if index >= 0 else 0])
+                    for index in indices
+                ]
+                table = host_tables[request_id]
+                row_slots = []
+                for position in row_physical:
+                    logical_block = position // block_size
+                    if logical_block >= len(table) or int(table[logical_block]) < 0:
+                        raise RuntimeError("tree level referenced an unallocated KV cache page")
+                    row_slots.append(int(table[logical_block]) * block_size + position % block_size)
+                row_mask = torch.stack(
+                    [plan.attention_mask[index + 1 if index >= 0 else 0] for index in indices]
+                ).to(device="cpu", dtype=torch.bool)
+
+                input_values.extend(tokens)
+                logical_positions.extend(row_logical)
+                physical_positions.extend(row_physical)
+                slot_values.extend(row_slots)
+                query_sequence_ids.extend([request_id] * len(indices))
+                request_sequence_ids.append(request_id)
+                query_lengths.append(len(indices))
+                sequence_lens.append(max(row_physical) + 1)
+                mask_rows.append(row_mask)
+                cumulative_query_lengths.append(
+                    (cumulative_query_lengths[-1] if cumulative_query_lengths else 0)
+                    + len(indices)
+                )
+
+            query_sequence_tensor = torch.tensor(
+                query_sequence_ids, dtype=torch.long, device=self.device
+            )
+            request_sequence_tensor = torch.tensor(
+                request_sequence_ids, dtype=torch.long, device=self.device
+            )
+            packed_mask = torch.cat(mask_rows, dim=0)
+            tree_mask = make_tree_fia_mask(mask_rows)
+            physical_tables = self.cache_block_tables
+            metadata = NativeAttentionMetadata(
+                slot_mapping=torch.tensor(slot_values, dtype=torch.int32, device=self.device),
+                context_lens=torch.tensor(
+                    [position + 1 for position in physical_positions], dtype=torch.int32
+                ),
+                block_tables=physical_tables.index_select(0, query_sequence_tensor),
+                actual_seq_lengths_q=tuple(cumulative_query_lengths),
+                sequence_lens=tuple(sequence_lens),
+                request_block_tables=physical_tables.index_select(
+                    0, request_sequence_tensor
+                ),
+                attention_mask=packed_mask.to(device=self.device),
+                use_fused_infer_attention=bool(attention.uses_paged_attention),
+                tree_attention=True,
+                tree_attention_mask=tree_mask.to(device=self.device),
+            )
+            return (
+                torch.tensor(input_values, dtype=torch.long, device=self.device),
+                torch.tensor(logical_positions, dtype=torch.long, device=self.device),
+                metadata,
+            )
+
         parts = [
             self.model.make_tree_level_attention_metadata(
-                plan, request_id, [node_index], [token_id], self.cache_block_tables
+                plan,
+                request_id,
+                (
+                    [int(node_indices)]
+                    if isinstance(node_indices, int)
+                    else [int(value) for value in node_indices]
+                ),
+                (
+                    [int(token_ids)]
+                    if isinstance(token_ids, int)
+                    else [int(value) for value in token_ids]
+                ),
+                self.cache_block_tables,
             )
-            for plan, request_id, node_index, token_id in requests
+            for plan, request_id, node_indices, token_ids in requests
         ]
         if len(parts) == 1:
             return parts[0]
         metadatas = [part[2] for part in parts]
+        cumulative_query_lengths: list[int] = []
+        for input_ids, _, _ in parts:
+            cumulative_query_lengths.append(
+                (cumulative_query_lengths[-1] if cumulative_query_lengths else 0)
+                + int(input_ids.numel())
+            )
         metadata = type(metadatas[0])(
             slot_mapping=torch.cat([value.slot_mapping for value in metadatas]),
             context_lens=torch.cat([value.context_lens for value in metadatas]),
             block_tables=torch.cat([value.block_tables for value in metadatas]),
-            actual_seq_lengths_q=tuple(range(1, len(parts) + 1)),
-            sequence_lens=tuple(int(value.context_lens[0]) for value in metadatas),
-            request_block_tables=torch.cat([value.block_tables[:1] for value in metadatas]),
+            actual_seq_lengths_q=tuple(cumulative_query_lengths),
+            sequence_lens=tuple(int(value.sequence_lens[0]) for value in metadatas),
+            request_block_tables=(
+                torch.cat([value.request_block_tables for value in metadatas])
+                if all(value.request_block_tables is not None for value in metadatas)
+                else None
+            ),
             attention_mask=torch.cat([value.attention_mask for value in metadatas]),
             use_fused_infer_attention=all(value.use_fused_infer_attention for value in metadatas),
             tree_attention=True,
-            tree_attention_mask=torch.cat([value.attention_mask[:, None, None, :] for value in metadatas]),
+            tree_attention_mask=make_tree_fia_mask(
+                [value.attention_mask for value in metadatas]
+            ),
         )
         return torch.cat([part[0] for part in parts]), torch.cat([part[1] for part in parts]), metadata
+
+    @torch.inference_mode()
+    def materialize_selected_tree_kv(
+        self,
+        plans: Sequence[TreeSpeculationPlan],
+        draft_token_ids: Sequence[Sequence[int]],
+        selected_indices: Sequence[Sequence[int]],
+        sequence_ids: Sequence[int],
+    ) -> dict[str, Any] | None:
+        """Write only selected tree nodes whose K/V was not produced by expansion.
+
+        Spine expansion already evaluates the root and every primary node
+        except the final depth. Siblings are leaves in the SpecRhythm tree.
+        Consequently the remaining selected nodes are independent queries
+        whose ancestors are resident and can be materialized in one batch.
+        The old path re-evaluated root plus *all* exploratory nodes even though
+        the fixed global B discarded most of them immediately afterwards.
+        """
+        if not self.is_draft:
+            return None
+        if not (
+            len(plans)
+            == len(draft_token_ids)
+            == len(selected_indices)
+            == len(sequence_ids)
+        ):
+            raise ValueError("selected tree KV materialization inputs must be row-aligned")
+        requests = []
+        for plan, row, selection, sequence_id in zip(
+            plans, draft_token_ids, selected_indices, sequence_ids
+        ):
+            node_count = int(plan.parent_indices.numel())
+            if len(row) != node_count:
+                raise ValueError("selected tree KV row does not match its exploratory plan")
+            indices = [int(value) for value in selection]
+            if indices != sorted(set(indices)) or any(
+                value < 0 or value >= node_count for value in indices
+            ):
+                raise ValueError("selected tree KV indices must be unique and topologically ordered")
+            first_unwritten_primary = max(0, int(plan.depth) - 1)
+            missing = [value for value in indices if value >= first_unwritten_primary]
+            if missing:
+                requests.append(
+                    (
+                        plan,
+                        int(sequence_id),
+                        missing,
+                        [int(row[value]) for value in missing],
+                    )
+                )
+        if not requests:
+            return {
+                "model_calls": 0,
+                "graph_calls": 0,
+                "materialized_nodes": 0,
+                "profile_seconds": {},
+            }
+        profile_subphases = bool(getattr(self, "_profile_tree_subphases", False))
+        metadata_started = None
+        if profile_subphases:
+            torch.npu.synchronize()
+            metadata_started = time.perf_counter()
+        with _trace_region(self, "SpecSLO/DraftMaterializeMetadata"):
+            input_ids, positions, metadata = self._pack_tree_draft_level(requests)
+        profile_seconds: dict[str, float] = {}
+        if metadata_started is not None:
+            torch.npu.synchronize()
+            profile_seconds["draft_tree_materialize_metadata"] = (
+                time.perf_counter() - metadata_started
+            )
+        graph_runner = getattr(self, "graph_runner", None)
+        use_graph = isinstance(graph_runner, NativeACLGraphRunner) and not getattr(
+            getattr(self, "config", None), "enforce_eager", True
+        )
+        compute_started = None
+        if profile_subphases:
+            torch.npu.synchronize()
+            compute_started = time.perf_counter()
+        with _trace_region(self, "SpecSLO/DraftMaterializeModel"):
+            if use_graph:
+                graph_runner.run_tree_hidden(input_ids, positions, metadata)
+                graph_calls = int(graph_runner.last_target_execution.used_aclgraph)
+            else:
+                self.model(input_ids, positions, metadata)
+                graph_calls = 0
+        if compute_started is not None:
+            torch.npu.synchronize()
+            profile_seconds["draft_tree_materialize_compute"] = (
+                time.perf_counter() - compute_started
+            )
+        return {
+            "model_calls": 1,
+            "graph_calls": graph_calls,
+            "materialized_nodes": int(input_ids.numel()),
+            "profile_seconds": profile_seconds,
+        }
 
     @torch.inference_mode()
     def draft_tree_forward(
@@ -4462,6 +5157,7 @@ class NativePearlEngine:
         root_token_ids: Sequence[int],
         sequence_ids: Sequence[int],
         eager_parent_sources: Mapping[int, tuple[TreeSpeculationPlan, Sequence[int]]] | None = None,
+        profile_subphases: bool = False,
         *,
         draft_temperatures: Sequence[float] | None = None,
         draft_top_ps: Sequence[float] | None = None,
@@ -4470,6 +5166,30 @@ class NativePearlEngine:
         """Expand normal and eager trees in unified per-depth draft batches."""
         if not self.is_draft:
             return None
+        profile_subphases = profile_subphases or bool(
+            getattr(self, "_profile_tree_subphases", False)
+        )
+        profile_seconds = {
+            "draft_tree_setup": 0.0,
+            "draft_tree_level_compute": 0.0,
+            "draft_tree_topk": 0.0,
+            "draft_tree_materialize_metadata": 0.0,
+            "draft_tree_materialize_compute": 0.0,
+        }
+
+        def profile_start() -> float | None:
+            if not profile_subphases:
+                return None
+            torch.npu.synchronize()
+            return time.perf_counter()
+
+        def profile_stop(started_at: float | None, phase: str) -> None:
+            if started_at is None:
+                return
+            torch.npu.synchronize()
+            profile_seconds[phase] += time.perf_counter() - started_at
+
+        setup_started = profile_start()
         plan_list = list(plans)
         roots = [int(value) for value in root_token_ids]
         request_ids = [int(value) for value in sequence_ids]
@@ -4517,24 +5237,40 @@ class NativePearlEngine:
                 work_plans[row_index] = self._tree_eager_scratch_plan(plan, parent_plan)
             work_slots = work_plans[row_index].cache_positions.detach().cpu().tolist()
             self._ensure_cache_capacity([request_id] * len(work_slots), work_slots)
+        profile_stop(setup_started, "draft_tree_setup")
 
         graph_runner = getattr(self, "graph_runner", None)
         use_graph = isinstance(graph_runner, NativeACLGraphRunner) and not getattr(
             getattr(self, "config", None), "enforce_eager", True
         )
+        defer_materialization = bool(
+            getattr(self, "_defer_tree_materialization", False)
+        )
         graph_calls = 0
         model_calls = 0
+        query_count = 0
 
         def run_level(requests):
-            nonlocal graph_calls, model_calls
-            input_ids, positions, metadata = self._pack_tree_draft_level(requests)
+            nonlocal graph_calls, model_calls, query_count
+            with _trace_region(self, "SpecSLO/DraftLevelMetadata"):
+                input_ids, positions, metadata = self._pack_tree_draft_level(requests)
             model_calls += 1
-            if use_graph:
-                logits = graph_runner.run_tree_logits(input_ids, positions, metadata, self.draft_vocab_size)
-                graph_calls += int(graph_runner.last_target_execution.used_aclgraph)
-                return logits
-            hidden = self.model(input_ids, positions, metadata)
-            return self.model.compute_logits(hidden)[:, : self.draft_vocab_size]
+            query_count += int(input_ids.numel())
+            compute_started = profile_start()
+            with _trace_region(self, "SpecSLO/DraftLevelModel"):
+                if use_graph:
+                    logits = graph_runner.run_tree_logits(
+                        input_ids, positions, metadata, self.draft_vocab_size
+                    )
+                    graph_calls += int(
+                        graph_runner.last_target_execution.used_aclgraph
+                    )
+                    profile_stop(compute_started, "draft_tree_level_compute")
+                    return logits
+                hidden = self.model(input_ids, positions, metadata)
+                logits = self.model.compute_logits(hidden)[:, : self.draft_vocab_size]
+            profile_stop(compute_started, "draft_tree_level_compute")
+            return logits
 
         if frontier_requests:
             frontier_logits = run_level(frontier_requests)
@@ -4568,6 +5304,7 @@ class NativePearlEngine:
                 for index in level_rows
             ]
             logits = run_level(requests)
+            topk_started = profile_start()
             max_width = min(max(work_plans[index].width for index in level_rows), int(logits.shape[-1]))
             sampled_rows: list[tuple[list[int], list[float]]] = []
             for local_row, row_index in enumerate(level_rows):
@@ -4605,35 +5342,67 @@ class NativePearlEngine:
                 for node_index, token_id, score in zip(level_indices, token_ids, probabilities):
                     rows[row_index][node_index] = int(token_id)
                     node_confidences[row_index][node_index] = float(score)
+            profile_stop(topk_started, "draft_tree_topk")
         rows = [[row[0] if token < 0 else token for token in row] for row in rows]
 
-        packed_sequences: list[int] = []
-        packed_positions: list[int] = []
-        for request_id, plan in zip(request_ids, work_plans):
-            cache_positions = plan.cache_positions
-            assert cache_positions is not None
-            local_positions = [int(value) for value in cache_positions.detach().cpu().tolist()]
-            packed_sequences.extend([request_id] * len(local_positions))
-            packed_positions.extend(local_positions)
-        self._ensure_cache_capacity(packed_sequences, packed_positions)
-        input_ids, positions, metadata = self.model.make_tree_attention_metadata(
-            work_plans,
-            effective_roots,
-            rows,
-            self.cache_allocation.block_tables,
-            sequence_ids=request_ids,
-        )
-        model_calls += 1
-        if use_graph:
-            graph_runner.run_tree_hidden(input_ids, positions, metadata)
-            graph_calls += int(graph_runner.last_target_execution.used_aclgraph)
+        materialize_metadata_started = profile_start()
+        if defer_materialization:
+            mapping_values: list[int] = []
+            for request_id, plan in zip(request_ids, work_plans):
+                cache_positions = plan.cache_positions
+                assert cache_positions is not None
+                local_positions = [
+                    int(value) for value in cache_positions.detach().cpu().tolist()
+                ]
+                mapping_values.extend(
+                    self._cache_slot_mapping(
+                        [request_id] * len(local_positions),
+                        local_positions,
+                    )
+                )
+            # One host-to-device transfer avoids one launch and one concat per
+            # request in the latency-sensitive Draft control path.
+            cache_slot_mapping = torch.tensor(
+                mapping_values, dtype=torch.int32, device=self.device
+            )
         else:
-            self.model(input_ids, positions, metadata)
+            packed_sequences: list[int] = []
+            packed_positions: list[int] = []
+            for request_id, plan in zip(request_ids, work_plans):
+                cache_positions = plan.cache_positions
+                assert cache_positions is not None
+                local_positions = [
+                    int(value) for value in cache_positions.detach().cpu().tolist()
+                ]
+                packed_sequences.extend([request_id] * len(local_positions))
+                packed_positions.extend(local_positions)
+            self._ensure_cache_capacity(packed_sequences, packed_positions)
+            input_ids, positions, metadata = self.model.make_tree_attention_metadata(
+                work_plans,
+                effective_roots,
+                rows,
+                self.cache_allocation.block_tables,
+                sequence_ids=request_ids,
+            )
+            cache_slot_mapping = metadata.slot_mapping
+        profile_stop(materialize_metadata_started, "draft_tree_materialize_metadata")
+        if not defer_materialization:
+            model_calls += 1
+            query_count += int(input_ids.numel())
+            materialize_compute_started = profile_start()
+            if use_graph:
+                graph_runner.run_tree_hidden(input_ids, positions, metadata)
+                graph_calls += int(graph_runner.last_target_execution.used_aclgraph)
+            else:
+                self.model(input_ids, positions, metadata)
+            profile_stop(materialize_compute_started, "draft_tree_materialize_compute")
         active_counts = [
             int(getattr(plan, "candidate_budget", int(plan.width) * int(plan.depth))) for plan in plan_list
         ]
+        output_device = torch.device("cpu") if defer_materialization else self.device
         parent_rows = [
-            plan.parent_indices[:count].to(device=self.device) for plan, count in zip(plan_list, active_counts)
+            plan.parent_indices[:count].to(device=output_device)
+            for plan, count in zip(plan_list, active_counts)
         ]
         return {
             "draft_token_ids": rows,
@@ -4644,15 +5413,18 @@ class NativePearlEngine:
             "draft_confidence": torch.tensor(
                 [sum(row) / max(1, len(row)) for row in node_confidences],
                 dtype=torch.float32,
-                device=self.device,
+                device=output_device,
             ),
             "node_confidences": [
-                torch.tensor(row, dtype=torch.float32, device=self.device) for row in node_confidences
+                torch.tensor(row, dtype=torch.float32, device=output_device)
+                for row in node_confidences
             ],
-            "cache_slot_mapping": metadata.slot_mapping,
-            "query_count": int(input_ids.numel()),
+            "cache_slot_mapping": cache_slot_mapping,
+            "query_count": query_count,
             "model_calls": model_calls,
             "graph_calls": graph_calls,
+            "profile_seconds": profile_seconds,
+            "materialization_deferred": defer_materialization,
         }
 
     @torch.inference_mode()
@@ -4698,29 +5470,158 @@ class NativePearlEngine:
         accepted_node_indices: torch.Tensor,
         num_draft_tokens: Sequence[int],
     ) -> None:
-        """Compact accepted tree nodes into each request's linear KV suffix."""
+        """Compact accepted paths with one all-layer move for the whole batch.
+
+        Invalid tail depths become fixed-shape self copies.  This mirrors the
+        production vLLM tree compactor and avoids both dynamic host reads and a
+        full K/V layer sweep for every request.
+        """
         if cache_slot_mapping.ndim != 1:
             raise ValueError("cache_slot_mapping must be a flat tensor")
+        if accepted_node_indices.ndim != 2 or accepted_node_indices.shape[0] != len(num_draft_tokens):
+            raise ValueError("accepted_node_indices must contain one row per tree")
         cursor = 0
+        source_batches = []
+        destination_batches = []
         for row, count in enumerate(num_draft_tokens):
             count = int(count)
+            if count <= 0 or cursor + count + 1 > cache_slot_mapping.numel():
+                raise ValueError("tree KV compaction count exceeds its slot mapping")
             query_slots = cache_slot_mapping[cursor : cursor + count + 1]
-            accepted = accepted_node_indices[row]
-            source_slots = query_slots[1:]
-            selected = accepted[accepted >= 0].to(torch.long)
+            node_slots = query_slots[1:]
+            accepted = accepted_node_indices[row].to(torch.long)
+            if accepted.device.type != "npu" and (torch.any(accepted >= count) or torch.any(accepted < -1)):
+                raise ValueError("accepted tree node index exceeds its request-local mapping")
+            destination_indices = torch.arange(
+                accepted.numel(), dtype=torch.long, device=accepted.device
+            ).clamp_max(count - 1)
+            source_indices = torch.where(accepted >= 0, accepted, destination_indices)
             # Logical consecutive positions may cross non-consecutive KV
             # pages. Never derive physical destinations by root_slot + n.
-            self._move_tree_cache_slots(source_slots.index_select(0, selected), source_slots[: selected.numel()])
+            source_batches.append(node_slots.index_select(0, source_indices))
+            destination_batches.append(node_slots.index_select(0, destination_indices))
             cursor += count + 1
+        if cursor != cache_slot_mapping.numel():
+            raise ValueError("tree KV compaction slot mapping contains an unused suffix")
+        if source_batches:
+            self._move_tree_cache_slots(torch.cat(source_batches), torch.cat(destination_batches))
+
+    @staticmethod
+    def _tree_row_requires_kv_compaction(
+        accepted_node_indices: Sequence[int],
+        num_draft_tokens: int,
+    ) -> bool:
+        """Return whether an accepted spine leaves its packed logical slots.
+
+        Tree plans are spine-first, so the common top-1 accepted path already
+        occupies destination nodes ``0..depth-1``. Rejected tail entries are
+        also self-copies. Skipping those rows avoids a full all-layer KV sweep.
+        """
+        count = int(num_draft_tokens)
+        if count <= 0:
+            raise ValueError("tree KV compaction requires a positive candidate count")
+        return any(
+            int(node) >= 0 and int(node) != min(depth, count - 1)
+            for depth, node in enumerate(accepted_node_indices)
+        )
 
     def _move_tree_cache_slots(self, source: torch.Tensor, destination: torch.Tensor) -> None:
-        layer_caches = []
+        layer_caches = getattr(self, "_tree_layer_caches", None)
+        if layer_caches is None:
+            layer_caches = self._collect_tree_layer_caches()
+        move_kv_cache_slots(layer_caches, source, destination)
+
+    def _collect_tree_layer_caches(self) -> list[tuple[torch.Tensor, torch.Tensor]]:
+        """Validate and collect the model-lifetime paged KV tensors."""
+        configured_device = getattr(self, "device", None)
+        expected_device = (
+            self._spec_rhythm_tree_cache_device(configured_device)
+            if isinstance(configured_device, torch.device)
+            else None
+        )
+        layer_caches: list[tuple[torch.Tensor, torch.Tensor]] = []
         for layer in self.model.layers:
             key_cache, value_cache = layer.self_attn.key_cache, layer.self_attn.value_cache
-            if key_cache is None or value_cache is None:
-                raise RuntimeError("Tree KV movement requires allocated layer caches")
+            for cache in (key_cache, value_cache):
+                if not isinstance(cache, torch.Tensor) or cache.ndim != 4:
+                    raise RuntimeError("SpecRhythm tree KV preflight requires allocated paged layer caches")
+                if expected_device is not None and cache.device != expected_device:
+                    raise RuntimeError("SpecRhythm tree KV cache is on the wrong device")
             layer_caches.append((key_cache, value_cache))
-        move_kv_cache_slots(layer_caches, source, destination)
+        if not layer_caches:
+            raise RuntimeError("SpecRhythm tree KV preflight requires at least one layer cache")
+        return layer_caches
+
+    @staticmethod
+    def _verify_tree_outputs_host(
+        draft_token_rows: Sequence[Sequence[int]],
+        plans: Sequence[TreeSpeculationPlan],
+        target_query_token_ids: torch.Tensor,
+        max_depth: int,
+        output_device: torch.device,
+        placeholder_token_id: int = -1,
+    ) -> TreeVerificationOutput:
+        """Traverse small greedy trees on the host with one D2H and one H2D.
+
+        This is the optimized host-verdict path used while the captured NPU
+        verifier is still slower than its control-plane cost.  It implements
+        exactly ``verify_greedy_tree_batch``'s root-query convention: each
+        request contributes ``candidate_count + 1`` target successors and
+        the successor after the last accepted node is the bonus token.
+        """
+        if max_depth < 1 or not plans or len(draft_token_rows) != len(plans):
+            raise ValueError("host tree verifier requires aligned non-empty plans")
+        counts = [int(plan.candidate_budget) for plan in plans]
+        expected = sum(count + 1 for count in counts)
+        if target_query_token_ids.ndim != 1 or target_query_token_ids.numel() != expected:
+            raise ValueError("host tree verifier target rows do not match candidate counts")
+        target_values = [int(value) for value in target_query_token_ids.detach().cpu().tolist()]
+        packed_output: list[list[int]] = []
+        cursor = 0
+        for row, plan, count in zip(draft_token_rows, plans, counts):
+            candidates = [int(value) for value in row[:count]]
+            if len(candidates) != count:
+                raise ValueError("host tree verifier draft row is shorter than its plan")
+            parents = [
+                int(value)
+                for value in plan.parent_indices[:count].detach().cpu().tolist()
+            ]
+            targets = target_values[cursor : cursor + count + 1]
+            cursor += count + 1
+            emitted = [placeholder_token_id] * (max_depth + 1)
+            accepted = [-1] * max_depth
+            parent = -1
+            prediction_index = 0
+            active = True
+            for depth in range(max_depth):
+                if not active or prediction_index >= len(targets):
+                    break
+                prediction = targets[prediction_index]
+                emitted[depth] = prediction
+                selected = next(
+                    (
+                        index
+                        for index, (candidate_parent, candidate) in enumerate(
+                            zip(parents, candidates)
+                        )
+                        if candidate_parent == parent and candidate == prediction
+                    ),
+                    -1,
+                )
+                if selected < 0:
+                    active = False
+                    break
+                accepted[depth] = selected
+                parent = selected
+                prediction_index = selected + 1
+            if active:
+                emitted[max_depth] = targets[min(prediction_index, len(targets) - 1)]
+            packed_output.append([*emitted, *accepted])
+        packed = torch.tensor(packed_output, dtype=torch.long, device=output_device)
+        return TreeVerificationOutput(
+            packed[:, : max_depth + 1],
+            packed[:, max_depth + 1 :],
+        )
 
     @staticmethod
     @torch.inference_mode()

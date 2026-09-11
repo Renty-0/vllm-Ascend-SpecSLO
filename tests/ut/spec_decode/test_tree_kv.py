@@ -1,7 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 
+from unittest.mock import Mock
+
 import torch
 
+from vllm_ascend.spec_decode import tree_kv
 from vllm_ascend.spec_decode.tree_kv import move_kv_cache_slots
 
 
@@ -22,3 +25,15 @@ def test_move_tuple_kv_cache_slots():
     move_kv_cache_slots([(key, value)], torch.tensor([5]), torch.tensor([0]))
     assert key.flatten(0, 1)[0].item() == 5
     assert value.flatten(0, 1)[0].item() == 105
+
+
+def test_move_npu_tuple_uses_fused_reshape_and_cache(monkeypatch):
+    key = Mock(device=Mock(type="npu"))
+    value = Mock(device=Mock(type="npu"))
+    fused = Mock()
+    monkeypatch.setattr(tree_kv, "_move_npu_kv_pair_slots", fused)
+    monkeypatch.setattr(tree_kv, "_is_npu_kv_pair", lambda pair: True)
+
+    move_kv_cache_slots([(key, value)], torch.tensor([5]), torch.tensor([0]))
+
+    fused.assert_called_once()

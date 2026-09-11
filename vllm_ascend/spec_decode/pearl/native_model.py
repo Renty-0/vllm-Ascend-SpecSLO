@@ -861,6 +861,15 @@ class NativeAttention(nn.Module):
         if self.key_cache is None or self.value_cache is None:
             raise RuntimeError("Configure the PEARL KV cache before running the model.")
         qkv = self.qkv_proj(hidden_states)
+        metadata = attention_metadata or self._default_metadata(positions)
+        track_finiteness = self.track_cache_finiteness or metadata.tree_attention
+        if track_finiteness:
+            # Q, K and V are slices (plus finite normalization/RoPE
+            # transforms) of this fused projection. Checking the projection
+            # once and the attention result once preserves the per-layer
+            # numerical fault boundary while avoiding three independent
+            # isfinite+reduce chains on every graph replay.
+            self.tree_cache_nonfinite.logical_or_(~torch.isfinite(qkv).all())
         if self.use_qknorm_rope_fusion and qkv.device.type == "npu" and qkv.dtype == torch.bfloat16:
             assert isinstance(self.q_norm, NativeRMSNorm)
             assert isinstance(self.k_norm, NativeRMSNorm)
@@ -887,14 +896,6 @@ class NativeAttention(nn.Module):
             key = self.k_norm(key.view(-1, self.num_kv_heads, self.head_dim))
             value = value.view(-1, self.num_kv_heads, self.head_dim)
             query, key = self.rotary_emb(positions, query, key)
-        metadata = attention_metadata or self._default_metadata(positions)
-        track_finiteness = self.track_cache_finiteness or metadata.tree_attention
-        if track_finiteness:
-            # Device-resident sticky state is compatible with graph replay.
-            # One host check for all layers occurs at the collective commit
-            # preflight, not one synchronization per attention layer.
-            nonfinite = ~(torch.isfinite(query).all() & torch.isfinite(key).all() & torch.isfinite(value).all())
-            self.tree_cache_nonfinite.logical_or_(nonfinite)
         self._write_to_cache(metadata.slot_mapping, key, value)
 
         if metadata.use_fused_infer_attention:

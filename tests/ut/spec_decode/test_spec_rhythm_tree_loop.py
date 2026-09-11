@@ -48,6 +48,7 @@ class _TreeLoopHarness:
         self.prefilled = set()
         self.estimators = []
         self.window_observations = []
+        self.draft_window_ms = draft_window_ms
         self.last_explored_requests = 0
         harness = self
 
@@ -171,6 +172,7 @@ class _TreeLoopHarness:
     def exchange(self, rows, plans, frontiers=None, confidences=None, *args, **kwargs):
         self.events.append(("exchange", tuple(plan.candidate_budget for plan in plans)))
         self.last_explored_requests = len(plans)
+        kwargs["draft_compute_ms"] = len(plans) * 4.0
         if not plans:
             return None
         # Use the real wire encoder on the simulated draft leader; the
@@ -204,11 +206,12 @@ class _TreeLoopHarness:
             "cache_slot_mapping": torch.arange(sum(plan.parent_indices.numel() + 1 for plan in plans)),
         }
 
-    def verdict(self, output, plans):
+    def verdict(self, output, plans, target_compute_ms=0.0):
         self.events.append(("verdict", tuple(plan.candidate_budget for plan in plans)))
         if self.before_verdict is not None:
             self.before_verdict()
-        return output.token_ids.tolist(), output.accepted_node_indices.tolist()
+        self.window_observations.append((target_compute_ms, self.draft_window_ms))
+        return output.token_ids.tolist(), output.accepted_node_indices.tolist(), self.draft_window_ms
 
     def prefill(self, rows, states, indices):
         self.events.append(("prefill", tuple(indices)))
@@ -249,6 +252,48 @@ def test_tree_loop_completes_and_matches_replicated_request_states(monkeypatch):
     assert all(len(result["completion_token_ids"]) == 6 for result in results)
     assert [state.token_ids for state in harness.draft_states] == [state.token_ids for state in harness.target_states]
     harness.engine._release_cache.assert_called_once()
+
+
+def test_tree_loop_populates_bounded_decode_profile(monkeypatch):
+    harness = _TreeLoopHarness(monkeypatch, requests=4, capacity=4, max_tokens=12)
+    harness.engine.config = replace(harness.engine.config, profile_decode_steps=2)
+
+    harness.run(max_rounds=4)
+
+    assert harness.engine.last_worker_profiled_decode_steps == 2
+    assert set(harness.engine.last_worker_decode_profile_seconds) == {
+        "draft_compute",
+        "draft_to_target_communication",
+        "target_compute",
+        "target_verdict",
+        "target_to_draft_communication",
+        "wait_sync",
+        "state_update",
+    }
+    assert harness.engine.last_worker_decode_profile_seconds["target_compute"] > 0
+    assert harness.engine.last_worker_decode_profile_seconds["target_verdict"] > 0
+    assert all(value >= 0 for value in harness.engine.last_worker_decode_profile_seconds.values())
+    assert set(harness.engine.last_worker_decode_profile_detail_seconds) == {
+        "scheduler_plan",
+        "draft_tree_setup",
+        "draft_tree_level_compute",
+        "draft_tree_topk",
+        "draft_tree_materialize_metadata",
+        "draft_tree_materialize_compute",
+        "target_tree_setup",
+        "target_tree_metadata",
+        "target_tree_model",
+        "target_tree_output",
+        "draft_postprocess",
+        "profile_timeline_collective",
+        "proposal_publish",
+        "commit_preflight",
+        "commit_consensus",
+        "kv_compaction",
+        "request_commit",
+        "cycle_accounting",
+    }
+    assert all(value >= 0 for value in harness.engine.last_worker_decode_profile_detail_seconds.values())
 
 
 def test_tree_loop_caps_active_requests_and_refills_after_guarded_completion(monkeypatch):
@@ -391,6 +436,7 @@ def test_tree_confidence_envelope_roundtrip_is_identical_on_every_rank(monkeypat
         [None, 123],
         [0.123456789, 0.987654321],
         [[0, 1], [0, 1, 2, 3]],
+        0.0,
     )
 
 
@@ -455,6 +501,8 @@ def test_tree_kv_compaction_uses_page_table_slots_not_physical_arithmetic():
     engine.model = SimpleNamespace(
         layers=[SimpleNamespace(self_attn=SimpleNamespace(key_cache=key_cache, value_cache=value_cache))]
     )
+    original_move = engine._move_tree_cache_slots
+    engine._move_tree_cache_slots = Mock(wraps=original_move)
     # Request 0 crosses from the end of physical page 0 to page 3, then page
     # 1.  Its accepted sibling branch occupies slots 4/5, but logical commit
     # destinations are 12/13.  Request 1 has a different variable node count.
@@ -466,6 +514,22 @@ def test_tree_kv_compaction_uses_page_table_slots_not_physical_arithmetic():
     assert flat_keys[[12, 13, 8]].tolist() == [4, 5, 9]
     assert flat_values[[12, 13, 8]].tolist() == [104, 105, 109]
     assert flat_keys[[3, 2]].tolist() == [3, 2]
+    engine._move_tree_cache_slots.assert_called_once()
+
+
+@pytest.mark.parametrize(
+    "accepted,count,expected",
+    [
+        ([0, 1], 4, False),
+        ([0, -1], 4, False),
+        ([-1, -1], 4, False),
+        ([0, -1], 1, False),
+        ([2, 3], 4, True),
+        ([0, 2], 4, True),
+    ],
+)
+def test_tree_kv_compaction_skips_already_packed_primary_spines(accepted, count, expected):
+    assert native.NativePearlEngine._tree_row_requires_kv_compaction(accepted, count) is expected
 
 
 @pytest.mark.parametrize("online_prefill", [False, True])

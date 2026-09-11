@@ -96,6 +96,15 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Synchronously profile this many decode steps per static chunk.",
     )
     parser.add_argument(
+        "--profile-host-decode-steps",
+        type=int,
+        default=0,
+        help=(
+            "Record rank-local host timestamps for this many decode steps "
+            "without inserting NPU synchronization or profile collectives."
+        ),
+    )
+    parser.add_argument(
         "--profile-only",
         action="store_true",
         help="Stop after the synchronously profiled decode steps.",
@@ -103,6 +112,11 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--worker-timeout-seconds", type=float, default=300.0)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--enforce-eager", action="store_true")
+    parser.add_argument(
+        "--require-no-graph-fallback",
+        action="store_true",
+        help="Fail unless every worker executes Graph with zero measured fallback.",
+    )
     parser.add_argument("--enable-prefix-caching", action="store_true")
     parser.add_argument("--enable-continuous-batching", action="store_true")
     parser.add_argument(
@@ -330,8 +344,12 @@ def main(argv: Sequence[str] | None = None) -> None:
         raise ValueError("--spec-rhythm-max-target-batch must be non-negative.")
     if args.profile_decode_steps < 0:
         raise ValueError("--profile-decode-steps must be non-negative.")
+    if args.profile_host_decode_steps < 0:
+        raise ValueError("--profile-host-decode-steps must be non-negative.")
     if args.profile_only and args.profile_decode_steps == 0:
         raise ValueError("--profile-only requires --profile-decode-steps to be positive.")
+    if args.require_no_graph_fallback and args.enforce_eager:
+        raise ValueError("--require-no-graph-fallback cannot be combined with --enforce-eager.")
     if args.num_pearl_steps is not None and args.num_pearl_steps <= 0:
         raise ValueError("--num-pearl-steps must be positive.")
     if args.num_pearl_steps is not None and args.enable_continuous_batching:
@@ -417,6 +435,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         precompile_decode_graphs=args.precompile_decode_graphs,
         enable_cpu_binding=not args.disable_cpu_binding,
         profile_decode_steps=0,
+        profile_host_decode_steps=0,
         stop_after_profiled_decode_steps=False,
         enforce_eager=args.enforce_eager,
         gamma=args.gamma,
@@ -532,6 +551,7 @@ def main(argv: Sequence[str] | None = None) -> None:
                 engine.configure_decode_profiling(
                     args.profile_decode_steps,
                     stop_after_profiled_decode_steps=True,
+                    profile_host_decode_steps=args.profile_host_decode_steps,
                 )
                 _add_requests(
                     engine,
@@ -544,6 +564,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             engine.configure_decode_profiling(
                 args.profile_decode_steps,
                 args.profile_only,
+                args.profile_host_decode_steps,
             )
             started = time.perf_counter()
             _add_requests(
@@ -566,6 +587,12 @@ def main(argv: Sequence[str] | None = None) -> None:
                 phase: sum(metric["decode_phase_seconds"][phase] for metric in chunk_metrics)
                 for phase in chunk_metrics[0]["decode_phase_seconds"]
             }
+            measured_graph_deltas = _worker_aclgraph_deltas(
+                warmup_worker_metrics,
+                engine.last_worker_metrics,
+            )
+            if args.require_no_graph_fallback:
+                _require_no_graph_fallback(measured_graph_deltas)
             results.append(
                 {
                     "batch_size": batch_size,
@@ -598,14 +625,24 @@ def main(argv: Sequence[str] | None = None) -> None:
                     "aclgraph_capacity_fallbacks": max(metric["aclgraph_capacity_fallbacks"] for metric in metrics),
                     "aclgraph_shape_fallbacks": max(metric["aclgraph_shape_fallbacks"] for metric in metrics),
                     "worker_aclgraph_metrics": engine.last_worker_metrics,
-                    "measured_worker_aclgraph_deltas": _worker_aclgraph_deltas(
-                        warmup_worker_metrics,
-                        engine.last_worker_metrics,
-                    ),
+                    "measured_worker_aclgraph_deltas": measured_graph_deltas,
                     "worker_metrics_by_chunk": engine.last_worker_metrics_by_chunk,
                     "decode_profile": _aggregate_decode_profile(
                         engine.last_worker_metrics_by_chunk,
                         batch_size,
+                    ),
+                    "decode_host_profile": _aggregate_decode_host_profile(
+                        engine.last_worker_metrics_by_chunk,
+                        batch_size,
+                    ),
+                    # Per-cycle timestamps are populated only for the
+                    # explicitly bounded intrusive profile window. Retaining
+                    # them makes claimed Draft/Target overlap auditable rather
+                    # than inferring it from two accumulated phase totals.
+                    "decode_timeline": (
+                        list(metrics[0].get("decode_timeline", ()))
+                        if args.profile_decode_steps > 0
+                        else []
                     ),
                     "output_token_ids_sha256": hashlib.sha256(
                         json.dumps(output_token_rows, separators=(",", ":")).encode()
@@ -640,6 +677,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "target_verification_graph_post_counts": target_graph_post_counts,
         "auto_gamma_profile_sequence_length": args.auto_gamma_profile_sequence_length,
         "profile_decode_steps": args.profile_decode_steps,
+        "profile_host_decode_steps": args.profile_host_decode_steps,
         "profile_only": args.profile_only,
         "profile_shape_warmup": args.profile_only,
         "max_model_len": args.max_model_len,
@@ -648,6 +686,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "max_aclgraph_entries": args.max_aclgraph_entries,
         "prefill_chunk_size": args.prefill_chunk_size,
         "enforce_eager": args.enforce_eager,
+        "require_no_graph_fallback": args.require_no_graph_fallback,
         "enable_prefix_caching": args.enable_prefix_caching,
         "enable_continuous_batching": (args.enable_continuous_batching or args.enable_spec_rhythm),
         "enable_preemptive_scheduling": (args.enable_preemptive_scheduling or args.enable_spec_rhythm),
@@ -664,6 +703,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "spec_rhythm_max_eager_tokens": effective_eager_cap,
         "spec_rhythm_slo_adaptive": request_has_slo,
         "spec_rhythm_auto_eager_tokens": args.spec_rhythm_auto_eager_tokens,
+        "spec_rhythm_cpu_verdict": args.spec_rhythm_cpu_verdict,
         "spec_rhythm_roofline": args.spec_rhythm_roofline,
         "spec_rhythm_verification_budget": args.spec_rhythm_verification_budget,
         "spec_rhythm_draft_token_budget": args.spec_rhythm_draft_token_budget,
@@ -775,6 +815,7 @@ def _aggregate_decode_profile(worker_metrics_by_chunk, batch_size: int):
         "wait_sync": 0.0,
         "state_update": 0.0,
     }
+    detail_totals: dict[str, float] = {}
     profiled_steps = 0
     profiled_chunks = 0
     for chunk in full_chunks:
@@ -800,6 +841,19 @@ def _aggregate_decode_profile(worker_metrics_by_chunk, batch_size: int):
         component_totals["target_verdict"] += target_verdict
         component_totals["wait_sync"] += wait_sync
         component_totals["state_update"] += state_update
+        detail_prefix = "worker_profile_detail_"
+        detail_suffix = "_seconds"
+        detail_names = {
+            key[len(detail_prefix) : -len(detail_suffix)]
+            for worker in workers
+            for key in worker
+            if key.startswith(detail_prefix) and key.endswith(detail_suffix)
+        }
+        for name in detail_names:
+            detail_totals[name] = detail_totals.get(name, 0.0) + max(
+                float(worker.get(f"{detail_prefix}{name}{detail_suffix}", 0.0))
+                for worker in workers
+            )
         profiled_steps += chunk_steps
         profiled_chunks += 1
     if profiled_steps == 0:
@@ -815,6 +869,125 @@ def _aggregate_decode_profile(worker_metrics_by_chunk, batch_size: int):
         "component_milliseconds_per_decode_step": {
             phase: seconds * 1000 / profiled_steps for phase, seconds in component_totals.items()
         },
+        "detail_seconds": detail_totals,
+        "detail_milliseconds_per_decode_step": {
+            phase: seconds * 1000 / profiled_steps for phase, seconds in detail_totals.items()
+        },
+    }
+
+
+def _aggregate_decode_host_profile(worker_metrics_by_chunk, batch_size: int):
+    """Merge non-synchronizing rank-local timestamps into cycle diagnostics.
+
+    ``time.perf_counter`` uses one host monotonic clock, including across the
+    spawned workers, so absolute rank timestamps can be compared directly.
+    No timing collective is inserted into the measured decode path.
+    """
+    cycles = []
+    for chunk_index, chunk in enumerate(worker_metrics_by_chunk):
+        if int(chunk.get("batch_size", 0)) != int(batch_size):
+            continue
+        workers = chunk.get("worker_metrics", ())
+        rows_by_step: dict[int, list[dict]] = {}
+        for worker in workers:
+            for row in worker.get("worker_host_timeline", ()):
+                rows_by_step.setdefault(int(row["step"]), []).append(row)
+        for step, rows in sorted(rows_by_step.items()):
+            draft_rows = [row for row in rows if int(row.get("is_draft_rank", 0))]
+            target_rows = [row for row in rows if not int(row.get("is_draft_rank", 0))]
+            if not draft_rows or not target_rows:
+                continue
+            draft = min(draft_rows, key=lambda row: int(row["rank"]))
+            target = min(target_rows, key=lambda row: int(row["rank"]))
+
+            def duration_ms(row, start: str, end: str) -> float:
+                if start not in row or end not in row:
+                    return 0.0
+                return max(0.0, float(row[end]) - float(row[start])) * 1000.0
+
+            cycle_start = min(float(row["cycle_start_seconds"]) for row in rows)
+            cycle_end = max(float(row.get("cycle_end_seconds", cycle_start)) for row in rows)
+            draft_start = float(draft.get("draft_start_seconds", cycle_start))
+            draft_end = float(draft.get("draft_end_seconds", draft_start))
+            target_start = float(target.get("target_start_seconds", cycle_start))
+            target_end = float(target.get("target_end_seconds", target_start))
+            correction_end = max(
+                float(row.get("correction_end_seconds", row.get("publish_end_seconds", cycle_start)))
+                for row in rows
+            )
+            cycles.append(
+                {
+                    "chunk": chunk_index,
+                    "step": step,
+                    "target_requests": int(target.get("target_requests", 0)),
+                    "draft_requests": int(draft.get("draft_requests", 0)),
+                    "verify_candidates": int(target.get("verify_candidates", 0)),
+                    "cycle_wall_ms": max(0.0, cycle_end - cycle_start) * 1000.0,
+                    "scheduler_critical_ms": max(
+                        duration_ms(row, "cycle_start_seconds", "scheduler_end_seconds") for row in rows
+                    ),
+                    "scheduler_roof_critical_ms": max(
+                        duration_ms(row, "cycle_start_seconds", "scheduler_roof_end_seconds") for row in rows
+                    ),
+                    "scheduler_plan_critical_ms": max(
+                        duration_ms(row, "scheduler_roof_end_seconds", "scheduler_plan_end_seconds")
+                        for row in rows
+                    ),
+                    "scheduler_budget_critical_ms": max(
+                        duration_ms(row, "scheduler_plan_end_seconds", "scheduler_budget_end_seconds")
+                        for row in rows
+                    ),
+                    "scheduler_tree_plan_critical_ms": max(
+                        duration_ms(row, "scheduler_budget_end_seconds", "scheduler_end_seconds") for row in rows
+                    ),
+                    "draft_compute_host_ms": duration_ms(draft, "draft_start_seconds", "draft_end_seconds"),
+                    "target_compute_host_ms": duration_ms(target, "target_start_seconds", "target_end_seconds"),
+                    "host_compute_overlap_ms": max(
+                        0.0,
+                        min(draft_end, target_end) - max(draft_start, target_start),
+                    )
+                    * 1000.0,
+                    "draft_to_target_critical_ms": max(
+                        duration_ms(row, "exchange_start_seconds", "exchange_end_seconds") for row in rows
+                    ),
+                    "target_verdict_host_ms": duration_ms(
+                        target, "verdict_start_seconds", "verdict_end_seconds"
+                    ),
+                    "target_to_draft_critical_ms": max(
+                        duration_ms(row, "correction_start_seconds", "correction_end_seconds") for row in rows
+                    ),
+                    "state_update_critical_ms": max(
+                        duration_ms(row, "state_start_seconds", "state_end_seconds") for row in rows
+                    ),
+                    "state_preflight_critical_ms": max(
+                        duration_ms(row, "state_start_seconds", "state_preflight_end_seconds") for row in rows
+                    ),
+                    "state_consensus_critical_ms": max(
+                        duration_ms(row, "state_preflight_end_seconds", "state_consensus_end_seconds")
+                        for row in rows
+                    ),
+                    "state_compaction_critical_ms": max(
+                        duration_ms(row, "state_consensus_end_seconds", "state_compaction_end_seconds")
+                        for row in rows
+                    ),
+                    "state_request_commit_critical_ms": max(
+                        duration_ms(row, "state_compaction_end_seconds", "state_request_commit_end_seconds")
+                        for row in rows
+                    ),
+                    "post_correction_tail_ms": max(0.0, cycle_end - correction_end) * 1000.0,
+                    "rank_cycle_ms": {
+                        str(int(row["rank"])): duration_ms(
+                            row, "cycle_start_seconds", "cycle_end_seconds"
+                        )
+                        for row in rows
+                    },
+                }
+            )
+    if not cycles:
+        return None
+    return {
+        "mode": "rank-local host timestamps; no added NPU synchronize or collective",
+        "cycles": cycles,
     }
 
 
@@ -826,18 +999,44 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
         "aclgraph_failed_captures",
         "aclgraph_capacity_fallbacks",
         "aclgraph_shape_fallbacks",
+        "aclgraph_runtime_validation_replays",
     )
     before_by_rank = {int(worker["rank"]): worker for worker in before_workers}
     return [
         {
             "rank": int(worker["rank"]),
             **{
-                f"{name}_delta": int(worker[name]) - int(before_by_rank.get(int(worker["rank"]), {}).get(name, 0))
+                f"{name}_delta": int(worker.get(name, 0))
+                - int(before_by_rank.get(int(worker["rank"]), {}).get(name, 0))
                 for name in counter_names
             },
         }
         for worker in after_workers
     ]
+
+
+def _require_no_graph_fallback(worker_deltas) -> None:
+    """Turn Graph execution from a report field into a benchmark invariant."""
+    fallback_names = (
+        "aclgraph_failed_captures_delta",
+        "aclgraph_capacity_fallbacks_delta",
+        "aclgraph_shape_fallbacks_delta",
+    )
+    failures = [
+        (int(worker["rank"]), {name: int(worker[name]) for name in fallback_names})
+        for worker in worker_deltas
+        if any(int(worker[name]) != 0 for name in fallback_names)
+    ]
+    inactive = [
+        int(worker["rank"])
+        for worker in worker_deltas
+        if int(worker["aclgraph_captures_delta"]) + int(worker["aclgraph_replays_delta"]) <= 0
+    ]
+    if failures or inactive:
+        raise RuntimeError(
+            "Graph-only benchmark invariant failed: "
+            f"fallbacks={failures or 'none'}, inactive_ranks={inactive or 'none'}"
+        )
 
 
 if __name__ == "__main__":

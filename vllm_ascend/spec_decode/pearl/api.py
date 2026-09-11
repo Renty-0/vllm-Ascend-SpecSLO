@@ -122,6 +122,11 @@ class PEARLConfig:
     precompile_decode_graphs: bool = False
     enable_cpu_binding: bool = True
     profile_decode_steps: int = 0
+    # Lightweight rank-local host timestamps.  Unlike ``profile_decode_steps``
+    # this diagnostic never inserts an NPU synchronize or an extra collective,
+    # so it can expose queue stalls and first-replay latency without destroying
+    # the dual-batch overlap being measured.
+    profile_host_decode_steps: int = 0
     stop_after_profiled_decode_steps: bool = False
     enable_mc2: bool = False
     mc2_profile: Mapping[str, Any] | str | None = None
@@ -234,6 +239,8 @@ class PEARLConfig:
             raise ValueError("PEARL auto-gamma profile sequence length must be positive.")
         if self.profile_decode_steps < 0:
             raise ValueError("PEARL profile_decode_steps must be non-negative.")
+        if self.profile_host_decode_steps < 0:
+            raise ValueError("PEARL profile_host_decode_steps must be non-negative.")
         if self.stop_after_profiled_decode_steps and self.profile_decode_steps == 0:
             raise ValueError("PEARL profiling-only execution requires profile_decode_steps to be positive.")
         if self.gamma == 0 or self.gamma < -1:
@@ -345,6 +352,7 @@ class PEARLConfig:
             precompile_decode_graphs=self.precompile_decode_graphs,
             enable_cpu_binding=self.enable_cpu_binding,
             profile_decode_steps=self.profile_decode_steps,
+            profile_host_decode_steps=self.profile_host_decode_steps,
             stop_after_profiled_decode_steps=self.stop_after_profiled_decode_steps,
             enforce_eager=self.enforce_eager,
             enable_mc2=self.enable_mc2,
@@ -366,7 +374,7 @@ class PEARLEngine:
         self._requests: list[tuple[int, list[int], SamplingParams]] = []
         self._next_request_id = 0
         self.last_metrics: list[dict[str, Any]] = []
-        self.last_worker_metrics: list[dict[str, int | float]] = []
+        self.last_worker_metrics: list[dict[str, Any]] = []
         self.last_worker_metrics_by_chunk: list[dict[str, Any]] = []
         self._closed = False
         self._processes: list[mp.Process] = []
@@ -460,10 +468,13 @@ class PEARLEngine:
         self,
         profile_decode_steps: int,
         stop_after_profiled_decode_steps: bool = False,
+        profile_host_decode_steps: int = 0,
     ) -> None:
         """Configure synchronized decode profiling on every persistent worker."""
         if profile_decode_steps < 0:
             raise ValueError("PEARL profile_decode_steps must be non-negative.")
+        if profile_host_decode_steps < 0:
+            raise ValueError("PEARL profile_host_decode_steps must be non-negative.")
         if stop_after_profiled_decode_steps and profile_decode_steps == 0:
             raise ValueError("PEARL profiling-only execution requires profile_decode_steps to be positive.")
         self._send_all(
@@ -471,7 +482,7 @@ class PEARLEngine:
                 "configure_decode_profiling",
                 profile_decode_steps,
                 stop_after_profiled_decode_steps,
-                None,
+                profile_host_decode_steps,
             )
         )
         replies = self._receive_all("worker profiling configuration")
@@ -690,8 +701,19 @@ class PEARLEngine:
                             "worker_metrics": worker_graph_metrics,
                         }
                     )
+                    # Some counters describe only one model role.  Aggregate
+                    # the union and use zero for workers where that role is
+                    # inactive, rather than making every future diagnostic
+                    # counter a cross-rank schema hazard.
+                    metric_names = set().union(*(metrics.keys() for metrics in worker_graph_metrics))
                     aggregate_graph_metrics = {
-                        name: max(metrics[name] for metrics in worker_graph_metrics) for name in worker_graph_metrics[0]
+                        name: max(
+                            value
+                            for metrics in worker_graph_metrics
+                            if isinstance((value := metrics.get(name)), (int, float))
+                        )
+                        for name in metric_names
+                        if any(isinstance(metrics.get(name), (int, float)) for metrics in worker_graph_metrics)
                     }
                     for result in batch_results:
                         result.update(aggregate_graph_metrics)
@@ -884,7 +906,11 @@ def _pearl_worker(
                 connection.send(("logged", rank))
                 continue
             if mode == "configure_decode_profiling":
-                engine.configure_decode_profiling(int(prompts), bool(sampling_params))
+                engine.configure_decode_profiling(
+                    int(prompts),
+                    bool(sampling_params),
+                    int(num_pearl_steps or 0),
+                )
                 connection.send(("configured", rank))
                 continue
             if mode == "pearl_stream_live":

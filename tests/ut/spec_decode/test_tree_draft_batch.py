@@ -58,6 +58,39 @@ def test_multiple_normal_trees_share_one_model_invocation_per_depth():
     assert [row.numel() for row in output["node_confidences"]] == [4, 4]
 
 
+def test_runtime_defers_full_tree_write_and_materializes_only_selected_missing_nodes():
+    engine = _engine()
+    engine.config = SimpleNamespace(enforce_eager=True, kvcache_block_size=4)
+    # The production allocation keeps host block tables while the model owns
+    # the device tensor used to build attention metadata.
+    engine.cache_allocation.block_tables = engine.cache_block_tables.tolist()
+    engine._defer_tree_materialization = True
+    plans = [
+        build_tree_speculation_plan(2, 2, prefix_len=2, max_model_len=32)
+        for _ in range(2)
+    ]
+
+    output = engine.draft_tree_forward(plans, [5, 9], [0, 1])
+
+    # Root and node 0 were evaluated by the two expansion levels. The former
+    # ten-query full-tree write is absent until global B selects candidates.
+    assert [call[0].numel() for call in engine.model.calls] == [2, 2]
+    assert output["materialization_deferred"] is True
+    assert output["cache_slot_mapping"].numel() == 10
+
+    materialized = engine.materialize_selected_tree_kv(
+        plans,
+        output["draft_token_ids"],
+        [[0, 1], [0]],
+        [0, 1],
+    )
+
+    # Only request 0's final primary node is selected but not already resident.
+    assert materialized["materialized_nodes"] == 1
+    assert materialized["model_calls"] == 1
+    assert engine.model.calls[-1][0].numel() == 1
+
+
 def test_normal_and_eager_share_levels_but_eager_scratch_does_not_overwrite_parent():
     engine = _engine()
     parent = build_tree_speculation_plan(2, 2, prefix_len=2, max_model_len=32)

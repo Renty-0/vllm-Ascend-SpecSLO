@@ -9,8 +9,13 @@ import torch
 
 from tests.ut.spec_decode.test_spec_rhythm_kv_preflight import _fixture, _preflight
 from tests.ut.spec_decode.test_tree_draft_batch import _engine
+from vllm_ascend.spec_decode.pearl.native_engine import NativePearlEngine
 from vllm_ascend.spec_decode.pearl.native_model import NativeAttention, make_tree_fia_mask
-from vllm_ascend.spec_decode.pearl.tree import build_tree_speculation_plan, pack_selected_tree_plan
+from vllm_ascend.spec_decode.pearl.tree import (
+    build_tree_speculation_plan,
+    pack_selected_tree_plan,
+    verify_greedy_tree_batch,
+)
 
 
 def test_heterogeneous_full_mask_pads_only_mask_not_queries():
@@ -52,6 +57,31 @@ def test_unified_q1_draft_has_one_full_mask_per_request():
     assert torch.equal(metadata.request_block_tables, engine.cache_block_tables)
 
 
+def test_host_verdict_matches_tensor_verifier_for_heterogeneous_trees():
+    base = build_tree_speculation_plan(2, 2, 3, 32)
+    plans = [
+        pack_selected_tree_plan(base, [0, 1]),
+        pack_selected_tree_plan(base, [0, 2]),
+    ]
+    drafts = [[7, 8], [10, 11]]
+    targets = torch.tensor([7, 8, 9, 11, 12, 13])
+    expected = verify_greedy_tree_batch(
+        torch.tensor([7, 8, 10, 11]),
+        torch.cat([plan.parent_indices for plan in plans]),
+        [2, 2],
+        targets,
+        torch.tensor([9, 13]),
+        max_depth=2,
+    )
+
+    actual = NativePearlEngine._verify_tree_outputs_host(
+        drafts, plans, targets, max_depth=2, output_device=torch.device("cpu")
+    )
+
+    assert torch.equal(actual.token_ids, expected.token_ids)
+    assert torch.equal(actual.accepted_node_indices, expected.accepted_node_indices.to(torch.long))
+
+
 @pytest.mark.parametrize("rows", [[], [torch.ones(0, 4)], [torch.ones(2)], [torch.ones(1, 4), torch.ones(2, 5)]])
 def test_invalid_full_mask_layout_fails_before_operator(rows):
     with pytest.raises(ValueError):
@@ -70,15 +100,18 @@ def test_cache_holes_are_finite_and_sticky_fault_resets_on_reallocation():
 
 
 @pytest.mark.parametrize("draft", [False, True])
-def test_nonfinite_attention_fails_before_any_tree_commit(draft):
+def test_nonfinite_attention_flag_is_preserved_for_the_shared_commit_vote(draft):
     fixture = _fixture(draft=draft)
     engine, controller, *_ = fixture
     for layer in engine.model.layers:
         layer.self_attn.tree_cache_nonfinite = torch.tensor(False)
     engine.model.layers[-1].self_attn.tree_cache_nonfinite.fill_(True)
     ready_before = dict(controller.ready)
-    with pytest.raises(RuntimeError, match="nonfinite Q/K/V"):
-        _preflight(fixture)
+    # Local structural preflight is intentionally non-mutating and does not
+    # synchronize device flags. The production loop folds this sticky bit
+    # into its following world all-reduce commit vote.
+    _preflight(fixture)
+    assert engine._spec_rhythm_nonfinite_flag()
     assert controller.ready == ready_before
 
 
