@@ -1,8 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 
+from itertools import combinations
+
 import pytest
 import torch
 
+import vllm_ascend.spec_decode.pearl.tree as tree_module
 from vllm_ascend.spec_decode.pearl.spec_rhythm import SpecRhythmBudgetPlan
 from vllm_ascend.spec_decode.pearl.tree import (
     SpecRhythmTreeCoordinator,
@@ -10,6 +13,7 @@ from vllm_ascend.spec_decode.pearl.tree import (
     build_tree_speculation_plan,
     cached_cpu_tree_speculation_plan,
     make_spine_first_parents,
+    pack_selected_tree_plan,
     select_tree_candidates,
     tree_budget_from_spec_rhythm,
     verify_greedy_tree,
@@ -55,6 +59,117 @@ def test_cached_cpu_tree_plan_reuses_read_only_geometry_across_budgets():
     assert smaller.attention_mask is full.attention_mask
     assert smaller.cache_positions is full.cache_positions
     assert different_prefix.attention_mask is not smaller.attention_mask
+
+
+@pytest.mark.parametrize("width", range(1, 5))
+@pytest.mark.parametrize("depth", range(1, 5))
+def test_cached_relative_tree_masks_match_reference_for_every_prefix(width, depth):
+    query_len = 1 + width * depth
+    max_model_len = query_len + 5
+    masks = []
+
+    for prefix_len in range(max_model_len - query_len + 1):
+        plan = cached_cpu_tree_speculation_plan(
+            width,
+            depth,
+            prefix_len,
+            max_model_len,
+            candidate_budget=width * depth,
+        )
+        reference = build_tree_attention_mask(width, depth, prefix_len, max_model_len)
+        assert torch.equal(plan.attention_mask, reference)
+        masks.append(plan.attention_mask)
+
+    # Prefix variants are shifted views of one immutable topology master.
+    storage = masks[0].untyped_storage().data_ptr()
+    assert all(mask.untyped_storage().data_ptr() == storage for mask in masks)
+
+
+def _ancestor_closed_subsets(parents):
+    nodes = range(len(parents))
+    for size in range(1, len(parents) + 1):
+        for selected in combinations(nodes, size):
+            selected_set = set(selected)
+            if all(parents[node] == -1 or parents[node] in selected_set for node in selected):
+                yield selected
+
+
+def _independent_packed_mask(parents, selected, prefix_len, max_model_len):
+    remap = {old: new for new, old in enumerate(selected)}
+    mask = torch.ones((len(selected) + 1, max_model_len), dtype=torch.bool)
+    mask[:, : prefix_len + 1] = False
+    for row, old_node in enumerate(selected, start=1):
+        ancestor = old_node
+        while ancestor >= 0:
+            mask[row, prefix_len + remap[ancestor] + 1] = False
+            ancestor = parents[ancestor]
+    return mask
+
+
+@pytest.mark.parametrize(("width", "depth"), [(1, 3), (2, 3), (3, 2), (3, 3)])
+def test_packed_relative_masks_match_every_ancestor_closed_subtree(width, depth):
+    query_len = 1 + width * depth
+    max_model_len = query_len + 3
+    parents = make_spine_first_parents(width, depth).tolist()
+    selections = list(_ancestor_closed_subsets(parents))
+
+    for prefix_len in range(max_model_len - query_len + 1):
+        base = build_tree_speculation_plan(width, depth, prefix_len, max_model_len)
+        for selected in selections:
+            packed = pack_selected_tree_plan(base, selected)
+            expected = _independent_packed_mask(parents, selected, prefix_len, max_model_len)
+            assert torch.equal(packed.attention_mask, expected), (
+                width,
+                depth,
+                prefix_len,
+                selected,
+            )
+
+
+def test_packed_prefix_variants_share_one_relative_mask_master():
+    width, depth, max_model_len = 2, 3, 32
+    selected = (0, 1, 2, 4)
+    masks = []
+    for prefix_len in range(10):
+        base = build_tree_speculation_plan(width, depth, prefix_len, max_model_len)
+        masks.append(pack_selected_tree_plan(base, selected).attention_mask)
+
+    assert len({mask.untyped_storage().data_ptr() for mask in masks}) == 1
+    assert len({mask.data_ptr() for mask in masks}) == len(masks)
+
+
+def test_relative_mask_master_survives_geometry_lru_cache_misses():
+    """Model sequential decode churn without relying on wall-clock timing."""
+
+    geometry_cache = tree_module._cached_cpu_tree_geometry
+    master_cache = tree_module._relative_tree_attention_mask_master
+    geometry_cache.cache_clear()
+    master_cache.cache_clear()
+    try:
+        # Ninety-six active prefix lengths exceed the 64-entry geometry LRU.
+        # Traversing them in order twice causes a deliberate 100% geometry
+        # miss rate, while the prefix-independent mask must still allocate once.
+        for _ in range(2):
+            for prefix_len in range(96):
+                cached_cpu_tree_speculation_plan(
+                    2,
+                    3,
+                    prefix_len,
+                    256,
+                    candidate_budget=6,
+                )
+
+        geometry_info = geometry_cache.cache_info()
+        master_info = master_cache.cache_info()
+        assert geometry_info.misses == 192
+        assert geometry_info.hits == 0
+        assert geometry_info.currsize == geometry_info.maxsize == 64
+        assert master_info.misses == 1
+        assert master_info.hits == 191
+        assert master_info.currsize == 1
+    finally:
+        geometry_cache.cache_clear()
+        master_cache.cache_clear()
 
 
 def test_selection_preserves_ancestor_chain():

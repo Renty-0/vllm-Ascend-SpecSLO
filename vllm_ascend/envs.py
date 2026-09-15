@@ -50,6 +50,23 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE": lambda: bool(
         int(os.getenv("VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE", "0"))
     ),
+    # Opt in to production-style draft ACLGraph ordering: record graph-input
+    # readiness, submit replay, then update every captured attention task on
+    # the auxiliary stream. Valid values: 0 (default/off) or 1 (on).
+    # Non-sensitive; experimental NPU performance switch.
+    "VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE", "0"))
+    ),
+    # Opt in to replay-first attention-task refreshes for the generic
+    # ACLGraph runner used by the packed-FIA target path.  The graph is
+    # submitted after an input-readiness dependency is queued, then every
+    # captured attention task is refreshed through its ExternalEvent.  Valid
+    # values: 0 (default/off) or 1 (on).  Non-sensitive; experimental NPU
+    # performance switch.  This does not affect the multi-step tree-target
+    # runner, whose execution contract is separate.
+    "VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE", "0"))
+    ),
     "VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE": lambda: bool(
         int(os.getenv("VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE", "0"))
     ),
@@ -80,6 +97,18 @@ env_variables: dict[str, Callable[[], Any]] = {
     ),
     "VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET": lambda: bool(
         int(os.getenv("VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET", "0"))
+    ),
+    # Run one same-shape eager FIA causality probe per target worker.  The
+    # probe perturbs only the last queried proposal token, checks that earlier
+    # rows are unchanged, and restores the original KV row before returning.
+    # Diagnostic only; disabled by default because it executes three forwards.
+    "VLLM_ASCEND_SPECRHYTHM_VALIDATE_PACKED_CAUSAL_LEAKAGE": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_SPECRHYTHM_VALIDATE_PACKED_CAUSAL_LEAKAGE",
+                "0",
+            )
+        )
     ),
     "VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH": lambda: bool(
         int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH", "0"))

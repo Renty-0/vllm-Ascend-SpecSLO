@@ -51,6 +51,68 @@ def _spine_first_topology(width: int, depth: int) -> tuple[tuple[int, ...], tupl
     return parents, tuple(visible_rows), tuple(visible_offsets)
 
 
+@lru_cache(maxsize=64)
+def _relative_tree_attention_mask_master(
+    parents: tuple[int, ...],
+    max_model_len: int,
+) -> torch.Tensor:
+    """Cache one prefix-independent CPU mask for a packed tree topology.
+
+    Column ``max_model_len`` represents the virtual root at relative position
+    zero.  Columns to its left represent the committed prefix and are visible
+    to every query; columns to its right represent packed candidate slots.
+    A concrete absolute-prefix mask is therefore only a shifted view into this
+    tensor.  Cached scheduler plans treat this storage as immutable.
+    """
+
+    if max_model_len <= 0:
+        raise ValueError("max_model_len must be positive")
+    node_count = len(parents)
+    if not 1 <= node_count < max_model_len:
+        raise ValueError("tree topology must fit inside max_model_len")
+    if any(parent < -1 or parent >= index for index, parent in enumerate(parents)):
+        raise ValueError("tree parents must be topologically ordered")
+
+    root_column = int(max_model_len)
+    mask = torch.ones(
+        (node_count + 1, 2 * max_model_len),
+        dtype=torch.bool,
+        device="cpu",
+    )
+    mask[:, :root_column] = False
+    # The root is visible to itself and every candidate row.
+    mask[:, root_column] = False
+    visible_rows: list[int] = []
+    visible_columns: list[int] = []
+    for node in range(node_count):
+        ancestor = node
+        while ancestor >= 0:
+            visible_rows.append(node + 1)
+            visible_columns.append(root_column + ancestor + 1)
+            ancestor = parents[ancestor]
+    if visible_rows:
+        mask[
+            torch.tensor(visible_rows, dtype=torch.long),
+            torch.tensor(visible_columns, dtype=torch.long),
+        ] = False
+    return mask
+
+
+def _relative_tree_attention_mask_view(
+    parents: tuple[int, ...],
+    prefix_len: int,
+    max_model_len: int,
+) -> torch.Tensor:
+    """Return the exact absolute-prefix mask as an immutable cached view."""
+
+    query_len = len(parents) + 1
+    if prefix_len < 0 or prefix_len + query_len > max_model_len:
+        raise ValueError("tree query positions exceed max_model_len")
+    master = _relative_tree_attention_mask_master(parents, max_model_len)
+    start = max_model_len - prefix_len
+    return master[:, start : start + max_model_len]
+
+
 def make_spine_first_parents(width: int, depth: int, device: torch.device | str | None = None) -> torch.Tensor:
     """Return contiguous spine-first parent indices for a uniform tree."""
 
@@ -174,27 +236,115 @@ def pack_selected_tree_plan(
         raise ValueError("selected tree is not ancestor closed")
     new_parents = [-1 if parents[index] == -1 else remap[parents[index]] for index in indices]
     device = plan.parent_indices.device
+    if device.type == "cpu" and plan.positions.device.type == "cpu":
+        # The scheduler publishes the same small set of ancestor-closed tree
+        # shapes repeatedly across requests and decode cycles.  Constructing
+        # parent/position/mask tensors request by request cost ~0.2 ms/call on
+        # the production host (and was amplified by four rank processes at
+        # B64).  CPU plans are immutable execution metadata, so share the
+        # cached result just like ``cached_cpu_tree_speculation_plan`` shares
+        # the unselected geometry.
+        return _cached_cpu_packed_tree_plan(
+            int(plan.width),
+            int(plan.depth),
+            int(plan.prefix_len),
+            int(plan.max_model_len),
+            tuple(parents),
+            tuple(int(value) for value in plan.positions.tolist()),
+            plan.positions.dtype,
+            tuple(indices),
+        )
+    return _materialize_packed_tree_plan(
+        width=int(plan.width),
+        depth=int(plan.depth),
+        prefix_len=int(plan.prefix_len),
+        max_model_len=int(plan.max_model_len),
+        positions=plan.positions,
+        indices=indices,
+        new_parents=new_parents,
+        device=device,
+    )
+
+
+def _materialize_packed_tree_plan(
+    *,
+    width: int,
+    depth: int,
+    prefix_len: int,
+    max_model_len: int,
+    positions: torch.Tensor,
+    indices: Sequence[int],
+    new_parents: Sequence[int],
+    device: torch.device | str,
+) -> TreeSpeculationPlan:
+    """Materialize one packed tree without scalar tensor assignments."""
+
     query_indices = torch.tensor([0, *[index + 1 for index in indices]], dtype=torch.long, device=device)
-    positions = plan.positions.index_select(0, query_indices)
-    mask = torch.ones((len(indices) + 1, plan.max_model_len), dtype=torch.bool, device=device)
-    mask[:, : plan.prefix_len + 1] = False
-    for index in range(len(indices)):
-        ancestor = index
-        while ancestor >= 0:
-            mask[index + 1, plan.prefix_len + ancestor + 1] = False
-            ancestor = new_parents[ancestor]
+    packed_positions = positions.index_select(0, query_indices)
+    if torch.device(device).type == "cpu":
+        mask = _relative_tree_attention_mask_view(
+            tuple(int(parent) for parent in new_parents),
+            prefix_len,
+            max_model_len,
+        )
+    else:
+        mask = torch.ones((len(indices) + 1, max_model_len), dtype=torch.bool, device=device)
+        mask[:, : prefix_len + 1] = False
+        visible_rows: list[int] = []
+        visible_columns: list[int] = []
+        for index in range(len(indices)):
+            ancestor = index
+            while ancestor >= 0:
+                visible_rows.append(index + 1)
+                visible_columns.append(prefix_len + ancestor + 1)
+                ancestor = new_parents[ancestor]
+        if visible_rows:
+            # A single indexed update replaces one dispatcher call for every
+            # candidate/ancestor pair.  This also keeps the non-CPU fallback
+            # usable without host-driven scalar NPU operations.
+            mask[
+                torch.tensor(visible_rows, dtype=torch.long, device=device),
+                torch.tensor(visible_columns, dtype=torch.long, device=device),
+            ] = False
     return TreeSpeculationPlan(
-        width=plan.width,
-        depth=plan.depth,
+        width=width,
+        depth=depth,
         candidate_budget=len(indices),
-        prefix_len=plan.prefix_len,
-        max_model_len=plan.max_model_len,
+        prefix_len=prefix_len,
+        max_model_len=max_model_len,
         parent_indices=torch.tensor(new_parents, dtype=torch.int32, device=device),
-        positions=positions,
+        positions=packed_positions,
         attention_mask=mask,
         cache_positions=torch.arange(
-            plan.prefix_len, plan.prefix_len + len(indices) + 1, dtype=torch.int32, device=device
+            prefix_len, prefix_len + len(indices) + 1, dtype=torch.int32, device=device
         ),
+    )
+
+
+@lru_cache(maxsize=2048)
+def _cached_cpu_packed_tree_plan(
+    width: int,
+    depth: int,
+    prefix_len: int,
+    max_model_len: int,
+    parents: tuple[int, ...],
+    positions: tuple[int, ...],
+    position_dtype: torch.dtype,
+    indices: tuple[int, ...],
+) -> TreeSpeculationPlan:
+    """Return shared read-only metadata for a selected CPU tree geometry."""
+
+    remap = {old: new for new, old in enumerate(indices)}
+    new_parents = tuple(-1 if parents[index] == -1 else remap[parents[index]] for index in indices)
+    return _materialize_packed_tree_plan(
+        width=width,
+        depth=depth,
+        prefix_len=prefix_len,
+        max_model_len=max_model_len,
+        positions=torch.tensor(positions, dtype=position_dtype),
+        indices=indices,
+        new_parents=new_parents,
+        device="cpu",
     )
 
 
@@ -257,12 +407,27 @@ def _cached_cpu_tree_geometry(
 ) -> TreeSpeculationPlan:
     """Return one read-only CPU tensor template for a tree geometry."""
 
-    return build_tree_speculation_plan(
-        width,
-        depth,
-        prefix_len,
-        max_model_len,
-        device="cpu",
+    parents_tuple, _, _ = _spine_first_topology(width, depth)
+    parents = torch.tensor(parents_tuple, dtype=torch.int32)
+    levels = torch.tensor([0] + _node_levels(width, depth), dtype=torch.int32)
+    return TreeSpeculationPlan(
+        width=width,
+        depth=depth,
+        candidate_budget=width * depth,
+        prefix_len=int(prefix_len),
+        max_model_len=int(max_model_len),
+        parent_indices=parents,
+        positions=levels + int(prefix_len),
+        attention_mask=_relative_tree_attention_mask_view(
+            parents_tuple,
+            int(prefix_len),
+            int(max_model_len),
+        ),
+        cache_positions=torch.arange(
+            prefix_len,
+            prefix_len + width * depth + 1,
+            dtype=torch.int32,
+        ),
     )
 
 

@@ -11,6 +11,8 @@ import time
 from collections.abc import Sequence
 from pathlib import Path
 
+from examples.specslo_benchmark_report import capture_runtime_environment
+
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -163,6 +165,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "enable_prefix_caching": args.enable_prefix_caching,
         "max_tokens": args.max_tokens,
         "warmup_prompts": args.warmup_prompts,
+        "runtime_environment": capture_runtime_environment(),
         "first_prompt_token_ids": first_prompt_token_ids,
         "results": results,
     }

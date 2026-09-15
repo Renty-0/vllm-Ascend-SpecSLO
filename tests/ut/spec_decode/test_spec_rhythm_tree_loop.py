@@ -38,10 +38,12 @@ class _TreeLoopHarness:
         budget=8,
         draft_window_ms=32.0,
         calibrate_window=True,
+        eager_reserve_tokens=0,
     ):
         self.events = []
         self.active_snapshots = []
         self.home_snapshots = []
+        self.plan_kwargs = []
         self.controllers = []
         self.capacity = capacity
         self.before_verdict = None
@@ -61,6 +63,7 @@ class _TreeLoopHarness:
                 active = list(active_indices)
                 harness.active_snapshots.append(active)
                 harness.home_snapshots.append({index: self.request_states[index].home_batch_id for index in active})
+                harness.plan_kwargs.append(dict(kwargs))
                 return super().build_plan(active, **kwargs)
 
         class CalibratedWindowEstimator(DraftWindowEstimator):
@@ -112,6 +115,7 @@ class _TreeLoopHarness:
             spec_rhythm_online_prefill=online_prefill,
             spec_rhythm_urgency_threshold=0.0,
             spec_rhythm_acceptance_floor=0.0,
+            spec_rhythm_eager_reserve_tokens=eager_reserve_tokens,
             enforce_eager=True,
         )
         self.engine.topology = PearlTopology.from_tensor_parallel_sizes(1, 3)
@@ -331,6 +335,30 @@ def test_tree_loop_submits_both_computes_before_new_candidate_exchange(monkeypat
     assert steady_steps > 0
 
 
+def test_tree_loop_forwards_slo_target_request_cap_to_controller(monkeypatch):
+    harness = _TreeLoopHarness(
+        monkeypatch,
+        requests=4,
+        capacity=4,
+        max_tokens=8,
+        slo=40.0,
+    )
+    harness.engine.config = replace(
+        harness.engine.config,
+        spec_rhythm_max_target_batch=1,
+    )
+
+    harness.run(max_rounds=4)
+
+    assert harness.plan_kwargs
+    assert all(kwargs["max_target_requests"] == 1 for kwargs in harness.plan_kwargs)
+    assert all(
+        len(indices) <= 1
+        for event, indices in harness.events
+        if event == "target"
+    )
+
+
 @pytest.mark.parametrize("stale_row", [0, -1])
 def test_tree_loop_rejects_stale_verdict_before_mutating_any_request(monkeypatch, stale_row):
     harness = _TreeLoopHarness(monkeypatch, requests=4, capacity=4)
@@ -354,6 +382,45 @@ def test_tree_loop_online_admission_prefills_before_decode(monkeypatch):
     results = harness.run()
     assert harness.prefilled == {0, 1, 2}
     assert all(len(result["completion_token_ids"]) == 6 for result in results)
+
+
+def test_tree_loop_polls_live_admission_once_per_active_cycle(monkeypatch):
+    harness = _TreeLoopHarness(
+        monkeypatch,
+        requests=1,
+        capacity=2,
+        max_tokens=8,
+        online_prefill=True,
+    )
+    calls = []
+
+    def poll_admission(block):
+        calls.append(block)
+        return False, ()
+
+    harness.engine._request_admission_callback = poll_admission
+    harness.run(max_rounds=1)
+
+    assert calls == [False]
+
+
+def test_online_prefill_does_not_add_redundant_device_sync(monkeypatch):
+    harness = _TreeLoopHarness(
+        monkeypatch,
+        requests=1,
+        capacity=1,
+        max_tokens=8,
+        online_prefill=True,
+    )
+    synchronize = Mock()
+    monkeypatch.setattr(torch.npu, "synchronize", synchronize)
+
+    # A zero-round run still performs admission/prefill and the mandatory
+    # service-finalization fence.  It must not add another fence immediately
+    # after the host-visible prefill result.
+    harness.run(max_rounds=0)
+
+    synchronize.assert_called_once_with()
 
 
 def test_tree_loop_accepts_unknown_request_during_active_decode(monkeypatch):
@@ -517,6 +584,74 @@ def test_tree_kv_compaction_uses_page_table_slots_not_physical_arithmetic():
     engine._move_tree_cache_slots.assert_called_once()
 
 
+def test_host_tree_kv_compaction_moves_only_nonidentity_branch_slots():
+    engine = native.NativePearlEngine.__new__(native.NativePearlEngine)
+    engine.device = torch.device("cpu")
+    engine._move_tree_cache_slots = Mock()
+    engine.compact_tree_round(
+        None,
+        [[0, 3, -1], [0, 1, 2]],
+        [6, 6],
+        host_slot_rows=[
+            [100, 10, 11, 12, 13, 14, 15],
+            [200, 20, 21, 22, 23, 24, 25],
+        ],
+    )
+    engine._move_tree_cache_slots.assert_called_once()
+    source, destination = engine._move_tree_cache_slots.call_args.args
+    assert source.dtype == destination.dtype == torch.int32
+    assert source.tolist() == [13]
+    assert destination.tolist() == [11]
+
+
+def test_promoted_eager_tree_kv_rows_move_once_and_keep_per_proposal_mappings():
+    engine = native.NativePearlEngine.__new__(native.NativePearlEngine)
+    engine.device = torch.device("cpu")
+    engine._move_tree_cache_slots = Mock()
+    engine._cache_slot_mapping = Mock(
+        side_effect=lambda request_ids, positions: [
+            request_id * 100 + position
+            for request_id, position in zip(request_ids, positions)
+        ]
+    )
+    first = native.cached_cpu_tree_speculation_plan(
+        2,
+        2,
+        10,
+        64,
+        candidate_budget=4,
+    )
+    second = native.cached_cpu_tree_speculation_plan(
+        2,
+        2,
+        20,
+        64,
+        candidate_budget=4,
+    )
+    cache_mappings = {
+        7: torch.tensor([10, 11, 12, 13, 14], dtype=torch.int32),
+        9: torch.tensor([20, 21, 22, 23, 24], dtype=torch.int32),
+    }
+
+    moved = engine._move_promoted_tree_cache_slots(
+        [(7, 3, first), (9, 5, second)],
+        cache_mappings,
+        {
+            7: [10, 11, 12, 13, 14],
+            9: [20, 21, 22, 23, 24],
+        },
+    )
+
+    assert moved == 10
+    engine._move_tree_cache_slots.assert_called_once()
+    source, destination = engine._move_tree_cache_slots.call_args.args
+    assert source.tolist() == [10, 11, 12, 13, 14, 20, 21, 22, 23, 24]
+    assert destination.tolist() == [310, 311, 312, 313, 314, 520, 521, 522, 523, 524]
+    assert cache_mappings[7].tolist() == [310, 311, 312, 313, 314]
+    assert cache_mappings[9].tolist() == [520, 521, 522, 523, 524]
+    assert cache_mappings[7].device == cache_mappings[9].device == engine.device
+
+
 @pytest.mark.parametrize(
     "accepted,count,expected",
     [
@@ -628,6 +763,32 @@ def test_tree_loop_does_not_admit_eager_before_window_calibration(monkeypatch):
     # The first target observation calibrates the estimator only after that
     # step's work was selected, making it available for the following step.
     assert harness.estimators[0].estimate(normal_tokens=4, max_draft_tokens=8).calibrated
+
+
+@pytest.mark.parametrize("window_ms,expects_eager", [(2.0, False), (10.0, True)])
+def test_tree_loop_eager_reserve_requires_hidden_fixed_overhead(
+    monkeypatch,
+    window_ms,
+    expects_eager,
+):
+    harness = _TreeLoopHarness(
+        monkeypatch,
+        requests=2,
+        capacity=2,
+        max_tokens=12,
+        slo=0.001,
+        draft_window_ms=window_ms,
+        eager_reserve_tokens=4,
+    )
+    staged = []
+    harness.before_verdict = lambda: staged.extend(harness.controllers[0].staged_eager)
+
+    results = harness.run(max_rounds=4)
+
+    assert bool(staged) is expects_eager
+    assert (
+        results[0]["spec_rhythm"]["spec_rhythm_tree_eager_promoted"] > 0
+    ) is expects_eager
 
 
 def test_tree_loop_tpot_includes_first_verification_after_prefill_token(monkeypatch):
@@ -838,8 +999,11 @@ def test_ordinary_linear_pearl_still_accepts_nonzero_sampling(monkeypatch, tempe
     harness.engine._allocate_cache.assert_called_once()
 
 
-@pytest.mark.parametrize("reason", ["explicit_budget", "streaming_callback"])
-def test_linear_specslo_keeps_control_plane_for_budget_or_streaming(monkeypatch, reason):
+@pytest.mark.parametrize(
+    "reason",
+    ["explicit_budget", "streaming_callback", "linear_full_window"],
+)
+def test_linear_specslo_keeps_control_plane_for_explicit_features(monkeypatch, reason):
     harness = _TreeLoopHarness(monkeypatch, requests=1, capacity=1)
     harness.engine.config = replace(
         harness.engine.config,
@@ -847,6 +1011,7 @@ def test_linear_specslo_keeps_control_plane_for_budget_or_streaming(monkeypatch,
         spec_rhythm_tree_depth=1,
         spec_rhythm_min_gamma=4,
         spec_rhythm_verification_budget=4 if reason == "explicit_budget" else None,
+        spec_rhythm_linear_full_window=reason == "linear_full_window",
     )
     harness.engine.graph_runner = SimpleNamespace(set_expected_fia_batch_size=Mock())
     harness.engine._allocate_cache = Mock()
@@ -886,7 +1051,7 @@ def _synthetic_tree_profile(verification_requests, mode="eager", max_model_len=2
                 "ar_comparator": "standard_decode_full_active_batch",
                 **runtime_source_fingerprints(),
                 "tree_fia_sparse_mode": 1,
-                "tree_fia_inner_precise": 2,
+                "tree_fia_inner_precise": 1,
                 "max_model_len": max_model_len,
                 "tree_width": 2,
                 "tree_depth": 2,

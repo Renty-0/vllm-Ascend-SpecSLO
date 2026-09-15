@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 """Token-granular KV compaction used after tree verification."""
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
+from typing import Any
 
 import torch
 import torch_npu
@@ -21,6 +22,16 @@ class TreeKVCompactionPlan:
             raise ValueError("tree KV compaction slot tensors must be aligned 1-D tensors")
         if self.accepted_node_indices.shape != self.source_slots.shape:
             raise ValueError("accepted node indices must align with source slots")
+
+
+@dataclass
+class _TreeKVCompactionGraphEntry:
+    """One address-stable compaction graph for an exact move count."""
+
+    source_slots: torch.Tensor
+    destination_slots: torch.Tensor
+    graph: Any
+    validated: bool = False
 
 
 def build_tree_kv_compaction_plan(
@@ -195,7 +206,7 @@ def _move_npu_kv_pair_slots(
         value=value_values,
         key_cache=key_cache,
         value_cache=value_cache,
-        slot_indices=destination_slots.to(torch.int32),
+        slot_indices=destination_slots,
     )
 
 
@@ -204,6 +215,229 @@ def _is_npu_kv_pair(layer_cache: tuple[torch.Tensor, ...] | list[torch.Tensor]) 
         isinstance(cache, torch.Tensor) and cache.device.type == "npu"
         for cache in layer_cache
     )
+
+
+class TreeKVCompactionGraphRunner:
+    """Replay all-layer NPU KV movement graphs keyed by exact move count.
+
+    An ``NPUGraph`` binds the addresses of every captured KV tensor.  A runner
+    therefore belongs to one model/worker cache allocation for its entire
+    lifetime; it must never be shared by engines merely because their move
+    counts match.  Calls are expected to be serialized on one worker's current
+    stream, like the model ACLGraph runner.
+
+    The first call for a count warms up and captures an identity movement, then
+    copies the real indices into graph-owned buffers and replays exactly once.
+    Running the real overlapping movement eagerly before capture validation
+    would apply it twice and can destroy a later source slot.
+    """
+
+    def __init__(
+        self,
+        kv_caches: Iterable[tuple[torch.Tensor, torch.Tensor]],
+        *,
+        enabled: bool = True,
+        max_graph_entries: int = 16,
+        validate_first_replay: bool = True,
+    ) -> None:
+        if max_graph_entries <= 0:
+            raise ValueError("tree KV compaction max_graph_entries must be positive")
+        supplied_caches = tuple(kv_caches)
+        if not supplied_caches or not all(
+            isinstance(pair, (tuple, list)) and _is_npu_kv_pair(pair)
+            for pair in supplied_caches
+        ):
+            raise ValueError("tree KV compaction graphs require non-empty NPU K/V pairs")
+        layer_caches = tuple((pair[0], pair[1]) for pair in supplied_caches)
+        devices = {cache.device for pair in layer_caches for cache in pair}
+        if len(devices) != 1:
+            raise ValueError("tree KV compaction graph caches must share one NPU device")
+        for key_cache, value_cache in layer_caches:
+            if key_cache.ndim < 2 or value_cache.shape != key_cache.shape:
+                raise ValueError("tree KV compaction graph K/V cache shapes must align")
+            if value_cache.dtype != key_cache.dtype:
+                raise ValueError("tree KV compaction graph K/V cache dtypes must align")
+
+        self.layer_caches = layer_caches
+        self.device = next(iter(devices))
+        self.enabled = bool(enabled)
+        self.max_graph_entries = int(max_graph_entries)
+        self.validate_first_replay = bool(validate_first_replay)
+        self.entries: dict[int, _TreeKVCompactionGraphEntry] = {}
+        self.disabled_move_counts: set[int] = set()
+        self.capture_count = 0
+        self.capture_attempt_count = 0
+        self.replay_count = 0
+        self.failed_capture_count = 0
+        self.failed_validation_count = 0
+        self.capacity_fallback_count = 0
+
+    def _eager_move(
+        self,
+        source_slots: torch.Tensor,
+        destination_slots: torch.Tensor,
+    ) -> None:
+        for key_cache, value_cache in self.layer_caches:
+            _move_npu_kv_pair_slots(
+                key_cache,
+                value_cache,
+                source_slots,
+                destination_slots,
+            )
+
+    def _capture_entry(self, move_count: int) -> _TreeKVCompactionGraphEntry:
+        # Identity slots make both allocation warmup and capture harmless to
+        # live model state. They are mutable graph inputs, not captured host
+        # literals; later replays only change their values, never addresses.
+        source_slots = torch.arange(
+            move_count,
+            dtype=torch.long,
+            device=self.device,
+        )
+        destination_slots = source_slots.to(dtype=torch.int32)
+        minimum_capacity = min(
+            int(cache.shape[0]) * int(cache.shape[1]) for pair in self.layer_caches for cache in pair
+        )
+        if move_count > minimum_capacity:
+            raise ValueError("tree KV compaction identity warmup exceeds cache capacity")
+
+        # Initialize lazy operator resources before entering capture. Capture
+        # itself is not assumed to produce a consumable first result.
+        self._eager_move(source_slots, destination_slots)
+        torch.npu.synchronize()
+        graph = torch.npu.NPUGraph()
+        with torch.npu.graph(graph):
+            self._eager_move(source_slots, destination_slots)
+        return _TreeKVCompactionGraphEntry(
+            source_slots=source_slots,
+            destination_slots=destination_slots,
+            graph=graph,
+        )
+
+    def _source_snapshots(
+        self,
+        source_slots: torch.Tensor,
+    ) -> list[tuple[torch.Tensor, torch.Tensor]]:
+        return [
+            (
+                torch.index_select(key_cache.flatten(0, 1), 0, source_slots).clone(),
+                torch.index_select(value_cache.flatten(0, 1), 0, source_slots).clone(),
+            )
+            for key_cache, value_cache in self.layer_caches
+        ]
+
+    def _validate_or_repair_first_replay(
+        self,
+        move_count: int,
+        entry: _TreeKVCompactionGraphEntry,
+        destination_slots: torch.Tensor,
+        expected: Sequence[tuple[torch.Tensor, torch.Tensor]],
+    ) -> bool:
+        # A single host synchronization covers every layer. Exact copies must
+        # be bit-identical; accepting a tolerance could conceal a stale-index
+        # graph replay and commit the wrong branch KV.
+        matches = torch.ones((), dtype=torch.bool, device=self.device)
+        destination_long = destination_slots.to(dtype=torch.long)
+        for (key_cache, value_cache), (expected_key, expected_value) in zip(
+            self.layer_caches,
+            expected,
+        ):
+            actual_key = torch.index_select(key_cache.flatten(0, 1), 0, destination_long)
+            actual_value = torch.index_select(value_cache.flatten(0, 1), 0, destination_long)
+            matches = matches & torch.all(actual_key == expected_key)
+            matches = matches & torch.all(actual_value == expected_value)
+        if bool(matches.cpu().item()):
+            entry.validated = True
+            return True
+
+        # The graph only writes destination slots. Repair them from snapshots
+        # rather than rerunning a gather from possibly-overwritten sources.
+        torch.npu.synchronize()
+        self.entries.pop(move_count, None)
+        entry.graph.reset()
+        self.disabled_move_counts.add(move_count)
+        self.failed_validation_count += 1
+        for (key_cache, value_cache), (expected_key, expected_value) in zip(
+            self.layer_caches,
+            expected,
+        ):
+            torch_npu._npu_reshape_and_cache(
+                key=expected_key,
+                value=expected_value,
+                key_cache=key_cache,
+                value_cache=value_cache,
+                slot_indices=destination_slots,
+            )
+        return False
+
+    def move(
+        self,
+        source_slots: torch.Tensor,
+        destination_slots: torch.Tensor,
+    ) -> bool:
+        """Move slots and return whether an ACLGraph replay performed it."""
+        if source_slots.ndim != 1 or destination_slots.shape != source_slots.shape:
+            raise ValueError("tree KV compaction graph slots must be aligned 1-D tensors")
+        move_count = int(source_slots.numel())
+        if move_count == 0:
+            return False
+        source_slots = source_slots.to(device=self.device, dtype=torch.long)
+        destination_slots = destination_slots.to(
+            device=self.device,
+            dtype=torch.int32,
+        )
+        if not self.enabled or move_count in self.disabled_move_counts:
+            self._eager_move(source_slots, destination_slots)
+            return False
+
+        entry = self.entries.get(move_count)
+        if entry is None:
+            if len(self.entries) >= self.max_graph_entries:
+                self.capacity_fallback_count += 1
+                self._eager_move(source_slots, destination_slots)
+                return False
+            self.capture_attempt_count += 1
+            try:
+                entry = self._capture_entry(move_count)
+            except Exception:
+                # Capture is an optimization, not part of the correctness
+                # contract.  Identity warmup/capture cannot have changed the
+                # requested destinations, so this real move is still safe to
+                # execute exactly once through the eager path.
+                self.failed_capture_count += 1
+                self.disabled_move_counts.add(move_count)
+                self._eager_move(source_slots, destination_slots)
+                return False
+            self.entries[move_count] = entry
+            self.capture_count += 1
+
+        expected = self._source_snapshots(source_slots) if self.validate_first_replay and not entry.validated else None
+        # Copies and replay intentionally use the current stream. This orders
+        # changed indices after the previous replay and before this replay
+        # without a per-cycle host synchronization or auxiliary-stream race.
+        entry.source_slots.copy_(source_slots)
+        entry.destination_slots.copy_(destination_slots)
+        entry.graph.replay()
+        self.replay_count += 1
+        if expected is not None:
+            return self._validate_or_repair_first_replay(
+                move_count,
+                entry,
+                destination_slots,
+                expected,
+            )
+        return True
+
+    def release(self) -> int:
+        """Synchronously release resident CANN graph resources."""
+        if not self.entries:
+            return 0
+        torch.npu.synchronize()
+        entries = tuple(self.entries.values())
+        self.entries.clear()
+        for entry in entries:
+            entry.graph.reset()
+        return len(entries)
 
 
 def move_kv_cache_slots(
@@ -218,6 +452,7 @@ def move_kv_cache_slots(
         return
     source_slots = source_slots.to(dtype=torch.long)
     destination_slots = destination_slots.to(dtype=torch.long)
+    destination_slots_int32 = destination_slots.to(dtype=torch.int32)
     for layer_cache in kv_caches:
         if isinstance(layer_cache, torch.Tensor):
             _move_tensor_slots(
@@ -228,7 +463,7 @@ def move_kv_cache_slots(
                 layer_cache[0],
                 layer_cache[1],
                 source_slots,
-                destination_slots,
+                destination_slots_int32,
             )
         else:
             for cache in layer_cache:

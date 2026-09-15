@@ -23,7 +23,7 @@ Input schema::
         "native_graph_source_sha256": "actual 64-character source SHA256",
         "tree_source_sha256": "actual 64-character source SHA256",
         "tree_fia_sparse_mode": 1,
-        "tree_fia_inner_precise": 2,
+        "tree_fia_inner_precise": 1,
         "max_model_len": 4096,
         "tree_width": 2,
         "tree_depth": 4

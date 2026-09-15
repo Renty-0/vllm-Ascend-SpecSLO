@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import atexit
 import logging
+import math
 import os
 import socket
 import threading
@@ -39,6 +40,70 @@ from vllm_ascend.spec_decode.pearl.qwen_pair import validate_model_pair
 from vllm_ascend.spec_decode.pearl.roofline import ProfiledRoofline, normalize_roofline
 
 logger = logging.getLogger("vllm_ascend.spec_decode.pearl")
+
+
+_TARGET_GRAPH_CORRECTNESS_MODES = frozenset({"packed_fia_eager", "graph_update_first", "graph_replay_first"})
+
+
+def _target_graph_correctness_environment(
+    mode: str,
+    *,
+    validate_every_replay: bool = False,
+) -> dict[str, str]:
+    """Return a hermetic target-graph environment for correctness A/B runs.
+
+    This is deliberately a diagnostic-only switch.  It changes no model or KV
+    state and must only be applied by an idle worker between complete batches.
+    """
+    if mode not in _TARGET_GRAPH_CORRECTNESS_MODES:
+        choices = ", ".join(sorted(_TARGET_GRAPH_CORRECTNESS_MODES))
+        raise ValueError(f"Unknown target graph correctness mode {mode!r}; expected one of {choices}.")
+    graph_enabled = mode != "packed_fia_eager"
+    replay_first = mode == "graph_replay_first"
+    return {
+        "VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH": "0" if graph_enabled else "1",
+        "VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET": "1",
+        "VLLM_ASCEND_SPECRHYTHM_FORCE_STEPWISE_TARGET": "0",
+        "VLLM_ASCEND_SPECRHYTHM_STEPWISE_TARGET_FIA": "0",
+        # Keep the production candidate's draft ordering fixed in every case;
+        # only the target replay ordering is the A/B variable.
+        "VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE": "1",
+        "VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE": "1" if replay_first else "0",
+        "VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE": "0",
+        "VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS": "0",
+        "VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE": "0",
+        "VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY": "0",
+        "VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS": "1" if validate_every_replay else "0",
+    }
+
+
+def _apply_target_graph_correctness_environment(
+    mode: str,
+    *,
+    validate_every_replay: bool = False,
+) -> dict[str, str]:
+    environment = _target_graph_correctness_environment(
+        mode,
+        validate_every_replay=validate_every_replay,
+    )
+    os.environ.update(environment)
+    return environment
+
+
+def _configure_worker_target_graph_correctness(
+    engine: NativePearlEngine,
+    mode: str,
+    *,
+    validate_every_replay: bool = False,
+) -> dict[str, str]:
+    if engine.cache_allocation is not None or engine.cache_block_tables is not None:
+        raise RuntimeError(
+            "Target graph correctness mode can only change after the previous batch released its KV cache."
+        )
+    return _apply_target_graph_correctness_environment(
+        mode,
+        validate_every_replay=validate_every_replay,
+    )
 
 
 class _TokenCommitDeliveryError(RuntimeError):
@@ -88,9 +153,23 @@ class PEARLConfig:
     enable_continuous_batching: bool = False
     enable_preemptive_scheduling: bool = False
     enable_spec_rhythm: bool = False
+    # Experimental independent full-window protocol for the fixed-gamma
+    # serial linear path. False preserves the legacy nano-PEARL protocol.
+    spec_rhythm_linear_full_window: bool = False
+    # Experimental fixed-gamma policy. When enabled, measured W may select a
+    # serial-draft graph bucket larger than the mandatory normal-row bucket.
+    spec_rhythm_linear_eager_cross_graph_bucket: bool = False
     # With an arrival-aware manifest, prefill only the initial decode bucket;
     # later requests are prefetched when they enter a free slot.
     spec_rhythm_online_prefill: bool = False
+    # Opt-in bounded coalescing for arrival-gated fixed-gamma serial prefill.
+    # The 1/0 defaults preserve immediate admission exactly.
+    spec_rhythm_prefill_coalesce_min_requests: int = 1
+    spec_rhythm_prefill_coalesce_max_wait_ms: float = 0.0
+    # Opt-in aggregate token cap for one arrival-gated prefill submission.
+    # Zero preserves whole-prompt prefill.  The first safe implementation is
+    # intentionally restricted to prefix-cache-off fixed-serial SpecRhythm.
+    spec_rhythm_prefill_token_chunk_size: int = 0
     # Keep the paper's alternating dual-batch schedule by default.  Merging
     # both logical homes into one target forward is an opt-in throughput probe
     # because it removes the rolling-eager scheduling window.
@@ -101,6 +180,10 @@ class PEARLConfig:
     spec_rhythm_max_target_batch: int = 0
     spec_rhythm_min_gamma: int = 1
     spec_rhythm_max_eager_tokens: int = 0
+    # Maximum number of global B slots that may be reserved for complete
+    # rolling-eager proposals before normal-row admission. Zero preserves the
+    # legacy normal-first allocator.
+    spec_rhythm_eager_reserve_tokens: int = 0
     spec_rhythm_urgency_threshold: float = 0.75
     spec_rhythm_acceptance_floor: float = 0.4
     spec_rhythm_acceptance_ema_alpha: float = 0.2
@@ -120,6 +203,9 @@ class PEARLConfig:
     draft_use_production_rope: bool = True
     target_use_production_rope: bool = True
     precompile_decode_graphs: bool = False
+    # Capture and changed-input qualify only the fixed-gamma serial draft
+    # buckets. Target verification graphs remain lazy to avoid their HBM peak.
+    precompile_serial_draft_graphs: bool = False
     enable_cpu_binding: bool = True
     profile_decode_steps: int = 0
     # Lightweight rank-local host timestamps.  Unlike ``profile_decode_steps``
@@ -162,12 +248,73 @@ class PEARLConfig:
             raise ValueError("SpecRhythm requires PEARL continuous batching and preemptive scheduling.")
         if self.enable_spec_rhythm and self.gamma == -1:
             raise ValueError("SpecRhythm requires a fixed maximum PEARL gamma.")
+        if self.spec_rhythm_linear_full_window and (
+            not self.enable_spec_rhythm
+            or self.gamma <= 0
+            or self.spec_rhythm_min_gamma != self.gamma
+            or self.spec_rhythm_tree_width != 1
+            or self.spec_rhythm_tree_depth != 1
+        ):
+            raise ValueError(
+                "SpecRhythm linear full-window requires enable_spec_rhythm=True, "
+                "a fixed gamma (spec_rhythm_min_gamma == gamma), and the serial "
+                "linear tree shape 1x1."
+            )
+        if self.spec_rhythm_linear_eager_cross_graph_bucket and not (
+            self.enable_spec_rhythm and self.spec_rhythm_linear_full_window
+        ):
+            raise ValueError("Cross-graph-bucket linear eager scheduling requires SpecRhythm linear full-window mode.")
+        if self.spec_rhythm_prefill_coalesce_min_requests <= 0:
+            raise ValueError("SpecRhythm prefill coalescing minimum must be positive.")
+        if (
+            not math.isfinite(self.spec_rhythm_prefill_coalesce_max_wait_ms)
+            or self.spec_rhythm_prefill_coalesce_max_wait_ms < 0
+        ):
+            raise ValueError("SpecRhythm prefill coalescing wait must be finite and non-negative.")
+        prefill_coalescing = (
+            self.spec_rhythm_prefill_coalesce_min_requests != 1 or self.spec_rhythm_prefill_coalesce_max_wait_ms != 0
+        )
+        if prefill_coalescing and not (
+            self.enable_spec_rhythm and self.spec_rhythm_online_prefill and self.spec_rhythm_linear_full_window
+        ):
+            raise ValueError(
+                "SpecRhythm prefill coalescing requires enable_spec_rhythm, "
+                "online prefill, and linear full-window mode."
+            )
+        if prefill_coalescing and (
+            self.spec_rhythm_prefill_coalesce_min_requests <= 1 or self.spec_rhythm_prefill_coalesce_max_wait_ms <= 0
+        ):
+            raise ValueError("SpecRhythm prefill coalescing requires a minimum above one and a positive bounded wait.")
+        coalesce_capacity = min(
+            self.max_num_seqs,
+            self.prefill_chunk_size or self.max_num_seqs,
+        )
+        if self.spec_rhythm_prefill_coalesce_min_requests > coalesce_capacity:
+            raise ValueError("SpecRhythm prefill coalescing minimum must fit the prefill and decode capacities.")
+        if self.spec_rhythm_prefill_token_chunk_size < 0:
+            raise ValueError("SpecRhythm prefill token chunk size must be non-negative.")
+        if self.spec_rhythm_prefill_token_chunk_size > 0:
+            if not (
+                self.enable_spec_rhythm and self.spec_rhythm_online_prefill and self.spec_rhythm_linear_full_window
+            ):
+                raise ValueError(
+                    "SpecRhythm token-chunk prefill requires enable_spec_rhythm, "
+                    "online prefill, and linear full-window mode."
+                )
+            if self.enable_prefix_caching:
+                raise ValueError("SpecRhythm token-chunk prefill requires prefix caching to be disabled.")
+            if self.spec_rhythm_prefill_token_chunk_size > self.max_num_batched_tokens:
+                raise ValueError("SpecRhythm prefill token chunk size must not exceed max_num_batched_tokens.")
         if self.spec_rhythm_min_gamma <= 0 or (self.gamma != -1 and self.spec_rhythm_min_gamma > self.gamma):
             raise ValueError("SpecRhythm min gamma must be in [1, gamma].")
         if self.spec_rhythm_max_eager_tokens < 0 or (
             self.gamma != -1 and self.spec_rhythm_max_eager_tokens > self.gamma
         ):
             raise ValueError("SpecRhythm eager-token cap must be in [0, gamma].")
+        if self.spec_rhythm_linear_full_window and self.spec_rhythm_max_eager_tokens not in (0, self.gamma):
+            raise ValueError("SpecRhythm linear full-window eager-token cap must be 0 or gamma.")
+        if self.spec_rhythm_eager_reserve_tokens < 0:
+            raise ValueError("SpecRhythm eager-token reserve must be non-negative.")
         if self.spec_rhythm_priority_burst <= 0:
             raise ValueError("SpecRhythm priority burst must be positive.")
         if self.spec_rhythm_target_fallback_max_batch < 0:
@@ -211,6 +358,12 @@ class PEARLConfig:
                 raise ValueError("Legacy SpecRhythm roofline values must be positive token budgets.")
         if self.spec_rhythm_draft_token_budget is not None and self.spec_rhythm_draft_token_budget <= 0:
             raise ValueError("SpecRhythm draft-token budget must be positive when supplied.")
+        if (
+            self.spec_rhythm_linear_full_window
+            and self.spec_rhythm_draft_token_budget is not None
+            and self.spec_rhythm_draft_token_budget < self.gamma
+        ):
+            raise ValueError("SpecRhythm linear full-window draft-token budget must be at least gamma.")
         if self.spec_rhythm_verification_budget is not None and self.spec_rhythm_verification_budget <= 0:
             raise ValueError("SpecRhythm verification budget must be positive when supplied.")
         if self.spec_rhythm_tree_width <= 0 or self.spec_rhythm_tree_depth <= 0:
@@ -326,7 +479,12 @@ class PEARLConfig:
             enable_continuous_batching=self.enable_continuous_batching,
             enable_preemptive_scheduling=self.enable_preemptive_scheduling,
             enable_spec_rhythm=self.enable_spec_rhythm,
+            spec_rhythm_linear_full_window=self.spec_rhythm_linear_full_window,
+            spec_rhythm_linear_eager_cross_graph_bucket=(self.spec_rhythm_linear_eager_cross_graph_bucket),
             spec_rhythm_online_prefill=self.spec_rhythm_online_prefill,
+            spec_rhythm_prefill_coalesce_min_requests=(self.spec_rhythm_prefill_coalesce_min_requests),
+            spec_rhythm_prefill_coalesce_max_wait_ms=(self.spec_rhythm_prefill_coalesce_max_wait_ms),
+            spec_rhythm_prefill_token_chunk_size=(self.spec_rhythm_prefill_token_chunk_size),
             spec_rhythm_merge_ready_homes=self.spec_rhythm_merge_ready_homes,
             spec_rhythm_priority_mode=self.spec_rhythm_priority_mode,
             spec_rhythm_priority_burst=self.spec_rhythm_priority_burst,
@@ -334,6 +492,7 @@ class PEARLConfig:
             spec_rhythm_max_target_batch=self.spec_rhythm_max_target_batch,
             spec_rhythm_min_gamma=self.spec_rhythm_min_gamma,
             spec_rhythm_max_eager_tokens=self.spec_rhythm_max_eager_tokens,
+            spec_rhythm_eager_reserve_tokens=self.spec_rhythm_eager_reserve_tokens,
             spec_rhythm_urgency_threshold=self.spec_rhythm_urgency_threshold,
             spec_rhythm_acceptance_floor=self.spec_rhythm_acceptance_floor,
             spec_rhythm_acceptance_ema_alpha=self.spec_rhythm_acceptance_ema_alpha,
@@ -350,6 +509,7 @@ class PEARLConfig:
             draft_use_production_rope=self.draft_use_production_rope,
             target_use_production_rope=self.target_use_production_rope,
             precompile_decode_graphs=self.precompile_decode_graphs,
+            precompile_serial_draft_graphs=self.precompile_serial_draft_graphs,
             enable_cpu_binding=self.enable_cpu_binding,
             profile_decode_steps=self.profile_decode_steps,
             profile_host_decode_steps=self.profile_host_decode_steps,
@@ -488,6 +648,72 @@ class PEARLEngine:
         replies = self._receive_all("worker profiling configuration")
         if any(reply[0] != "configured" for reply in replies):
             raise RuntimeError(f"Unexpected PEARL worker profiling replies: {replies!r}")
+
+    def configure_target_graph_correctness_mode(
+        self,
+        mode: str,
+        *,
+        validate_every_replay: bool = False,
+    ) -> list[dict[str, str]]:
+        """Select one target execution route on idle persistent workers.
+
+        This narrow diagnostic API lets a single model load execute an eager
+        oracle, an update-first graph control, and a replay-first candidate.
+        Workers reject the transition while a batch still owns KV state.
+        """
+        expected = _target_graph_correctness_environment(
+            mode,
+            validate_every_replay=validate_every_replay,
+        )
+        if self._requests:
+            raise RuntimeError("Target graph correctness mode cannot change with queued requests.")
+        if getattr(self, "_live_epoch", None) is not None:
+            raise RuntimeError("Target graph correctness mode cannot change during live generation.")
+        self._send_all(
+            (
+                "configure_target_graph_correctness",
+                mode,
+                bool(validate_every_replay),
+                None,
+            )
+        )
+        replies = self._receive_all("worker target-graph correctness configuration")
+        if any(
+            reply[0] != "target_graph_correctness_configured" or len(reply) < 3 or reply[2] != expected
+            for reply in replies
+        ):
+            raise RuntimeError(f"Unexpected PEARL target-graph correctness replies: {replies!r}")
+        return [reply[2] for reply in replies]
+
+    def seal_graph_cache(self) -> list[dict[str, Any]]:
+        """Seal every worker's qualified graph inventory before measurement."""
+
+        self._send_all(("seal_graph_cache", None, None, None))
+        replies = self._receive_all("worker graph-cache sealing")
+        if any(reply[0] != "graph_cache_sealed" for reply in replies):
+            raise RuntimeError(f"Unexpected PEARL graph-cache sealing replies: {replies!r}")
+        self.last_worker_metrics = [reply[2] for reply in replies]
+        return self.last_worker_metrics
+
+    def unseal_graph_cache(self) -> list[dict[str, Any]]:
+        """Reopen graph discovery for the next untimed qualification point."""
+
+        self._send_all(("unseal_graph_cache", None, None, None))
+        replies = self._receive_all("worker graph-cache unsealing")
+        if any(reply[0] != "graph_cache_unsealed" for reply in replies):
+            raise RuntimeError(f"Unexpected PEARL graph-cache unsealing replies: {replies!r}")
+        self.last_worker_metrics = [reply[2] for reply in replies]
+        return self.last_worker_metrics
+
+    def prune_unvalidated_graph_entries(self) -> list[dict[str, Any]]:
+        """Release unqualified cold-only graph entries on every worker."""
+
+        self._send_all(("prune_unvalidated_graph_entries", None, None, None))
+        replies = self._receive_all("worker graph-cache pruning")
+        if any(reply[0] != "graph_cache_pruned" for reply in replies):
+            raise RuntimeError(f"Unexpected PEARL graph-cache pruning replies: {replies!r}")
+        self.last_worker_metrics = [reply[2] for reply in replies]
+        return self.last_worker_metrics
 
     def generate(self, *, on_token_commit: Callable[[dict[str, Any]], None] | None = None):
         """Generate queued requests, optionally delivering each guarded commit.
@@ -905,6 +1131,21 @@ def _pearl_worker(
                 logger.info("[PEARL rank %d] %s", rank, prompts)
                 connection.send(("logged", rank))
                 continue
+            if mode == "seal_graph_cache":
+                connection.send(("graph_cache_sealed", rank, engine.seal_graph_cache()))
+                continue
+            if mode == "unseal_graph_cache":
+                connection.send(("graph_cache_unsealed", rank, engine.unseal_graph_cache()))
+                continue
+            if mode == "prune_unvalidated_graph_entries":
+                connection.send(
+                    (
+                        "graph_cache_pruned",
+                        rank,
+                        engine.prune_unvalidated_graph_entries(),
+                    )
+                )
+                continue
             if mode == "configure_decode_profiling":
                 engine.configure_decode_profiling(
                     int(prompts),
@@ -912,6 +1153,20 @@ def _pearl_worker(
                     int(num_pearl_steps or 0),
                 )
                 connection.send(("configured", rank))
+                continue
+            if mode == "configure_target_graph_correctness":
+                environment = _configure_worker_target_graph_correctness(
+                    engine,
+                    str(prompts),
+                    validate_every_replay=bool(sampling_params),
+                )
+                connection.send(
+                    (
+                        "target_graph_correctness_configured",
+                        rank,
+                        environment,
+                    )
+                )
                 continue
             if mode == "pearl_stream_live":
                 if admission_connection is None:

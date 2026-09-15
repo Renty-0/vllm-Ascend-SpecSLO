@@ -3,7 +3,7 @@
 import os
 from multiprocessing import Pipe
 from types import SimpleNamespace
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
 
 import pytest
 import torch
@@ -11,6 +11,8 @@ import torch
 from examples.benchmark_nano_pearl_speculative import (
     _aggregate_decode_host_profile,
     _aggregate_decode_profile,
+    _graph_qualification_can_prune,
+    _graph_qualification_fixed_point,
     _parse_target_graph_post_counts,
     _require_no_graph_fallback,
     _worker_aclgraph_deltas,
@@ -21,6 +23,8 @@ from examples.benchmark_nano_pearl_speculative import (
 from examples.benchmark_nano_pearl_target_only import (
     _build_parser as _build_target_only_benchmark_parser,
 )
+from examples.offline_inference_nano_pearl import parse_args as _parse_offline_args
+from examples.serve_specslo import _build_parser as _build_specslo_server_parser
 from vllm_ascend.spec_decode.pearl.api import PEARLConfig, PEARLEngine
 from vllm_ascend.spec_decode.pearl.native_cache import NativePrefixCache
 from vllm_ascend.spec_decode.pearl.native_engine import (
@@ -42,7 +46,12 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
     _continuous_result_states,
     _finished,
     _gamma_from_decode_speeds,
+    _linear_draft_graph_buckets,
+    _next_linear_draft_graph_bucket,
+    _next_power_of_two_graph_bucket,
     _normalize_sampling_params,
+    _power_of_two_graph_buckets,
+    _record_linear_draft_full_chain_metrics,
     _restore_completed_states,
     _sample_logits,
     _select_preemptive_continuous_indices,
@@ -50,7 +59,7 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
     _target_graph_precompile_shapes,
     _truncate_completion,
 )
-from vllm_ascend.spec_decode.pearl.native_graph import NativeACLGraphRunner
+from vllm_ascend.spec_decode.pearl.native_graph import NativeACLGraphRunner, NativeGraphExecution
 from vllm_ascend.spec_decode.pearl.native_model import (
     MIN_PAGED_ATTENTION_BLOCKS,
     PAGED_ATTENTION_BLOCK_SIZE,
@@ -78,6 +87,242 @@ def test_selected_tree_uses_causal_fast_path_only_for_a_contiguous_spine():
     assert _is_contiguous_linear_tree_plan(pack_selected_tree_plan(tree, [0]))
     assert _is_contiguous_linear_tree_plan(pack_selected_tree_plan(tree, [0, 1]))
     assert not _is_contiguous_linear_tree_plan(pack_selected_tree_plan(tree, [0, 2]))
+
+
+def test_linear_draft_graph_buckets_cover_service_capacity_without_large_low_load_padding():
+    assert _power_of_two_graph_buckets(64) == [1, 2, 4, 8, 16, 32, 64]
+    assert _power_of_two_graph_buckets(48) == [1, 2, 4, 8, 16, 32, 48]
+    assert _next_power_of_two_graph_bucket(1, 64) == 1
+    assert _next_power_of_two_graph_bucket(11, 64) == 16
+    assert _next_power_of_two_graph_bucket(40, 48) == 48
+
+
+def test_fixed_gamma_linear_draft_uses_bounded_dense_service_buckets():
+    assert _linear_draft_graph_buckets(64) == [
+        1,
+        2,
+        4,
+        8,
+        12,
+        16,
+        20,
+        24,
+        28,
+        32,
+        48,
+        64,
+    ]
+    assert _linear_draft_graph_buckets(48) == [
+        1,
+        2,
+        4,
+        8,
+        12,
+        16,
+        20,
+        24,
+        28,
+        32,
+        48,
+    ]
+    assert _linear_draft_graph_buckets(3) == [1, 2, 3]
+    assert _next_linear_draft_graph_bucket(1, 64) == 1
+    assert _next_linear_draft_graph_bucket(11, 64) == 12
+    assert _next_linear_draft_graph_bucket(17, 64) == 20
+    assert _next_linear_draft_graph_bucket(25, 64) == 28
+    assert _next_linear_draft_graph_bucket(33, 64) == 48
+    assert _next_linear_draft_graph_bucket(49, 64) == 64
+
+
+def test_precompile_changed_input_qualifies_every_full_serial_draft_bucket():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.config = SimpleNamespace(
+        max_num_seqs=3,
+        enable_continuous_batching=True,
+        max_tokens=32,
+        enable_spec_rhythm=True,
+        spec_rhythm_tree_width=1,
+        spec_rhythm_tree_depth=1,
+        spec_rhythm_stable_graphs=True,
+    )
+    engine.is_draft = True
+    engine.gamma = 4
+    engine.draft_vocab_size = 8
+    draft_counters = {
+        "runtime_validation_calls": 0,
+        "changed_input_validation_calls": 0,
+        "runtime_validation_failures": 0,
+    }
+    graph_runner = SimpleNamespace(
+        draft_entries={},
+        execution_counters={"draft": draft_counters},
+        set_expected_fia_batch_size=MagicMock(),
+    )
+    engine.graph_runner = graph_runner
+    engine.precompiled_decode_batch_sizes = frozenset()
+    engine._allocate_cache = MagicMock()
+    engine._release_cache = MagicMock()
+    engine._prefill_and_sample_target_batch = MagicMock()
+
+    state_snapshots: list[tuple[int, list[list[int]]]] = []
+    calls_by_bucket: dict[int, int] = {}
+
+    def draft_batch(states, active_indices, budgets, **kwargs):
+        batch_size = len(active_indices)
+        calls_by_bucket[batch_size] = calls_by_bucket.get(batch_size, 0) + 1
+        state_snapshots.append(
+            (batch_size, [list(state.token_ids) for state in states])
+        )
+        assert active_indices == list(range(batch_size))
+        assert budgets == [engine.gamma] * batch_size
+        assert kwargs["verification_sizes"] == [1] * batch_size
+        entry_key = (
+            f"draft-greedy:{engine.draft_vocab_size}|steps:{engine.gamma}|paged",
+            batch_size,
+        )
+        if calls_by_bucket[batch_size] == 1:
+            graph_runner.draft_entries[entry_key] = SimpleNamespace(
+                runtime_validated=False,
+                validated_real_row_count=batch_size,
+            )
+        else:
+            assert calls_by_bucket[batch_size] == 2
+            entry = graph_runner.draft_entries[entry_key]
+            entry.runtime_validated = True
+            draft_counters["runtime_validation_calls"] += 1
+            draft_counters["changed_input_validation_calls"] += 1
+        next_windows = torch.full(
+            (batch_size, engine.gamma),
+            10 + batch_size,
+            dtype=torch.long,
+        )
+        return None, next_windows, None
+
+    engine._draft_spec_rhythm_device_batch = MagicMock(side_effect=draft_batch)
+
+    with patch(
+        "vllm_ascend.spec_decode.pearl.native_engine.torch.npu.synchronize"
+    ) as synchronize:
+        engine._precompile_decode_graphs(include_target_graphs=False)
+
+    assert calls_by_bucket == {1: 2, 2: 2, 3: 2}
+    assert state_snapshots == [
+        (1, [[0, 0]]),
+        (1, [[0, 0, 11]]),
+        (2, [[0, 0], [0, 0]]),
+        (2, [[0, 0, 12], [0, 0, 12]]),
+        (3, [[0, 0], [0, 0], [0, 0]]),
+        (3, [[0, 0, 13], [0, 0, 13], [0, 0, 13]]),
+    ]
+    assert draft_counters == {
+        "runtime_validation_calls": 3,
+        "changed_input_validation_calls": 3,
+        "runtime_validation_failures": 0,
+    }
+    assert all(
+        entry.runtime_validated
+        and entry.validated_real_row_count == entry_key[1]
+        for entry_key, entry in graph_runner.draft_entries.items()
+    )
+    assert [
+        args.args[0]
+        for args in graph_runner.set_expected_fia_batch_size.call_args_list
+    ] == [1, 2, 3]
+    assert engine.precompiled_decode_batch_sizes == frozenset()
+    engine._allocate_cache.assert_called_once_with(
+        [[0], [0], [0]],
+        enable_prefix_caching=False,
+    )
+    engine._release_cache.assert_called_once_with()
+    synchronize.assert_called_once_with()
+
+
+def test_draft_only_precompile_participates_in_prefill_without_capturing_target_graphs():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.config = SimpleNamespace(
+        max_num_seqs=3,
+        enable_continuous_batching=True,
+        max_tokens=32,
+    )
+    engine.is_draft = False
+    engine.precompiled_decode_batch_sizes = frozenset()
+    engine.graph_runner = SimpleNamespace(
+        set_expected_fia_batch_size=MagicMock(),
+    )
+    engine._allocate_cache = MagicMock()
+    engine._release_cache = MagicMock()
+    engine._prefill_and_sample_target_batch = MagicMock()
+    engine._run_device_packed_greedy = MagicMock()
+    engine._draft_spec_rhythm_device_batch = MagicMock()
+
+    with patch(
+        "vllm_ascend.spec_decode.pearl.native_engine.torch.npu.synchronize"
+    ) as synchronize:
+        engine._precompile_decode_graphs(include_target_graphs=False)
+
+    engine._prefill_and_sample_target_batch.assert_called_once()
+    engine._run_device_packed_greedy.assert_not_called()
+    engine._draft_spec_rhythm_device_batch.assert_not_called()
+    engine.graph_runner.set_expected_fia_batch_size.assert_not_called()
+    assert engine.precompiled_decode_batch_sizes == frozenset()
+    engine._release_cache.assert_called_once_with()
+    synchronize.assert_called_once_with()
+
+
+@pytest.mark.parametrize(
+    ("execution", "expected_counter"),
+    [
+        (
+            NativeGraphExecution(
+                "capture_replay",
+                capture_attempted=True,
+                replay_executed=True,
+            ),
+            "_linear_draft_full_chain_capture_replay_calls",
+        ),
+        (
+            NativeGraphExecution("replay", replay_executed=True),
+            "_linear_draft_full_chain_replay_calls",
+        ),
+        (
+            NativeGraphExecution("eager", "disabled_entry"),
+            "_linear_draft_full_chain_eager_fallback_calls",
+        ),
+    ],
+)
+def test_linear_full_chain_telemetry_distinguishes_runner_outcomes(
+    execution,
+    expected_counter,
+):
+    owner = SimpleNamespace()
+
+    _record_linear_draft_full_chain_metrics(
+        owner,
+        logical_rows=3,
+        padded_rows=4,
+        gamma=4,
+        execution=execution,
+    )
+
+    assert owner._linear_draft_full_chain_bucket_calls == {4: 1}
+    assert owner._linear_draft_full_chain_logical_row_calls == {3: 1}
+    assert owner._linear_draft_full_chain_calls == 1
+    assert owner._linear_draft_full_chain_logical_rows == 3
+    assert owner._linear_draft_full_chain_logical_tokens == 12
+    assert owner._linear_draft_full_chain_padded_rows == 4
+    assert owner._linear_draft_full_chain_padded_tokens == 16
+    assert owner._linear_draft_full_chain_padding_rows == 1
+    assert owner._linear_draft_full_chain_padding_tokens == 4
+    assert getattr(owner, expected_counter) == 1
+    assert sum(
+        getattr(owner, name, 0)
+        for name in (
+            "_linear_draft_full_chain_capture_replay_calls",
+            "_linear_draft_full_chain_replay_calls",
+            "_linear_draft_full_chain_eager_fallback_calls",
+            "_linear_draft_full_chain_unclassified_calls",
+        )
+    ) == owner._linear_draft_full_chain_calls
 
 
 def test_pearl_defaults_to_tp3_deterministic_aiv_without_overriding_user_configuration():
@@ -235,6 +480,7 @@ def test_benchmark_parses_explicit_target_graph_post_counts():
 def test_target_follower_builds_replicated_greedy_result_without_broadcast():
     engine = NativePearlEngine.__new__(NativePearlEngine)
     engine.rank = 2
+    engine.is_draft = False
     engine.gamma = 3
     engine.device = torch.device("cpu")
     engine.topology = PearlTopology(draft_ranks=(0,), target_ranks=(1, 2))
@@ -253,6 +499,35 @@ def test_target_follower_builds_replicated_greedy_result_without_broadcast():
 
     broadcast.assert_not_called()
     assert accepted == [2, 0]
+    assert corrections == [None, 42]
+    assert next_windows == [[20, 21, 22], [30, 31, 32]]
+
+
+def test_target_follower_uses_rank_local_continuations_with_verification_only_message():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 2
+    engine.is_draft = False
+    engine.gamma = 3
+    engine.device = torch.device("cpu")
+    engine.topology = PearlTopology(draft_ranks=(0,), target_ranks=(1, 2))
+    engine.groups = SimpleNamespace(correction_group=MagicMock())
+    verdict = torch.tensor([[3, -1], [0, 42]])
+    verification_only = torch.tensor([10, 11, 12, 13])
+    local_next = torch.tensor([[20, 21, 22], [30, 31, 32]])
+
+    with patch("vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast") as broadcast:
+        accepted, corrections, next_windows = engine._broadcast_device_round_result(
+            verdict,
+            verification_only,
+            verification_size=4,
+            batch_size=2,
+            local_next_windows=local_next,
+            replicated_target_verdict=True,
+            next_window_sizes=[3, 3],
+        )
+
+    broadcast.assert_not_called()
+    assert accepted == [3, 0]
     assert corrections == [None, 42]
     assert next_windows == [[20, 21, 22], [30, 31, 32]]
 
@@ -514,6 +789,82 @@ def test_rolling_eager_suffix_is_guarded_until_parent_verification():
     )
     assert draft.token_ids == target.token_ids
     assert draft.committed_length == target.committed_length
+
+
+@pytest.mark.parametrize("accepted", [0, 1, 2, 3, 4])
+def test_full_window_state_transition_matches_target_and_draft_committed_prefix(accepted):
+    prefix = [10, 11, 12]
+    proposal = [20, 21, 22, 23]
+    staged_eager = [30, 31, 32, 33]
+    correction = None if accepted == len(proposal) else 90 + accepted
+    target = PearlPipelineState(prefix.copy(), prompt_length=2)
+    draft = target.clone()
+    draft.token_ids.extend([*proposal, *staged_eager])
+
+    target.apply_target_full_window_verification(
+        proposal_token_ids=proposal,
+        accepted=accepted,
+        correction_token_id=correction,
+    )
+    draft.apply_draft_full_window_verification(
+        proposal_token_ids=proposal,
+        accepted=accepted,
+        correction_token_id=correction,
+        staged_eager_token_ids=staged_eager,
+    )
+
+    committed = [*prefix, *proposal[:accepted]]
+    if correction is not None:
+        committed.append(correction)
+    expected_draft = [*committed, *staged_eager] if correction is None else committed
+    assert target.token_ids == committed
+    assert draft.token_ids == expected_draft
+    assert target.committed_length == draft.committed_length == len(committed)
+    assert target.committed_completion_token_ids == draft.committed_completion_token_ids
+    assert target.accepted_draft_tokens == draft.accepted_draft_tokens == accepted
+    assert target.verified_draft_tokens == draft.verified_draft_tokens == len(proposal)
+    assert target.verification_rounds == draft.verification_rounds == 1
+    assert target.continuation_epoch == draft.continuation_epoch == 1
+    assert target.pre_verify and draft.pre_verify
+    assert target.pending_window_size == draft.pending_window_size == 0
+
+
+def test_full_window_draft_full_accept_without_eager_ends_at_committed_frontier():
+    state = PearlPipelineState([1, 2, 3], prompt_length=2)
+    proposal = torch.tensor([4, 5, 6, 7])
+    state.token_ids.extend(proposal.tolist())
+
+    state.apply_draft_full_window_verification(
+        proposal_token_ids=proposal,
+        accepted=4,
+        correction_token_id=None,
+    )
+
+    assert state.token_ids == [1, 2, 3, 4, 5, 6, 7]
+    assert state.committed_length == len(state.token_ids)
+    assert state.acceptance_lengths == [4]
+
+
+def test_full_window_transitions_reject_misaligned_role_local_tails_without_mutation():
+    target = PearlPipelineState([1, 2, 3, 99], prompt_length=2, committed_length=3)
+    target_before = target.clone()
+    with pytest.raises(RuntimeError, match="exact committed token frontier"):
+        target.apply_target_full_window_verification(
+            proposal_token_ids=[4, 5, 6, 7],
+            accepted=0,
+            correction_token_id=42,
+        )
+    assert target == target_before
+
+    draft = PearlPipelineState([1, 2, 3, 4, 5, 6, 8], prompt_length=2, committed_length=3)
+    draft_before = draft.clone()
+    with pytest.raises(RuntimeError, match=r"proposal \+ staged eager"):
+        draft.apply_draft_full_window_verification(
+            proposal_token_ids=[4, 5, 6, 7],
+            accepted=0,
+            correction_token_id=42,
+        )
+    assert draft == draft_before
 
 
 def test_device_mailbox_validates_prefix_epoch_and_variable_shapes():
@@ -1054,6 +1405,486 @@ def test_target_verification_can_select_paged_attention_aclgraph():
     assert engine._run_packed_greedy.call_args.kwargs["use_fused_infer_attention"] is False
 
 
+@pytest.mark.parametrize("force_stepwise", [False, True])
+def test_target_full_window_preserves_request_rows_and_queries_complete_proposals(force_stepwise):
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.config = SimpleNamespace(
+        enforce_eager=True,
+        target_use_paged_attention=True,
+        spec_rhythm_stable_graphs=True,
+    )
+    engine._run_device_packed_greedy = MagicMock()
+    states = [
+        PearlPipelineState([1, 101], prompt_length=1),
+        PearlPipelineState([4, 5, 102], prompt_length=1),
+        PearlPipelineState([7, 8, 9, 103], prompt_length=1),
+    ]
+    active_indices = [2, 0]
+    proposals = [
+        torch.tensor([20, 21, 22, 23]),
+        torch.tensor([30, 31, 32, 33]),
+    ]
+    payloads = [
+        NativeSpecRhythmDevicePayload(
+            ticket=SpecRhythmProposalTicket(
+                proposal_id=row,
+                request_index=request_index,
+                home_batch_id=row,
+                gamma=engine.gamma,
+                required_prefix_epoch=0,
+            ),
+            verification_tokens=proposal,
+            next_tokens=proposal,
+            verification_size=engine.gamma,
+            draft_confidence=1.0,
+        )
+        for row, (request_index, proposal) in enumerate(zip(active_indices, proposals))
+    ]
+    expected_rows = [[200, 201, 202, 203], [300, 301, 302, 303]]
+    if force_stepwise:
+        engine._run_device_packed_greedy.side_effect = [
+            torch.tensor([200 + step, 300 + step]) for step in range(engine.gamma)
+        ]
+    else:
+        engine._run_device_packed_greedy.return_value = torch.tensor(expected_rows).flatten()
+
+    with patch.dict(
+        os.environ,
+        {
+            "VLLM_ASCEND_SPECRHYTHM_FORCE_STEPWISE_TARGET": "1" if force_stepwise else "0",
+            "VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH": "0",
+            # Keep the packed branch covered only as an explicit backend
+            # diagnostic. Production paged-attention full-window verification
+            # uses the causal multi-step path even inside B<=64/gamma<=8.
+            "VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET": "0" if force_stepwise else "1",
+        },
+    ):
+        output, logits = engine._target_full_window_outputs_batch(states, active_indices, payloads)
+
+    assert logits is None
+    assert output.reshape(len(active_indices), engine.gamma).tolist() == expected_rows
+    calls = engine._run_device_packed_greedy.call_args_list
+    if force_stepwise:
+        assert len(calls) == engine.gamma
+        expected_inputs = [
+            torch.tensor([103, 101]),
+            torch.tensor([20, 30]),
+            torch.tensor([21, 31]),
+            torch.tensor([22, 32]),
+        ]
+        expected_positions = [[3, 1], [4, 2], [5, 3], [6, 4]]
+        for call, expected_input, expected_position in zip(calls, expected_inputs, expected_positions):
+            assert torch.equal(call.args[0], expected_input)
+            assert call.args[1] == active_indices
+            assert call.args[2] == expected_position
+    else:
+        assert len(calls) == 1
+        assert torch.equal(
+            calls[0].args[0],
+            torch.tensor([103, 20, 21, 22, 101, 30, 31, 32]),
+        )
+        assert calls[0].args[1] == [2, 2, 2, 2, 0, 0, 0, 0]
+        assert calls[0].args[2] == [3, 4, 5, 6, 1, 2, 3, 4]
+
+
+def test_target_full_window_captures_causal_pa_chain_in_one_exact_row_graph():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 32
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        target_use_paged_attention=True,
+        spec_rhythm_stable_graphs=True,
+    )
+    engine._prepare_attention_metadata = MagicMock(
+        side_effect=[
+            (torch.tensor([3 + step, 1 + step]), SimpleNamespace(step=step))
+            for step in range(engine.gamma)
+        ]
+    )
+    engine._run_device_packed_greedy = MagicMock()
+    engine.graph_runner = MagicMock()
+    engine.graph_runner.run_target_greedy.return_value = tuple(
+        torch.tensor([200 + step, 300 + step])
+        for step in range(engine.gamma)
+    )
+    states = [
+        PearlPipelineState([1, 101], prompt_length=1),
+        PearlPipelineState([4, 5, 102], prompt_length=1),
+        PearlPipelineState([7, 8, 9, 103], prompt_length=1),
+    ]
+    active_indices = [2, 0]
+    proposals = [
+        torch.tensor([20, 21, 22, 23]),
+        torch.tensor([30, 31, 32, 33]),
+    ]
+    payloads = [
+        NativeSpecRhythmDevicePayload(
+            ticket=SpecRhythmProposalTicket(
+                proposal_id=row,
+                request_index=request_index,
+                home_batch_id=row,
+                gamma=engine.gamma,
+                required_prefix_epoch=0,
+            ),
+            verification_tokens=proposal,
+            next_tokens=proposal,
+            verification_size=engine.gamma,
+            draft_confidence=1.0,
+        )
+        for row, (request_index, proposal) in enumerate(
+            zip(active_indices, proposals)
+        )
+    ]
+
+    with patch.dict(
+        os.environ,
+        {
+            "VLLM_ASCEND_SPECRHYTHM_FORCE_STEPWISE_TARGET": "0",
+            "VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET": "0",
+            "VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH": "0",
+        },
+    ):
+        output, logits = engine._target_full_window_outputs_batch(
+            states,
+            active_indices,
+            payloads,
+        )
+
+    assert logits is None
+    assert output.reshape(2, 4).tolist() == [
+        [200, 201, 202, 203],
+        [300, 301, 302, 303],
+    ]
+    graph_inputs = engine.graph_runner.run_target_greedy.call_args.args[0]
+    assert [value.tolist() for value in graph_inputs] == [
+        [103, 101],
+        [20, 30],
+        [21, 31],
+        [22, 32],
+    ]
+    assert all(value.shape == (2,) for value in graph_inputs)
+    assert engine._prepare_attention_metadata.call_args_list == [
+        call(active_indices, [3 + step, 1 + step], use_fused_infer_attention=False)
+        for step in range(engine.gamma)
+    ]
+    engine._run_device_packed_greedy.assert_not_called()
+
+
+def test_target_full_window_keeps_packed_fia_with_stable_draft_graphs():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        target_use_paged_attention=False,
+        spec_rhythm_stable_graphs=True,
+    )
+    engine._run_device_packed_greedy = MagicMock(
+        return_value=torch.arange(8)
+    )
+    states = [
+        PearlPipelineState([1, 101], prompt_length=1),
+        PearlPipelineState([2, 102], prompt_length=1),
+    ]
+    payloads = [
+        NativeSpecRhythmDevicePayload(
+            ticket=SpecRhythmProposalTicket(
+                proposal_id=row,
+                request_index=row,
+                home_batch_id=row,
+                gamma=4,
+                required_prefix_epoch=0,
+            ),
+            verification_tokens=torch.tensor(
+                [200 + row * 4 + step for step in range(4)]
+            ),
+            next_tokens=torch.tensor(
+                [200 + row * 4 + step for step in range(4)]
+            ),
+            verification_size=4,
+            draft_confidence=1.0,
+        )
+        for row in range(2)
+    ]
+
+    output, _ = engine._target_full_window_outputs_batch(
+        states,
+        [0, 1],
+        payloads,
+    )
+
+    assert output.tolist() == list(range(8))
+    call_args = engine._run_device_packed_greedy.call_args
+    assert call_args.kwargs == {
+        "use_aclgraph": True,
+        "use_fused_infer_attention": True,
+    }
+    assert call_args.args[1] == [0, 0, 0, 0, 1, 1, 1, 1]
+
+
+def test_packed_causal_fia_leakage_probe_is_explicit_and_runs_once():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.gamma = 4
+    engine.draft_vocab_size = 64
+    engine.rank = 1
+    engine.model = MagicMock()
+    reference_hidden = torch.arange(16, dtype=torch.float32).reshape(8, 2)
+    perturbed_hidden = reference_hidden.clone()
+    perturbed_hidden[[3, 7]] += 10
+    reference_tokens = torch.arange(8, dtype=torch.long)
+    perturbed_tokens = reference_tokens.clone()
+    perturbed_tokens[[3, 7]] += 10
+    engine._run_device_packed_hidden = MagicMock(
+        side_effect=[
+            reference_hidden,
+            perturbed_hidden,
+            reference_hidden.clone(),
+        ]
+    )
+    engine.model.compute_greedy_tokens.side_effect = [
+        reference_tokens,
+        perturbed_tokens,
+        reference_tokens.clone(),
+    ]
+    query_tokens = torch.tensor([10, 11, 12, 13, 20, 21, 22, 23])
+    sequence_ids = [2, 2, 2, 2, 0, 0, 0, 0]
+    positions = [7, 8, 9, 10, 3, 4, 5, 6]
+
+    with patch.dict(
+        os.environ,
+        {"VLLM_ASCEND_SPECRHYTHM_VALIDATE_PACKED_CAUSAL_LEAKAGE": "0"},
+    ):
+        engine._validate_packed_causal_fia_leakage_once(
+            query_tokens,
+            sequence_ids,
+            positions,
+        )
+    engine._run_device_packed_hidden.assert_not_called()
+
+    with patch.dict(
+        os.environ,
+        {"VLLM_ASCEND_SPECRHYTHM_VALIDATE_PACKED_CAUSAL_LEAKAGE": "1"},
+    ):
+        engine._validate_packed_causal_fia_leakage_once(
+            query_tokens,
+            sequence_ids,
+            positions,
+        )
+        engine._validate_packed_causal_fia_leakage_once(
+            query_tokens,
+            sequence_ids,
+            positions,
+        )
+
+    assert engine._run_device_packed_hidden.call_count == 3
+    calls = engine._run_device_packed_hidden.call_args_list
+    assert torch.equal(calls[0].args[0], query_tokens)
+    assert torch.equal(calls[2].args[0], query_tokens)
+    assert calls[1].args[0].tolist() == [10, 11, 12, 14, 20, 21, 22, 24]
+    assert all(call.kwargs["use_aclgraph"] is False for call in calls)
+    assert all(call.kwargs["use_fused_infer_attention"] is True for call in calls)
+    assert engine._packed_causal_leakage_probe_completed is True
+    assert engine._packed_causal_leakage_probe_attempts == 1
+    assert engine._packed_causal_leakage_probe_passes == 1
+    assert engine._packed_causal_leakage_probe_failures == 0
+    assert engine._packed_causal_leakage_probe_hidden_mismatch_steps == 0
+    assert engine._packed_causal_leakage_probe_token_mismatch_steps == 0
+    assert engine._packed_causal_leakage_probe_max_abs_diff == 0.0
+
+
+def test_packed_causal_fia_leakage_probe_restores_kv_before_failure():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.gamma = 4
+    engine.draft_vocab_size = 64
+    engine.rank = 1
+    engine.model = MagicMock()
+    reference_hidden = torch.arange(8, dtype=torch.float32).reshape(4, 2)
+    leaked_hidden = reference_hidden.clone()
+    leaked_hidden[0, 0] += 1
+    reference_tokens = torch.arange(4, dtype=torch.long)
+    leaked_tokens = reference_tokens.clone()
+    leaked_tokens[1] += 1
+    engine._run_device_packed_hidden = MagicMock(
+        side_effect=[
+            reference_hidden,
+            leaked_hidden,
+            reference_hidden.clone(),
+        ]
+    )
+    engine.model.compute_greedy_tokens.side_effect = [
+        reference_tokens,
+        leaked_tokens,
+        reference_tokens.clone(),
+    ]
+    query_tokens = torch.tensor([10, 11, 12, 13])
+
+    with (
+        patch.dict(
+            os.environ,
+            {"VLLM_ASCEND_SPECRHYTHM_VALIDATE_PACKED_CAUSAL_LEAKAGE": "1"},
+        ),
+        pytest.raises(RuntimeError, match="hidden_mismatch_steps=1"),
+    ):
+        engine._validate_packed_causal_fia_leakage_once(
+            query_tokens,
+            [0, 0, 0, 0],
+            [3, 4, 5, 6],
+        )
+
+    calls = engine._run_device_packed_hidden.call_args_list
+    assert len(calls) == 3
+    # The last call replays the original token row even though validation is
+    # about to fail, restoring the KV slot changed by the perturbation.
+    assert torch.equal(calls[-1].args[0], query_tokens)
+    assert engine._packed_causal_leakage_probe_attempts == 1
+    assert engine._packed_causal_leakage_probe_passes == 0
+    assert engine._packed_causal_leakage_probe_failures == 1
+    assert engine._packed_causal_leakage_probe_hidden_mismatch_steps == 1
+    assert engine._packed_causal_leakage_probe_token_mismatch_steps == 1
+    assert engine._packed_causal_leakage_probe_restore_hidden_mismatch_steps == 0
+    assert engine._packed_causal_leakage_probe_restore_token_mismatch_steps == 0
+
+
+def test_target_full_window_invokes_packed_causal_probe_before_normal_fia():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        target_use_paged_attention=False,
+        spec_rhythm_stable_graphs=True,
+    )
+    engine._validate_packed_causal_fia_leakage_once = MagicMock()
+    engine._run_device_packed_greedy = MagicMock(return_value=torch.arange(4))
+    state = PearlPipelineState([1, 101], prompt_length=1)
+    proposal = torch.tensor([20, 21, 22, 23])
+    payload = NativeSpecRhythmDevicePayload(
+        ticket=SpecRhythmProposalTicket(
+            proposal_id=0,
+            request_index=0,
+            home_batch_id=0,
+            gamma=4,
+            required_prefix_epoch=0,
+        ),
+        verification_tokens=proposal,
+        next_tokens=proposal,
+        verification_size=4,
+        draft_confidence=1.0,
+    )
+
+    output, _ = engine._target_full_window_outputs_batch(
+        [state],
+        [0],
+        [payload],
+    )
+
+    query_tokens = torch.tensor([101, 20, 21, 22])
+    probe_call = engine._validate_packed_causal_fia_leakage_once.call_args
+    assert torch.equal(probe_call.args[0], query_tokens)
+    assert probe_call.args[1:] == ([0, 0, 0, 0], [1, 2, 3, 4])
+    production_call = engine._run_device_packed_greedy.call_args
+    assert torch.equal(production_call.args[0], query_tokens)
+    assert production_call.kwargs == {
+        "use_aclgraph": True,
+        "use_fused_infer_attention": True,
+    }
+    assert output.tolist() == [0, 1, 2, 3]
+
+
+def test_target_full_window_rejects_an_uncommitted_target_suffix_before_forward():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.config = SimpleNamespace(
+        enforce_eager=True,
+        target_use_paged_attention=True,
+        spec_rhythm_stable_graphs=True,
+    )
+    engine._run_device_packed_greedy = MagicMock()
+    state = PearlPipelineState([1, 2, 3, 99], prompt_length=2, committed_length=3)
+    proposal = torch.tensor([10, 11, 12, 13])
+    payload = NativeSpecRhythmDevicePayload(
+        ticket=SpecRhythmProposalTicket(
+            proposal_id=0,
+            request_index=0,
+            home_batch_id=0,
+            gamma=engine.gamma,
+            required_prefix_epoch=0,
+        ),
+        verification_tokens=proposal,
+        next_tokens=proposal,
+        verification_size=engine.gamma,
+        draft_confidence=1.0,
+    )
+
+    with pytest.raises(RuntimeError, match="uncommitted token suffix"):
+        engine._target_full_window_outputs_batch([state], [0], [payload])
+
+    engine._run_device_packed_greedy.assert_not_called()
+
+
+@pytest.mark.parametrize(("batch_size", "gamma"), [(65, 4), (1, 9)])
+def test_target_full_window_uses_causal_pa_outside_validated_packed_boundary(
+    batch_size,
+    gamma,
+):
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = gamma
+    engine.device = torch.device("cpu")
+    engine.config = SimpleNamespace(
+        enforce_eager=True,
+        target_use_paged_attention=True,
+        spec_rhythm_stable_graphs=True,
+    )
+    engine._run_device_packed_greedy = MagicMock(
+        side_effect=[torch.arange(batch_size) for _ in range(gamma)]
+    )
+    states = [PearlPipelineState([1, 100 + row], prompt_length=1) for row in range(batch_size)]
+    active_indices = list(range(batch_size))
+    payloads = [
+        NativeSpecRhythmDevicePayload(
+            ticket=SpecRhythmProposalTicket(
+                proposal_id=row,
+                request_index=row,
+                home_batch_id=row % 2,
+                gamma=gamma,
+                required_prefix_epoch=0,
+            ),
+            verification_tokens=torch.arange(gamma) + 200 + row * gamma,
+            next_tokens=torch.arange(gamma) + 200 + row * gamma,
+            verification_size=gamma,
+            draft_confidence=1.0,
+        )
+        for row in range(batch_size)
+    ]
+
+    with patch.dict(
+        os.environ,
+        {
+            "VLLM_ASCEND_SPECRHYTHM_FORCE_STEPWISE_TARGET": "0",
+            "VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET": "0",
+        },
+    ):
+        output, _ = engine._target_full_window_outputs_batch(
+            states,
+            active_indices,
+            payloads,
+        )
+
+    assert output.shape == (batch_size * gamma,)
+    assert engine._run_device_packed_greedy.call_count == gamma
+
+
 @pytest.mark.parametrize("return_logits", [False, True])
 def test_tree_eager_diagnostic_logits_are_optional(return_logits):
     engine = NativePearlEngine.__new__(NativePearlEngine)
@@ -1299,6 +2130,127 @@ def test_target_tree_forward_packs_variable_request_budgets_into_one_forward():
     engine._ensure_cache_capacity.assert_called_once_with([0, 0, 1, 1, 1, 1], [1, 2, 6, 7, 8, 9])
 
 
+def test_tree_target_graph_padding_preserves_real_rows_and_fills_exact_buckets():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        spec_rhythm_stable_graphs=True,
+        spec_rhythm_tree_width=2,
+        spec_rhythm_tree_depth=2,
+        max_model_len=64,
+    )
+    states = [
+        PearlPipelineState([index + 1] * (index + 2), prompt_length=index + 2)
+        for index in range(4)
+    ]
+    plans = [
+        engine._spec_rhythm_tree_plan(states[0], 4),
+        engine._spec_rhythm_tree_plan(states[1], 4),
+    ]
+
+    padded = engine._pad_spec_rhythm_target_tree_graph(
+        plans,
+        [11, 12],
+        [[21, 22, 23, 24], [31, 32, 33, 34]],
+        [0, 1],
+        [0, 1, 2, 3],
+        states,
+    )
+
+    padded_plans, roots, rows, request_ids, real_count = padded
+    assert real_count == 2
+    assert request_ids == [0, 1, 2, 3]
+    assert roots[:2] == [11, 12]
+    assert rows[:2] == [[21, 22, 23, 24], [31, 32, 33, 34]]
+    # Two real five-query trees plus two three-query dummy trees fill the
+    # four-token-aligned 16-query graph envelope exactly.
+    assert [plan.candidate_budget for plan in padded_plans] == [4, 4, 2, 2]
+    assert sum(plan.candidate_budget + 1 for plan in padded_plans) == 16
+
+
+def test_tree_target_graph_padding_grows_bucket_for_shallow_tree():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        spec_rhythm_stable_graphs=True,
+        spec_rhythm_tree_width=2,
+        spec_rhythm_tree_depth=1,
+        max_model_len=64,
+    )
+    states = [
+        PearlPipelineState([index + 1] * (index + 2), prompt_length=index + 2)
+        for index in range(4)
+    ]
+    plan = engine._spec_rhythm_tree_plan(states[0], 2)
+
+    padded = engine._pad_spec_rhythm_target_tree_graph(
+        [plan], [11], [[21, 22]], [0], [0, 1, 2, 3], states
+    )
+
+    padded_plans, _, _, request_ids, real_count = padded
+    assert real_count == 1
+    # One dummy row cannot fill the next four-query bucket for a 2x1 tree.
+    # Four request rows can: 3 real queries + 3 * 3 dummy queries = 12.
+    assert request_ids == [0, 1, 2, 3]
+    assert [plan.candidate_budget for plan in padded_plans] == [2, 2, 2, 2]
+    assert sum(plan.candidate_budget + 1 for plan in padded_plans) == 12
+
+
+def test_target_tree_forward_discards_graph_padding_outputs_and_mappings():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.device = torch.device("cpu")
+    engine.target_vocab_size = 32
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        spec_rhythm_tree_width=2,
+        spec_rhythm_tree_depth=2,
+    )
+    engine.cache_allocation = SimpleNamespace(block_tables=[[0], [1], [2]])
+    engine.cache_block_tables = torch.zeros((3, 1), dtype=torch.int32)
+    engine._ensure_cache_capacity = MagicMock()
+    engine.graph_runner = MagicMock()
+    engine.graph_runner.run_target_greedy.return_value = (torch.arange(7, 14),)
+    engine.graph_runner.last_target_execution = SimpleNamespace(used_aclgraph=True)
+    engine.model = MagicMock()
+    engine.model.make_tree_attention_metadata.return_value = (
+        torch.arange(7),
+        torch.arange(7),
+        SimpleNamespace(
+            slot_mapping=torch.arange(7, dtype=torch.int32),
+            use_fused_infer_attention=True,
+            tree_attention=True,
+            tree_attention_mask=torch.zeros((3, 1, 3, 16), dtype=torch.bool),
+            attention_mask=torch.zeros((7, 16), dtype=torch.bool),
+        ),
+    )
+    plans = [
+        build_tree_speculation_plan(2, 2, 1, 16, candidate_budget=1),
+        build_tree_speculation_plan(2, 2, 2, 16, candidate_budget=1),
+        build_tree_speculation_plan(2, 2, 3, 16, candidate_budget=2),
+    ]
+
+    result = engine.target_tree_forward(
+        plans,
+        [1, 2, 3],
+        [[4], [5], [0, 0]],
+        sequence_ids=[0, 1, 2],
+        real_tree_count=2,
+    )
+
+    assert result["target_token_ids"].tolist() == [7, 9]
+    assert result["target_query_token_ids"].tolist() == [7, 8, 9, 10]
+    assert result["bonus_token_ids"].tolist() == [8, 10]
+    assert result["num_draft_tokens"] == [1, 1]
+    assert result["tree_count"] == 2
+    assert result["logical_query_count"] == 4
+    assert result["query_count"] == 7
+    assert result["graph_padding_query_count"] == 3
+    assert result["cache_slot_mapping"].tolist() == [0, 1, 2, 3]
+    padded_metadata = engine.graph_runner.run_target_greedy.call_args.args[2][0]
+    assert padded_metadata.tree_attention_mask.shape == (3, 1, 5, 16)
+
+
 def test_tree_state_commits_path_and_records_budget_acceptance():
     state = PearlPipelineState([11], prompt_length=1, max_tokens=8)
 
@@ -1356,6 +2308,61 @@ def test_draft_tree_forward_expands_spine_and_broadcast_shape():
     assert result["parent_indices"].numel() == 3
     assert result["num_draft_tokens"] == [3]
     assert engine.model.make_tree_attention_metadata.call_args.kwargs["sequence_ids"] == [1]
+
+
+def test_draft_tree_forward_fuses_committed_catchup_into_root_call():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = True
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 4
+    engine.config = SimpleNamespace(enforce_eager=True, max_model_len=16)
+    engine.cache_allocation = SimpleNamespace(
+        block_tables=torch.zeros((1, 4), dtype=torch.int32)
+    )
+    engine.cache_block_tables = torch.zeros((1, 4), dtype=torch.int32)
+    engine._ensure_cache_capacity = MagicMock()
+    engine.model = MagicMock()
+    engine.model.make_tree_level_attention_metadata.side_effect = (
+        lambda plan, sequence_id, node_indices, input_token_ids, block_tables: (
+            torch.tensor(input_token_ids),
+            torch.tensor(node_indices),
+            SimpleNamespace(),
+        )
+    )
+    engine.model.make_tree_attention_metadata.return_value = (
+        torch.tensor([8, 1, 2]),
+        torch.tensor([3, 4, 4]),
+        SimpleNamespace(slot_mapping=torch.arange(3, dtype=torch.int32)),
+    )
+    # The first row only restores accepted KV.  Candidate sampling must use
+    # the final (current-root) row from the same packed model invocation.
+    engine.model.compute_logits.return_value = torch.tensor(
+        [[9.0, 0.1, 0.2, 0.3], [0.1, 9.0, 0.2, 0.3]]
+    )
+    plan = build_tree_speculation_plan(
+        width=2,
+        depth=1,
+        prefix_len=3,
+        max_model_len=16,
+        candidate_budget=2,
+    )
+
+    result = engine.draft_tree_forward(
+        [plan],
+        [8],
+        [0],
+        committed_catchup_token_ids=[[7, 8]],
+    )
+
+    packed_call = engine.model.make_tree_level_attention_metadata.call_args_list[0]
+    catchup_plan = packed_call.args[0]
+    assert catchup_plan.width == 1
+    assert catchup_plan.depth == 1
+    assert catchup_plan.prefix_len == 2
+    assert packed_call.args[2] == [-1, 0]
+    assert packed_call.args[3] == [7, 8]
+    assert result["draft_token_ids"] == [[1, 3]]
+    assert result["model_calls"] == 2  # One fused logits call plus final KV write.
 
 
 def test_draft_tree_eager_writes_frontier_root_into_tree_kv():
@@ -1555,6 +2562,7 @@ def test_draft_aclgraph_captures_paged_attention_steps():
         "draft-greedy:32|steps:2|paged",
         2,
     )
+    assert runner._capture_draft.call_args.kwargs["valid_row_count"] == 2
 
 
 def test_draft_aclgraph_eager_chain_feeds_each_token_to_the_next_step():
@@ -1574,6 +2582,8 @@ def test_draft_aclgraph_eager_chain_feeds_each_token_to_the_next_step():
     )
 
     assert output.tolist() == [[4, 5]]
+    assert runner.last_draft_execution.mode == "eager"
+    assert runner.last_draft_execution.fallback_reason == "disabled"
     assert torch.equal(model.call_args_list[0].args[0], torch.tensor([3]))
     assert torch.equal(model.call_args_list[1].args[0], torch.tensor([4]))
 
@@ -1627,6 +2637,8 @@ def test_draft_aclgraph_uses_eager_for_a_dynamic_tail_batch():
 
     assert output.tolist() == [[4, 5], [6, 7]]
     assert runner.shape_fallback_count == 1
+    assert runner.last_draft_execution.mode == "eager"
+    assert runner.last_draft_execution.fallback_reason == "shape"
     runner._execute_draft.assert_called_once()
 
 
@@ -1710,6 +2722,286 @@ def test_spec_rhythm_eager_verification_keeps_the_parent_window_prefix():
     assert verification.tolist() == [10, 31, 32, 33, 20]
     assert continuation.tolist() == [[10, 11, -1, -1], [20, 21, -1, -1]]
     assert confidence.tolist() == pytest.approx([0.7, 0.6])
+    assert engine._linear_draft_stepwise_calls == 1
+    assert engine._linear_draft_stepwise_model_calls == 2
+    assert getattr(engine, "_linear_draft_full_chain_bucket_calls", {}) == {}
+
+
+def test_spec_rhythm_full_window_draft_payload_is_the_complete_next_window():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = True
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.config = SimpleNamespace(
+        enforce_eager=True,
+        draft_use_paged_attention=False,
+        enable_spec_rhythm=True,
+        spec_rhythm_stable_graphs=False,
+        max_num_seqs=8,
+    )
+    engine._run_device_packed_greedy_with_confidence = MagicMock(
+        side_effect=[
+            (torch.tensor([10, 20]), torch.tensor([0.9, 0.8])),
+            (torch.tensor([11, 21]), torch.tensor([0.7, 0.6])),
+            (torch.tensor([12, 22]), torch.tensor([0.5, 0.4])),
+            (torch.tensor([13, 23]), torch.tensor([0.3, 0.2])),
+        ]
+    )
+    states = [
+        PearlPipelineState([1, 2], prompt_length=1),
+        PearlPipelineState([3, 4], prompt_length=1),
+    ]
+
+    verification, continuation, confidence = engine._draft_spec_rhythm_device_batch(
+        states,
+        [0, 1],
+        [engine.gamma, engine.gamma],
+        verification_sizes=[engine.gamma, engine.gamma],
+        full_window=True,
+    )
+
+    expected = torch.tensor([[10, 11, 12, 13], [20, 21, 22, 23]])
+    assert torch.equal(continuation, expected)
+    assert torch.equal(verification.reshape(2, engine.gamma), expected)
+    assert confidence.tolist() == pytest.approx([0.6, 0.5])
+    step_inputs = [call.args[0] for call in engine._run_device_packed_greedy_with_confidence.call_args_list]
+    assert len(step_inputs) == engine.gamma
+    assert all(
+        torch.equal(actual, expected_input)
+        for actual, expected_input in zip(
+            step_inputs,
+            [
+                torch.tensor([2, 4]),
+                torch.tensor([10, 20]),
+                torch.tensor([11, 21]),
+                torch.tensor([12, 22]),
+            ],
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    ("work_rows", "expected_graph_rows"),
+    [
+        (1, 1),
+        (3, 4),
+        (8, 8),
+        (16, 16),
+        (17, 20),
+        (25, 28),
+        (32, 32),
+        (33, 48),
+        (48, 48),
+        (64, 64),
+    ],
+)
+def test_spec_rhythm_full_draft_graph_uses_bounded_dense_buckets(
+    work_rows,
+    expected_graph_rows,
+):
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = True
+    engine.gamma = 4
+    engine.draft_vocab_size = 128
+    engine.device = torch.device("cpu")
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        draft_use_paged_attention=False,
+        enable_spec_rhythm=True,
+        spec_rhythm_stable_graphs=True,
+        max_num_seqs=64,
+    )
+    engine.graph_runner = MagicMock()
+    engine.graph_runner.last_draft_execution = NativeGraphExecution(
+        "replay",
+        replay_executed=True,
+    )
+    engine.graph_runner.run_draft_greedy.return_value = torch.arange(
+        expected_graph_rows * engine.gamma,
+        dtype=torch.long,
+    ).reshape(expected_graph_rows, engine.gamma)
+    engine._run_device_packed_greedy_with_confidence = MagicMock()
+    engine.rank = 0
+    engine.last_worker_decode_phase_seconds = {}
+    engine.last_worker_decode_profile_seconds = {}
+    engine.last_worker_decode_profile_detail_seconds = {}
+    engine.last_worker_decode_counters = {}
+    engine.last_worker_decode_host_timeline = []
+    engine.last_worker_profiled_decode_steps = 0
+
+    def metadata(indices, positions, *, use_fused_infer_attention):
+        assert len(indices) == work_rows
+        assert not use_fused_infer_attention
+        return torch.tensor(positions, dtype=torch.long), SimpleNamespace(
+            slot_mapping=torch.arange(work_rows, dtype=torch.long),
+            context_lens=torch.ones(work_rows, dtype=torch.int32),
+            block_tables=torch.zeros((work_rows, 1), dtype=torch.int32),
+        )
+
+    engine._prepare_attention_metadata = MagicMock(side_effect=metadata)
+    states = [PearlPipelineState([1, 2], prompt_length=1) for _ in range(work_rows)]
+
+    verification, continuation, confidence = engine._draft_spec_rhythm_device_batch(
+        states,
+        list(range(work_rows)),
+        [engine.gamma] * work_rows,
+        verification_sizes=[1] * work_rows,
+    )
+
+    graph_call = engine.graph_runner.run_draft_greedy.call_args
+    assert graph_call.args[0].shape == (expected_graph_rows,)
+    assert all(value.shape == (expected_graph_rows,) for value in graph_call.args[1])
+    assert all(value.slot_mapping.shape == (expected_graph_rows,) for value in graph_call.args[2])
+    assert graph_call.kwargs["valid_row_count"] == work_rows
+    assert continuation.shape == (work_rows, engine.gamma)
+    assert verification.shape == (work_rows,)
+    assert confidence.tolist() == [1.0] * work_rows
+    engine._run_device_packed_greedy_with_confidence.assert_not_called()
+    assert engine._linear_draft_full_chain_bucket_calls == {expected_graph_rows: 1}
+    assert engine._linear_draft_full_chain_calls == 1
+    assert getattr(
+        engine, "_linear_draft_full_chain_capture_replay_calls", 0
+    ) == 0
+    assert engine._linear_draft_full_chain_replay_calls == 1
+    assert getattr(
+        engine, "_linear_draft_full_chain_eager_fallback_calls", 0
+    ) == 0
+    assert getattr(
+        engine, "_linear_draft_full_chain_unclassified_calls", 0
+    ) == 0
+    assert engine._linear_draft_full_chain_logical_rows == work_rows
+    assert engine._linear_draft_full_chain_logical_tokens == work_rows * engine.gamma
+    assert engine._linear_draft_full_chain_padded_rows == expected_graph_rows
+    assert engine._linear_draft_full_chain_padded_tokens == expected_graph_rows * engine.gamma
+    assert engine._linear_draft_full_chain_padding_rows == expected_graph_rows - work_rows
+    assert engine._linear_draft_full_chain_padding_tokens == (
+        expected_graph_rows - work_rows
+    ) * engine.gamma
+    assert getattr(engine, "_linear_draft_stepwise_calls", 0) == 0
+    metrics = engine.graph_metrics()
+    assert metrics[
+        f"spec_rhythm_linear_draft_full_chain_bucket_{expected_graph_rows}_calls"
+    ] == 1
+    assert metrics["spec_rhythm_linear_draft_full_chain_calls"] == 1
+    assert metrics["spec_rhythm_linear_draft_full_chain_replay_calls"] == 1
+    assert metrics["spec_rhythm_linear_draft_full_chain_logical_rows"] == work_rows
+    assert metrics["spec_rhythm_linear_draft_full_chain_padded_rows"] == expected_graph_rows
+    assert metrics["spec_rhythm_linear_draft_stepwise_calls"] == 0
+
+
+def test_linear_spec_rhythm_capture_prewarms_paged_home_and_full_draft_graphs():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = True
+    engine.gamma = 4
+    engine.draft_vocab_size = 128
+    engine.device = torch.device("cpu")
+    engine.precompiled_decode_batch_sizes = frozenset()
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        target_use_paged_attention=False,
+        draft_use_paged_attention=False,
+        enable_spec_rhythm=True,
+        spec_rhythm_tree_width=1,
+        spec_rhythm_tree_depth=1,
+        spec_rhythm_stable_graphs=True,
+        max_num_seqs=64,
+    )
+    engine.graph_runner = MagicMock()
+    engine.graph_runner.run_draft_greedy.side_effect = (
+        lambda input_ids, positions, metadatas, vocabulary_size, *, valid_row_count: torch.zeros(
+            (input_ids.shape[0], len(positions)),
+            dtype=torch.long,
+        )
+    )
+    metadata_modes = []
+
+    def metadata(indices, positions, *, use_fused_infer_attention):
+        metadata_modes.append(use_fused_infer_attention)
+        rows = len(indices)
+        return torch.tensor(positions, dtype=torch.long), SimpleNamespace(
+            slot_mapping=torch.arange(rows, dtype=torch.long),
+            context_lens=torch.ones(rows, dtype=torch.int32),
+            block_tables=torch.zeros((rows, 1), dtype=torch.int32),
+        )
+
+    engine._prepare_attention_metadata = MagicMock(side_effect=metadata)
+    prompts = [[1]] * 40
+
+    with patch("vllm_ascend.spec_decode.pearl.native_engine.dist.barrier"):
+        engine._capture_decode_graphs(prompts, [2] * len(prompts))
+
+    graph_calls = engine.graph_runner.run_draft_greedy.call_args_list
+    assert [call.args[0].shape[0] for call in graph_calls] == [32, 64]
+    assert [call.kwargs["valid_row_count"] for call in graph_calls] == [32, 40]
+    assert all(mode is False for mode in metadata_modes)
+    assert graph_calls[1].args[2][0].slot_mapping[40:].tolist() == [-1] * 24
+
+
+def test_ordinary_pearl_capture_keeps_its_single_home_fia_graph():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = True
+    engine.gamma = 4
+    engine.draft_vocab_size = 128
+    engine.device = torch.device("cpu")
+    engine.precompiled_decode_batch_sizes = frozenset()
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        target_use_paged_attention=False,
+        draft_use_paged_attention=False,
+        enable_spec_rhythm=False,
+        spec_rhythm_tree_width=1,
+        spec_rhythm_tree_depth=1,
+        spec_rhythm_stable_graphs=True,
+        max_num_seqs=64,
+    )
+    engine.graph_runner = MagicMock()
+    metadata_modes = []
+
+    def metadata(indices, positions, *, use_fused_infer_attention):
+        metadata_modes.append(use_fused_infer_attention)
+        return torch.tensor(positions), SimpleNamespace(
+            use_fused_infer_attention=use_fused_infer_attention,
+        )
+
+    engine._prepare_attention_metadata = MagicMock(side_effect=metadata)
+
+    with patch("vllm_ascend.spec_decode.pearl.native_engine.dist.barrier"):
+        engine._capture_decode_graphs([[1]] * 40, [2] * 40)
+
+    graph_call = engine.graph_runner.run_draft_greedy.call_args
+    assert graph_call.args[0].shape == (32,)
+    assert graph_call.kwargs["valid_row_count"] == 32
+    assert metadata_modes == [True] * engine.gamma
+
+
+@pytest.mark.parametrize(
+    ("disable_target_graph", "expected_calls"),
+    [("1", 0), ("0", 2)],
+)
+def test_static_target_graph_precapture_respects_diagnostic_disable(
+    monkeypatch,
+    disable_target_graph,
+    expected_calls,
+):
+    monkeypatch.setenv(
+        "VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH",
+        disable_target_graph,
+    )
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.precompiled_decode_batch_sizes = frozenset()
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        target_use_paged_attention=False,
+    )
+    engine._run_device_packed_greedy = MagicMock()
+
+    with patch("vllm_ascend.spec_decode.pearl.native_engine.dist.barrier"):
+        engine._capture_decode_graphs([[1], [2]], [3, 4])
+
+    assert engine._run_device_packed_greedy.call_count == expected_calls
 
 
 def test_greedy_verdict_supports_mixed_per_request_gamma():
@@ -1843,6 +3135,12 @@ def test_direct_worker_cli_exposes_cache_capacity_controls():
             "--max-aclgraph-entries",
             "8",
             "--spec-rhythm-online-prefill",
+            "--spec-rhythm-prefill-coalesce-min-requests",
+            "2",
+            "--spec-rhythm-prefill-coalesce-max-wait-ms",
+            "600",
+            "--spec-rhythm-prefill-token-chunk-size",
+            "128",
             "--spec-rhythm-merge-ready-homes",
             "--spec-rhythm-priority-mode",
             "--spec-rhythm-priority-burst",
@@ -1862,9 +3160,13 @@ def test_direct_worker_cli_exposes_cache_capacity_controls():
     assert args.target_use_production_rope is True
     assert args.spec_rhythm_min_gamma == 1
     assert args.spec_rhythm_max_eager_tokens == 0
+    assert args.spec_rhythm_eager_reserve_tokens == 0
     assert args.spec_rhythm_tree_width == 1
     assert args.spec_rhythm_tree_depth == 1
     assert args.spec_rhythm_online_prefill is True
+    assert args.spec_rhythm_prefill_coalesce_min_requests == 2
+    assert args.spec_rhythm_prefill_coalesce_max_wait_ms == 600.0
+    assert args.spec_rhythm_prefill_token_chunk_size == 128
     assert args.spec_rhythm_merge_ready_homes is True
     assert args.spec_rhythm_priority_mode is True
     assert args.spec_rhythm_priority_burst == 3
@@ -1894,6 +3196,230 @@ def test_benchmark_cli_defaults_production_rope_with_independent_fallbacks():
     assert defaults.target_use_production_rope is True
     assert fallback.draft_use_production_rope is False
     assert fallback.target_use_production_rope is False
+
+
+def test_linear_full_window_cli_is_opt_in_across_public_entrypoints():
+    benchmark_required = [
+        "--draft-model",
+        "draft",
+        "--target-model",
+        "target",
+        "--prompt",
+        "hello",
+    ]
+    benchmark_default = _build_benchmark_parser().parse_args(benchmark_required)
+    benchmark_enabled = _build_benchmark_parser().parse_args(
+        [
+            *benchmark_required,
+            "--spec-rhythm-linear-full-window",
+            "--spec-rhythm-linear-eager-cross-graph-bucket",
+        ]
+    )
+    server_required = [
+        "--draft-model",
+        "draft",
+        "--target-model",
+        "target",
+        "--spec-rhythm-roofline",
+        "roofline.json",
+    ]
+    server_default = _build_specslo_server_parser().parse_args(server_required)
+    server_enabled = _build_specslo_server_parser().parse_args(
+        [*server_required, "--spec-rhythm-linear-full-window"]
+    )
+    with patch(
+        "sys.argv",
+        [
+            "offline_inference_nano_pearl.py",
+            "--draft-model",
+            "draft",
+            "--target-model",
+            "target",
+            "hello",
+        ],
+    ):
+        offline_default = _parse_offline_args()
+    with patch(
+        "sys.argv",
+        [
+            "offline_inference_nano_pearl.py",
+            "--draft-model",
+            "draft",
+            "--target-model",
+            "target",
+            "--spec-rhythm-linear-full-window",
+            "hello",
+        ],
+    ):
+        offline_enabled = _parse_offline_args()
+
+    assert benchmark_default.spec_rhythm_linear_full_window is False
+    assert benchmark_enabled.spec_rhythm_linear_full_window is True
+    assert benchmark_default.spec_rhythm_linear_eager_cross_graph_bucket is False
+    assert benchmark_enabled.spec_rhythm_linear_eager_cross_graph_bucket is True
+    assert server_default.spec_rhythm_linear_full_window is False
+    assert server_enabled.spec_rhythm_linear_full_window is True
+    assert offline_default.spec_rhythm_linear_full_window is False
+    assert offline_enabled.spec_rhythm_linear_full_window is True
+
+
+def test_prefill_coalescing_cli_defaults_and_values_across_online_entrypoints():
+    benchmark_required = [
+        "--draft-model",
+        "draft",
+        "--target-model",
+        "target",
+        "--prompt",
+        "hello",
+    ]
+    benchmark_default = _build_benchmark_parser().parse_args(benchmark_required)
+    benchmark_enabled = _build_benchmark_parser().parse_args(
+        [
+            *benchmark_required,
+            "--spec-rhythm-prefill-coalesce-min-requests",
+            "2",
+            "--spec-rhythm-prefill-coalesce-max-wait-ms",
+            "600",
+            "--spec-rhythm-prefill-token-chunk-size",
+            "128",
+        ]
+    )
+    server_required = [
+        "--draft-model",
+        "draft",
+        "--target-model",
+        "target",
+        "--spec-rhythm-roofline",
+        "roofline.json",
+    ]
+    server_default = _build_specslo_server_parser().parse_args(server_required)
+    server_enabled = _build_specslo_server_parser().parse_args(
+        [
+            *server_required,
+            "--prefill-coalesce-min-requests",
+            "3",
+            "--prefill-coalesce-max-wait-ms",
+            "450",
+        ]
+    )
+    native_required = [
+        "--draft-model",
+        "draft",
+        "--target-model",
+        "target",
+        "--prompt",
+        "hello",
+    ]
+    native_default = _build_parser().parse_args(native_required)
+    native_enabled = _build_parser().parse_args(
+        [
+            *native_required,
+            "--spec-rhythm-prefill-coalesce-min-requests",
+            "4",
+            "--spec-rhythm-prefill-coalesce-max-wait-ms",
+            "700",
+            "--spec-rhythm-prefill-token-chunk-size",
+            "96",
+        ]
+    )
+
+    assert benchmark_default.spec_rhythm_prefill_coalesce_min_requests == 1
+    assert benchmark_default.spec_rhythm_prefill_coalesce_max_wait_ms == 0.0
+    assert benchmark_enabled.spec_rhythm_prefill_coalesce_min_requests == 2
+    assert benchmark_enabled.spec_rhythm_prefill_coalesce_max_wait_ms == 600.0
+    assert benchmark_default.spec_rhythm_prefill_token_chunk_size == 0
+    assert benchmark_enabled.spec_rhythm_prefill_token_chunk_size == 128
+    assert server_default.prefill_coalesce_min_requests == 1
+    assert server_default.prefill_coalesce_max_wait_ms == 0.0
+    assert server_enabled.prefill_coalesce_min_requests == 3
+    assert server_enabled.prefill_coalesce_max_wait_ms == 450.0
+    assert native_default.spec_rhythm_prefill_coalesce_min_requests == 1
+    assert native_default.spec_rhythm_prefill_coalesce_max_wait_ms == 0.0
+    assert native_enabled.spec_rhythm_prefill_coalesce_min_requests == 4
+    assert native_enabled.spec_rhythm_prefill_coalesce_max_wait_ms == 700.0
+    assert native_default.spec_rhythm_prefill_token_chunk_size == 0
+    assert native_enabled.spec_rhythm_prefill_token_chunk_size == 96
+
+
+def test_serial_draft_graph_precompile_cli_is_opt_in_across_public_entrypoints():
+    benchmark_required = [
+        "--draft-model",
+        "draft",
+        "--target-model",
+        "target",
+        "--prompt",
+        "hello",
+    ]
+    benchmark_default = _build_benchmark_parser().parse_args(
+        benchmark_required
+    )
+    benchmark_enabled = _build_benchmark_parser().parse_args(
+        [*benchmark_required, "--precompile-serial-draft-graphs"]
+    )
+    server_required = [
+        "--draft-model",
+        "draft",
+        "--target-model",
+        "target",
+        "--spec-rhythm-roofline",
+        "roofline.json",
+    ]
+    server_default = _build_specslo_server_parser().parse_args(server_required)
+    server_enabled = _build_specslo_server_parser().parse_args(
+        [*server_required, "--precompile-serial-draft-graphs"]
+    )
+    native_required = [
+        "--draft-model",
+        "draft",
+        "--target-model",
+        "target",
+        "--prompt",
+        "hello",
+    ]
+    native_default = _build_parser().parse_args(native_required)
+    native_enabled = _build_parser().parse_args(
+        [*native_required, "--precompile-serial-draft-graphs"]
+    )
+    with patch(
+        "sys.argv",
+        [
+            "offline_inference_nano_pearl.py",
+            "--draft-model",
+            "draft",
+            "--target-model",
+            "target",
+            "hello",
+        ],
+    ):
+        offline_default = _parse_offline_args()
+    with patch(
+        "sys.argv",
+        [
+            "offline_inference_nano_pearl.py",
+            "--draft-model",
+            "draft",
+            "--target-model",
+            "target",
+            "--precompile-serial-draft-graphs",
+            "hello",
+        ],
+    ):
+        offline_enabled = _parse_offline_args()
+
+    for args in (
+        benchmark_default,
+        server_default,
+        native_default,
+        offline_default,
+    ):
+        assert args.precompile_serial_draft_graphs is False
+    for args in (
+        benchmark_enabled,
+        server_enabled,
+        native_enabled,
+        offline_enabled,
+    ):
+        assert args.precompile_serial_draft_graphs is True
 
 
 def test_benchmark_clis_accept_disjoint_warmup_prompt_offsets():
@@ -1951,6 +3477,7 @@ def test_public_pearl_config_maps_upstream_fields_to_native_runtime():
             enable_spec_rhythm=True,
             spec_rhythm_min_gamma=2,
             spec_rhythm_max_eager_tokens=3,
+            spec_rhythm_eager_reserve_tokens=12,
             spec_rhythm_roofline={"8:1": 24},
             spec_rhythm_draft_token_budget=32,
             spec_rhythm_tree_width=2,
@@ -1991,6 +3518,7 @@ def test_public_pearl_config_maps_upstream_fields_to_native_runtime():
     assert native.enable_spec_rhythm is True
     assert native.spec_rhythm_min_gamma == 2
     assert native.spec_rhythm_max_eager_tokens == 3
+    assert native.spec_rhythm_eager_reserve_tokens == 12
     assert native.spec_rhythm_roofline == {"8:1": 24}
     assert native.spec_rhythm_draft_token_budget == 32
     assert native.spec_rhythm_tree_width == 2
@@ -2004,6 +3532,276 @@ def test_public_pearl_config_maps_upstream_fields_to_native_runtime():
     assert native.enable_cpu_binding is False
     assert native.profile_decode_steps == 5
     assert native.profile_host_decode_steps == 7
+
+
+def test_public_pearl_config_maps_opt_in_linear_full_window_to_native_runtime():
+    model_config = SimpleNamespace(
+        architectures=["Qwen2ForCausalLM"],
+        eos_token_id=1,
+    )
+    with patch(
+        "vllm_ascend.spec_decode.pearl.api.AutoConfig.from_pretrained",
+        side_effect=[model_config, model_config],
+    ):
+        config = PEARLConfig(
+            "draft",
+            "target",
+            gamma=4,
+            enable_continuous_batching=True,
+            enable_preemptive_scheduling=True,
+            enable_spec_rhythm=True,
+            spec_rhythm_linear_full_window=True,
+            spec_rhythm_linear_eager_cross_graph_bucket=True,
+            spec_rhythm_online_prefill=True,
+            spec_rhythm_prefill_coalesce_min_requests=2,
+            spec_rhythm_prefill_coalesce_max_wait_ms=600.0,
+            spec_rhythm_prefill_token_chunk_size=128,
+            spec_rhythm_min_gamma=4,
+            spec_rhythm_tree_width=1,
+            spec_rhythm_tree_depth=1,
+            enable_prefix_caching=False,
+        )
+
+    native = config.to_native()
+    assert config.spec_rhythm_linear_full_window is True
+    assert native.spec_rhythm_linear_full_window is True
+    assert config.spec_rhythm_linear_eager_cross_graph_bucket is True
+    assert native.spec_rhythm_linear_eager_cross_graph_bucket is True
+    assert native.spec_rhythm_online_prefill is True
+    assert native.spec_rhythm_prefill_coalesce_min_requests == 2
+    assert native.spec_rhythm_prefill_coalesce_max_wait_ms == 600.0
+    assert native.spec_rhythm_prefill_token_chunk_size == 128
+
+
+@pytest.mark.parametrize(
+    "config_type",
+    [NativePearlConfig, PEARLConfig],
+)
+def test_cross_graph_bucket_linear_eager_requires_full_window(config_type):
+    common = {
+        "gamma": 4,
+        "max_num_seqs": 8,
+        "enable_continuous_batching": True,
+        "enable_preemptive_scheduling": True,
+        "enable_spec_rhythm": True,
+        "spec_rhythm_linear_eager_cross_graph_bucket": True,
+        "spec_rhythm_min_gamma": 4,
+    }
+    if config_type is NativePearlConfig:
+        with pytest.raises(ValueError, match="Cross-graph-bucket"):
+            config_type(
+                "draft",
+                "target",
+                1,
+                3,
+                max_model_len=512,
+                max_tokens=32,
+                **common,
+            )
+    else:
+        with pytest.raises(ValueError, match="Cross-graph-bucket"):
+            config_type("draft", "target", **common)
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"enable_spec_rhythm": False},
+        {"spec_rhythm_online_prefill": False},
+        {"spec_rhythm_linear_full_window": False},
+        {"spec_rhythm_tree_width": 2},
+    ],
+)
+def test_native_prefill_coalescing_rejects_other_modes(overrides):
+    values = {
+        "draft_model": "draft",
+        "target_model": "target",
+        "draft_tp_size": 1,
+        "target_tp_size": 3,
+        "gamma": 4,
+        "max_model_len": 512,
+        "max_tokens": 32,
+        "max_num_seqs": 8,
+        "enable_continuous_batching": True,
+        "enable_preemptive_scheduling": True,
+        "enable_spec_rhythm": True,
+        "spec_rhythm_linear_full_window": True,
+        "spec_rhythm_online_prefill": True,
+        "spec_rhythm_prefill_coalesce_min_requests": 2,
+        "spec_rhythm_prefill_coalesce_max_wait_ms": 600.0,
+        "spec_rhythm_min_gamma": 4,
+    }
+    values.update(overrides)
+
+    with pytest.raises(ValueError):
+        NativePearlConfig(**values)
+
+
+def test_public_prefill_coalescing_rejects_non_online_mode_before_model_load():
+    with pytest.raises(ValueError, match="prefill coalescing"):
+        PEARLConfig(
+            "draft",
+            "target",
+            gamma=4,
+            max_num_seqs=8,
+            enable_continuous_batching=True,
+            enable_preemptive_scheduling=True,
+            enable_spec_rhythm=True,
+            spec_rhythm_linear_full_window=True,
+            spec_rhythm_online_prefill=False,
+            spec_rhythm_prefill_coalesce_min_requests=2,
+            spec_rhythm_prefill_coalesce_max_wait_ms=600.0,
+            spec_rhythm_min_gamma=4,
+        )
+
+
+@pytest.mark.parametrize(
+    ("minimum", "wait_ms"),
+    [(0, 0.0), (2, 0.0), (1, 1.0), (2, -1.0), (2, float("inf"))],
+)
+def test_native_prefill_coalescing_rejects_invalid_bounds(minimum, wait_ms):
+    with pytest.raises(ValueError, match="prefill coalescing"):
+        NativePearlConfig(
+            "draft",
+            "target",
+            1,
+            3,
+            4,
+            512,
+            32,
+            max_num_seqs=8,
+            enable_continuous_batching=True,
+            enable_preemptive_scheduling=True,
+            enable_spec_rhythm=True,
+            spec_rhythm_linear_full_window=True,
+            spec_rhythm_online_prefill=True,
+            spec_rhythm_prefill_coalesce_min_requests=minimum,
+            spec_rhythm_prefill_coalesce_max_wait_ms=wait_ms,
+            spec_rhythm_min_gamma=4,
+        )
+
+
+def test_public_pearl_config_maps_serial_draft_graph_precompile_to_native_runtime():
+    model_config = SimpleNamespace(
+        architectures=["Qwen2ForCausalLM"],
+        eos_token_id=1,
+    )
+    with patch(
+        "vllm_ascend.spec_decode.pearl.api.AutoConfig.from_pretrained",
+        side_effect=[model_config, model_config],
+    ):
+        config = PEARLConfig(
+            "draft",
+            "target",
+            gamma=4,
+            max_num_seqs=8,
+            enable_continuous_batching=True,
+            enable_preemptive_scheduling=True,
+            enable_spec_rhythm=True,
+            draft_use_paged_attention=True,
+            precompile_serial_draft_graphs=True,
+        )
+
+    native = config.to_native()
+    assert config.precompile_serial_draft_graphs is True
+    assert native.precompile_serial_draft_graphs is True
+    assert native.precompile_decode_graphs is False
+
+
+@pytest.mark.parametrize(
+    "overrides",
+    [
+        {"enable_spec_rhythm": False},
+        {"spec_rhythm_min_gamma": 3},
+        {"spec_rhythm_tree_width": 2},
+        {"spec_rhythm_tree_depth": 2},
+    ],
+)
+def test_public_pearl_config_restricts_linear_full_window_to_fixed_gamma_serial_linear_path(
+    overrides,
+):
+    values = {
+        "gamma": 4,
+        "enable_continuous_batching": True,
+        "enable_preemptive_scheduling": True,
+        "enable_spec_rhythm": True,
+        "spec_rhythm_linear_full_window": True,
+        "spec_rhythm_min_gamma": 4,
+        "spec_rhythm_tree_width": 1,
+        "spec_rhythm_tree_depth": 1,
+    }
+    values.update(overrides)
+
+    with pytest.raises(ValueError, match="linear full-window"):
+        PEARLConfig("draft", "target", **values)
+
+
+def test_public_pearl_config_rejects_partial_linear_full_window_eager_cap():
+    with pytest.raises(ValueError, match="eager-token cap must be 0 or gamma"):
+        PEARLConfig(
+            "draft",
+            "target",
+            gamma=4,
+            enable_continuous_batching=True,
+            enable_preemptive_scheduling=True,
+            enable_spec_rhythm=True,
+            spec_rhythm_linear_full_window=True,
+            spec_rhythm_min_gamma=4,
+            spec_rhythm_max_eager_tokens=2,
+        )
+
+
+def test_native_pearl_config_rejects_partial_linear_full_window_eager_cap():
+    with pytest.raises(ValueError, match="eager-token cap must be 0 or gamma"):
+        NativePearlConfig(
+            "draft",
+            "target",
+            1,
+            3,
+            4,
+            512,
+            32,
+            enable_continuous_batching=True,
+            enable_preemptive_scheduling=True,
+            enable_spec_rhythm=True,
+            spec_rhythm_linear_full_window=True,
+            spec_rhythm_min_gamma=4,
+            spec_rhythm_max_eager_tokens=2,
+        )
+
+
+def test_public_pearl_config_rejects_full_window_draft_budget_below_gamma():
+    with pytest.raises(ValueError, match="draft-token budget must be at least gamma"):
+        PEARLConfig(
+            "draft",
+            "target",
+            gamma=4,
+            enable_continuous_batching=True,
+            enable_preemptive_scheduling=True,
+            enable_spec_rhythm=True,
+            spec_rhythm_linear_full_window=True,
+            spec_rhythm_min_gamma=4,
+            spec_rhythm_draft_token_budget=3,
+        )
+
+
+def test_native_pearl_config_rejects_full_window_draft_budget_below_gamma():
+    with pytest.raises(ValueError, match="draft-token budget must be at least gamma"):
+        NativePearlConfig(
+            "draft",
+            "target",
+            1,
+            3,
+            4,
+            512,
+            32,
+            enable_continuous_batching=True,
+            enable_preemptive_scheduling=True,
+            enable_spec_rhythm=True,
+            spec_rhythm_linear_full_window=True,
+            spec_rhythm_min_gamma=4,
+            spec_rhythm_draft_token_budget=3,
+        )
 
 
 def test_public_pearl_config_rejects_nonpositive_worker_timeout():
@@ -2061,6 +3859,45 @@ def test_native_graph_precompilation_requires_fixed_paged_configuration():
             target_use_paged_attention=True,
             max_aclgraph_entries=8,
         )
+
+
+def test_serial_draft_graph_precompilation_requires_stable_paged_configuration():
+    common = {
+        "draft_model": "draft",
+        "target_model": "target",
+        "draft_tp_size": 1,
+        "target_tp_size": 1,
+        "gamma": 4,
+        "max_model_len": 32,
+        "max_tokens": 8,
+        "max_num_seqs": 8,
+        "enable_continuous_batching": True,
+        "enable_preemptive_scheduling": True,
+        "enable_spec_rhythm": True,
+        "draft_use_paged_attention": True,
+        "precompile_serial_draft_graphs": True,
+    }
+
+    config = NativePearlConfig(**common)
+    assert config.precompile_serial_draft_graphs is True
+    assert config.precompile_decode_graphs is False
+
+    without_draft_paged = {**common, "draft_use_paged_attention": False}
+    with pytest.raises(ValueError, match="paged attention on the draft model"):
+        NativePearlConfig(**without_draft_paged)
+    nonserial_tree = {**common, "spec_rhythm_tree_width": 2}
+    with pytest.raises(ValueError, match="fixed-gamma stable SpecRhythm"):
+        NativePearlConfig(**nonserial_tree)
+    eager = {**common, "enforce_eager": True}
+    with pytest.raises(ValueError, match="incompatible with enforce_eager"):
+        NativePearlConfig(**eager)
+    over_capacity = {
+        **common,
+        "max_num_seqs": 64,
+        "max_aclgraph_entries": 8,
+    }
+    with pytest.raises(ValueError, match="exceeds max_aclgraph_entries"):
+        NativePearlConfig(**over_capacity)
 
 
 def test_profiling_only_continuous_results_can_include_unfinished_requests():
@@ -2164,6 +4001,39 @@ def test_public_engine_configures_decode_profiling_on_every_worker():
 
     engine._send_all.assert_called_once_with(("configure_decode_profiling", 5, True, 7))
     engine._receive_all.assert_called_once_with("worker profiling configuration")
+
+
+def test_public_engine_seals_and_unseals_graph_cache_on_every_worker():
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine._send_all = MagicMock()
+    sealed_metrics = [{"rank": 0, "aclgraph_sealed": 1}]
+    unsealed_metrics = [{"rank": 0, "aclgraph_sealed": 0}]
+    pruned_metrics = [
+        {"rank": 0, "aclgraph_pruned_unvalidated_entries": 2}
+    ]
+    engine._receive_all = MagicMock(
+        side_effect=[
+            [("graph_cache_sealed", 0, sealed_metrics[0])],
+            [("graph_cache_unsealed", 0, unsealed_metrics[0])],
+            [("graph_cache_pruned", 0, pruned_metrics[0])],
+        ]
+    )
+
+    assert engine.seal_graph_cache() == sealed_metrics
+    assert engine.unseal_graph_cache() == unsealed_metrics
+    assert engine.prune_unvalidated_graph_entries() == pruned_metrics
+
+    assert engine._send_all.call_args_list == [
+        call(("seal_graph_cache", None, None, None)),
+        call(("unseal_graph_cache", None, None, None)),
+        call(("prune_unvalidated_graph_entries", None, None, None)),
+    ]
+    assert engine._receive_all.call_args_list == [
+        call("worker graph-cache sealing"),
+        call("worker graph-cache unsealing"),
+        call("worker graph-cache pruning"),
+    ]
+    assert engine.last_worker_metrics == pruned_metrics
 
 
 def test_public_engine_publishes_live_admission_with_monotonic_epoch_sequence():
@@ -2495,25 +4365,23 @@ def test_worker_aclgraph_deltas_count_cold_measurement_without_warmup():
 
     deltas = _worker_aclgraph_deltas([], after)
 
-    assert deltas == [
-        {
-            "rank": 0,
-            "aclgraph_captures_delta": 2,
-            "aclgraph_capture_attempts_delta": 2,
-            "aclgraph_replays_delta": 7,
-            "aclgraph_failed_captures_delta": 0,
-            "aclgraph_capacity_fallbacks_delta": 0,
-            "aclgraph_shape_fallbacks_delta": 0,
-            "aclgraph_runtime_validation_replays_delta": 0,
-        }
-    ]
+    assert len(deltas) == 1
+    assert deltas[0]["rank"] == 0
+    assert deltas[0]["is_draft_rank"] == 0
+    assert deltas[0]["aclgraph_captures_delta"] == 2
+    assert deltas[0]["aclgraph_capture_attempts_delta"] == 2
+    assert deltas[0]["aclgraph_replays_delta"] == 7
+    assert deltas[0]["aclgraph_failed_captures_delta"] == 0
+    assert deltas[0]["aclgraph_runtime_validation_replays_delta"] == 0
+    assert deltas[0]["aclgraph_generic_total_calls_delta"] == 0
 
 
 def test_graph_only_benchmark_gate_accepts_active_workers_without_fallback():
     deltas = [
         {
             "rank": rank,
-            "aclgraph_captures_delta": int(rank == 0),
+            "aclgraph_captures_delta": 0,
+            "aclgraph_capture_attempts_delta": 0,
             "aclgraph_replays_delta": 4,
             "aclgraph_failed_captures_delta": 0,
             "aclgraph_capacity_fallbacks_delta": 0,
@@ -2524,7 +4392,286 @@ def test_graph_only_benchmark_gate_accepts_active_workers_without_fallback():
     _require_no_graph_fallback(deltas)
 
 
-@pytest.mark.parametrize("failure", ["fallback", "inactive"])
+def _qualification_worker_metrics(**updates):
+    metrics = {
+        "rank": 0,
+        "is_draft_rank": 0,
+        "aclgraph_entries": 1,
+        "aclgraph_generic_entries": 1,
+        "aclgraph_draft_entries": 0,
+        "aclgraph_target_entries": 0,
+        "aclgraph_unvalidated_entries": 0,
+        "aclgraph_generic_unvalidated_entries": 0,
+        "aclgraph_draft_unvalidated_entries": 0,
+        "aclgraph_target_unvalidated_entries": 0,
+        "aclgraph_disabled_entries": 0,
+        "aclgraph_captures": 1,
+        "aclgraph_capture_attempts": 1,
+        "aclgraph_replays": 2,
+        "aclgraph_failed_captures": 0,
+        "aclgraph_capacity_fallbacks": 0,
+        "aclgraph_shape_fallbacks": 0,
+        "aclgraph_runtime_validation_replays": 1,
+        "aclgraph_generic_total_calls": 2,
+        "aclgraph_generic_capture_replay_calls": 1,
+        "aclgraph_generic_replay_calls": 1,
+        "aclgraph_generic_eager_fallback_calls": 0,
+        "aclgraph_generic_disabled_entry_calls": 0,
+        "aclgraph_generic_unclassified_calls": 0,
+        "aclgraph_generic_runtime_validation_calls": 1,
+        "aclgraph_generic_runtime_validation_failures": 0,
+        "aclgraph_generic_changed_input_validation_calls": 1,
+        "aclgraph_generic_logical_row_expansion_validation_calls": 0,
+    }
+    metrics.update(updates)
+    return metrics
+
+
+def test_graph_qualification_fixed_point_requires_a_validation_free_hot_trace():
+    before = _qualification_worker_metrics()
+    complete, issues = _graph_qualification_fixed_point(
+        [before],
+        [
+            _qualification_worker_metrics(
+                aclgraph_replays=3,
+                aclgraph_generic_total_calls=3,
+                aclgraph_generic_replay_calls=2,
+            )
+        ],
+    )
+
+    assert complete
+    assert issues == []
+
+
+@pytest.mark.parametrize(
+    "updates",
+    [
+        {
+            "aclgraph_entries": 2,
+            "aclgraph_generic_entries": 2,
+            "aclgraph_captures": 2,
+            "aclgraph_capture_attempts": 2,
+        },
+        {
+            "aclgraph_unvalidated_entries": 1,
+            "aclgraph_generic_unvalidated_entries": 1,
+        },
+        {"aclgraph_disabled_entries": 1},
+        {
+            "aclgraph_shape_fallbacks": 1,
+            "aclgraph_generic_eager_fallback_calls": 1,
+        },
+        {
+            "aclgraph_replays": 3,
+            "aclgraph_runtime_validation_replays": 2,
+            "aclgraph_generic_total_calls": 3,
+            "aclgraph_generic_replay_calls": 2,
+            "aclgraph_generic_runtime_validation_calls": 2,
+            "aclgraph_generic_changed_input_validation_calls": 2,
+        },
+    ],
+)
+def test_graph_qualification_fixed_point_rejects_open_or_fallback_state(
+    updates,
+):
+    before = _qualification_worker_metrics()
+    after = _qualification_worker_metrics(**updates)
+
+    complete, issues = _graph_qualification_fixed_point([before], [after])
+
+    assert not complete
+    assert issues
+
+
+def test_graph_qualification_prunes_only_a_capture_free_stale_set():
+    before = _qualification_worker_metrics()
+    stale = _qualification_worker_metrics(
+        aclgraph_replays=3,
+        aclgraph_generic_total_calls=3,
+        aclgraph_generic_replay_calls=2,
+        aclgraph_unvalidated_entries=1,
+        aclgraph_generic_unvalidated_entries=1,
+    )
+
+    assert _graph_qualification_can_prune([before], [stale])
+    assert not _graph_qualification_can_prune(
+        [before],
+        [
+            {
+                **stale,
+                "aclgraph_entries": 2,
+                "aclgraph_generic_entries": 2,
+                "aclgraph_captures": 2,
+                "aclgraph_capture_attempts": 2,
+            }
+        ],
+    )
+    assert not _graph_qualification_can_prune(
+        [before],
+        [{**stale, "aclgraph_disabled_entries": 1}],
+    )
+
+
+def _full_window_graph_deltas(target_graph_kind="target"):
+    if target_graph_kind not in ("target", "generic"):
+        raise ValueError("Unsupported test target graph kind.")
+    common = {
+        "aclgraph_captures_delta": 0,
+        "aclgraph_capture_attempts_delta": 0,
+        "aclgraph_failed_captures_delta": 0,
+        "aclgraph_capacity_fallbacks_delta": 0,
+        "aclgraph_shape_fallbacks_delta": 0,
+        "aclgraph_runtime_validation_replays_delta": 0,
+    }
+    return [
+        {
+            **common,
+            "rank": 0,
+            "is_draft_rank": 1,
+            "aclgraph_replays_delta": 5,
+            "aclgraph_draft_total_calls_delta": 5,
+            "aclgraph_draft_replay_calls_delta": 5,
+            "spec_rhythm_linear_draft_full_chain_calls_delta": 5,
+            "spec_rhythm_linear_draft_full_chain_capture_replay_calls_delta": 0,
+            "spec_rhythm_linear_draft_full_chain_replay_calls_delta": 5,
+            "spec_rhythm_linear_draft_full_chain_eager_fallback_calls_delta": 0,
+            "spec_rhythm_linear_draft_full_chain_unclassified_calls_delta": 0,
+            "spec_rhythm_linear_draft_stepwise_calls_delta": 0,
+        },
+        {
+            **common,
+            "rank": 1,
+            "is_draft_rank": 0,
+            "aclgraph_replays_delta": 5,
+            f"aclgraph_{target_graph_kind}_total_calls_delta": 5,
+            f"aclgraph_{target_graph_kind}_replay_calls_delta": 5,
+        },
+    ]
+
+
+def test_graph_only_benchmark_gate_accepts_audited_full_window_calls():
+    _require_no_graph_fallback(
+        _full_window_graph_deltas(),
+        require_full_window=True,
+    )
+
+
+def test_graph_only_benchmark_gate_accepts_additional_graph_only_draft_calls():
+    deltas = _full_window_graph_deltas()
+    deltas[0]["aclgraph_replays_delta"] += 2
+    deltas[0]["aclgraph_draft_total_calls_delta"] += 2
+    deltas[0]["aclgraph_draft_replay_calls_delta"] += 2
+
+    _require_no_graph_fallback(
+        deltas,
+        require_full_window=True,
+    )
+
+
+def test_graph_only_benchmark_gate_can_explicitly_select_packed_target_backend():
+    _require_no_graph_fallback(
+        _full_window_graph_deltas("generic"),
+        require_full_window=True,
+        full_window_target_graph_kind="generic",
+    )
+
+
+@pytest.mark.parametrize("target_graph_kind", ["target", "generic"])
+def test_graph_only_benchmark_gate_auto_selects_one_target_backend(
+    target_graph_kind,
+):
+    _require_no_graph_fallback(
+        _full_window_graph_deltas(target_graph_kind),
+        require_full_window=True,
+        full_window_target_graph_kind="auto",
+    )
+
+
+@pytest.mark.parametrize(
+    ("rank", "counter"),
+    [
+        (0, "spec_rhythm_linear_draft_stepwise_calls_delta"),
+        (0, "aclgraph_draft_eager_fallback_calls_delta"),
+        (1, "aclgraph_target_unclassified_calls_delta"),
+        (1, "aclgraph_target_runtime_validation_calls_delta"),
+        (1, "aclgraph_target_changed_input_validation_calls_delta"),
+        (1, "aclgraph_target_logical_row_expansion_validation_calls_delta"),
+    ],
+)
+def test_graph_only_benchmark_gate_rejects_non_replay_full_window_calls(
+    rank,
+    counter,
+):
+    deltas = _full_window_graph_deltas()
+    deltas[rank][counter] = 1
+    if counter == "aclgraph_draft_eager_fallback_calls_delta":
+        deltas[rank]["aclgraph_draft_replay_calls_delta"] -= 1
+    elif counter == "aclgraph_target_unclassified_calls_delta":
+        deltas[rank]["aclgraph_target_replay_calls_delta"] -= 1
+    with pytest.raises(RuntimeError, match="Graph-only benchmark invariant failed"):
+        _require_no_graph_fallback(deltas, require_full_window=True)
+
+
+def test_graph_only_benchmark_gate_rejects_target_calls_not_equal_to_replays():
+    deltas = _full_window_graph_deltas()
+    deltas[1]["aclgraph_target_replay_calls_delta"] -= 1
+
+    with pytest.raises(RuntimeError, match="Graph-only benchmark invariant failed"):
+        _require_no_graph_fallback(deltas, require_full_window=True)
+
+
+@pytest.mark.parametrize(
+    "target_graph_kind",
+    ["target", "generic"],
+)
+def test_graph_only_benchmark_gate_rejects_mixed_target_backends(
+    target_graph_kind,
+):
+    deltas = _full_window_graph_deltas(target_graph_kind)
+    other_kind = "generic" if target_graph_kind == "target" else "target"
+    deltas[1][f"aclgraph_{other_kind}_total_calls_delta"] = 1
+    deltas[1][f"aclgraph_{other_kind}_replay_calls_delta"] = 1
+    deltas[1]["aclgraph_replays_delta"] += 1
+
+    with pytest.raises(RuntimeError, match="Graph-only benchmark invariant failed"):
+        _require_no_graph_fallback(
+            deltas,
+            require_full_window=True,
+            full_window_target_graph_kind="auto",
+        )
+
+
+def test_graph_only_benchmark_gate_rejects_wrong_explicit_target_backend():
+    with pytest.raises(RuntimeError, match="Graph-only benchmark invariant failed"):
+        _require_no_graph_fallback(
+            _full_window_graph_deltas("target"),
+            require_full_window=True,
+            full_window_target_graph_kind="generic",
+        )
+
+
+def test_graph_only_benchmark_gate_rejects_measured_runtime_validation():
+    deltas = _full_window_graph_deltas()
+    deltas[1]["aclgraph_runtime_validation_replays_delta"] = 1
+
+    with pytest.raises(RuntimeError, match="Graph-only benchmark invariant failed"):
+        _require_no_graph_fallback(deltas, require_full_window=True)
+
+
+def test_graph_only_benchmark_gate_rejects_unknown_target_backend():
+    with pytest.raises(
+        ValueError,
+        match="full_window_target_graph_kind must be auto, target, or generic",
+    ):
+        _require_no_graph_fallback(
+            _full_window_graph_deltas(),
+            require_full_window=True,
+            full_window_target_graph_kind="tree",
+        )
+
+
+@pytest.mark.parametrize("failure", ["fallback", "capture", "inactive"])
 def test_graph_only_benchmark_gate_rejects_any_rank_without_graph_contract(failure):
     delta = {
         "rank": 2,
@@ -2536,6 +4683,8 @@ def test_graph_only_benchmark_gate_rejects_any_rank_without_graph_contract(failu
     }
     if failure == "fallback":
         delta["aclgraph_shape_fallbacks_delta"] = 1
+    elif failure == "capture":
+        delta["aclgraph_capture_attempts_delta"] = 1
     else:
         delta["aclgraph_replays_delta"] = 0
     with pytest.raises(RuntimeError, match="Graph-only benchmark invariant failed"):
@@ -2703,6 +4852,149 @@ def test_native_aclgraph_releases_target_graph_resources_and_reopens_resident_ca
     assert runner.replay_count == 20
 
 
+def test_native_aclgraph_qualification_status_and_seal_require_every_entry():
+    with patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream"):
+        runner = NativeACLGraphRunner(MagicMock(), enabled=True)
+    runner.entries[("generic", 1)] = SimpleNamespace(runtime_validated=True)
+    runner.draft_entries[("draft", 1)] = SimpleNamespace(runtime_validated=False)
+    runner.target_entries[("target", (1,))] = SimpleNamespace(
+        runtime_validated=True
+    )
+
+    status = runner.graph_qualification_status()
+
+    assert status == {
+        "generic_entries": 1,
+        "draft_entries": 1,
+        "target_entries": 1,
+        "generic_unvalidated_entries": 0,
+        "draft_unvalidated_entries": 1,
+        "target_unvalidated_entries": 0,
+        "unvalidated_entries": 1,
+        "disabled_entries": 0,
+        "generic_pruned_unvalidated_entries": 0,
+        "draft_pruned_unvalidated_entries": 0,
+        "target_pruned_unvalidated_entries": 0,
+        "pruned_unvalidated_entries": 0,
+        "sealed": 0,
+    }
+    with pytest.raises(RuntimeError, match="unqualified resident entries"):
+        runner.seal_graph_cache()
+
+    runner.draft_entries[("draft", 1)].runtime_validated = True
+    sealed = runner.seal_graph_cache()
+    assert sealed["sealed"] == 1
+    assert runner.unseal_graph_cache()["sealed"] == 0
+
+
+def test_native_aclgraph_seal_rejects_disabled_entries():
+    with patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream"):
+        runner = NativeACLGraphRunner(MagicMock(), enabled=True)
+    runner.disabled_entry_keys.add(("greedy:8", 1))
+
+    with pytest.raises(RuntimeError, match="containing disabled entries"):
+        runner.seal_graph_cache()
+
+
+def test_native_aclgraph_prunes_only_unvalidated_entries_and_reopens_capacity():
+    with patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream"):
+        runner = NativeACLGraphRunner(MagicMock(), enabled=True)
+    retained = SimpleNamespace(runtime_validated=True, graph=MagicMock())
+    generic_stale = SimpleNamespace(runtime_validated=False, graph=MagicMock())
+    draft_stale = SimpleNamespace(runtime_validated=False, graph=MagicMock())
+    target_stale = SimpleNamespace(runtime_validated=False, graph=MagicMock())
+    runner.entries[("retained", 1)] = retained
+    runner.entries[("generic-stale", 1)] = generic_stale
+    runner.draft_entries[("draft-stale", 1)] = draft_stale
+    runner.target_entries[("target-stale", (1,))] = target_stale
+    runner._capture_budget_used = 4
+
+    with patch(
+        "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.synchronize"
+    ) as synchronize:
+        status = runner.prune_unvalidated_graph_entries()
+
+    synchronize.assert_called_once_with()
+    retained.graph.reset.assert_not_called()
+    for entry in (generic_stale, draft_stale, target_stale):
+        entry.graph.reset.assert_called_once_with()
+    assert list(runner.entries) == [("retained", 1)]
+    assert not runner.draft_entries
+    assert not runner.target_entries
+    assert runner._capture_budget_used == 1
+    assert status["unvalidated_entries"] == 0
+    assert status["pruned_unvalidated_entries"] == 3
+    assert status["generic_pruned_unvalidated_entries"] == 1
+    assert status["draft_pruned_unvalidated_entries"] == 1
+    assert status["target_pruned_unvalidated_entries"] == 1
+
+
+def test_sealed_native_aclgraph_refuses_missing_generic_entry_before_capture():
+    model = MagicMock()
+    metadata = SimpleNamespace(
+        slot_mapping=torch.tensor([0], dtype=torch.int32),
+        context_lens=torch.tensor([1], dtype=torch.int32),
+        block_tables=torch.tensor([[0]], dtype=torch.int32),
+        actual_seq_lengths_q=(),
+        sequence_lens=(),
+        request_block_tables=None,
+        attention_mask=None,
+        use_fused_infer_attention=False,
+    )
+    with patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream"):
+        runner = NativeACLGraphRunner(model, enabled=True)
+    runner.graph_cache_sealed = True
+
+    with pytest.raises(RuntimeError, match="reason=missing_entry"):
+        runner.run_greedy(
+            torch.tensor([1]),
+            torch.tensor([0]),
+            metadata,
+            vocabulary_size=8,
+        )
+
+    assert runner.capture_attempt_count == 0
+    assert runner.execution_counters["generic"]["total_calls"] == 0
+    model.assert_not_called()
+
+
+def test_sealed_native_aclgraph_refuses_generic_logical_row_expansion():
+    metadata = SimpleNamespace(
+        slot_mapping=torch.tensor([0, 1, 2], dtype=torch.int32),
+        context_lens=torch.tensor([1, 1, 1], dtype=torch.int32),
+        block_tables=torch.zeros((3, 1), dtype=torch.int32),
+        actual_seq_lengths_q=(),
+        sequence_lens=(),
+        request_block_tables=None,
+        attention_mask=None,
+        use_fused_infer_attention=False,
+    )
+    with patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream"):
+        runner = NativeACLGraphRunner(MagicMock(), enabled=True)
+    runner.entries[("greedy:8", 4)] = SimpleNamespace(
+        input_ids=torch.zeros(4, dtype=torch.long),
+        positions=torch.zeros(4, dtype=torch.long),
+        slot_mapping=torch.full((4,), -1, dtype=torch.int32),
+        context_lens=torch.zeros(4, dtype=torch.int32),
+        block_tables=torch.zeros((4, 1), dtype=torch.int32),
+        request_block_tables=None,
+        attention_mask=None,
+        actual_seq_lengths_q=(),
+        sequence_lens=(),
+        runtime_validated=True,
+        validated_real_row_count=2,
+    )
+    runner.graph_cache_sealed = True
+
+    with pytest.raises(RuntimeError, match="reason=logical_row_expansion"):
+        runner.run_greedy(
+            torch.tensor([1, 2, 3]),
+            torch.tensor([0, 0, 0]),
+            metadata,
+            vocabulary_size=8,
+        )
+
+
 def test_native_aclgraph_replay_orders_task_updates_without_host_sync():
     model = MagicMock()
     metadata = SimpleNamespace(
@@ -2744,26 +5036,198 @@ def test_native_aclgraph_replay_orders_task_updates_without_host_sync():
     entry.graph.replay.assert_called_once_with()
 
 
-def test_native_aclgraph_greedy_validation_accepts_only_sparse_graph_divergence():
+def test_native_aclgraph_first_changed_generic_input_is_runtime_validated():
+    model = MagicMock()
+    update_stream = MagicMock()
+    current_stream = MagicMock()
+    metadata = SimpleNamespace(
+        slot_mapping=torch.tensor([0], dtype=torch.int32),
+        context_lens=torch.tensor([1], dtype=torch.int32),
+        block_tables=torch.tensor([[0]], dtype=torch.int32),
+        actual_seq_lengths_q=(),
+        sequence_lens=(),
+        request_block_tables=None,
+        attention_mask=None,
+        use_fused_infer_attention=False,
+    )
+    with patch(
+        "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream",
+        return_value=update_stream,
+    ):
+        runner = NativeACLGraphRunner(model, enabled=True)
+    entry = SimpleNamespace(
+        input_ids=torch.tensor([1]),
+        positions=torch.tensor([0]),
+        slot_mapping=metadata.slot_mapping.clone(),
+        context_lens=metadata.context_lens.clone(),
+        block_tables=metadata.block_tables.clone(),
+        request_block_tables=None,
+        attention_mask=None,
+        actual_seq_lengths_q=(),
+        sequence_lens=(),
+        graph=MagicMock(),
+        output=torch.tensor([7]),
+        tasks=[],
+        runtime_validated=False,
+        validated_real_row_count=1,
+    )
+    runner.entries[("greedy:8", 1)] = entry
+    runner._execute = MagicMock(return_value=torch.tensor([7]))
+    runner._update_attention_tasks = MagicMock()
+    with (
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.current_stream",
+            return_value=current_stream,
+        ),
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.synchronize"),
+    ):
+        output = runner.run_greedy(
+            torch.tensor([2]),
+            torch.tensor([0]),
+            metadata,
+            vocabulary_size=8,
+        )
+
+    assert output.tolist() == [7]
+    assert entry.runtime_validated
+    assert runner.runtime_validation_replay_count == 1
+    counters = runner.execution_counters["generic"]
+    assert counters["total_calls"] == 1
+    assert counters["replay_calls"] == 1
+    assert counters["runtime_validation_calls"] == 1
+    assert counters["changed_input_validation_calls"] == 1
+
+
+def test_generic_graph_capture_tracks_logical_rows_not_bucket_size():
+    update_stream = MagicMock()
+    current_stream = MagicMock()
+    with patch(
+        "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream",
+        return_value=update_stream,
+    ):
+        runner = NativeACLGraphRunner(MagicMock(), enabled=True)
+    runner._execute = MagicMock(
+        side_effect=[torch.tensor([7, 8, 0, 0]), torch.tensor([7, 8, 0, 0])]
+    )
+    runner._update_attention_tasks = MagicMock()
+    metadata = SimpleNamespace(
+        slot_mapping=torch.tensor([0, 1, -1, -1], dtype=torch.int32),
+        context_lens=torch.tensor([1, 1, 0, 0], dtype=torch.int32),
+        block_tables=torch.zeros((4, 1), dtype=torch.int32),
+        actual_seq_lengths_q=(),
+        sequence_lens=(),
+        request_block_tables=None,
+        attention_mask=None,
+        use_fused_infer_attention=False,
+    )
+    with (
+        patch("torch.npu.NPUGraph", return_value=MagicMock()),
+        patch("torch.npu.graph", return_value=MagicMock()),
+        patch("torch.npu.current_stream", return_value=current_stream),
+        patch("torch.npu.synchronize"),
+    ):
+        runner._capture(
+            ("greedy:8", 4),
+            torch.tensor([1, 2, 0, 0]),
+            torch.tensor([0, 0, 0, 0]),
+            metadata,
+            None,
+            valid_row_count=2,
+        )
+
+    entry = runner.entries[("greedy:8", 4)]
+    assert entry.validated_real_row_count == 2
+    assert not entry.runtime_validated
+
+
+def test_native_aclgraph_greedy_validation_requires_exact_integer_output():
     reference = torch.arange(128)
     sparse = reference.clone()
     sparse[:7] = -1
     dense = sparse.clone()
     dense[7] = -1
 
-    assert NativeACLGraphRunner._outputs_match(sparse, reference)
+    assert NativeACLGraphRunner._outputs_match(reference.clone(), reference)
+    assert not NativeACLGraphRunner._outputs_match(sparse, reference)
     assert not NativeACLGraphRunner._outputs_match(dense, reference)
 
 
-def test_native_aclgraph_greedy_validation_rejects_multiple_small_batch_mismatches():
+def test_native_aclgraph_greedy_validation_rejects_any_small_batch_mismatch():
     reference = torch.arange(16)
     one_mismatch = reference.clone()
     one_mismatch[0] = -1
     two_mismatches = one_mismatch.clone()
     two_mismatches[1] = -1
 
-    assert NativeACLGraphRunner._outputs_match(one_mismatch, reference)
+    assert not NativeACLGraphRunner._outputs_match(one_mismatch, reference)
     assert not NativeACLGraphRunner._outputs_match(two_mismatches, reference)
+
+
+def test_draft_aclgraph_validation_ignores_only_consistent_padding_rows():
+    reference = torch.arange(16, dtype=torch.long).reshape(4, 4)
+    graph = reference.clone()
+    graph[2:] = -1
+    metadatas = [
+        SimpleNamespace(slot_mapping=torch.tensor([10, 11, -1, -1]))
+        for _ in range(4)
+    ]
+
+    assert NativeACLGraphRunner._draft_outputs_match(
+        graph,
+        reference,
+        metadatas,
+        valid_row_count=2,
+    )
+
+    graph[1, 3] = -1
+    assert not NativeACLGraphRunner._draft_outputs_match(
+        graph,
+        reference,
+        metadatas,
+        valid_row_count=2,
+    )
+
+
+@pytest.mark.parametrize(
+    "bad_slot_mapping",
+    [
+        # A true logical row is consistently lost in every proposal step.
+        torch.tensor([10, -1, -1, -1]),
+        # The valid set contains a hole and is not the declared prefix.
+        torch.tensor([10, -1, 12, -1]),
+        # A graph-padding row is incorrectly materialized.
+        torch.tensor([10, 11, 12, -1]),
+    ],
+)
+def test_draft_aclgraph_validation_rejects_noncanonical_slot_prefix(
+    bad_slot_mapping,
+):
+    reference = torch.arange(16, dtype=torch.long).reshape(4, 4)
+    metadatas = [SimpleNamespace(slot_mapping=bad_slot_mapping) for _ in range(4)]
+
+    assert not NativeACLGraphRunner._draft_outputs_match(
+        reference,
+        reference,
+        metadatas,
+        valid_row_count=2,
+    )
+
+
+def test_draft_aclgraph_validation_rejects_any_real_row_difference():
+    reference = torch.arange(16, dtype=torch.long).reshape(4, 4)
+    graph = reference.clone()
+    graph[0, 0] = -1
+    metadatas = [
+        SimpleNamespace(slot_mapping=torch.tensor([10, 11, -1, -1]))
+        for _ in range(4)
+    ]
+
+    assert not NativeACLGraphRunner._draft_outputs_match(
+        graph,
+        reference,
+        metadatas,
+        valid_row_count=2,
+    )
 
 
 def test_native_aclgraph_skips_dynamic_fia_tail_without_spending_capture_budget():

@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 import argparse
+import math
 from collections.abc import Sequence
 
 
@@ -21,7 +22,16 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--tree-width", type=int, default=2)
     parser.add_argument("--tree-depth", type=int, default=2)
     parser.add_argument("--min-gamma", type=int, default=1)
+    parser.add_argument(
+        "--spec-rhythm-linear-full-window",
+        action="store_true",
+        help=(
+            "Use the independent full-window protocol for fixed-gamma serial "
+            "linear SpecRhythm (requires --min-gamma == --gamma and tree 1x1)."
+        ),
+    )
     parser.add_argument("--max-eager-tokens", type=int, default=4)
+    parser.add_argument("--eager-reserve-tokens", type=int, default=0)
     parser.add_argument("--max-model-len", type=int, default=4096)
     parser.add_argument("--max-num-seqs", type=int, default=64)
     parser.add_argument("--max-num-queued-seqs", type=int, default=256)
@@ -55,6 +65,14 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--disable-cpu-binding", action="store_true")
     parser.add_argument("--precompile-decode-graphs", action="store_true")
     parser.add_argument(
+        "--precompile-serial-draft-graphs",
+        action="store_true",
+        help=(
+            "Precompile and changed-input qualify only fixed-gamma serial "
+            "draft graphs; keep target verification graphs lazy."
+        ),
+    )
+    parser.add_argument(
         "--stable-graphs",
         action=argparse.BooleanOptionalAction,
         default=True,
@@ -63,6 +81,18 @@ def _build_parser() -> argparse.ArgumentParser:
         "--online-prefill",
         action=argparse.BooleanOptionalAction,
         default=True,
+    )
+    parser.add_argument(
+        "--prefill-coalesce-min-requests",
+        type=int,
+        default=1,
+        help="Minimum arrived requests for bounded fixed-serial online prefill coalescing.",
+    )
+    parser.add_argument(
+        "--prefill-coalesce-max-wait-ms",
+        type=float,
+        default=0.0,
+        help="Maximum fixed-serial online prefill coalescing wait in milliseconds.",
     )
     parser.add_argument(
         "--slo-priority",
@@ -78,6 +108,15 @@ def main(argv: Sequence[str] | None = None) -> None:
         raise ValueError("--max-num-queued-seqs must be at least --max-num-seqs")
     if args.prefill_chunk_size > args.max_num_queued_seqs:
         raise ValueError("--prefill-chunk-size must fit --max-num-queued-seqs")
+    if args.prefill_coalesce_min_requests <= 0:
+        raise ValueError("--prefill-coalesce-min-requests must be positive")
+    if (
+        not math.isfinite(args.prefill_coalesce_max_wait_ms)
+        or args.prefill_coalesce_max_wait_ms < 0
+    ):
+        raise ValueError(
+            "--prefill-coalesce-max-wait-ms must be finite and non-negative"
+        )
     if args.http_max_batch_size is not None and args.http_max_batch_size > args.max_num_queued_seqs:
         raise ValueError("--http-max-batch-size must fit --max-num-queued-seqs")
 
@@ -108,13 +147,21 @@ def main(argv: Sequence[str] | None = None) -> None:
         enable_continuous_batching=True,
         enable_preemptive_scheduling=True,
         enable_spec_rhythm=True,
+        spec_rhythm_linear_full_window=args.spec_rhythm_linear_full_window,
         spec_rhythm_online_prefill=args.online_prefill,
+        spec_rhythm_prefill_coalesce_min_requests=(
+            args.prefill_coalesce_min_requests
+        ),
+        spec_rhythm_prefill_coalesce_max_wait_ms=(
+            args.prefill_coalesce_max_wait_ms
+        ),
         spec_rhythm_priority_mode=args.slo_priority,
         spec_rhythm_priority_burst=args.priority_burst,
         spec_rhythm_target_fallback_max_batch=args.target_fallback_max_batch,
         spec_rhythm_max_target_batch=args.max_target_batch,
         spec_rhythm_min_gamma=args.min_gamma,
         spec_rhythm_max_eager_tokens=args.max_eager_tokens,
+        spec_rhythm_eager_reserve_tokens=args.eager_reserve_tokens,
         spec_rhythm_urgency_threshold=args.urgency_threshold,
         spec_rhythm_acceptance_floor=args.acceptance_floor,
         spec_rhythm_acceptance_ema_alpha=args.acceptance_ema_alpha,
@@ -125,6 +172,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         draft_use_paged_attention=args.draft_use_paged_attention,
         target_use_paged_attention=args.target_use_paged_attention,
         precompile_decode_graphs=args.precompile_decode_graphs,
+        precompile_serial_draft_graphs=args.precompile_serial_draft_graphs,
         enable_cpu_binding=not args.disable_cpu_binding,
         enforce_eager=args.enforce_eager,
         enable_mc2=args.enable_mc2,

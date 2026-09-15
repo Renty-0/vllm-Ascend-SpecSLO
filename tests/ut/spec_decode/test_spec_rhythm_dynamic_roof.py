@@ -402,6 +402,7 @@ def test_native_linear_loop_uses_actual_counts_and_shared_committed_context(monk
     engine.device = torch.device("cpu")
     engine.rank = 0 if is_draft else 1
     engine.topology = SimpleNamespace(target_leader_rank=1)
+    engine.eos_token_ids = frozenset()
     engine.config = NativePearlConfig(
         "fixture-draft",
         "fixture-target",
@@ -410,6 +411,7 @@ def test_native_linear_loop_uses_actual_counts_and_shared_committed_context(monk
         8,
         1024,
         5,
+        max_num_seqs=2,
         spec_rhythm_roofline={"2:1": 8, "2:2": 1},
     )
     # Target has 512 tokens while draft has 513. Neither unverified suffix may
@@ -454,7 +456,15 @@ def test_native_linear_loop_uses_actual_counts_and_shared_committed_context(monk
 
     original_bound = engine._bound_spec_rhythm_linear_ready
 
-    def inject_prior_ready(controller, payloads, local_states, active, roof):
+    def inject_prior_ready(
+        controller,
+        payloads,
+        local_states,
+        active,
+        roof,
+        *,
+        full_window=False,
+    ):
         for index in active:
             controller.request_states[index].home_batch_id = 0
             ticket = controller.new_ticket(index, gamma=1, eager=False)
@@ -467,7 +477,14 @@ def test_native_linear_loop_uses_actual_counts_and_shared_committed_context(monk
                 0.8,
             )
         recorded["roof"] = roof
-        return original_bound(controller, payloads, local_states, active, roof)
+        return original_bound(
+            controller,
+            payloads,
+            local_states,
+            active,
+            roof,
+            full_window=full_window,
+        )
 
     engine._bound_spec_rhythm_linear_ready = inject_prior_ready
     monkeypatch.setattr(native, "SpecRhythmPipelineController", controller_factory)

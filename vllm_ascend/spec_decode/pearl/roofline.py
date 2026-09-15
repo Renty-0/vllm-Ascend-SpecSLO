@@ -15,7 +15,7 @@ from typing import Any
 
 STRICT_ROOFLINE_SCHEMA_VERSION = 3
 TREE_FIA_SPARSE_MODE = 1
-TREE_FIA_INNER_PRECISE = 2
+TREE_FIA_INNER_PRECISE = 1
 _ROOFLINE_SOURCE_FILES = {
     "native_engine_source_sha256": "native_engine.py",
     "native_model_source_sha256": "native_model.py",

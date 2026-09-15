@@ -132,7 +132,7 @@ def test_metadata_names_real_detected_hardware_and_exact_timing_contract():
     assert "greedy_output_head" in metadata["timing_includes"]
     assert {key: metadata[key] for key in runtime_source_fingerprints()} == runtime_source_fingerprints()
     assert metadata["tree_fia_sparse_mode"] == 1
-    assert metadata["tree_fia_inner_precise"] == 2
+    assert metadata["tree_fia_inner_precise"] == 1
     assert "verification_attention_backends" not in metadata  # Actual route has not yet been observed.
 
 

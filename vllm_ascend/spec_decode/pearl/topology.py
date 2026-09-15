@@ -106,6 +106,7 @@ class PearlProcessGroups:
     target_group: dist.ProcessGroup
     verification_group: dist.ProcessGroup
     correction_group: dist.ProcessGroup
+    verification_coordination_group: dist.ProcessGroup
 
     @classmethod
     def create(cls, topology: PearlTopology, backend: str | None = None) -> PearlProcessGroups:
@@ -133,6 +134,16 @@ class PearlProcessGroups:
         target_group = dist.new_group(ranks=list(topology.target_ranks), backend=selected_backend)
         verification_group = dist.new_group(ranks=list(topology.verification_ranks), backend=selected_backend)
         correction_group = dist.new_group(ranks=list(topology.correction_ranks), backend=selected_backend)
+        # HCCL collectives from an overlapping process group must not be
+        # submitted while target TP all-reduces are still in flight.  A tiny
+        # host-side rendezvous lets every verification rank announce that its
+        # local model stream is complete without consuming an NPU/HCCL stream
+        # itself.  This is particularly important for TP3 stepwise target
+        # verification, where target compute can outlive the draft chain.
+        verification_coordination_group = dist.new_group(
+            ranks=list(topology.verification_ranks),
+            backend="gloo",
+        )
 
         return cls(
             topology=topology,
@@ -141,6 +152,7 @@ class PearlProcessGroups:
             target_group=target_group,
             verification_group=verification_group,
             correction_group=correction_group,
+            verification_coordination_group=verification_coordination_group,
         )
 
     @property

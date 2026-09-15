@@ -757,13 +757,20 @@ class NativeAttention(nn.Module):
 
     def _fused_infer_attention(self, query: torch.Tensor, metadata: NativeAttentionMetadata) -> torch.Tensor:
         assert self.key_cache is not None and self.value_cache is not None
-        assert metadata.request_block_tables is not None and metadata.attention_mask is not None
+        assert metadata.request_block_tables is not None
+        attention_mask = (
+            metadata.tree_attention_mask
+            if metadata.tree_attention
+            else metadata.attention_mask
+        )
+        if attention_mask is None:
+            raise RuntimeError("Fused infer attention requires its selected mask")
         attended = torch.empty_like(query)
         run_native_fused_infer_attention(
             query=query,
             key_cache=self.key_cache.view(self.key_cache.shape[0], self.block_size, -1),
             value_cache=self.value_cache.view(self.value_cache.shape[0], self.block_size, -1),
-            attention_mask=metadata.tree_attention_mask if metadata.tree_attention else metadata.attention_mask,
+            attention_mask=attention_mask,
             block_table=metadata.request_block_tables,
             block_size=self.block_size,
             actual_seq_lengths_q=list(metadata.actual_seq_lengths_q),
@@ -1154,16 +1161,17 @@ class NativeQwen2ForCausalLM(nn.Module):
         The target model writes all K/V entries into unique physical cache
         positions while RoPE receives the logical depth positions.  The
         request-local mask is indexed by physical slots, so sibling branches
-        cannot read one another. NPU uses the production FULL-mask FIA
-        contract; the 2-D mask remains available for the independent dense
+        cannot read one another. NPU uses only the production FULL-mask FIA
+        contract; the CPU path retains the 2-D mask for its independent dense
         reference. Linear PEARL keeps its causal FIA contract unchanged.
         """
         if not plans or len(plans) != len(root_token_ids) or len(plans) != len(draft_token_ids):
             raise ValueError("tree plans, root tokens and draft rows must have equal non-zero length")
+        device = self.embed_tokens.weight.device
         if isinstance(block_tables, torch.Tensor):
-            physical_tables = block_tables.to(device=self.embed_tokens.weight.device, dtype=torch.int32)
+            physical_tables = block_tables.to(device=device, dtype=torch.int32)
         else:
-            physical_tables = torch.tensor(block_tables, dtype=torch.int32, device=self.embed_tokens.weight.device)
+            physical_tables = torch.tensor(block_tables, dtype=torch.int32, device=device)
         request_ids = list(range(len(plans))) if sequence_ids is None else [int(value) for value in sequence_ids]
         if len(request_ids) != len(plans) or len(set(request_ids)) != len(request_ids):
             raise ValueError("tree sequence IDs must be unique and row-aligned")
@@ -1203,13 +1211,21 @@ class NativeQwen2ForCausalLM(nn.Module):
             mask = plan.attention_mask
             if tuple(mask.shape) != (expected_nodes + 1, self.max_model_len):
                 raise ValueError("tree attention mask shape does not match its plan")
-            mask_rows.append(mask.to(device=self.embed_tokens.weight.device, dtype=torch.bool))
+            # Production FULL-tree FIA consumes only the request-major 4-D
+            # mask.  Keep CPU plans on CPU while packing so a batch performs
+            # one H2D mask transfer instead of one transfer per request plus
+            # a duplicate 2-D NPU concatenation.  The dense CPU oracle keeps
+            # its original 2-D mask below.
+            mask_rows.append(
+                mask
+                if device.type == "npu" and attention.uses_paged_attention
+                else mask.to(device=device, dtype=torch.bool)
+            )
             query_lengths.append(expected_nodes + 1)
             sequence_lens.append(max(cache_positions) + 1)
             all_linear = all_linear and _is_contiguous_linear_tree_plan(plan)
         if any(position >= self.max_model_len for position in physical_positions):
             raise ValueError("tree cache position exceeds max_model_len")
-        device = self.embed_tokens.weight.device
         if device.type == "npu" and attention.uses_paged_attention and all_linear:
             # Before the first sibling is selected, a tree is exactly one
             # contiguous causal chain per request. Reuse the ordinary TND FIA
@@ -1238,9 +1254,22 @@ class NativeQwen2ForCausalLM(nn.Module):
         cumulative: list[int] = []
         for length in query_lengths:
             cumulative.append((cumulative[-1] if cumulative else 0) + length)
-        token_tables = physical_tables.index_select(0, sequence_tensor)
         request_tensor = torch.tensor(request_ids, dtype=torch.long, device=device)
-        tree_mask = torch.cat(mask_rows, dim=0)
+        request_tables = physical_tables.index_select(0, request_tensor)
+        use_fused_tree_attention = device.type == "npu" and attention.uses_paged_attention
+        if use_fused_tree_attention:
+            tree_mask = None
+            tree_fia_mask = make_tree_fia_mask(mask_rows).to(
+                device=device,
+                dtype=torch.bool,
+            )
+            # FIA indexes one block-table row per request.  As in the linear
+            # FIA path, token-major tables are not read by the operator.
+            token_tables = request_tables
+        else:
+            tree_mask = torch.cat(mask_rows, dim=0)
+            tree_fia_mask = make_tree_fia_mask(mask_rows)
+            token_tables = physical_tables.index_select(0, sequence_tensor)
         metadata = NativeAttentionMetadata(
             slot_mapping=slot_mapping.to(torch.int32),
             # Dense tree attention reads this vector on the host to choose the
@@ -1254,11 +1283,11 @@ class NativeQwen2ForCausalLM(nn.Module):
             block_tables=token_tables,
             actual_seq_lengths_q=tuple(cumulative),
             sequence_lens=tuple(sequence_lens),
-            request_block_tables=physical_tables.index_select(0, request_tensor),
+            request_block_tables=request_tables,
             attention_mask=tree_mask,
-            use_fused_infer_attention=device.type == "npu" and attention.uses_paged_attention,
+            use_fused_infer_attention=use_fused_tree_attention,
             tree_attention=True,
-            tree_attention_mask=make_tree_fia_mask(mask_rows),
+            tree_attention_mask=tree_fia_mask,
         )
         return torch.tensor(input_ids, dtype=torch.long, device=device), position_tensor, metadata
 
@@ -1309,24 +1338,41 @@ class NativeQwen2ForCausalLM(nn.Module):
         position_tensor = torch.tensor(logical_positions, dtype=torch.long, device=device)
         physical_position_tensor = torch.tensor(physical_positions, dtype=torch.long, device=device)
         slot_mapping = physical_blocks * attention.block_size + physical_position_tensor.remainder(attention.block_size)
+        use_fused_tree_attention = device.type == "npu" and attention.uses_paged_attention
         mask_rows = []
         for index in indices:
             row = plan.attention_mask[index + 1 if index >= 0 else 0]
-            mask_rows.append(row.to(device=device, dtype=torch.bool))
+            mask_rows.append(
+                row
+                if use_fused_tree_attention
+                else row.to(device=device, dtype=torch.bool)
+            )
+        level_mask = torch.stack(mask_rows)
+        if use_fused_tree_attention:
+            attention_mask = None
+            tree_attention_mask = level_mask.unsqueeze(0).unsqueeze(0).to(
+                device=device,
+                dtype=torch.bool,
+            )
+            token_tables = physical_tables[int(sequence_id) : int(sequence_id) + 1]
+        else:
+            attention_mask = level_mask
+            tree_attention_mask = make_tree_fia_mask([level_mask])
+            token_tables = physical_tables[int(sequence_id)].expand(len(indices), -1)
         metadata = NativeAttentionMetadata(
             slot_mapping=slot_mapping.to(torch.int32),
             context_lens=torch.tensor(
                 [int(value) + 1 for value in physical_positions],
                 dtype=torch.int32,
             ),
-            block_tables=physical_tables[int(sequence_id)].expand(len(indices), -1),
+            block_tables=token_tables,
             actual_seq_lengths_q=(len(indices),),
             sequence_lens=(max(physical_positions) + 1,),
             request_block_tables=physical_tables[int(sequence_id) : int(sequence_id) + 1],
-            attention_mask=torch.stack(mask_rows),
-            use_fused_infer_attention=device.type == "npu" and attention.uses_paged_attention,
+            attention_mask=attention_mask,
+            use_fused_infer_attention=use_fused_tree_attention,
             tree_attention=True,
-            tree_attention_mask=make_tree_fia_mask([torch.stack(mask_rows)]),
+            tree_attention_mask=tree_attention_mask,
         )
         return torch.tensor(token_ids, dtype=torch.long, device=device), position_tensor, metadata
 

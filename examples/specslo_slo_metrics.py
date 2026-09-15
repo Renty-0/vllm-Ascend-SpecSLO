@@ -40,6 +40,10 @@ def summarize_slo_rows(rows, *, tpot_field, definition, elapsed_seconds=None):
         group["mean_tpot_scope"] = "valid timing rows only; missing rows never attain SLO"
     return {
         "tpot_definition": definition,
+        "goodput_definition": (
+            f"sum(output_tokens where {tpot_field} <= slo_tpot_ms) / "
+            "measured_e2e_seconds"
+        ),
         "constrained_requests": len(constrained),
         "attained_requests": attained,
         "attainment": attained / len(constrained) if constrained else None,

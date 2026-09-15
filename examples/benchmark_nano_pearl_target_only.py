@@ -12,6 +12,12 @@ import time
 from collections.abc import Sequence
 from pathlib import Path
 
+from examples.specslo_benchmark_report import (
+    ONLINE_E2E_TIMING_SCOPE,
+    capture_runtime_environment,
+    sha256_file,
+)
+
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -295,6 +301,16 @@ def _load_prompts(
     return [str(row["question"]) for row in rows[:max_samples]], None
 
 
+def _sampling_max_token_limits(sampling_params, count: int) -> list[int]:
+    """Materialize the exact per-request output limits used by one run."""
+
+    if isinstance(sampling_params, list):
+        if len(sampling_params) != count:
+            raise ValueError("Expected one SamplingParams value per request.")
+        return [int(params.max_tokens) for params in sampling_params]
+    return [int(sampling_params.max_tokens)] * count
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     args = _build_parser().parse_args(argv)
     if any(batch_size <= 0 for batch_size in args.batch_sizes):
@@ -507,6 +523,20 @@ def main(argv: Sequence[str] | None = None) -> None:
                     json.dumps(prompt_token_ids[: len(measured_inputs)], separators=(",", ":")).encode()
                 ).hexdigest(),
                 "elapsed_seconds": elapsed,
+                "e2e_elapsed_seconds": elapsed,
+                "e2e_timing_scope": (
+                    ONLINE_E2E_TIMING_SCOPE
+                    if args.online_arrivals
+                    else "one synchronous llm.generate measurement; inputs pretokenized"
+                ),
+                "request_output_token_limits": _sampling_max_token_limits(
+                    measured_sampling_params,
+                    len(measured_inputs),
+                ),
+                "warmup_output_token_limits": _sampling_max_token_limits(
+                    current_warmup_params,
+                    len(warmup_inputs),
+                ),
                 "output_throughput_tokens_per_second": output_tokens / elapsed,
                 "output_token_ids_sha256": hashlib.sha256(
                     json.dumps(output_token_rows, separators=(",", ":")).encode()
@@ -547,15 +577,22 @@ def main(argv: Sequence[str] | None = None) -> None:
         "max_tokens": args.max_tokens,
         "respect_eos": args.respect_eos,
         "request_manifest": args.request_manifest,
+        "request_manifest_sha256": (
+            sha256_file(args.request_manifest)
+            if args.request_manifest is not None
+            else None
+        ),
         "requested_output_tokens": (sum(request_max_tokens[:prompt_count]) if request_max_tokens is not None else None),
         "warmup_prompts": args.warmup_prompts,
         "warmup_prompt_offset": args.warmup_prompt_offset,
         "warmup_max_tokens": args.warmup_max_tokens,
         "warmup_runs": args.warmup_runs,
+        "warmup_excluded_from_measurement": True,
         "static_chunks": args.static_chunks,
         "online_arrivals": args.online_arrivals,
         "enable_prefix_caching": args.enable_prefix_caching,
         "enable_log_stats": args.enable_log_stats,
+        "runtime_environment": capture_runtime_environment(),
         "first_prompt_token_ids": first_prompt_token_ids,
         "results": results,
     }

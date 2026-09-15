@@ -28,8 +28,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--slo-tpot-ms", type=float)
     parser.add_argument("--slo-class")
     parser.add_argument("--enable-spec-rhythm", action="store_true")
+    parser.add_argument(
+        "--spec-rhythm-linear-full-window",
+        action="store_true",
+        help=(
+            "Use the independent full-window protocol for fixed-gamma serial "
+            "linear SpecRhythm (requires min-gamma == gamma and tree 1x1)."
+        ),
+    )
     parser.add_argument("--spec-rhythm-min-gamma", type=int, default=1)
     parser.add_argument("--spec-rhythm-max-eager-tokens", type=int, default=0)
+    parser.add_argument("--spec-rhythm-eager-reserve-tokens", type=int, default=0)
     parser.add_argument("--spec-rhythm-urgency-threshold", type=float, default=0.75)
     parser.add_argument("--spec-rhythm-acceptance-floor", type=float, default=0.4)
     parser.add_argument("--spec-rhythm-acceptance-ema-alpha", type=float, default=0.2)
@@ -42,6 +51,17 @@ def parse_args() -> argparse.Namespace:
         "--spec-rhythm-verification-budget",
         type=int,
         help="Fixed global SpecRhythm candidate-token budget B.",
+    )
+    parser.add_argument("--draft-use-paged-attention", action="store_true")
+    parser.add_argument("--target-use-paged-attention", action="store_true")
+    parser.add_argument("--precompile-decode-graphs", action="store_true")
+    parser.add_argument(
+        "--precompile-serial-draft-graphs",
+        action="store_true",
+        help=(
+            "Precompile and changed-input qualify only fixed-gamma serial "
+            "draft graphs; keep target verification graphs lazy."
+        ),
     )
     parser.add_argument("--disable-cpu-binding", action="store_true")
     parser.add_argument("--enforce-eager", action="store_true")
@@ -78,8 +98,10 @@ def main() -> None:
         enable_continuous_batching=args.enable_spec_rhythm,
         enable_preemptive_scheduling=args.enable_spec_rhythm,
         enable_spec_rhythm=args.enable_spec_rhythm,
+        spec_rhythm_linear_full_window=args.spec_rhythm_linear_full_window,
         spec_rhythm_min_gamma=args.spec_rhythm_min_gamma,
         spec_rhythm_max_eager_tokens=args.spec_rhythm_max_eager_tokens,
+        spec_rhythm_eager_reserve_tokens=args.spec_rhythm_eager_reserve_tokens,
         spec_rhythm_urgency_threshold=args.spec_rhythm_urgency_threshold,
         spec_rhythm_acceptance_floor=args.spec_rhythm_acceptance_floor,
         spec_rhythm_acceptance_ema_alpha=args.spec_rhythm_acceptance_ema_alpha,
@@ -88,6 +110,10 @@ def main() -> None:
         spec_rhythm_draft_token_budget=args.spec_rhythm_draft_token_budget,
         spec_rhythm_tree_width=args.spec_rhythm_tree_width,
         spec_rhythm_tree_depth=args.spec_rhythm_tree_depth,
+        draft_use_paged_attention=args.draft_use_paged_attention,
+        target_use_paged_attention=args.target_use_paged_attention,
+        precompile_decode_graphs=args.precompile_decode_graphs,
+        precompile_serial_draft_graphs=args.precompile_serial_draft_graphs,
         profile_decode_steps=args.profile_decode_steps,
         stop_after_profiled_decode_steps=args.profile_only,
         worker_timeout_seconds=args.worker_timeout_seconds,

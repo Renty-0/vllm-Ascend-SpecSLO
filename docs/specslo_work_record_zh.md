@@ -1,15 +1,18 @@
 # vLLM-Ascend-SpecSLO 工作记录
 
-更新时间：2026-09-10
+更新时间：2026-09-14
 
-> 2026-09-10 复核更正：第 6.5 节“核心机制已经闭合”的结论超出了短 smoke
-> 能证明的范围。当前明确存在树运行循环的功能缺口，详见
-> [第五章及核心功能审计](specslo_section5_audit_20260910_zh.md)。历史记录保留，
-> 最新完成度以该审计为准。
-
-> 同日实现进展：上述缺项已开始逐项修复，最新软件变更、成功/失败的 NPU 证据和
-> 尚待验收内容见 [核心闭环回归记录](specslo_core_regression_20260910_zh.md)。
-> 历史 PEARL 性能不能替代 SpecSLO 验收；本轮仍未宣称 1.3× Goodput 达标。
+> 当前结论：第 6.12 节记录的固定 `gamma=4`、serial-linear SpecSLO 正式点已完成
+> RPS=4、batch 上限 64、60 请求 × 256 token 的四卡验收。三次当前源码候选的
+> 论文口径 TPOT 达成率为 90.00%--93.33%；以三次原生 vLLM-Ascend TP4 baseline 中最高
+> Goodput 为分母，最保守提升为 **1.3913x**。正式计时窗口 graph capture、runtime
+> validation 和所有 fallback 增量均为零。
+>
+> 第 6.1--6.11 节是按日期保留的历史检查点，其中“尚未达标”“下一步”等措辞只描述
+> 当时状态，不能覆盖第 6.12 节。2026-09-10 的功能缺口审计见
+> [第五章及核心功能审计](specslo_section5_audit_20260910_zh.md)，修复过程见
+> [核心闭环回归记录](specslo_core_regression_20260910_zh.md)。历史 PEARL 结果始终
+> 不能替代 SpecSLO 验收。
 
 ## 1. 项目范围
 
@@ -61,8 +64,9 @@ target 验证；调度器按照 SLO 紧迫度、接受率和设备 roofline 预�
   保留 TP2/TP4 的显式环境变量覆盖。
 - 增加 CPU/NUMA/IRQ affinity、prefill chunk、连续批处理、完成行 padding、
   full/half graph bucket 和 SLO/分阶段 profiling 统计。
-- 保留 TP3 MC2、融合 FFN、QKV NZ、权重预取、通信 overlap 等实验入口，便于
-  后续在真实 CANN 版本上替换成经过验证的 kernel。
+- 保留 TP3 MC2、融合 FFN、QKV NZ 和权重预取等实验入口。draft/target 模型阶段
+  overlap 已进入正式路径；跨模型 HCCL 与 target TP3 all-reduce 的并发在当前
+  CANN/HCCL 上会形成 stream wait cycle，故采用计算结束后的安全通信边界。
 
 ### 2.3 vLLM 核心层配套
 
@@ -103,8 +107,9 @@ target 验证；调度器按照 SLO 紧迫度、接受率和设备 roofline 预�
    HCCL 初始化、verification/correction group 和 rank 映射。
 2. **自描述通信协议**：每轮携带 request、proposal、epoch、逻辑宽度和置信度，
    接收端拒绝过期、错请求和不匹配宽度，解决异步 HCCL 下的状态污染。
-3. **SpecRhythm 控制面**：记录接受率 EMA、SLO urgency、draft/verify 成本，
-   按预算和队列状态选择 gamma、继续 draft 或 target 验证。
+3. **SpecRhythm 控制面**：通用路径记录接受率 EMA、SLO urgency、draft/verify 成本，
+   按预算和队列状态选择 gamma、继续 draft 或 target 验证；第 6.12 节的独立验收路径
+   按用户约束固定每请求 `gamma=4`，不消费离线 B 表。
 4. **设备侧树基础设施**：实现树节点索引、祖先路径、唯一 KV 位置映射、native
    target tree forward、显式 ancestor mask、验证结果回写和接受路径 KV compaction
    plan；通用 V1 tree verification 已有单元测试。
@@ -145,9 +150,9 @@ admission wait 单独作为调度债务参与 urgency，不计入 decode TPOT。
 - **TP3 MC2 的实机验证**：custom AscendC MC2、meta、编译 fusion pass、communicator
   解析和 `pearl/mc2.py` dispatch/fallback 已完成；仍没有在目标 CANN/固件版本上
   证明稳定地超过生产 all-reduce + matmul。
-- **SpecRhythm 与树状投机解码的实机回归**：策略、native target forward、唯一
-  cache position、KV compaction plan 和 rejection-safe 数据结构已完成；仍需在真实
-  Qwen/Llama 模型上压测分支提交、回滚和数值一致性。
+- **SpecRhythm 与树状投机解码的扩展实机回归**：Qwen3 短树和 fixed-gamma linear
+  路径已完成实卡回归；仍需覆盖长多请求树分支/回滚、Llama、随机采样和更长上下文
+  的数值压力矩阵。
 - **通用 vLLM 服务路径**：`SpecRhythmScheduler` 与
   `PearlDualModelScheduler` 已提供 admission、双 batch 并行回调、preempt/reactivate、
   global roofline 和 verification commit；仍需绑定上游 V1 scheduler 的 worker 生命周期。
@@ -157,14 +162,18 @@ admission wait 单独作为调度债务参与 urgency，不计入 decode TPOT。
 - **生产级动态 shape graph（运行时 guard 已完成，版本矩阵待验证）**：native
   graph 已按 shape bucket 捕获、回放、首轮 eager 对照和容量 fallback；仍需按
   CANN 版本和真实到达分布建立 capture/replay 兼容矩阵。
-- **性能和稳定性回归**：需在固定 NPU 型号、驱动/CANN、模型量化配置下重新测
-  batch、gamma、接受率、端到端延迟、SLO goodput、长上下文和多租户抢占。
+- **性能和稳定性扩展矩阵**：RPS=4、batch 上限 64、固定 gamma4 正式点已完成；
+  RPS=2、batch=8/16/32、动态 B/gamma、长上下文和多租户抢占仍需独立回归。
 - **扩展覆盖面**：多模态、LoRA、structured output、更多 tokenizer/vocab 映射
   以及异常退出后的 HCCL 资源回收仍需补齐。
 
 ## 6. 验证记录
 
-本次迁移收尾执行了以下检查：
+下列小节按发生时间保留验证记录。最新完整投机解码 CPU 回归为
+`1179 passed, 13 skipped, 16 warnings`；修改/新增 Python 的 Ruff、
+`git diff --check`、正式 runner `bash -n` 和新示例 `py_compile` 均通过。
+
+早期迁移收尾曾执行以下检查：
 
 - Ascend 重点单元测试：`223 passed, 13 skipped, 14 warnings`。
 - bridge/vocab 单元测试：`28 passed, 14 warnings`。
@@ -197,16 +206,17 @@ admission wait 单独作为调度债务参与 urgency，不计入 decode TPOT。
   以及 `collect_pearl_teacher_trace.py` JSONL CLI。
 - TP residual MC2：增加 HCCL communicator 名称兼容探测、`enable_mc2` 配置和
   fused-op 失败自动 fallback；默认关闭，需在目标 CANN 上显式开启验证。
-- 本轮相关单测为 `132 passed, 14 warnings`；完整 `tests/ut/spec_decode` 还受容器
-  缺少 `numba` 影响，ngram proposer 收集失败，其余可收集用例通过。
+- 该阶段相关单测为 `132 passed, 14 warnings`；当时完整
+  `tests/ut/spec_decode` 曾受容器缺少 `numba` 影响。该阻塞后来已经消除，最新完整
+  回归结果以上述 1179 passed 为准。
 
 参考仓库逐文件审计见
 [`atc26v0_feature_audit_zh.md`](atc26v0_feature_audit_zh.md)。该审计把上游
 scaffold/probe 与真正可执行的 nano-PEARL 功能分开记录，避免把探针通过误报为
 生产迁移完成。
 
-本次只做功能迁移和验证，没有宣称新的吞吐提升；后续性能报告必须注明模型、
-TP、batch、gamma、warmup、CANN/驱动版本和端到端计时口径。
+该早期阶段只做功能迁移和验证，没有宣称新的吞吐提升；后续性能报告继续必须注明
+模型、TP、batch、gamma、warmup、CANN/驱动版本和端到端计时口径。
 
 ### 6.1 SpecRhythm 目标回归（2026-09-08）
 
@@ -225,7 +235,7 @@ generation 的 e2e wall time：
 target-only 这次通过 `VLLM_ENABLE_V1_MULTIPROCESSING=0` 和单线程环境变量
 绕过容器已有的 PyTorch 多进程线程池崩溃；它以离线一次性提交所有 prompt，
 没有消费 arrival timestamp，也没有逐请求 SLO 计时，因此只能作为吞吐参考，
-不能用于宣称 1.3x Goodput。当前结果尚未达到图片中的 80% SLO attainment 和
+不能用于宣称 1.3x Goodput。当时结果尚未达到图片中的 80% SLO attainment 和
 1.3x Goodput 目标；主要瓶颈是 TP3 target compute、每轮 verdict/broadcast、
 以及 draft-target exchange，ACLGraph capture/replay 本身未失败。
 
@@ -238,7 +248,7 @@ target-only 这次通过 `VLLM_ENABLE_V1_MULTIPROCESSING=0` 和单线程环境�
 - 增加 `--spec-rhythm-auto-eager-tokens`，按请求 gamma 限制 eager 预算，并在结果
   中输出按类别的 attainment/goodput/mean TPOT。
 
-后续回归必须使用同一份 manifest、同一到达时间、同一 max token 和相同计时口径，
+当时确定后续回归必须使用同一份 manifest、同一到达时间、同一 max token 和相同计时口径，
 分别跑 RPS 2/4 与 batch 8/16/32/64；在 baseline 也接入在线 arrival/SLO 计时前，
 只报告吞吐，不报告伪 Goodput 加速比。
 
@@ -247,7 +257,7 @@ target-only 这次通过 `VLLM_ENABLE_V1_MULTIPROCESSING=0` 和单线程环境�
 图片给出的 SpecRhythm 验收条件为：tight、normal、loose 三类请求的 TPOT 上限
 分别为 40/50/150 ms；同一 batch 内请求比例为 6:2:2；RPS 在 2 和 4 之间变化；
 batch 覆盖 8 和 64；相对原始 vLLM-Ascend 的 SpecRhythm 达标率至少 80%，
-Goodput 至少 1.3 倍。当前实现使用 Qwen3-0.6B draft（TP1）+ Qwen3-32B
+Goodput 至少 1.3 倍。当时实现使用 Qwen3-0.6B draft（TP1）+ Qwen3-32B
 target（TP3），baseline 为 Qwen3-32B target-only（TP4），物理卡为 Ascend
 910B2，计时包含 prefill 和 generation，warmup 不计入 e2e。
 
@@ -265,7 +275,7 @@ PEARL 文件均为 `/root/data/specslo-workloads/` 下对应 JSON：
 | SpecSLO/SpecRhythm TP1+TP3，gamma=4，priority burst=2 | 414.563 | 54.61% | 20.31% (13/64) | 84.208 | 0.162x |
 | SpecSLO/SpecRhythm TP1+TP3，gamma=8 | 302.115 | 38.45% | 20.31% (13/64) | 61.367 | 0.118x |
 
-因此图片中的 80% attainment 和 1.3x Goodput **尚未达成**。当前 best SpecSLO/SpecRhythm
+因此在 2026-09-09 该轮中，80% attainment 和 1.3x Goodput **尚未达成**。当时 best SpecSLO/SpecRhythm
 吞吐仅为 baseline 的 0.657x，Goodput 为 0.162x；不能把普通吞吐、SLO 达标率
 和 Goodput 混写成加速比。短输出的独立 sanity workload（同一 B64、RPS4、
 `max_tokens=32`）在最新 continuation-device 路径下为 102.766 tok/s、56.25%
@@ -308,8 +318,8 @@ attainment，输出哈希为 `94f88c86174f830b9b497c6ae60e9f9fb641715a18edc95ef0
 长回归的 target leader phase 为 target compute 21.327 s、target verify
 10.151 s、target-to-draft broadcast 2.957 s；draft worker 仍累计 28.259 s。
 这些阶段在一次 round 内由 draft/target 两个 worker 并行启动，但 round 末尾仍在
-HCCL verdict/state 边界汇合，尚未形成多个 round 同时在飞的深流水线。要达到图片
-目标，必须继续完成并在实机验证：
+HCCL verdict/state 边界汇合，尚未形成多个 round 同时在飞的深流水线。当时提出的
+候选改进和实机验证方向为：
 
 为避免把累计 worker 计时与单轮阶段混为一谈，另做了同一 workload 的
 `profile-only --profile-decode-steps=3`。profile 文件为
@@ -335,8 +345,9 @@ HCCL verdict/state 边界汇合，尚未形成多个 round 同时在飞的深流
 3. 在 RPS2/RPS4、B8/B64 上用同一 manifest 同时跑 baseline 和 PEARL，完成
    80% attainment 与 1.3x Goodput 的全矩阵回归。
 
-在上述两项硬件/执行模型工作完成前，继续调 gamma、CPU verdict 或 graph bucket
-只能带来局部波动，无法合理声称达到图片中的验收目标。
+当时判断上述硬件/执行模型工作是达标前置条件。第 6.12 节后来以计算阶段 overlap、
+安全 HCCL 边界和 SLO 调度通过 1.3x，证明 TP3 MC2 和跨 communicator 通信并发不是
+固定 gamma4 正式点达标的必要条件；本段只保留为历史诊断。
 
 ### 6.3 2026-09-09：arrival-aware admission 与 TP3 硬件验证
 
@@ -353,12 +364,13 @@ packed prefill，并取消首个 arrival 前对未来请求的整批预填充。
 `spec_rhythm_max_target_batch` 仅作为显式实验开关，动态 FIA 与 target cap=32 的实测
 均没有收益，默认策略保持固定 paged graph 和 merged-home。
 
-本轮没有达到图片要求的 80% attainment/1.3x Goodput。原因已在独立报告中量化：
+该轮没有达到图片要求的 80% attainment/1.3x Goodput。当时原因分析为：
 arrival-inclusive workload 的请求到达跨度约 31.6 秒，4096 token 的 E2E 上界约
 129.6 tok/s，而 1.3 倍 graph baseline 已是 140.5 tok/s；此外 TP3 target forward、
-target verdict 以及按轮次的 HCCL/state 边界仍是主要服务开销。后续必须使用更长的
-稳态 workload，并实现跨 home 的真正异步 mailbox/overlap，才能对图片目标做有意义的
-验收。
+target verdict 以及按轮次的 HCCL/state 边界仍是主要服务开销。当时推断需要更长
+稳态 workload 和跨 home 异步 mailbox。第 6.12 节后来完成正式长 workload，并在不让
+跨模型 HCCL 与 TP3 collective 并发的安全边界下达标，因此该 mailbox 推断不再作为
+必要条件。
 
 ### 6.4 2026-09-09：树状 SpecRhythm 主循环接入
 
@@ -379,8 +391,9 @@ target verdict 以及按轮次的 HCCL/state 边界仍是主要服务开销。�
 - ready proposal 和 ahead-of-turn eager proposal 按 proposal id 分开保存，拒绝会
   invalidate；树 eager 还会记录父树主干和 draft frontier，只有依赖一致才 promotion，
   两侧均执行 accepted-path KV compaction。
-- `PearlDualBatchResult` 现在返回 draft/target 各自耗时及真实 overlap window，避免
-  把两个并发回调仅凭总耗时误判为串行。
+- `PearlDualBatchResult` 返回 draft/target 各自耗时及 rank-local host overlap
+  window，避免把两个并发回调仅凭总耗时误判为串行；物理设备 overlap 需由 CANN
+  trace 单独证明。
 - 通用 `SpecRhythmScheduler` 现在也使用 projected wait、SLO urgency、priority
   burst、ready-home 合并和 eager acceptance 门控；双 worker adapter 在每个并发
   service step 后回写 cycle elapsed，后续预算不会继续使用静态 TPOT。
@@ -445,9 +458,10 @@ logit 平局；这排除了该观察点的 head tie-break/树 mask 错误，但�
 batch 的前缀计算已经一致。诊断配置差异与原始失败均保留，不追改历史结果。
 
 详细证据、仍待验收项及结果路径见
-[本轮核心回归记录](specslo_core_regression_20260910_zh.md)。1.3× Goodput 尚未达成。
+[本轮核心回归记录](specslo_core_regression_20260910_zh.md)。截至该历史检查点，
+1.3× Goodput 尚未达成。
 
-### 2026-09-10 功能冻结与最终 B 前置条件
+### 6.6 2026-09-10 功能冻结与最终 B 前置条件
 
 最新实现已补齐文本生成范围的 V1 EngineCore 协议、OpenAI-compatible HTTP/SSE
 生产生命周期、实时接纳/取消/故障传播，以及 target/draft 非贪心树采样。Qwen3-0.6B
@@ -469,7 +483,8 @@ profiler：在不同模型、active batch、context 范围下扫描总候选数�
 
 完整冻结清单与最终实验协议见
 [SpecSLO 功能冻结与 B profiling 前置验收](specslo_functional_freeze_20260910_zh.md)。
-只有生成最终 B 表后，才允许开始 RPS/Goodput 性能测试与调优。
+对于论文动态预算路径，只有生成最终 B 表后才允许开始对应的 RPS/Goodput 性能测试。
+第 6.12 节是用户后续明确要求的固定 gamma4 独立验收，不消费或冒充该动态 B 表。
 
 同日后续：新增全模型有限值 sticky guard，实卡 target rank 2 有效 head 权重 NaN
 注入时四 rank 均在首 token 之前停止，恢复权重后仍不允许复用污染状态。第 5.3 节补上
@@ -542,7 +557,7 @@ trace 三层证据，并修复首次尾部 Graph shape 会重复执行完整 32B
 运行时校验 bug。修复后 Qwen3-0.6B TP1 + Qwen3-32B TP3 在固定 B8 短回归中的三次
 中位吞吐为 167.785 token/s，相对生产 vLLM-Ascend TP4 target-only 的
 141.663 token/s 为 1.1844x；输出与 native TP3 target-only 完全一致，Graph 三类
-fallback 和额外 runtime validation replay 均为 0。1.3x 尚未达到。
+fallback 和额外 runtime validation replay 均为 0。该 profiling 检查点尚未达到 1.3x。
 
 新细分表明：稳态 scheduler 的约 2.216 ms 中约 2.014 ms 用于 tree plan/ticket
 构造；state update 的约 3.072 ms 中约 2.182 ms 用于 commit consensus。target
@@ -577,8 +592,9 @@ vLLM-Ascend Qwen3-32B TP4 target-only 141.663 token/s 为 **1.3017x**。三轮�
 均为 `3204949b4f0aecb1b4a5398994b38d008c21bb30163c03073c245bb46d74e3b1`，Graph
 failed/capacity/shape fallback 均为 0。稳定 cycle 中位由 v30 的 43.209 ms 降至
 37.456 ms，scheduler 由 2.216 ms 降至 0.429 ms，tree plan/ticket 由 2.014 ms 降至
-0.211 ms，target/draft host window 由 33.888/22.861 ms 降至 30.561/20.613 ms；真实
-overlap 仍为 20.461 ms。
+0.211 ms，target/draft host window 由 33.888/22.861 ms 降至 30.561/20.613 ms；
+rank-local host timestamp overlap 为 20.461 ms。物理设备 overlap 只由独立 CANN
+trace 证明，不能由该 host 数字替代。
 
 采用的同卡证据为
 `tree-b8-B8-cached-plans-3run-v35.json`。最终代码因原 NPU 1--3 被外部 PID 占用，另在
@@ -586,6 +602,154 @@ NPU 4--7 完成一次功能 smoke：输出 hash 一致、84 次 Graph replay、�
 其吞吐不与旧卡位 baseline 混算。width/depth=2/3、B=12 探针仅 164.856 token/s，已
 否决，不写入生产默认值。
 
-上述 1.3017x 仅回答固定 8 prompt x 16 output token 的短吞吐回归。论文式 RPS=2/4、
-batch=8/16/32/64、严格/常规/宽松 6:2:2 的 TPOT attainment 与 Goodput 验收仍是独立
-阶段，不能用本节替代。
+上述 1.3017x 仅回答固定 8 prompt x 16 output token 的短吞吐回归，不能用本节替代
+论文式 TPOT/Goodput 验收；后续第 6.12 节已完成其中 RPS=4、batch 上限 64 的正式点，
+完整 RPS/batch 矩阵仍未完成。
+
+### 6.10 2026-09-14：固定 gamma=4 串行 full-window 性能重构检查点
+
+本阶段按新的实验约束暂不消费离线 B 表：每个被选择的请求固定分配
+`gamma=4`，draft 使用一条四 token 自回归链，不把四个候选伪装成深度不足的树。
+本节记录的是当时代码和 CPU 合同检查点；检查时八张 NPU 均由其他容器任务占用，
+所以该检查点尚未写入新的 NPU 吞吐或 1.3x 达标结论。后续实测见第 6.12 节。
+
+已完成的关键路径修改如下：
+
+1. 新增独立的 linear full-window 协议。target 对每个 proposal 执行
+   `[committed root, d1, d2, d3] -> [d1, d2, d3, d4]`，一次验证完整四 token；
+   不再沿用旧 PEARL 在 rejection 后先做一 token pre-verify、再重建宽窗口的状态机。
+   full accept 保留合法 rolling-eager child，任意 rejection 原子删除被拒绝后缀和
+   eager child，并在 draft/target 两个模型侧提交同一 correction frontier。
+2. full-window proposal 改为紧凑异步 HCCL envelope。verification 与 continuation
+   是同一四-token 窗口，只发送一份；64 行时消息由旧自描述布局的 961 个 int64
+   降为 257 个（含一个 timing scalar）。draft(B) 与 target verify(A) 的模型阶段先在
+   两个独立设备组上重叠。当前 CANN/HCCL 若在 target forward 前 post receive，会与
+   TP3 all-reduce 形成跨 communicator stream wait cycle；因此各 rank 先完成本地 stream
+   synchronize 和 Gloo coordination，随后再提交并等待 compact HCCL broadcast。
+3. target 对旧 proposal 的 forward/verdict 与 draft 对下一 proposal 的生成并发。
+   verdict 移到新 proposal rendezvous 之前，关键路径由 `max(D,T)+V` 收紧为
+   `max(D,T+V)`；host timeline 新增 compact submit/wait 边界，不能把完整 in-flight
+   区间误报为纯通信耗时。
+4. 新增固定 gamma=4 greedy verdict Triton-Ascend kernel，每行一次写出
+   `(accepted_prefix_length, correction_token_id)`，替代 `eq/all/argmax/where/gather/stack`
+   多个小算子；只在 full-window greedy 路径启用，旧动态 gamma、随机采样和 CPU
+   verdict 均保持原实现。正式计时前必须用 warmup 触发首次 Triton JIT。
+5. proposal 在 target forward、verdict 和 correction 中只打包一次二维 tensor，
+   删除相同 token 的重复 `cat + stack`；固定 greedy 不再为置信度做逐轮 D2H。
+6. rolling-eager 的 W 估计改为下一周期读取已完成的 draft NPU event，并与上一周期
+   的真实 logical token 数配对。这样 event 查询不再位于当前 proposal HCCL submit
+   之前的同步关键路径。
+7. 增加控制面和边界保护：full-window 即使没有单请求 SLO 字段也强制进入
+   SpecRhythm service；partial gamma/eager cap 和小于 gamma 的 draft budget 在创建
+   ticket/collective 前失败；父 proposal 全接受后已经达到 `max_tokens` 时不生成无用
+   eager child；B>64 或 gamma>8 的 paged-attention full-window 自动使用因果 stepwise
+   路径，除非显式进入后端资格验证。
+8. tiny-batch target-only fallback 现在先原子预检整批 frontier、epoch、ticket 和
+   payload，再统一失效 proposal、截断 draft eager 尾并提交精确 target token；在线
+   fallback 每周期继续检查新到达请求，不再等长请求完成后才 admission。
+
+当前 CPU 回归覆盖 mismatch 0/1/2/3/full accept、完整 proposal 输入顺序、异步消息
+布局、warmup/steady/eager promotion/rejection、缩批 fallback、在线 refill、非法预算在
+collective 前失败、旧协议隔离和 public CLI 路由。当时列出的后续硬门禁包括 Triton
+kernel/oracle、packed target 数值一致性、TP3 通信无死锁、ACLGraph 零回退、profiling
+以及 60 请求正式 TPOT/Goodput；这些项目随后由数值回归、图封存门禁和第 6.12 节的
+RPS4/B64 正式结果补齐。
+
+### 6.11 2026-09-14：ACLGraph 计时前资格验证与封存
+
+为避免把首次 capture、changed-input 数值验证或隐式 eager fallback 混入吞吐计时，
+native graph runner 增加了可审计的两阶段生命周期：先在未计时窗口重放完整真实
+workload，直到一整轮同时满足 capture=0、runtime validation=0、fallback=0、
+unvalidated=0；随后封存 graph cache，再进入正式计时。封存状态下遇到 missing key、
+未验证/已禁用 entry、shape 不支持或 logical-row expansion 会立即报错，不允许静默
+capture、验证或回退。
+
+冷启动调度可能产生后续完整 workload 不再访问的 entry。严格循环只在“一整轮没有
+任何新 capture，但仍有未验证 resident entry”时，安全清除这些未验证 entry，并逐项
+reset graph、精确归还 capture budget；已验证 entry 永不被该操作清除。清除后必须再跑
+完整 workload：若被清除 shape 实际仍是热路径，它会重新 capture，因而不可能误过
+fixed-point 门禁。worker/API 已提供 unseal、prune 和 seal 命令，默认非严格运行行为
+保持不变。
+
+四卡 Qwen3-0.6B TP1 + Qwen3-32B TP3、固定 gamma=4、40 请求 × 32 token 的 910B2
+短验收在第 4 次未计时重放达到 fixed point 并成功 seal。正式计时区间中 draft rank 0
+为 185/185 次 draft graph replay，target rank 1--3 各为 185/185 次 packed-FIA generic
+graph replay；四 rank 的 capture、capture attempt、runtime validation、failed/capacity/
+shape fallback 增量全部为 0，resident unvalidated/disabled entry 也均为 0。对应证据为
+`/root/data/nano-pearl-benchmark-results/20260914-specslo-fixed-gamma4-full-window/runs/short-packedfia-coalesce2-sealed-prune-20260914T2022Z/result.json`。
+这项短结果只证明计时窗口是纯 graph replay，不能单独替代正式 60 请求验收；随后
+第 6.12 节已经完成正式 Goodput/1.3x 门禁。
+
+### 6.12 2026-09-14：固定 gamma4 正式 Goodput 验收通过
+
+正式合同为 Qwen3-0.6B draft TP1 + Qwen3-32B target TP3，对比原生
+vLLM-Ascend Qwen3-32B TP4 target-only；使用同四张 910B2、同一严格 36/12/12
+manifest、RPS=4、batch 上限 64、60 请求、每请求 256 token，TPOT 约束依次为
+40/50/150 ms。候选固定每请求 `gamma=4`、`serial_linear`、tree width/depth=1/1，
+不消费离线 B 表。E2E 从 arrival origin 开始，包含 enqueue、worker IPC、prefill 和
+decode；输入已 tokenize，候选与 baseline 的 warmup 均不计入正式窗口。
+
+三次原生 TP4 baseline 的原始吞吐为 623.554/620.904/622.519 token/s，论文 TPOT
+达成为 36/34/34（共 60），Goodput 为 374.132/351.845/352.761 token/s。三次当前
+源码 SpecSLO 候选分别得到：
+
+| 候选 | 原始吞吐 | paper TPOT 达成 | Goodput | 相对最高 baseline Goodput |
+| --- | ---: | ---: | ---: | ---: |
+| current repeat 1 | 573.285 tok/s | 55/60 = 91.67% | 525.511 tok/s | 1.4046x |
+| current repeat 2 | 587.930 tok/s | 56/60 = 93.33% | 548.735 tok/s | 1.4667x |
+| host-profile 500 | 578.372 tok/s | 54/60 = 90.00% | 520.535 tok/s | 1.3913x |
+
+因此“最差候选 / 最好 baseline”的保守 Goodput 比值为 **1.391311x**，且候选最差
+论文口径 TPOT 达成率为 **90%**，同时越过 1.3x 和 80% 门禁。原始吞吐中位比值只有
+0.9291x，故结论严格限定为 SLO-aware Goodput 提升，不能称为 raw throughput 加速。
+收益主要来自 tight 请求达成由 baseline 的 11--12/36 提升至 30--32/36；normal 和
+loose 在候选三次均为 12/12。
+
+三次正式候选都先运行完整 workload 至 graph fixed point，再 seal cache。计时窗口
+每 rank 分别有 544、541、528 次 replay，capture attempt、capture、runtime
+validation、failed/capacity/shape/eager fallback 增量全部为零。rank 0 全部进入 draft
+full-chain graph，rank 1--3 全部进入 target generic packed-FIA graph。因此图不回退是
+timed counter 的硬门禁，不是由命令行开关推断。
+
+500-cycle 低扰动 host profile 中有 479 个 dual cycle，463 个是无在线 prefill 的纯
+稳态 dual cycle。纯稳态均值为：cycle wall 42.466 ms、draft host window 36.006 ms、
+target host window 14.223 ms、两者交集 14.217 ms、verdict 0.464 ms、T→D 1.009 ms、
+state update 0.256 ms。两路 host model window 的 overlap 占较短 target window
+99.96%。`compute coordination` 的 23.662 ms 主要是短 target 等待长 draft 到达安全
+通信点，已经与 draft window 重叠，不能再次串行相加。compact submit/wait 分别为
+0.429/0.135 ms，从 submit 至 exchange 完成的完整 D→T host envelope 为 1.138 ms；
+它包含 materialize/publish，不是纯 HCCL wire latency。rank-local host timestamp 不能
+单独替代 CANN device-kernel trace。
+
+随后以静态 B8/P8/T32、8 条不同 GSM8K prompt 补做当前 fixed-gamma 路径的全 rank
+CANN trace。profiler active 3 个 cycle 均为 draft4 + target4，四 rank 各 27 次 sealed
+graph replay且零 capture/validation/fallback。仅统计官方 Ascend Hardware 设备计算事件
+后，draft rank 0 对三个 target rank 的 strict AI Core overlap 分别为
+10.538/10.632/10.653 ms；AI Core + MIX_AIC 为 16.571/16.572/16.630 ms；全设备计算为
+24.766/24.746/24.715 ms。三个 target rank 均保存真实 MatMul--MatMul 同时执行实例。
+证据为结果目录下 `validation/device-overlap-fixedg4-retry-5OxoEK/device-overlap.json`。
+该短 trace 证明采样三步的物理 kernel overlap，不参与正式 Goodput，三个 target pair
+也不能相加或外推为全程利用率。
+
+静态 B8/T32 数值诊断进一步确认 eager oracle、update-first、replay-first 三次和
+validate-every-replay 的 token/hash/轮数/接受统计完全一致；replay-first target 每 rank
+25 replay、0 fallback，强制校验为 25 validation、0 failure。该诊断只作数值正确性
+证据，不参与吞吐结论。
+
+采用的关键优化及审阅位置：
+
+- fixed full-window 与原子提交：`native_engine.py:521-651,6382-6421,10011-10189,10492-10647`；
+- 双 home 计划/并行执行：`spec_rhythm.py:561-677,748-777,813-863` 和
+  `native_engine.py:6142-6218,6453-6532,6557-6562`；
+- HCCL 安全边界/compact transport：`native_engine.py:6650-6754` 和
+  `fixed_greedy_transport.py:35-117,169-356`；
+- fused verdict：`ops/triton/spec_decode/fixed_greedy_verdict.py:22-111`；
+- draft/target replay-first：`native_graph.py:862-901,1070-1100,2194-2275`；
+- graph qualification/seal：`native_graph.py:589-757` 和
+  `benchmark_nano_pearl_speculative.py:683-800,1384-1481,1534-1794`。
+
+完整逐次表、profiling、provenance、限制和证据路径见
+`/root/data/nano-pearl-benchmark-results/20260914-specslo-fixed-gamma4-full-window/README.md`。
+最新完整 `tests/ut/spec_decode` 为 **1179 passed, 13 skipped, 16 warnings**。本次只完成
+RPS4/B64 固定 gamma4 正式点；RPS2、B8/16/32、动态 B、随机采样和冷启动仍不能由该
+结果外推。

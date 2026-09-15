@@ -48,7 +48,7 @@ def profile_document():
                 "ar_comparator": "standard_decode_full_active_batch",
                 **runtime_source_fingerprints(),
                 "tree_fia_sparse_mode": 1,
-                "tree_fia_inner_precise": 2,
+                "tree_fia_inner_precise": 1,
                 "max_model_len": 1024,
                 "tree_width": 2,
                 "tree_depth": 2,
@@ -137,6 +137,12 @@ def test_profile_requires_actual_prepared_target_attention_backend(profile_docum
     for wrong in ("dense_sdpa_tree_v1", "paged_attention_v1", "unknown"):
         with pytest.raises(ValueError, match="does not match actual target metadata"):
             profile.validate_attention_backend(wrong)
+
+
+def test_profile_rejects_wrong_tree_fia_inner_precision(profile_document):
+    profile_document["metadata"]["tree_fia_inner_precise"] = 2
+    with pytest.raises(ValueError, match="tree_fia_inner_precise=1"):
+        _normalize(profile_document)
 
 
 @pytest.mark.parametrize("field", list(runtime_source_fingerprints()))

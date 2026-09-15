@@ -162,12 +162,19 @@ def test_real_tree_loop_closes_eager_gate_before_window_accounting(monkeypatch):
     harness.engine.draft_tree_forward = draft
     harness.run(max_rounds=2)
     assert len(window_inputs) == 2
-    assert window_inputs[1] == {"normal_tokens": 8, "max_draft_tokens": 8}
+    assert window_inputs[1] == {
+        "normal_tokens": 8,
+        "max_draft_tokens": 8,
+        "eager_work": False,
+    }
     assert eager_requests == [(), ()]
 
 
 def test_single_eager_window_prioritizes_gap_benefit_not_tpot_ratio(monkeypatch):
-    harness = _TreeLoopHarness(monkeypatch, requests=4, capacity=4, max_tokens=32, slo=40, draft_window_ms=12)
+    # Eight milliseconds of normal work plus the conservatively estimated
+    # four-millisecond eager fixed cost must fit before the four-node eager
+    # tree itself is admitted.
+    harness = _TreeLoopHarness(monkeypatch, requests=4, capacity=4, max_tokens=32, slo=40, draft_window_ms=16)
     measured_priority = {}
 
     def configure(states):

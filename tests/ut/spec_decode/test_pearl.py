@@ -2,11 +2,15 @@
 # SPDX-FileCopyrightText: Copyright contributors to the vLLM project
 """Unit tests for the experimental PEARL protocol building blocks."""
 
+from unittest.mock import Mock
+
 import pytest
 import torch
+import torch.distributed as dist
 
 from vllm_ascend.spec_decode.pearl import (
     PearlPhase,
+    PearlProcessGroups,
     PearlProposalBatch,
     PearlRequestState,
     PearlTopology,
@@ -26,6 +30,25 @@ def test_topology_creates_disjoint_draft_target_and_verification_groups():
     assert topology.is_verification_rank(0)
     assert not topology.is_verification_rank(1)
     topology.validate_world_size(5)
+
+
+def test_process_groups_add_cpu_verification_coordination_group(monkeypatch):
+    topology = PearlTopology.from_tensor_parallel_sizes(draft_tp_size=1, target_tp_size=3)
+    created_groups = [object() for _ in range(5)]
+    new_group = Mock(side_effect=created_groups)
+    monkeypatch.setattr(dist, "is_initialized", lambda: True)
+    monkeypatch.setattr(dist, "get_world_size", lambda: 4)
+    monkeypatch.setattr(dist, "get_rank", lambda: 0)
+    monkeypatch.setattr(dist, "get_backend", lambda: "hccl")
+    monkeypatch.setattr(dist, "new_group", new_group)
+
+    groups = PearlProcessGroups.create(topology, backend="hccl")
+
+    assert groups.verification_coordination_group is created_groups[4]
+    assert new_group.call_args_list[-1].kwargs == {
+        "ranks": [0, 1, 2, 3],
+        "backend": "gloo",
+    }
 
 
 @pytest.mark.parametrize(

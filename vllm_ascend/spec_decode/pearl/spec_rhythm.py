@@ -237,6 +237,7 @@ class SpecRhythmBudgetShaper:
         draft_token_budget: int | None = None,
         batch_size: int | None = None,
         eager_token_cap: int | None = None,
+        eager_reserve_tokens: int = 0,
         draft_window_ms: float | None = None,
         draft_ms_per_token: float | None = None,
         verification_roof: int | None = None,
@@ -260,6 +261,8 @@ class SpecRhythmBudgetShaper:
                 raise ValueError("SpecRhythm execution-plan verification roof must be non-negative.")
         if eager_token_cap is not None and eager_token_cap < 0:
             raise ValueError("SpecRhythm eager-token cap must be non-negative.")
+        if eager_reserve_tokens < 0:
+            raise ValueError("SpecRhythm eager-token reserve must be non-negative.")
         if (draft_window_ms is None) != (draft_ms_per_token is None):
             raise ValueError("A measured draft window requires a measured per-token draft cost.")
         if draft_window_ms is not None and (
@@ -270,6 +273,10 @@ class SpecRhythmBudgetShaper:
         ):
             raise ValueError("Draft window must be finite/non-negative and token cost positive.")
         available_draft = 2 * roof if draft_token_budget is None else max(0, int(draft_token_budget))
+        hidden_tokens: int | None = None
+        if draft_window_ms is not None:
+            assert draft_ms_per_token is not None
+            hidden_tokens = int(draft_window_ms / draft_ms_per_token)
         normal_caps = {index: min(self.max_gamma, states[index].max_gamma or self.max_gamma) for index in normal}
         minimum_budgets = {index: min(self.min_gamma, normal_caps[index]) for index in normal}
         if roof == 0:
@@ -289,13 +296,68 @@ class SpecRhythmBudgetShaper:
             )
         if any(value > roof for value in minimum_budgets.values()):
             raise ValueError("The SpecRhythm roofline cannot fit the minimum normal proposal budget.")
+
+        # A fixed-gamma normal home can otherwise consume all of B before the
+        # rolling-eager stage is considered.  The reserve is an explicit
+        # *upper bound*, not a quota: only requests that already passed the
+        # caller's W admission and still have positive a_need/acceptance value
+        # receive a complete minimum proposal.  If none qualifies, no budget
+        # is withheld from normal progress.
+        initial_gaps = {
+            index: states[index].projected_progress_gap(projected_wait_ms)
+            for index in requested
+        }
+        eager_budgets: dict[int, int] = {}
+        reserve_limit = min(int(eager_reserve_tokens), roof, available_draft)
+        if hidden_tokens is not None:
+            reserve_limit = min(reserve_limit, hidden_tokens)
+        reserve_remaining = reserve_limit
+        for index in sorted(
+            eager,
+            key=lambda index: (
+                initial_gaps[index]
+                * states[index].expected_acceptance_benefit,
+                states[index].urgency(projected_wait_ms),
+                -index,
+            ),
+            reverse=True,
+        ):
+            state = states[index]
+            cap = min(self.max_gamma, state.max_gamma or self.max_gamma)
+            if eager_token_cap is not None:
+                cap = min(cap, eager_token_cap)
+            minimum = min(self.min_gamma, cap)
+            if (
+                minimum <= 0
+                or initial_gaps[index] <= 0
+                or state.expected_acceptance_benefit < self.acceptance_floor
+                or minimum > reserve_remaining
+            ):
+                continue
+            eager_budgets[index] = minimum
+            reserve_remaining -= minimum
+        reserved_eager_tokens = sum(eager_budgets.values())
+
         # A fixed B can be smaller than the number of ready-to-draft requests.
         # Admit a bounded subset instead of failing the whole service cycle.
         # Retain age for deferred rows so a tight-SLO stream cannot permanently
         # exclude a relaxed row before it ever acquires a ready proposal.
         normal_candidates = normal
-        if sum(minimum_budgets.values()) > min(roof, available_draft):
-            remaining_minimum = min(roof, available_draft)
+        normal_admission_budget = min(
+            roof - reserved_eager_tokens,
+            available_draft - reserved_eager_tokens,
+        )
+        if hidden_tokens is not None and reserved_eager_tokens:
+            # Reserved work is optional and therefore must fit W.  Normal work
+            # may retain the legacy mandatory-overflow behavior only when no
+            # eager reservation was actually made.
+            normal_admission_budget = min(
+                normal_admission_budget,
+                hidden_tokens - reserved_eager_tokens,
+            )
+        normal_admission_budget = max(0, normal_admission_budget)
+        if sum(minimum_budgets.values()) > normal_admission_budget:
+            remaining_minimum = normal_admission_budget
             admitted = []
             for index in sorted(
                 normal,
@@ -322,20 +384,18 @@ class SpecRhythmBudgetShaper:
         normal_budgets = {index: minimum_budgets[index] for index in normal}
         minimum_needed = sum(normal_budgets.values())
         if draft_window_ms is not None:
-            assert draft_ms_per_token is not None
-            hidden_tokens = int(draft_window_ms / draft_ms_per_token)
+            assert hidden_tokens is not None
             # Normal minimum progress is mandatory; only its predicted
             # overflow is exposed. Optional eager/deeper work shares the
             # measured residual W and cannot extend that mandatory overflow.
             available_draft = min(available_draft, max(minimum_needed, hidden_tokens))
-        eager_budgets: dict[int, int] = {}
-        remaining_draft = available_draft - minimum_needed
+        remaining_draft = available_draft - minimum_needed - reserved_eager_tokens
         # The roofline is a target-side *global* candidate budget.  Normal and
         # eager proposals share it because both are verified in the same target
         # step.  Keeping one counter also makes the invariant explicit for
         # future tree-shaped allocations.
-        remaining_roof = roof - minimum_needed
-        gaps = {index: states[index].projected_progress_gap(projected_wait_ms) for index in requested}
+        remaining_roof = roof - minimum_needed - reserved_eager_tokens
+        gaps = {index: initial_gaps[index] for index in requested}
         priorities = {index: gaps[index] * states[index].expected_acceptance_benefit for index in eager}
 
         # Stage 1: close projected progress gaps. Prefix depth is allocated one
@@ -361,10 +421,15 @@ class SpecRhythmBudgetShaper:
                 remaining_roof -= grant
             else:
                 eager_cap = cap if eager_token_cap is None else min(cap, eager_token_cap)
-                wanted = min(eager_cap, max(self.min_gamma, gaps[index]))
+                current = eager_budgets.get(index, 0)
+                wanted = max(
+                    0,
+                    min(eager_cap, max(self.min_gamma, gaps[index]))
+                    - current,
+                )
                 grant = min(wanted, remaining_roof, remaining_draft)
                 if grant > 0:
-                    eager_budgets[index] = grant
+                    eager_budgets[index] = current + grant
                     remaining_roof -= grant
             remaining_draft -= grant
             if remaining_draft <= 0:
@@ -534,21 +599,36 @@ class SpecRhythmPipelineController:
         active_set = set(active)
         self._discard_inactive_payloads(active_set)
         ready_homes = {self.request_states[index].home_batch_id for index in active if index in self.ready}
+        # A promoted rolling-eager ticket belongs to the home that was just
+        # verified, but paper section 4.3 requires it to join the *next*
+        # cycle's opposite-home verification.  It must not take ownership of
+        # that cycle or pull every old ready row from its home along with it.
+        normal_ready_homes = {
+            self.request_states[index].home_batch_id
+            for index in active
+            if index in self.ready and not self.ready[index].eager
+        }
+        base_ready_homes = normal_ready_homes or ready_homes
         target_home: int | None
-        if self.next_target_home_batch_id in ready_homes:
+        if self.next_target_home_batch_id in base_ready_homes:
             target_home = self.next_target_home_batch_id
-        elif ready_homes:
-            target_home = min(ready_homes)
+        elif base_ready_homes:
+            target_home = min(base_ready_homes)
         else:
             target_home = None
-        if priority and len(ready_homes) > 1:
+        if priority and len(base_ready_homes) > 1:
             urgency_by_home = {
                 home: max(
                     self.request_states[index].urgency(projected_wait_ms)
                     for index in active
-                    if self.request_states[index].home_batch_id == home and index in self.ready
+                    if self.request_states[index].home_batch_id == home
+                    and index in self.ready
+                    and (
+                        not normal_ready_homes
+                        or not self.ready[index].eager
+                    )
                 )
-                for home in ready_homes
+                for home in base_ready_homes
             }
             urgent_home = max(
                 urgency_by_home,
@@ -556,7 +636,7 @@ class SpecRhythmPipelineController:
             )
             if urgency_by_home[urgent_home] >= 1.0:
                 if self._priority_home_id == urgent_home and self._priority_streak >= priority_burst:
-                    alternatives = [home for home in ready_homes if home != urgent_home]
+                    alternatives = [home for home in base_ready_homes if home != urgent_home]
                     target_home = min(alternatives) if alternatives else urgent_home
                 else:
                     target_home = urgent_home
@@ -585,7 +665,15 @@ class SpecRhythmPipelineController:
         target_candidates = tuple(
             index
             for index in active
-            if self.request_states[index].home_batch_id in target_homes and index in self.ready
+            if index in self.ready
+            and (
+                self.request_states[index].home_batch_id in target_homes
+                or (
+                    not merge_ready_homes
+                    and target_home is not None
+                    and self.ready[index].eager
+                )
+            )
         )
         candidate_counts = {
             index: int(self.ready[index].gamma if ready_candidate_counts is None else ready_candidate_counts[index])
@@ -605,17 +693,39 @@ class SpecRhythmPipelineController:
         )
         if constrained:
             # Pack whole proposals so deferral cannot invalidate an eager
-            # continuation's exact parent path. Age wins over urgency after
-            # deferral, preventing repeated small/high-priority proposals from
-            # starving a large or relaxed-SLO proposal indefinitely.
+            # continuation's exact parent path.  For unconstrained traffic,
+            # age wins after deferral to prevent starvation.  Under an SLO
+            # policy, section 4.3's a_need must be the primary ordering key:
+            # putting age first turns fixed-B scheduling into round-robin and
+            # prevents tight requests from catching up.  Relaxed requests are
+            # still starvation-safe because their a_need grows while waiting.
+            def target_priority(index: int):
+                age = self._ready_wait_cycles.get(index, 0)
+                urgency = self.request_states[index].urgency(
+                    projected_wait_ms
+                )
+                if priority:
+                    return (
+                        self.request_states[index].projected_progress_gap(
+                            projected_wait_ms
+                        ),
+                        urgency,
+                        age,
+                        self.request_states[index].home_batch_id
+                        == self.next_target_home_batch_id,
+                        -index,
+                    )
+                return (
+                    age,
+                    urgency,
+                    self.request_states[index].home_batch_id
+                    == self.next_target_home_batch_id,
+                    -index,
+                )
+
             ordered = sorted(
                 target_candidates,
-                key=lambda index: (
-                    self._ready_wait_cycles.get(index, 0),
-                    self.request_states[index].urgency(projected_wait_ms),
-                    self.request_states[index].home_batch_id == self.next_target_home_batch_id,
-                    -index,
-                ),
+                key=target_priority,
                 reverse=True,
             )
             selected: list[int] = []
@@ -736,6 +846,22 @@ class SpecRhythmPipelineController:
         self.next_target_home_batch_id = 1 - state.home_batch_id
         return promoted
 
+    def finish_cycle(self, target_home_batch_id: int | None) -> None:
+        """Advance home rotation after every request in one target cycle.
+
+        A rolling-eager verification may contain tickets from both homes.
+        Per-request completion order therefore cannot define the next normal
+        home.  Native executors call this once after the complete target batch;
+        the per-request update above remains for backward-compatible callers
+        that verify only one home at a time.
+        """
+
+        if target_home_batch_id is None:
+            return
+        if target_home_batch_id not in (0, 1):
+            raise ValueError("SpecRhythm target batch must be zero or one.")
+        self.next_target_home_batch_id = 1 - target_home_batch_id
+
     def validate_verification(self, request_index: int) -> SpecRhythmProposalTicket:
         """Check a ready ticket without mutating state, before device KV commit."""
 
@@ -805,6 +931,7 @@ class SpecRhythmScheduler:
         merge_ready_homes: bool = False,
         max_target_requests: int | None = None,
         max_eager_tokens: int = 0,
+        eager_reserve_tokens: int = 0,
         urgency_threshold: float = 0.75,
     ) -> None:
         if max_num_seqs <= 0:
@@ -823,6 +950,8 @@ class SpecRhythmScheduler:
             raise ValueError("SpecRhythm target request limit must be positive")
         if max_eager_tokens < 0:
             raise ValueError("SpecRhythm eager-token cap must be non-negative")
+        if eager_reserve_tokens < 0:
+            raise ValueError("SpecRhythm eager-token reserve must be non-negative")
         if urgency_threshold < 0:
             raise ValueError("SpecRhythm urgency threshold must be non-negative")
         self.priority_mode = priority_mode
@@ -830,6 +959,7 @@ class SpecRhythmScheduler:
         self.merge_ready_homes = bool(merge_ready_homes)
         self.max_target_requests = max_target_requests
         self.max_eager_tokens = int(max_eager_tokens)
+        self.eager_reserve_tokens = int(eager_reserve_tokens)
         self.urgency_threshold = float(urgency_threshold)
         self.request_states: dict[int, SpecRhythmRuntimeState] = {}
         self._active: list[int] = []
@@ -952,6 +1082,7 @@ class SpecRhythmScheduler:
             draft_token_budget=draft_token_budget,
             batch_size=batch_size,
             eager_token_cap=self.max_eager_tokens or None,
+            eager_reserve_tokens=self.eager_reserve_tokens,
             draft_window_ms=draft_window_ms,
             draft_ms_per_token=draft_ms_per_token,
             verification_roof=execution.verification_candidate_budget,
@@ -996,6 +1127,9 @@ class SpecRhythmScheduler:
 
     def finish_verification(self, request_index: int, **kwargs) -> SpecRhythmProposalTicket | None:
         return self.controller.finish_verification(request_index, **kwargs)
+
+    def finish_cycle(self, target_home_batch_id: int | None) -> None:
+        self.controller.finish_cycle(target_home_batch_id)
 
 
 __all__ = [

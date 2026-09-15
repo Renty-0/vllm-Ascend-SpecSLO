@@ -307,6 +307,74 @@ def test_budget_shaper_preserves_prefix_by_allocating_integer_depths():
     assert plan.allocated_draft_tokens == 5
 
 
+def test_fixed_gamma_reserves_complete_eager_proposals_inside_global_b():
+    states = {
+        index: SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=index % 2,
+            slo_tpot_ms=40.0,
+            delivered_tokens=1,
+            decode_elapsed_ms=1000.0,
+        )
+        for index in range(40)
+    }
+    shaper = SpecRhythmBudgetShaper(
+        min_gamma=4,
+        max_gamma=4,
+        verification_budget=120,
+    )
+
+    plan = shaper.shape(
+        plan_id=0,
+        normal_request_indices=range(30),
+        eager_request_indices=range(30, 40),
+        states=states,
+        projected_wait_ms=100.0,
+        context_len=32,
+        eager_reserve_tokens=24,
+    )
+
+    assert plan.eager_budgets == {index: 4 for index in range(30, 36)}
+    assert len(plan.normal_budgets) == 24
+    assert set(plan.normal_budgets.values()) == {4}
+    assert len(plan.deferred_normal_request_indices) == 6
+    assert sum(plan.normal_budgets.values()) + sum(plan.eager_budgets.values()) == 120
+
+
+def test_eager_reserve_does_not_withhold_b_without_eligible_eager_work():
+    states = {
+        index: SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=index % 2,
+            slo_tpot_ms=40.0,
+            delivered_tokens=1,
+            decode_elapsed_ms=1000.0,
+            acceptance_ema=(1.0 if index < 30 else 0.0),
+        )
+        for index in range(40)
+    }
+    shaper = SpecRhythmBudgetShaper(
+        min_gamma=4,
+        max_gamma=4,
+        verification_budget=120,
+    )
+
+    plan = shaper.shape(
+        plan_id=0,
+        normal_request_indices=range(30),
+        eager_request_indices=range(30, 40),
+        states=states,
+        projected_wait_ms=100.0,
+        context_len=32,
+        eager_reserve_tokens=24,
+    )
+
+    assert plan.eager_budgets == {}
+    assert plan.normal_budgets == {index: 4 for index in range(30)}
+    assert plan.deferred_normal_request_indices == ()
+    assert plan.allocated_draft_tokens == 120
+
+
 def test_budget_plan_rejects_normal_plus_eager_global_roof_overrun():
     from vllm_ascend.spec_decode.pearl.spec_rhythm import SpecRhythmBudgetPlan
 
@@ -365,6 +433,42 @@ def test_slo_pipeline_keeps_alternating_home_by_default():
     assert plan.eager_candidate_indices == (0, 2)
 
 
+def test_promoted_eager_joins_next_opposite_home_without_merging_old_ready_rows():
+    states = _states(3)
+    controller = SpecRhythmPipelineController(states)
+
+    # Promote request 2's ahead-of-turn proposal from home 0.
+    controller.publish([controller.new_ticket(2, gamma=4, eager=False)])
+    promoted = controller.new_ticket(2, gamma=4, eager=True)
+    controller.publish([promoted])
+    assert _finish_simulated_proposal(controller, 2) is promoted
+
+    # Home 1 owns the next normal verification. Home 0 also has an older
+    # normal ticket, which must not be swept in with the promoted continuation.
+    controller.publish(
+        [
+            controller.new_ticket(0, gamma=4, eager=False),
+            controller.new_ticket(1, gamma=4, eager=False),
+        ]
+    )
+    plan = controller.build_plan(
+        [0, 1, 2],
+        verification_budget=8,
+    )
+
+    assert plan.target_home_batch_id == 1
+    assert plan.target_request_indices == (1, 2)
+    assert plan.target_candidate_budgets == {1: 4, 2: 4}
+    assert 0 not in plan.target_request_indices
+
+    # Per-request completion order is mixed-home; the cycle owner controls
+    # the next normal home after all tickets have committed.
+    for index in plan.target_request_indices:
+        _finish_simulated_proposal(controller, index)
+    controller.finish_cycle(plan.target_home_batch_id)
+    assert controller.next_target_home_batch_id == 0
+
+
 def _finish_simulated_proposal(controller, index, *, fully_accepted=True):
     proposed = controller.ready[index].gamma
     accepted = proposed if fully_accepted else proposed // 2
@@ -401,24 +505,22 @@ def test_actual_ready_budget_bounds_retained_eager_plus_new_normal():
     assert _finish_simulated_proposal(controller, 1) is retained
     _finish_simulated_proposal(controller, 3, fully_accepted=False)
     second = controller.build_plan(range(4), verification_budget=8)
-    assert second.target_candidate_budgets == {0: 3, 2: 1}
+    # The promoted request joins the next opposite-home target batch instead
+    # of lingering for a full additional rotation.
+    assert second.target_candidate_budgets == {0: 3, 1: 4, 2: 1}
     assert second.normal_draft_request_indices == (3,)
     fresh = controller.new_ticket(3, gamma=8, eager=False)
     controller.publish([fresh])
     for index in second.target_request_indices:
         _finish_simulated_proposal(controller, index, fully_accepted=False)
-    assert sum(controller.ready[index].gamma for index in (1, 3)) == 12
 
     third = controller.build_plan(range(4), verification_budget=8)
     assert sum(third.target_candidate_budgets.values()) <= 8
-    assert third.target_request_indices == (1,)
-    assert third.deferred_target_request_indices == (3,)
+    assert third.target_request_indices == (3,)
+    assert third.target_candidate_budgets == {3: 8}
     assert controller.ready[3] is fresh
     assert fresh.lifecycle is ProposalLifecycle.AVAILABLE
     assert fresh.gamma == 8  # No unsafe truncation of the tree or dependency.
-    _finish_simulated_proposal(controller, 1)
-    fourth = controller.build_plan(range(4), verification_budget=8)
-    assert fourth.target_candidate_budgets == {3: 8}
 
 
 @pytest.mark.parametrize("merge_homes", [False, True])
@@ -503,6 +605,34 @@ def test_budget_deferral_does_not_starve_large_relaxed_request(request_cap):
         max_target_requests=request_cap,
     )
     assert second.target_candidate_budgets == {1: 8}
+
+
+def test_slo_ready_budget_prioritizes_a_need_before_deferral_age():
+    states = _states(2)
+    for state in states.values():
+        state.home_batch_id = 0
+        state.delivered_tokens = 1
+        state.decode_elapsed_ms = 200.0
+    states[0].slo_tpot_ms = 40.0
+    states[1].slo_tpot_ms = 150.0
+    controller = SpecRhythmPipelineController(states)
+    controller.publish(
+        [controller.new_ticket(index, gamma=4, eager=False) for index in states]
+    )
+    # Even a previously deferred relaxed request cannot displace the tight
+    # request while the latter has the larger section-4.3 progress gap.
+    controller._ready_wait_cycles[1] = 10
+
+    plan = controller.build_plan(
+        [0, 1],
+        priority=True,
+        projected_wait_ms=100.0,
+        merge_ready_homes=True,
+        verification_budget=4,
+    )
+
+    assert plan.target_request_indices == (0,)
+    assert plan.deferred_target_request_indices == (1,)
 
 
 def test_ready_budget_accepts_explicit_candidate_counts():

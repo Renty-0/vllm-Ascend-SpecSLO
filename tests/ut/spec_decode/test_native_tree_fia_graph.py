@@ -74,12 +74,13 @@ def test_fia_eager_and_capture_keep_distinct_operator_contracts(tree):
             kwargs = call.kwargs
             assert kwargs["actual_seq_lengths"] == [2, 7]
             if tree:
-                assert kwargs["sparse_mode"] == 1 and kwargs["inner_precise"] == 2
+                assert kwargs["sparse_mode"] == 1 and kwargs["inner_precise"] == 1
                 assert "next_tokens" not in kwargs and "pre_tokens" not in kwargs
                 assert kwargs["atten_mask"].shape == (2, 1, 5, 32)
             else:
                 assert kwargs["sparse_mode"] == 3
-                assert kwargs["next_tokens"] == kwargs["pre_tokens"] == 2147483647
+                assert kwargs["next_tokens"] == 0
+                assert "pre_tokens" not in kwargs
                 assert "inner_precise" not in kwargs
 
 
@@ -96,6 +97,33 @@ def test_fia_workspace_cache_separates_linear_tree_and_full_mask_shape():
         for tree, columns in [(False, 32), (True, 32), (True, 32), (True, 64)]:
             graph.run_native_fused_infer_attention(**_fia_arguments(_metadata(columns=columns), tree=tree))
         assert workspace.call_count == 3
+
+
+def test_tree_fia_workspace_pool_reuses_larger_envelope_across_graph_captures():
+    pool = {}
+    with (
+        patch.object(graph.torch_npu.npu_fused_infer_attention_score, "out"),
+        patch.object(
+            graph.torch_npu,
+            "_npu_fused_infer_attention_score_get_max_workspace",
+            return_value=torch.empty(8),
+        ) as workspace,
+        patch("torch.npu.current_stream", return_value=MagicMock()),
+        patch("torch.npu.ExternalEvent", return_value=MagicMock()),
+        patch("torch.npu.graph_task_group_begin"),
+        patch("torch.npu.graph_task_group_end", return_value="handle"),
+    ):
+        with graph._collect_graph_tasks(fia_workspaces=pool):
+            graph.run_native_fused_infer_attention(
+                **_fia_arguments(_metadata(counts=(5, 5)), tree=True)
+            )
+        with graph._collect_graph_tasks(fia_workspaces=pool):
+            graph.run_native_fused_infer_attention(
+                **_fia_arguments(_metadata(counts=(2, 5)), tree=True)
+            )
+
+    assert workspace.call_count == 1
+    assert len(pool) == 1
 
 
 @pytest.mark.parametrize("tree", [False, True])
@@ -122,20 +150,27 @@ def test_fia_task_update_preserves_mode_and_updates_heterogeneous_lengths(tree):
         assert kwargs["actual_seq_lengths_kv"] == [20, 16]
         assert kwargs["atten_mask"] is args["attention_mask"]
         if tree:
-            assert kwargs["sparse_mode"] == 1 and kwargs["inner_precise"] == 2
+            assert kwargs["sparse_mode"] == 1 and kwargs["inner_precise"] == 1
             assert "next_tokens" not in kwargs and "pre_tokens" not in kwargs
         else:
             assert kwargs["sparse_mode"] == 3 and kwargs["next_tokens"] == 0
             assert "inner_precise" not in kwargs and "pre_tokens" not in kwargs
 
 
-def test_tree_fia_graph_key_reuses_context_lengths_but_separates_query_partitions():
+def test_tree_fia_graph_key_reuses_exact_query_and_kv_lengths_via_task_update():
     runner = _runner()
     runner._capture_target = MagicMock(return_value=(torch.arange(7),))
     first = _metadata()
     same_partition = _metadata(lengths=(14, 15))
     different_partition = _metadata(counts=(5, 2), lengths=(14, 15))
-    with patch.object(graph, "bucket_tree_attention_metadata", side_effect=AssertionError("no dense bucketing")):
+    with (
+        patch.object(graph, "bucket_tree_attention_metadata", side_effect=AssertionError("no dense bucketing")),
+        patch.object(
+            graph,
+            "bucket_tree_fia_attention_metadata",
+            side_effect=AssertionError("FULL-mask FIA must retain exact KV lengths"),
+        ),
+    ):
         _call(runner, first)
         _call(runner, same_partition)
         _call(runner, different_partition)
@@ -143,13 +178,36 @@ def test_tree_fia_graph_key_reuses_context_lengths_but_separates_query_partition
         _call(runner, _metadata(counts=(3, 4)))
     calls = runner._capture_target.call_args_list
     assert calls[0].args[0] == calls[1].args[0]
-    assert calls[0].args[0] != calls[2].args[0]
+    assert calls[0].args[0] == calls[2].args[0]
     assert calls[0].args[0] != calls[3].args[0]
     assert calls[0].args[0] != calls[4].args[0]
     assert "tree-fia-full" in calls[0].args[0][0]
+    assert "exact-length-task-update" in calls[0].args[0][0]
     assert calls[0].kwargs["reference_metadatas"][0] is first
-    assert calls[0].args[3][0].sequence_lens == (16, 16)
+    assert calls[0].args[3][0].sequence_lens == (12, 13)
     assert first.context_lens.tolist() == [12, 12, 13, 13, 13, 13, 13]
+
+
+def test_causal_fia_graph_key_separates_request_table_shapes():
+    runner = _runner()
+    runner._capture_target = MagicMock(return_value=(torch.arange(7),))
+    two_requests = replace(
+        _metadata(counts=(2, 5)),
+        tree_attention=False,
+        tree_attention_mask=None,
+    )
+    one_request = replace(
+        _metadata(counts=(7,), lengths=(13,)),
+        tree_attention=False,
+        tree_attention_mask=None,
+    )
+
+    _call(runner, two_requests)
+    _call(runner, one_request)
+
+    calls = runner._capture_target.call_args_list
+    assert calls[0].args[0] != calls[1].args[0]
+    assert "fia:exact-length-task-update" in calls[0].args[0][0]
 
 
 def test_tree_fia_capture_owns_full_mask_and_replay_copies_every_new_value():
@@ -179,10 +237,33 @@ def test_tree_fia_capture_owns_full_mask_and_replay_copies_every_new_value():
         assert torch.equal(entry.tree_attention_masks[0], second.tree_attention_mask)
         assert torch.equal(entry.attention_masks[0], second.attention_mask)
         assert entry.actual_seq_lengths_q == ((2, 7),)
-        assert entry.sequence_lens == ((16, 16),)
+        assert entry.sequence_lens == ((14, 15),)
 
 
-def test_tree_fia_replay_skips_layer_task_updates_inside_stable_bucket():
+def test_tree_fia_capture_and_replay_do_not_require_redundant_2d_mask():
+    runner = _runner()
+    runner._execute_target = MagicMock(return_value=(torch.arange(7),))
+    runner._update_target_attention_tasks = MagicMock()
+    first = replace(_metadata(), attention_mask=None)
+    with (
+        patch("torch.npu.NPUGraph", return_value=MagicMock()),
+        patch("torch.npu.graph", return_value=MagicMock()),
+        patch("torch.npu.current_stream", return_value=MagicMock()),
+        patch("torch.npu.synchronize"),
+    ):
+        _call(runner, first)
+        entry = next(iter(runner.target_entries.values()))
+        assert entry.attention_masks == (None,)
+        second = replace(_metadata(lengths=(14, 15)), attention_mask=None)
+        second.tree_attention_mask[1, 0, 0, 3] = True
+        _call(runner, second)
+
+    assert runner.capture_count == 1
+    assert runner.last_target_execution.mode == "replay"
+    assert torch.equal(entry.tree_attention_masks[0], second.tree_attention_mask)
+
+
+def test_tree_fia_replay_updates_tasks_when_exact_kv_lengths_change():
     runner = _runner()
     runner._execute_target = MagicMock(return_value=(torch.arange(7),))
     runner._update_target_attention_tasks = MagicMock()
@@ -195,6 +276,45 @@ def test_tree_fia_replay_skips_layer_task_updates_inside_stable_bucket():
         _call(runner, _metadata(lengths=(12, 13)))
         runner._update_target_attention_tasks.reset_mock()
         _call(runner, _metadata(lengths=(14, 15)))
+
+    runner._update_target_attention_tasks.assert_called_once()
+    assert runner.task_update_skip_replay_count == 0
+    assert runner.task_update_replay_count == 1
+
+
+def test_tree_fia_replay_updates_tasks_when_query_partition_changes_inside_same_shapes():
+    runner = _runner()
+    runner._execute_target = MagicMock(return_value=(torch.arange(7),))
+    runner._update_target_attention_tasks = MagicMock()
+    with (
+        patch("torch.npu.NPUGraph", return_value=MagicMock()),
+        patch("torch.npu.graph", return_value=MagicMock()),
+        patch("torch.npu.current_stream", return_value=MagicMock()),
+        patch("torch.npu.synchronize"),
+    ):
+        _call(runner, _metadata(counts=(2, 5)))
+        runner._update_target_attention_tasks.reset_mock()
+        _call(runner, _metadata(counts=(5, 2)))
+
+    runner._update_target_attention_tasks.assert_called_once()
+    assert runner.task_update_skip_replay_count == 0
+    assert runner.task_update_replay_count == 1
+    assert runner.capture_count == 1
+
+
+def test_tree_fia_replay_skips_task_updates_when_exact_lengths_are_unchanged():
+    runner = _runner()
+    runner._execute_target = MagicMock(return_value=(torch.arange(7),))
+    runner._update_target_attention_tasks = MagicMock()
+    with (
+        patch("torch.npu.NPUGraph", return_value=MagicMock()),
+        patch("torch.npu.graph", return_value=MagicMock()),
+        patch("torch.npu.current_stream", return_value=MagicMock()),
+        patch("torch.npu.synchronize"),
+    ):
+        _call(runner, _metadata(lengths=(12, 13)))
+        runner._update_target_attention_tasks.reset_mock()
+        _call(runner, _metadata(lengths=(12, 13)))
 
     runner._update_target_attention_tasks.assert_not_called()
     assert runner.task_update_skip_replay_count == 1

@@ -5,7 +5,6 @@ These tests do not claim to exercise the Ascend graph runtime. Hardware graph
 replay/numerical regression remains a separate end-to-end acceptance gate.
 """
 
-import os
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
@@ -254,19 +253,30 @@ def test_target_graph_reports_capture_then_real_replay_and_copies_new_mask():
         assert entry.attention_masks[0][0, 6]
         assert runner.capture_count == 1
         assert runner.replay_count == 2
-        # One eager reference plus one capture-body invocation; there is no
-        # third full-model call on the first production replay.
-        assert runner._execute_target.call_count == 2
+        # The first replay with changed inputs is compared exactly against an
+        # eager reference before this entry becomes a production hot path.
+        assert runner._execute_target.call_count == 3
         assert entry.runtime_validated
-        assert runner.runtime_validation_replay_count == 0
+        assert runner.runtime_validation_replay_count == 1
+        assert runner.execution_counters["target"] == {
+            "total_calls": 2,
+            "capture_replay_calls": 1,
+            "replay_calls": 1,
+            "eager_fallback_calls": 0,
+            "disabled_entry_calls": 0,
+            "unclassified_calls": 0,
+            "runtime_validation_calls": 1,
+            "runtime_validation_failures": 0,
+            "changed_input_validation_calls": 1,
+            "logical_row_expansion_validation_calls": 0,
+        }
 
 
-def test_target_graph_changed_input_runtime_validation_is_explicit_diagnostic():
+def test_target_graph_defers_runtime_validation_until_inputs_change():
     runner = _runner()
     runner._execute_target = MagicMock(return_value=(torch.tensor([1, 2]),))
     runner._update_target_attention_tasks = MagicMock()
     with (
-        patch.dict(os.environ, {"VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS": "1"}),
         patch("torch.npu.NPUGraph", return_value=MagicMock()),
         patch("torch.npu.graph", return_value=MagicMock()),
         patch("torch.npu.current_stream", return_value=MagicMock()),
@@ -275,6 +285,9 @@ def test_target_graph_changed_input_runtime_validation_is_explicit_diagnostic():
         _target_call(runner, _metadata((5, 6)))
         entry = next(iter(runner.target_entries.values()))
         assert not entry.runtime_validated
+        _target_call(runner, _metadata((5, 6)))
+        assert not entry.runtime_validated
+        assert runner.runtime_validation_replay_count == 0
         _target_call(runner, _metadata((6, 7)))
 
     assert entry.runtime_validated

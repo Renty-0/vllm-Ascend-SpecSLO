@@ -2,7 +2,7 @@
 """Probe production FULL-mask tree FIA without loading a model.
 
 The contract is copied from attention_v1.py's tree_attention branch: paged
-KV, TND, sparse_mode=1, inner_precise=2, [requests, 1, maxQ, max_context]
+KV, TND, sparse_mode=1, inner_precise=1, [requests, 1, maxQ, max_context]
 boolean mask (True=blocked), and actual query/KV lengths. Query tensors have
 exactly sum(query_counts) rows; only the mask envelope is rectangular.
 
@@ -22,6 +22,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import time
 from pathlib import Path
 
 
@@ -37,6 +38,10 @@ def _parser():
     parser.add_argument("--seed", type=int, default=867)
     parser.add_argument("--atol", type=float, default=0.001)
     parser.add_argument("--rtol", type=float, default=0.005)
+    parser.add_argument("--inner-precise", type=int, choices=(1, 2), default=1)
+    parser.add_argument("--benchmark-batch", type=int, default=0)
+    parser.add_argument("--benchmark-warmup", type=int, default=10)
+    parser.add_argument("--benchmark-repeats", type=int, default=30)
     parser.add_argument("--graph", action="store_true")
     parser.add_argument("--output", required=True)
     return parser
@@ -51,6 +56,8 @@ def _validate(args):
         raise ValueError("Cache capacity must be block aligned and cover tree scratch positions")
     if args.atol < 0 or args.rtol < 0:
         raise ValueError("Oracle tolerances must be non-negative")
+    if args.benchmark_batch < 0 or args.benchmark_warmup < 0 or args.benchmark_repeats <= 0:
+        raise ValueError("Benchmark sizes must be non-negative and repeats must be positive")
     if args.device != "cpu" and not args.device.startswith("npu:"):
         raise ValueError("Choose cpu or one explicitly assigned npu:<index>")
     if args.device == "cpu" and args.graph:
@@ -180,13 +187,14 @@ def _device_tensors(case, device, layout):
     }.items()}
 
 
-def _fia_kwargs(case, tensors, layout):
+def _fia_kwargs(case, tensors, layout, args=None):
+    inner_precise = 1 if args is None else args.inner_precise
     return {
         **tensors, "input_layout": layout, "block_size": case["block_size"],
         "actual_seq_lengths": case["actual_seq_lengths"] if layout == "TND" else case["query_counts"],
         "actual_seq_lengths_kv": case["sequence_lengths"], "num_heads": case["heads"],
         "num_key_value_heads": case["kv_heads"], "scale": 1.0 / math.sqrt(case["head_dim"]),
-        "sparse_mode": 1, "inner_precise": 2,
+        "sparse_mode": 1, "inner_precise": inner_precise,
     }
 
 
@@ -229,7 +237,7 @@ def _graph_replays(cases, args, layout):
     import torch_npu
 
     tensors = _device_tensors(cases[0], args.device, layout)
-    initial = _fia_kwargs(cases[0], tensors, layout)
+    initial = _fia_kwargs(cases[0], tensors, layout, args)
     output = torch.empty_like(tensors["query"])
     lse = torch.empty(1, dtype=output.dtype, device=args.device)
     workspace = torch_npu._npu_fused_infer_attention_score_get_max_workspace(**initial)
@@ -253,7 +261,7 @@ def _graph_replays(cases, args, layout):
             if tensor.shape != current[name].shape:
                 raise ValueError("A replay family must keep all graph buffer shapes stable")
             tensor.copy_(current[name])
-        kwargs = _fia_kwargs(case, tensors, layout)
+        kwargs = _fia_kwargs(case, tensors, layout, args)
         main_stream = torch.npu.current_stream()
         update_stream.wait_stream(main_stream)
         with torch.npu.stream(update_stream):
@@ -275,6 +283,78 @@ def _graph_replays(cases, args, layout):
     return rows
 
 
+def _benchmark(case, args):
+    """Measure one representative FULL-tree FIA op and its graph update path."""
+    import torch
+    import torch_npu
+
+    tensors = _device_tensors(case, args.device, "TND")
+    kwargs = _fia_kwargs(case, tensors, "TND", args)
+    for _ in range(args.benchmark_warmup):
+        torch_npu.npu_fused_infer_attention_score(**kwargs)
+    torch.npu.synchronize()
+    started = time.perf_counter()
+    for _ in range(args.benchmark_repeats):
+        torch_npu.npu_fused_infer_attention_score(**kwargs)
+    torch.npu.synchronize()
+    eager_ms = (time.perf_counter() - started) * 1000.0 / args.benchmark_repeats
+
+    output = torch.empty_like(tensors["query"])
+    lse = torch.empty(1, dtype=output.dtype, device=args.device)
+    workspace = torch_npu._npu_fused_infer_attention_score_get_max_workspace(**kwargs)
+    for _ in range(3):
+        torch_npu.npu_fused_infer_attention_score.out(
+            **kwargs, workspace=workspace, out=[output, lse]
+        )
+    torch.npu.synchronize()
+    graph = torch.npu.NPUGraph()
+    event = torch.npu.ExternalEvent()
+    with torch.npu.graph(graph):
+        capture_stream = torch.npu.current_stream()
+        event.wait(capture_stream)
+        event.reset(capture_stream)
+        torch.npu.graph_task_group_begin(capture_stream)
+        torch_npu.npu_fused_infer_attention_score.out(
+            **kwargs, workspace=workspace, out=[output, lse]
+        )
+        handle = torch.npu.graph_task_group_end(capture_stream)
+    update_stream = torch.npu.Stream()
+    for _ in range(args.benchmark_warmup):
+        main_stream = torch.npu.current_stream()
+        update_stream.wait_stream(main_stream)
+        with torch.npu.stream(update_stream):
+            torch.npu.graph_task_update_begin(update_stream, handle)
+            torch_npu.npu_fused_infer_attention_score.out(
+                **kwargs, workspace=workspace, out=[output, lse]
+            )
+            torch.npu.graph_task_update_end(update_stream)
+            event.record(update_stream)
+        main_stream.wait_stream(update_stream)
+        graph.replay()
+    torch.npu.synchronize()
+    started = time.perf_counter()
+    for _ in range(args.benchmark_repeats):
+        main_stream = torch.npu.current_stream()
+        update_stream.wait_stream(main_stream)
+        with torch.npu.stream(update_stream):
+            torch.npu.graph_task_update_begin(update_stream, handle)
+            torch_npu.npu_fused_infer_attention_score.out(
+                **kwargs, workspace=workspace, out=[output, lse]
+            )
+            torch.npu.graph_task_update_end(update_stream)
+            event.record(update_stream)
+        main_stream.wait_stream(update_stream)
+        graph.replay()
+    torch.npu.synchronize()
+    graph_update_ms = (time.perf_counter() - started) * 1000.0 / args.benchmark_repeats
+    return {
+        **_describe(case, "TND"),
+        "inner_precise": args.inner_precise,
+        "eager_ms_per_op": eager_ms,
+        "graph_update_replay_ms_per_op": graph_update_ms,
+    }
+
+
 def main(argv=None):
     args = _parser().parse_args(argv)
     _validate(args)
@@ -287,9 +367,13 @@ def main(argv=None):
         torch.npu.set_device(args.device)
     report = {
         "status": "running", "config": vars(args), "npu_executed": on_npu,
-        "contract": "paged FULL mask sparse_mode=1 inner_precise=2; no query padding",
+        "contract": (
+            "paged FULL mask sparse_mode=1 "
+            f"inner_precise={args.inner_precise}; no query padding"
+        ),
         "oracle": "independent CPU float64 explicit ancestor gather and score-softmax-value",
-        "torch_version": torch.__version__, "cases": [], "graphs": [], "errors": [],
+        "torch_version": torch.__version__, "cases": [], "graphs": [],
+        "benchmarks": [], "errors": [],
     }
     destination = Path(args.output)
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -316,7 +400,7 @@ def main(argv=None):
                             if on_npu:
                                 tensors = _device_tensors(case, args.device, layout)
                                 actual, _ = torch_npu.npu_fused_infer_attention_score(
-                                    **_fia_kwargs(case, tensors, layout)
+                                    **_fia_kwargs(case, tensors, layout, args)
                                 )
                                 actual = _flatten_output(actual, layout)
                                 description["fia_vs_cpu64"] = _comparison(actual, oracle, args)
@@ -337,7 +421,7 @@ def main(argv=None):
                                 if on_npu:
                                     tensors = _device_tensors(poisoned, args.device, layout)
                                     changed, _ = torch_npu.npu_fused_infer_attention_score(
-                                        **_fia_kwargs(poisoned, tensors, layout)
+                                        **_fia_kwargs(poisoned, tensors, layout, args)
                                     )
                                     changed = _flatten_output(changed, layout)
                                     perturbation["fia_invariance"] = _comparison(
@@ -363,6 +447,17 @@ def main(argv=None):
                     except Exception as error:
                         report["errors"].append({"graph_counts": counts, "layout": layout, "error": repr(error)})
                     save()
+        if on_npu and args.benchmark_batch:
+            benchmark_context = min(args.contexts[0], args.max_context - 16)
+            case = _make_case(
+                [benchmark_context] * args.benchmark_batch,
+                [5] * args.benchmark_batch,
+                scratch=False,
+                args=args,
+                seed=args.seed + 197,
+            )
+            report["benchmarks"].append(_benchmark(case, args))
+            save()
         checks = []
         for row in report["cases"]:
             comparison = row.get("fia_vs_cpu64" if on_npu else "dense_fp32_vs_cpu64", {})

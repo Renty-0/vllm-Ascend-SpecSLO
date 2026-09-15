@@ -98,6 +98,44 @@ def test_kv_preflight_accepts_nonmonotone_slots_without_mutation(draft, eager):
     assert set(pending) == (set() if draft else set(controller.ready[index].proposal_id for index in range(2)))
 
 
+def test_kv_preflight_can_return_the_already_synchronized_host_mappings():
+    fixture = _fixture()
+    engine, controller, payloads, mappings, plans, output = fixture
+    pending, host_mappings = engine._preflight_spec_rhythm_tree_cache_commit(
+        controller,
+        payloads,
+        mappings,
+        [0, 1],
+        plans,
+        output,
+        return_host_mappings=True,
+    )
+    assert set(host_mappings) == set(pending)
+    assert list(host_mappings.values()) == [
+        [3, 7, 6, 9, 11],
+        [19, 23, 22, 25, 27],
+    ]
+
+
+def test_kv_preflight_does_not_require_discarded_normal_draft_mapping():
+    fixture = _fixture(draft=True)
+    _, controller, payloads, mappings, _, _ = fixture
+    for ticket in controller.ready.values():
+        payloads[ticket.proposal_id]["draft_kv_materialized"] = False
+        mappings.pop(ticket.proposal_id)
+    pending, host_mappings = fixture[0]._preflight_spec_rhythm_tree_cache_commit(
+        controller,
+        payloads,
+        mappings,
+        [0, 1],
+        fixture[4],
+        None,
+        return_host_mappings=True,
+    )
+    assert pending == {}
+    assert host_mappings == {}
+
+
 @pytest.mark.parametrize("kind", ["missing", "short", "long", "rank", "float", "negative", "large", "alias"])
 @pytest.mark.parametrize("location", ["target", "draft", "eager"])
 def test_kv_preflight_rejects_bad_last_proposal_mapping(kind, location):
@@ -299,9 +337,10 @@ def test_remote_preflight_error_prevents_leader_commit_mapping_and_stream_chunks
     inspected_mappings = []
 
     def record_pending(*args, **kwargs):
-        pending = original_preflight(*args, **kwargs)
+        result = original_preflight(*args, **kwargs)
+        pending = result[0] if kwargs.get("return_host_mappings") else result
         inspected_mappings.append((args[2], dict(args[2]), pending))
-        return pending
+        return result
 
     harness.engine._preflight_spec_rhythm_tree_cache_commit = record_pending
     with pytest.raises(RuntimeError, match="preflight failed on another rank; this step was not committed"):

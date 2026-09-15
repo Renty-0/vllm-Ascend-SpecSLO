@@ -76,7 +76,7 @@ def test_runtime_defers_full_tree_write_and_materializes_only_selected_missing_n
     # ten-query full-tree write is absent until global B selects candidates.
     assert [call[0].numel() for call in engine.model.calls] == [2, 2]
     assert output["materialization_deferred"] is True
-    assert output["cache_slot_mapping"].numel() == 10
+    assert output["cache_slot_mapping"] is None
 
     materialized = engine.materialize_selected_tree_kv(
         plans,

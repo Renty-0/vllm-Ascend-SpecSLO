@@ -70,7 +70,7 @@ def test_single_query_full_mask_abi_uses_explicit_lengths_and_precision(layout):
     case = probe._make_case([3, 4], [1, 1], scratch=True, args=_args(), seed=5)
     tensors = probe._device_tensors(case, "cpu", layout)
     kwargs = probe._fia_kwargs(case, tensors, layout)
-    assert kwargs["sparse_mode"] == 1 and kwargs["inner_precise"] == 2
+    assert kwargs["sparse_mode"] == 1 and kwargs["inner_precise"] == 1
     assert kwargs["atten_mask"].shape == (2, 1, 1, 32)
     assert kwargs["actual_seq_lengths"] == ([1, 2] if layout == "TND" else [1, 1])
     assert kwargs["actual_seq_lengths_kv"] == [9, 10]

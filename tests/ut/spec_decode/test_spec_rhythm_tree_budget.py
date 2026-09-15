@@ -205,6 +205,46 @@ def test_normal_overflow_is_reported_but_does_not_admit_eager():
     assert predicted.predicted_exposed_draft_ms == 7.0
 
 
+def test_draft_window_charges_and_learns_eager_batch_fixed_overhead():
+    estimator = DraftWindowEstimator(ema_alpha=1.0)
+    estimator.observe(
+        draft_compute_ms=8.0,
+        drafted_tokens=4,
+        target_verify_ms=12.0,
+    )
+
+    # Before the first eager sample, one normal cycle is the conservative
+    # fixed-cost proxy: 8 ms normal + 8 ms extra cannot fit a 12 ms W.
+    blocked = estimator.estimate(
+        normal_tokens=4,
+        max_draft_tokens=12,
+        eager_work=True,
+    )
+    assert blocked.eager_fixed_overhead_ms == 8.0
+    assert blocked.eager_fixed_overhead_hidden is False
+    assert blocked.eager_token_budget == 0
+
+    # A measured eager cycle isolates 14 - (4 * 2) = 6 ms of batch-level
+    # frontier/materialization overhead without changing the normal slope.
+    estimator.observe(
+        draft_compute_ms=14.0,
+        drafted_tokens=4,
+        target_verify_ms=20.0,
+        eager_work=True,
+    )
+    predicted = estimator.estimate(
+        normal_tokens=4,
+        max_draft_tokens=12,
+        eager_work=True,
+    )
+    assert estimator.draft_ms_per_token == 2.0
+    assert estimator.eager_fixed_overhead_ms == 6.0
+    assert predicted.eager_fixed_overhead_ms == 6.0
+    assert predicted.eager_fixed_overhead_hidden is True
+    assert predicted.eager_token_budget == 3
+    assert predicted.residual_window_ms == 6.0
+
+
 def test_profiled_roof_is_not_silently_increased_to_active_batch_size():
     shaper = SpecRhythmBudgetShaper(min_gamma=1, max_gamma=8, roofline={"batch:8": 3})
     assert shaper.verification_roof(8, 1024) == 3

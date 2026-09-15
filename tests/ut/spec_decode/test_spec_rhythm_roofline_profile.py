@@ -45,7 +45,7 @@ def _document(rows=None):
             "ar_comparator": "standard_decode_full_active_batch",
             **runtime_source_fingerprints(),
             "tree_fia_sparse_mode": 1,
-            "tree_fia_inner_precise": 2,
+            "tree_fia_inner_precise": 1,
             "max_model_len": 1024,
             "tree_width": 2,
             "tree_depth": 2,

@@ -115,6 +115,18 @@ def test_selected_scratch_and_trimmed_plans_keep_cpu_storage_and_dependencies():
     assert trimmed.candidate_budget == 2
 
 
+def test_selected_cpu_plan_reuses_immutable_packed_geometry():
+    base = build_tree_speculation_plan(2, 3, 7, 64, candidate_budget=4)
+    first = pack_selected_tree_plan(base, [0, 1, 2, 4])
+    second = pack_selected_tree_plan(base, torch.tensor([0, 1, 2, 4]))
+
+    assert first is second
+    assert first.parent_indices.tolist() == [-1, 0, 1, 0]
+    assert first.positions.tolist() == [7, 8, 9, 10, 9]
+    assert first.cache_positions.tolist() == [7, 8, 9, 10, 11]
+    assert torch.equal(first.attention_mask, second.attention_mask)
+
+
 @pytest.mark.parametrize("level", [False, True])
 def test_cpu_plan_metadata_explicitly_targets_model_device(monkeypatch, level):
     engine = _engine()
@@ -141,12 +153,17 @@ def test_cpu_plan_metadata_explicitly_targets_model_device(monkeypatch, level):
     boundary.assert_device_transfer(positions)
     assert positions.tolist() == expected_positions
     assert metadata.slot_mapping.tolist() == expected_slots
-    assert torch.equal(metadata.attention_mask, expected_mask)
+    assert metadata.attention_mask is None
+    assert torch.equal(
+        metadata.tree_attention_mask[0, 0, : expected_mask.shape[0]],
+        expected_mask,
+    )
     assert metadata.context_lens.device.type == "cpu"
     assert metadata.tree_attention and metadata.use_fused_infer_attention
     # Mask transfers must be explicit too; the plan remains CPU and unchanged.
     mask_copies = [source for source, _ in boundary.transfers if source.dtype == torch.bool]
-    assert mask_copies and sum(value.numel() for value in mask_copies) == expected_mask.numel()
+    assert len(mask_copies) == 1
+    assert sum(value.numel() for value in mask_copies) == expected_mask.numel()
     assert torch.equal(plan.attention_mask, original_mask)
     _assert_cpu_plan(plan)
 

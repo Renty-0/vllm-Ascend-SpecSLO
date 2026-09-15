@@ -250,6 +250,10 @@ class DraftWindowBudget:
     residual_window_ms: float
     predicted_exposed_draft_ms: float
     calibrated: bool
+    # Batch-level frontier/materialization cost paid once when any rolling
+    # eager row is present. It is separate from exploratory-token cost.
+    eager_fixed_overhead_ms: float = 0.0
+    eager_fixed_overhead_hidden: bool = False
 
 
 @dataclass
@@ -266,6 +270,8 @@ class DraftWindowEstimator:
     draft_ms_per_token: float | None = field(default=None, init=False)
     target_verify_ms: float | None = field(default=None, init=False)
     communication_ms: float | None = field(default=None, init=False)
+    normal_cycle_compute_ms: float | None = field(default=None, init=False)
+    eager_fixed_overhead_ms: float | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.ema_alpha) or not 0.0 < self.ema_alpha <= 1.0:
@@ -278,6 +284,7 @@ class DraftWindowEstimator:
         drafted_tokens: int,
         target_verify_ms: float,
         communication_ms: float = 0.0,
+        eager_work: bool = False,
     ) -> None:
         values = (draft_compute_ms, target_verify_ms, communication_ms)
         if any(not math.isfinite(value) or value < 0.0 for value in values) or drafted_tokens < 0:
@@ -287,12 +294,41 @@ class DraftWindowEstimator:
             return sample if previous is None else self.ema_alpha * sample + (1.0 - self.ema_alpha) * previous
 
         if drafted_tokens and draft_compute_ms > 0.0:
-            self.draft_ms_per_token = update(self.draft_ms_per_token, draft_compute_ms / drafted_tokens)
+            if eager_work and self.draft_ms_per_token is not None:
+                # Rolling eager adds two batch-level paths in the current tree
+                # worker: parent-frontier prediction and selected-KV
+                # materialization.  Their launch/model cost is not represented
+                # by ``drafted_tokens``. Learn the residual without polluting
+                # the normal per-token slope used for future W decisions.
+                predicted_normal_ms = self.draft_ms_per_token * drafted_tokens
+                eager_overhead_sample = max(
+                    0.0,
+                    draft_compute_ms - predicted_normal_ms,
+                )
+                self.eager_fixed_overhead_ms = update(
+                    self.eager_fixed_overhead_ms,
+                    eager_overhead_sample,
+                )
+            else:
+                self.draft_ms_per_token = update(
+                    self.draft_ms_per_token,
+                    draft_compute_ms / drafted_tokens,
+                )
+                self.normal_cycle_compute_ms = update(
+                    self.normal_cycle_compute_ms,
+                    draft_compute_ms,
+                )
         if target_verify_ms > 0.0:
             self.target_verify_ms = update(self.target_verify_ms, target_verify_ms)
         self.communication_ms = update(self.communication_ms, communication_ms)
 
-    def estimate(self, *, normal_tokens: int, max_draft_tokens: int) -> DraftWindowBudget:
+    def estimate(
+        self,
+        *,
+        normal_tokens: int,
+        max_draft_tokens: int,
+        eager_work: bool = False,
+    ) -> DraftWindowBudget:
         if normal_tokens < 0 or max_draft_tokens < 0:
             raise ValueError("Draft-window token counts must be non-negative.")
         normal = min(int(normal_tokens), int(max_draft_tokens))
@@ -304,15 +340,38 @@ class DraftWindowEstimator:
             return DraftWindowBudget(window_ms, self.draft_ms_per_token, normal, normal, 0, 0.0, 0.0, False)
         assert self.draft_ms_per_token is not None
         normal_ms = normal * self.draft_ms_per_token
-        hidden_tokens = int(window_ms / self.draft_ms_per_token)
+        eager_fixed_overhead_ms = 0.0
+        if eager_work:
+            # Before the first eager observation, use one complete normal
+            # draft cycle as a conservative proxy for the two extra batched
+            # model paths.  This allows the first probe only when W has ample
+            # headroom; after that the measured residual replaces the proxy.
+            eager_fixed_overhead_ms = (
+                self.eager_fixed_overhead_ms
+                if self.eager_fixed_overhead_ms is not None
+                else self.normal_cycle_compute_ms
+                if self.normal_cycle_compute_ms is not None
+                else self.draft_ms_per_token * max(1, normal)
+            )
+        eager_window_ms = max(0.0, window_ms - eager_fixed_overhead_ms)
+        hidden_tokens = int(eager_window_ms / self.draft_ms_per_token)
         capacity = min(int(max_draft_tokens), max(normal, hidden_tokens))
+        eager_fixed_overhead_hidden = (
+            not eager_work
+            or normal_ms + eager_fixed_overhead_ms <= window_ms
+        )
         return DraftWindowBudget(
             draft_window_ms=window_ms,
             draft_ms_per_token=self.draft_ms_per_token,
             normal_tokens=normal,
             draft_token_budget=capacity,
             eager_token_budget=max(0, capacity - normal),
-            residual_window_ms=max(0.0, window_ms - normal_ms),
+            residual_window_ms=max(
+                0.0,
+                window_ms - normal_ms - eager_fixed_overhead_ms,
+            ),
             predicted_exposed_draft_ms=max(0.0, normal_ms - window_ms),
             calibrated=True,
+            eager_fixed_overhead_ms=eager_fixed_overhead_ms,
+            eager_fixed_overhead_hidden=eager_fixed_overhead_hidden,
         )
