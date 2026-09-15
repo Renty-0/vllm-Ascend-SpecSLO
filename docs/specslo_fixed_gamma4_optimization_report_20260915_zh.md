@@ -1,9 +1,9 @@
 # SpecSLO 固定 gamma=4 优化与 1.3913×（约 1.4×）Goodput 验收报告
 
 - 更新时间：2026-09-15
-- 代码分支：`vllm-hust-sd/nano-pearl-0808`
+- 当前链式投机解码分支：`SpecSLO-Chain`
 - 测试后整理的代码提交：[`032527b3f7a7258376d204f7a4ad79f4d5c1eff8`](https://github.com/Renty-0/vllm-Ascend-SpecSLO/commit/032527b3f7a7258376d204f7a4ad79f4d5c1eff8)
-- 远端仓库：[`Renty-0/vllm-Ascend-SpecSLO`](https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/vllm-hust-sd/nano-pearl-0808)
+- 远端仓库：[`Renty-0/vllm-Ascend-SpecSLO`](https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/SpecSLO-Chain)
 
 ## 1. 汇报结论
 
