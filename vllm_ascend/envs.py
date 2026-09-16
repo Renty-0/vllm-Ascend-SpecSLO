@@ -35,7 +35,8 @@ env_variables: dict[str, Callable[[], Any]] = {
     # Default None lets the execution path choose. Non-sensitive.
     "VLLM_ASCEND_PEARL_NPU_PROFILE_RANK": lambda: (
         int(os.environ["VLLM_ASCEND_PEARL_NPU_PROFILE_RANK"])
-        if "VLLM_ASCEND_PEARL_NPU_PROFILE_RANK" in os.environ else None
+        if "VLLM_ASCEND_PEARL_NPU_PROFILE_RANK" in os.environ
+        else None
     ),
     # PEARL/SpecSLO experimental diagnostics and compatibility switches.
     # All are non-sensitive. Production defaults keep diagnostics disabled
@@ -43,10 +44,14 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE": lambda: bool(
         int(os.getenv("VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE", "0"))
     ),
-    "VLLM_ASCEND_PEARL_VERBOSE": lambda: bool(int(os.getenv("VLLM_ASCEND_PEARL_VERBOSE", "0"))),
-    "VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS", "0"))
+    # Strict qualification gate for native PARD eager execution.  Default off
+    # keeps the public engine fail-closed.  This never enables draft ACLGraph;
+    # it only permits the fixed-gamma greedy full-window NPU qualification run.
+    "VLLM_ASCEND_SPECSLO_ENABLE_EXPERIMENTAL_PARD_EAGER": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECSLO_ENABLE_EXPERIMENTAL_PARD_EAGER", "0"))
     ),
+    "VLLM_ASCEND_PEARL_VERBOSE": lambda: bool(int(os.getenv("VLLM_ASCEND_PEARL_VERBOSE", "0"))),
+    "VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS": lambda: bool(int(os.getenv("VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS", "0"))),
     "VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE": lambda: bool(
         int(os.getenv("VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE", "0"))
     ),
@@ -67,24 +72,207 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE": lambda: bool(
         int(os.getenv("VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE", "0"))
     ),
+    # Coalesce only the ExternalEvent gate used by consecutive FIA task
+    # updates in an exact target-verification ACLGraph.  A value of 1 keeps the
+    # production one-event-per-layer contract (default/off); experimental
+    # values 2 and 4 release that many independently updated single-operator
+    # handles with one event.  CANN currently permits only one operator per
+    # task-group handle, so this switch deliberately does not coalesce handles
+    # or graph_task_update_begin/end calls.  Non-sensitive NPU performance
+    # switch; changed-input numerical qualification is required before use.
+    "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_EVENT_GROUP_SIZE": lambda: int(
+        os.getenv(
+            "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_EVENT_GROUP_SIZE",
+            "1",
+        )
+    ),
     "VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE": lambda: bool(
         int(os.getenv("VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE", "0"))
     ),
-    "VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY", "0"))
-    ),
+    "VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY": lambda: bool(int(os.getenv("VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY", "0"))),
     "VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS": lambda: bool(
         int(os.getenv("VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS", "0"))
     ),
+    # Let every shape captured by one native PEARL graph runner use the same
+    # allocator pool.  This is safe because a worker submits at most one model
+    # graph at a time, and prevents each mixed-prefill bucket from retaining a
+    # separate copy of all transformer intermediates.  Keep it opt-in until
+    # the changed-shape replay and P128 performance gates have passed.
+    "VLLM_ASCEND_PEARL_SHARED_GRAPH_POOL": lambda: bool(int(os.getenv("VLLM_ASCEND_PEARL_SHARED_GRAPH_POOL", "0"))),
+    # Collect fine-grained host timings for native PagedAttention and fused
+    # infer-attention graph-task refreshes. Disabled by default because the
+    # per-task clock reads are intended for profiling, not production
+    # throughput measurements.
+    "VLLM_ASCEND_PEARL_PROFILE_PA_TASK_UPDATE": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_PROFILE_PA_TASK_UPDATE", "0"))
+    ),
+    # Reuse one host length signature and one workspace query per serial
+    # draft step while preserving every per-layer graph task update.
+    "VLLM_ASCEND_PEARL_DRAFT_STEP_MAJOR_PA_TASK_UPDATE": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_PEARL_DRAFT_STEP_MAJOR_PA_TASK_UPDATE",
+                "0",
+            )
+        )
+    ),
+    # Replace the fixed-gamma serial draft's one-token PA calls with a
+    # request-major FULL-mask FIA contract.  Every request keeps its exact
+    # visible prefix in the mask while the host-side KV length is rounded to
+    # a power-of-two bucket.  This makes the captured FIA task arguments
+    # stable inside a bucket and permits replay without rebuilding every
+    # decoder layer's graph task.  Experimental and disabled by default until
+    # the NPU numerical/throughput gates pass.
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_BUCKET": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_BUCKET",
+                "0",
+            )
+        )
+    ),
+    # Keep the host-side FIA KV-length tuple stable when different requests
+    # occupy the same serial-draft graph bucket/lane.  All real rows use the
+    # workload-wide lifetime envelope while the FULL mask continues to expose
+    # only each row's exact causal prefix.  This is meaningful only together
+    # with LINEAR_DRAFT_FIA_BUCKET and is independently opt-in while its NPU
+    # numerical/performance gate is evaluated.
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_COMMON_KV": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_COMMON_KV",
+                "0",
+            )
+        )
+    ),
+    # Replace the fixed-gamma common-KV draft graph's per-layer ExternalEvent
+    # gates with one entry-wide stable-task barrier.  This is legal only when
+    # every replay keeps the captured FIA query/KV length literals unchanged;
+    # the native runner rejects a changed signature before graph submission.
+    # Experimental and disabled by default pending the NPU ABI/numerical gate.
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_STABLE_TASK_BARRIER": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_STABLE_TASK_BARRIER",
+                "0",
+            )
+        )
+    ),
+    # Use a fixed descending per-row lifetime-capacity vector for each serial
+    # draft graph bucket. Active rows are ranked into dominating slots and
+    # outputs are restored to caller order. This avoids making every row pay
+    # the service-wide maximum KV scan while preserving a membership-invariant
+    # graph signature. Independently opt-in and mutually exclusive with the
+    # common-KV mode above.
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_RANKED_KV": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_RANKED_KV",
+                "0",
+            )
+        )
+    ),
+    # Build every fixed-gamma FULL visibility mask in one broadcasted pass
+    # while caching only the immutable arange base. Meaningful only with the
+    # bucketed linear-draft FIA path; independently opt-in for NPU gating.
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_BATCHED_MASKS": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_BATCHED_MASKS",
+                "0",
+            )
+        )
+    ),
+    # Reuse fixed-shape serial-draft positions, slot mappings, request tables
+    # and FULL-mask storage across common-KV graph replays. Dynamic values are
+    # rewritten on the current stream before the graph runner copies them into
+    # graph-owned buffers. Experimental and disabled by default until the NPU
+    # operator/stream-ordering gate passes.
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_PERSISTENT_STAGING": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_PERSISTENT_STAGING",
+                "0",
+            )
+        )
+    ),
+    # Priority of the auxiliary ACLGraph task-update stream. Ascend accepts
+    # 0 for the default priority and -1 for the high-priority stream used by
+    # TorchAir's production graph updater. Keep 0 as the compatibility
+    # default until the native PEARL NPU A/B has passed.
+    "VLLM_ASCEND_PEARL_GRAPH_UPDATE_STREAM_PRIORITY": lambda: int(
+        os.getenv("VLLM_ASCEND_PEARL_GRAPH_UPDATE_STREAM_PRIORITY", "0")
+    ),
+    # Role-local overrides keep draft and target graph-update experiments
+    # independently attributable. When unset they inherit the legacy global
+    # switch above, preserving the established launcher contract.
+    "VLLM_ASCEND_PEARL_DRAFT_GRAPH_UPDATE_STREAM_PRIORITY": lambda: int(
+        os.getenv(
+            "VLLM_ASCEND_PEARL_DRAFT_GRAPH_UPDATE_STREAM_PRIORITY",
+            os.getenv("VLLM_ASCEND_PEARL_GRAPH_UPDATE_STREAM_PRIORITY", "0"),
+        )
+    ),
+    "VLLM_ASCEND_PEARL_TARGET_GRAPH_UPDATE_STREAM_PRIORITY": lambda: int(
+        os.getenv(
+            "VLLM_ASCEND_PEARL_TARGET_GRAPH_UPDATE_STREAM_PRIORITY",
+            os.getenv("VLLM_ASCEND_PEARL_GRAPH_UPDATE_STREAM_PRIORITY", "0"),
+        )
+    ),
     # Comma-separated request indices for bounded scheduler tracing.
-    "VLLM_ASCEND_SPECRHYTHM_TRACE_REQUEST": lambda: os.getenv(
-        "VLLM_ASCEND_SPECRHYTHM_TRACE_REQUEST", ""
+    "VLLM_ASCEND_SPECRHYTHM_TRACE_REQUEST": lambda: os.getenv("VLLM_ASCEND_SPECRHYTHM_TRACE_REQUEST", ""),
+    "VLLM_ASCEND_SPECRHYTHM_TREE_GRAPH": lambda: bool(int(os.getenv("VLLM_ASCEND_SPECRHYTHM_TREE_GRAPH", "1"))),
+    "VLLM_ASCEND_SPECRHYTHM_USE_FIA": lambda: bool(int(os.getenv("VLLM_ASCEND_SPECRHYTHM_USE_FIA", "0"))),
+    # Fuse a staged whole-prompt target prefill with the current fixed-gamma
+    # verification into one eager packed-FIA model pass. This deliberately
+    # retains the existing single-stream/HCCL ordering and remains opt-in
+    # until its NPU numerical and performance gates have passed.
+    "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_PREFILL": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_PREFILL", "0"))
     ),
-    "VLLM_ASCEND_SPECRHYTHM_TREE_GRAPH": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_TREE_GRAPH", "1"))
+    # Experimental fixed-envelope ACLGraph for the mixed verification/prefill
+    # target pass. Keep this separate from MIXED_TARGET_PREFILL so enabling
+    # the eager fusion cannot silently change capture or replay behavior.
+    "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH", "0"))
     ),
-    "VLLM_ASCEND_SPECRHYTHM_USE_FIA": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_USE_FIA", "0"))
+    # Zero preserves the ordinary graph runner capacity. A mixed-target graph
+    # caller must explicitly provision enough packed-token capacity (for
+    # example 645 for gamma=4 and the 512-token prompt bucket).
+    "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_MAX_TOKENS": lambda: int(
+        os.getenv("VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_MAX_TOKENS", "0")
+    ),
+    # Optional comma-separated subset of the production prompt-token buckets.
+    # Keeping only workload-relevant buckets bounds resident ACLGraph HBM;
+    # the scheduler caps each staged mixed prefill to the largest selected
+    # bucket so omitted shapes never become an eager fallback.
+    "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_BUCKETS": lambda: os.getenv(
+        "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_BUCKETS", ""
+    ),
+    # Pair the target fusion above with a draft-side mixed first step: staged
+    # prompt rows share the first eager FIA model pass with incumbent draft
+    # roots, then a qualified three-step PA graph completes gamma=4.
+    "VLLM_ASCEND_SPECRHYTHM_MIXED_DRAFT_PREFILL": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_MIXED_DRAFT_PREFILL", "0"))
+    ),
+    # Preserve the incumbent PA full-chain exactly, but submit a disjoint
+    # staged draft prompt prefill on a side NPU stream while that graph runs.
+    # The service joins the stream before its existing cross-model broadcast
+    # fence, so no partially populated prompt KV row can be published.
+    "VLLM_ASCEND_SPECRHYTHM_OVERLAP_DRAFT_PREFILL": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_OVERLAP_DRAFT_PREFILL", "0"))
+    ),
+    # Greedy target ranks compute an identical compact verdict. Materialize
+    # it once on the target leader and fan it out through the existing Gloo
+    # coordination group instead of launching a second tiny HCCL collective.
+    "VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION", "0"))
+    ),
+    # Publish the two per-cycle float64 accounting/frontier envelopes through
+    # the existing CPU coordination group. This is valid only for TP1 draft,
+    # where that group contains every world rank; other topologies retain the
+    # WORLD/HCCL path. Experimental and disabled by default.
+    "VLLM_ASCEND_SPECRHYTHM_GLOO_ACCOUNTING": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_GLOO_ACCOUNTING", "0"))
     ),
     "VLLM_ASCEND_SPECRHYTHM_VALIDATE_MAILBOX": lambda: bool(
         int(os.getenv("VLLM_ASCEND_SPECRHYTHM_VALIDATE_MAILBOX", "0"))
@@ -95,9 +283,7 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_SPECRHYTHM_STEPWISE_TARGET_FIA": lambda: bool(
         int(os.getenv("VLLM_ASCEND_SPECRHYTHM_STEPWISE_TARGET_FIA", "0"))
     ),
-    "VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET", "0"))
-    ),
+    "VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET": lambda: bool(int(os.getenv("VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET", "0"))),
     # Run one same-shape eager FIA causality probe per target worker.  The
     # probe perturbs only the last queried proposal token, checks that earlier
     # rows are unchanged, and restores the original KV row before returning.
@@ -113,9 +299,7 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH": lambda: bool(
         int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH", "0"))
     ),
-    "VLLM_ASCEND_USE_NATIVE_QWEN2_ROPE": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_USE_NATIVE_QWEN2_ROPE", "0"))
-    ),
+    "VLLM_ASCEND_USE_NATIVE_QWEN2_ROPE": lambda: bool(int(os.getenv("VLLM_ASCEND_USE_NATIVE_QWEN2_ROPE", "0"))),
     # max compile thread number for package building. Usually, it is set to
     # the number of CPU cores. If not set, the default value is None, which
     # means all number of CPU cores will be used.

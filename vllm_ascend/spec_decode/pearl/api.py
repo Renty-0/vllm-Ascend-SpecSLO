@@ -24,6 +24,7 @@ import torch.distributed as dist
 import torch.multiprocessing as mp
 from transformers import AutoConfig, AutoTokenizer
 
+from vllm_ascend import envs
 from vllm_ascend.spec_decode.pearl.native_engine import (
     TARGET_VERIFICATION_GRAPH_BUCKETS,
     NativePearlConfig,
@@ -35,6 +36,13 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
 from vllm_ascend.spec_decode.pearl.native_model import (
     PAGED_ATTENTION_BLOCK_SIZE,
     SUPPORTED_NATIVE_ARCHITECTURES,
+)
+from vllm_ascend.spec_decode.pearl.pard import (
+    PARD_PARALLEL_DRAFT_MODE,
+    SERIAL_LINEAR_DRAFT_MODE,
+    require_experimental_pard_eager,
+    validate_native_draft_mode,
+    validate_pard_parallel_model_pair,
 )
 from vllm_ascend.spec_decode.pearl.qwen_pair import validate_model_pair
 from vllm_ascend.spec_decode.pearl.roofline import ProfiledRoofline, normalize_roofline
@@ -153,12 +161,19 @@ class PEARLConfig:
     enable_continuous_batching: bool = False
     enable_preemptive_scheduling: bool = False
     enable_spec_rhythm: bool = False
+    spec_rhythm_ablation_mode: str = "auto"
     # Experimental independent full-window protocol for the fixed-gamma
     # serial linear path. False preserves the legacy nano-PEARL protocol.
     spec_rhythm_linear_full_window: bool = False
+    # Opt-in standard speculative-decoding bonus token for the fixed gamma-4
+    # serial full-window path. False preserves the four-token-only protocol.
+    spec_rhythm_linear_bonus_token: bool = False
     # Experimental fixed-gamma policy. When enabled, measured W may select a
     # serial-draft graph bucket larger than the mandatory normal-row bucket.
     spec_rhythm_linear_eager_cross_graph_bucket: bool = False
+    # Fill an otherwise idle draft side with dependency-exact continuations,
+    # ordered by full-window acceptance and still bounded by measured W.
+    spec_rhythm_linear_idle_residual_eager: bool = False
     # With an arrival-aware manifest, prefill only the initial decode bucket;
     # later requests are prefetched when they enter a free slot.
     spec_rhythm_online_prefill: bool = False
@@ -218,9 +233,12 @@ class PEARLConfig:
     mc2_profile: Mapping[str, Any] | str | None = None
     seed: int | None = None
     worker_timeout_seconds: float = 300.0
+    draft_tp1_greedy_argmax: bool = False
+    draft_mode: str = SERIAL_LINEAR_DRAFT_MODE
     draft_config: PEARLModelGroupConfig = field(init=False, repr=False)
     target_config: PEARLModelGroupConfig = field(init=False, repr=False)
     eos: int | list[int] | None = field(init=False, repr=False)
+    pard_token: int | None = field(init=False, repr=False, default=None)
 
     def __post_init__(self) -> None:
         object.__setattr__(
@@ -230,6 +248,9 @@ class PEARLConfig:
         )
         if self.draft_tensor_parallel_size <= 0 or self.target_tensor_parallel_size <= 0:
             raise ValueError("PEARL tensor-parallel sizes must be positive.")
+        validate_native_draft_mode(self.draft_mode, self.gamma)
+        if self.draft_tp1_greedy_argmax and self.draft_tensor_parallel_size != 1:
+            raise ValueError("The draft greedy argmax fast path requires draft TP size 1.")
         if self.world_size > 8:
             raise ValueError("Upstream nano-PEARL supports at most eight model workers.")
         if self.max_model_len <= 0 or self.max_num_seqs <= 0:
@@ -248,6 +269,29 @@ class PEARLConfig:
             raise ValueError("SpecRhythm requires PEARL continuous batching and preemptive scheduling.")
         if self.enable_spec_rhythm and self.gamma == -1:
             raise ValueError("SpecRhythm requires a fixed maximum PEARL gamma.")
+        if self.spec_rhythm_ablation_mode not in {
+            "auto",
+            "serial",
+            "nano_pearl",
+            "dual_batch",
+            "dual_batch_rolling",
+        }:
+            raise ValueError("Unknown SpecRhythm ablation mode.")
+        if self.spec_rhythm_ablation_mode != "auto" and not (
+            self.enable_spec_rhythm
+            and self.spec_rhythm_online_prefill
+            and self.spec_rhythm_linear_full_window
+            and self.gamma > 0
+            and self.spec_rhythm_min_gamma == self.gamma
+            and self.spec_rhythm_tree_width == 1
+            and self.spec_rhythm_tree_depth == 1
+        ):
+            raise ValueError(
+                "Explicit SpecRhythm ablation modes require SpecRhythm fixed-gamma "
+                "online linear full-window execution with tree shape 1x1."
+            )
+        if self.spec_rhythm_ablation_mode != "auto" and self.spec_rhythm_merge_ready_homes:
+            raise ValueError("Explicit SpecRhythm ablations cannot merge logical homes.")
         if self.spec_rhythm_linear_full_window and (
             not self.enable_spec_rhythm
             or self.gamma <= 0
@@ -260,10 +304,27 @@ class PEARLConfig:
                 "a fixed gamma (spec_rhythm_min_gamma == gamma), and the serial "
                 "linear tree shape 1x1."
             )
+        if self.spec_rhythm_linear_bonus_token and not (
+            self.enable_spec_rhythm
+            and self.spec_rhythm_linear_full_window
+            and self.gamma == 4
+            and self.spec_rhythm_min_gamma == self.gamma
+            and self.spec_rhythm_tree_width == 1
+            and self.spec_rhythm_tree_depth == 1
+        ):
+            raise ValueError(
+                "SpecRhythm linear bonus-token mode requires enable_spec_rhythm=True, "
+                "linear full-window mode, fixed gamma 4, and the serial linear "
+                "tree shape 1x1."
+            )
         if self.spec_rhythm_linear_eager_cross_graph_bucket and not (
             self.enable_spec_rhythm and self.spec_rhythm_linear_full_window
         ):
             raise ValueError("Cross-graph-bucket linear eager scheduling requires SpecRhythm linear full-window mode.")
+        if self.spec_rhythm_linear_idle_residual_eager and not (
+            self.enable_spec_rhythm and self.spec_rhythm_linear_full_window
+        ):
+            raise ValueError("Idle residual linear eager scheduling requires SpecRhythm linear full-window mode.")
         if self.spec_rhythm_prefill_coalesce_min_requests <= 0:
             raise ValueError("SpecRhythm prefill coalescing minimum must be positive.")
         if (
@@ -405,6 +466,16 @@ class PEARLConfig:
 
         draft_config = AutoConfig.from_pretrained(self.draft_model_path)
         target_config = AutoConfig.from_pretrained(self.target_model_path)
+        if self.draft_mode == PARD_PARALLEL_DRAFT_MODE:
+            object.__setattr__(
+                self,
+                "pard_token",
+                validate_pard_parallel_model_pair(
+                    draft_config,
+                    target_config,
+                    gamma=self.gamma,
+                ),
+            )
         for name, model_config in (("draft", draft_config), ("target", target_config)):
             architecture = model_config.architectures[0]
             if architecture not in SUPPORTED_NATIVE_ARCHITECTURES:
@@ -464,6 +535,8 @@ class PEARLConfig:
             max_tokens=self.max_model_len,
             draft_dtype=self.draft_dtype,
             target_dtype=self.target_dtype,
+            draft_mode=self.draft_mode,
+            draft_tp1_greedy_argmax=self.draft_tp1_greedy_argmax,
             max_num_seqs=self.max_num_seqs,
             prefill_chunk_size=self.prefill_chunk_size,
             max_num_queued_seqs=self.max_num_queued_seqs,
@@ -479,8 +552,11 @@ class PEARLConfig:
             enable_continuous_batching=self.enable_continuous_batching,
             enable_preemptive_scheduling=self.enable_preemptive_scheduling,
             enable_spec_rhythm=self.enable_spec_rhythm,
+            spec_rhythm_ablation_mode=self.spec_rhythm_ablation_mode,
             spec_rhythm_linear_full_window=self.spec_rhythm_linear_full_window,
+            spec_rhythm_linear_bonus_token=self.spec_rhythm_linear_bonus_token,
             spec_rhythm_linear_eager_cross_graph_bucket=(self.spec_rhythm_linear_eager_cross_graph_bucket),
+            spec_rhythm_linear_idle_residual_eager=(self.spec_rhythm_linear_idle_residual_eager),
             spec_rhythm_online_prefill=self.spec_rhythm_online_prefill,
             spec_rhythm_prefill_coalesce_min_requests=(self.spec_rhythm_prefill_coalesce_min_requests),
             spec_rhythm_prefill_coalesce_max_wait_ms=(self.spec_rhythm_prefill_coalesce_max_wait_ms),
@@ -526,6 +602,11 @@ class PEARLEngine:
 
     def __init__(self, config: PEARLConfig) -> None:
         self.config = config
+        if config.draft_mode == PARD_PARALLEL_DRAFT_MODE:
+            require_experimental_pard_eager(
+                config,
+                enabled=envs.VLLM_ASCEND_SPECSLO_ENABLE_EXPERIMENTAL_PARD_EAGER,
+            )
         validate_model_pair(config.draft_model_path, config.target_model_path)
         # Worker processes must inherit queue mode before importing torch-npu;
         # setting it inside NativePearlEngine is too late for this runtime knob.
@@ -601,6 +682,10 @@ class PEARLEngine:
                 per_request_gamma if per_request_gamma is not None else sampling_params.spec_rhythm_max_gamma
             ),
         )
+        if getattr(self.config, "draft_mode", SERIAL_LINEAR_DRAFT_MODE) == PARD_PARALLEL_DRAFT_MODE and (
+            sampling_params.temperature != 0 or sampling_params.draft_temperature != 0
+        ):
+            raise ValueError("Experimental native PARD eager qualification requires greedy target and draft sampling.")
         if isinstance(prompt, str):
             formatted_prompt = self.tokenizer.apply_chat_template(
                 [{"role": "user", "content": prompt}],

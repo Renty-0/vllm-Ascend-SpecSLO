@@ -30,6 +30,14 @@ def _build_parser() -> argparse.ArgumentParser:
             "linear SpecRhythm (requires --min-gamma == --gamma and tree 1x1)."
         ),
     )
+    parser.add_argument(
+        "--spec-rhythm-linear-bonus-token",
+        action="store_true",
+        help=(
+            "Commit the target bonus token after a fully accepted fixed gamma-4 "
+            "serial full window (experimental; disabled by default)."
+        ),
+    )
     parser.add_argument("--max-eager-tokens", type=int, default=4)
     parser.add_argument("--eager-reserve-tokens", type=int, default=0)
     parser.add_argument("--max-model-len", type=int, default=4096)
@@ -110,13 +118,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         raise ValueError("--prefill-chunk-size must fit --max-num-queued-seqs")
     if args.prefill_coalesce_min_requests <= 0:
         raise ValueError("--prefill-coalesce-min-requests must be positive")
-    if (
-        not math.isfinite(args.prefill_coalesce_max_wait_ms)
-        or args.prefill_coalesce_max_wait_ms < 0
-    ):
-        raise ValueError(
-            "--prefill-coalesce-max-wait-ms must be finite and non-negative"
-        )
+    if not math.isfinite(args.prefill_coalesce_max_wait_ms) or args.prefill_coalesce_max_wait_ms < 0:
+        raise ValueError("--prefill-coalesce-max-wait-ms must be finite and non-negative")
     if args.http_max_batch_size is not None and args.http_max_batch_size > args.max_num_queued_seqs:
         raise ValueError("--http-max-batch-size must fit --max-num-queued-seqs")
 
@@ -148,13 +151,10 @@ def main(argv: Sequence[str] | None = None) -> None:
         enable_preemptive_scheduling=True,
         enable_spec_rhythm=True,
         spec_rhythm_linear_full_window=args.spec_rhythm_linear_full_window,
+        spec_rhythm_linear_bonus_token=args.spec_rhythm_linear_bonus_token,
         spec_rhythm_online_prefill=args.online_prefill,
-        spec_rhythm_prefill_coalesce_min_requests=(
-            args.prefill_coalesce_min_requests
-        ),
-        spec_rhythm_prefill_coalesce_max_wait_ms=(
-            args.prefill_coalesce_max_wait_ms
-        ),
+        spec_rhythm_prefill_coalesce_min_requests=(args.prefill_coalesce_min_requests),
+        spec_rhythm_prefill_coalesce_max_wait_ms=(args.prefill_coalesce_max_wait_ms),
         spec_rhythm_priority_mode=args.slo_priority,
         spec_rhythm_priority_burst=args.priority_burst,
         spec_rhythm_target_fallback_max_batch=args.target_fallback_max_batch,

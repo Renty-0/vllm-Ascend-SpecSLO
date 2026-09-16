@@ -28,6 +28,62 @@ def _states(count=4):
     }
 
 
+def _publish_ready(controller, indices, gamma=4):
+    controller.publish([controller.new_ticket(index, gamma=gamma, eager=False) for index in indices])
+
+
+def test_single_batch_serial_plan_never_submits_draft_with_target():
+    controller = SpecRhythmPipelineController(_states())
+    warmup = controller.build_single_batch_plan(range(4), overlap=False)
+    assert warmup.normal_draft_request_indices == (0, 1, 2, 3)
+    assert warmup.target_request_indices == ()
+
+    _publish_ready(controller, (0, 1))
+    steady = controller.build_single_batch_plan(
+        range(4),
+        overlap=False,
+        max_target_requests=2,
+        verification_budget=8,
+        ready_candidate_counts={0: 4, 1: 4},
+    )
+    assert steady.target_request_indices == (0, 1)
+    assert steady.normal_draft_request_indices == ()
+    assert steady.eager_candidate_indices == ()
+    assert steady.target_home_batch_id is None
+
+
+def test_single_batch_nano_pearl_plan_overlaps_same_batch_ahead_of_turn():
+    controller = SpecRhythmPipelineController(_states())
+    _publish_ready(controller, (0, 1))
+    steady = controller.build_single_batch_plan(
+        range(4),
+        overlap=True,
+        max_target_requests=2,
+        verification_budget=8,
+        ready_candidate_counts={0: 4, 1: 4},
+    )
+    assert steady.target_request_indices == (0, 1)
+    assert steady.normal_draft_request_indices == (2, 3)
+    assert steady.eager_candidate_indices == (0, 1)
+    assert steady.target_home_batch_id is None
+    assert steady.draft_home_batch_id == 0
+
+
+def test_single_batch_plan_defers_whole_proposals_under_target_cap():
+    controller = SpecRhythmPipelineController(_states())
+    _publish_ready(controller, range(4))
+    first = controller.build_single_batch_plan(
+        range(4),
+        overlap=False,
+        max_target_requests=2,
+        verification_budget=8,
+        ready_candidate_counts={index: 4 for index in range(4)},
+    )
+    assert first.target_request_indices == (0, 1)
+    assert first.deferred_target_request_indices == (2, 3)
+    assert sum(first.target_candidate_budgets.values()) == 8
+
+
 def test_progress_gap_matches_paper_equation():
     state = SpecRhythmRuntimeState(
         request_index=0,
@@ -123,10 +179,7 @@ def test_measured_zero_roof_defers_speculation_without_inventing_gamma_budget():
         (),
     )
     shaper = SpecRhythmBudgetShaper(min_gamma=1, max_gamma=4, roofline=roofline)
-    states = {
-        index: SpecRhythmRuntimeState(request_index=index, home_batch_id=index)
-        for index in range(2)
-    }
+    states = {index: SpecRhythmRuntimeState(request_index=index, home_batch_id=index) for index in range(2)}
     plan = shaper.shape(
         plan_id=3,
         normal_request_indices=[0, 1],
@@ -616,9 +669,7 @@ def test_slo_ready_budget_prioritizes_a_need_before_deferral_age():
     states[0].slo_tpot_ms = 40.0
     states[1].slo_tpot_ms = 150.0
     controller = SpecRhythmPipelineController(states)
-    controller.publish(
-        [controller.new_ticket(index, gamma=4, eager=False) for index in states]
-    )
+    controller.publish([controller.new_ticket(index, gamma=4, eager=False) for index in states])
     # Even a previously deferred relaxed request cannot displace the tight
     # request while the latter has the larger section-4.3 progress gap.
     controller._ready_wait_cycles[1] = 10
@@ -697,6 +748,8 @@ def test_full_acceptance_promotes_matching_eager_continuation():
     assert eager.lifecycle is ProposalLifecycle.AVAILABLE
     assert controller.ready[0] is eager
     assert states[0].prefix_epoch == eager.required_prefix_epoch == 1
+    assert states[0].acceptance_ema == pytest.approx(1.0)
+    assert states[0].full_acceptance_ema == pytest.approx(1.0)
 
 
 def test_dual_model_scheduler_runs_both_runners_and_returns_schedule():
@@ -781,6 +834,11 @@ def test_rejection_discards_eager_continuation_and_advances_epoch():
     assert 0 not in controller.ready
     assert 0 not in controller.staged_eager
     assert states[0].prefix_epoch == 1
+    # Token acceptance and full-window continuation probability deliberately
+    # learn different quantities from the same verification outcome.
+    assert states[0].acceptance_ema == pytest.approx(0.85)
+    assert states[0].full_acceptance_ema == pytest.approx(0.8)
+    assert states[0].expected_continuation_benefit == pytest.approx(0.752)
 
 
 def test_stale_mailbox_is_rejected_before_state_mutation():

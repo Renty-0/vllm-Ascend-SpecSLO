@@ -17,6 +17,7 @@ from examples.specslo_benchmark_report import (
     capture_runtime_environment,
     sha256_file,
 )
+from vllm_ascend.spec_decode.pearl.admission import decide_prefill_coalesce
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -134,6 +135,24 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--prefill-coalesce-min-requests",
+        type=int,
+        default=1,
+        help=(
+            "Apply the shared SpecSLO admission gate to the target-only "
+            "baseline and release at least this many ready requests together."
+        ),
+    )
+    parser.add_argument(
+        "--prefill-coalesce-max-wait-ms",
+        type=float,
+        default=0.0,
+        help=(
+            "Bound target-only admission coalescing by the oldest request's "
+            "original arrival time; the delay remains included in E2E."
+        ),
+    )
+    parser.add_argument(
         "--output-json",
         help="Also write the final benchmark payload to this path.",
     )
@@ -153,6 +172,10 @@ def _run_online_arrivals(
     sampling_params,
     request_rows: list[dict],
     count: int,
+    *,
+    prefill_coalesce_min_requests: int = 1,
+    prefill_coalesce_max_wait_ms: float = 0.0,
+    request_limit: int = 1,
 ):
     """Drive vLLM's engine with the manifest's wall-clock arrival trace."""
     if not request_rows:
@@ -171,31 +194,108 @@ def _run_online_arrivals(
     # accounting below.
     mono_minus_wall = mono_start - wall_start
     pending = list(enumerate(selected_rows))
+    ready: list[tuple[int, dict]] = []
     outputs = []
     service_step_seconds = 0.0
     arrival_sleep_seconds = 0.0
-    while pending or llm.llm_engine.has_unfinished_requests():
+    coalescing_enabled = bool(prefill_coalesce_min_requests > 1 and prefill_coalesce_max_wait_ms > 0)
+    coalesce_metrics: dict[str, int | float | bool | list[int]] = {
+        "enabled": coalescing_enabled,
+        "minimum_requests": prefill_coalesce_min_requests,
+        "maximum_wait_ms": prefill_coalesce_max_wait_ms,
+        "deferred_polls": 0,
+        "size_releases": 0,
+        "timeout_releases": 0,
+        "forced_releases": 0,
+        "admission_batches": 0,
+        "admitted_requests": 0,
+        "singleton_batches": 0,
+        "pair_batches": 0,
+        "multi_batches": 0,
+        "max_wait_observed_ms": 0.0,
+        "total_admission_wait_seconds": 0.0,
+        "release_sizes": [],
+    }
+    while pending or ready or llm.llm_engine.has_unfinished_requests():
         elapsed = time.monotonic() - mono_start
         while pending and float(pending[0][1].get("arrival_offset_sec", 0.0)) <= elapsed:
-            index, row = pending.pop(0)
-            params = copy.copy(selected_params[index])
-            params.output_kind = RequestOutputKind.FINAL_ONLY
-            request_id = str(row.get("request_id", f"online-{index:06d}"))
-            arrival_wall = wall_start + float(row.get("arrival_offset_sec", 0.0))
-            llm.llm_engine.add_request(
-                request_id,
-                selected_prompts[index],
-                params,
-                arrival_time=arrival_wall,
+            ready.append(pending.pop(0))
+
+        service_busy = llm.llm_engine.has_unfinished_requests()
+        decision = decide_prefill_coalesce(
+            ready_count=len(ready),
+            remaining_count=len(ready) + len(pending),
+            active_request_count=int(service_busy),
+            request_limit=request_limit,
+            minimum_requests=prefill_coalesce_min_requests,
+            maximum_wait_ms=prefill_coalesce_max_wait_ms,
+            now=elapsed,
+            ready_arrival_times=[float(row.get("arrival_offset_sec", 0.0)) for _, row in ready],
+        )
+        if decision.waited_ms is not None:
+            coalesce_metrics["max_wait_observed_ms"] = max(
+                float(coalesce_metrics["max_wait_observed_ms"]),
+                decision.waited_ms,
             )
+        if decision.release:
+            if decision.reason == "size":
+                coalesce_metrics["size_releases"] = int(coalesce_metrics["size_releases"]) + 1
+            elif decision.reason == "timeout":
+                coalesce_metrics["timeout_releases"] = int(coalesce_metrics["timeout_releases"]) + 1
+            elif decision.reason != "disabled":
+                coalesce_metrics["forced_releases"] = int(coalesce_metrics["forced_releases"]) + 1
+            # The scheduler capacity is a hard service bound, not only an
+            # input to the coalescing decision.  Keep excess ready requests
+            # queued for the next admission rather than creating an
+            # oversized native-vLLM batch that the SpecSLO side cannot match.
+            release = ready[:request_limit]
+            ready = ready[request_limit:]
+            release_size = len(release)
+            coalesce_metrics["admission_batches"] = int(coalesce_metrics["admission_batches"]) + 1
+            coalesce_metrics["admitted_requests"] = int(coalesce_metrics["admitted_requests"]) + release_size
+            if release_size == 1:
+                coalesce_metrics["singleton_batches"] = int(coalesce_metrics["singleton_batches"]) + 1
+            elif release_size == 2:
+                coalesce_metrics["pair_batches"] = int(coalesce_metrics["pair_batches"]) + 1
+            elif release_size > 2:
+                coalesce_metrics["multi_batches"] = int(coalesce_metrics["multi_batches"]) + 1
+            release_sizes = coalesce_metrics["release_sizes"]
+            assert isinstance(release_sizes, list)
+            release_sizes.append(release_size)
+            admission_elapsed = time.monotonic() - mono_start
+            for index, row in release:
+                arrival_offset = float(row.get("arrival_offset_sec", 0.0))
+                coalesce_metrics["total_admission_wait_seconds"] = float(
+                    coalesce_metrics["total_admission_wait_seconds"]
+                ) + max(0.0, admission_elapsed - arrival_offset)
+                params = copy.copy(selected_params[index])
+                params.output_kind = RequestOutputKind.FINAL_ONLY
+                request_id = str(row.get("request_id", f"online-{index:06d}"))
+                arrival_wall = wall_start + arrival_offset
+                llm.llm_engine.add_request(
+                    request_id,
+                    selected_prompts[index],
+                    params,
+                    arrival_time=arrival_wall,
+                )
+        elif ready:
+            coalesce_metrics["deferred_polls"] = int(coalesce_metrics["deferred_polls"]) + 1
+
         if llm.llm_engine.has_unfinished_requests():
             step_started = time.perf_counter()
             for output in llm.llm_engine.step():
                 if output.finished:
                     outputs.append(output)
             service_step_seconds += time.perf_counter() - step_started
-        elif pending:
-            delay = float(pending[0][1].get("arrival_offset_sec", 0.0)) - elapsed
+        elif pending or ready:
+            elapsed = time.monotonic() - mono_start
+            wake_offsets = []
+            if pending:
+                wake_offsets.append(float(pending[0][1].get("arrival_offset_sec", 0.0)))
+            if ready and coalescing_enabled:
+                oldest = min(float(row.get("arrival_offset_sec", 0.0)) for _, row in ready)
+                wake_offsets.append(oldest + prefill_coalesce_max_wait_ms / 1000.0)
+            delay = min(wake_offsets, default=elapsed) - elapsed
             sleep_seconds = min(max(delay, 0.0), 0.01)
             time.sleep(sleep_seconds)
             arrival_sleep_seconds += sleep_seconds
@@ -209,6 +309,7 @@ def _run_online_arrivals(
             "wall_seconds": time.monotonic() - mono_start,
             "service_step_seconds": service_step_seconds,
             "arrival_sleep_seconds": arrival_sleep_seconds,
+            "prefill_coalesce": coalesce_metrics,
         },
     )
 
@@ -325,6 +426,12 @@ def main(argv: Sequence[str] | None = None) -> None:
         raise ValueError("--warmup-max-tokens must be positive.")
     if args.warmup_runs < 0:
         raise ValueError("--warmup-runs must be non-negative.")
+    if args.prefill_coalesce_min_requests <= 0:
+        raise ValueError("--prefill-coalesce-min-requests must be positive.")
+    if not math.isfinite(args.prefill_coalesce_max_wait_ms) or args.prefill_coalesce_max_wait_ms < 0:
+        raise ValueError("--prefill-coalesce-max-wait-ms must be finite and non-negative.")
+    if args.prefill_coalesce_min_requests > 1 and args.prefill_coalesce_max_wait_ms <= 0:
+        raise ValueError("Target-only prefill coalescing requires a positive maximum wait.")
     if (args.speculative_model is None) != (args.speculative_method is None):
         raise ValueError("--speculative-model and --speculative-method must be provided together.")
     if args.num_speculative_tokens <= 0:
@@ -488,6 +595,9 @@ def main(argv: Sequence[str] | None = None) -> None:
                 measured_sampling_params,
                 request_rows,
                 len(measured_inputs),
+                prefill_coalesce_min_requests=(args.prefill_coalesce_min_requests),
+                prefill_coalesce_max_wait_ms=(args.prefill_coalesce_max_wait_ms),
+                request_limit=args.max_num_seqs,
             )
             online_slo = _online_slo_summary(outputs, request_rows, mono_minus_wall, elapsed)
         else:
@@ -577,11 +687,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "max_tokens": args.max_tokens,
         "respect_eos": args.respect_eos,
         "request_manifest": args.request_manifest,
-        "request_manifest_sha256": (
-            sha256_file(args.request_manifest)
-            if args.request_manifest is not None
-            else None
-        ),
+        "request_manifest_sha256": (sha256_file(args.request_manifest) if args.request_manifest is not None else None),
         "requested_output_tokens": (sum(request_max_tokens[:prompt_count]) if request_max_tokens is not None else None),
         "warmup_prompts": args.warmup_prompts,
         "warmup_prompt_offset": args.warmup_prompt_offset,
@@ -590,6 +696,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         "warmup_excluded_from_measurement": True,
         "static_chunks": args.static_chunks,
         "online_arrivals": args.online_arrivals,
+        "prefill_coalesce_min_requests": args.prefill_coalesce_min_requests,
+        "prefill_coalesce_max_wait_ms": args.prefill_coalesce_max_wait_ms,
         "enable_prefix_caching": args.enable_prefix_caching,
         "enable_log_stats": args.enable_log_stats,
         "runtime_environment": capture_runtime_environment(),

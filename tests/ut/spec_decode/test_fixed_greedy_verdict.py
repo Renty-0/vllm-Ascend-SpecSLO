@@ -7,7 +7,10 @@ import pytest
 import torch
 
 import vllm_ascend.spec_decode.pearl.native_engine as native_engine
-from vllm_ascend.ops.triton.spec_decode.fixed_greedy_verdict import fixed_greedy_full_window_verdict
+from vllm_ascend.ops.triton.spec_decode.fixed_greedy_verdict import (
+    fixed_greedy_full_window_bonus_verdict,
+    fixed_greedy_full_window_verdict,
+)
 
 
 def test_fixed_greedy_full_window_verdict_covers_every_rejection_position():
@@ -38,6 +41,164 @@ def test_fixed_greedy_full_window_verdict_covers_every_rejection_position():
     assert verdict.tolist() == [[0, 90], [1, 91], [2, 92], [3, 93], [4, -1]]
 
 
+def test_fixed_greedy_full_window_verdict_returns_enabled_bonus_only_on_full_match():
+    draft = torch.tensor(
+        [
+            [10, 11, 12, 13],
+            [20, 21, 22, 23],
+            [30, 31, 32, 33],
+            [40, 41, 42, 43],
+        ],
+        dtype=torch.long,
+    ).flatten()
+    target = draft.clone()
+    target[5] = 91
+    bonus_token_ids = torch.tensor([100, 101, 102, 103], dtype=torch.long)
+    bonus_enabled_mask = torch.tensor([True, True, False, True], dtype=torch.bool)
+
+    verdict = fixed_greedy_full_window_verdict(
+        target,
+        draft,
+        bonus_token_ids,
+        bonus_enabled_mask,
+    )
+
+    assert verdict.shape == (4, 2)
+    assert verdict.tolist() == [[4, 100], [1, 91], [4, -1], [4, 103]]
+
+
+@pytest.mark.parametrize("flat_draft", [False, True])
+def test_fixed_greedy_full_window_bonus_verdict_consumes_strided_target_rows(
+    flat_draft,
+):
+    draft = torch.tensor(
+        [
+            [10, 11, 12, 13],
+            [20, 21, 22, 23],
+            [30, 31, 32, 33],
+            [40, 41, 42, 43],
+        ],
+        dtype=torch.long,
+    )
+    target_rows = torch.tensor(
+        [
+            [10, 11, 12, 13, 100],
+            [20, 91, 22, 23, 101],
+            [30, 31, 32, 33, 102],
+            [40, 41, 42, 43, 103],
+        ],
+        dtype=torch.long,
+    )
+    bonus_enabled_mask = torch.tensor(
+        [True, True, False, True],
+        dtype=torch.bool,
+    )
+
+    verdict = fixed_greedy_full_window_bonus_verdict(
+        target_rows,
+        draft.flatten() if flat_draft else draft,
+        bonus_enabled_mask,
+    )
+
+    assert verdict.shape == (4, 2)
+    assert verdict.tolist() == [[4, 100], [1, 91], [4, -1], [4, 103]]
+
+
+def test_fixed_greedy_full_window_bonus_verdict_accepts_an_empty_batch():
+    verdict = fixed_greedy_full_window_bonus_verdict(
+        torch.empty((0, 5), dtype=torch.long),
+        torch.empty((0, 4), dtype=torch.long),
+        torch.empty(0, dtype=torch.bool),
+    )
+
+    assert verdict.shape == (0, 2)
+    assert verdict.dtype == torch.long
+
+
+@pytest.mark.parametrize(
+    ("target_rows", "draft", "mask", "match"),
+    [
+        (
+            torch.ones(10, dtype=torch.long),
+            torch.ones(8, dtype=torch.long),
+            torch.ones(2, dtype=torch.bool),
+            "target tokens must have shape",
+        ),
+        (
+            torch.ones((2, 4), dtype=torch.long),
+            torch.ones(8, dtype=torch.long),
+            torch.ones(2, dtype=torch.bool),
+            "target tokens must have shape",
+        ),
+        (
+            torch.ones((2, 5), dtype=torch.long),
+            torch.ones((2, 5), dtype=torch.long),
+            torch.ones(2, dtype=torch.bool),
+            "draft tokens must have shape",
+        ),
+        (
+            torch.ones((2, 5), dtype=torch.long),
+            torch.ones(8, dtype=torch.long),
+            torch.ones((2, 1), dtype=torch.bool),
+            "enabled mask must have shape",
+        ),
+        (
+            torch.ones((2, 5), dtype=torch.int32),
+            torch.ones(8, dtype=torch.long),
+            torch.ones(2, dtype=torch.bool),
+            "token tensors must use torch.long",
+        ),
+        (
+            torch.ones((2, 5), dtype=torch.long),
+            torch.ones(8, dtype=torch.int32),
+            torch.ones(2, dtype=torch.bool),
+            "token tensors must use torch.long",
+        ),
+        (
+            torch.ones((2, 5), dtype=torch.long),
+            torch.ones(8, dtype=torch.long),
+            torch.ones(2, dtype=torch.int32),
+            "enabled mask must use torch.bool",
+        ),
+        (
+            torch.ones((2, 10), dtype=torch.long)[:, ::2],
+            torch.ones(8, dtype=torch.long),
+            torch.ones(2, dtype=torch.bool),
+            "contiguous",
+        ),
+        (
+            torch.ones((2, 5), dtype=torch.long),
+            torch.ones((2, 8), dtype=torch.long)[:, ::2],
+            torch.ones(2, dtype=torch.bool),
+            "contiguous",
+        ),
+        (
+            torch.ones((2, 5), dtype=torch.long),
+            torch.ones(8, dtype=torch.long),
+            torch.tensor([True, False, True, False])[::2],
+            "contiguous",
+        ),
+    ],
+)
+def test_fixed_greedy_full_window_bonus_verdict_rejects_invalid_contract(
+    target_rows,
+    draft,
+    mask,
+    match,
+):
+    with pytest.raises(ValueError, match=match):
+        fixed_greedy_full_window_bonus_verdict(target_rows, draft, mask)
+
+
+def test_fixed_greedy_full_window_bonus_verdict_requires_one_device():
+    target_rows = torch.ones((2, 5), dtype=torch.long)
+    draft = torch.ones(8, dtype=torch.long)
+    mask = torch.ones(2, dtype=torch.bool, device="meta")
+
+    with pytest.raises(ValueError, match="share one device"):
+        fixed_greedy_full_window_bonus_verdict(target_rows, draft, mask)
+
+
 @pytest.mark.parametrize(
     ("target", "draft", "match"),
     [
@@ -60,6 +221,75 @@ def test_fixed_greedy_full_window_verdict_accepts_an_empty_cpu_batch():
 
     assert verdict.shape == (0, 2)
     assert verdict.dtype == torch.long
+
+
+def test_fixed_greedy_full_window_verdict_accepts_an_empty_bonus_batch():
+    verdict = fixed_greedy_full_window_verdict(
+        torch.empty(0, dtype=torch.long),
+        torch.empty(0, dtype=torch.long),
+        torch.empty(0, dtype=torch.long),
+        torch.empty(0, dtype=torch.bool),
+    )
+
+    assert verdict.shape == (0, 2)
+    assert verdict.dtype == torch.long
+
+
+@pytest.mark.parametrize(
+    ("bonus_token_ids", "bonus_enabled_mask", "match"),
+    [
+        (torch.ones(2, dtype=torch.long), None, "supplied together"),
+        (None, torch.ones(2, dtype=torch.bool), "supplied together"),
+        (torch.ones((2, 1), dtype=torch.long), torch.ones(2, dtype=torch.bool), "shape"),
+        (torch.ones(3, dtype=torch.long), torch.ones(3, dtype=torch.bool), "shape"),
+        (torch.ones(2, dtype=torch.int32), torch.ones(2, dtype=torch.bool), "torch.long"),
+        (torch.ones(2, dtype=torch.long), torch.ones(2, dtype=torch.int32), "torch.bool"),
+        (
+            torch.arange(4, dtype=torch.long)[::2],
+            torch.tensor([True, False]),
+            "contiguous",
+        ),
+        (
+            torch.ones(2, dtype=torch.long),
+            torch.tensor([True, False, True, False])[::2],
+            "contiguous",
+        ),
+    ],
+)
+def test_fixed_greedy_full_window_verdict_rejects_invalid_bonus_contract(
+    bonus_token_ids,
+    bonus_enabled_mask,
+    match,
+):
+    target = torch.arange(8, dtype=torch.long)
+    draft = target.clone()
+
+    with pytest.raises(ValueError, match=match):
+        fixed_greedy_full_window_verdict(
+            target,
+            draft,
+            bonus_token_ids,
+            bonus_enabled_mask,
+        )
+
+
+@pytest.mark.skipif(
+    not hasattr(torch, "device"),
+    reason="torch device support is required",
+)
+def test_fixed_greedy_full_window_verdict_rejects_bonus_on_another_device():
+    target = torch.arange(8, dtype=torch.long)
+    draft = target.clone()
+    bonus_token_ids = torch.ones(2, dtype=torch.long, device="meta")
+    bonus_enabled_mask = torch.ones(2, dtype=torch.bool, device="meta")
+
+    with pytest.raises(ValueError, match="share one device"):
+        fixed_greedy_full_window_verdict(
+            target,
+            draft,
+            bonus_token_ids,
+            bonus_enabled_mask,
+        )
 
 
 def _verification_engine(*, full_window: bool):

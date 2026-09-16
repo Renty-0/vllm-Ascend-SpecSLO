@@ -322,9 +322,9 @@ target 工作。按同 step 的 `worker_host_timeline` 明确排除 16 个在线
 | --- | ---: | --- |
 | cycle wall | 42.466 | rank 最大墙钟窗口 |
 | scheduler | 1.432 | plan、budget、ticket 和控制面 |
-| Draft compute | 36.006 | TP1 四步 full-chain graph host 提交窗口 |
-| Target verify forward | 14.223 | TP3 packed-FIA target graph host 提交窗口 |
-| Draft/Target overlap | 14.217 | 覆盖 target 短窗口的 **99.96%** |
+| Draft full-chain host submit | 36.006 | TP1 四步 full-chain graph 异步提交窗口 |
+| Target forward host submit | 14.223 | TP3 packed-FIA target graph 异步提交窗口 |
+| Draft/Target host-submit overlap | 14.217 | 覆盖 target host-submit 短窗口的 **99.96%** |
 | Target verdict | 0.464 | fused fixed-greedy verdict |
 | Draft→Target full envelope | 1.138 | compact submit 至 exchange 完成，含 host bookkeeping |
 | └ compact submit / wait | 0.429 / 0.135 | HCCL 提交/等待窗口 |
@@ -333,7 +333,10 @@ target 工作。按同 step 的 `worker_host_timeline` 明确排除 16 个在线
 | state update | 0.256 | 原子请求状态更新 |
 | post-correction tail | 0.923 | correction 后尾部工作 |
 
-若串行，两路 forward 约为 `36.006 + 14.223 = 50.229 ms`；实际 host 交集
+这两个数是 CPU 从调用到异步入队返回的时间；当前路径没有在 forward 返回前调用
+`torch.npu.synchronize()`，因此 **14.223 ms 不是 target 的 NPU 完成延迟**，也不包含后续
+device verdict。若只按 host 提交窗口串行，两路约为
+`36.006 + 14.223 = 50.229 ms`；实际 host 交集
 14.217 ms，扣除交集约 36.012 ms。这证明 worker/host 提交窗口发生了双 batch overlap，
 但不能单凭 host 时间戳宣称物理 AI Core 完全重叠。
 
@@ -457,8 +460,131 @@ coordination → compact HCCL。不能把 D→T 通信误报为已与 TP3 all-re
 > online prefill coalesce。正式 Qwen3-0.6B TP1 + Qwen3-32B TP3 对原生 Qwen3-32B TP4
 > 的 RPS4/B64/P60/T256 测试中，TPOT 达成率由 baseline 的 56.67%--60.00% 提升到
 > 90.00%--93.33%，最保守 Goodput 比为 1.3913×，中位比为 1.4897×。Host profiling
-> 显示 target 14.223 ms 窗口的 99.96% 与 draft 重叠，CANN trace 在三个 target rank
+> 显示 target host-submit 14.223 ms 窗口的 99.96% 与 draft host-submit 重叠，
+> CANN trace 在三个 target rank
 > 上分别测得 10.538/10.632/10.653 ms strict AI Core overlap；正式计时窗口每 rank
 > 528--544 次 graph replay 且 capture、validation、fallback 全为 0。需要强调，这是一组
 > fixed-gamma Goodput 结果，raw throughput 中位仅为 baseline 的 0.9291×，也不等同于
 > 论文动态 B 的完整性能矩阵。
+
+## 13. 2026-09-16：四步 draft 设备计时纠偏与后续方向
+
+### 13.1 结论：PARD 不进入主路径
+
+此前把 `worker_draft_seconds / steps` 与 `worker_target_seconds / steps` 当成模型计算时间，
+会把 host 入队、task update 和同步等待混进 compute。使用跨 cycle 携带的 NPU Event
+重新计时后，P128/T256、fixed gamma4、TP1 draft + TP3 target 的 475 个可比较 cycle 中，
+**475/475 个 cycle 都是完整四步 draft device 窗口低于 target 可消费 device 窗口**。
+正确的可比较周期均值为：
+
+| 筛选范围 | cycle 数 | 四步 causal AR draft | target forward + device verdict |
+| --- | ---: | ---: | ---: |
+| 所有双边 Event 均有效的 cycle | 475 | 33.508 ms | 44.506 ms |
+| 再排除 mixed target-prefill | 454 | 33.493 ms | 37.256 ms |
+
+报告初版写的 31.833/43.092 ms 是对 500 行 dashboard 直接求均值：draft 因为
+Event 滞后一个 cycle，前 25 行为 0，使 31.833 ms 被人为压低；target 的
+43.092 ms 则还混入 mixed target-prefill cycle。该口径与“475 个可比较 cycle”不一致，
+现已更正。
+
+另一个必须区分的边界是：8.1 的 14.223 ms 是 P60 稳态纯 decode 的 target
+**host 异步提交窗口**，而本节 Event 在 target forward 前记录起点、在
+`_verify_target_tokens_batch()` 后记录终点，测的是 **target forward + device verdict**
+整个可消费窗口。因此 14.223 ms 与 37--45 ms 不是同一个指标，不代表 target
+性能从 14 ms 退化到 43 ms。现有 Event 还不能单独给出不含 verdict 的 target-forward-only
+device 时间；若要回答这个更严格的问题，必须在 forward 返回后、verdict 之前再加一个
+NPU Event 边界。
+
+这里的 draft device 数值是 `root -> d1 -> d2 -> d3 -> d4` 整条四步链，不是单个 draft
+token 的时间。四个依赖 forward 捕获在一次 ACLGraph 中，稳态只 replay 一次。因此，
+“用 PARD 避免四步 draft 比 target 慢”没有成立的前提。PARD 的 B2 eager 试验虽然降低
+draft 时间，但接受率由 serial 的 93.75% 降到 65%，E2E 仅改善约 4.1%；该路径保持
+实验性、默认关闭，不作为 SpecSLO-Chain 的优化方向。
+
+### 13.2 persistent FIA staging 受控 A/B：降低 draft，但没有提高 E2E
+
+为了确认链外 metadata 是否仍拖慢 draft，实现了默认关闭的 persistent FIA staging：
+复用四步 input IDs、position、slot mapping、FULL mask 和 common-KV request table，避免
+每 cycle 重建 Python metadata wrapper。相同 P128/T256 合同的单次受控 A/B 如下：
+
+| 指标 | OFF（当前源码） | ON | 变化 |
+| --- | ---: | ---: | ---: |
+| 四步 draft device mean（有效 Event cycle） | 33.508 ms | 29.557 ms | -11.79% |
+| target 可消费 device mean（有效 Event cycle） | 44.506 ms | 45.502 ms | +2.24% |
+| cycle wall mean | 48.520 ms | 51.341 ms | +5.81% |
+| coordination critical mean | 26.456 ms | 30.752 ms | +16.24% |
+| accounting tail mean | 1.177 ms | 3.229 ms | +174.23% |
+| raw throughput | 720.155 tok/s | 713.889 tok/s | -0.87% |
+| 论文口径 Goodput | 630.136 tok/s | 552.149 tok/s | -12.38% |
+| TPOT 达成率 | 87.50% | 77.34% | -10.16 pp |
+
+两边 graph qualification 都到 fixed point，draft/target/mixed-target fallback 与 runtime
+validation failure 都为 0。ON 路径记录 3022 hits、71 misses。结果说明 staging 确实
+缩短 draft device 时间，但 target 已是关键路径；额外 staging copy/刷新还扩大了
+coordination 和尾部窗口，最终 raw 反而下降。该实现继续保持默认关闭，不进入正式配置。
+
+证据：
+
+- OFF：`/root/data/nano-pearl-benchmark-results/20260916-specslo-serial-chain-current-profile/runs/p128-c4-stable-barrier-persistent-staging-off-current-host500/result.json`；
+- ON：`/root/data/nano-pearl-benchmark-results/20260916-specslo-serial-chain-current-profile/runs/p128-c4-stable-barrier-persistent-staging-on-host500/result.json`。
+
+### 13.3 新发现的数值回归风险
+
+同一 prompt hash、相同 seed 和相同 OFF 配置的两次在线运行，最终 output token hash
+也不一致，128 个请求中有 112 个在较后位置出现分歧；OFF 与 ON 则有 107 个请求不同。
+因此不能只凭 OFF/ON hash 不同把问题归因给 staging，现有在线双 batch/graph 路径本身
+还存在跨运行输出漂移。原生 target-only 在相同 manifest、不同 coalesce/batch shape 下
+也会得到不同输出 hash，说明 BF16 kernel/batch shape 与在线 admission 时序至少是一个
+混杂因素，不能直接判成 speculative 语义错误。当前正式路径仍通过已有静态
+changed-input oracle；后续所有 task-update 优化必须增加固定 active-set、固定 shape 的
+逐 token oracle，再单独检查在线跨重复一致性。在该问题解释清楚前，不把任何新候选设为
+默认。
+
+### 13.4 下一优化优先级
+
+当前 target graph 每次 replay 对 Qwen3-32B 的 64 层 FIA task 逐层执行 task update；
+profiling 显示三个 TP3 rank 每 cycle 的 FIA task submit 约 11.7--12.4 ms，另有约
+0.8 ms 的 64 次 event record。CANN 8.5/9.0 的 task-group 接口目前只允许单算子调用，
+因此不能安全地把 2/4 层塞进同一个 update handle，也不能减少逐层 begin/end。下一项
+实验只让连续 2 层或 4 层共享一个 ExternalEvent：每层 handle/begin/end 保持不变，
+组首 wait/reset、组末 record 一次，同时保留 replay-first 和 changed-input oracle。
+该路径理论上先回收 event 开销；不通过移除同步边界换取表面性能。
+
+### 13.5 target FIA event-group 实测：微观开销下降，但 E2E 无收益
+
+已按上述边界实现了默认关闭的 target FIA event-group，合法组大小为
+1/2/4。它不改变 64 层 attention 的 handle 更新数，只让相邻层共享一个
+`ExternalEvent`。group=2 先通过了固定 B8/P8/T32 的 NPU oracle：
+
+- packed-FIA eager oracle、update-first control 和三次 replay-first 的 token IDs、
+  输出 hash、轮数、accepted/verified 统计全部一致；
+- validate-every-replay case 在每个 target rank 执行 25 次 replay/25 次校验，
+  零 failure/fallback。
+
+开启相同 PA task-update 计时插桩的 P128/T256 诊断 A/B 显示，group=1 三个
+target rank 每 replay 的 event record 平均约为 0.82--0.87 ms，group=2 约为
+0.45--0.50 ms，符合事件数减半的预期。但关闭 host timeline 与 task-update profiling
+后的同源正式 A/B 为：
+
+| 指标 | group=1 | group=2 | 变化 |
+| --- | ---: | ---: | ---: |
+| raw E2E throughput | 715.393 tok/s | 714.810 tok/s | -0.08% |
+| inference throughput | 717.305 tok/s | 716.689 tok/s | -0.09% |
+| E2E | 45.804 s | 45.842 s | +0.08% |
+| mean accepted tokens | 3.876 | 3.866 | -0.010 |
+| 论文口径 Goodput | 586.846 tok/s | 558.445 tok/s | -4.84% |
+| TPOT 达成率 | 82.03% | 78.13% | -3.91 pp |
+
+两边 graph qualification 均到 fixed point，三个 target rank 的 failed capture、capacity/
+shape/eager fallback 和 runtime-validation failure 全为 0。raw 差异处于噪声内且没有
+正收益，Goodput 反而因在线 admission 轨迹与 40 ms 阈值放大而下降。因此不跑
+group=4，生产默认保持 group=1；该实验证明单纯减少 `event.record` 不是当前
+主瓶颈。后续优先级转向 target 每层 handle submit 和 verify 计算本身，而不是
+PARD 或继续压缩已低于 target 的 serial gamma4 draft。
+
+证据：
+
+- 固定形状 oracle：
+  `/root/data/nano-pearl-benchmark-results/20260916-specslo-target-fia-event-group-correctness-g2.json`；
+- 诊断与正式 A/B：
+  `/root/data/nano-pearl-benchmark-results/20260916-specslo-target-event-group-ab/runs/`。

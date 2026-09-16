@@ -86,10 +86,7 @@ def _use_native_fused_mm_all_reduce(tp_size: int, device_type: str) -> bool:
     if device_type != "npu":
         return False
     if tp_size == 3:
-        return bool(
-            ascend_envs.VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE
-            and not _TP3_MM_ALL_REDUCE_DISABLED
-        )
+        return bool(ascend_envs.VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE and not _TP3_MM_ALL_REDUCE_DISABLED)
     return bool(tp_size in (2, 4, 8) and ascend_envs.VLLM_ASCEND_ENABLE_MATMUL_ALLREDUCE)
 
 
@@ -457,9 +454,13 @@ class NativeLMHead(NativeVocabEmbedding):
         context: NativeTPContext,
         *,
         track_cache_finiteness: bool = False,
+        tp1_greedy_argmax: bool = False,
     ) -> None:
         super().__init__(vocab_size, hidden_size, context)
+        if tp1_greedy_argmax and context.size != 1:
+            raise ValueError("The greedy argmax fast path is supported only for TP1.")
         self.track_cache_finiteness = track_cache_finiteness
+        self.tp1_greedy_argmax = tp1_greedy_argmax
         self.register_buffer("logits_nonfinite", torch.zeros((), dtype=torch.bool), persistent=False)
 
     def _track_logits(self, logits: torch.Tensor) -> None:
@@ -495,8 +496,16 @@ class NativeLMHead(NativeVocabEmbedding):
             local_logits = F.linear(hidden_states, self.weight)
             local_logits = local_logits[:, :local_vocabulary_size]
             self._track_logits(local_logits)
+            if self.tp1_greedy_argmax:
+                # TP1 does not need the winning value for a cross-rank
+                # reduction. Request only the token ID so Ascend can select
+                # its ArgMax path instead of ArgMaxWithValue.
+                return torch.argmax(local_logits, dim=-1)
             local_values, local_token_ids = local_logits.max(dim=-1)
-            local_token_ids += self.vocab_start
+            # TP1 owns the vocabulary from offset zero.  Avoid recording an
+            # otherwise redundant in-place add in every captured draft step.
+            if self.vocab_start:
+                local_token_ids += self.vocab_start
         if self.context.size == 1:
             return local_token_ids
 
@@ -531,7 +540,8 @@ class NativeLMHead(NativeVocabEmbedding):
             local_logits = F.linear(hidden_states, self.weight)[:, :local_vocabulary_size]
             self._track_logits(local_logits)
             local_values, local_token_ids = local_logits.float().max(dim=-1)
-            local_token_ids += self.vocab_start
+            if self.vocab_start:
+                local_token_ids += self.vocab_start
             local_logsumexp = torch.logsumexp(local_logits.float(), dim=-1)
         if self.context.size == 1:
             return local_token_ids, (local_values - local_logsumexp).exp()
@@ -758,11 +768,7 @@ class NativeAttention(nn.Module):
     def _fused_infer_attention(self, query: torch.Tensor, metadata: NativeAttentionMetadata) -> torch.Tensor:
         assert self.key_cache is not None and self.value_cache is not None
         assert metadata.request_block_tables is not None
-        attention_mask = (
-            metadata.tree_attention_mask
-            if metadata.tree_attention
-            else metadata.attention_mask
-        )
+        attention_mask = metadata.tree_attention_mask if metadata.tree_attention else metadata.attention_mask
         if attention_mask is None:
             raise RuntimeError("Fused infer attention requires its selected mask")
         attended = torch.empty_like(query)
@@ -1022,6 +1028,7 @@ class NativeQwen2ForCausalLM(nn.Module):
             config.hidden_size,
             context,
             track_cache_finiteness=self.track_cache_finiteness,
+            tp1_greedy_argmax=bool(getattr(config, "pearl_tp1_greedy_argmax", False)),
         )
         self.register_buffer("attention_mask", None, persistent=False)
         if getattr(config, "tie_word_embeddings", False):
@@ -1342,17 +1349,17 @@ class NativeQwen2ForCausalLM(nn.Module):
         mask_rows = []
         for index in indices:
             row = plan.attention_mask[index + 1 if index >= 0 else 0]
-            mask_rows.append(
-                row
-                if use_fused_tree_attention
-                else row.to(device=device, dtype=torch.bool)
-            )
+            mask_rows.append(row if use_fused_tree_attention else row.to(device=device, dtype=torch.bool))
         level_mask = torch.stack(mask_rows)
         if use_fused_tree_attention:
             attention_mask = None
-            tree_attention_mask = level_mask.unsqueeze(0).unsqueeze(0).to(
-                device=device,
-                dtype=torch.bool,
+            tree_attention_mask = (
+                level_mask.unsqueeze(0)
+                .unsqueeze(0)
+                .to(
+                    device=device,
+                    dtype=torch.bool,
+                )
             )
             token_tables = physical_tables[int(sequence_id) : int(sequence_id) + 1]
         else:

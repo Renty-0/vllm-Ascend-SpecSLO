@@ -36,6 +36,14 @@ def parse_args() -> argparse.Namespace:
             "linear SpecRhythm (requires min-gamma == gamma and tree 1x1)."
         ),
     )
+    parser.add_argument(
+        "--spec-rhythm-linear-bonus-token",
+        action="store_true",
+        help=(
+            "Commit the target bonus token after a fully accepted fixed gamma-4 "
+            "serial full window (experimental; disabled by default)."
+        ),
+    )
     parser.add_argument("--spec-rhythm-min-gamma", type=int, default=1)
     parser.add_argument("--spec-rhythm-max-eager-tokens", type=int, default=0)
     parser.add_argument("--spec-rhythm-eager-reserve-tokens", type=int, default=0)
@@ -99,6 +107,7 @@ def main() -> None:
         enable_preemptive_scheduling=args.enable_spec_rhythm,
         enable_spec_rhythm=args.enable_spec_rhythm,
         spec_rhythm_linear_full_window=args.spec_rhythm_linear_full_window,
+        spec_rhythm_linear_bonus_token=args.spec_rhythm_linear_bonus_token,
         spec_rhythm_min_gamma=args.spec_rhythm_min_gamma,
         spec_rhythm_max_eager_tokens=args.spec_rhythm_max_eager_tokens,
         spec_rhythm_eager_reserve_tokens=args.spec_rhythm_eager_reserve_tokens,

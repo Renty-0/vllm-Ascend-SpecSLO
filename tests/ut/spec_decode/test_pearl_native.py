@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import os
+from itertools import combinations
 from multiprocessing import Pipe
 from types import SimpleNamespace
 from unittest.mock import MagicMock, call, patch
@@ -25,6 +26,7 @@ from examples.benchmark_nano_pearl_target_only import (
 )
 from examples.offline_inference_nano_pearl import parse_args as _parse_offline_args
 from examples.serve_specslo import _build_parser as _build_specslo_server_parser
+from vllm_ascend.spec_decode.pearl import native_engine as native_engine_module
 from vllm_ascend.spec_decode.pearl.api import PEARLConfig, PEARLEngine
 from vllm_ascend.spec_decode.pearl.native_cache import NativePrefixCache
 from vllm_ascend.spec_decode.pearl.native_engine import (
@@ -46,24 +48,37 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
     _continuous_result_states,
     _finished,
     _gamma_from_decode_speeds,
+    _linear_draft_fia_lifetime_limits,
     _linear_draft_graph_buckets,
     _next_linear_draft_graph_bucket,
+    _next_mixed_target_verify_capacity,
     _next_power_of_two_graph_bucket,
+    _next_stable_target_verify_capacity,
     _normalize_sampling_params,
     _power_of_two_graph_buckets,
+    _ranked_linear_draft_fia_plan,
     _record_linear_draft_full_chain_metrics,
+    _record_mixed_target_graph_outcome,
+    _record_stable_target_verify_graph_outcome,
     _restore_completed_states,
+    _restore_ranked_linear_draft_rows,
     _sample_logits,
     _select_preemptive_continuous_indices,
     _set_default_npu_environment,
     _target_graph_precompile_shapes,
     _truncate_completion,
+    plan_mixed_target_graph_envelope,
+    plan_mixed_target_graph_layout,
+    plan_stable_target_verify_graph_envelope,
+    plan_stable_target_verify_graph_layout,
+    resolve_mixed_target_graph_buckets,
 )
 from vllm_ascend.spec_decode.pearl.native_graph import NativeACLGraphRunner, NativeGraphExecution
 from vllm_ascend.spec_decode.pearl.native_model import (
     MIN_PAGED_ATTENTION_BLOCKS,
     PAGED_ATTENTION_BLOCK_SIZE,
     NativeAttention,
+    NativeAttentionMetadata,
     NativeColumnLinear,
     NativeLMHead,
     NativeQwen2ForCausalLM,
@@ -134,6 +149,701 @@ def test_fixed_gamma_linear_draft_uses_bounded_dense_service_buckets():
     assert _next_linear_draft_graph_bucket(49, 64) == 64
 
 
+def test_stable_target_verify_uses_every_exact_capacity():
+    assert [_next_stable_target_verify_capacity(count) for count in range(1, 33)] == list(range(1, 33))
+    for invalid in (0, 33):
+        with pytest.raises(ValueError, match=r"\[1, 32\]"):
+            _next_stable_target_verify_capacity(invalid)
+
+
+def test_mixed_target_verify_uses_smallest_resident_capacity():
+    assert [_next_mixed_target_verify_capacity(count) for count in (1, 16, 17, 24, 25, 32)] == [
+        16,
+        16,
+        24,
+        24,
+        32,
+        32,
+    ]
+    for invalid in (0, 33):
+        with pytest.raises(ValueError, match=r"\[1, 32\]"):
+            _next_mixed_target_verify_capacity(invalid)
+
+
+@pytest.mark.parametrize(
+    ("verification_rows", "prompt_lengths", "capacity", "bucket"),
+    [
+        (1, [15], 16, 64),
+        (16, [32, 31], 16, 64),
+        (17, [32, 31], 24, 64),
+        (24, [32, 31], 24, 64),
+        (25, [32, 31], 32, 64),
+        (31, [64, 1], 32, 128),
+        (32, [128, 128, 128, 128], 32, 512),
+        (32, [512], 32, 512),
+        (32, [513], 32, 768),
+        (32, [769], 32, 1024),
+        (32, [1025], 32, 1536),
+        (32, [1570], 32, 2048),
+    ],
+)
+def test_mixed_target_graph_layout_has_fixed_safe_shape(
+    verification_rows,
+    prompt_lengths,
+    capacity,
+    bucket,
+):
+    layout = plan_mixed_target_graph_layout(
+        verification_rows,
+        prompt_lengths,
+        gamma=4,
+    )
+
+    assert layout.prompt_token_bucket == bucket
+    assert layout.verification_capacity == capacity
+    assert layout.request_segment_count == capacity + 5
+    assert layout.total_query_tokens == capacity * 4 + bucket + 5
+    assert layout.query_lengths[:capacity] == (4,) * capacity
+    assert layout.query_lengths[capacity : capacity + len(prompt_lengths)] == tuple(prompt_lengths)
+    assert all(length > 0 for length in layout.query_lengths)
+    assert layout.verification_output_count == verification_rows * 4
+    expected_prompt_indices = []
+    cursor = capacity * 4
+    for length in prompt_lengths:
+        cursor += length
+        expected_prompt_indices.append(cursor - 1)
+    assert layout.prompt_output_indices == tuple(expected_prompt_indices)
+    assert f"|verify:{capacity}|" in layout.graph_key
+    assert layout.graph_key.endswith(f"|prompt-tokens:{bucket}")
+
+
+def test_mixed_target_graph_bucket_subset_is_sorted_and_validated():
+    assert resolve_mixed_target_graph_buckets("") == (
+        64,
+        128,
+        192,
+        256,
+        384,
+        512,
+        768,
+        1024,
+        1536,
+        2048,
+    )
+    assert resolve_mixed_target_graph_buckets("2048,384,192,1536,768,256,1024,512") == (
+        192,
+        256,
+        384,
+        512,
+        768,
+        1024,
+        1536,
+        2048,
+    )
+    for invalid in ("1", "192,192", "256,nope"):
+        with pytest.raises(ValueError, match="GRAPH_BUCKETS"):
+            resolve_mixed_target_graph_buckets(invalid)
+
+
+@pytest.mark.parametrize(
+    ("verification_rows", "prompt_lengths", "match"),
+    [
+        (0, [1], "verification rows"),
+        (33, [1], "verification rows"),
+        (1, [], "prompt rows"),
+        (1, [1, 1, 1, 1, 1], "prompt rows"),
+        (1, [0], "prompt lengths"),
+        (1, [2049], "largest stable bucket"),
+    ],
+)
+def test_mixed_target_graph_layout_rejects_unsafe_shape_before_device_work(
+    verification_rows,
+    prompt_lengths,
+    match,
+):
+    with pytest.raises(ValueError, match=match):
+        plan_mixed_target_graph_layout(
+            verification_rows,
+            prompt_lengths,
+            gamma=4,
+        )
+
+
+def test_mixed_target_graph_key_ignores_exact_partitions_within_bucket():
+    left = plan_mixed_target_graph_layout(1, [20], gamma=4)
+    right = plan_mixed_target_graph_layout(16, [31, 32], gamma=4)
+
+    assert left.query_lengths != right.query_lengths
+    assert left.graph_key == right.graph_key
+    assert left.total_query_tokens == right.total_query_tokens == 133
+
+    larger = plan_mixed_target_graph_layout(17, [20], gamma=4)
+    assert larger.verification_capacity == 24
+    assert larger.graph_key != left.graph_key
+
+
+def test_mixed_target_graph_envelope_uses_disjoint_scratch_slots():
+    layout = plan_mixed_target_graph_layout(2, [20, 11], gamma=4)
+    envelope = plan_mixed_target_graph_envelope(
+        layout,
+        [3, 7],
+        [100, 200],
+        [11, 12],
+        [5, 9],
+        [128, 129, 130, 131, 132],
+    )
+
+    assert len(envelope.token_sequence_ids) == layout.total_query_tokens
+    assert layout.verification_capacity == 16
+    assert len(envelope.segment_sequence_ids) == 21
+    assert envelope.segment_sequence_ids[:2] == (3, 7)
+    assert envelope.positions[:8] == (
+        100,
+        101,
+        102,
+        103,
+        200,
+        201,
+        202,
+        203,
+    )
+    # Fourteen dummy verification rows share scratch row 128, but write
+    # consecutive non-overlapping ranges rather than aliases.
+    dummy_verify_start = 2 * 4
+    dummy_verify_end = 16 * 4
+    assert set(envelope.token_sequence_ids[dummy_verify_start:dummy_verify_end]) == {128}
+    assert envelope.positions[dummy_verify_start:dummy_verify_end] == tuple(
+        range(dummy_verify_end - dummy_verify_start)
+    )
+    assert envelope.segment_sequence_ids[16:18] == (11, 12)
+    assert envelope.segment_sequence_ids[18:] == (131, 132, 132)
+    # The last prompt scratch row owns one dummy at position zero; the
+    # residual starts at one, so no two writes alias.
+    assert envelope.positions[-layout.query_lengths[-1] - 1] == 0
+    assert envelope.positions[-layout.query_lengths[-1]] == 1
+
+
+def test_stable_target_verify_graph_envelope_is_exact_q_without_padding():
+    layout = plan_stable_target_verify_graph_layout(
+        2,
+        query_width=4,
+        verification_capacity=2,
+    )
+    envelope = plan_stable_target_verify_graph_envelope(
+        layout,
+        [3, 7],
+        [100, 200],
+        128,
+    )
+
+    assert layout.verification_output_count == 8
+    assert layout.total_query_tokens == 2 * 4
+    assert layout.request_segment_count == 2
+    assert envelope.segment_sequence_ids[:2] == (3, 7)
+    assert envelope.positions[:8] == (100, 101, 102, 103, 200, 201, 202, 203)
+    assert layout.dummy_verification_rows == 0
+
+
+def test_stable_target_verify_exact_shape_metadata_is_cached():
+    native_engine_module._cached_stable_target_verify_graph_layout.cache_clear()
+    native_engine_module._stable_target_verify_cumulative_q.cache_clear()
+
+    first = native_engine_module._cached_stable_target_verify_graph_layout(
+        7,
+        4,
+        7,
+    )
+    second = native_engine_module._cached_stable_target_verify_graph_layout(
+        7,
+        4,
+        7,
+    )
+
+    assert first is second
+    assert native_engine_module._stable_target_verify_cumulative_q(
+        4,
+        7,
+    ) == (4, 8, 12, 16, 20, 24, 28)
+
+
+@pytest.mark.parametrize(
+    "broken",
+    ["verify-count", "prompt-count", "scratch-count", "scratch-alias", "real-alias"],
+)
+def test_mixed_target_graph_envelope_rejects_unsafe_row_ownership(broken):
+    layout = plan_mixed_target_graph_layout(2, [20], gamma=4)
+    verify_ids = [3, 7]
+    verify_starts = [10, 20]
+    prompt_ids = [11]
+    prompt_starts = [0]
+    scratch_ids = [128, 129, 130, 131, 132]
+    if broken == "verify-count":
+        verify_ids.pop()
+    elif broken == "prompt-count":
+        prompt_starts.clear()
+    elif broken == "scratch-count":
+        scratch_ids.pop()
+    elif broken == "scratch-alias":
+        scratch_ids[-1] = scratch_ids[-2]
+    elif broken == "real-alias":
+        prompt_ids[0] = verify_ids[0]
+
+    with pytest.raises(ValueError, match="Mixed-target graph"):
+        plan_mixed_target_graph_envelope(
+            layout,
+            verify_ids,
+            verify_starts,
+            prompt_ids,
+            prompt_starts,
+            scratch_ids,
+        )
+
+
+def test_mixed_target_scratch_rows_extend_storage_not_service_capacity():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.config = SimpleNamespace(max_num_queued_seqs=128, max_num_seqs=64)
+    engine._mixed_target_graph_enabled = True
+
+    assert engine._cache_sequence_capacity == 128
+    assert engine._cache_storage_sequence_capacity == 133
+    assert engine._mixed_target_scratch_sequence_ids == (128, 129, 130, 131, 132)
+
+
+def test_prepare_mixed_target_graph_call_materializes_positive_scratch_slots():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.device = torch.device("cpu")
+    engine._mixed_target_graph_enabled = True
+    engine.config = SimpleNamespace(
+        max_num_queued_seqs=4,
+        max_num_seqs=4,
+        max_model_len=4096,
+    )
+    engine.cache_allocation = SimpleNamespace()
+    engine.cache_block_tables = torch.arange(9 * 8, dtype=torch.int32).reshape(9, 8)
+    engine.model = SimpleNamespace(attention_mask=torch.zeros((1, 1), dtype=torch.bool))
+    engine._ensure_cache_capacity = MagicMock()
+    engine._cache_slot_mapping = MagicMock(return_value=list(range(133)))
+    layout = plan_mixed_target_graph_layout(2, [2, 2], gamma=4)
+    envelope = plan_mixed_target_graph_envelope(
+        layout,
+        [0, 1],
+        [5, 7],
+        [2, 3],
+        [1, 0],
+        engine._mixed_target_scratch_sequence_ids,
+    )
+
+    positions, metadata = engine._prepare_mixed_target_graph_call(
+        layout,
+        envelope,
+        torch.zeros(133, dtype=torch.long),
+    )
+
+    assert positions.tolist() == list(envelope.positions)
+    assert metadata.actual_seq_lengths_q[-1] == 133
+    assert len(metadata.actual_seq_lengths_q) == 21
+    assert metadata.sequence_lens == envelope.sequence_lens
+    assert metadata.request_block_tables.shape == (21, 8)
+    assert metadata.slot_mapping.tolist() == list(range(133))
+    assert min(metadata.slot_mapping.tolist()) >= 0
+    engine._ensure_cache_capacity.assert_called_once_with(
+        list(envelope.token_sequence_ids),
+        list(envelope.positions),
+    )
+
+
+def test_prepare_stable_target_verify_graph_call_materializes_exact_q():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.device = torch.device("cpu")
+    engine._mixed_target_graph_enabled = True
+    engine.config = SimpleNamespace(
+        max_num_queued_seqs=64,
+        max_num_seqs=64,
+        max_model_len=4096,
+    )
+    engine.cache_allocation = SimpleNamespace()
+    engine.cache_block_tables = torch.arange(
+        69 * 8,
+        dtype=torch.int32,
+    ).reshape(69, 8)
+    engine.model = SimpleNamespace(attention_mask=torch.zeros((1, 1), dtype=torch.bool))
+    engine._ensure_cache_capacity = MagicMock()
+    engine._cache_slot_mapping = MagicMock(return_value=list(range(8)))
+    layout = plan_stable_target_verify_graph_layout(
+        2,
+        query_width=4,
+        verification_capacity=2,
+    )
+    envelope = plan_stable_target_verify_graph_envelope(
+        layout,
+        [0, 1],
+        [5, 7],
+        engine._mixed_target_scratch_sequence_ids[0],
+    )
+
+    positions, metadata = engine._prepare_stable_target_verify_graph_call(
+        layout,
+        envelope,
+        torch.zeros(8, dtype=torch.long),
+    )
+
+    assert positions.tolist() == list(envelope.positions)
+    assert metadata.actual_seq_lengths_q == (4, 8)
+    assert metadata.sequence_lens == envelope.sequence_lens
+    assert metadata.request_block_tables.shape == (2, 8)
+    assert metadata.slot_mapping.tolist() == list(range(8))
+    engine._ensure_cache_capacity.assert_called_once_with(
+        list(envelope.token_sequence_ids),
+        list(envelope.positions),
+    )
+
+
+def _stable_target_verify_numerical_harness(stable_tokens, restored_tokens):
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 64
+    engine._stable_target_verify_numerical_validation_attempts = 0
+    engine._stable_target_verify_numerical_validation_passes = 0
+    engine._stable_target_verify_numerical_validation_failures = 0
+    engine._stable_target_verify_numerical_restore_failures = 0
+    exact_tokens = torch.arange(8, dtype=torch.long) + 100
+    engine._run_device_packed_greedy = MagicMock(side_effect=[exact_tokens, restored_tokens])
+    engine._prepare_stable_target_verify_graph_call = MagicMock(return_value=(torch.arange(8), SimpleNamespace()))
+    engine.model = MagicMock()
+    engine.model.return_value = torch.arange(16, dtype=torch.float32).reshape(
+        8,
+        2,
+    )
+    engine.model.compute_greedy_tokens.return_value = stable_tokens
+    layout = plan_stable_target_verify_graph_layout(
+        2,
+        query_width=4,
+        verification_capacity=2,
+    )
+    envelope = plan_stable_target_verify_graph_envelope(
+        layout,
+        [0, 1],
+        [1, 1],
+        64,
+    )
+    inputs = torch.arange(1, 9, dtype=torch.long)
+    return engine, layout, envelope, inputs, exact_tokens
+
+
+def test_stable_target_verify_numerics_compares_and_restores_exact_kv():
+    expected = torch.arange(8, dtype=torch.long) + 100
+    engine, layout, envelope, inputs, _ = _stable_target_verify_numerical_harness(expected, expected)
+
+    engine._validate_stable_target_verify_numerics(
+        layout,
+        envelope,
+        inputs,
+    )
+
+    assert engine._run_device_packed_greedy.call_count == 2
+    for exact_call in engine._run_device_packed_greedy.call_args_list:
+        assert exact_call.kwargs == {
+            "use_aclgraph": False,
+            "use_fused_infer_attention": True,
+        }
+    assert engine.model.call_count == 1
+    assert engine._stable_target_verify_numerical_validation_attempts == 1
+    assert engine._stable_target_verify_numerical_validation_passes == 1
+    assert engine._stable_target_verify_numerical_validation_failures == 0
+    assert engine._stable_target_verify_numerical_restore_failures == 0
+
+
+def test_stable_target_verify_numerics_fails_closed_on_envelope_mismatch():
+    exact = torch.arange(8, dtype=torch.long) + 100
+    stable = exact.clone()
+    stable[-1] += 1
+    engine, layout, envelope, inputs, _ = _stable_target_verify_numerical_harness(stable, exact)
+
+    with pytest.raises(RuntimeError, match="changed greedy tokens"):
+        engine._validate_stable_target_verify_numerics(
+            layout,
+            envelope,
+            inputs,
+        )
+
+    assert engine._stable_target_verify_numerical_validation_attempts == 1
+    assert engine._stable_target_verify_numerical_validation_passes == 0
+    assert engine._stable_target_verify_numerical_validation_failures == 1
+    assert engine._stable_target_verify_numerical_restore_failures == 0
+
+
+def test_stable_target_verify_numerics_fails_closed_on_restore_mismatch():
+    exact = torch.arange(8, dtype=torch.long) + 100
+    restored = exact.clone()
+    restored[0] += 1
+    engine, layout, envelope, inputs, _ = _stable_target_verify_numerical_harness(exact, restored)
+
+    with pytest.raises(RuntimeError, match="KV restoration is not trustworthy"):
+        engine._validate_stable_target_verify_numerics(
+            layout,
+            envelope,
+            inputs,
+        )
+
+    assert engine._stable_target_verify_numerical_validation_attempts == 1
+    assert engine._stable_target_verify_numerical_validation_passes == 0
+    assert engine._stable_target_verify_numerical_validation_failures == 1
+    assert engine._stable_target_verify_numerical_restore_failures == 1
+
+
+def test_mixed_target_graph_qualification_changes_real_and_scratch_rows():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine._mixed_target_graph_enabled = True
+    engine._mixed_target_graph_prompt_buckets = (64, 128)
+    engine.config = SimpleNamespace(
+        max_num_queued_seqs=64,
+        max_num_seqs=64,
+        max_model_len=4096,
+        spec_rhythm_linear_bonus_token=False,
+    )
+    engine.cache_allocation = SimpleNamespace()
+    engine.cache_block_tables = torch.zeros((69, 4), dtype=torch.int32)
+    engine._prepare_mixed_target_graph_call = MagicMock(
+        side_effect=lambda layout, envelope, inputs: (
+            torch.arange(inputs.numel()),
+            SimpleNamespace(),
+        )
+    )
+    engine.graph_runner = MagicMock()
+    engine.graph_runner.max_graph_tokens = 261
+    engine.graph_runner.entries = {}
+    engine.graph_runner.execution_counters = {
+        "generic": {
+            "changed_input_validation_calls": 0,
+            "runtime_validation_failures": 0,
+        }
+    }
+
+    calls_by_key = {}
+
+    def qualify_on_second_call(*args, **kwargs):
+        key = (f"hidden|fia-stable:{kwargs['graph_key']}", kwargs["expected_tokens"])
+        entry = engine.graph_runner.entries.setdefault(
+            key,
+            SimpleNamespace(runtime_validated=False),
+        )
+        calls_by_key[key] = calls_by_key.get(key, 0) + 1
+        if calls_by_key[key] == 2:
+            entry.runtime_validated = True
+            engine.graph_runner.execution_counters["generic"]["changed_input_validation_calls"] += 1
+        return torch.zeros((kwargs["expected_tokens"], 2))
+
+    engine.graph_runner.run_stable_fia_hidden.side_effect = qualify_on_second_call
+
+    engine._qualify_stable_target_verify_graph = MagicMock()
+    engine._qualify_mixed_target_graph_buckets()
+
+    assert engine.graph_runner.run_stable_fia_hidden.call_count == 12
+    envelopes = [call.args[1] for call in engine._prepare_mixed_target_graph_call.call_args_list]
+    assert [
+        (
+            envelope.layout.prompt_token_bucket,
+            envelope.layout.verification_capacity,
+            envelope.layout.verification_rows,
+        )
+        for envelope in envelopes
+    ] == [
+        (128, 32, 32),
+        (128, 32, 17),
+        (128, 24, 24),
+        (128, 24, 17),
+        (128, 16, 16),
+        (128, 16, 15),
+        (64, 32, 32),
+        (64, 32, 17),
+        (64, 24, 24),
+        (64, 24, 17),
+        (64, 16, 16),
+        (64, 16, 15),
+    ]
+    for first_envelope, changed_envelope in zip(
+        envelopes[::2],
+        envelopes[1::2],
+    ):
+        capacity = first_envelope.layout.verification_capacity
+        changed_rows = changed_envelope.layout.verification_rows
+        assert first_envelope.layout.graph_key == changed_envelope.layout.graph_key
+        assert changed_envelope.layout.prompt_lengths[-3:] == (1, 1, 1)
+        assert changed_envelope.segment_sequence_ids[:changed_rows] == tuple(range(changed_rows))
+        assert changed_envelope.segment_sequence_ids[changed_rows:capacity] == (64,) * (capacity - changed_rows)
+        assert changed_envelope.segment_sequence_ids[capacity : capacity + 4] == tuple(range(capacity, capacity + 4))
+    for first_call, changed_call in zip(
+        engine.graph_runner.run_stable_fia_hidden.call_args_list[::2],
+        engine.graph_runner.run_stable_fia_hidden.call_args_list[1::2],
+    ):
+        assert int(first_call.args[0].min()) == 1
+        assert int(changed_call.args[0].min()) == 2
+    assert engine._mixed_target_graph_qualified_buckets == 6
+    assert engine.graph_runner.execution_counters["generic"]["changed_input_validation_calls"] == 6
+    engine._qualify_stable_target_verify_graph.assert_called_once_with()
+
+
+def test_stable_target_verify_graph_qualifies_every_exact_capacity_largest_first():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.draft_vocab_size = 64
+    engine.device = torch.device("cpu")
+    engine._mixed_target_graph_enabled = True
+    engine.config = SimpleNamespace(
+        max_num_queued_seqs=64,
+        max_num_seqs=64,
+        max_model_len=4096,
+        spec_rhythm_linear_bonus_token=False,
+    )
+    engine.cache_allocation = SimpleNamespace()
+    engine.cache_block_tables = torch.zeros((69, 4), dtype=torch.int32)
+    engine._prepare_stable_target_verify_graph_call = MagicMock(
+        side_effect=lambda layout, envelope, inputs: (
+            torch.arange(inputs.numel()),
+            SimpleNamespace(),
+        )
+    )
+    numerical_shapes = []
+
+    def validate_numerics(layout, envelope, inputs):
+        numerical_shapes.append((layout.verification_rows, layout.verification_capacity))
+        engine._stable_target_verify_numerical_validation_attempts += 1
+        engine._stable_target_verify_numerical_validation_passes += 1
+
+    engine._validate_stable_target_verify_numerics = MagicMock(side_effect=validate_numerics)
+    engine.graph_runner = MagicMock()
+    engine.graph_runner.max_graph_tokens = 128
+    engine.graph_runner.entries = {}
+    engine.graph_runner.execution_counters = {
+        "generic": {
+            "changed_input_validation_calls": 0,
+            "runtime_validation_failures": 0,
+        }
+    }
+
+    calls_by_key = {}
+
+    def qualify_on_second_call(*args, **kwargs):
+        key = (
+            f"greedy:{engine.draft_vocab_size}|fia-stable:{kwargs['graph_key']}",
+            kwargs["expected_tokens"],
+        )
+        entry = engine.graph_runner.entries.setdefault(
+            key,
+            SimpleNamespace(runtime_validated=False),
+        )
+        calls_by_key[key] = calls_by_key.get(key, 0) + 1
+        if calls_by_key[key] == 2:
+            entry.runtime_validated = True
+            engine.graph_runner.execution_counters["generic"]["changed_input_validation_calls"] += 1
+        return torch.zeros(kwargs["expected_tokens"], dtype=torch.long)
+
+    engine.graph_runner.run_stable_fia_greedy.side_effect = qualify_on_second_call
+
+    engine._qualify_stable_target_verify_graph()
+
+    assert engine.graph_runner.run_stable_fia_greedy.call_count == 64
+    assert all(
+        call.args[3] == engine.draft_vocab_size for call in engine.graph_runner.run_stable_fia_greedy.call_args_list
+    )
+    graph_capacities = [
+        call.kwargs["expected_tokens"] // 4 for call in engine.graph_runner.run_stable_fia_greedy.call_args_list
+    ]
+    assert graph_capacities == [capacity for capacity in range(32, 0, -1) for _ in range(2)]
+    assert numerical_shapes == [(capacity, capacity) for capacity in range(32, 0, -1) for _ in range(2)]
+    assert engine._stable_target_verify_graph_qualified == 1
+    assert engine._stable_target_verify_graph_qualified_capacities == tuple(range(1, 33))
+    assert engine._stable_target_verify_graph_capacity_map == {value: value for value in range(1, 33)}
+
+
+@pytest.mark.parametrize(
+    ("outcome", "changed_counter"),
+    [
+        (("graph", 19, 311), "spec_rhythm_mixed_target_graph_batches"),
+        (
+            ("bounded_shape", 19, 311),
+            "spec_rhythm_mixed_target_graph_bounded_shape_fallback_batches",
+        ),
+        (
+            ("token_capacity", 19, 311),
+            "spec_rhythm_mixed_target_graph_token_capacity_fallback_batches",
+        ),
+        (
+            ("execution_fallback", 19, 311),
+            "spec_rhythm_mixed_target_graph_execution_fallback_batches",
+        ),
+    ],
+)
+def test_mixed_target_graph_outcome_updates_service_counters(
+    outcome,
+    changed_counter,
+):
+    keys = (
+        "spec_rhythm_mixed_target_graph_batches",
+        "spec_rhythm_mixed_target_graph_requests",
+        "spec_rhythm_mixed_target_graph_prompt_tokens",
+        "spec_rhythm_mixed_target_graph_bounded_shape_fallback_batches",
+        "spec_rhythm_mixed_target_graph_token_capacity_fallback_batches",
+        "spec_rhythm_mixed_target_graph_execution_fallback_batches",
+    )
+    counters = dict.fromkeys(keys, 0)
+
+    _record_mixed_target_graph_outcome(counters, outcome)
+
+    assert counters[changed_counter] == 1
+    if outcome[0] == "graph":
+        assert counters["spec_rhythm_mixed_target_graph_requests"] == 19
+        assert counters["spec_rhythm_mixed_target_graph_prompt_tokens"] == 311
+    else:
+        assert counters["spec_rhythm_mixed_target_graph_batches"] == 0
+        assert counters["spec_rhythm_mixed_target_graph_requests"] == 0
+        assert counters["spec_rhythm_mixed_target_graph_prompt_tokens"] == 0
+
+
+@pytest.mark.parametrize(
+    ("outcome", "changed_counter"),
+    [
+        (("graph", 17), "spec_rhythm_stable_target_verify_graph_batches"),
+        (
+            ("bounded_shape", 17),
+            "spec_rhythm_stable_target_verify_graph_bounded_shape_fallback_batches",
+        ),
+        (
+            ("token_capacity", 17),
+            "spec_rhythm_stable_target_verify_graph_token_capacity_fallback_batches",
+        ),
+        (
+            ("execution_fallback", 17),
+            "spec_rhythm_stable_target_verify_graph_execution_fallback_batches",
+        ),
+    ],
+)
+def test_stable_target_verify_graph_outcome_has_independent_service_counters(
+    outcome,
+    changed_counter,
+):
+    keys = (
+        "spec_rhythm_stable_target_verify_graph_batches",
+        "spec_rhythm_stable_target_verify_graph_requests",
+        "spec_rhythm_stable_target_verify_graph_bounded_shape_fallback_batches",
+        "spec_rhythm_stable_target_verify_graph_token_capacity_fallback_batches",
+        "spec_rhythm_stable_target_verify_graph_execution_fallback_batches",
+    )
+    counters = dict.fromkeys(keys, 0)
+
+    _record_stable_target_verify_graph_outcome(counters, outcome)
+
+    assert counters[changed_counter] == 1
+    assert counters["spec_rhythm_stable_target_verify_graph_requests"] == (17 if outcome[0] == "graph" else 0)
+    assert "spec_rhythm_mixed_target_graph_batches" not in counters
+
+
 def test_precompile_changed_input_qualifies_every_full_serial_draft_bucket():
     engine = NativePearlEngine.__new__(NativePearlEngine)
     engine.config = SimpleNamespace(
@@ -157,6 +867,8 @@ def test_precompile_changed_input_qualifies_every_full_serial_draft_bucket():
         draft_entries={},
         execution_counters={"draft": draft_counters},
         set_expected_fia_batch_size=MagicMock(),
+        task_update_skip_replay_count=0,
+        last_draft_entry_key=None,
     )
     engine.graph_runner = graph_runner
     engine.precompiled_decode_batch_sizes = frozenset()
@@ -170,12 +882,11 @@ def test_precompile_changed_input_qualifies_every_full_serial_draft_bucket():
     def draft_batch(states, active_indices, budgets, **kwargs):
         batch_size = len(active_indices)
         calls_by_bucket[batch_size] = calls_by_bucket.get(batch_size, 0) + 1
-        state_snapshots.append(
-            (batch_size, [list(state.token_ids) for state in states])
-        )
+        state_snapshots.append((batch_size, [list(state.token_ids) for state in states]))
         assert active_indices == list(range(batch_size))
         assert budgets == [engine.gamma] * batch_size
-        assert kwargs["verification_sizes"] == [1] * batch_size
+        assert kwargs["verification_sizes"] == [engine.gamma] * batch_size
+        assert kwargs["full_window"] is True
         entry_key = (
             f"draft-greedy:{engine.draft_vocab_size}|steps:{engine.gamma}|paged",
             batch_size,
@@ -188,9 +899,11 @@ def test_precompile_changed_input_qualifies_every_full_serial_draft_bucket():
         else:
             assert calls_by_bucket[batch_size] == 2
             entry = graph_runner.draft_entries[entry_key]
+            assert not entry.runtime_validated
             entry.runtime_validated = True
             draft_counters["runtime_validation_calls"] += 1
             draft_counters["changed_input_validation_calls"] += 1
+        graph_runner.last_draft_entry_key = entry_key
         next_windows = torch.full(
             (batch_size, engine.gamma),
             10 + batch_size,
@@ -200,9 +913,7 @@ def test_precompile_changed_input_qualifies_every_full_serial_draft_bucket():
 
     engine._draft_spec_rhythm_device_batch = MagicMock(side_effect=draft_batch)
 
-    with patch(
-        "vllm_ascend.spec_decode.pearl.native_engine.torch.npu.synchronize"
-    ) as synchronize:
+    with patch("vllm_ascend.spec_decode.pearl.native_engine.torch.npu.synchronize") as synchronize:
         engine._precompile_decode_graphs(include_target_graphs=False)
 
     assert calls_by_bucket == {1: 2, 2: 2, 3: 2}
@@ -219,15 +930,12 @@ def test_precompile_changed_input_qualifies_every_full_serial_draft_bucket():
         "changed_input_validation_calls": 3,
         "runtime_validation_failures": 0,
     }
+
     assert all(
-        entry.runtime_validated
-        and entry.validated_real_row_count == entry_key[1]
+        entry.runtime_validated and entry.validated_real_row_count == entry_key[1]
         for entry_key, entry in graph_runner.draft_entries.items()
     )
-    assert [
-        args.args[0]
-        for args in graph_runner.set_expected_fia_batch_size.call_args_list
-    ] == [1, 2, 3]
+    assert [args.args[0] for args in graph_runner.set_expected_fia_batch_size.call_args_list] == [1, 2, 3]
     assert engine.precompiled_decode_batch_sizes == frozenset()
     engine._allocate_cache.assert_called_once_with(
         [[0], [0], [0]],
@@ -235,6 +943,81 @@ def test_precompile_changed_input_qualifies_every_full_serial_draft_bucket():
     )
     engine._release_cache.assert_called_once_with()
     synchronize.assert_called_once_with()
+
+
+def test_stable_task_barrier_qualification_keeps_common_kv_signature_fixed():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.gamma = 4
+    engine.draft_vocab_size = 8
+    counters = {
+        "runtime_validation_calls": 0,
+        "changed_input_validation_calls": 0,
+        "runtime_validation_failures": 0,
+    }
+    graph_runner = SimpleNamespace(
+        draft_entries={},
+        execution_counters={"draft": counters},
+        task_update_skip_replay_count=0,
+        last_draft_entry_key=None,
+    )
+    engine.graph_runner = graph_runner
+    state = PearlPipelineState(
+        [1, 2],
+        prompt_length=2,
+        max_tokens=32,
+    )
+    state.committed_length = len(state.token_ids)
+    entry_key = (
+        "draft-greedy:8|steps:4|fia:1|lane:0|stable-task-barrier|kv-cap:38",
+        1,
+    )
+    calls = 0
+
+    def draft_batch(states, active_indices, budgets, **kwargs):
+        nonlocal calls
+        calls += 1
+        assert active_indices == [0]
+        assert budgets == [engine.gamma]
+        assert kwargs["full_window"] is True
+        assert kwargs["graph_lane"] == 0
+        # The stable barrier must never qualify by mutating the common-KV host
+        # signature. Input tensors still change as tokens are appended.
+        assert states[0].max_tokens == 32
+        if calls == 1:
+            graph_runner.draft_entries[entry_key] = SimpleNamespace(
+                runtime_validated=False,
+                validated_real_row_count=1,
+            )
+        else:
+            entry = graph_runner.draft_entries[entry_key]
+            assert not entry.runtime_validated
+            entry.runtime_validated = True
+            counters["runtime_validation_calls"] += 1
+            counters["changed_input_validation_calls"] += 1
+            graph_runner.task_update_skip_replay_count += 1
+        graph_runner.last_draft_entry_key = entry_key
+        return None, torch.full((1, engine.gamma), 7, dtype=torch.long), None
+
+    engine._draft_spec_rhythm_device_batch = MagicMock(side_effect=draft_batch)
+    with patch.dict(
+        os.environ,
+        {
+            "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_BUCKET": "1",
+            "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_COMMON_KV": "1",
+            "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_STABLE_TASK_BARRIER": "1",
+        },
+    ):
+        engine._qualify_linear_draft_graph_bucket(
+            [state],
+            1,
+            graph_lane=0,
+        )
+
+    assert calls == 3
+    assert state.token_ids == [1, 2]
+    assert state.committed_length == 2
+    assert state.max_tokens == 32
+    assert graph_runner.task_update_skip_replay_count == 2
 
 
 def test_draft_only_precompile_participates_in_prefill_without_capturing_target_graphs():
@@ -255,15 +1038,78 @@ def test_draft_only_precompile_participates_in_prefill_without_capturing_target_
     engine._run_device_packed_greedy = MagicMock()
     engine._draft_spec_rhythm_device_batch = MagicMock()
 
-    with patch(
-        "vllm_ascend.spec_decode.pearl.native_engine.torch.npu.synchronize"
-    ) as synchronize:
+    with patch("vllm_ascend.spec_decode.pearl.native_engine.torch.npu.synchronize") as synchronize:
         engine._precompile_decode_graphs(include_target_graphs=False)
 
     engine._prefill_and_sample_target_batch.assert_called_once()
     engine._run_device_packed_greedy.assert_not_called()
     engine._draft_spec_rhythm_device_batch.assert_not_called()
     engine.graph_runner.set_expected_fia_batch_size.assert_not_called()
+    assert engine.precompiled_decode_batch_sizes == frozenset()
+    engine._release_cache.assert_called_once_with()
+    synchronize.assert_called_once_with()
+
+
+def test_target_only_precompile_does_not_capture_serial_draft_graphs():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.config = SimpleNamespace(
+        max_num_seqs=3,
+        enable_continuous_batching=True,
+        max_tokens=32,
+    )
+    engine.is_draft = True
+    engine.precompiled_decode_batch_sizes = frozenset()
+    engine.graph_runner = SimpleNamespace(
+        set_expected_fia_batch_size=MagicMock(),
+    )
+    engine._allocate_cache = MagicMock()
+    engine._release_cache = MagicMock()
+    engine._prefill_and_sample_target_batch = MagicMock()
+    engine._draft_spec_rhythm_device_batch = MagicMock()
+
+    with patch("vllm_ascend.spec_decode.pearl.native_engine.torch.npu.synchronize") as synchronize:
+        engine._precompile_decode_graphs(
+            include_target_graphs=True,
+            include_draft_graphs=False,
+        )
+
+    engine._prefill_and_sample_target_batch.assert_called_once()
+    engine._draft_spec_rhythm_device_batch.assert_not_called()
+    engine.graph_runner.set_expected_fia_batch_size.assert_not_called()
+    assert engine.precompiled_decode_batch_sizes == frozenset()
+    engine._release_cache.assert_called_once_with()
+    synchronize.assert_called_once_with()
+
+
+def test_serial_draft_precompile_also_qualifies_opted_in_mixed_target_graph():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.config = SimpleNamespace(
+        max_num_seqs=3,
+        enable_continuous_batching=True,
+        max_tokens=32,
+    )
+    engine.is_draft = False
+    engine._mixed_target_graph_enabled = True
+    engine.precompiled_decode_batch_sizes = frozenset()
+    engine.graph_runner = SimpleNamespace(
+        set_expected_fia_batch_size=MagicMock(),
+    )
+    engine._allocate_cache = MagicMock()
+    engine._release_cache = MagicMock()
+    engine._prefill_and_sample_target_batch = MagicMock()
+    engine._run_device_packed_greedy = MagicMock()
+    engine._qualify_mixed_target_graph_buckets = MagicMock()
+
+    with patch("vllm_ascend.spec_decode.pearl.native_engine.torch.npu.synchronize") as synchronize:
+        engine._precompile_decode_graphs(include_target_graphs=False)
+
+    engine._qualify_mixed_target_graph_buckets.assert_called_once_with()
+    engine._run_device_packed_greedy.assert_not_called()
+    engine._allocate_cache.assert_called_once_with(
+        [[0], [0], [0]],
+        enable_prefix_caching=False,
+        reserve_sequence_capacity=True,
+    )
     assert engine.precompiled_decode_batch_sizes == frozenset()
     engine._release_cache.assert_called_once_with()
     synchronize.assert_called_once_with()
@@ -314,15 +1160,18 @@ def test_linear_full_chain_telemetry_distinguishes_runner_outcomes(
     assert owner._linear_draft_full_chain_padding_rows == 1
     assert owner._linear_draft_full_chain_padding_tokens == 4
     assert getattr(owner, expected_counter) == 1
-    assert sum(
-        getattr(owner, name, 0)
-        for name in (
-            "_linear_draft_full_chain_capture_replay_calls",
-            "_linear_draft_full_chain_replay_calls",
-            "_linear_draft_full_chain_eager_fallback_calls",
-            "_linear_draft_full_chain_unclassified_calls",
+    assert (
+        sum(
+            getattr(owner, name, 0)
+            for name in (
+                "_linear_draft_full_chain_capture_replay_calls",
+                "_linear_draft_full_chain_replay_calls",
+                "_linear_draft_full_chain_eager_fallback_calls",
+                "_linear_draft_full_chain_unclassified_calls",
+            )
         )
-    ) == owner._linear_draft_full_chain_calls
+        == owner._linear_draft_full_chain_calls
+    )
 
 
 def test_pearl_defaults_to_tp3_deterministic_aiv_without_overriding_user_configuration():
@@ -356,9 +1205,7 @@ def test_native_mm_allreduce_never_activates_from_symbol_presence_alone():
 
 
 def test_native_mm_allreduce_matches_explicit_vllm_and_tp3_opt_ins():
-    with patch(
-        "vllm_ascend.spec_decode.pearl.native_model.ascend_envs.VLLM_ASCEND_ENABLE_MATMUL_ALLREDUCE", True
-    ):
+    with patch("vllm_ascend.spec_decode.pearl.native_model.ascend_envs.VLLM_ASCEND_ENABLE_MATMUL_ALLREDUCE", True):
         assert _use_native_fused_mm_all_reduce(2, "npu")
         assert _use_native_fused_mm_all_reduce(4, "npu")
         assert _use_native_fused_mm_all_reduce(8, "npu")
@@ -477,6 +1324,235 @@ def test_benchmark_parses_explicit_target_graph_post_counts():
     )
 
 
+class _RecordingHostView:
+    def __init__(self, tensor, events, bounds):
+        self.tensor = tensor
+        self.events = events
+        self.bounds = bounds
+
+    def copy_(self, source, *, non_blocking=False):
+        self.events.append(("copy", *self.bounds, non_blocking))
+        self.tensor.copy_(source)
+        return self
+
+    def tolist(self):
+        self.events.append(("tolist", *self.bounds))
+        return self.tensor.tolist()
+
+
+class _RecordingHostBuffer:
+    def __init__(self, size, events):
+        self.tensor = torch.full((size,), -999, dtype=torch.long)
+        self.events = events
+
+    def __getitem__(self, key):
+        assert isinstance(key, slice)
+        start = 0 if key.start is None else key.start
+        stop = self.tensor.numel() if key.stop is None else key.stop
+        return _RecordingHostView(self.tensor[key], self.events, (start, stop))
+
+
+class _RecordingCopyEvent:
+    def __init__(self, events):
+        self.events = events
+
+    def record(self):
+        self.events.append("record")
+
+    def synchronize(self):
+        self.events.append("synchronize")
+
+
+def _fixed_full_window_correction_engine(*, is_draft, events):
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 0 if is_draft else 1
+    engine.is_draft = is_draft
+    engine.gamma = 4
+    engine.device = SimpleNamespace(type="npu")
+    engine.config = SimpleNamespace(
+        spec_rhythm_linear_full_window=True,
+        spec_rhythm_linear_bonus_token=False,
+    )
+    engine.topology = PearlTopology(draft_ranks=(0,), target_ranks=(1, 2))
+    engine.groups = SimpleNamespace(correction_group=object())
+    engine._fixed_full_window_host_correction_staging = native_engine_module._FixedFullWindowHostCorrectionStaging(
+        verdict_receive=torch.full((64,), -777, dtype=torch.long),
+        host_values=_RecordingHostBuffer(192, events),
+        copy_done_event=_RecordingCopyEvent(events),
+    )
+    return engine
+
+
+@pytest.mark.parametrize("batch_size", [1, 16, 32])
+def test_fixed_full_window_target_staging_overlaps_continuation_copy_and_collective_wait(batch_size):
+    events = []
+    engine = _fixed_full_window_correction_engine(is_draft=False, events=events)
+    verdict = torch.stack(
+        (
+            torch.full((batch_size,), 4, dtype=torch.long),
+            torch.full((batch_size,), -1, dtype=torch.long),
+        ),
+        dim=1,
+    )
+    local_next = torch.arange(batch_size * 4, dtype=torch.long).reshape(batch_size, 4)
+    work = MagicMock()
+    work.wait.side_effect = lambda: events.append("wait")
+
+    def broadcast(*_args, **_kwargs):
+        events.append("broadcast")
+        return work
+
+    with (
+        patch.dict(os.environ, {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "0"}),
+        patch("vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast", side_effect=broadcast),
+    ):
+        accepted, corrections, next_windows = engine._broadcast_device_round_result(
+            verdict,
+            None,
+            verification_size=batch_size * 4,
+            batch_size=batch_size,
+            local_next_windows=local_next,
+            replicated_target_verdict=True,
+            next_window_sizes=[4] * batch_size,
+        )
+
+    continuation_size = batch_size * 4
+    packed_size = continuation_size + batch_size * 2
+    assert events == [
+        "broadcast",
+        ("copy", 0, continuation_size, True),
+        "wait",
+        ("copy", continuation_size, packed_size, True),
+        "record",
+        "synchronize",
+        ("tolist", 0, packed_size),
+    ]
+    assert accepted == [4] * batch_size
+    assert corrections == [None] * batch_size
+    assert next_windows == local_next.tolist()
+    assert engine._fixed_full_window_host_correction_staging_eligible_calls == 1
+    assert engine._fixed_full_window_host_correction_staging_calls == 1
+
+
+def test_fixed_full_window_draft_staging_reuses_receive_buffer_and_keeps_windows_on_device():
+    events = []
+    engine = _fixed_full_window_correction_engine(is_draft=True, events=events)
+    receive_storage = engine._fixed_full_window_host_correction_staging.verdict_receive.untyped_storage()
+    published_storage_pointers = []
+    work = MagicMock()
+    work.wait.side_effect = lambda: events.append("wait")
+
+    def broadcast(published, **_kwargs):
+        events.append("broadcast")
+        published_storage_pointers.append(published.untyped_storage().data_ptr())
+        rows = published.numel() // 2
+        published.copy_(torch.tensor([4, -1] * rows, dtype=torch.long))
+        return work
+
+    with (
+        patch.dict(os.environ, {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "0"}),
+        patch("vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast", side_effect=broadcast),
+    ):
+        for batch_size in (32, 1):
+            local_next = torch.arange(batch_size * 4, dtype=torch.long).reshape(batch_size, 4)
+            accepted, corrections, next_windows = engine._broadcast_device_round_result(
+                None,
+                None,
+                verification_size=batch_size * 4,
+                batch_size=batch_size,
+                local_next_windows=local_next,
+                replicated_target_verdict=True,
+                next_window_sizes=[4] * batch_size,
+            )
+            assert accepted == [4] * batch_size
+            assert corrections == [None] * batch_size
+            assert all(torch.equal(window, local_next[row]) for row, window in enumerate(next_windows))
+
+    assert published_storage_pointers == [receive_storage.data_ptr()] * 2
+    assert engine._fixed_full_window_host_correction_staging_eligible_calls == 2
+    assert engine._fixed_full_window_host_correction_staging_calls == 2
+    assert events == [
+        "broadcast",
+        "wait",
+        ("copy", 0, 64, True),
+        "record",
+        "synchronize",
+        ("tolist", 0, 64),
+        "broadcast",
+        "wait",
+        ("copy", 0, 2, True),
+        "record",
+        "synchronize",
+        ("tolist", 0, 2),
+    ]
+
+
+def test_fixed_full_window_staging_ignores_stale_tail_when_target_batch_shrinks():
+    events = []
+    engine = _fixed_full_window_correction_engine(is_draft=False, events=events)
+    work = MagicMock()
+
+    with (
+        patch.dict(os.environ, {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "0"}),
+        patch("vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast", return_value=work),
+    ):
+        engine._broadcast_device_round_result(
+            torch.tensor([[4, -1]] * 32),
+            None,
+            verification_size=128,
+            batch_size=32,
+            local_next_windows=torch.arange(128).reshape(32, 4),
+            replicated_target_verdict=True,
+            next_window_sizes=[4] * 32,
+        )
+        accepted, corrections, next_windows = engine._broadcast_device_round_result(
+            torch.tensor([[0, 12345]]),
+            None,
+            verification_size=4,
+            batch_size=1,
+            local_next_windows=torch.tensor([[91, 92, 93, 94]]),
+            replicated_target_verdict=True,
+            next_window_sizes=[4],
+        )
+
+    assert accepted == [0]
+    assert corrections == [12345]
+    assert next_windows == [[91, 92, 93, 94]]
+    assert events[-4:] == [
+        ("copy", 4, 6, True),
+        "record",
+        "synchronize",
+        ("tolist", 0, 6),
+    ]
+
+
+def test_fixed_full_window_staging_falls_back_for_partial_windows():
+    events = []
+    engine = _fixed_full_window_correction_engine(is_draft=False, events=events)
+    work = MagicMock()
+
+    with (
+        patch.dict(os.environ, {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "0"}),
+        patch("vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast", return_value=work),
+    ):
+        accepted, corrections, next_windows = engine._broadcast_device_round_result(
+            torch.tensor([[3, -1]]),
+            None,
+            verification_size=3,
+            batch_size=1,
+            local_next_windows=torch.tensor([[31, 32, 33, 999]]),
+            replicated_target_verdict=True,
+            next_window_sizes=[3],
+        )
+
+    assert events == []
+    assert accepted == [3]
+    assert corrections == [None]
+    assert next_windows == [[31, 32, 33]]
+    assert getattr(engine, "_fixed_full_window_host_correction_staging_eligible_calls", 0) == 0
+    assert getattr(engine, "_fixed_full_window_host_correction_staging_calls", 0) == 0
+
+
 def test_target_follower_builds_replicated_greedy_result_without_broadcast():
     engine = NativePearlEngine.__new__(NativePearlEngine)
     engine.rank = 2
@@ -530,6 +1606,272 @@ def test_target_follower_uses_rank_local_continuations_with_verification_only_me
     assert accepted == [3, 0]
     assert corrections == [None, 42]
     assert next_windows == [[20, 21, 22], [30, 31, 32]]
+
+
+def test_device_round_result_classifies_second_channel_as_correction_or_bonus():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 2
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.config = SimpleNamespace(spec_rhythm_linear_bonus_token=True)
+    engine.topology = PearlTopology(draft_ranks=(0,), target_ranks=(1, 2))
+    engine.groups = SimpleNamespace(correction_group=MagicMock())
+    verdict = torch.tensor(
+        [
+            [4, 88],
+            [2, 91],
+            [4, -1],
+        ],
+        dtype=torch.long,
+    )
+    local_next = torch.arange(12, dtype=torch.long).reshape(3, 4)
+
+    with patch("vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast") as broadcast:
+        accepted, corrections, next_windows = engine._broadcast_device_round_result(
+            verdict,
+            None,
+            verification_size=12,
+            batch_size=3,
+            local_next_windows=local_next,
+            replicated_target_verdict=True,
+            next_window_sizes=[4, 4, 4],
+        )
+
+    broadcast.assert_not_called()
+    assert accepted == [4, 2, 4]
+    assert corrections == [None, 91, None]
+    assert engine._last_device_round_bonus_tokens == [88, None, None]
+    assert next_windows == [
+        [0, 1, 2, 3],
+        [4, 5, 6, 7],
+        [8, 9, 10, 11],
+    ]
+
+
+def test_gloo_correction_materializes_only_target_leader_verdict():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 1
+    engine.is_draft = False
+    engine.gamma = 3
+    engine.device = torch.device("cpu")
+    engine.topology = PearlTopology(draft_ranks=(0,), target_ranks=(1, 2))
+    coordination_group = object()
+    engine.groups = SimpleNamespace(
+        correction_group=object(),
+        verification_coordination_group=coordination_group,
+    )
+    verdict = torch.tensor([[3, -1], [0, 42]])
+    local_next = torch.tensor([[20, 21, 22], [30, 31, 32]])
+
+    with (
+        patch.dict(
+            os.environ,
+            {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "1"},
+        ),
+        patch("vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast") as broadcast,
+    ):
+        accepted, corrections, next_windows = engine._broadcast_device_round_result(
+            verdict,
+            None,
+            verification_size=4,
+            batch_size=2,
+            local_next_windows=local_next,
+            replicated_target_verdict=True,
+        )
+
+    (published,), kwargs = broadcast.call_args
+    assert published.device.type == "cpu"
+    assert published.tolist() == [3, -1, 0, 42]
+    assert kwargs == {"src": 1, "group": coordination_group}
+    assert accepted == [3, 0]
+    assert corrections == [None, 42]
+    assert next_windows == [[20, 21, 22], [30, 31, 32]]
+
+
+def test_gloo_correction_delivers_target_verdict_to_draft():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 0
+    engine.is_draft = True
+    engine.gamma = 3
+    engine.device = torch.device("cpu")
+    engine.topology = PearlTopology(draft_ranks=(0,), target_ranks=(1, 2))
+    coordination_group = object()
+    engine.groups = SimpleNamespace(
+        correction_group=object(),
+        verification_coordination_group=coordination_group,
+    )
+    local_next = torch.tensor([[20, 21, 22], [30, 31, 32]])
+
+    def publish_verdict(result, **_kwargs):
+        result.copy_(torch.tensor([3, -1, 0, 42]))
+
+    with (
+        patch.dict(
+            os.environ,
+            {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "1"},
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast",
+            side_effect=publish_verdict,
+        ) as broadcast,
+    ):
+        accepted, corrections, next_windows = engine._broadcast_device_round_result(
+            None,
+            None,
+            verification_size=4,
+            batch_size=2,
+            local_next_windows=local_next,
+            replicated_target_verdict=True,
+        )
+
+    broadcast.assert_called_once()
+    assert broadcast.call_args.kwargs == {
+        "src": 1,
+        "group": coordination_group,
+    }
+    assert accepted == [3, 0]
+    assert corrections == [None, 42]
+    assert torch.equal(next_windows[0], torch.tensor([20, 21, 22]))
+    assert torch.equal(next_windows[1], torch.tensor([30, 31, 32]))
+
+
+def test_gloo_correction_overwrites_target_follower_local_verdict():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 2
+    engine.is_draft = False
+    engine.gamma = 3
+    engine.device = torch.device("cpu")
+    engine.topology = PearlTopology(draft_ranks=(0,), target_ranks=(1, 2))
+    coordination_group = object()
+    engine.groups = SimpleNamespace(
+        correction_group=object(),
+        verification_coordination_group=coordination_group,
+    )
+    follower_verdict = torch.tensor([[0, 999], [0, 998]])
+    local_next = torch.tensor([[20, 21, 22], [30, 31, 32]])
+
+    def publish_leader_verdict(result, **_kwargs):
+        result.copy_(torch.tensor([3, -1, 0, 42]))
+
+    with (
+        patch.dict(
+            os.environ,
+            {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "1"},
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast",
+            side_effect=publish_leader_verdict,
+        ) as broadcast,
+    ):
+        accepted, corrections, _ = engine._broadcast_device_round_result(
+            follower_verdict,
+            None,
+            verification_size=4,
+            batch_size=2,
+            local_next_windows=local_next,
+            replicated_target_verdict=True,
+        )
+
+    broadcast.assert_called_once()
+    assert broadcast.call_args.kwargs == {
+        "src": 1,
+        "group": coordination_group,
+    }
+    assert accepted == [3, 0]
+    assert corrections == [None, 42]
+
+
+def test_gloo_correction_falls_back_for_wider_draft_tp():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 2
+    engine.is_draft = False
+    engine.gamma = 3
+    engine.device = torch.device("cpu")
+    engine.topology = PearlTopology(
+        draft_ranks=(0, 1),
+        target_ranks=(2, 3),
+    )
+    correction_group = object()
+    engine.groups = SimpleNamespace(
+        correction_group=correction_group,
+        verification_coordination_group=object(),
+    )
+    verdict = torch.tensor([[3, -1]])
+    local_next = torch.tensor([[20, 21, 22]])
+    work = MagicMock()
+
+    with (
+        patch.dict(
+            os.environ,
+            {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "1"},
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast",
+            return_value=work,
+        ) as broadcast,
+    ):
+        accepted, corrections, _ = engine._broadcast_device_round_result(
+            verdict,
+            None,
+            verification_size=3,
+            batch_size=1,
+            local_next_windows=local_next,
+            replicated_target_verdict=True,
+        )
+
+    (published,), kwargs = broadcast.call_args
+    assert torch.equal(published, verdict.flatten())
+    assert kwargs == {
+        "src": 2,
+        "group": correction_group,
+        "async_op": True,
+    }
+    work.wait.assert_called_once_with()
+    assert accepted == [3]
+    assert corrections == [None]
+
+
+def test_gloo_correction_does_not_change_stochastic_world_broadcast():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 1
+    engine.is_draft = False
+    engine.gamma = 3
+    engine.device = torch.device("cpu")
+    engine.topology = PearlTopology(draft_ranks=(0,), target_ranks=(1, 2))
+    engine.groups = SimpleNamespace(
+        correction_group=object(),
+        verification_coordination_group=object(),
+    )
+    verdict = torch.tensor([[2, 42]])
+    local_next = torch.tensor([[20, 21, 22]])
+    work = MagicMock()
+
+    with (
+        patch.dict(
+            os.environ,
+            {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "1"},
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast",
+            return_value=work,
+        ) as broadcast,
+    ):
+        accepted, corrections, _ = engine._broadcast_device_round_result(
+            verdict,
+            None,
+            verification_size=3,
+            batch_size=1,
+            local_next_windows=local_next,
+            replicated_target_verdict=False,
+        )
+
+    (published,), kwargs = broadcast.call_args
+    assert torch.equal(published, verdict.flatten())
+    assert kwargs == {"src": 1, "async_op": True}
+    work.wait.assert_called_once_with()
+    assert accepted == [2]
+    assert corrections == [42]
 
 
 def test_tree_verdict_target_leader_broadcasts_to_target_and_draft_groups():
@@ -843,6 +2185,80 @@ def test_full_window_draft_full_accept_without_eager_ends_at_committed_frontier(
     assert state.token_ids == [1, 2, 3, 4, 5, 6, 7]
     assert state.committed_length == len(state.token_ids)
     assert state.acceptance_lengths == [4]
+
+
+def test_full_window_bonus_commits_identically_on_target_and_draft():
+    prefix = [10, 11, 12]
+    proposal = [20, 21, 22, 23]
+    bonus = 99
+    target = PearlPipelineState(prefix.copy(), prompt_length=2)
+    draft = target.clone()
+    draft.token_ids.extend(proposal)
+
+    target.apply_target_full_window_verification(
+        proposal_token_ids=proposal,
+        accepted=len(proposal),
+        correction_token_id=None,
+        bonus_token_id=bonus,
+    )
+    draft.apply_draft_full_window_verification(
+        proposal_token_ids=proposal,
+        accepted=len(proposal),
+        correction_token_id=None,
+        bonus_token_id=bonus,
+    )
+
+    expected = [*prefix, *proposal, bonus]
+    assert target.token_ids == draft.token_ids == expected
+    assert target.committed_length == draft.committed_length == len(expected)
+    assert target.committed_completion_token_ids == [12, *proposal, bonus]
+    assert draft.committed_completion_token_ids == [12, *proposal, bonus]
+    assert target.accepted_draft_tokens == draft.accepted_draft_tokens == 4
+    assert target.verified_draft_tokens == draft.verified_draft_tokens == 4
+    assert target.verification_rounds == draft.verification_rounds == 1
+
+
+def test_full_window_rejection_commits_correction_but_never_bonus():
+    prefix = [10, 11, 12]
+    proposal = [20, 21, 22, 23]
+    target = PearlPipelineState(prefix.copy(), prompt_length=2)
+    draft = target.clone()
+    draft.token_ids.extend(proposal)
+
+    target.apply_target_full_window_verification(
+        proposal_token_ids=proposal,
+        accepted=2,
+        correction_token_id=90,
+    )
+    draft.apply_draft_full_window_verification(
+        proposal_token_ids=proposal,
+        accepted=2,
+        correction_token_id=90,
+    )
+
+    assert target.token_ids == draft.token_ids == [*prefix, 20, 21, 90]
+    assert target.committed_length == draft.committed_length == 6
+    assert target.accepted_draft_tokens == draft.accepted_draft_tokens == 2
+    assert target.verified_draft_tokens == draft.verified_draft_tokens == 4
+
+
+def test_full_window_bonus_and_staged_eager_are_mutually_exclusive():
+    state = PearlPipelineState([10, 11, 12], prompt_length=2)
+    proposal = [20, 21, 22, 23]
+    eager = [30, 31, 32, 33]
+    state.token_ids.extend([*proposal, *eager])
+    before = state.clone()
+
+    with pytest.raises(ValueError, match="cannot retain a staged eager"):
+        state.apply_draft_full_window_verification(
+            proposal_token_ids=proposal,
+            accepted=4,
+            correction_token_id=None,
+            staged_eager_token_ids=eager,
+            bonus_token_id=99,
+        )
+
+    assert state == before
 
 
 def test_full_window_transitions_reject_misaligned_role_local_tails_without_mutation():
@@ -1209,14 +2625,21 @@ def test_paged_draft_graph_input_copy_updates_context_and_token_block_tables():
         context_lens=(torch.empty(2, dtype=torch.int32),),
         block_tables=(torch.empty((2, 2), dtype=torch.int32),),
         request_block_tables=(None,),
-        actual_seq_lengths_q=(),
-        sequence_lens=(),
+        actual_seq_lengths_q=((1, 2),),
+        sequence_lens=((3, 4),),
+        attention_masks=(None,),
+        tree_attention_masks=(None,),
+        tree_attention_modes=(False,),
     )
     metadata = SimpleNamespace(
         slot_mapping=torch.tensor([1, 2]),
         context_lens=torch.tensor([4, 5], dtype=torch.int32),
         block_tables=torch.tensor([[0, 1], [2, 3]], dtype=torch.int32),
-        request_block_tables=torch.tensor([[4, 5], [6, 7]], dtype=torch.int32),
+        request_block_tables=None,
+        attention_mask=None,
+        tree_attention=False,
+        tree_attention_mask=None,
+        use_fused_infer_attention=False,
         actual_seq_lengths_q=(1, 2),
         sequence_lens=(4, 5),
     )
@@ -1279,6 +2702,25 @@ def test_native_prefix_cache_activates_reserved_live_sequence():
     assert allocation.block_tables[2][:2] == [1, 2]
     with pytest.raises(RuntimeError, match="activated twice"):
         cache.activate_sequence(2, [7])
+    cache.release()
+
+
+def test_native_prefix_cache_recycles_completed_online_sequence_pages():
+    # There are exactly enough physical pages for one live row.  Activating
+    # the distant reserved row can therefore succeed only if row 0 returned
+    # both pages to the pool.
+    cache = NativePrefixCache(num_blocks=2, blocks_per_sequence=3, block_size=4)
+    allocation = cache.allocate([], sequence_capacity=128)
+
+    cache.activate_sequence(0, [1, 2, 3, 4, 5])
+    first_blocks = tuple(allocation.block_tables[0][:2])
+    assert all(block_id >= 0 for block_id in first_blocks)
+    assert cache.release_sequence(0) == 2
+    assert allocation.block_tables[0] == [-1, -1, -1]
+
+    cache.activate_sequence(127, [6, 7, 8, 9, 10])
+    assert set(allocation.block_tables[127][:2]) == set(first_blocks)
+    assert cache.release_sequence(0) == 0
     cache.release()
 
 
@@ -1502,16 +2944,12 @@ def test_target_full_window_captures_causal_pa_chain_in_one_exact_row_graph():
         spec_rhythm_stable_graphs=True,
     )
     engine._prepare_attention_metadata = MagicMock(
-        side_effect=[
-            (torch.tensor([3 + step, 1 + step]), SimpleNamespace(step=step))
-            for step in range(engine.gamma)
-        ]
+        side_effect=[(torch.tensor([3 + step, 1 + step]), SimpleNamespace(step=step)) for step in range(engine.gamma)]
     )
     engine._run_device_packed_greedy = MagicMock()
     engine.graph_runner = MagicMock()
     engine.graph_runner.run_target_greedy.return_value = tuple(
-        torch.tensor([200 + step, 300 + step])
-        for step in range(engine.gamma)
+        torch.tensor([200 + step, 300 + step]) for step in range(engine.gamma)
     )
     states = [
         PearlPipelineState([1, 101], prompt_length=1),
@@ -1537,9 +2975,7 @@ def test_target_full_window_captures_causal_pa_chain_in_one_exact_row_graph():
             verification_size=engine.gamma,
             draft_confidence=1.0,
         )
-        for row, (request_index, proposal) in enumerate(
-            zip(active_indices, proposals)
-        )
+        for row, (request_index, proposal) in enumerate(zip(active_indices, proposals))
     ]
 
     with patch.dict(
@@ -1570,8 +3006,7 @@ def test_target_full_window_captures_causal_pa_chain_in_one_exact_row_graph():
     ]
     assert all(value.shape == (2,) for value in graph_inputs)
     assert engine._prepare_attention_metadata.call_args_list == [
-        call(active_indices, [3 + step, 1 + step], use_fused_infer_attention=False)
-        for step in range(engine.gamma)
+        call(active_indices, [3 + step, 1 + step], use_fused_infer_attention=False) for step in range(engine.gamma)
     ]
     engine._run_device_packed_greedy.assert_not_called()
 
@@ -1586,9 +3021,7 @@ def test_target_full_window_keeps_packed_fia_with_stable_draft_graphs():
         target_use_paged_attention=False,
         spec_rhythm_stable_graphs=True,
     )
-    engine._run_device_packed_greedy = MagicMock(
-        return_value=torch.arange(8)
-    )
+    engine._run_device_packed_greedy = MagicMock(return_value=torch.arange(8))
     states = [
         PearlPipelineState([1, 101], prompt_length=1),
         PearlPipelineState([2, 102], prompt_length=1),
@@ -1602,12 +3035,8 @@ def test_target_full_window_keeps_packed_fia_with_stable_draft_graphs():
                 gamma=4,
                 required_prefix_epoch=0,
             ),
-            verification_tokens=torch.tensor(
-                [200 + row * 4 + step for step in range(4)]
-            ),
-            next_tokens=torch.tensor(
-                [200 + row * 4 + step for step in range(4)]
-            ),
+            verification_tokens=torch.tensor([200 + row * 4 + step for step in range(4)]),
+            next_tokens=torch.tensor([200 + row * 4 + step for step in range(4)]),
             verification_size=4,
             draft_confidence=1.0,
         )
@@ -1627,6 +3056,650 @@ def test_target_full_window_keeps_packed_fia_with_stable_draft_graphs():
         "use_fused_infer_attention": True,
     }
     assert call_args.args[1] == [0, 0, 0, 0, 1, 1, 1, 1]
+
+
+def test_target_full_window_fia_uses_stable_decode_only_graph_envelope(
+    monkeypatch,
+):
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 64
+    engine._mixed_target_graph_enabled = True
+    engine._mixed_target_graph_prompt_buckets = (256, 512, 1024, 2048)
+    engine._stable_target_verify_graph_capacity_map = {value: value for value in range(1, 33)}
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        target_use_paged_attention=False,
+        spec_rhythm_stable_graphs=True,
+        spec_rhythm_linear_bonus_token=False,
+        max_num_queued_seqs=4,
+        max_num_seqs=4,
+        max_model_len=4096,
+    )
+    engine._validate_packed_causal_fia_leakage_once = MagicMock()
+    engine._prepare_stable_target_verify_graph_call = MagicMock(return_value=(torch.arange(8), SimpleNamespace()))
+    engine._run_device_packed_greedy = MagicMock()
+    engine.graph_runner = MagicMock()
+    engine.graph_runner.max_graph_tokens = 2181
+    engine.graph_runner.last_generic_execution = SimpleNamespace(used_aclgraph=True)
+    engine.graph_runner.run_stable_fia_greedy.return_value = torch.arange(8, dtype=torch.long) + 1000
+    engine.model = MagicMock()
+    monkeypatch.setattr(
+        native_engine_module.envs,
+        "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH",
+        True,
+    )
+    states = [
+        PearlPipelineState([1, 101], prompt_length=1),
+        PearlPipelineState([2, 102], prompt_length=1),
+    ]
+    payloads = [
+        NativeSpecRhythmDevicePayload(
+            ticket=SpecRhythmProposalTicket(
+                proposal_id=row,
+                request_index=row,
+                home_batch_id=row,
+                gamma=4,
+                required_prefix_epoch=0,
+            ),
+            verification_tokens=torch.tensor([200 + row * 4 + step for step in range(4)]),
+            next_tokens=torch.tensor([200 + row * 4 + step for step in range(4)]),
+            verification_size=4,
+            draft_confidence=1.0,
+        )
+        for row in range(2)
+    ]
+
+    with patch.object(
+        native_engine_module.torch,
+        "cat",
+        wraps=torch.cat,
+    ) as cat_mock:
+        output, logits = engine._target_full_window_outputs_batch(
+            states,
+            [0, 1],
+            payloads,
+        )
+
+    assert logits is None
+    assert output.tolist() == list(range(1000, 1008))
+    # Exact-Q service builds the proposal window once. It must not allocate an
+    # empty padding tensor and copy the complete window through a second cat.
+    assert cat_mock.call_count == 1
+    engine._run_device_packed_greedy.assert_not_called()
+    graph_call = engine.graph_runner.run_stable_fia_greedy.call_args
+    graph_inputs = graph_call.args[0]
+    assert graph_inputs.shape == (8,)
+    assert graph_inputs[:8].tolist() == [
+        101,
+        200,
+        201,
+        202,
+        102,
+        204,
+        205,
+        206,
+    ]
+    assert graph_call.kwargs == {
+        "graph_key": ("stable-target-verify-hidden|width:4|verify:2"),
+        "expected_tokens": 8,
+        "expected_request_segments": 2,
+    }
+    assert graph_call.args[3] == 64
+    engine.graph_runner.run_stable_fia_greedy.assert_called_once()
+    engine.graph_runner.run_stable_fia_hidden.assert_not_called()
+    engine.model.compute_greedy_tokens.assert_not_called()
+    envelope = engine._prepare_stable_target_verify_graph_call.call_args.args[1]
+    assert envelope.layout.total_query_tokens == 8
+    assert envelope.layout.verification_capacity == 2
+    assert envelope.segment_sequence_ids == (0, 1)
+    assert engine._last_stable_target_verify_graph_outcome == ("graph", 2)
+
+
+def test_sealed_exact_target_service_uses_persistent_graph_staging(monkeypatch):
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 64
+    engine._mixed_target_graph_enabled = True
+    engine._stable_target_verify_graph_capacity_map = {2: 2}
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        max_model_len=4096,
+        max_num_queued_seqs=3,
+        max_num_seqs=3,
+    )
+    engine.cache_block_tables = torch.tensor(
+        [[10, 11], [20, 21], [30, 31], [40, 41]],
+        dtype=torch.int32,
+    )
+    engine._ensure_cache_capacity = MagicMock()
+    engine._cache_slot_mapping = MagicMock(return_value=[13, 14, 15, 16, 27, 28, 29, 30])
+    engine._prepare_stable_target_verify_graph_call = MagicMock()
+    engine.graph_runner = MagicMock()
+    engine.graph_runner.max_graph_tokens = 2181
+    engine.graph_runner.graph_cache_sealed = True
+    engine.graph_runner.last_generic_execution = SimpleNamespace(used_aclgraph=True)
+    engine.graph_runner.run_stable_fia_greedy_staged.return_value = torch.arange(8, dtype=torch.long) + 500
+    engine.model = SimpleNamespace(attention_mask=torch.zeros((4, 4), dtype=torch.int8))
+    monkeypatch.setattr(
+        native_engine_module.envs,
+        "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH",
+        True,
+    )
+
+    output = engine._target_full_window_stable_fia_graph(
+        torch.arange(8, dtype=torch.long),
+        (0, 1),
+        (3, 7),
+        query_width=4,
+    )
+
+    assert output.tolist() == list(range(500, 508))
+    engine._prepare_stable_target_verify_graph_call.assert_not_called()
+    engine.graph_runner.run_stable_fia_greedy.assert_not_called()
+    staged_call = engine.graph_runner.run_stable_fia_greedy_staged.call_args
+    assert staged_call.args[0].tolist() == list(range(8))
+    assert staged_call.args[1] == 64
+    assert staged_call.kwargs == {
+        "positions": (3, 4, 5, 6, 7, 8, 9, 10),
+        "slot_mapping": [13, 14, 15, 16, 27, 28, 29, 30],
+        "actual_seq_lengths_q": (4, 8),
+        "sequence_lens": (7, 11),
+        "segment_sequence_ids": (0, 1),
+        "cache_block_tables": engine.cache_block_tables,
+        "attention_mask": engine.model.attention_mask,
+        "graph_key": "stable-target-verify-hidden|width:4|verify:2",
+        "expected_tokens": 8,
+        "expected_request_segments": 2,
+    }
+    engine._ensure_cache_capacity.assert_called_once_with(
+        [0, 0, 0, 0, 1, 1, 1, 1],
+        [3, 4, 5, 6, 7, 8, 9, 10],
+    )
+    assert engine._last_stable_target_verify_graph_outcome == ("graph", 2)
+
+
+def test_target_full_window_bonus_queries_fifth_token_and_splits_verdict_rows():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 1
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 64
+    engine.topology = PearlTopology(draft_ranks=(0,), target_ranks=(1, 2, 3))
+    engine.config = SimpleNamespace(
+        enforce_eager=True,
+        target_use_paged_attention=False,
+        spec_rhythm_stable_graphs=True,
+        spec_rhythm_linear_bonus_token=True,
+        spec_rhythm_cpu_verdict=False,
+        spec_rhythm_linear_full_window=True,
+    )
+    engine.greedy_verification_layouts = {}
+    target_rows = torch.tensor(
+        [
+            [20, 21, 22, 23, 90],
+            [30, 91, 32, 33, 99],
+        ],
+        dtype=torch.long,
+    )
+    engine._run_device_packed_greedy = MagicMock(return_value=target_rows.flatten())
+    engine._validate_packed_causal_fia_leakage_once = MagicMock()
+    states = [
+        PearlPipelineState([1, 101], prompt_length=1),
+        PearlPipelineState([4, 5, 102], prompt_length=1),
+        PearlPipelineState([7, 8, 9, 103], prompt_length=1),
+    ]
+    active_indices = [2, 0]
+    proposals = [
+        torch.tensor([20, 21, 22, 23]),
+        torch.tensor([30, 31, 32, 33]),
+    ]
+    payloads = [
+        NativeSpecRhythmDevicePayload(
+            ticket=SpecRhythmProposalTicket(
+                proposal_id=row,
+                request_index=request_index,
+                home_batch_id=row,
+                gamma=4,
+                required_prefix_epoch=0,
+            ),
+            verification_tokens=proposal,
+            next_tokens=proposal,
+            verification_size=4,
+            draft_confidence=1.0,
+        )
+        for row, (request_index, proposal) in enumerate(zip(active_indices, proposals))
+    ]
+
+    with patch.dict(
+        os.environ,
+        {
+            "VLLM_ASCEND_SPECRHYTHM_FORCE_STEPWISE_TARGET": "0",
+            "VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH": "0",
+        },
+    ):
+        target_tokens, logits = engine._target_full_window_outputs_batch(
+            states,
+            active_indices,
+            payloads,
+        )
+
+    assert logits is None
+    assert target_tokens.reshape(2, 5).tolist() == target_rows.tolist()
+    target_call = engine._run_device_packed_greedy.call_args
+    assert target_call.args[0].tolist() == [
+        103,
+        20,
+        21,
+        22,
+        23,
+        101,
+        30,
+        31,
+        32,
+        33,
+    ]
+    assert target_call.args[1] == [2, 2, 2, 2, 2, 0, 0, 0, 0, 0]
+    assert target_call.args[2] == [3, 4, 5, 6, 7, 1, 2, 3, 4, 5]
+
+    verdict = engine._verify_target_tokens_batch(
+        target_tokens,
+        None,
+        torch.stack(proposals).flatten(),
+        [4, 4],
+        [0.0, 0.0],
+        bonus_enabled=[True, True],
+    )
+
+    assert verdict is not None
+    assert verdict.tolist() == [[4, 90], [1, 91]]
+
+
+def test_mixed_target_prefill_fuses_disjoint_rows_in_one_eager_fia_forward():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 64
+    engine.config = SimpleNamespace(
+        target_use_paged_attention=False,
+        max_num_batched_tokens=32,
+    )
+    engine.cache_allocation = SimpleNamespace(num_cached_tokens=[0, 0, 1, 0])
+    engine._run_device_packed_hidden = MagicMock(return_value=torch.arange(24, dtype=torch.float32).reshape(12, 2))
+    engine.model = MagicMock()
+    engine.model.compute_greedy_tokens.return_value = torch.arange(10, dtype=torch.long) + 1000
+    states = [
+        PearlPipelineState([10, 100], prompt_length=1),
+        PearlPipelineState([20, 21, 101], prompt_length=2),
+        PearlPipelineState([30, 31, 32], prompt_length=3),
+        PearlPipelineState([40, 41], prompt_length=2),
+    ]
+    proposals = [
+        torch.tensor([200, 201, 202, 203]),
+        torch.tensor([210, 211, 212, 213]),
+    ]
+    payloads = [
+        NativeSpecRhythmDevicePayload(
+            ticket=SpecRhythmProposalTicket(
+                proposal_id=row,
+                request_index=row,
+                home_batch_id=row,
+                gamma=4,
+                required_prefix_epoch=0,
+            ),
+            verification_tokens=proposal,
+            next_tokens=proposal,
+            verification_size=4,
+            draft_confidence=1.0,
+        )
+        for row, proposal in enumerate(proposals)
+    ]
+
+    with patch.object(
+        native_engine_module.torch,
+        "cat",
+        wraps=torch.cat,
+    ) as cat_mock:
+        target_tokens, logits, first_tokens = engine._target_full_window_outputs_with_prefill_batch(
+            states,
+            [0, 1],
+            payloads,
+            [2, 3],
+        )
+
+    assert logits is None
+    assert target_tokens.tolist() == list(range(1000, 1008))
+    assert first_tokens.tolist() == [1008, 1009]
+    # One cat assembles real verification rows and one assembles the compact
+    # eager mixed tensor.
+    assert cat_mock.call_count == 2
+    call_args = engine._run_device_packed_hidden.call_args
+    assert torch.equal(
+        call_args.args[0],
+        torch.tensor([100, 200, 201, 202, 101, 210, 211, 212, 31, 32, 40, 41]),
+    )
+    assert call_args.args[1] == [
+        0,
+        0,
+        0,
+        0,
+        1,
+        1,
+        1,
+        1,
+        2,
+        2,
+        3,
+        3,
+    ]
+    assert call_args.args[2] == [1, 2, 3, 4, 2, 3, 4, 5, 1, 2, 0, 1]
+    assert call_args.kwargs == {
+        "use_aclgraph": False,
+        "use_fused_infer_attention": True,
+    }
+    selected_hidden = engine.model.compute_greedy_tokens.call_args.args[0]
+    expected_hidden = torch.arange(24, dtype=torch.float32).reshape(12, 2)[[*range(8), 9, 11]]
+    assert torch.equal(selected_hidden, expected_hidden)
+    assert engine._last_mixed_target_graph_outcome == ("disabled", 0, 0)
+
+
+def test_mixed_target_prefill_uses_stable_graph_and_real_output_indices(
+    monkeypatch,
+):
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 64
+    engine._mixed_target_graph_enabled = True
+    engine.config = SimpleNamespace(
+        target_use_paged_attention=False,
+        max_num_batched_tokens=256,
+        max_num_queued_seqs=4,
+        max_num_seqs=4,
+        max_model_len=4096,
+        enforce_eager=False,
+        spec_rhythm_linear_bonus_token=False,
+    )
+    engine.cache_allocation = SimpleNamespace(num_cached_tokens=[0, 0, 1, 0])
+    engine._run_device_packed_hidden = MagicMock()
+    engine._prepare_mixed_target_graph_call = MagicMock(return_value=(torch.arange(133), SimpleNamespace()))
+    engine.graph_runner = MagicMock()
+    engine.graph_runner.max_graph_tokens = 133
+    engine.graph_runner.run_stable_fia_hidden.return_value = torch.arange(
+        266,
+        dtype=torch.float32,
+    ).reshape(133, 2)
+    engine.model = MagicMock()
+    engine.model.compute_greedy_tokens.return_value = torch.arange(10, dtype=torch.long) + 1000
+    monkeypatch.setattr(
+        native_engine_module.envs,
+        "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH",
+        True,
+    )
+    states = [
+        PearlPipelineState([10, 100], prompt_length=1),
+        PearlPipelineState([20, 21, 101], prompt_length=2),
+        PearlPipelineState([30, 31, 32], prompt_length=3),
+        PearlPipelineState([40, 41], prompt_length=2),
+    ]
+    proposals = [
+        torch.tensor([200, 201, 202, 203]),
+        torch.tensor([210, 211, 212, 213]),
+    ]
+    payloads = [
+        NativeSpecRhythmDevicePayload(
+            ticket=SpecRhythmProposalTicket(
+                proposal_id=row,
+                request_index=row,
+                home_batch_id=row,
+                gamma=4,
+                required_prefix_epoch=0,
+            ),
+            verification_tokens=proposal,
+            next_tokens=proposal,
+            verification_size=4,
+            draft_confidence=1.0,
+        )
+        for row, proposal in enumerate(proposals)
+    ]
+
+    with patch.object(
+        native_engine_module.torch,
+        "cat",
+        wraps=torch.cat,
+    ) as cat_mock:
+        target_tokens, logits, first_tokens = engine._target_full_window_outputs_with_prefill_batch(
+            states,
+            [0, 1],
+            payloads,
+            [2, 3],
+        )
+
+    assert logits is None
+    assert target_tokens.tolist() == list(range(1000, 1008))
+    assert first_tokens.tolist() == [1008, 1009]
+    # One cat assembles real verification rows and one assembles the fixed
+    # graph envelope. The compact eager-only mixed tensor must stay unbuilt.
+    assert cat_mock.call_count == 2
+    engine._run_device_packed_hidden.assert_not_called()
+    graph_call = engine.graph_runner.run_stable_fia_hidden.call_args
+    graph_inputs = graph_call.args[0]
+    assert graph_inputs.shape == (133,)
+    assert graph_inputs[:8].tolist() == [
+        100,
+        200,
+        201,
+        202,
+        101,
+        210,
+        211,
+        212,
+    ]
+    assert graph_inputs[64:68].tolist() == [31, 32, 40, 41]
+    assert torch.count_nonzero(graph_inputs[8:64]) == 0
+    assert graph_call.kwargs == {
+        "graph_key": ("mixed-target-hidden|gamma:4|verify:16|prompt:4+pad1|prompt-tokens:64"),
+        "expected_tokens": 133,
+        "expected_request_segments": 21,
+    }
+    selected_hidden = engine.model.compute_greedy_tokens.call_args.args[0]
+    expected_hidden = torch.arange(266, dtype=torch.float32).reshape(133, 2)[[*range(8), 65, 67]]
+    assert torch.equal(selected_hidden, expected_hidden)
+    assert engine._last_mixed_target_graph_outcome == ("graph", 4, 4)
+
+
+def test_mixed_target_graph_capacity_shortfall_keeps_unpadded_eager_path(
+    monkeypatch,
+):
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 64
+    engine._mixed_target_graph_enabled = True
+    engine.config = SimpleNamespace(
+        target_use_paged_attention=False,
+        max_num_batched_tokens=32,
+        max_num_queued_seqs=4,
+        max_num_seqs=4,
+        max_model_len=4096,
+        enforce_eager=False,
+        spec_rhythm_linear_bonus_token=False,
+    )
+    engine.cache_allocation = SimpleNamespace(num_cached_tokens=[0, 1])
+    engine.graph_runner = MagicMock(max_graph_tokens=128)
+    engine._run_device_packed_hidden = MagicMock(return_value=torch.arange(12, dtype=torch.float32).reshape(6, 2))
+    engine.model = MagicMock()
+    engine.model.compute_greedy_tokens.return_value = torch.arange(5)
+    monkeypatch.setattr(
+        native_engine_module.envs,
+        "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH",
+        True,
+    )
+    states = [
+        PearlPipelineState([10, 100], prompt_length=1),
+        PearlPipelineState([20, 21], prompt_length=2),
+    ]
+    proposal = torch.tensor([200, 201, 202, 203])
+    payload = NativeSpecRhythmDevicePayload(
+        ticket=SpecRhythmProposalTicket(
+            proposal_id=0,
+            request_index=0,
+            home_batch_id=0,
+            gamma=4,
+            required_prefix_epoch=0,
+        ),
+        verification_tokens=proposal,
+        next_tokens=proposal,
+        verification_size=4,
+        draft_confidence=1.0,
+    )
+
+    engine._target_full_window_outputs_with_prefill_batch(
+        states,
+        [0],
+        [payload],
+        [1],
+    )
+
+    engine.graph_runner.run_stable_fia_hidden.assert_not_called()
+    eager_inputs = engine._run_device_packed_hidden.call_args.args[0]
+    assert eager_inputs.tolist() == [100, 200, 201, 202, 21]
+    assert engine._last_mixed_target_graph_outcome == (
+        "token_capacity",
+        2,
+        1,
+    )
+
+
+def test_prefill_broadcast_uses_precomputed_mixed_target_tokens(monkeypatch):
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = False
+    engine.device = torch.device("cpu")
+    engine.cache_allocation = SimpleNamespace(num_cached_tokens=[0, 0])
+    engine.topology = SimpleNamespace(target_leader_rank=0)
+    engine._run_packed_sample = MagicMock()
+    engine._vote_spec_rhythm_prefill_finiteness = MagicMock()
+    monkeypatch.setattr(native_engine_module.dist, "broadcast", MagicMock())
+    states = [
+        PearlPipelineState([10, 11], prompt_length=2),
+        PearlPipelineState([20, 21], prompt_length=2),
+    ]
+
+    tokens = engine._prefill_and_sample_target_batch(
+        [[10, 11], [20, 21]],
+        states,
+        [0, 1],
+        precomputed_target_tokens=torch.tensor([31, 41]),
+    )
+
+    assert tokens == [31, 41]
+    engine._run_packed_sample.assert_not_called()
+    engine._vote_spec_rhythm_prefill_finiteness.assert_called_once_with()
+
+
+def test_draft_prefill_hidden_batch_populates_only_uncached_prompt_suffixes():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = True
+    engine.device = torch.device("cpu")
+    engine.cache_allocation = SimpleNamespace(num_cached_tokens=[0, 2, 1])
+    expected = torch.tensor([[1.0], [2.0]])
+    engine._run_packed_hidden = MagicMock(return_value=expected)
+
+    hidden = engine._draft_prefill_hidden_batch(
+        [[10, 11, 12, 13], [20, 21, 22]],
+        [1, 2],
+    )
+
+    assert hidden is expected
+    engine._run_packed_hidden.assert_called_once_with(
+        [12, 13, 21, 22],
+        [1, 1, 2, 2],
+        [2, 3, 1, 2],
+        use_aclgraph=False,
+        logit_indices=[1, 3],
+        use_fused_infer_attention=False,
+    )
+
+
+def test_mixed_draft_prefill_uses_one_fia_first_step_and_three_step_pa_graph():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = True
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 64
+    engine.config = SimpleNamespace(
+        draft_use_paged_attention=True,
+        enforce_eager=False,
+        max_num_batched_tokens=32,
+        max_num_seqs=8,
+    )
+    engine.cache_allocation = SimpleNamespace(num_cached_tokens=[0, 0, 1, 0])
+    engine._run_device_packed_hidden = MagicMock(return_value=torch.arange(12, dtype=torch.float32).reshape(6, 2))
+    engine.model = MagicMock()
+    engine.model.compute_greedy_tokens.return_value = torch.tensor([500, 501])
+
+    def metadata(_rows, positions, use_fused_infer_attention):
+        assert use_fused_infer_attention is False
+        return (
+            torch.tensor(positions),
+            SimpleNamespace(
+                slot_mapping=torch.arange(2, dtype=torch.int32),
+                context_lens=torch.tensor(positions, dtype=torch.int32) + 1,
+                block_tables=torch.zeros((2, 2), dtype=torch.int32),
+                request_block_tables=None,
+                actual_seq_lengths_q=(1, 2),
+                sequence_lens=tuple(position + 1 for position in positions),
+                attention_mask=None,
+                use_fused_infer_attention=False,
+            ),
+        )
+
+    engine._prepare_attention_metadata = MagicMock(side_effect=metadata)
+    engine.graph_runner = MagicMock()
+    engine.graph_runner.run_draft_greedy.return_value = torch.tensor([[600, 601, 602], [610, 611, 612]])
+    states = [
+        PearlPipelineState([10, 100], prompt_length=1),
+        PearlPipelineState([20, 21, 101], prompt_length=2),
+        PearlPipelineState([30, 31, 32], prompt_length=3),
+        PearlPipelineState([40, 41], prompt_length=2),
+    ]
+
+    verification, windows, confidence = engine._draft_spec_rhythm_device_batch_with_prefill(
+        states,
+        [0, 1],
+        [4, 4],
+        [2, 3],
+    )
+
+    assert windows.tolist() == [
+        [500, 600, 601, 602],
+        [501, 610, 611, 612],
+    ]
+    assert torch.equal(verification, windows.flatten())
+    assert confidence.tolist() == [1.0, 1.0]
+    mixed_call = engine._run_device_packed_hidden.call_args
+    assert torch.equal(
+        mixed_call.args[0],
+        torch.tensor([100, 101, 31, 32, 40, 41]),
+    )
+    assert mixed_call.args[1] == [0, 1, 2, 2, 3, 3]
+    assert mixed_call.args[2] == [1, 2, 1, 2, 0, 1]
+    assert mixed_call.kwargs == {
+        "use_aclgraph": False,
+        "use_fused_infer_attention": True,
+    }
+    graph_call = engine.graph_runner.run_draft_greedy.call_args
+    assert torch.equal(graph_call.args[0], torch.tensor([500, 501]))
+    assert len(graph_call.args[1]) == 3
+    assert len(graph_call.args[2]) == 3
+    assert graph_call.kwargs == {"valid_row_count": 2}
 
 
 def test_packed_causal_fia_leakage_probe_is_explicit_and_runs_once():
@@ -1846,9 +3919,7 @@ def test_target_full_window_uses_causal_pa_outside_validated_packed_boundary(
         target_use_paged_attention=True,
         spec_rhythm_stable_graphs=True,
     )
-    engine._run_device_packed_greedy = MagicMock(
-        side_effect=[torch.arange(batch_size) for _ in range(gamma)]
-    )
+    engine._run_device_packed_greedy = MagicMock(side_effect=[torch.arange(batch_size) for _ in range(gamma)])
     states = [PearlPipelineState([1, 100 + row], prompt_length=1) for row in range(batch_size)]
     active_indices = list(range(batch_size))
     payloads = [
@@ -2139,10 +4210,7 @@ def test_tree_target_graph_padding_preserves_real_rows_and_fills_exact_buckets()
         spec_rhythm_tree_depth=2,
         max_model_len=64,
     )
-    states = [
-        PearlPipelineState([index + 1] * (index + 2), prompt_length=index + 2)
-        for index in range(4)
-    ]
+    states = [PearlPipelineState([index + 1] * (index + 2), prompt_length=index + 2) for index in range(4)]
     plans = [
         engine._spec_rhythm_tree_plan(states[0], 4),
         engine._spec_rhythm_tree_plan(states[1], 4),
@@ -2177,15 +4245,10 @@ def test_tree_target_graph_padding_grows_bucket_for_shallow_tree():
         spec_rhythm_tree_depth=1,
         max_model_len=64,
     )
-    states = [
-        PearlPipelineState([index + 1] * (index + 2), prompt_length=index + 2)
-        for index in range(4)
-    ]
+    states = [PearlPipelineState([index + 1] * (index + 2), prompt_length=index + 2) for index in range(4)]
     plan = engine._spec_rhythm_tree_plan(states[0], 2)
 
-    padded = engine._pad_spec_rhythm_target_tree_graph(
-        [plan], [11], [[21, 22]], [0], [0, 1, 2, 3], states
-    )
+    padded = engine._pad_spec_rhythm_target_tree_graph([plan], [11], [[21, 22]], [0], [0, 1, 2, 3], states)
 
     padded_plans, _, _, request_ids, real_count = padded
     assert real_count == 1
@@ -2316,9 +4379,7 @@ def test_draft_tree_forward_fuses_committed_catchup_into_root_call():
     engine.device = torch.device("cpu")
     engine.draft_vocab_size = 4
     engine.config = SimpleNamespace(enforce_eager=True, max_model_len=16)
-    engine.cache_allocation = SimpleNamespace(
-        block_tables=torch.zeros((1, 4), dtype=torch.int32)
-    )
+    engine.cache_allocation = SimpleNamespace(block_tables=torch.zeros((1, 4), dtype=torch.int32))
     engine.cache_block_tables = torch.zeros((1, 4), dtype=torch.int32)
     engine._ensure_cache_capacity = MagicMock()
     engine.model = MagicMock()
@@ -2336,9 +4397,7 @@ def test_draft_tree_forward_fuses_committed_catchup_into_root_call():
     )
     # The first row only restores accepted KV.  Candidate sampling must use
     # the final (current-root) row from the same packed model invocation.
-    engine.model.compute_logits.return_value = torch.tensor(
-        [[9.0, 0.1, 0.2, 0.3], [0.1, 9.0, 0.2, 0.3]]
-    )
+    engine.model.compute_logits.return_value = torch.tensor([[9.0, 0.1, 0.2, 0.3], [0.1, 9.0, 0.2, 0.3]])
     plan = build_tree_speculation_plan(
         width=2,
         depth=1,
@@ -2588,6 +4647,63 @@ def test_draft_aclgraph_eager_chain_feeds_each_token_to_the_next_step():
     assert torch.equal(model.call_args_list[1].args[0], torch.tensor([4]))
 
 
+def test_draft_aclgraph_kv_only_tail_skips_unused_lm_head():
+    model = MagicMock()
+    model.side_effect = [
+        torch.tensor([[10.0]]),
+        torch.tensor([[20.0]]),
+        torch.tensor([[30.0]]),
+    ]
+    model.compute_greedy_tokens.side_effect = [
+        torch.tensor([4]),
+        torch.tensor([5]),
+    ]
+    runner = NativeACLGraphRunner(model, enabled=False)
+
+    output = runner.run_draft_greedy(
+        torch.tensor([3]),
+        [torch.tensor([2]), torch.tensor([3]), torch.tensor([4])],
+        [
+            SimpleNamespace(use_fused_infer_attention=True),
+            SimpleNamespace(use_fused_infer_attention=True),
+            SimpleNamespace(use_fused_infer_attention=True),
+        ],
+        vocabulary_size=32,
+        final_kv_only=True,
+    )
+
+    assert output.tolist() == [[4, 5]]
+    assert model.call_count == 3
+    assert model.compute_greedy_tokens.call_count == 2
+    assert torch.equal(model.call_args_list[0].args[0], torch.tensor([3]))
+    assert torch.equal(model.call_args_list[1].args[0], torch.tensor([4]))
+    assert torch.equal(model.call_args_list[2].args[0], torch.tensor([5]))
+
+
+def test_draft_aclgraph_kv_only_tail_uses_separate_graph_entry():
+    model = MagicMock()
+    runner = NativeACLGraphRunner(model, enabled=False)
+    runner.enabled = True
+    runner.expected_fia_batch_size = 1
+    runner._capture_draft = MagicMock(return_value=torch.tensor([[4, 5]]))
+    metadata = SimpleNamespace(use_fused_infer_attention=False)
+
+    output = runner.run_draft_greedy(
+        torch.tensor([3]),
+        [torch.tensor([2]), torch.tensor([3]), torch.tensor([4])],
+        [metadata, metadata, metadata],
+        vocabulary_size=32,
+        final_kv_only=True,
+    )
+
+    assert output.tolist() == [[4, 5]]
+    assert runner._capture_draft.call_args.args[0] == (
+        "draft-greedy:32|steps:3|paged|final-kv",
+        1,
+    )
+    assert runner._capture_draft.call_args.kwargs["final_kv_only"] is True
+
+
 def test_target_aclgraph_eager_path_keeps_fixed_verification_inputs():
     model = MagicMock()
     model.side_effect = [torch.tensor([[10.0]]), torch.tensor([[20.0]])]
@@ -2780,6 +4896,696 @@ def test_spec_rhythm_full_window_draft_payload_is_the_complete_next_window():
     )
 
 
+def test_linear_draft_metadata_only_padding_matches_generic_graph_padding():
+    input_ids = torch.tensor([3, 4], dtype=torch.long)
+    positions = torch.tensor([9, 10], dtype=torch.long)
+    metadata = NativeAttentionMetadata(
+        slot_mapping=torch.tensor([17, 18], dtype=torch.int32),
+        context_lens=torch.tensor([10, 11], dtype=torch.int32),
+        block_tables=torch.tensor([[1, 2], [3, 4]], dtype=torch.int32),
+        actual_seq_lengths_q=(1, 2),
+        sequence_lens=(10, 11),
+    )
+
+    _, expected_positions, expected_metadata = NativeACLGraphRunner._pad_inputs(
+        input_ids,
+        positions,
+        metadata,
+        capture_size=4,
+    )
+    actual_positions, actual_metadata = native_engine_module._pad_linear_draft_graph_metadata(
+        positions,
+        metadata,
+        capture_size=4,
+    )
+
+    assert torch.equal(actual_positions, expected_positions)
+    assert torch.equal(actual_metadata.slot_mapping, expected_metadata.slot_mapping)
+    assert torch.equal(actual_metadata.context_lens, expected_metadata.context_lens)
+    assert torch.equal(actual_metadata.block_tables, expected_metadata.block_tables)
+    assert actual_metadata.actual_seq_lengths_q == expected_metadata.actual_seq_lengths_q
+    assert actual_metadata.sequence_lens == expected_metadata.sequence_lens
+
+
+def test_bucketed_linear_draft_fia_masks_exact_prefix_and_pads_safe_rows():
+    positions = torch.tensor([9, 32], dtype=torch.long)
+    request_tables = torch.tensor(
+        [[5, -1, -1], [7, 8, 9]],
+        dtype=torch.int32,
+    )
+    metadata = NativeAttentionMetadata(
+        slot_mapping=torch.tensor([17, 44], dtype=torch.int32),
+        context_lens=torch.tensor([10, 33], dtype=torch.int32),
+        block_tables=request_tables,
+        actual_seq_lengths_q=(1, 2),
+        sequence_lens=(10, 33),
+        request_block_tables=request_tables,
+        attention_mask=torch.zeros((1, 1), dtype=torch.int8),
+        use_fused_infer_attention=True,
+    )
+
+    padded_positions, padded = native_engine_module._pad_bucketed_linear_draft_fia_graph_metadata(
+        positions,
+        metadata,
+        4,
+        block_size=16,
+        host_request_block_tables=[[5, -1, -1], [7, 8, 9]],
+        kv_length_limits=[20, 48],
+    )
+
+    assert torch.equal(padded_positions, torch.tensor([9, 32, 0, 0]))
+    assert torch.equal(
+        padded.slot_mapping,
+        torch.tensor([17, 44, -1, -1], dtype=torch.int32),
+    )
+    assert padded.actual_seq_lengths_q == (1, 2, 3, 4)
+    assert padded.sequence_lens == (20, 48, 1, 1)
+    assert padded.context_lens.tolist() == [20, 48, 1, 1]
+    assert padded.tree_attention
+    assert padded.attention_mask is None
+    assert padded.tree_attention_mask.shape == (4, 1, 1, 48)
+    assert not padded.tree_attention_mask[0, 0, 0, :10].any()
+    assert padded.tree_attention_mask[0, 0, 0, 10:].all()
+    assert not padded.tree_attention_mask[1, 0, 0, :33].any()
+    assert padded.tree_attention_mask[1, 0, 0, 33:].all()
+    assert not padded.tree_attention_mask[2, 0, 0, 0]
+    assert padded.tree_attention_mask[2, 0, 0, 1:].all()
+    assert padded.request_block_tables.tolist() == [
+        [5, 5, 5],
+        [7, 8, 9],
+        [5, 5, 5],
+        [5, 5, 5],
+    ]
+
+
+def test_bucketed_linear_draft_fia_accepts_batched_masks_and_shared_table():
+    request_tables = torch.tensor(
+        [[5, -1, -1], [7, 8, 9]],
+        dtype=torch.int32,
+    )
+    shared_table = native_engine_module.sanitize_and_pad_linear_draft_fia_request_tables(
+        request_tables,
+        capture_size=4,
+    )
+    masks = native_engine_module.LinearDraftFIAFullMaskBuilder().build(
+        [9, 32],
+        step_count=4,
+        capture_size=4,
+        capacity=48,
+        device="cpu",
+    )
+
+    padded_metadatas = []
+    for step in range(4):
+        positions = torch.tensor([9 + step, 32 + step], dtype=torch.long)
+        metadata = NativeAttentionMetadata(
+            slot_mapping=torch.tensor([17 + step, 44 + step], dtype=torch.int32),
+            context_lens=(positions + 1).to(torch.int32),
+            block_tables=request_tables,
+            actual_seq_lengths_q=(1, 2),
+            sequence_lens=tuple((positions + 1).tolist()),
+            request_block_tables=request_tables,
+            attention_mask=torch.zeros((1, 1), dtype=torch.int8),
+            use_fused_infer_attention=True,
+        )
+        _, padded = native_engine_module._pad_bucketed_linear_draft_fia_graph_metadata(
+            positions,
+            metadata,
+            4,
+            block_size=16,
+            exact_positions=positions.tolist(),
+            host_request_block_tables=[[5, -1, -1], [7, 8, 9]],
+            kv_length_limits=[20, 48],
+            precomputed_full_mask=masks[step],
+            shared_request_block_tables=shared_table,
+        )
+        padded_metadatas.append(padded)
+
+    assert all(metadata.request_block_tables is shared_table for metadata in padded_metadatas)
+    assert all(metadata.tree_attention_mask is masks[step] for step, metadata in enumerate(padded_metadatas))
+
+
+def test_persistent_linear_draft_fia_envelope_reuses_lane_local_metadata():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.device = torch.device("cpu")
+    engine._linear_draft_fia_persistent_staging_pool = {}
+
+    kwargs = {
+        "capture_size": 4,
+        "step_count": 4,
+        "block_size": 4,
+        "table_width": 3,
+        "sequence_lens": (12, 12, 12, 12),
+        "input_dtype": torch.long,
+        "table_dtype": torch.int32,
+    }
+    lane_zero = engine._get_linear_draft_fia_persistent_envelope(
+        graph_lane=0,
+        **kwargs,
+    )
+    same_lane = engine._get_linear_draft_fia_persistent_envelope(
+        graph_lane=0,
+        **kwargs,
+    )
+    lane_one = engine._get_linear_draft_fia_persistent_envelope(
+        graph_lane=1,
+        **kwargs,
+    )
+
+    assert same_lane is lane_zero
+    assert lane_one is not lane_zero
+    assert lane_one.staging.full_masks.data_ptr() != lane_zero.staging.full_masks.data_ptr()
+    assert all(
+        metadata.request_block_tables is lane_zero.staging.request_block_tables
+        for metadata in lane_zero.attention_metadatas
+    )
+    assert all(
+        metadata.tree_attention_mask is lane_zero.staging.full_mask_views[step]
+        for step, metadata in enumerate(lane_zero.attention_metadatas)
+    )
+    assert engine._linear_draft_fia_persistent_staging_hits == 1
+    assert engine._linear_draft_fia_persistent_staging_misses == 2
+
+
+def test_linear_draft_fia_common_kv_uses_service_wide_lifetime_limit():
+    states = [
+        PearlPipelineState([1, 2], prompt_length=2, max_tokens=32),
+        # This inactive request must still determine the stable service-wide
+        # envelope so later admission cannot change a graph lane's literals.
+        PearlPipelineState([3] * 65, prompt_length=65, max_tokens=128),
+        PearlPipelineState([4] * 17, prompt_length=17, max_tokens=64),
+    ]
+
+    assert _linear_draft_fia_lifetime_limits(
+        states,
+        [2, 0],
+        4,
+        common_kv=False,
+    ) == [85, 38]
+    assert _linear_draft_fia_lifetime_limits(
+        states,
+        [2, 0],
+        4,
+        common_kv=True,
+    ) == [197, 197]
+
+
+def test_linear_draft_fia_common_kv_is_independently_opt_in(monkeypatch):
+    variable = "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_COMMON_KV"
+    monkeypatch.delenv(variable, raising=False)
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_COMMON_KV is False
+    monkeypatch.setenv(variable, "1")
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_COMMON_KV is True
+
+
+def test_linear_draft_fia_stable_task_barrier_is_independently_opt_in(
+    monkeypatch,
+):
+    variable = "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_STABLE_TASK_BARRIER"
+    monkeypatch.delenv(variable, raising=False)
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_STABLE_TASK_BARRIER is False
+    monkeypatch.setenv(variable, "1")
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_STABLE_TASK_BARRIER is True
+
+
+def test_linear_draft_fia_common_kv_keeps_30_to_31_row_bucket_signature():
+    capture_size = 32
+    common_limit = 48
+
+    def padded_metadata(num_tokens: int) -> NativeAttentionMetadata:
+        request_tables = torch.tensor(
+            [[100 + row, -1, -1, -1] for row in range(num_tokens)],
+            dtype=torch.int32,
+        )
+        positions = torch.full((num_tokens,), 9, dtype=torch.long)
+        metadata = NativeAttentionMetadata(
+            slot_mapping=torch.arange(num_tokens, dtype=torch.int32),
+            context_lens=torch.full((num_tokens,), 10, dtype=torch.int32),
+            block_tables=request_tables,
+            actual_seq_lengths_q=tuple(range(1, num_tokens + 1)),
+            sequence_lens=(10,) * num_tokens,
+            request_block_tables=request_tables,
+            attention_mask=torch.zeros((1, 1), dtype=torch.int8),
+            use_fused_infer_attention=True,
+        )
+        _, padded = native_engine_module._pad_bucketed_linear_draft_fia_graph_metadata(
+            positions,
+            metadata,
+            capture_size,
+            block_size=16,
+            exact_positions=positions.tolist(),
+            host_request_block_tables=request_tables.tolist(),
+            kv_length_limits=[common_limit] * num_tokens,
+            dummy_kv_length_limits=[common_limit] * (capture_size - num_tokens),
+        )
+        return padded
+
+    rows_30 = padded_metadata(30)
+    rows_31 = padded_metadata(31)
+    expected_signature = (common_limit,) * capture_size
+    assert rows_30.sequence_lens == expected_signature
+    assert rows_31.sequence_lens == expected_signature
+    assert rows_30.context_lens.tolist() == list(expected_signature)
+    assert rows_31.context_lens.tolist() == list(expected_signature)
+    for padded, first_dummy in ((rows_30, 30), (rows_31, 31)):
+        assert (padded.slot_mapping[first_dummy:] < 0).all()
+        for row in range(first_dummy, capture_size):
+            dummy_mask = padded.tree_attention_mask[row, 0, 0]
+            assert not dummy_mask[0]
+            assert dummy_mask[1:].all()
+
+
+def test_ranked_linear_draft_fia_capacity_slots_dominate_any_subset():
+    states = [
+        PearlPipelineState(
+            [row + 1] * (row + 1),
+            prompt_length=row + 1,
+            max_tokens=8 + (row * 7) % 23,
+        )
+        for row in range(9)
+    ]
+    gamma = 4
+    capture_size = 8
+    expected_capacities = tuple(
+        sorted(
+            (state.prompt_length + state.max_tokens + gamma for state in states),
+            reverse=True,
+        )[:capture_size]
+    )
+
+    for subset_size in range(1, 6):
+        for subset in combinations(range(len(states)), subset_size):
+            plan = _ranked_linear_draft_fia_plan(
+                states,
+                subset,
+                gamma,
+                capture_size,
+            )
+            ranked_active_limits = [
+                states[subset[caller_row]].prompt_length + states[subset[caller_row]].max_tokens + gamma
+                for caller_row in plan.graph_to_caller_rows
+            ]
+            assert plan.capacity_limits == expected_capacities
+            assert all(
+                active_limit <= capacity_limit
+                for active_limit, capacity_limit in zip(
+                    ranked_active_limits,
+                    plan.capacity_limits,
+                )
+            )
+
+
+def test_ranked_linear_draft_fia_keeps_30_to_31_row_bucket_signature():
+    capture_size = 32
+    gamma = 4
+    states = [
+        PearlPipelineState(
+            [row + 1, row + 101],
+            prompt_length=2,
+            max_tokens=8 + row,
+        )
+        for row in range(40)
+    ]
+
+    def pad_subset(active_indices: list[int]) -> NativeAttentionMetadata:
+        plan = _ranked_linear_draft_fia_plan(
+            states,
+            active_indices,
+            gamma,
+            capture_size,
+        )
+        graph_indices = [active_indices[row] for row in plan.graph_to_caller_rows]
+        num_tokens = len(graph_indices)
+        request_tables = torch.tensor(
+            [[100 + index, -1, -1, -1] for index in graph_indices],
+            dtype=torch.int32,
+        )
+        positions = torch.ones(num_tokens, dtype=torch.long)
+        metadata = NativeAttentionMetadata(
+            slot_mapping=torch.arange(num_tokens, dtype=torch.int32),
+            context_lens=torch.full((num_tokens,), 2, dtype=torch.int32),
+            block_tables=request_tables,
+            actual_seq_lengths_q=tuple(range(1, num_tokens + 1)),
+            sequence_lens=(2,) * num_tokens,
+            request_block_tables=request_tables,
+            attention_mask=torch.zeros((1, 1), dtype=torch.int8),
+            use_fused_infer_attention=True,
+        )
+        _, padded = native_engine_module._pad_bucketed_linear_draft_fia_graph_metadata(
+            positions,
+            metadata,
+            capture_size,
+            block_size=16,
+            exact_positions=positions.tolist(),
+            host_request_block_tables=request_tables.tolist(),
+            kv_length_limits=plan.capacity_limits[:num_tokens],
+            dummy_kv_length_limits=plan.capacity_limits[num_tokens:],
+        )
+        return padded
+
+    rows_30 = pad_subset(list(range(0, 40, 1))[:30])
+    rows_31 = pad_subset(list(range(39, -1, -1))[:31])
+    assert rows_30.sequence_lens == rows_31.sequence_lens
+    assert rows_30.context_lens.tolist() == rows_31.context_lens.tolist()
+    for padded, first_dummy in ((rows_30, 30), (rows_31, 31)):
+        assert (padded.slot_mapping[first_dummy:] < 0).all()
+        for row in range(first_dummy, capture_size):
+            dummy_mask = padded.tree_attention_mask[row, 0, 0]
+            assert not dummy_mask[0]
+            assert dummy_mask[1:].all()
+
+
+def test_ranked_linear_draft_fia_restores_graph_rows_to_caller_order():
+    states = [
+        PearlPipelineState([1], prompt_length=1, max_tokens=10),
+        PearlPipelineState([2], prompt_length=1, max_tokens=30),
+        PearlPipelineState([3], prompt_length=1, max_tokens=20),
+    ]
+    plan = _ranked_linear_draft_fia_plan(states, [0, 1, 2], 4, 4)
+    assert plan.graph_to_caller_rows == (1, 2, 0)
+    assert plan.caller_to_graph_rows == (2, 0, 1)
+
+    graph_windows = torch.tensor(
+        [[100, 101], [200, 201], [300, 301]],
+    )
+    graph_confidence = torch.tensor([0.9, 0.8, 0.7])
+    assert _restore_ranked_linear_draft_rows(
+        graph_windows,
+        plan.caller_to_graph_rows,
+    ).tolist() == [[300, 301], [100, 101], [200, 201]]
+    assert _restore_ranked_linear_draft_rows(
+        graph_confidence,
+        plan.caller_to_graph_rows,
+    ).tolist() == pytest.approx([0.7, 0.9, 0.8])
+
+
+def test_ranked_linear_draft_fia_rejects_capacity_above_page_table():
+    states = [
+        PearlPipelineState([1, 2], prompt_length=2, max_tokens=80),
+    ]
+    plan = _ranked_linear_draft_fia_plan(states, [0], 4, 1)
+    request_tables = torch.tensor([[7, 8, 9, 10]], dtype=torch.int32)
+    metadata = NativeAttentionMetadata(
+        slot_mapping=torch.tensor([1], dtype=torch.int32),
+        context_lens=torch.tensor([2], dtype=torch.int32),
+        block_tables=request_tables,
+        actual_seq_lengths_q=(1,),
+        sequence_lens=(2,),
+        request_block_tables=request_tables,
+        attention_mask=torch.zeros((1, 1), dtype=torch.int8),
+        use_fused_infer_attention=True,
+    )
+
+    with pytest.raises(ValueError, match="exceeding cache capacity"):
+        native_engine_module._pad_bucketed_linear_draft_fia_graph_metadata(
+            torch.tensor([1]),
+            metadata,
+            capture_size=1,
+            block_size=16,
+            exact_positions=[1],
+            host_request_block_tables=request_tables.tolist(),
+            kv_length_limits=plan.capacity_limits,
+            dummy_kv_length_limits=(),
+        )
+
+
+def test_ranked_linear_draft_fia_full_window_restores_all_public_rows():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = True
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.draft_vocab_size = 1000
+    engine.config = SimpleNamespace(
+        enforce_eager=False,
+        draft_use_paged_attention=True,
+        enable_spec_rhythm=True,
+        spec_rhythm_stable_graphs=True,
+        spec_rhythm_linear_bonus_token=False,
+        max_num_seqs=4,
+    )
+    engine.model = SimpleNamespace(layers=[SimpleNamespace(self_attn=SimpleNamespace(block_size=16))])
+    block_tables = [[20 + row, -1, -1, -1] for row in range(3)]
+    engine.cache_allocation = SimpleNamespace(block_tables=block_tables)
+    states = [
+        PearlPipelineState([1, 10], prompt_length=2, max_tokens=10),
+        PearlPipelineState([2, 20], prompt_length=2, max_tokens=30),
+        PearlPipelineState([3, 30], prompt_length=2, max_tokens=20),
+    ]
+
+    def prepare(sequence_ids, positions, *, use_fused_infer_attention):
+        assert sequence_ids == [1, 2, 0]
+        assert use_fused_infer_attention
+        tables = torch.tensor(
+            [block_tables[index] for index in sequence_ids],
+            dtype=torch.int32,
+        )
+        lengths = tuple(position + 1 for position in positions)
+        return (
+            torch.tensor(positions, dtype=torch.long),
+            NativeAttentionMetadata(
+                slot_mapping=torch.arange(3, dtype=torch.int32),
+                context_lens=torch.tensor(lengths, dtype=torch.int32),
+                block_tables=tables,
+                actual_seq_lengths_q=(1, 2, 3),
+                sequence_lens=lengths,
+                request_block_tables=tables,
+                attention_mask=torch.zeros((1, 1), dtype=torch.int8),
+                use_fused_infer_attention=True,
+            ),
+        )
+
+    engine._prepare_attention_metadata = MagicMock(side_effect=prepare)
+    graph_rows = torch.tensor(
+        [
+            [100, 101, 102, 103],
+            [200, 201, 202, 203],
+            [300, 301, 302, 303],
+            [-1, -1, -1, -1],
+        ],
+    )
+    engine.graph_runner = SimpleNamespace(
+        run_draft_greedy=MagicMock(return_value=graph_rows),
+        last_draft_execution=None,
+    )
+
+    with patch.dict(
+        os.environ,
+        {
+            "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_BUCKET": "1",
+            "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_COMMON_KV": "0",
+            "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_RANKED_KV": "1",
+        },
+    ):
+        verification, next_windows, confidence = engine._draft_spec_rhythm_device_batch(
+            states,
+            [0, 1, 2],
+            [4, 4, 4],
+            verification_sizes=[4, 4, 4],
+            full_window=True,
+            graph_lane=0,
+        )
+
+    expected = torch.tensor(
+        [
+            [300, 301, 302, 303],
+            [100, 101, 102, 103],
+            [200, 201, 202, 203],
+        ]
+    )
+    assert torch.equal(next_windows, expected)
+    assert torch.equal(verification, expected.flatten())
+    assert confidence.tolist() == [1.0, 1.0, 1.0]
+    graph_input = engine.graph_runner.run_draft_greedy.call_args.args[0]
+    assert graph_input.tolist() == [20, 30, 10, 0]
+    for metadata in engine.graph_runner.run_draft_greedy.call_args.args[2]:
+        assert metadata.sequence_lens == (36, 26, 16, 1)
+        dummy_mask = metadata.tree_attention_mask[3, 0, 0]
+        assert not dummy_mask[0]
+        assert dummy_mask[1:].all()
+
+
+def test_ranked_and_common_linear_draft_fia_are_mutually_exclusive():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.is_draft = True
+    engine.gamma = 4
+    engine.device = torch.device("cpu")
+    engine.config = SimpleNamespace(
+        draft_use_paged_attention=True,
+        enable_spec_rhythm=True,
+        spec_rhythm_stable_graphs=True,
+    )
+    state = PearlPipelineState([1, 2], prompt_length=1)
+    with (
+        patch.dict(
+            os.environ,
+            {
+                "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_BUCKET": "1",
+                "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_COMMON_KV": "1",
+                "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_RANKED_KV": "1",
+            },
+        ),
+        pytest.raises(ValueError, match="mutually exclusive"),
+    ):
+        engine._draft_spec_rhythm_device_batch(
+            [state],
+            [0],
+            [4],
+            verification_sizes=[4],
+            full_window=True,
+        )
+
+
+def test_bucketed_linear_draft_fia_rejects_undercovered_kv_limit():
+    metadata = NativeAttentionMetadata(
+        slot_mapping=torch.tensor([17], dtype=torch.int32),
+        context_lens=torch.tensor([10], dtype=torch.int32),
+        block_tables=torch.tensor([[5]], dtype=torch.int32),
+        actual_seq_lengths_q=(1,),
+        sequence_lens=(10,),
+        request_block_tables=torch.tensor([[5]], dtype=torch.int32),
+        attention_mask=torch.zeros((1, 1), dtype=torch.int8),
+        use_fused_infer_attention=True,
+    )
+
+    with pytest.raises(ValueError, match="must cover every exact request length"):
+        native_engine_module._pad_bucketed_linear_draft_fia_graph_metadata(
+            torch.tensor([9]),
+            metadata,
+            1,
+            block_size=16,
+            host_request_block_tables=[[5]],
+            kv_length_limits=[9],
+        )
+
+
+def test_bucketed_linear_draft_fia_covers_context_bucket_boundaries():
+    block_size = 128
+    capacity = 4096
+    contexts = (1, 127, 128, 129, 2047, 2048, 2049, 4095)
+    table_width = capacity // block_size
+    request_tables = []
+    for request_index, context_length in enumerate(contexts):
+        visible_pages = (context_length + block_size - 1) // block_size
+        first_page = 100 + request_index * table_width
+        request_tables.append(
+            list(range(first_page, first_page + visible_pages)) + [-1] * (table_width - visible_pages)
+        )
+    request_tables_tensor = torch.tensor(request_tables, dtype=torch.int32)
+    positions = torch.tensor(
+        [context_length - 1 for context_length in contexts],
+        dtype=torch.long,
+    )
+    metadata = NativeAttentionMetadata(
+        slot_mapping=torch.arange(len(contexts), dtype=torch.int32),
+        context_lens=torch.tensor(contexts, dtype=torch.int32),
+        block_tables=request_tables_tensor,
+        actual_seq_lengths_q=tuple(range(1, len(contexts) + 1)),
+        sequence_lens=contexts,
+        request_block_tables=request_tables_tensor,
+        attention_mask=torch.zeros((1, 1), dtype=torch.int8),
+        use_fused_infer_attention=True,
+    )
+
+    padded_positions, padded = native_engine_module._pad_bucketed_linear_draft_fia_graph_metadata(
+        positions,
+        metadata,
+        capture_size=12,
+        block_size=block_size,
+        exact_positions=positions.tolist(),
+        host_request_block_tables=request_tables,
+    )
+
+    expected_buckets = (1, 128, 128, 256, 2048, 2048, 4096, 4096)
+    assert padded.sequence_lens == (*expected_buckets, 1, 1, 1, 1)
+    assert padded.context_lens.tolist() == list(padded.sequence_lens)
+    assert torch.equal(padded_positions[: len(contexts)], positions)
+    assert not padded_positions[len(contexts) :].any()
+    assert padded.tree_attention_mask.shape == (12, 1, 1, capacity)
+    for request_index, context_length in enumerate(contexts):
+        request_mask = padded.tree_attention_mask[request_index, 0, 0]
+        assert not request_mask[:context_length].any()
+        assert request_mask[context_length:].all()
+
+
+@pytest.mark.parametrize(
+    ("context_length", "host_table"),
+    [
+        (129, [11, -1, 13, 14]),
+        (1, [-1, -1, -1, -1]),
+    ],
+    ids=("visible-page-hole", "all-pages-unallocated"),
+)
+def test_bucketed_linear_draft_fia_rejects_unallocated_visible_pages(
+    context_length,
+    host_table,
+):
+    request_tables = torch.tensor([host_table], dtype=torch.int32)
+    metadata = NativeAttentionMetadata(
+        slot_mapping=torch.tensor([17], dtype=torch.int32),
+        context_lens=torch.tensor([context_length], dtype=torch.int32),
+        block_tables=request_tables,
+        actual_seq_lengths_q=(1,),
+        sequence_lens=(context_length,),
+        request_block_tables=request_tables,
+        attention_mask=torch.zeros((1, 1), dtype=torch.int8),
+        use_fused_infer_attention=True,
+    )
+
+    with pytest.raises(RuntimeError, match="unallocated page"):
+        native_engine_module._pad_bucketed_linear_draft_fia_graph_metadata(
+            torch.tensor([context_length - 1]),
+            metadata,
+            capture_size=1,
+            block_size=128,
+            exact_positions=[context_length - 1],
+            host_request_block_tables=[host_table],
+        )
+
+
+def test_bucketed_linear_draft_fia_sanitizes_each_tail_and_dummy_row_safely():
+    request_tables = torch.tensor(
+        [
+            [17, -1, -1, -1],
+            [29, 30, -1, -1],
+        ],
+        dtype=torch.int32,
+    )
+    metadata = NativeAttentionMetadata(
+        slot_mapping=torch.tensor([71, 72], dtype=torch.int32),
+        context_lens=torch.tensor([1, 129], dtype=torch.int32),
+        block_tables=request_tables,
+        actual_seq_lengths_q=(1, 2),
+        sequence_lens=(1, 129),
+        request_block_tables=request_tables,
+        attention_mask=torch.zeros((1, 1), dtype=torch.int8),
+        use_fused_infer_attention=True,
+    )
+
+    _, padded = native_engine_module._pad_bucketed_linear_draft_fia_graph_metadata(
+        torch.tensor([0, 128]),
+        metadata,
+        capture_size=4,
+        block_size=128,
+        exact_positions=[0, 128],
+        host_request_block_tables=[
+            [17, -1, -1, -1],
+            [29, 30, -1, -1],
+        ],
+    )
+
+    assert padded.request_block_tables.tolist() == [
+        [17, 17, 17, 17],
+        [29, 30, 29, 29],
+        [17, 17, 17, 17],
+        [17, 17, 17, 17],
+    ]
+    assert (padded.slot_mapping[2:] < 0).all()
+    for dummy_index in (2, 3):
+        dummy_mask = padded.tree_attention_mask[dummy_index, 0, 0]
+        assert not dummy_mask[0]
+        assert dummy_mask[1:].all()
+
+
 @pytest.mark.parametrize(
     ("work_rows", "expected_graph_rows"),
     [
@@ -2841,14 +5647,47 @@ def test_spec_rhythm_full_draft_graph_uses_bounded_dense_buckets(
     engine._prepare_attention_metadata = MagicMock(side_effect=metadata)
     states = [PearlPipelineState([1, 2], prompt_length=1) for _ in range(work_rows)]
 
-    verification, continuation, confidence = engine._draft_spec_rhythm_device_batch(
-        states,
-        list(range(work_rows)),
-        [engine.gamma] * work_rows,
-        verification_sizes=[1] * work_rows,
-    )
+    with (
+        patch.object(
+            NativeACLGraphRunner,
+            "_pad_inputs",
+            wraps=NativeACLGraphRunner._pad_inputs,
+        ) as pad_inputs,
+        patch.object(
+            native_engine_module.torch,
+            "ones",
+            wraps=torch.ones,
+        ) as ones,
+        patch.object(
+            native_engine_module.torch,
+            "full",
+            wraps=torch.full,
+        ) as full,
+    ):
+        verification, continuation, confidence = engine._draft_spec_rhythm_device_batch(
+            states,
+            list(range(work_rows)),
+            [engine.gamma] * work_rows,
+            verification_sizes=[1] * work_rows,
+        )
 
     graph_call = engine.graph_runner.run_draft_greedy.call_args
+    assert pad_inputs.call_count == 1
+    confidence_call = call(
+        work_rows,
+        dtype=torch.float32,
+        device=engine.device,
+    )
+    assert ones.call_args_list.count(confidence_call) == 1
+    assert (
+        call(
+            (work_rows, engine.gamma),
+            -1,
+            dtype=torch.long,
+            device=engine.device,
+        )
+        not in full.call_args_list
+    )
     assert graph_call.args[0].shape == (expected_graph_rows,)
     assert all(value.shape == (expected_graph_rows,) for value in graph_call.args[1])
     assert all(value.slot_mapping.shape == (expected_graph_rows,) for value in graph_call.args[2])
@@ -2859,34 +5698,28 @@ def test_spec_rhythm_full_draft_graph_uses_bounded_dense_buckets(
     engine._run_device_packed_greedy_with_confidence.assert_not_called()
     assert engine._linear_draft_full_chain_bucket_calls == {expected_graph_rows: 1}
     assert engine._linear_draft_full_chain_calls == 1
-    assert getattr(
-        engine, "_linear_draft_full_chain_capture_replay_calls", 0
-    ) == 0
+    assert getattr(engine, "_linear_draft_full_chain_capture_replay_calls", 0) == 0
     assert engine._linear_draft_full_chain_replay_calls == 1
-    assert getattr(
-        engine, "_linear_draft_full_chain_eager_fallback_calls", 0
-    ) == 0
-    assert getattr(
-        engine, "_linear_draft_full_chain_unclassified_calls", 0
-    ) == 0
+    assert getattr(engine, "_linear_draft_full_chain_eager_fallback_calls", 0) == 0
+    assert getattr(engine, "_linear_draft_full_chain_unclassified_calls", 0) == 0
     assert engine._linear_draft_full_chain_logical_rows == work_rows
     assert engine._linear_draft_full_chain_logical_tokens == work_rows * engine.gamma
     assert engine._linear_draft_full_chain_padded_rows == expected_graph_rows
     assert engine._linear_draft_full_chain_padded_tokens == expected_graph_rows * engine.gamma
     assert engine._linear_draft_full_chain_padding_rows == expected_graph_rows - work_rows
-    assert engine._linear_draft_full_chain_padding_tokens == (
-        expected_graph_rows - work_rows
-    ) * engine.gamma
+    assert engine._linear_draft_full_chain_padding_tokens == (expected_graph_rows - work_rows) * engine.gamma
     assert getattr(engine, "_linear_draft_stepwise_calls", 0) == 0
+    engine._fixed_full_window_host_correction_staging_eligible_calls = 7
+    engine._fixed_full_window_host_correction_staging_calls = 6
     metrics = engine.graph_metrics()
-    assert metrics[
-        f"spec_rhythm_linear_draft_full_chain_bucket_{expected_graph_rows}_calls"
-    ] == 1
+    assert metrics[f"spec_rhythm_linear_draft_full_chain_bucket_{expected_graph_rows}_calls"] == 1
     assert metrics["spec_rhythm_linear_draft_full_chain_calls"] == 1
     assert metrics["spec_rhythm_linear_draft_full_chain_replay_calls"] == 1
     assert metrics["spec_rhythm_linear_draft_full_chain_logical_rows"] == work_rows
     assert metrics["spec_rhythm_linear_draft_full_chain_padded_rows"] == expected_graph_rows
     assert metrics["spec_rhythm_linear_draft_stepwise_calls"] == 0
+    assert metrics["spec_rhythm_fixed_full_window_host_correction_staging_eligible_calls"] == 7
+    assert metrics["spec_rhythm_fixed_full_window_host_correction_staging_calls"] == 6
 
 
 def test_linear_spec_rhythm_capture_prewarms_paged_home_and_full_draft_graphs():
@@ -3224,9 +6057,7 @@ def test_linear_full_window_cli_is_opt_in_across_public_entrypoints():
         "roofline.json",
     ]
     server_default = _build_specslo_server_parser().parse_args(server_required)
-    server_enabled = _build_specslo_server_parser().parse_args(
-        [*server_required, "--spec-rhythm-linear-full-window"]
-    )
+    server_enabled = _build_specslo_server_parser().parse_args([*server_required, "--spec-rhythm-linear-full-window"])
     with patch(
         "sys.argv",
         [
@@ -3350,12 +6181,8 @@ def test_serial_draft_graph_precompile_cli_is_opt_in_across_public_entrypoints()
         "--prompt",
         "hello",
     ]
-    benchmark_default = _build_benchmark_parser().parse_args(
-        benchmark_required
-    )
-    benchmark_enabled = _build_benchmark_parser().parse_args(
-        [*benchmark_required, "--precompile-serial-draft-graphs"]
-    )
+    benchmark_default = _build_benchmark_parser().parse_args(benchmark_required)
+    benchmark_enabled = _build_benchmark_parser().parse_args([*benchmark_required, "--precompile-serial-draft-graphs"])
     server_required = [
         "--draft-model",
         "draft",
@@ -3365,9 +6192,7 @@ def test_serial_draft_graph_precompile_cli_is_opt_in_across_public_entrypoints()
         "roofline.json",
     ]
     server_default = _build_specslo_server_parser().parse_args(server_required)
-    server_enabled = _build_specslo_server_parser().parse_args(
-        [*server_required, "--precompile-serial-draft-graphs"]
-    )
+    server_enabled = _build_specslo_server_parser().parse_args([*server_required, "--precompile-serial-draft-graphs"])
     native_required = [
         "--draft-model",
         "draft",
@@ -3377,9 +6202,7 @@ def test_serial_draft_graph_precompile_cli_is_opt_in_across_public_entrypoints()
         "hello",
     ]
     native_default = _build_parser().parse_args(native_required)
-    native_enabled = _build_parser().parse_args(
-        [*native_required, "--precompile-serial-draft-graphs"]
-    )
+    native_enabled = _build_parser().parse_args([*native_required, "--precompile-serial-draft-graphs"])
     with patch(
         "sys.argv",
         [
@@ -3448,6 +6271,43 @@ def test_benchmark_clis_accept_disjoint_warmup_prompt_offsets():
 
     assert speculative.warmup_prompt_offset == 200
     assert target_only.warmup_prompt_offset == 200
+
+
+def test_speculative_benchmark_accepts_ablation_mode_and_respect_eos():
+    args = _build_benchmark_parser().parse_args(
+        [
+            "--draft-model",
+            "draft",
+            "--target-model",
+            "target",
+            "--prompt",
+            "hello",
+            "--respect-eos",
+            "--spec-rhythm-ablation-mode",
+            "dual_batch_rolling",
+        ]
+    )
+    assert args.respect_eos is True
+    assert args.spec_rhythm_ablation_mode == "dual_batch_rolling"
+
+
+def test_target_only_benchmark_accepts_shared_prefill_coalesce_policy():
+    args = _build_target_only_benchmark_parser().parse_args(
+        [
+            "--model",
+            "target",
+            "--prompt",
+            "hello",
+            "--online-arrivals",
+            "--prefill-coalesce-min-requests",
+            "4",
+            "--prefill-coalesce-max-wait-ms",
+            "1100",
+        ]
+    )
+
+    assert args.prefill_coalesce_min_requests == 4
+    assert args.prefill_coalesce_max_wait_ms == 1100.0
 
 
 def test_public_pearl_config_maps_upstream_fields_to_native_runtime():
@@ -3751,6 +6611,54 @@ def test_public_pearl_config_rejects_partial_linear_full_window_eager_cap():
         )
 
 
+@pytest.mark.parametrize(
+    "mode",
+    ["serial", "nano_pearl", "dual_batch", "dual_batch_rolling"],
+)
+def test_native_fixed_gamma_ablation_modes_require_online_full_window(mode):
+    common = dict(
+        enable_continuous_batching=True,
+        enable_preemptive_scheduling=True,
+        enable_spec_rhythm=True,
+        spec_rhythm_linear_full_window=True,
+        spec_rhythm_online_prefill=True,
+        spec_rhythm_min_gamma=4,
+        spec_rhythm_ablation_mode=mode,
+    )
+    config = NativePearlConfig("draft", "target", 1, 4, 4, 512, 32, **common)
+    assert config.spec_rhythm_ablation_mode == mode
+
+    common["spec_rhythm_online_prefill"] = False
+    with pytest.raises(ValueError, match="ablation modes"):
+        NativePearlConfig("draft", "target", 1, 4, 4, 512, 32, **common)
+
+
+def test_public_fixed_gamma_ablation_mode_maps_to_native_runtime():
+    model_config = SimpleNamespace(
+        architectures=["Qwen2ForCausalLM"],
+        eos_token_id=1,
+    )
+    with patch(
+        "vllm_ascend.spec_decode.pearl.api.AutoConfig.from_pretrained",
+        side_effect=[model_config, model_config],
+    ):
+        config = PEARLConfig(
+            "draft",
+            "target",
+            draft_tensor_parallel_size=1,
+            target_tensor_parallel_size=4,
+            gamma=4,
+            enable_continuous_batching=True,
+            enable_preemptive_scheduling=True,
+            enable_spec_rhythm=True,
+            spec_rhythm_linear_full_window=True,
+            spec_rhythm_online_prefill=True,
+            spec_rhythm_min_gamma=4,
+            spec_rhythm_ablation_mode="nano_pearl",
+        )
+    assert config.to_native().spec_rhythm_ablation_mode == "nano_pearl"
+
+
 def test_native_pearl_config_rejects_partial_linear_full_window_eager_cap():
     with pytest.raises(ValueError, match="eager-token cap must be 0 or gamma"):
         NativePearlConfig(
@@ -4008,9 +6916,7 @@ def test_public_engine_seals_and_unseals_graph_cache_on_every_worker():
     engine._send_all = MagicMock()
     sealed_metrics = [{"rank": 0, "aclgraph_sealed": 1}]
     unsealed_metrics = [{"rank": 0, "aclgraph_sealed": 0}]
-    pruned_metrics = [
-        {"rank": 0, "aclgraph_pruned_unvalidated_entries": 2}
-    ]
+    pruned_metrics = [{"rank": 0, "aclgraph_pruned_unvalidated_entries": 2}]
     engine._receive_all = MagicMock(
         side_effect=[
             [("graph_cache_sealed", 0, sealed_metrics[0])],
@@ -4256,6 +7162,16 @@ def test_host_decode_profile_merges_rank_local_timestamps_without_sync():
                     "draft_end_seconds": draft[1],
                     "target_start_seconds": target[0],
                     "target_end_seconds": target[1],
+                    "linear_w_observed_draft_ms": 18.0,
+                    "linear_w_observed_target_ms": 40.0,
+                    "compute_coordination_start_seconds": 1.03,
+                    "compute_coordination_end_seconds": 1.052,
+                    "compact_submit_start_seconds": 1.052,
+                    "compact_submit_end_seconds": 1.053,
+                    "compact_wait_start_seconds": 1.053,
+                    "compact_wait_end_seconds": 1.054,
+                    "overlap_prefill_start_seconds": 1.054,
+                    "overlap_prefill_end_seconds": 1.056,
                     "exchange_start_seconds": 1.052,
                     "exchange_end_seconds": 1.057 + rank * 0.001,
                     "verdict_start_seconds": 1.057,
@@ -4269,6 +7185,8 @@ def test_host_decode_profile_merges_rank_local_timestamps_without_sync():
                     "state_request_commit_end_seconds": 1.066,
                     "state_end_seconds": 1.066,
                     "cycle_end_seconds": 1.07 + rank * 0.001,
+                    "accounted_tail_ms": 1.25,
+                    "new_activation_tail_request_ms": 0.5,
                     "target_requests": 4,
                     "draft_requests": 4,
                     "verify_candidates": 8,
@@ -4300,6 +7218,13 @@ def test_host_decode_profile_merges_rank_local_timestamps_without_sync():
     assert cycle["draft_compute_host_ms"] == pytest.approx(20.0)
     assert cycle["target_compute_host_ms"] == pytest.approx(40.0)
     assert cycle["host_compute_overlap_ms"] == pytest.approx(18.0)
+    assert cycle["draft_compute_device_ms"] == pytest.approx(18.0)
+    assert cycle["target_verify_device_ms"] == pytest.approx(40.0)
+    assert cycle["draft_device_below_target"] is True
+    assert cycle["compute_coordination_critical_ms"] == pytest.approx(22.0)
+    assert cycle["compact_submit_critical_ms"] == pytest.approx(1.0)
+    assert cycle["compact_wait_critical_ms"] == pytest.approx(1.0)
+    assert cycle["staged_prefill_critical_ms"] == pytest.approx(2.0)
     assert cycle["draft_to_target_critical_ms"] == pytest.approx(8.0)
     assert cycle["target_to_draft_critical_ms"] == pytest.approx(7.0)
     assert cycle["state_update_critical_ms"] == pytest.approx(2.0)
@@ -4307,6 +7232,8 @@ def test_host_decode_profile_merges_rank_local_timestamps_without_sync():
     assert cycle["state_consensus_critical_ms"] == pytest.approx(0.5)
     assert cycle["state_compaction_critical_ms"] == pytest.approx(0.2)
     assert cycle["state_request_commit_critical_ms"] == pytest.approx(0.8)
+    assert cycle["accounted_tail_ms"] == pytest.approx(1.25)
+    assert cycle["new_activation_tail_request_ms"] == pytest.approx(0.5)
 
 
 def test_worker_aclgraph_deltas_match_workers_by_rank():
@@ -4376,6 +7303,55 @@ def test_worker_aclgraph_deltas_count_cold_measurement_without_warmup():
     assert deltas[0]["aclgraph_generic_total_calls_delta"] == 0
 
 
+def test_worker_aclgraph_deltas_include_mixed_target_service_contract():
+    before = [
+        {
+            "rank": 1,
+            "is_draft_rank": 0,
+            "spec_rhythm_mixed_target_graph_enabled": 1,
+            "spec_rhythm_mixed_target_graph_qualified_buckets": 6,
+            "spec_rhythm_stable_target_verify_graph_enabled": 1,
+            "spec_rhythm_stable_target_verify_graph_qualified": 1,
+            "spec_rhythm_stable_target_verify_graph_qualified_capacities": 32,
+            "spec_rhythm_stable_target_verify_graph_qualified_capacity_mask": 0xFFFFFFFF,
+            "spec_rhythm_stable_target_verify_graph_max_qualified_capacity": 32,
+            "spec_rhythm_stable_target_verify_graph_exact_routes": 32,
+            "spec_rhythm_stable_target_verify_numerical_validation_attempts": 64,
+            "spec_rhythm_stable_target_verify_numerical_validation_passes": 64,
+            "spec_rhythm_stable_target_verify_numerical_validation_failures": 0,
+            "spec_rhythm_stable_target_verify_numerical_restore_failures": 0,
+            "worker_spec_rhythm_mixed_target_prefill_batches": 3,
+            "worker_spec_rhythm_mixed_target_graph_batches": 3,
+            "worker_spec_rhythm_mixed_target_graph_requests": 7,
+            "worker_spec_rhythm_mixed_target_graph_prompt_tokens": 511,
+            "worker_spec_rhythm_mixed_target_graph_token_capacity_fallback_batches": 0,
+        }
+    ]
+    after = [
+        {
+            **before[0],
+            "worker_spec_rhythm_mixed_target_prefill_batches": 8,
+            "worker_spec_rhythm_mixed_target_graph_batches": 8,
+            "worker_spec_rhythm_mixed_target_graph_requests": 19,
+            "worker_spec_rhythm_mixed_target_graph_prompt_tokens": 2047,
+            "worker_spec_rhythm_mixed_target_graph_token_capacity_fallback_batches": 1,
+        }
+    ]
+
+    delta = _worker_aclgraph_deltas(before, after)[0]
+
+    assert delta["spec_rhythm_mixed_target_graph_enabled"] == 1
+    assert delta["spec_rhythm_mixed_target_graph_qualified_buckets"] == 6
+    assert delta["spec_rhythm_stable_target_verify_graph_qualified"] == 1
+    assert delta["spec_rhythm_stable_target_verify_graph_qualified_capacity_mask"] == 0xFFFFFFFF
+    assert delta["spec_rhythm_stable_target_verify_numerical_validation_passes"] == 64
+    assert delta["worker_spec_rhythm_mixed_target_prefill_batches"] == 8
+    assert delta["worker_spec_rhythm_mixed_target_graph_batches"] == 8
+    assert delta["worker_spec_rhythm_mixed_target_graph_requests"] == 19
+    assert delta["worker_spec_rhythm_mixed_target_graph_prompt_tokens"] == 2047
+    assert delta["worker_spec_rhythm_mixed_target_graph_token_capacity_fallback_batches"] == 1
+
+
 def test_graph_only_benchmark_gate_accepts_active_workers_without_fallback():
     deltas = [
         {
@@ -4390,6 +7366,114 @@ def test_graph_only_benchmark_gate_accepts_active_workers_without_fallback():
         for rank in range(4)
     ]
     _require_no_graph_fallback(deltas)
+
+
+def _stable_target_verify_graph_contract():
+    return {
+        "spec_rhythm_stable_target_verify_graph_enabled": 1,
+        "spec_rhythm_stable_target_verify_graph_qualified": 1,
+        "spec_rhythm_stable_target_verify_graph_qualified_capacities": 32,
+        "spec_rhythm_stable_target_verify_graph_qualified_capacity_mask": 0xFFFFFFFF,
+        "spec_rhythm_stable_target_verify_graph_max_qualified_capacity": 32,
+        "spec_rhythm_stable_target_verify_graph_exact_routes": 32,
+        "spec_rhythm_stable_target_verify_numerical_validation_attempts": 64,
+        "spec_rhythm_stable_target_verify_numerical_validation_passes": 64,
+        "spec_rhythm_stable_target_verify_numerical_validation_failures": 0,
+        "spec_rhythm_stable_target_verify_numerical_restore_failures": 0,
+        "worker_spec_rhythm_stable_target_verify_graph_batches": 7,
+        "worker_spec_rhythm_stable_target_verify_graph_requests": 19,
+        "worker_spec_rhythm_stable_target_verify_graph_bounded_shape_fallback_batches": 0,
+        "worker_spec_rhythm_stable_target_verify_graph_token_capacity_fallback_batches": 0,
+        "worker_spec_rhythm_stable_target_verify_graph_execution_fallback_batches": 0,
+    }
+
+
+def test_graph_only_benchmark_gate_accepts_all_mixed_target_prefills_on_graph():
+    deltas = _full_window_graph_deltas()
+    deltas[0].update(
+        {
+            "spec_rhythm_mixed_target_graph_enabled": 0,
+            "spec_rhythm_mixed_target_graph_qualified_buckets": 0,
+        }
+    )
+    deltas[1].update(
+        {
+            "spec_rhythm_mixed_target_graph_enabled": 1,
+            "spec_rhythm_mixed_target_graph_qualified_buckets": 6,
+            "worker_spec_rhythm_mixed_target_prefill_batches": 3,
+            "worker_spec_rhythm_mixed_target_graph_batches": 3,
+            "worker_spec_rhythm_mixed_target_graph_bounded_shape_fallback_batches": 0,
+            "worker_spec_rhythm_mixed_target_graph_token_capacity_fallback_batches": 0,
+            "worker_spec_rhythm_mixed_target_graph_execution_fallback_batches": 0,
+            **_stable_target_verify_graph_contract(),
+        }
+    )
+
+    _require_no_graph_fallback(deltas, require_full_window=True)
+
+
+@pytest.mark.parametrize(
+    "counter",
+    [
+        "worker_spec_rhythm_mixed_target_graph_bounded_shape_fallback_batches",
+        "worker_spec_rhythm_mixed_target_graph_token_capacity_fallback_batches",
+        "worker_spec_rhythm_mixed_target_graph_execution_fallback_batches",
+        "worker_spec_rhythm_stable_target_verify_graph_bounded_shape_fallback_batches",
+        "worker_spec_rhythm_stable_target_verify_graph_token_capacity_fallback_batches",
+        "worker_spec_rhythm_stable_target_verify_graph_execution_fallback_batches",
+    ],
+)
+def test_graph_only_benchmark_gate_rejects_mixed_target_fallback(counter):
+    deltas = _full_window_graph_deltas()
+    deltas[0]["spec_rhythm_mixed_target_graph_enabled"] = 0
+    deltas[1].update(
+        {
+            "spec_rhythm_mixed_target_graph_enabled": 1,
+            "spec_rhythm_mixed_target_graph_qualified_buckets": 6,
+            "worker_spec_rhythm_mixed_target_prefill_batches": 3,
+            "worker_spec_rhythm_mixed_target_graph_batches": 2,
+            **_stable_target_verify_graph_contract(),
+            counter: 1,
+        }
+    )
+
+    with pytest.raises(RuntimeError, match="mixed_target_failures"):
+        _require_no_graph_fallback(deltas, require_full_window=True)
+
+
+@pytest.mark.parametrize(
+    ("counter", "value"),
+    [
+        ("spec_rhythm_stable_target_verify_graph_qualified", 0),
+        ("spec_rhythm_stable_target_verify_graph_qualified_capacities", 31),
+        ("spec_rhythm_stable_target_verify_graph_qualified_capacity_mask", 0x7FFFFFFF),
+        ("spec_rhythm_stable_target_verify_graph_max_qualified_capacity", 31),
+        ("spec_rhythm_stable_target_verify_graph_exact_routes", 31),
+        ("spec_rhythm_stable_target_verify_numerical_validation_passes", 63),
+        ("spec_rhythm_stable_target_verify_numerical_validation_failures", 1),
+        ("worker_spec_rhythm_stable_target_verify_graph_batches", 0),
+    ],
+)
+def test_graph_only_benchmark_gate_rejects_incomplete_stable_verify_contract(
+    counter,
+    value,
+):
+    deltas = _full_window_graph_deltas()
+    deltas[0]["spec_rhythm_mixed_target_graph_enabled"] = 0
+    deltas[1].update(
+        {
+            "spec_rhythm_mixed_target_graph_enabled": 1,
+            "spec_rhythm_mixed_target_graph_qualified_buckets": 6,
+            "worker_spec_rhythm_mixed_target_prefill_batches": 3,
+            "worker_spec_rhythm_mixed_target_graph_batches": 3,
+            "worker_spec_rhythm_mixed_target_graph_requests": 7,
+            **_stable_target_verify_graph_contract(),
+            counter: value,
+        }
+    )
+
+    with pytest.raises(RuntimeError, match="mixed_target_failures"):
+        _require_no_graph_fallback(deltas, require_full_window=True)
 
 
 def _qualification_worker_metrics(**updates):
@@ -4442,6 +7526,26 @@ def test_graph_qualification_fixed_point_requires_a_validation_free_hot_trace():
 
     assert complete
     assert issues == []
+
+
+def test_graph_qualification_fixed_point_requires_all_exact_verify_graphs():
+    stable_contract = _stable_target_verify_graph_contract()
+    before = _qualification_worker_metrics(**stable_contract)
+    after = _qualification_worker_metrics(
+        **stable_contract,
+        aclgraph_replays=3,
+        aclgraph_generic_total_calls=3,
+        aclgraph_generic_replay_calls=2,
+    )
+
+    complete, issues = _graph_qualification_fixed_point([before], [after])
+    assert complete
+    assert issues == []
+
+    after["spec_rhythm_stable_target_verify_graph_exact_routes"] = 31
+    complete, issues = _graph_qualification_fixed_point([before], [after])
+    assert not complete
+    assert any("stable target-verify graph contract mismatch" in issue for issue in issues)
 
 
 @pytest.mark.parametrize(
@@ -4857,9 +7961,7 @@ def test_native_aclgraph_qualification_status_and_seal_require_every_entry():
         runner = NativeACLGraphRunner(MagicMock(), enabled=True)
     runner.entries[("generic", 1)] = SimpleNamespace(runtime_validated=True)
     runner.draft_entries[("draft", 1)] = SimpleNamespace(runtime_validated=False)
-    runner.target_entries[("target", (1,))] = SimpleNamespace(
-        runtime_validated=True
-    )
+    runner.target_entries[("target", (1,))] = SimpleNamespace(runtime_validated=True)
 
     status = runner.graph_qualification_status()
 
@@ -4876,6 +7978,7 @@ def test_native_aclgraph_qualification_status_and_seal_require_every_entry():
         "draft_pruned_unvalidated_entries": 0,
         "target_pruned_unvalidated_entries": 0,
         "pruned_unvalidated_entries": 0,
+        "shared_memory_pool": 0,
         "sealed": 0,
     }
     with pytest.raises(RuntimeError, match="unqualified resident entries"):
@@ -4909,9 +8012,7 @@ def test_native_aclgraph_prunes_only_unvalidated_entries_and_reopens_capacity():
     runner.target_entries[("target-stale", (1,))] = target_stale
     runner._capture_budget_used = 4
 
-    with patch(
-        "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.synchronize"
-    ) as synchronize:
+    with patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.synchronize") as synchronize:
         status = runner.prune_unvalidated_graph_entries()
 
     synchronize.assert_called_once_with()
@@ -5106,9 +8207,7 @@ def test_generic_graph_capture_tracks_logical_rows_not_bucket_size():
         return_value=update_stream,
     ):
         runner = NativeACLGraphRunner(MagicMock(), enabled=True)
-    runner._execute = MagicMock(
-        side_effect=[torch.tensor([7, 8, 0, 0]), torch.tensor([7, 8, 0, 0])]
-    )
+    runner._execute = MagicMock(side_effect=[torch.tensor([7, 8, 0, 0]), torch.tensor([7, 8, 0, 0])])
     runner._update_attention_tasks = MagicMock()
     metadata = SimpleNamespace(
         slot_mapping=torch.tensor([0, 1, -1, -1], dtype=torch.int32),
@@ -5167,10 +8266,7 @@ def test_draft_aclgraph_validation_ignores_only_consistent_padding_rows():
     reference = torch.arange(16, dtype=torch.long).reshape(4, 4)
     graph = reference.clone()
     graph[2:] = -1
-    metadatas = [
-        SimpleNamespace(slot_mapping=torch.tensor([10, 11, -1, -1]))
-        for _ in range(4)
-    ]
+    metadatas = [SimpleNamespace(slot_mapping=torch.tensor([10, 11, -1, -1])) for _ in range(4)]
 
     assert NativeACLGraphRunner._draft_outputs_match(
         graph,
@@ -5217,10 +8313,7 @@ def test_draft_aclgraph_validation_rejects_any_real_row_difference():
     reference = torch.arange(16, dtype=torch.long).reshape(4, 4)
     graph = reference.clone()
     graph[0, 0] = -1
-    metadatas = [
-        SimpleNamespace(slot_mapping=torch.tensor([10, 11, -1, -1]))
-        for _ in range(4)
-    ]
+    metadatas = [SimpleNamespace(slot_mapping=torch.tensor([10, 11, -1, -1])) for _ in range(4)]
 
     assert not NativeACLGraphRunner._draft_outputs_match(
         graph,

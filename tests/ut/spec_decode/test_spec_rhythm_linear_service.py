@@ -37,11 +37,13 @@ class _LinearLoopHarness:
         remote_draft_compute_ms=4.0,
         full_window=False,
         eager_cross_graph_bucket=False,
+        idle_residual_eager=False,
         prefill_coalesce_min_requests=1,
         prefill_coalesce_max_wait_ms=0.0,
         prefill_token_chunk_size=0,
         prompt_lengths=None,
         is_draft=False,
+        bonus_token=False,
     ):
         self.events = []
         self.prefilled = set()
@@ -84,30 +86,22 @@ class _LinearLoopHarness:
             enable_continuous_batching=True,
             enable_preemptive_scheduling=True,
             spec_rhythm_linear_full_window=full_window,
-            spec_rhythm_linear_eager_cross_graph_bucket=(
-                eager_cross_graph_bucket
-            ),
+            spec_rhythm_linear_bonus_token=bonus_token,
+            spec_rhythm_linear_eager_cross_graph_bucket=(eager_cross_graph_bucket),
+            spec_rhythm_linear_idle_residual_eager=idle_residual_eager,
             spec_rhythm_online_prefill=online_prefill,
-            spec_rhythm_prefill_coalesce_min_requests=(
-                prefill_coalesce_min_requests
-            ),
-            spec_rhythm_prefill_coalesce_max_wait_ms=(
-                prefill_coalesce_max_wait_ms
-            ),
+            spec_rhythm_prefill_coalesce_min_requests=(prefill_coalesce_min_requests),
+            spec_rhythm_prefill_coalesce_max_wait_ms=(prefill_coalesce_max_wait_ms),
             spec_rhythm_prefill_token_chunk_size=prefill_token_chunk_size,
             spec_rhythm_min_gamma=4,
-            spec_rhythm_target_fallback_max_batch=(
-                capacity if target_fallback is True else int(target_fallback)
-            ),
+            spec_rhythm_target_fallback_max_batch=(capacity if target_fallback is True else int(target_fallback)),
             spec_rhythm_cpu_verdict=True,
             profile_host_decode_steps=profile_host_steps,
             enforce_eager=True,
         )
         self.engine.topology = PearlTopology.from_tensor_parallel_sizes(1, 3)
         self.engine.rank = (
-            self.engine.topology.draft_leader_rank
-            if is_draft
-            else self.engine.topology.target_leader_rank
+            self.engine.topology.draft_leader_rank if is_draft else self.engine.topology.target_leader_rank
         )
         self.engine.is_draft = is_draft
         self.engine.device = torch.device("cpu")
@@ -121,13 +115,17 @@ class _LinearLoopHarness:
         self.engine.graph_runner = SimpleNamespace(set_expected_fia_batch_size=Mock())
         self.engine.greedy_verification_layouts = {}
         self.engine.cache_allocation = SimpleNamespace(num_cached_tokens=[0] * request_count)
+        # The scheduler harness is intentionally device-free.  Exercise the
+        # online cache lifecycle boundaries without constructing physical NPU
+        # page tables; NativePrefixCache has dedicated allocation/recycling
+        # tests below.
+        self.engine._activate_cache_sequence = Mock()
+        self.engine._release_cache_sequence = Mock(return_value=0)
         self.engine._release_cache = Mock()
         self.engine.graph_metrics = lambda: {}
         self.engine._deliver_committed_tokens = lambda *args, **kwargs: None
         self.engine._prefill_and_sample_target_batch = self.prefill
-        self.engine._prefill_spec_rhythm_token_chunk_batch = (
-            self.prefill_token_chunk
-        )
+        self.engine._prefill_spec_rhythm_token_chunk_batch = self.prefill_token_chunk
         self.engine._target_round_outputs_batch = self.target
         self.engine._target_full_window_outputs_batch = self.target_full_window
         self.engine._exchange_spec_rhythm_device_proposals = self.exchange
@@ -194,11 +192,7 @@ class _LinearLoopHarness:
             assert state.committed_length == state.prompt_length
             assert len(state.token_ids) == state.prompt_length
             assert len(prompts[chunk.request_index]) == chunk.prompt_length
-        completed = {
-            chunk.request_index: 301 + chunk.request_index
-            for chunk in chunks
-            if chunk.completes_prompt
-        }
+        completed = {chunk.request_index: 301 + chunk.request_index for chunk in chunks if chunk.completes_prompt}
         self.prefilled.update(completed)
         return completed
 
@@ -232,7 +226,22 @@ class _LinearLoopHarness:
                 proposal_matrix,
                 torch.stack([payload.next_tokens for payload in payloads]),
             )
-        return torch.cat([payload.verification_tokens for payload in payloads]), None
+        rows = [payload.verification_tokens for payload in payloads]
+        if self.engine.config.spec_rhythm_linear_bonus_token:
+            rows = [
+                torch.cat(
+                    (
+                        row,
+                        torch.tensor(
+                            [900 + payload.ticket.request_index],
+                            dtype=row.dtype,
+                            device=row.device,
+                        ),
+                    )
+                )
+                for row, payload in zip(rows, payloads)
+            ]
+        return torch.cat(rows), None
 
     def exchange(
         self,
@@ -280,9 +289,31 @@ class _LinearLoopHarness:
         if verdict is None:
             accepted = list(next_window_sizes)
             corrections = [None] * batch_size
+            bonuses = [None] * batch_size
         else:
             accepted = [int(value) for value in verdict[:, 0].tolist()]
-            corrections = [None if int(value) < 0 else int(value) for value in verdict[:, 1].tolist()]
+            result_tokens = [int(value) for value in verdict[:, 1].tolist()]
+            if self.engine.config.spec_rhythm_linear_bonus_token:
+                corrections = [
+                    token_id if accepted_count < expected else None
+                    for accepted_count, expected, token_id in zip(
+                        accepted,
+                        next_window_sizes,
+                        result_tokens,
+                    )
+                ]
+                bonuses = [
+                    token_id if accepted_count == expected and token_id >= 0 else None
+                    for accepted_count, expected, token_id in zip(
+                        accepted,
+                        next_window_sizes,
+                        result_tokens,
+                    )
+                ]
+            else:
+                corrections = [None if token_id < 0 else token_id for token_id in result_tokens]
+                bonuses = [None] * batch_size
+        self.engine._last_device_round_bonus_tokens = bonuses
         return accepted, corrections, [[777] * int(size) for size in next_window_sizes]
 
     def run(self, *, continuous_batching=False, max_rounds=None):
@@ -345,10 +376,7 @@ def test_token_chunk_planner_is_fair_capped_and_cursor_pure():
     )
 
     assert cursors == {0: 0, 1: 0, 2: 0}
-    assert [
-        (chunk.request_index, chunk.start, chunk.end, chunk.completes_prompt)
-        for chunk in first
-    ] == [
+    assert [(chunk.request_index, chunk.start, chunk.end, chunk.completes_prompt) for chunk in first] == [
         (0, 0, 2, False),
         (1, 0, 2, True),
         (2, 0, 2, False),
@@ -362,13 +390,81 @@ def test_token_chunk_planner_is_fair_capped_and_cursor_pure():
         cursors=cursors,
         token_cap=6,
     )
-    assert [
-        (chunk.request_index, chunk.start, chunk.end, chunk.completes_prompt)
-        for chunk in second
-    ] == [
+    assert [(chunk.request_index, chunk.start, chunk.end, chunk.completes_prompt) for chunk in second] == [
         (0, 2, 5, False),
         (2, 2, 5, True),
     ]
+
+
+def test_fixed_gamma_identity_budget_preserves_selected_row_order():
+    normal, eager = native._fixed_gamma_identity_budgets(
+        [3, 1],
+        [4, 2],
+        gamma=4,
+        verification_roof=20,
+    )
+
+    assert list(normal.items()) == [(3, 4), (1, 4)]
+    assert list(eager.items()) == [(4, 4), (2, 4)]
+
+
+@pytest.mark.parametrize(
+    ("normal", "eager", "roof", "message"),
+    [
+        ([0, 0], [], 8, "duplicate"),
+        ([0], [0], 8, "both normal and eager"),
+        ([0, 1], [2], 8, "exceeds"),
+    ],
+)
+def test_fixed_gamma_identity_budget_rejects_invalid_envelopes(
+    normal,
+    eager,
+    roof,
+    message,
+):
+    with pytest.raises(ValueError, match=message):
+        native._fixed_gamma_identity_budgets(
+            normal,
+            eager,
+            gamma=4,
+            verification_roof=roof,
+        )
+
+
+def test_slo_fixed_gamma_full_window_skips_general_bound_and_shape(monkeypatch):
+    monkeypatch.delenv(
+        "VLLM_ASCEND_SPECRHYTHM_VALIDATE_MAILBOX",
+        raising=False,
+    )
+    bound = Mock(side_effect=AssertionError("fixed path called linear rebuild"))
+    shape = Mock(side_effect=AssertionError("fixed path called general shaper"))
+    monkeypatch.setattr(
+        native.NativePearlEngine,
+        "_bound_spec_rhythm_linear_ready",
+        bound,
+    )
+    monkeypatch.setattr(native.SpecRhythmBudgetShaper, "shape", shape)
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(9, 9, 9, 9),
+        capacity=4,
+        slo=40.0,
+        full_window=True,
+    )
+
+    result = harness.run(max_rounds=6)[0]
+    metrics = result["spec_rhythm"]
+
+    bound.assert_not_called()
+    shape.assert_not_called()
+    assert harness.proposal_batches
+    assert all(gamma == 4 for batch in harness.proposal_batches for _, gamma, _ in batch)
+    assert metrics["spec_rhythm_fixed_gamma_scheduler_fast_path"] == 1
+    assert metrics["spec_rhythm_fixed_gamma_scheduler_fast_path_cycles"] == 5
+    assert metrics["spec_rhythm_linear_rebuilt_requests"] == 0
+    assert metrics["spec_rhythm_linear_discarded_ready"] == 0
+    assert metrics["spec_rhythm_linear_invalidated_eager"] == 0
+    assert metrics["spec_rhythm_linear_discarded_unverified_tokens"] == 0
 
 
 def test_token_chunk_planner_rotates_when_cap_is_smaller_than_row_count():
@@ -459,8 +555,7 @@ def test_cross_cycle_token_chunk_prefill_is_private_until_final_chunk(
         request_chunks = [
             event
             for event in harness.events
-            if event[0] == "prefill-token-chunk"
-            and any(span[0] == index for span in event[1])
+            if event[0] == "prefill-token-chunk" and any(span[0] == index for span in event[1])
         ]
         publications.append(
             (
@@ -478,8 +573,7 @@ def test_cross_cycle_token_chunk_prefill_is_private_until_final_chunk(
     request_one_chunks = [
         event[1]
         for event in harness.events
-        if event[0] == "prefill-token-chunk"
-        and any(span[0] == 1 for span in event[1])
+        if event[0] == "prefill-token-chunk" and any(span[0] == 1 for span in event[1])
     ]
     assert request_one_chunks == [
         ((1, 0, 2, False),),
@@ -521,8 +615,7 @@ def test_partial_token_chunk_drains_safely_after_incumbent_finishes(
     request_one_chunks = [
         event[1]
         for event in harness.events
-        if event[0] == "prefill-token-chunk"
-        and any(span[0] == 1 for span in event[1])
+        if event[0] == "prefill-token-chunk" and any(span[0] == 1 for span in event[1])
     ]
     assert request_one_chunks == [
         ((1, 0, 2, False),),
@@ -569,9 +662,7 @@ def test_token_chunk_prefill_config_fails_closed():
                 "spec_rhythm_prefill_token_chunk_size": 257,
             }
         )
-    enabled = native.NativePearlConfig(
-        **{**common, "enable_prefix_caching": False}
-    )
+    enabled = native.NativePearlConfig(**{**common, "enable_prefix_caching": False})
     assert enabled.spec_rhythm_prefill_token_chunk_size == 8
 
 
@@ -634,9 +725,7 @@ def test_online_prefill_coalescing_releases_one_request_at_timeout(monkeypatch):
     assert diagnostics["spec_rhythm_prefill_coalesce_deferred_polls"] >= 1
     assert diagnostics["spec_rhythm_prefill_coalesce_timeout_releases"] >= 1
     assert diagnostics["spec_rhythm_prefill_singleton_batches"] >= 2
-    assert diagnostics[
-        "spec_rhythm_prefill_coalesce_max_wait_observed_ms"
-    ] >= 140.0
+    assert diagnostics["spec_rhythm_prefill_coalesce_max_wait_observed_ms"] >= 140.0
 
 
 def test_online_prefill_coalescing_never_delays_an_empty_service(monkeypatch):
@@ -692,9 +781,7 @@ def test_online_prefill_coalescing_preserves_tokens_and_paper_tpot_scope(
     assert [result["completion_token_ids"] for result in coalesced] == [
         result["completion_token_ids"] for result in immediate
     ]
-    assert [result["paper_tpot_ms"] for result in coalesced] == [
-        result["paper_tpot_ms"] for result in immediate
-    ]
+    assert [result["paper_tpot_ms"] for result in coalesced] == [result["paper_tpot_ms"] for result in immediate]
 
 
 def test_online_fallback_admits_arrival_before_long_incumbent_finishes(monkeypatch):
@@ -813,9 +900,7 @@ def test_fallback_last_max_round_does_not_prefill_a_replacement(monkeypatch):
 
     assert results[0]["completion_token_ids"] == [301, 888]
     assert results[1]["completion_token_ids"] == []
-    assert [event for event in harness.events if event[0] == "prefill"] == [
-        ("prefill", (0,))
-    ]
+    assert [event for event in harness.events if event[0] == "prefill"] == [("prefill", (0,))]
 
 
 def test_fallback_profile_stop_does_not_prefill_a_replacement(monkeypatch):
@@ -838,9 +923,7 @@ def test_fallback_profile_stop_does_not_prefill_a_replacement(monkeypatch):
 
     assert results[0]["completion_token_ids"] == [301, 888]
     assert results[1]["completion_token_ids"] == []
-    assert [event for event in harness.events if event[0] == "prefill"] == [
-        ("prefill", (0,))
-    ]
+    assert [event for event in harness.events if event[0] == "prefill"] == [("prefill", (0,))]
     assert harness.engine.last_worker_profiled_decode_steps == 1
 
 
@@ -905,6 +988,7 @@ def test_online_prefill_ready_selection_ignores_role_local_cache_hits(
                 state.token_ids = [100 + index] * 200
                 state.prompt_length = 200
                 state.committed_length = 200
+                state.draft_synced_length = 200
         harness.run()
         return next(event for event in harness.events if event[0] == "prefill")
 
@@ -943,9 +1027,7 @@ def test_fallback_arrival_debt_uses_post_prefill_publication_time(monkeypatch):
 
     def advance_target(input_ids, indices, positions, temperatures, **kwargs):
         wall[0] += 0.02
-        return original_target_only(
-            input_ids, indices, positions, temperatures, **kwargs
-        )
+        return original_target_only(input_ids, indices, positions, temperatures, **kwargs)
 
     harness.engine._prefill_and_sample_target_batch = delayed_prefill
     harness.engine._run_packed_sample = advance_target
@@ -989,9 +1071,7 @@ def test_new_activation_tail_starts_after_first_token_publication(monkeypatch):
     def timed_target(input_ids, indices, positions, temperatures, **kwargs):
         wall[0] += 0.02
         perf[0] += 0.02
-        return original_target_only(
-            input_ids, indices, positions, temperatures, **kwargs
-        )
+        return original_target_only(input_ids, indices, positions, temperatures, **kwargs)
 
     harness.engine._run_packed_sample = timed_target
 
@@ -1025,9 +1105,7 @@ def test_fallback_finished_row_uses_its_own_publication_endpoint(monkeypatch):
 
     def timed_target(input_ids, indices, positions, temperatures, **kwargs):
         clock[0] += 0.01
-        return original_target_only(
-            input_ids, indices, positions, temperatures, **kwargs
-        )
+        return original_target_only(input_ids, indices, positions, temperatures, **kwargs)
 
     harness.engine._run_packed_sample = timed_target
 
@@ -1039,9 +1117,7 @@ def test_fallback_finished_row_uses_its_own_publication_endpoint(monkeypatch):
 
     results = harness.run()
 
-    assert [result["observed_tpot_ms"] for result in results] == pytest.approx(
-        [10.0, 110.0]
-    )
+    assert [result["observed_tpot_ms"] for result in results] == pytest.approx([10.0, 110.0])
 
 
 def test_verification_finished_row_uses_its_own_publication_endpoint(
@@ -1160,14 +1236,8 @@ def test_terminal_staged_prefill_completes_without_consuming_decode_capacity(
     assert results[1]["accepted_draft_tokens"] == 0
     assert results[1]["verified_draft_tokens"] == 0
     assert results[1]["verification_rounds"] == 0
-    assert [delivery for delivery in deliveries if delivery[0] == 1] == [
-        (1, [302], True)
-    ]
-    assert all(
-        request_index != 1
-        for batch in harness.proposal_batches
-        for request_index, _gamma, _eager in batch
-    )
+    assert [delivery for delivery in deliveries if delivery[0] == 1] == [(1, [302], True)]
+    assert all(request_index != 1 for batch in harness.proposal_batches for request_index, _gamma, _eager in batch)
     assert [event for event in harness.events if event[0] == "prefill"][:3] == [
         ("prefill", (0,)),
         ("prefill", (1,)),
@@ -1206,9 +1276,7 @@ def test_linear_online_refill_pause_charges_only_surviving_incumbent(monkeypatch
 
     results = harness.run(continuous_batching=True)
 
-    assert [result["observed_tpot_ms"] for result in results] == pytest.approx(
-        [20.0, 160.0 / 3.0, 20.0]
-    )
+    assert [result["observed_tpot_ms"] for result in results] == pytest.approx([20.0, 160.0 / 3.0, 20.0])
     # The completed request is not charged for its replacement's prefill, and
     # the replacement itself does not inherit a pre-admission pause.
     assert results[0]["spec_rhythm"]["spec_rhythm_online_refill_ms"] == pytest.approx(100.0)
@@ -1344,11 +1412,35 @@ def test_linear_full_window_service_verifies_complete_serial_proposals(monkeypat
     assert all(result["verified_draft_tokens"] % 4 == 0 for result in results)
     assert all(result["accepted_draft_tokens"] == result["verified_draft_tokens"] for result in results)
     assert any(event[0] == "target-full-window" for event in harness.events)
-    assert all(
-        gamma == 4
-        for batch in harness.proposal_batches
-        for _, gamma, _ in batch
+    assert all(gamma == 4 for batch in harness.proposal_batches for _, gamma, _ in batch)
+
+
+def test_linear_full_window_bonus_service_commits_fifth_target_token(monkeypatch):
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(6,),
+        capacity=1,
+        full_window=True,
+        bonus_token=True,
     )
+
+    result = harness.run()[0]
+
+    assert result["completion_token_ids"] == [301, 777, 777, 777, 777, 900]
+    assert result["accepted_draft_tokens"] == 4
+    assert result["verified_draft_tokens"] == 4
+    assert harness.target_states[0].committed_completion_token_ids == [
+        301,
+        777,
+        777,
+        777,
+        777,
+        900,
+    ]
+    counters = result["spec_rhythm"]
+    assert counters["spec_rhythm_linear_bonus_eligible_rows"] == 1
+    assert counters["spec_rhythm_linear_bonus_committed_tokens"] == 1
+    assert counters["spec_rhythm_linear_bonus_suppressed_eager_rows"] == 0
 
 
 @pytest.mark.parametrize(
@@ -1541,9 +1633,7 @@ def test_linear_host_timeline_adds_no_profiling_synchronize(monkeypatch):
         "cycle_end_seconds",
     ):
         assert key in traces[1]
-    assert traces[0]["accounting_boundary_seconds"] == traces[1][
-        "cycle_start_seconds"
-    ]
+    assert traces[0]["accounting_boundary_seconds"] == traces[1]["cycle_start_seconds"]
     # The only synchronize is the pre-existing service-finalization fence.
     harness.synchronize.assert_called_once_with()
     # Active-cycle accounting carries elapsed monotonic time, the target-leader
@@ -1803,6 +1893,102 @@ def test_linear_fixed_gamma_w_eager_only_work_is_not_pinned_to_virtual_bucket_on
 
     assert window.eager_token_budget == 16
     assert len(selected) == 4
+
+
+def test_linear_fixed_gamma_w_keeps_urgent_rows_ahead_of_idle_residual_rows():
+    states = {
+        0: native.SpecRhythmRuntimeState(
+            request_index=0,
+            home_batch_id=0,
+            slo_tpot_ms=10.0,
+            delivered_tokens=1,
+            decode_elapsed_ms=100.0,
+            acceptance_ema=0.5,
+            full_acceptance_ema=0.1,
+        ),
+        1: native.SpecRhythmRuntimeState(
+            request_index=1,
+            home_batch_id=1,
+            slo_tpot_ms=1000.0,
+            delivered_tokens=10,
+            decode_elapsed_ms=1.0,
+            acceptance_ema=1.0,
+            full_acceptance_ema=1.0,
+        ),
+    }
+    estimator = native.DraftWindowEstimator(ema_alpha=1.0)
+    estimator.observe(
+        draft_compute_ms=4.0,
+        drafted_tokens=4,
+        target_verify_ms=4.0,
+        eager_work=False,
+    )
+
+    selected, _ = native._gate_linear_eager_candidates(
+        [1, 0],
+        states=states,
+        projected_wait_ms=1.0,
+        normal_request_count=0,
+        gamma=4,
+        estimator=estimator,
+        max_rows=1,
+        residual_indices=frozenset({1}),
+    )
+
+    assert selected == [0]
+
+
+def test_linear_idle_residual_eager_turns_single_home_target_only_into_continuation(
+    monkeypatch,
+):
+    clock = [0.0]
+    monkeypatch.setattr(native.time, "perf_counter", lambda: clock[0])
+    monkeypatch.setattr(native.time, "time", lambda: 100.0)
+
+    def ample_window(_self, *, normal_tokens, max_draft_tokens, eager_work=False):
+        del eager_work
+        return native.DraftWindowBudget(
+            draft_window_ms=16.0,
+            draft_ms_per_token=1.0,
+            normal_tokens=normal_tokens,
+            draft_token_budget=max_draft_tokens,
+            eager_token_budget=max_draft_tokens - normal_tokens,
+            residual_window_ms=16.0 - normal_tokens,
+            predicted_exposed_draft_ms=0.0,
+            calibrated=True,
+        )
+
+    monkeypatch.setattr(native.DraftWindowEstimator, "estimate", ample_window)
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(24,),
+        capacity=1,
+        slo=1000.0,
+        full_window=True,
+        idle_residual_eager=True,
+        remote_draft_compute_ms=4.0,
+        profile_host_steps=8,
+    )
+    original_target = harness.target_full_window
+
+    def timed_target(states, indices, payloads, *, proposal_matrix=None):
+        output = original_target(
+            states,
+            indices,
+            payloads,
+            proposal_matrix=proposal_matrix,
+        )
+        if indices:
+            clock[0] += 0.016
+        return output
+
+    harness.engine._target_full_window_outputs_batch = timed_target
+
+    results = harness.run(max_rounds=8)
+
+    counters = results[0]["spec_rhythm"]
+    assert counters["spec_rhythm_linear_idle_residual_eligible_rows"] > 0
+    assert counters["spec_rhythm_linear_idle_residual_admitted_rows"] > 0
 
 
 def test_linear_fixed_gamma_w_telemetry_and_cycle_bootstrap(monkeypatch):

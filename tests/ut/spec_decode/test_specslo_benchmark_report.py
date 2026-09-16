@@ -237,9 +237,7 @@ def test_gate_fails_closed_on_missing_runtime_environment_provenance():
     )
 
     assert report["comparability"]["passed"] is False
-    assert report["comparability"]["contract"][
-        "baseline_missing_runtime_environment"
-    ]["match"] is False
+    assert report["comparability"]["contract"]["baseline_missing_runtime_environment"]["match"] is False
 
 
 def test_gate_rejects_mislabeled_or_non_e2e_paper_goodput():
@@ -247,9 +245,7 @@ def test_gate_rejects_mislabeled_or_non_e2e_paper_goodput():
     candidate["results"][0]["slo"]["paper"]["tpot_definition"] = (
         "decode_after_first_token_ms / max(1, output_tokens - 1)"
     )
-    candidate["results"][0]["slo"]["paper"][
-        "goodput_tokens_per_e2e_second"
-    ] = 131.0
+    candidate["results"][0]["slo"]["paper"]["goodput_tokens_per_e2e_second"] = 131.0
 
     report = evaluate_gate(
         candidate,
@@ -259,12 +255,8 @@ def test_gate_rejects_mislabeled_or_non_e2e_paper_goodput():
     )
 
     assert report["comparability"]["passed"] is False
-    assert report["comparability"]["contract"][
-        "candidate_paper_tpot_definition"
-    ]["match"] is False
-    assert report["comparability"]["contract"][
-        "candidate_paper_goodput_e2e_consistent"
-    ]["match"] is False
+    assert report["comparability"]["contract"]["candidate_paper_tpot_definition"]["match"] is False
+    assert report["comparability"]["contract"]["candidate_paper_goodput_e2e_consistent"]["match"] is False
 
 
 @pytest.mark.parametrize(
@@ -319,18 +311,12 @@ def test_provenance_records_cards_environment_command_and_artifact_hashes(tmp_pa
     assert parse_visible_devices("1, 2,3,4") == ["1", "2", "3", "4"]
     assert finalized["cards"]["visible_devices"] == ["1", "2", "3", "4"]
     assert finalized["environment"]["TASK_QUEUE_ENABLE"] == "1"
-    assert (
-        "VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE"
-        in finalized["environment"]
-    )
-    assert (
-        "VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE"
-        in finalized["environment"]
-    )
-    assert (
-        "VLLM_ASCEND_SPECRHYTHM_VALIDATE_PACKED_CAUSAL_LEAKAGE"
-        in finalized["environment"]
-    )
+    assert "VLLM_ASCEND_SPECSLO_ENABLE_EXPERIMENTAL_PARD_EAGER" in finalized["environment"]
+    assert "VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE" in finalized["environment"]
+    assert "VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE" in finalized["environment"]
+    assert "VLLM_ASCEND_SPECRHYTHM_VALIDATE_PACKED_CAUSAL_LEAKAGE" in finalized["environment"]
+    assert "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_COMMON_KV" in finalized["environment"]
+    assert "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_RANKED_KV" in finalized["environment"]
     assert finalized["command"] == ["python", "benchmark.py"]
     assert finalized["git"]["revision"] == "abc123"
     assert finalized["artifacts"]["result_json_sha256"] == sha256_file(result_path)

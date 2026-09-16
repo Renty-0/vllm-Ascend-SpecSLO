@@ -23,13 +23,8 @@ from pathlib import Path
 from typing import Any
 
 PAPER_TPOT_DEFINITION = "same_decode_elapsed_ms / output_tokens"
-PAPER_GOODPUT_DEFINITION = (
-    "sum(output_tokens where paper_tpot_ms <= slo_tpot_ms) / "
-    "measured_e2e_seconds"
-)
-ONLINE_E2E_TIMING_SCOPE = (
-    "arrival origin, enqueue, worker IPC, prefill and decode; inputs pretokenized"
-)
+PAPER_GOODPUT_DEFINITION = "sum(output_tokens where paper_tpot_ms <= slo_tpot_ms) / measured_e2e_seconds"
+ONLINE_E2E_TIMING_SCOPE = "arrival origin, enqueue, worker IPC, prefill and decode; inputs pretokenized"
 
 
 CRITICAL_ENVIRONMENT = (
@@ -40,19 +35,35 @@ CRITICAL_ENVIRONMENT = (
     "OMP_NUM_THREADS",
     "OPENBLAS_NUM_THREADS",
     "VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE",
+    "VLLM_ASCEND_SPECSLO_ENABLE_EXPERIMENTAL_PARD_EAGER",
     "VLLM_ASCEND_PEARL_VERBOSE",
     "VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS",
     "VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE",
     "VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE",
+    "VLLM_ASCEND_PEARL_DRAFT_STEP_MAJOR_PA_TASK_UPDATE",
     "VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE",
     "VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE",
     "VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY",
     "VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS",
+    "VLLM_ASCEND_PEARL_SHARED_GRAPH_POOL",
     "VLLM_ASCEND_PEARL_NPU_PROFILE_DIR",
     "VLLM_ASCEND_PEARL_NPU_PROFILE_RANK",
     "VLLM_ASCEND_SPECRHYTHM_TRACE_REQUEST",
     "VLLM_ASCEND_SPECRHYTHM_TREE_GRAPH",
     "VLLM_ASCEND_SPECRHYTHM_USE_FIA",
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_BUCKET",
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_COMMON_KV",
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_RANKED_KV",
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_BATCHED_MASKS",
+    "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_STABLE_TASK_BARRIER",
+    "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_PREFILL",
+    "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH",
+    "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_MAX_TOKENS",
+    "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_BUCKETS",
+    "VLLM_ASCEND_SPECRHYTHM_MIXED_DRAFT_PREFILL",
+    "VLLM_ASCEND_SPECRHYTHM_OVERLAP_DRAFT_PREFILL",
+    "VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION",
+    "VLLM_ASCEND_SPECRHYTHM_GLOO_ACCOUNTING",
     "VLLM_ASCEND_SPECRHYTHM_VALIDATE_MAILBOX",
     "VLLM_ASCEND_SPECRHYTHM_FORCE_STEPWISE_TARGET",
     "VLLM_ASCEND_SPECRHYTHM_PACKED_TARGET",
@@ -153,14 +164,8 @@ def collect_provenance(
             "branch": _run_git(repo_path, "branch", "--show-current"),
             "dirty": bool(status),
             "status": [] if status is None or not status else status.splitlines(),
-            "tracked_diff_sha256": (
-                None if diff is None else _sha256_bytes(diff.encode("utf-8"))
-            ),
-            "staged_diff_sha256": (
-                None
-                if staged_diff is None
-                else _sha256_bytes(staged_diff.encode("utf-8"))
-            ),
+            "tracked_diff_sha256": (None if diff is None else _sha256_bytes(diff.encode("utf-8"))),
+            "staged_diff_sha256": (None if staged_diff is None else _sha256_bytes(staged_diff.encode("utf-8"))),
         },
         "cards": {
             "visible_devices_raw": visible,
@@ -313,12 +318,8 @@ def _runtime_environment_comparison(
         }
         for name in SHARED_PERFORMANCE_ENVIRONMENT
     }
-    candidate_missing = [
-        name for name in CRITICAL_ENVIRONMENT if name not in candidate_environment
-    ]
-    baseline_missing = [
-        name for name in CRITICAL_ENVIRONMENT if name not in baseline_environment
-    ]
+    candidate_missing = [name for name in CRITICAL_ENVIRONMENT if name not in candidate_environment]
+    baseline_missing = [name for name in CRITICAL_ENVIRONMENT if name not in baseline_environment]
     return comparisons, candidate_missing, baseline_missing
 
 
@@ -368,8 +369,8 @@ def evaluate_gate(
     if not 0 <= baseline_attainment <= 1:
         raise ValueError("baseline paper attainment must be in [0, 1]")
 
-    environment_report, candidate_missing_environment, baseline_missing_environment = (
-        _runtime_environment_comparison(candidate, baseline)
+    environment_report, candidate_missing_environment, baseline_missing_environment = _runtime_environment_comparison(
+        candidate, baseline
     )
 
     comparisons = {

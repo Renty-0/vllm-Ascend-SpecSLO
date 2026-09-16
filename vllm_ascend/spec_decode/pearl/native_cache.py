@@ -155,6 +155,25 @@ class NativePrefixCache:
             self._release_table(table)
         self._active_tables = None
 
+    def release_sequence(self, sequence_id: int) -> int:
+        """Release one live row while retaining the surrounding allocation.
+
+        Online serving reserves logical page-table rows for the complete
+        request trace, but physical pages only need to follow the resident
+        service batch. Clearing a completed row lets a later request reuse
+        those pages without changing either request's stable sequence ID.
+        """
+
+        if self._active_tables is None:
+            raise RuntimeError("Allocate a PEARL batch before releasing a live sequence.")
+        if not 0 <= sequence_id < len(self._active_tables):
+            raise ValueError("PEARL cache sequence ID is outside the reserved batch.")
+        table = self._active_tables[sequence_id]
+        released = sum(block_id != -1 for block_id in table)
+        self._release_table(table)
+        table[:] = [-1] * len(table)
+        return released
+
     def _release_table(self, table: list[int]) -> None:
         for block_id in table:
             if block_id == -1:
