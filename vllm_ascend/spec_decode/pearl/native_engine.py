@@ -2879,12 +2879,20 @@ class NativePearlEngine:
         if npu_profile_dir and (npu_profile_rank == -1 or self.rank == npu_profile_rank):
             import torch_npu
 
+            npu_profile_wait_steps = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS
+            if npu_profile_wait_steps < 0:
+                raise ValueError("VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS must be non-negative.")
             npu_profiler = torch_npu.profiler.profile(
                 activities=[
                     torch_npu.profiler.ProfilerActivity.CPU,
                     torch_npu.profiler.ProfilerActivity.NPU,
                 ],
-                schedule=torch_npu.profiler.schedule(wait=0, warmup=1, active=3, repeat=1),
+                schedule=torch_npu.profiler.schedule(
+                    wait=npu_profile_wait_steps,
+                    warmup=1,
+                    active=3,
+                    repeat=1,
+                ),
                 on_trace_ready=torch_npu.profiler.tensorboard_trace_handler(
                     npu_profile_dir,
                     worker_name=(f"pearl-{'draft' if self.is_draft else 'target'}-rank-{self.rank}"),
@@ -6053,12 +6061,20 @@ class NativePearlEngine:
             if npu_profile_rank == -1 or self.rank == npu_profile_rank:
                 import torch_npu
 
+                npu_profile_wait_steps = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS
+                if npu_profile_wait_steps < 0:
+                    raise ValueError("VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS must be non-negative.")
                 npu_profiler = torch_npu.profiler.profile(
                     activities=[
                         torch_npu.profiler.ProfilerActivity.CPU,
                         torch_npu.profiler.ProfilerActivity.NPU,
                     ],
-                    schedule=torch_npu.profiler.schedule(wait=0, warmup=1, active=3, repeat=1),
+                    schedule=torch_npu.profiler.schedule(
+                        wait=npu_profile_wait_steps,
+                        warmup=1,
+                        active=3,
+                        repeat=1,
+                    ),
                     on_trace_ready=torch_npu.profiler.tensorboard_trace_handler(
                         npu_profile_dir,
                         worker_name=(f"spec-rhythm-{'draft' if self.is_draft else 'target'}-rank-{self.rank}"),

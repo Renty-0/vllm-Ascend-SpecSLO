@@ -38,6 +38,12 @@ env_variables: dict[str, Callable[[], Any]] = {
         if "VLLM_ASCEND_PEARL_NPU_PROFILE_RANK" in os.environ
         else None
     ),
+    # Skip this many worker decode cycles before the profiler's own warmup
+    # and active windows.  Online service traces need this to exclude initial
+    # pipeline-fill cycles and capture steady-state draft/target concurrency.
+    "VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS": lambda: int(
+        os.getenv("VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS", "0")
+    ),
     # PEARL/SpecSLO experimental diagnostics and compatibility switches.
     # All are non-sensitive. Production defaults keep diagnostics disabled
     # and select the native packed-tree/ACLGraph route.
