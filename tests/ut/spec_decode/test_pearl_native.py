@@ -40,6 +40,7 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
     _build_greedy_verdict,
     _build_greedy_verdict_cpu,
     _build_greedy_verdict_with_layout,
+    _can_reuse_rank_local_greedy_verdict,
     _build_parser,
     _build_stochastic_verdict,
     _build_verification_layout,
@@ -94,6 +95,33 @@ from vllm_ascend.spec_decode.pearl.native_model import (
 from vllm_ascend.spec_decode.pearl.spec_rhythm import SpecRhythmProposalTicket
 from vllm_ascend.spec_decode.pearl.topology import PearlTopology
 from vllm_ascend.spec_decode.pearl.tree import build_tree_speculation_plan, pack_selected_tree_plan
+
+
+@pytest.mark.parametrize("gamma", [2, 3])
+def test_generic_full_window_verdict_uses_target_leader_authority(gamma):
+    assert not _can_reuse_rank_local_greedy_verdict(
+        [0.0, 0.0],
+        gamma=gamma,
+        linear_full_window=True,
+    )
+
+
+def test_fixed_gamma4_full_window_may_reuse_rank_local_verdict():
+    assert _can_reuse_rank_local_greedy_verdict(
+        [0.0, 0.0],
+        gamma=4,
+        linear_full_window=True,
+    )
+    assert not _can_reuse_rank_local_greedy_verdict(
+        [0.0, 0.1],
+        gamma=4,
+        linear_full_window=True,
+    )
+    assert not _can_reuse_rank_local_greedy_verdict(
+        [0.0, 0.0],
+        gamma=4,
+        linear_full_window=False,
+    )
 
 
 def test_selected_tree_uses_causal_fast_path_only_for_a_contiguous_spine():

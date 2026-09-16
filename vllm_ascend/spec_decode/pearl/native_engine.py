@@ -146,6 +146,28 @@ FIXED_FULL_WINDOW_HOST_STAGING_VALUES = (
 )
 
 
+def _can_reuse_rank_local_greedy_verdict(
+    temperatures: Sequence[float],
+    *,
+    gamma: int,
+    linear_full_window: bool,
+) -> bool:
+    """Return whether target TP ranks may safely consume local verdicts.
+
+    Only the fixed-width gamma-4 full-window kernel has an exact replicated
+    verdict contract across target ranks.  The generic layout verdict can
+    observe rank-local token differences at numerical boundaries, so its
+    result must be published authoritatively by the target leader even for
+    greedy sampling.
+    """
+
+    return bool(
+        linear_full_window
+        and gamma == FIXED_GREEDY_FULL_WINDOW_WIDTH
+        and all(temperature == 0 for temperature in temperatures)
+    )
+
+
 @dataclass
 class _FixedFullWindowHostCorrectionStaging:
     """Persistent device/host storage for one fixed-gamma correction round."""
@@ -3059,7 +3081,11 @@ class NativePearlEngine:
             decode_phase_seconds["verify"] += phase_elapsed
             if profile_this_round and not self.is_draft:
                 decode_profile_seconds["target_verdict"] += phase_elapsed
-            replicated_target_verdict = all(temperature == 0 for temperature in temperatures)
+            replicated_target_verdict = _can_reuse_rank_local_greedy_verdict(
+                temperatures,
+                gamma=self.gamma,
+                linear_full_window=self.config.spec_rhythm_linear_full_window,
+            )
             if profile_this_round:
                 if replicated_target_verdict:
                     participates_in_correction = self.rank in self.topology.correction_ranks
@@ -7814,7 +7840,11 @@ class NativePearlEngine:
                         for row, payload in enumerate(target_payloads):
                             current_next[row, : payload.ticket.gamma] = payload.next_tokens
                 assert current_next is not None
-                replicated_target_verdict = all(temperature == 0 for temperature in temperatures)
+                replicated_target_verdict = _can_reuse_rank_local_greedy_verdict(
+                    temperatures,
+                    gamma=self.gamma,
+                    linear_full_window=linear_full_window,
+                )
                 if profile_this_round:
                     if replicated_target_verdict:
                         participates_in_correction = self.rank in self.topology.correction_ranks
