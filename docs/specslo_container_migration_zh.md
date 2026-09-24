@@ -67,6 +67,12 @@ SPECSLO_MANIFEST_DIR=/path/to/manifest \
   bash tools/specslo_migration/create_portable_archives.sh /path/on/external/storage/chunks 4G
 bash tools/specslo_migration/verify_portable_archives.sh /path/on/external/storage/chunks
 bash tools/specslo_migration/restore_portable_archive.sh /path/to/chunks root-data /
+
+# 单独生成全部已完成模型、历史 trace/log 和离线 Triton LLVM；不重复核心包：
+SPECSLO_INCLUDE_CORE=0 SPECSLO_INCLUDE_CODEX=0 \
+SPECSLO_INCLUDE_PRIVATE_CONFIG=0 SPECSLO_INCLUDE_COMPLETE_MODELS=1 \
+SPECSLO_INCLUDE_FORENSIC_LOGS=1 SPECSLO_INCLUDE_OFFLINE_TOOLCHAIN=1 \
+  bash tools/specslo_migration/create_portable_archives.sh /path/on/external/storage/large-chunks 4G
 ```
 
 `capture_manifest.sh` 会为三个 dirty repo 保存 Git bundle、binary patch 和状态，但不复制
@@ -80,6 +86,13 @@ portable archive 默认分开保存 `/root/data`、Miniconda、项目数据集�
 Qwen2.5-0.5B/Qwen2.5-14B 四个关键模型。设置 `SPECSLO_MANIFEST_DIR` 可把已经验证的
 manifest 一并打包。每个分卷以及 `ARCHIVE_INDEX.tsv` 都记录在 `SHA256SUMS` 中；校验脚本
 同时检查分卷连续性、zstd 完整性和 tar 可遍历性。
+
+`SPECSLO_INCLUDE_COMPLETE_MODELS=1` 会保存 `/data/shared-models` 中所有已完成模型，但跳过
+只有 `.incomplete` 权重的 Llama-3.1-70B/Llama-3.2-1B 下载残片；不要与
+`SPECSLO_INCLUDE_KEY_MODELS=1` 同时启用。`SPECSLO_INCLUDE_FORENSIC_LOGS=1` 单独保存
+不可再生的 `/root/ascend` 历史 trace/log；`SPECSLO_INCLUDE_OFFLINE_TOOLCHAIN=1` 保存可选的
+Triton LLVM 离线工具链。通过 `SPECSLO_INCLUDE_CORE=0`、`SPECSLO_INCLUDE_CODEX=0` 和
+`SPECSLO_INCLUDE_PRIVATE_CONFIG=0` 可生成不重复核心包的大文件归档。
 
 即使归档输出位于 `/tmp`，它仍与 `/root`、`/data` 同属当前服务器，只能作为临时 staging。
 服务器清空前必须把 `chunks/` 整体复制到异机 SSH 目录、对象存储或用户本地磁盘，并在

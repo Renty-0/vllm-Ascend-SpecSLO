@@ -13,6 +13,15 @@ cp /etc/os-release "$output_dir/os-release"
 df -hT > "$output_dir/filesystems.txt"
 findmnt -o TARGET,SOURCE,FSTYPE,OPTIONS > "$output_dir/mounts.txt"
 
+if command -v rpm >/dev/null 2>&1; then
+    rpm -qa --qf '%{NAME}\t%{VERSION}-%{RELEASE}\t%{ARCH}\n' \
+        | sort > "$output_dir/system-rpm-packages.tsv"
+fi
+if command -v dpkg-query >/dev/null 2>&1; then
+    dpkg-query -W -f='${binary:Package}\t${Version}\t${Architecture}\n' \
+        | sort > "$output_dir/system-dpkg-packages.tsv"
+fi
+
 if command -v npu-smi >/dev/null 2>&1; then
     npu-smi info > "$output_dir/npu-smi-info.txt" 2>&1 || true
 fi
@@ -63,7 +72,8 @@ done
 # File-size manifests are intentionally cheap enough to refresh repeatedly.
 # Large model hashes are generated separately because reading 171+ GB on every
 # capture would interfere with active experiments.
-for root in /root/data /data/shared-models /data/datasets; do
+for root in /root/data /root/ascend /root/.triton/llvm \
+    /data/shared-models /data/datasets; do
     if [[ -d "$root" ]]; then
         name=${root#/}
         name=${name//\//-}
