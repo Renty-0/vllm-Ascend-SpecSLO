@@ -63,8 +63,28 @@
 bash tools/specslo_migration/capture_manifest.sh /path/on/external/storage/manifest
 bash tools/specslo_migration/verify_manifest.sh /path/on/external/storage/manifest
 bash tools/specslo_migration/restore_environment.sh /path/to/manifest
+SPECSLO_MANIFEST_DIR=/path/to/manifest \
+  bash tools/specslo_migration/create_portable_archives.sh /path/on/external/storage/chunks 4G
+bash tools/specslo_migration/verify_portable_archives.sh /path/on/external/storage/chunks
+bash tools/specslo_migration/restore_portable_archive.sh /path/to/chunks root-data /
 ```
 
 `capture_manifest.sh` 会为三个 dirty repo 保存 Git bundle、binary patch 和状态，但不复制
 未跟踪大文件或模型权重；大文件必须通过可断点续传工具
 （推荐 `rsync --partial --append-verify` 或对象存储 multipart upload）单独传出服务器。
+portable archive 默认分开保存 `/root/data`、Miniconda、项目数据集、Codex 状态和私密配置，
+并用临时目录生成后再原子发布分卷。输出目录不能放进任何待归档目录内。
+`codex-state` 包含会话历史和 `auth.json`，`private-config` 包含 SSH key；两者都只能通过
+加密私有通道传输并加密落盘，恢复时应确认不会覆盖新容器已有凭据。设置
+`SPECSLO_INCLUDE_KEY_MODELS=1` 可额外打包 Qwen3-0.6B/Qwen3-32B 和
+Qwen2.5-0.5B/Qwen2.5-14B 四个关键模型。设置 `SPECSLO_MANIFEST_DIR` 可把已经验证的
+manifest 一并打包。每个分卷以及 `ARCHIVE_INDEX.tsv` 都记录在 `SHA256SUMS` 中；校验脚本
+同时检查分卷连续性、zstd 完整性和 tar 可遍历性。
+
+即使归档输出位于 `/tmp`，它仍与 `/root`、`/data` 同属当前服务器，只能作为临时 staging。
+服务器清空前必须把 `chunks/` 整体复制到异机 SSH 目录、对象存储或用户本地磁盘，并在
+异机再次运行 `verify_portable_archives.sh`。不能只保留当前机器上的压缩包。
+
+该方案保存项目源码、实验数据、用户态环境和必要配置，不等同于完整容器镜像：它不会保存
+宿主机 driver、完整 CANN 安装、全部 `/etc`、可重建 cache、只读 `/data/shared_datasets`
+或未明确选择的全部共享模型。新容器仍须按 manifest 记录匹配系统 ABI 并执行回归验证。
