@@ -37,7 +37,9 @@ from vllm_ascend.spec_decode.pearl.mc2 import (
     detect_mc2_capability,
     matmul_allreduce_add_rmsnorm_or_fallback,
     normalize_mc2_profile,
+    reset_mc2_dispatch_counters,
     resolve_hccl_comm_name,
+    snapshot_mc2_dispatch_counters,
 )
 from vllm_ascend.spec_decode.pearl.protocol import (
     PearlProposalBatch,
@@ -130,7 +132,9 @@ __all__ = [
     "detect_mc2_capability",
     "matmul_allreduce_add_rmsnorm_or_fallback",
     "normalize_mc2_profile",
+    "reset_mc2_dispatch_counters",
     "resolve_hccl_comm_name",
+    "snapshot_mc2_dispatch_counters",
     "TreeKVCompactionPlan",
     "build_tree_kv_compaction_plan",
     "move_kv_cache_slots",

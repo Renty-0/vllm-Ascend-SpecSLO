@@ -9,7 +9,8 @@ import operator
 import os
 import time
 import warnings
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from dataclasses import dataclass, replace
 from types import SimpleNamespace
@@ -203,6 +204,13 @@ class NativeACLGraphEntry:
     # a small consecutive set of independently captured single-op handles.
     # The default of one preserves the production per-layer event contract.
     task_event_group_size: int = 1
+    # A shorter first group lets replay start before the steady-state FIA
+    # update grain without changing any single-op graph-task handle.
+    task_event_prefix_group_size: int = 0
+    # The generic graph family can also serve stepwise draft calls.  Only an
+    # explicitly captured device-position PagedAttention entry may omit CANN
+    # graph-task handles.
+    taskless_device_attention: bool = False
 
 
 @dataclass
@@ -234,6 +242,11 @@ class NativeDraftACLGraphEntry:
     # remain unchanged for the complete lifetime of this entry.
     stable_task_barrier: bool = False
     stable_task_barrier_event: Any | None = None
+    # Empty captured attention-task lists are valid only for the explicit
+    # device-position PagedAttention backend.  Record that fact at capture so
+    # a collector regression cannot later masquerade as a taskless replay and
+    # silently skip required CANN graph-task updates.
+    taskless_device_attention: bool = False
 
 
 @dataclass
@@ -265,6 +278,7 @@ _CAPTURED_FIA_WORKSPACES: dict[tuple[Any, ...], torch.Tensor] | None = None
 _CAPTURED_STABLE_TASK_BARRIER = False
 _CAPTURED_STABLE_TASK_BARRIER_EVENT: Any | None = None
 _CAPTURED_TASK_EVENT_GROUP_SIZE = 1
+_CAPTURED_TASK_EVENT_PREFIX_GROUP_SIZE = 0
 _CAPTURED_TASK_EVENT_GROUP_INDEX = 0
 _CAPTURED_TASK_EVENT_GROUP_EVENT: Any | None = None
 
@@ -276,16 +290,21 @@ def _collect_graph_tasks(
     *,
     stable_task_barrier: bool = False,
     task_event_group_size: int = 1,
+    task_event_prefix_group_size: int = 0,
 ):
     global _CAPTURED_FIA_WORKSPACES, _CAPTURED_PA_WORKSPACES, _CAPTURED_STABLE_TASK_BARRIER
     global _CAPTURED_STABLE_TASK_BARRIER_EVENT, _CAPTURED_TASKS
     global _CAPTURED_TASK_EVENT_GROUP_EVENT, _CAPTURED_TASK_EVENT_GROUP_INDEX
-    global _CAPTURED_TASK_EVENT_GROUP_SIZE
+    global _CAPTURED_TASK_EVENT_GROUP_SIZE, _CAPTURED_TASK_EVENT_PREFIX_GROUP_SIZE
     if _CAPTURED_TASKS is not None:
         raise RuntimeError("Nested native PEARL ACLGraph capture is not supported.")
     if task_event_group_size not in TARGET_FIA_TASK_EVENT_GROUP_SIZES:
         raise ValueError("ACLGraph task event group size must be 1, 2, or 4.")
-    if stable_task_barrier and task_event_group_size != 1:
+    if task_event_prefix_group_size not in (0, 1, 2):
+        raise ValueError("ACLGraph task event prefix group size must be 0, 1, or 2.")
+    if task_event_prefix_group_size and task_event_prefix_group_size >= task_event_group_size:
+        raise ValueError("ACLGraph task event prefix group must be smaller than the steady group.")
+    if stable_task_barrier and (task_event_group_size != 1 or task_event_prefix_group_size):
         raise ValueError("A stable-task barrier cannot also use grouped task events.")
     tasks: list[NativePagedAttentionGraphTask | NativeFusedInferAttentionGraphTask] = []
     _CAPTURED_TASKS = tasks
@@ -298,6 +317,7 @@ def _collect_graph_tasks(
     _CAPTURED_STABLE_TASK_BARRIER = bool(stable_task_barrier)
     _CAPTURED_STABLE_TASK_BARRIER_EVENT = None
     _CAPTURED_TASK_EVENT_GROUP_SIZE = task_event_group_size
+    _CAPTURED_TASK_EVENT_PREFIX_GROUP_SIZE = task_event_prefix_group_size
     _CAPTURED_TASK_EVENT_GROUP_INDEX = 0
     _CAPTURED_TASK_EVENT_GROUP_EVENT = None
     try:
@@ -309,6 +329,7 @@ def _collect_graph_tasks(
         _CAPTURED_STABLE_TASK_BARRIER = False
         _CAPTURED_STABLE_TASK_BARRIER_EVENT = None
         _CAPTURED_TASK_EVENT_GROUP_SIZE = 1
+        _CAPTURED_TASK_EVENT_PREFIX_GROUP_SIZE = 0
         _CAPTURED_TASK_EVENT_GROUP_INDEX = 0
         _CAPTURED_TASK_EVENT_GROUP_EVENT = None
 
@@ -332,12 +353,19 @@ def _capture_graph_task_event(stream: torch.npu.Stream) -> Any:
             event.reset(stream)
             _CAPTURED_STABLE_TASK_BARRIER_EVENT = event
         return event
+    task_index = _CAPTURED_TASK_EVENT_GROUP_INDEX
+    prefix_size = _CAPTURED_TASK_EVENT_PREFIX_GROUP_SIZE
     if _CAPTURED_TASK_EVENT_GROUP_SIZE == 1:
         event = torch.npu.ExternalEvent()
         event.wait(stream)
         event.reset(stream)
+        _CAPTURED_TASK_EVENT_GROUP_INDEX += 1
         return event
-    if _CAPTURED_TASK_EVENT_GROUP_INDEX % _CAPTURED_TASK_EVENT_GROUP_SIZE == 0:
+    relative_index = task_index if not prefix_size or task_index < prefix_size else task_index - prefix_size
+    starts_group = task_index == 0 or (
+        task_index >= prefix_size and relative_index % _CAPTURED_TASK_EVENT_GROUP_SIZE == 0
+    )
+    if starts_group:
         event = torch.npu.ExternalEvent()
         event.wait(stream)
         event.reset(stream)
@@ -640,6 +668,7 @@ class NativeACLGraphRunner:
         max_graph_tokens: int = 512,
         max_graph_entries: int = DEFAULT_MAX_ACLGRAPH_ENTRIES,
         update_stream_priority: int | None = None,
+        is_target_worker: bool = False,
     ) -> None:
         if max_graph_entries <= 0:
             raise ValueError("Native PEARL max_graph_entries must be positive.")
@@ -658,11 +687,46 @@ class NativeACLGraphRunner:
         target_fia_task_event_group_size = int(envs.VLLM_ASCEND_PEARL_TARGET_FIA_TASK_EVENT_GROUP_SIZE)
         if target_fia_task_event_group_size not in TARGET_FIA_TASK_EVENT_GROUP_SIZES:
             raise ValueError("VLLM_ASCEND_PEARL_TARGET_FIA_TASK_EVENT_GROUP_SIZE must be 1, 2, or 4.")
+        target_fia_task_prefix_event_group_size = int(envs.VLLM_ASCEND_PEARL_TARGET_FIA_TASK_PREFIX_EVENT_GROUP_SIZE)
+        if target_fia_task_prefix_event_group_size not in (0, 1, 2):
+            raise ValueError("VLLM_ASCEND_PEARL_TARGET_FIA_TASK_PREFIX_EVENT_GROUP_SIZE must be 0, 1, or 2.")
+        if (
+            target_fia_task_prefix_event_group_size
+            and target_fia_task_prefix_event_group_size >= target_fia_task_event_group_size
+        ):
+            raise ValueError(
+                "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_PREFIX_EVENT_GROUP_SIZE "
+                "must be smaller than TARGET_FIA_TASK_EVENT_GROUP_SIZE."
+            )
         self.update_stream = torch.npu.Stream(priority=update_stream_priority) if enabled else None
+        target_fia_task_update_workers = int(envs.VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS)
+        if target_fia_task_update_workers not in (1, 2, 4):
+            raise ValueError("VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS must be 1, 2, or 4.")
+        self.target_fia_task_update_workers = target_fia_task_update_workers if enabled and is_target_worker else 1
+        self._target_fia_parallel_streams = (
+            [self.update_stream]
+            + [
+                torch.npu.Stream(priority=update_stream_priority)
+                for _ in range(self.target_fia_task_update_workers - 1)
+            ]
+            if self.update_stream is not None
+            else []
+        )
+        self._target_fia_update_executor = (
+            ThreadPoolExecutor(
+                max_workers=self.target_fia_task_update_workers,
+                thread_name_prefix="pearl-target-fia-update",
+            )
+            if self.target_fia_task_update_workers > 1
+            else None
+        )
         self.shared_graph_pool_enabled = bool(enabled and envs.VLLM_ASCEND_PEARL_SHARED_GRAPH_POOL)
         self.graph_pool = torch.npu.graph_pool_handle() if self.shared_graph_pool_enabled else None
         self.update_stream_priority = update_stream_priority
         self.target_fia_task_event_group_size = target_fia_task_event_group_size
+        self.target_fia_task_prefix_event_group_size = target_fia_task_prefix_event_group_size
+        self.target_fia_parallel_update_replays = 0
+        self.target_fia_parallel_update_tasks = 0
         # ``capture_attempt_count`` is cumulative telemetry.  Capacity is a
         # separate lifetime guard so an offline profiler can explicitly
         # release one measured shape and reopen exactly those resident slots
@@ -688,6 +752,8 @@ class NativeACLGraphRunner:
         self.pa_workspace_cache_hits = 0
         self.draft_step_major_pa_replays = 0
         self.draft_step_major_pa_fallback_replays = 0
+        self.generic_taskless_replays = 0
+        self.draft_taskless_replays = 0
         self.draft_stable_task_barrier_records = 0
         self._pa_workspace_structure_ids: dict[tuple[Any, ...], int] = {}
         self.pa_task_update_profiled_tasks = 0
@@ -711,6 +777,14 @@ class NativeACLGraphRunner:
             }
             for kind in ("generic", "draft", "target")
         }
+        # Keep replay-shape telemetry in host-only dictionaries.  Generic
+        # graphs are the steady target path used by SpecRhythm, while the
+        # dedicated target family is still used by multi-step target calls.
+        # ``token_rows`` is the physical model input M seen by every replayed
+        # graph step (capture-size padding included), which is the dimension
+        # needed to assess shape-gated kernels such as MC2.
+        self.replay_entry_key_histograms: dict[str, dict[Any, int]] = {kind: {} for kind in ("generic", "target")}
+        self.replay_token_rows_histograms: dict[str, dict[int, int]] = {kind: {} for kind in ("generic", "target")}
         self.disabled_entry_keys: set[tuple[str, int]] = set()
         self.expected_fia_batch_size: int | None = None
         self.last_fia_shape: tuple[int, ...] = ()
@@ -842,6 +916,9 @@ class NativeACLGraphRunner:
         kind: str,
         execution: NativeGraphExecution,
         output: Any,
+        *,
+        entry_key: Any | None = None,
+        token_rows: Sequence[int] = (),
     ) -> Any:
         """Record the returned execution path exactly once per public call."""
         if kind not in self.execution_counters:
@@ -853,6 +930,12 @@ class NativeACLGraphRunner:
             counters["capture_replay_calls"] += 1
         elif execution.mode == "replay":
             counters["replay_calls"] += 1
+            if entry_key is not None and kind in self.replay_entry_key_histograms:
+                entry_histogram = self.replay_entry_key_histograms[kind]
+                entry_histogram[entry_key] = entry_histogram.get(entry_key, 0) + 1
+                token_histogram = self.replay_token_rows_histograms[kind]
+                for rows in token_rows:
+                    token_histogram[rows] = token_histogram.get(rows, 0) + 1
         elif execution.mode == "eager":
             counters["eager_fallback_calls"] += 1
             if execution.fallback_reason == "disabled_entry":
@@ -876,8 +959,8 @@ class NativeACLGraphRunner:
         counters["runtime_validation_failures"] += int(failed)
         self.runtime_validation_replay_count += 1
 
-    def graph_execution_metrics(self) -> dict[str, int]:
-        """Return stable, flat per-path counters for benchmark auditing."""
+    def graph_execution_metrics(self) -> dict[str, Any]:
+        """Return stable per-path counters and replay histograms for auditing."""
         metrics = {
             f"{kind}_{name}": value
             for kind, counters in self.execution_counters.items()
@@ -892,6 +975,17 @@ class NativeACLGraphRunner:
         metrics.update(
             {f"{kind}_task_update_tasks": self.task_update_task_counts[kind] for kind in self.task_update_task_counts}
         )
+        for kind in self.replay_entry_key_histograms:
+            metrics[f"{kind}_replay_entry_key_histogram"] = {
+                repr(entry_key): count
+                for entry_key, count in sorted(
+                    self.replay_entry_key_histograms[kind].items(),
+                    key=lambda item: repr(item[0]),
+                )
+            }
+            metrics[f"{kind}_replay_token_rows_histogram"] = {
+                str(rows): count for rows, count in sorted(self.replay_token_rows_histograms[kind].items())
+            }
         metrics.update(
             {
                 "pa_workspace_host_key_tasks": self.pa_workspace_host_key_tasks,
@@ -900,10 +994,16 @@ class NativeACLGraphRunner:
                 "pa_workspace_cache_hits": self.pa_workspace_cache_hits,
                 "draft_step_major_pa_replays": (self.draft_step_major_pa_replays),
                 "draft_step_major_pa_fallback_replays": (self.draft_step_major_pa_fallback_replays),
+                "generic_taskless_replays": self.generic_taskless_replays,
+                "draft_taskless_replays": self.draft_taskless_replays,
                 "draft_stable_task_barrier_records": (self.draft_stable_task_barrier_records),
                 "pa_task_update_profiled_tasks": self.pa_task_update_profiled_tasks,
                 "graph_update_stream_priority": self.update_stream_priority,
                 "target_fia_task_event_group_size": (self.target_fia_task_event_group_size),
+                "target_fia_task_prefix_event_group_size": (self.target_fia_task_prefix_event_group_size),
+                "target_fia_task_update_workers": self.target_fia_task_update_workers,
+                "target_fia_parallel_update_replays": self.target_fia_parallel_update_replays,
+                "target_fia_parallel_update_tasks": self.target_fia_parallel_update_tasks,
                 **{
                     f"pa_task_update_host_{phase}_ns": elapsed_ns
                     for phase, elapsed_ns in self.pa_task_update_host_ns.items()
@@ -1144,8 +1244,9 @@ class NativeACLGraphRunner:
         graph_key: str,
         expected_tokens: int,
         expected_request_segments: int,
+        real_tokens: int | None = None,
     ) -> torch.Tensor:
-        """Replay one qualified exact stable-FIA graph from persistent buffers.
+        """Replay one qualified stable-FIA graph from persistent buffers.
 
         This is deliberately narrower than :meth:`run_stable_fia_greedy`.
         It is a sealed-service fast path for the exact decode-only
@@ -1168,7 +1269,12 @@ class NativeACLGraphRunner:
                 "Persistent stable-FIA staging is restricted to the exact target-verification service family."
             )
         if expected_tokens <= 0 or expected_request_segments <= 0:
-            raise ValueError("Exact stable-FIA token and request counts must be positive.")
+            raise ValueError("Stable-FIA token and request counts must be positive.")
+        if real_tokens is None:
+            real_tokens = expected_tokens
+        real_tokens = operator.index(real_tokens)
+        if not 0 < real_tokens <= expected_tokens:
+            raise ValueError("Stable-FIA real token count must fit the captured token capacity.")
         output_kind = f"greedy:{vocabulary_size}"
         entry_key = (
             f"{output_kind}|fia-stable:{graph_key}",
@@ -1232,7 +1338,7 @@ class NativeACLGraphRunner:
             )
         if (
             input_ids.ndim != 1
-            or tuple(input_ids.shape) != (expected_tokens,)
+            or tuple(input_ids.shape) != (real_tokens,)
             or input_ids.dtype != entry.input_ids.dtype
             or input_ids.device != entry.input_ids.device
             or tuple(entry.positions.shape) != (expected_tokens,)
@@ -1242,7 +1348,7 @@ class NativeACLGraphRunner:
             or entry.request_block_tables.ndim != 2
             or entry.request_block_tables.shape[0] != expected_request_segments
         ):
-            raise ValueError("Exact stable-FIA staged tensors do not match the qualified entry.")
+            raise ValueError("Stable-FIA staged tensors do not match the qualified entry.")
         if (
             not torch.is_tensor(cache_block_tables)
             or cache_block_tables.ndim != 2
@@ -1287,7 +1393,10 @@ class NativeACLGraphRunner:
             segment_ids,
             "segment_sequence_ids",
         )
-        entry.input_ids.copy_(input_ids)
+        # Qualification leaves valid dummy token ids in the suffix.  Service
+        # updates only the real prefix, avoiding a padding allocation/cat on
+        # every replay while scratch KV routing isolates the retained suffix.
+        entry.input_ids[:real_tokens].copy_(input_ids)
         entry.positions.copy_(entry.stable_positions_cpu, non_blocking=True)
         entry.slot_mapping.copy_(
             entry.stable_slot_mapping_cpu,
@@ -1533,6 +1642,7 @@ class NativeACLGraphRunner:
         *,
         valid_row_count: int | None = None,
         final_kv_only: bool = False,
+        return_confidence: bool = False,
         graph_lane: int | None = None,
         stable_task_barrier: bool = False,
     ) -> torch.Tensor:
@@ -1563,6 +1673,7 @@ class NativeACLGraphRunner:
                 attention_metadatas,
                 vocabulary_size,
                 final_kv_only=final_kv_only,
+                return_confidence=return_confidence,
             )
             return self._record_execution("draft", execution, output)
         attention_modes = [metadata.use_fused_infer_attention for metadata in attention_metadatas]
@@ -1582,6 +1693,7 @@ class NativeACLGraphRunner:
                 attention_metadatas,
                 vocabulary_size,
                 final_kv_only=final_kv_only,
+                return_confidence=return_confidence,
             )
             return self._record_execution("draft", execution, output)
         tree_fia_modes = [
@@ -1635,11 +1747,12 @@ class NativeACLGraphRunner:
         else:
             attention_key = "paged"
         final_kv_key = "|final-kv" if final_kv_only else ""
+        confidence_key = "|confidence" if return_confidence else ""
         lane_key = "" if graph_lane is None else f"|lane:{graph_lane}"
         barrier_key = f"|stable-task-barrier|kv-cap:{stable_sequence_lens[0]}" if stable_task_barrier else ""
         entry_key = (
             f"draft-greedy:{vocabulary_size}|steps:{len(positions)}|"
-            f"{attention_key}{final_kv_key}{lane_key}{barrier_key}",
+            f"{attention_key}{final_kv_key}{confidence_key}{lane_key}{barrier_key}",
             input_ids.shape[0],
         )
         self.last_draft_entry_key = entry_key
@@ -1652,6 +1765,7 @@ class NativeACLGraphRunner:
                 attention_metadatas,
                 vocabulary_size,
                 final_kv_only=final_kv_only,
+                return_confidence=return_confidence,
             )
             return self._record_execution("draft", execution, output)
         entry = self.draft_entries.get(entry_key)
@@ -1669,6 +1783,7 @@ class NativeACLGraphRunner:
                     attention_metadatas,
                     vocabulary_size,
                     final_kv_only=final_kv_only,
+                    return_confidence=return_confidence,
                 )
                 return self._record_execution("draft", execution, output)
             self.capture_attempt_count += 1
@@ -1681,6 +1796,7 @@ class NativeACLGraphRunner:
                 vocabulary_size,
                 valid_row_count=valid_row_count,
                 final_kv_only=final_kv_only,
+                return_confidence=return_confidence,
                 stable_task_barrier=stable_task_barrier,
             )
             return self._record_execution("draft", self.last_draft_execution, output)
@@ -1706,19 +1822,33 @@ class NativeACLGraphRunner:
             self._raise_if_graph_cache_sealed("draft", "unvalidated_entry", entry_key)
         if logical_row_expansion:
             self._raise_if_graph_cache_sealed("draft", "logical_row_expansion", entry_key)
-        assert self.update_stream is not None
         current_stream = torch.npu.current_stream()
         inline_update = envs.VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE
         replay_first_update = envs.VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE
-        if inline_update and replay_first_update:
+        taskless_device_attention = self._validate_draft_attention_task_contract(entry)
+        if not taskless_device_attention and inline_update and replay_first_update:
             raise RuntimeError(
                 "VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE and "
                 "VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE are "
                 "mutually exclusive."
             )
-        copy_done_event = self._draft_replay_first_copy_event(entry) if replay_first_update else None
+        if not taskless_device_attention:
+            assert self.update_stream is not None
+        copy_done_event = (
+            self._draft_replay_first_copy_event(entry)
+            if replay_first_update and not taskless_device_attention
+            else None
+        )
         self._copy_draft_inputs(entry, input_ids, positions, attention_metadatas)
-        if replay_first_update:
+        if taskless_device_attention:
+            # Device-position PagedAttention has no host-valued CANN task ABI
+            # and therefore captures no ExternalEvent/handle pairs.  Input
+            # copies and graph replay share the current stream, so routing an
+            # empty update through the auxiliary stream only adds a needless
+            # cross-stream dependency to every serial draft window.
+            entry.graph.replay()
+            self.draft_taskless_replays += 1
+        elif replay_first_update:
             assert copy_done_event is not None
             try:
                 copy_done_event.record(current_stream)
@@ -1792,9 +1922,9 @@ class NativeACLGraphRunner:
             # also protects CANN's graph-task metadata between consecutive
             # multi-step draft replays.
             current_stream.wait_stream(self.update_stream)
-        if not replay_first_update:
+        if not replay_first_update and not taskless_device_attention:
             entry.graph.replay()
-        if not task_lengths_unchanged:
+        if not task_lengths_unchanged and not taskless_device_attention:
             self._record_task_update("draft", len(entry.tasks))
         self.replay_count += 1
         execution = NativeGraphExecution("replay", replay_executed=True)
@@ -1807,6 +1937,7 @@ class NativeACLGraphRunner:
                 attention_metadatas,
                 vocabulary_size,
                 final_kv_only=final_kv_only,
+                return_confidence=return_confidence,
             )
             torch.npu.synchronize()
             validation_failed = not self._draft_outputs_match(
@@ -2031,7 +2162,13 @@ class NativeACLGraphRunner:
                 reference_metadatas=reference_metadatas,
                 output_kind=output_kind,
             )
-            return self._record_execution("target", self.last_target_execution, output)
+            return self._record_execution(
+                "target",
+                self.last_target_execution,
+                output,
+                entry_key=entry_key,
+                token_rows=step_sizes,
+            )
         if not entry.runtime_validated:
             self._raise_if_graph_cache_sealed("target", "unvalidated_entry", entry_key)
         task_lengths_unchanged = entry.actual_seq_lengths_q == tuple(
@@ -2098,9 +2235,21 @@ class NativeACLGraphRunner:
                     RuntimeWarning,
                     stacklevel=2,
                 )
-                return self._record_execution("target", execution, reference_outputs)
+                return self._record_execution(
+                    "target",
+                    execution,
+                    reference_outputs,
+                    entry_key=entry_key,
+                    token_rows=step_sizes,
+                )
             entry.runtime_validated = True
-        return self._record_execution("target", execution, entry.outputs)
+        return self._record_execution(
+            "target",
+            execution,
+            entry.outputs,
+            entry_key=entry_key,
+            token_rows=step_sizes,
+        )
 
     def _execute_target(
         self,
@@ -2462,8 +2611,10 @@ class NativeACLGraphRunner:
         vocabulary_size: int,
         *,
         final_kv_only: bool = False,
+        return_confidence: bool = False,
     ) -> torch.Tensor:
         outputs = []
+        confidence_outputs = []
         step_input = input_ids
         final_step = len(positions) - 1
         for step, (step_positions, metadata) in enumerate(zip(positions, attention_metadatas)):
@@ -2475,9 +2626,28 @@ class NativeACLGraphRunner:
                 # Keep that transformer/KV write in the graph but avoid a
                 # 151K-vocabulary LM-head projection and argmax.
                 continue
-            step_input = self.model.compute_greedy_tokens(hidden_states, vocabulary_size)
+            if return_confidence:
+                step_input, step_confidence = self.model.compute_greedy_tokens_with_confidence(
+                    hidden_states,
+                    vocabulary_size,
+                )
+                # A single long tensor keeps ACLGraph capture/replay and the
+                # compact HCCL proposal on one fixed-shape output contract.
+                # One-part-per-million precision is ample for scheduler
+                # ranking and avoids a second graph output/collective.
+                confidence_outputs.append(
+                    torch.round(step_confidence.float().clamp(0.0, 1.0) * 1_000_000).to(torch.long)
+                )
+            else:
+                step_input = self.model.compute_greedy_tokens(hidden_states, vocabulary_size)
             outputs.append(step_input)
-        return torch.stack(outputs, dim=1)
+        token_output = torch.stack(outputs, dim=1)
+        if not return_confidence:
+            return token_output
+        return torch.stack(
+            (token_output, torch.stack(confidence_outputs, dim=1)),
+            dim=-1,
+        )
 
     @staticmethod
     def _draft_outputs_match(
@@ -2498,7 +2668,8 @@ class NativeACLGraphRunner:
         if (
             graph_output.shape != reference_output.shape
             or graph_output.dtype != reference_output.dtype
-            or graph_output.ndim != 2
+            or graph_output.ndim not in (2, 3)
+            or (graph_output.ndim == 3 and graph_output.shape[2] != 2)
             or len(attention_metadatas) != graph_output.shape[1]
         ):
             return False
@@ -2529,6 +2700,7 @@ class NativeACLGraphRunner:
         *,
         valid_row_count: int,
         final_kv_only: bool = False,
+        return_confidence: bool = False,
         stable_task_barrier: bool = False,
     ) -> torch.Tensor:
         reference_output = self._execute_draft(
@@ -2537,6 +2709,7 @@ class NativeACLGraphRunner:
             attention_metadatas,
             vocabulary_size,
             final_kv_only=final_kv_only,
+            return_confidence=return_confidence,
         ).clone()
         torch.npu.synchronize()
         captured_input_ids = input_ids.clone()
@@ -2595,10 +2768,17 @@ class NativeACLGraphRunner:
                 captured_metadatas,
                 vocabulary_size,
                 final_kv_only=final_kv_only,
+                return_confidence=return_confidence,
             )
         if len(tasks) % len(captured_metadatas):
             raise RuntimeError("Draft ACLGraph attention tasks do not divide evenly across proposal steps.")
         tasks_per_step = len(tasks) // len(captured_metadatas)
+        taskless_device_attention = self._draft_uses_device_position_attention(captured_metadatas)
+        if taskless_device_attention and tasks:
+            graph.reset()
+            raise RuntimeError(
+                "Device-position PagedAttention draft capture unexpectedly produced refreshable attention tasks."
+            )
         stable_task_barrier_event = None
         if stable_task_barrier:
             if not tasks:
@@ -2631,27 +2811,31 @@ class NativeACLGraphRunner:
             validated_real_row_count=valid_row_count,
             stable_task_barrier=stable_task_barrier,
             stable_task_barrier_event=stable_task_barrier_event,
+            taskless_device_attention=taskless_device_attention,
         )
         self.draft_entries[entry_key] = entry
         current_stream = torch.npu.current_stream()
         current_stream.synchronize()
-        assert self.update_stream is not None
-        if envs.VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE:
-            if stable_task_barrier:
-                self._refresh_draft_stable_task_barrier(
-                    entry,
-                    stream=current_stream,
-                )
+        if not taskless_device_attention:
+            assert self.update_stream is not None
+            if envs.VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE:
+                if stable_task_barrier:
+                    self._refresh_draft_stable_task_barrier(
+                        entry,
+                        stream=current_stream,
+                    )
+                else:
+                    self._update_draft_attention_tasks(entry, stream=current_stream)
             else:
-                self._update_draft_attention_tasks(entry, stream=current_stream)
-        else:
-            self.update_stream.wait_stream(current_stream)
-            if stable_task_barrier:
-                self._refresh_draft_stable_task_barrier(entry)
-            else:
-                self._update_draft_attention_tasks(entry)
-            current_stream.wait_stream(self.update_stream)
+                self.update_stream.wait_stream(current_stream)
+                if stable_task_barrier:
+                    self._refresh_draft_stable_task_barrier(entry)
+                else:
+                    self._update_draft_attention_tasks(entry)
+                current_stream.wait_stream(self.update_stream)
         entry.graph.replay()
+        if taskless_device_attention:
+            self.draft_taskless_replays += 1
         torch.npu.synchronize()
         if not self._draft_outputs_match(
             output,
@@ -2738,6 +2922,53 @@ class NativeACLGraphRunner:
                 or entry.sequence_lens[step] != metadata.sequence_lens
             ):
                 return True
+        return False
+
+    def _draft_uses_device_position_attention(
+        self,
+        attention_metadatas: Sequence[Any],
+    ) -> bool:
+        """Identify the only draft graph contract allowed to own zero tasks."""
+
+        if not attention_metadatas or any(
+            bool(getattr(metadata, "use_fused_infer_attention", False))
+            or getattr(metadata, "attention_mask", None) is not None
+            for metadata in attention_metadatas
+        ):
+            return False
+        try:
+            layers = tuple(self.model.layers)
+        except (AttributeError, TypeError):
+            return False
+        if not layers:
+            return False
+        attention_layers = tuple(getattr(layer, "self_attn", None) for layer in layers)
+        return all(
+            attention is not None
+            and bool(getattr(attention, "uses_paged_attention", False))
+            and bool(getattr(attention, "use_device_paged_attention", False))
+            for attention in attention_layers
+        )
+
+    @staticmethod
+    def _validate_draft_attention_task_contract(entry: NativeDraftACLGraphEntry) -> bool:
+        """Fail closed when an empty task list lacks an explicit device PA origin."""
+
+        taskless_device_attention = getattr(entry, "taskless_device_attention", False) is True
+        task_count = len(entry.tasks)
+        step_count = len(entry.positions)
+        tasks_per_step = int(entry.tasks_per_step)
+        if taskless_device_attention:
+            if task_count or tasks_per_step:
+                raise RuntimeError(
+                    "Taskless device-position PagedAttention draft entry unexpectedly owns attention tasks."
+                )
+            return True
+        if tasks_per_step <= 0 or task_count != step_count * tasks_per_step:
+            raise RuntimeError(
+                "Draft ACLGraph has missing attention-task metadata and is not an explicit "
+                "device-position PagedAttention entry."
+            )
         return False
 
     @staticmethod
@@ -2927,17 +3158,29 @@ class NativeACLGraphRunner:
                             f"Draft ACLGraph step {step} FULL mask does not cover its FIA query/KV lengths."
                         )
             elif actual_q:
-                # Paged attention may append zero-length graph padding rows.
+                # Paged attention appends finite one-token graph padding
+                # rows.  They reuse a live page table but keep slot_mapping
+                # at -1, so replay can read a valid KV prefix without writing
+                # request state.  Zero-length rows are deliberately rejected:
+                # Ascend PA may emit NaN for them at large graph buckets.
                 # Packed requests retain one KV length per query segment;
                 # one-token/request draft batches instead retain one length
-                # per captured row, including that zero suffix.
+                # per captured row, including that read-only suffix.
+                taskless_device_attention = getattr(entry, "taskless_device_attention", False) is True
+                if taskless_device_attention and (
+                    actual_q != tuple(range(1, len(actual_q) + 1)) or len(sequence_lens) != input_row_count
+                ):
+                    raise RuntimeError(
+                        f"Draft ACLGraph step {step} device-position PagedAttention "
+                        "requires one KV length per real or padded row."
+                    )
                 if len(sequence_lens) not in (
                     len(actual_q),
                     input_row_count,
                 ) or any(length <= 0 for length in sequence_lens[: len(actual_q)]):
                     raise RuntimeError(f"Draft ACLGraph step {step} paged-attention query/KV lengths do not align.")
-                if any(length != 0 for length in sequence_lens[len(actual_q) :]):
-                    raise RuntimeError(f"Draft ACLGraph step {step} padded KV lengths must be zero.")
+                if any(length != 1 for length in sequence_lens[len(actual_q) :]):
+                    raise RuntimeError(f"Draft ACLGraph step {step} padded KV lengths must be one.")
             new_query_partitions.append(actual_q)
             new_kv_lengths.append(sequence_lens)
 
@@ -3049,6 +3292,8 @@ class NativeACLGraphRunner:
                 "generic",
                 self.last_generic_execution,
                 output[:num_tokens],
+                entry_key=entry_key,
+                token_rows=(capture_size,),
             )
         if _graph_owned_entry is not None:
             if entry is not _graph_owned_entry:
@@ -3089,13 +3334,18 @@ class NativeACLGraphRunner:
         current_stream = torch.npu.current_stream()
         inline_update = envs.VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE
         replay_first_update = envs.VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE
-        if inline_update and replay_first_update:
+        taskless_device_attention = self._validate_generic_attention_task_contract(entry)
+        if not taskless_device_attention and inline_update and replay_first_update:
             raise RuntimeError(
                 "VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE and "
                 "VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE are "
                 "mutually exclusive."
             )
-        copy_done_event = self._generic_replay_first_copy_event(entry) if replay_first_update else None
+        copy_done_event = (
+            self._generic_replay_first_copy_event(entry)
+            if replay_first_update and not taskless_device_attention
+            else None
+        )
         if _graph_owned_entry is None:
             self._copy_inputs(
                 entry,
@@ -3112,32 +3362,55 @@ class NativeACLGraphRunner:
             entry.sequence_lens = padded_metadata.sequence_lens
         if envs.VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS:
             current_stream.synchronize()
-        # Order task updates after the previous replay and the current input
-        # copies. CANN releases a replay early when updates are issued on an
-        # auxiliary stream, so an inline mode is available for runtimes where
-        # ExternalEvent visibility is not sufficient for multi-token PA.
-        assert self.update_stream is not None
-        if replay_first_update:
-            assert copy_done_event is not None
-            try:
-                copy_done_event.record(current_stream)
-                # The update stream cannot touch graph-owned metadata until
-                # this replay's input copies and the preceding current-stream
-                # replay have completed.  The graph itself then waits on each
-                # captured task event (or explicitly configured FIA event
-                # group) while its prefix overlaps host-side task refreshes.
-                self.update_stream.wait_event(copy_done_event)
-            except Exception as exc:
-                raise RuntimeError(
-                    "Generic target ACLGraph replay-first dependency setup failed before graph submission."
-                ) from exc
-            try:
-                entry.graph.replay()
-            except Exception as exc:
-                raise RuntimeError(
-                    "Generic target ACLGraph replay-first graph submission failed before attention-task update."
-                ) from exc
-            try:
+        if taskless_device_attention:
+            # Device-position PA consumes graph-owned tensors on the current
+            # stream and owns no CANN host-literal task handles or events.
+            entry.graph.replay()
+            self.generic_taskless_replays += 1
+        else:
+            # Order task updates after the previous replay and the current
+            # input copies. CANN releases a replay early when updates are issued
+            # on an auxiliary stream, so inline mode remains available where
+            # ExternalEvent visibility is insufficient for multi-token PA.
+            assert self.update_stream is not None
+            if replay_first_update:
+                assert copy_done_event is not None
+                try:
+                    copy_done_event.record(current_stream)
+                    # The update stream cannot touch graph-owned metadata until
+                    # this replay's input copies and preceding replay complete.
+                    self.update_stream.wait_event(copy_done_event)
+                except Exception as exc:
+                    raise RuntimeError(
+                        "Generic target ACLGraph replay-first dependency setup failed before graph submission."
+                    ) from exc
+                try:
+                    entry.graph.replay()
+                except Exception as exc:
+                    raise RuntimeError(
+                        "Generic target ACLGraph replay-first graph submission failed before attention-task update."
+                    ) from exc
+                try:
+                    if task_lengths_unchanged:
+                        self._record_attention_task_events(
+                            entry,
+                            self.update_stream,
+                        )
+                        self.task_update_skip_replay_count += 1
+                    else:
+                        self._update_attention_tasks(entry)
+                except Exception as exc:
+                    # The submitted graph may already be waiting on one of its
+                    # captured ExternalEvents.  Eager fallback could observe
+                    # partial KV writes or stale outputs, so terminate this
+                    # worker instead of returning unknown-provenance output.
+                    raise RuntimeError(
+                        "Generic target ACLGraph replay-first attention-task "
+                        "update failed after graph submission; the runner cannot "
+                        "safely fall back for this replay."
+                    ) from exc
+            elif not inline_update:
+                self.update_stream.wait_stream(current_stream)
                 if task_lengths_unchanged:
                     self._record_attention_task_events(
                         entry,
@@ -3146,42 +3419,23 @@ class NativeACLGraphRunner:
                     self.task_update_skip_replay_count += 1
                 else:
                     self._update_attention_tasks(entry)
-            except Exception as exc:
-                # The submitted graph may already be waiting on one of its
-                # captured ExternalEvents.  Eager fallback could observe
-                # partial KV writes or stale outputs, so terminate this worker
-                # instead of returning a result with unknown provenance.
-                raise RuntimeError(
-                    "Generic target ACLGraph replay-first attention-task "
-                    "update failed after graph submission; the runner cannot "
-                    "safely fall back for this replay."
-                ) from exc
-        elif not inline_update:
-            self.update_stream.wait_stream(current_stream)
-            if task_lengths_unchanged:
-                self._record_attention_task_events(
-                    entry,
-                    self.update_stream,
-                )
-                self.task_update_skip_replay_count += 1
             else:
-                self._update_attention_tasks(entry)
-        else:
-            if task_lengths_unchanged:
-                self._record_attention_task_events(entry, current_stream)
-                self.task_update_skip_replay_count += 1
-            else:
-                self._update_attention_tasks(entry, stream=current_stream)
-        if not inline_update and not replay_first_update:
-            # Attention task updates are issued on the auxiliary stream. The
-            # reverse dependency prevents replay from consuming old metadata.
-            current_stream.wait_stream(self.update_stream)
-        if not inline_update and envs.VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE:
-            self.update_stream.synchronize()
-        if not task_lengths_unchanged:
-            self._record_task_update("generic", len(entry.tasks))
-        if not replay_first_update:
-            entry.graph.replay()
+                if task_lengths_unchanged:
+                    self._record_attention_task_events(entry, current_stream)
+                    self.task_update_skip_replay_count += 1
+                else:
+                    self._update_attention_tasks(entry, stream=current_stream)
+            if not inline_update and not replay_first_update:
+                # Attention task updates are issued on the auxiliary stream.
+                # The reverse dependency prevents replay from consuming old
+                # metadata.
+                current_stream.wait_stream(self.update_stream)
+            if not inline_update and envs.VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE:
+                self.update_stream.synchronize()
+            if not task_lengths_unchanged:
+                self._record_task_update("generic", len(entry.tasks))
+            if not replay_first_update:
+                entry.graph.replay()
         self.replay_count += 1
         execution = NativeGraphExecution("replay", replay_executed=True)
         if envs.VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY:
@@ -3217,7 +3471,13 @@ class NativeACLGraphRunner:
                     RuntimeWarning,
                     stacklevel=2,
                 )
-                return self._record_execution("generic", execution, reference_output)
+                return self._record_execution(
+                    "generic",
+                    execution,
+                    reference_output,
+                    entry_key=entry_key,
+                    token_rows=(capture_size,),
+                )
             entry.runtime_validated = True
             entry.validated_real_row_count = max(
                 validated_real_row_count,
@@ -3254,8 +3514,20 @@ class NativeACLGraphRunner:
                     RuntimeWarning,
                     stacklevel=2,
                 )
-                return self._record_execution("generic", execution, replay_reference)
-        return self._record_execution("generic", execution, entry.output[:num_tokens])
+                return self._record_execution(
+                    "generic",
+                    execution,
+                    replay_reference,
+                    entry_key=entry_key,
+                    token_rows=(capture_size,),
+                )
+        return self._record_execution(
+            "generic",
+            execution,
+            entry.output[:num_tokens],
+            entry_key=entry_key,
+            token_rows=(capture_size,),
+        )
 
     def _is_reusable_fia_shape(self, actual_seq_lengths_q: tuple[int, ...]) -> bool:
         if not actual_seq_lengths_q:
@@ -3294,7 +3566,14 @@ class NativeACLGraphRunner:
             dtype=attention_metadata.slot_mapping.dtype,
             device=attention_metadata.slot_mapping.device,
         )
-        padded_context_lens = torch.zeros(capture_size, dtype=attention_metadata.context_lens.dtype)
+        # A zero-length PA row is not a harmless no-op on every Ascend
+        # attention kernel: large graph buckets can produce NaN for those
+        # dummy rows, which then (correctly) trips the model-wide finite
+        # guards even though all logical rows are healthy.  Give every dummy
+        # row a finite, read-only one-token context instead.  Reusing the
+        # first live page is safe because ``slot_mapping`` stays -1, so the
+        # padding rows never write KV state.
+        padded_context_lens = torch.ones(capture_size, dtype=attention_metadata.context_lens.dtype)
         padded_block_tables = torch.zeros(
             (capture_size, attention_metadata.block_tables.shape[1]),
             dtype=attention_metadata.block_tables.dtype,
@@ -3306,6 +3585,8 @@ class NativeACLGraphRunner:
         padded_slot_mapping[:num_tokens].copy_(attention_metadata.slot_mapping)
         padded_context_lens[:num_tokens].copy_(attention_metadata.context_lens)
         padded_block_tables[:num_tokens].copy_(attention_metadata.block_tables)
+        if pad_size and num_tokens:
+            padded_block_tables[num_tokens:].copy_(attention_metadata.block_tables[0])
         metadata_updates = {
             "slot_mapping": padded_slot_mapping,
             "context_lens": padded_context_lens,
@@ -3314,7 +3595,8 @@ class NativeACLGraphRunner:
         # A fixed-gamma PA draft has exactly one query token per request, so
         # its request-level ``sequence_lens`` tuple is also the exact host-side
         # value of the per-token ``context_lens`` tensor.  Preserve that tuple
-        # and append zero-length dummy requests when graph bucketing pads rows.
+        # and append finite, read-only one-token dummy requests when graph
+        # bucketing pads rows.
         # Packed multi-token PA does not satisfy this invariant and deliberately
         # retains its original request-level tuple for the safe fallback below.
         sequence_lens = tuple(getattr(attention_metadata, "sequence_lens", ()))
@@ -3328,7 +3610,7 @@ class NativeACLGraphRunner:
         ):
             metadata_updates["sequence_lens"] = (
                 *sequence_lens,
-                *((0,) * pad_size),
+                *((1,) * pad_size),
             )
         if hasattr(attention_metadata, "__dataclass_fields__"):
             padded_metadata = replace(attention_metadata, **metadata_updates)
@@ -3392,11 +3674,13 @@ class NativeACLGraphRunner:
         )
         exact_target_verification = "|fia-stable:stable-target-verify-hidden|" in entry_key[0]
         task_event_group_size = self.target_fia_task_event_group_size if exact_target_verification else 1
+        task_event_prefix_group_size = self.target_fia_task_prefix_event_group_size if exact_target_verification else 0
         graph = torch.npu.NPUGraph()
         with (
             _collect_graph_tasks(
                 fia_workspaces=self._fia_workspace_pool,
                 task_event_group_size=task_event_group_size,
+                task_event_prefix_group_size=task_event_prefix_group_size,
             ) as tasks,
             torch.npu.graph(graph, pool=self.graph_pool),
         ):
@@ -3406,7 +3690,17 @@ class NativeACLGraphRunner:
                 captured_metadata,
                 output_transform,
             )
-        self._validate_task_event_groups(tasks, task_event_group_size)
+        self._validate_task_event_groups(
+            tasks,
+            task_event_group_size,
+            task_event_prefix_group_size,
+        )
+        taskless_device_attention = self._draft_uses_device_position_attention((captured_metadata,))
+        if taskless_device_attention and tasks:
+            graph.reset()
+            raise RuntimeError(
+                "Device-position PagedAttention generic capture unexpectedly produced refreshable attention tasks."
+            )
         entry = NativeACLGraphEntry(
             input_ids=captured_input_ids,
             positions=captured_positions,
@@ -3422,6 +3716,8 @@ class NativeACLGraphRunner:
             attention_mask=captured_attention_mask,
             validated_real_row_count=valid_row_count,
             task_event_group_size=task_event_group_size,
+            task_event_prefix_group_size=task_event_prefix_group_size,
+            taskless_device_attention=taskless_device_attention,
         )
         if exact_target_verification:
             self._provision_stable_fia_staging(entry, attention_metadata)
@@ -3431,14 +3727,17 @@ class NativeACLGraphRunner:
         # host metadata and replay once before serving the triggering request.
         current_stream = torch.npu.current_stream()
         current_stream.synchronize()
-        assert self.update_stream is not None
-        if envs.VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE:
-            self._update_attention_tasks(entry, stream=current_stream)
-        else:
-            self.update_stream.wait_stream(current_stream)
-            self._update_attention_tasks(entry)
-            current_stream.wait_stream(self.update_stream)
+        if not taskless_device_attention:
+            assert self.update_stream is not None
+            if envs.VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE:
+                self._update_attention_tasks(entry, stream=current_stream)
+            else:
+                self.update_stream.wait_stream(current_stream)
+                self._update_attention_tasks(entry)
+                current_stream.wait_stream(self.update_stream)
         entry.graph.replay()
+        if taskless_device_attention:
+            self.generic_taskless_replays += 1
         torch.npu.synchronize()
         graph_matches_eager = self._outputs_match(output, reference_output)
         if not graph_matches_eager:
@@ -3475,6 +3774,24 @@ class NativeACLGraphRunner:
         if graph_output.dtype.is_floating_point:
             return torch.allclose(graph_output, reference_output, rtol=1e-3, atol=1e-3)
         return torch.equal(graph_output, reference_output)
+
+    @staticmethod
+    def _validate_generic_attention_task_contract(entry: NativeACLGraphEntry) -> bool:
+        """Return the explicit taskless mode or reject a missing task list."""
+
+        taskless_device_attention = getattr(entry, "taskless_device_attention", False) is True
+        if taskless_device_attention:
+            if entry.tasks:
+                raise RuntimeError(
+                    "Taskless device-position PagedAttention generic entry unexpectedly owns attention tasks."
+                )
+            return True
+        if not entry.tasks:
+            raise RuntimeError(
+                "Generic ACLGraph has no attention-task metadata and is not an explicit "
+                "device-position PagedAttention entry."
+            )
+        return False
 
     @staticmethod
     def _mismatch_summary(graph_output: torch.Tensor, reference_output: torch.Tensor) -> str:
@@ -3559,19 +3876,55 @@ class NativeACLGraphRunner:
         return group_size
 
     @staticmethod
+    def _task_event_prefix_group_size(
+        entry: NativeACLGraphEntry,
+        group_size: int,
+    ) -> int:
+        prefix_size = getattr(entry, "task_event_prefix_group_size", 0)
+        if not isinstance(prefix_size, int):
+            return 0
+        if prefix_size not in (0, 1, 2) or (prefix_size and prefix_size >= group_size):
+            raise RuntimeError(f"An ACLGraph entry has an unsupported task event prefix group size: {prefix_size}.")
+        return prefix_size
+
+    @staticmethod
+    def _task_event_group_ranges(
+        task_count: int,
+        group_size: int,
+        prefix_size: int = 0,
+    ) -> list[range]:
+        if task_count < 0 or group_size not in TARGET_FIA_TASK_EVENT_GROUP_SIZES:
+            raise RuntimeError("Invalid ACLGraph task-event grouping contract.")
+        if prefix_size not in (0, 1, 2) or (prefix_size and prefix_size >= group_size):
+            raise RuntimeError("Invalid ACLGraph task-event prefix grouping contract.")
+        groups: list[range] = []
+        start = 0
+        if prefix_size and task_count:
+            groups.append(range(0, min(prefix_size, task_count)))
+            start = min(prefix_size, task_count)
+        groups.extend(
+            range(offset, min(offset + group_size, task_count)) for offset in range(start, task_count, group_size)
+        )
+        return groups
+
+    @staticmethod
     def _validate_task_event_groups(
         tasks: list[NativePagedAttentionGraphTask | NativeFusedInferAttentionGraphTask],
         group_size: int,
+        prefix_size: int = 0,
     ) -> None:
-        if group_size == 1:
+        if group_size == 1 and not prefix_size:
             return
         if not tasks or any(not isinstance(task, NativeFusedInferAttentionGraphTask) for task in tasks):
             raise RuntimeError("Grouped ACLGraph task events require a non-empty FIA-only task list.")
         previous_event = None
-        for start in range(0, len(tasks), group_size):
-            event = tasks[start].event
-            group_end = min(start + group_size, len(tasks))
-            if any(task.event is not event for task in tasks[start:group_end]):
+        for group in NativeACLGraphRunner._task_event_group_ranges(
+            len(tasks),
+            group_size,
+            prefix_size,
+        ):
+            event = tasks[group.start].event
+            if any(tasks[index].event is not event for index in group):
                 raise RuntimeError("ACLGraph FIA tasks in one event group do not share their captured ExternalEvent.")
             if event is previous_event:
                 raise RuntimeError("Adjacent ACLGraph FIA task event groups unexpectedly share one ExternalEvent.")
@@ -3583,9 +3936,14 @@ class NativeACLGraphRunner:
         stream: torch.npu.Stream,
     ) -> None:
         group_size = self._task_event_group_size(entry)
-        self._validate_task_event_groups(entry.tasks, group_size)
-        for start in range(0, len(entry.tasks), group_size):
-            entry.tasks[start].event.record(stream)
+        prefix_size = self._task_event_prefix_group_size(entry, group_size)
+        self._validate_task_event_groups(entry.tasks, group_size, prefix_size)
+        for group in self._task_event_group_ranges(
+            len(entry.tasks),
+            group_size,
+            prefix_size,
+        ):
+            entry.tasks[group.start].event.record(stream)
 
     def _update_attention_tasks(
         self,
@@ -3599,6 +3957,10 @@ class NativeACLGraphRunner:
             task_lengths,
             stream=stream,
             event_group_size=self._task_event_group_size(entry),
+            event_prefix_group_size=self._task_event_prefix_group_size(
+                entry,
+                self._task_event_group_size(entry),
+            ),
         )
 
     def _update_draft_attention_tasks(
@@ -3712,7 +4074,10 @@ class NativeACLGraphRunner:
                 or actual_q != tuple(range(1, real_rows + 1))
                 or len(sequence_lens) != context_rows
                 or any(value <= 0 for value in sequence_lens[:real_rows])
-                or any(value != 0 for value in sequence_lens[real_rows:])
+                # Graph padding reuses one finite, read-only KV row.  A zero
+                # length can make Ascend PA emit NaN at larger buckets, so the
+                # padding contract is an exact length-one suffix.
+                or any(value != 1 for value in sequence_lens[real_rows:])
                 or any(int(task.context_lens.numel()) != context_rows for task in typed_group)
             ):
                 return False
@@ -3787,6 +4152,127 @@ class NativeACLGraphRunner:
         ]
         self._update_attention_task_list(entry.tasks, task_lengths)
 
+    def _update_fia_task_chunk(
+        self,
+        tasks: list[NativeFusedInferAttentionGraphTask],
+        task_lengths: list[tuple[list[int], list[int]]],
+        task_indices: Sequence[int],
+        stream: torch.npu.Stream,
+        event_group_ends: frozenset[int],
+    ) -> None:
+        """Refresh complete FIA event groups on one NPU update stream."""
+
+        if not task_indices:
+            return
+        torch.npu.set_device(tasks[0].query.device)
+        with torch.npu.stream(stream):
+            for task_index in task_indices:
+                task = tasks[task_index]
+                actual_seq_lengths_q, sequence_lens = task_lengths[task_index]
+                record_event = task_index in event_group_ends
+                self._update_fused_infer_attention_task(
+                    task,
+                    actual_seq_lengths_q,
+                    sequence_lens,
+                    stream=stream,
+                    profile_host=False,
+                    record_event=record_event,
+                )
+
+    def _try_parallel_fia_task_update(
+        self,
+        tasks: list[NativePagedAttentionGraphTask | NativeFusedInferAttentionGraphTask],
+        task_lengths: list[tuple[tuple[int, ...], tuple[int, ...]]],
+        *,
+        update_stream: torch.npu.Stream,
+        record_events: bool,
+        event_group_size: int,
+        event_prefix_group_size: int,
+    ) -> bool:
+        """Refresh independent target FIA handles concurrently when qualified.
+
+        CANN captures one refreshable handle per decoder layer.  Rebuilding
+        those handles is host dominated and does not execute model compute.
+        Each worker owns a disjoint handle set and NPU stream; the primary
+        update stream joins every secondary stream before the caller permits
+        graph replay.  Any mixed PA/tree task family stays on the serial path.
+        """
+
+        executor = self._target_fia_update_executor
+        worker_count = self.target_fia_task_update_workers
+        if (
+            executor is None
+            or worker_count <= 1
+            or not record_events
+            or len(tasks) < worker_count
+            or len(tasks) != len(task_lengths)
+            or any(not isinstance(task, NativeFusedInferAttentionGraphTask) or task.tree_attention for task in tasks)
+        ):
+            return False
+        typed_tasks = [task for task in tasks if isinstance(task, NativeFusedInferAttentionGraphTask)]
+        length_cache: dict[
+            tuple[tuple[int, ...], tuple[int, ...]],
+            tuple[list[int], list[int]],
+        ] = {}
+        materialized_lengths: list[tuple[list[int], list[int]]] = []
+        for lengths in task_lengths:
+            pair = length_cache.get(lengths)
+            if pair is None:
+                pair = (list(lengths[0]), list(lengths[1]))
+                length_cache[lengths] = pair
+            materialized_lengths.append(pair)
+
+        streams = self._target_fia_parallel_streams
+        if len(streams) != worker_count or streams[0] is not update_stream:
+            raise RuntimeError("Parallel target FIA update streams are inconsistent.")
+        for stream in streams[1:]:
+            stream.wait_stream(update_stream)
+        groups = self._task_event_group_ranges(
+            len(typed_tasks),
+            event_group_size,
+            event_prefix_group_size,
+        )
+        event_group_ends = frozenset(group.stop - 1 for group in groups)
+        partitions = [
+            tuple(index for group in groups[worker::worker_count] for index in group) for worker in range(worker_count)
+        ]
+        if any(not partition for partition in partitions):
+            return False
+        # With one event per task, submitting every stream to the persistent
+        # pool remains faster on 910B.  Grouped events make the per-worker
+        # chunks coarse enough that handling stream zero in the caller avoids
+        # a future dispatch and wins measurably.  In both cases a complete
+        # event group stays on one stream, so its final record releases only
+        # handles that have all been refreshed.
+        caller_owns_primary = event_group_size > 1
+        first_background_worker = 1 if caller_owns_primary else 0
+        futures = [
+            executor.submit(
+                self._update_fia_task_chunk,
+                typed_tasks,
+                materialized_lengths,
+                partitions[worker],
+                streams[worker],
+                event_group_ends,
+            )
+            for worker in range(first_background_worker, worker_count)
+        ]
+        if caller_owns_primary:
+            self._update_fia_task_chunk(
+                typed_tasks,
+                materialized_lengths,
+                partitions[0],
+                streams[0],
+                event_group_ends,
+            )
+        for future in futures:
+            future.result()
+        for stream in streams[1:]:
+            update_stream.wait_stream(stream)
+        self.target_fia_parallel_update_replays += 1
+        self.target_fia_parallel_update_tasks += len(tasks)
+        return True
+
     def _update_attention_task_list(
         self,
         tasks: list[NativePagedAttentionGraphTask | NativeFusedInferAttentionGraphTask],
@@ -3795,6 +4281,7 @@ class NativeACLGraphRunner:
         stream: torch.npu.Stream | None = None,
         record_events: bool = True,
         event_group_size: int = 1,
+        event_prefix_group_size: int = 0,
     ) -> None:
         update_stream = stream or self.update_stream
         assert update_stream is not None
@@ -3802,7 +4289,28 @@ class NativeACLGraphRunner:
             raise RuntimeError("ACLGraph attention tasks and replay metadata differ in length.")
         if event_group_size not in TARGET_FIA_TASK_EVENT_GROUP_SIZES:
             raise RuntimeError("ACLGraph task event group size must be 1, 2, or 4.")
-        self._validate_task_event_groups(tasks, event_group_size)
+        self._validate_task_event_groups(
+            tasks,
+            event_group_size,
+            event_prefix_group_size,
+        )
+        if self._try_parallel_fia_task_update(
+            tasks,
+            task_lengths,
+            update_stream=update_stream,
+            record_events=record_events,
+            event_group_size=event_group_size,
+            event_prefix_group_size=event_prefix_group_size,
+        ):
+            return
+        event_group_ends = frozenset(
+            group.stop - 1
+            for group in self._task_event_group_ranges(
+                len(tasks),
+                event_group_size,
+                event_prefix_group_size,
+            )
+        )
         fia_length_lists: dict[
             tuple[tuple[int, ...], tuple[int, ...]],
             tuple[list[int], list[int]],
@@ -3817,9 +4325,7 @@ class NativeACLGraphRunner:
                 task,
                 (actual_seq_lengths_q, sequence_lens),
             ) in enumerate(zip(tasks, task_lengths)):
-                record_task_event = record_events and (
-                    event_group_size == 1 or (task_index + 1) % event_group_size == 0 or task_index + 1 == len(tasks)
-                )
+                record_task_event = record_events and task_index in event_group_ends
                 if isinstance(task, NativeFusedInferAttentionGraphTask):
                     profile_host = self.profile_pa_task_update
                     phase_started = time.perf_counter_ns() if profile_host else 0
@@ -3846,7 +4352,8 @@ class NativeACLGraphRunner:
                 # For a one-token-per-request PA call, cumulative query lengths
                 # are exactly 1..N.  In that case ``sequence_lens`` was derived
                 # from the same Python positions as the CPU ``context_lens``
-                # tensor, and graph padding appends zeros to both.  Reuse this
+                # tensor, and graph padding appends finite length-one rows.
+                # Reuse this
                 # immutable host tuple instead of converting the identical CPU
                 # tensor once per layer (112 conversions for gamma=4/Qwen3).
                 # Multi-token packed PA cannot use the request-level tuple and
@@ -3868,7 +4375,7 @@ class NativeACLGraphRunner:
                         and actual_seq_lengths_q == tuple(range(1, real_request_count + 1))
                         and len(sequence_lens) == context_tensor_rows
                         and all(value > 0 for value in sequence_lens[:real_request_count])
-                        and all(value == 0 for value in sequence_lens[real_request_count:])
+                        and all(value == 1 for value in sequence_lens[real_request_count:])
                     )
                     context_length_key = (
                         sequence_lens

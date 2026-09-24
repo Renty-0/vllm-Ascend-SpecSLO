@@ -12,14 +12,15 @@ for choosing the safe ordering and for keeping the control plane (ticket order,
 verification sizes, and gamma) identical on every participating rank.
 
 Unlike the self-describing SpecRhythm mailbox, the compact envelope carries no
-per-row routing metadata or confidence values.  It is therefore suitable only
-for deterministic greedy execution after both sides have agreed on a
+per-row routing metadata.  It is therefore suitable only for deterministic
+greedy execution after both sides have agreed on a
 ``CompactFixedGreedyEnvelopeLayout``.  Mailbox validation and dynamic-gamma
 execution must continue to use the self-describing envelope.
 """
 
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 from numbers import Integral
 from typing import Any
@@ -49,6 +50,7 @@ class CompactFixedGreedyEnvelopeLayout:
     verification_sizes: tuple[int, ...]
     gamma: int
     include_draft_timing: bool = False
+    include_draft_confidence: bool = False
     share_full_window_tokens: bool = False
 
     def __post_init__(self) -> None:
@@ -77,6 +79,7 @@ class CompactFixedGreedyEnvelopeLayout:
         gamma: int,
         *,
         include_draft_timing: bool = False,
+        include_draft_confidence: bool = False,
     ) -> CompactFixedGreedyEnvelopeLayout:
         """Build the common full-window layout with ``gamma`` tokens per row."""
         if not isinstance(row_count, Integral) or isinstance(row_count, bool) or row_count <= 0:
@@ -85,6 +88,7 @@ class CompactFixedGreedyEnvelopeLayout:
             verification_sizes=(gamma,) * int(row_count),
             gamma=gamma,
             include_draft_timing=include_draft_timing,
+            include_draft_confidence=include_draft_confidence,
             share_full_window_tokens=True,
         )
 
@@ -107,7 +111,11 @@ class CompactFixedGreedyEnvelopeLayout:
             if self.share_full_window_tokens
             else self.verification_token_count + self.continuation_token_count
         )
-        return proposal_tokens + int(self.include_draft_timing)
+        return (
+            proposal_tokens
+            + self.row_count * int(self.include_draft_confidence)
+            + int(self.include_draft_timing)
+        )
 
     @property
     def legacy_message_numel(self) -> int:
@@ -126,6 +134,9 @@ class CompactFixedGreedyEnvelopeViews:
 
     verification_tokens: torch.Tensor
     continuation_tokens: torch.Tensor
+    # Quantized to one part per million so the complete envelope can retain a
+    # single HCCL-friendly int64 dtype without a second collective.
+    draft_confidences: torch.Tensor | None
     draft_compute_us: torch.Tensor | None
     verification_sizes: tuple[int, ...]
 
@@ -138,6 +149,20 @@ class CompactFixedGreedyEnvelopeViews:
             rows.append(self.verification_tokens.narrow(0, offset, size))
             offset += size
         return tuple(rows)
+
+
+@dataclass(frozen=True)
+class CompactFixedGreedyCPUBroadcastTiming:
+    """Host timing for one CPU/Gloo proposal publication."""
+
+    device_to_host_seconds: float
+    broadcast_seconds: float
+    host_to_device_submit_seconds: float
+    # Every participant already owns the complete host proposal envelope
+    # after Gloo. Expose the continuation view so the service can retain it
+    # with the guarded proposal and avoid a later NPU->CPU round trip during
+    # correction/state update.
+    host_continuation_tokens: torch.Tensor | None = None
 
 
 def _validate_message_buffer(
@@ -174,6 +199,7 @@ def pack_compact_fixed_greedy_envelope(
     verification_tokens: torch.Tensor,
     continuation_tokens: torch.Tensor,
     *,
+    draft_confidences: torch.Tensor | None = None,
     draft_compute_us: int | torch.Tensor | None = None,
     out: torch.Tensor | None = None,
 ) -> torch.Tensor:
@@ -195,6 +221,25 @@ def pack_compact_fixed_greedy_envelope(
         shape=(layout.row_count, layout.gamma),
         device=device,
     )
+    quantized_confidences: torch.Tensor | None = None
+    if layout.include_draft_confidence:
+        if draft_confidences is None:
+            raise ValueError("This compact envelope layout requires draft_confidences.")
+        if (
+            not draft_confidences.dtype.is_floating_point
+            or tuple(draft_confidences.shape) != (layout.row_count,)
+            or draft_confidences.device != device
+        ):
+            raise ValueError(
+                "draft_confidences must be one floating-point value per row "
+                f"on {device}."
+            )
+        quantized_confidences = torch.round(
+            draft_confidences.float().clamp(0.0, 1.0) * 1_000_000
+        ).to(torch.long)
+    elif draft_confidences is not None:
+        raise ValueError("draft_confidences were provided for a layout without confidence.")
+
     timing: torch.Tensor | None = None
     if layout.include_draft_timing:
         if draft_compute_us is None:
@@ -219,6 +264,8 @@ def pack_compact_fixed_greedy_envelope(
             if layout.share_full_window_tokens
             else [verification_tokens, flat_continuations]
         )
+        if quantized_confidences is not None:
+            parts.append(quantized_confidences)
         if timing is not None:
             parts.append(timing.reshape(1))
         # The allocation path deliberately retains torch.cat: on device it is
@@ -239,8 +286,12 @@ def pack_compact_fixed_greedy_envelope(
             continuation_end = verification_end + layout.continuation_token_count
             message[:verification_end].copy_(verification_tokens)
             message[verification_end:continuation_end].copy_(flat_continuations)
+        confidence_end = continuation_end
+        if quantized_confidences is not None:
+            confidence_end += layout.row_count
+            message[continuation_end:confidence_end].copy_(quantized_confidences)
         if timing is not None:
-            message[continuation_end].copy_(timing)
+            message[confidence_end].copy_(timing)
     return message
 
 
@@ -266,10 +317,16 @@ def unpack_compact_fixed_greedy_envelope(
             layout.row_count,
             layout.gamma,
         )
-    timing = message[continuation_end].reshape(()) if layout.include_draft_timing else None
+    confidence_end = continuation_end
+    confidences = None
+    if layout.include_draft_confidence:
+        confidence_end += layout.row_count
+        confidences = message[continuation_end:confidence_end]
+    timing = message[confidence_end].reshape(()) if layout.include_draft_timing else None
     return CompactFixedGreedyEnvelopeViews(
         verification_tokens=verification_tokens,
         continuation_tokens=continuation_tokens,
+        draft_confidences=confidences,
         draft_compute_us=timing,
         verification_sizes=layout.verification_sizes,
     )
@@ -311,6 +368,7 @@ def begin_compact_fixed_greedy_broadcast(
     device: torch.device | str,
     verification_tokens: torch.Tensor | None = None,
     continuation_tokens: torch.Tensor | None = None,
+    draft_confidences: torch.Tensor | None = None,
     draft_compute_us: int | torch.Tensor | None = None,
     buffer: torch.Tensor | None = None,
 ) -> PendingCompactFixedGreedyEnvelope:
@@ -335,13 +393,19 @@ def begin_compact_fixed_greedy_broadcast(
             layout,
             verification_tokens,
             continuation_tokens,
+            draft_confidences=draft_confidences,
             draft_compute_us=draft_compute_us,
             out=buffer,
         )
         if not _device_matches(message.device, actual_device):
             raise ValueError(f"Source payload must be on {actual_device}, got {message.device}.")
     else:
-        if verification_tokens is not None or continuation_tokens is not None or draft_compute_us is not None:
+        if (
+            verification_tokens is not None
+            or continuation_tokens is not None
+            or draft_confidences is not None
+            or draft_compute_us is not None
+        ):
             raise ValueError("Compact-envelope receivers must not provide source payload values.")
         if buffer is None:
             message = torch.empty(layout.message_numel, dtype=torch.long, device=actual_device)
@@ -358,3 +422,141 @@ def begin_compact_fixed_greedy_broadcast(
         async_op=True,
     )
     return PendingCompactFixedGreedyEnvelope(layout, message, work)
+
+
+def broadcast_compact_fixed_greedy_via_cpu(
+    layout: CompactFixedGreedyEnvelopeLayout,
+    *,
+    rank: int,
+    source_rank: int,
+    group: dist.ProcessGroup,
+    device: torch.device | str,
+    verification_tokens: torch.Tensor | None = None,
+    continuation_tokens: torch.Tensor | None = None,
+    draft_confidences: torch.Tensor | None = None,
+    draft_compute_us: int | torch.Tensor | None = None,
+    source_device_buffer: torch.Tensor | None = None,
+    source_cpu_buffer: torch.Tensor | None = None,
+) -> tuple[
+    CompactFixedGreedyEnvelopeViews,
+    CompactFixedGreedyCPUBroadcastTiming,
+]:
+    """Publish a compact proposal through a CPU process group.
+
+    Only the draft source waits for its proposal graph while copying the tiny
+    envelope to host. Target ranks can participate in Gloo while their TP
+    model work remains queued. Receiver copies are then submitted to each
+    current device stream, preserving the dependency before next-cycle use
+    without a global target-stream fence.
+    """
+
+    if not isinstance(rank, Integral) or isinstance(rank, bool) or rank < 0:
+        raise ValueError("rank must be a non-negative integer.")
+    if not isinstance(source_rank, Integral) or isinstance(source_rank, bool) or source_rank < 0:
+        raise ValueError("source_rank must be a non-negative integer.")
+    actual_device = torch.device(device)
+    is_source = rank == source_rank
+    device_message: torch.Tensor | None = None
+    device_to_host_started = time.perf_counter()
+    if is_source:
+        if verification_tokens is None or continuation_tokens is None:
+            raise ValueError("The CPU compact-envelope source must provide both payload tensors.")
+        if source_device_buffer is not None:
+            _validate_message_buffer(
+                source_device_buffer,
+                layout,
+                name="source_device_buffer",
+            )
+            if not _device_matches(source_device_buffer.device, actual_device):
+                raise ValueError(
+                    "source_device_buffer must be on "
+                    f"{actual_device}, got {source_device_buffer.device}."
+                )
+        if source_cpu_buffer is not None:
+            _validate_message_buffer(
+                source_cpu_buffer,
+                layout,
+                name="source_cpu_buffer",
+            )
+            if source_cpu_buffer.device.type != "cpu":
+                raise ValueError("source_cpu_buffer must be on CPU.")
+        device_message = pack_compact_fixed_greedy_envelope(
+            layout,
+            verification_tokens,
+            continuation_tokens,
+            draft_confidences=draft_confidences,
+            draft_compute_us=draft_compute_us,
+            out=source_device_buffer,
+        )
+        if not _device_matches(device_message.device, actual_device):
+            raise ValueError(
+                f"Source payload must be on {actual_device}, got {device_message.device}."
+            )
+        if source_cpu_buffer is None:
+            cpu_message = device_message.detach().cpu()
+        else:
+            cpu_message = source_cpu_buffer
+            async_device_to_host = bool(
+                actual_device.type == "npu" and cpu_message.is_pinned()
+            )
+            cpu_message.copy_(
+                device_message,
+                non_blocking=async_device_to_host,
+            )
+            # Gloo reads host memory immediately, so only this tiny copy must
+            # complete before publication. The allocation survives cycles.
+            if async_device_to_host:
+                torch.npu.current_stream(device=actual_device).synchronize()
+    else:
+        if source_device_buffer is not None or source_cpu_buffer is not None:
+            raise ValueError("CPU compact-envelope receivers cannot provide source buffers.")
+        if (
+            verification_tokens is not None
+            or continuation_tokens is not None
+            or draft_confidences is not None
+            or draft_compute_us is not None
+        ):
+            raise ValueError("CPU compact-envelope receivers must not provide source payload values.")
+        # Gloo writes directly into a pinned receiver buffer.  The following
+        # tiny H2D transfer can then be queued behind the already-submitted
+        # target verification instead of blocking Python until that target
+        # stream becomes idle.
+        cpu_message = torch.empty(
+            layout.message_numel,
+            dtype=torch.long,
+            pin_memory=actual_device.type == "npu",
+        )
+    device_to_host_ended = time.perf_counter()
+
+    broadcast_started = device_to_host_ended
+    dist.broadcast(
+        cpu_message,
+        src=int(source_rank),
+        group=group,
+    )
+    broadcast_ended = time.perf_counter()
+
+    host_to_device_started = broadcast_ended
+    if device_message is None:
+        device_message = cpu_message.to(
+            device=actual_device,
+            non_blocking=cpu_message.is_pinned(),
+        )
+    host_to_device_ended = time.perf_counter()
+    host_continuation_tokens = unpack_compact_fixed_greedy_envelope(
+        layout,
+        cpu_message,
+    ).continuation_tokens
+    return (
+        unpack_compact_fixed_greedy_envelope(layout, device_message),
+        CompactFixedGreedyCPUBroadcastTiming(
+            device_to_host_seconds=(
+                device_to_host_ended - device_to_host_started if is_source else 0.0
+            ),
+            broadcast_seconds=broadcast_ended - broadcast_started,
+            host_to_device_submit_seconds=(
+                host_to_device_ended - host_to_device_started if not is_source else 0.0
+            ),
+            host_continuation_tokens=host_continuation_tokens,
+        ),
+    )

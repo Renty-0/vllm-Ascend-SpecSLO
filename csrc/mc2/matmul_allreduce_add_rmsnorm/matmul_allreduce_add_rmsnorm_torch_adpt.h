@@ -27,7 +27,8 @@ std::tuple<at::Tensor, at::Tensor> matmul_allreduce_add_rmsnorm(
     int64_t tp_rank_id,
     double epsilon,
     bool is_trans_b,
-    bool is_gather_add_out)
+    bool is_gather_add_out,
+    bool projection_only)
     {
         at::Tensor output = at::empty_like(residual);
         at::Tensor add_out = at::empty_like(residual);
@@ -37,11 +38,16 @@ std::tuple<at::Tensor, at::Tensor> matmul_allreduce_add_rmsnorm(
         char *group_tp_ptr = group_tp_str.data();
 
         float epsilon_f = static_cast<float>(epsilon);
+        TORCH_CHECK(
+            projection_only || epsilon_f == 1.0e-6F,
+            "matmul_allreduce_add_rmsnorm full epilogue is qualified only for epsilon=1e-6; "
+            "use projection_only with native AddRMSNorm for other epsilon values");
         EXEC_NPU_CMD(aclnnMatmulAllreduceAddRmsnorm,
             // input
             x1, x2, residual, gamma,
             // attr
             group_tp_ptr, tp_rank_size, tp_rank_id, epsilon_f, is_trans_b, is_gather_add_out,
+            projection_only,
             // output
             output, add_out);
 

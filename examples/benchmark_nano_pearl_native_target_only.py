@@ -45,6 +45,17 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Use the native paged-attention cache for the target model.",
     )
     parser.add_argument("--enable-prefix-caching", action="store_true")
+    parser.add_argument(
+        "--seal-graph-cache-after-warmup",
+        action="store_true",
+        help=(
+            "Seal the changed-input-qualified ACLGraph inventory after warmup. "
+            "This requires one batch-size point and makes any measured-time "
+            "graph discovery fail closed."
+        ),
+    )
+    parser.add_argument("--enable-mc2", action="store_true")
+    parser.add_argument("--mc2-profile")
     parser.add_argument("--output-json")
     prompt_group = parser.add_mutually_exclusive_group(required=True)
     prompt_group.add_argument("--prompt")
@@ -69,6 +80,41 @@ def _load_prompts(prompt: str | None, gsm8k: str | None, max_samples: int) -> li
     return [str(row["question"]) for row in rows[:max_samples]]
 
 
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as source:
+        for chunk in iter(lambda: source.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _mc2_profile_provenance(path: str | None) -> dict[str, object | None]:
+    if path is None:
+        return {
+            "mc2_profile_resolved": None,
+            "mc2_profile_sha256": None,
+            "mc2_profile_rms_norm_epsilon": None,
+        }
+    resolved = Path(path).expanduser().resolve(strict=True)
+    document = json.loads(resolved.read_text(encoding="utf-8"))
+    metadata = document.get("metadata", {})
+    epsilon = metadata.get("rms_norm_epsilon") if isinstance(metadata, dict) else None
+    return {
+        "mc2_profile_resolved": str(resolved),
+        "mc2_profile_sha256": _sha256_file(resolved),
+        "mc2_profile_rms_norm_epsilon": epsilon,
+    }
+
+
+def _target_rms_norm_epsilon(model_path: str) -> float | None:
+    config_path = Path(model_path).expanduser() / "config.json"
+    if not config_path.is_file():
+        return None
+    document = json.loads(config_path.read_text(encoding="utf-8"))
+    value = document.get("rms_norm_eps")
+    return float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+
+
 def main(argv: Sequence[str] | None = None) -> None:
     args = _build_parser().parse_args(argv)
     if any(batch_size <= 0 for batch_size in args.batch_sizes):
@@ -79,7 +125,11 @@ def main(argv: Sequence[str] | None = None) -> None:
         raise ValueError("--warmup-prompts must be positive.")
     if args.num_prompts is not None and len(args.batch_sizes) != 1:
         raise ValueError("--num-prompts requires exactly one --batch-sizes value.")
+    if args.seal_graph_cache_after_warmup and len(args.batch_sizes) != 1:
+        raise ValueError("--seal-graph-cache-after-warmup requires exactly one batch size.")
     max_batch_size = max(args.batch_sizes)
+    profile_provenance = _mc2_profile_provenance(args.mc2_profile)
+    target_rms_norm_epsilon = _target_rms_norm_epsilon(args.target_model)
 
     from vllm_ascend.spec_decode.pearl import PEARLConfig, PEARLEngine, SamplingParams
 
@@ -97,6 +147,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         gpu_memory_utilization=args.gpu_memory_utilization,
         num_kvcache_blocks=args.num_kvcache_blocks,
         enable_prefix_caching=args.enable_prefix_caching,
+        enable_mc2=args.enable_mc2,
+        mc2_profile=args.mc2_profile,
         enforce_eager=args.enforce_eager,
         target_use_paged_attention=args.target_use_paged_attention,
         seed=args.seed,
@@ -119,6 +171,11 @@ def main(argv: Sequence[str] | None = None) -> None:
             for prompt in warmup_prompts:
                 engine.add_request(prompt, sampling_params)
             engine.AR_generate()
+            worker_metrics_before_measurement = (
+                engine.seal_graph_cache()
+                if args.seal_graph_cache_after_warmup
+                else engine.last_worker_metrics
+            )
 
             for prompt in measured_prompts:
                 engine.add_request(prompt, sampling_params)
@@ -152,6 +209,14 @@ def main(argv: Sequence[str] | None = None) -> None:
                     # divergent token, not only by an aggregate hash.
                     "output_token_ids": output_token_rows,
                     "first_output_token_ids": engine.last_metrics[0]["completion_token_ids"],
+                    # Preserve per-rank production counters around the timed
+                    # window.  MC2 is dispatched while a graph is captured;
+                    # later graph replays intentionally do not re-enter the
+                    # Python adapter, so both the absolute warm state and the
+                    # measured replay delta are needed to prove that the
+                    # resident model-runner graph contains the fused path.
+                    "worker_metrics_before_measurement": worker_metrics_before_measurement,
+                    "worker_metrics_after_measurement": engine.last_worker_metrics,
                 }
             )
 
@@ -163,6 +228,13 @@ def main(argv: Sequence[str] | None = None) -> None:
         "target_tensor_parallel_size": args.target_tp_size,
         "prefill_chunk_size": args.prefill_chunk_size,
         "enable_prefix_caching": args.enable_prefix_caching,
+        "enable_mc2": args.enable_mc2,
+        "mc2_profile": args.mc2_profile,
+        **profile_provenance,
+        "target_rms_norm_epsilon": target_rms_norm_epsilon,
+        "enforce_eager": args.enforce_eager,
+        "execution_mode": "eager" if args.enforce_eager else "aclgraph",
+        "seal_graph_cache_after_warmup": args.seal_graph_cache_after_warmup,
         "max_tokens": args.max_tokens,
         "warmup_prompts": args.warmup_prompts,
         "runtime_environment": capture_runtime_environment(),

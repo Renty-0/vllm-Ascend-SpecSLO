@@ -40,6 +40,16 @@ def _parser():
     parser.add_argument("--rtol", type=float, default=0.005)
     parser.add_argument("--inner-precise", type=int, choices=(1, 2), default=1)
     parser.add_argument("--benchmark-batch", type=int, default=0)
+    parser.add_argument(
+        "--benchmark-fixed-kv-capacity",
+        type=int,
+        default=0,
+        help=(
+            "Also benchmark the same FULL mask with every request's host KV "
+            "length fixed to this capacity. Masked tail pages remain valid, "
+            "which models a graph signature that can skip per-layer task updates."
+        ),
+    )
     parser.add_argument("--benchmark-warmup", type=int, default=10)
     parser.add_argument("--benchmark-repeats", type=int, default=30)
     parser.add_argument("--graph", action="store_true")
@@ -58,6 +68,8 @@ def _validate(args):
         raise ValueError("Oracle tolerances must be non-negative")
     if args.benchmark_batch < 0 or args.benchmark_warmup < 0 or args.benchmark_repeats <= 0:
         raise ValueError("Benchmark sizes must be non-negative and repeats must be positive")
+    if args.benchmark_fixed_kv_capacity < 0 or args.benchmark_fixed_kv_capacity > args.max_context:
+        raise ValueError("Fixed benchmark KV capacity must fit max_context")
     if args.device != "cpu" and not args.device.startswith("npu:"):
         raise ValueError("Choose cpu or one explicitly assigned npu:<index>")
     if args.device == "cpu" and args.graph:
@@ -347,12 +359,39 @@ def _benchmark(case, args):
         graph.replay()
     torch.npu.synchronize()
     graph_update_ms = (time.perf_counter() - started) * 1000.0 / args.benchmark_repeats
+
+    # A fixed host length signature needs no graph-task rebuild.  The graph
+    # still waits on its captured ExternalEvent, so release that dependency
+    # once per replay exactly as the production task-update skip path does.
+    for _ in range(args.benchmark_warmup):
+        event.record(torch.npu.current_stream())
+        graph.replay()
+    torch.npu.synchronize()
+    started = time.perf_counter()
+    for _ in range(args.benchmark_repeats):
+        event.record(torch.npu.current_stream())
+        graph.replay()
+    torch.npu.synchronize()
+    graph_stable_ms = (time.perf_counter() - started) * 1000.0 / args.benchmark_repeats
     return {
         **_describe(case, "TND"),
         "inner_precise": args.inner_precise,
         "eager_ms_per_op": eager_ms,
         "graph_update_replay_ms_per_op": graph_update_ms,
+        "graph_stable_replay_ms_per_op": graph_stable_ms,
+        "graph_task_update_saved_ms_per_op": graph_update_ms - graph_stable_ms,
     }
+
+
+def _fixed_kv_capacity_case(case, capacity):
+    """Keep exact visibility while extending FIA's host KV length literal."""
+
+    if capacity <= 0 or any(length > capacity for length in case["sequence_lengths"]):
+        raise ValueError("Fixed KV capacity must cover every exact request length")
+    result = dict(case)
+    result["sequence_lengths"] = [capacity] * len(case["sequence_lengths"])
+    result["fixed_kv_capacity"] = capacity
+    return result
 
 
 def main(argv=None):
@@ -456,7 +495,27 @@ def main(argv=None):
                 args=args,
                 seed=args.seed + 197,
             )
-            report["benchmarks"].append(_benchmark(case, args))
+            exact_tensors = _device_tensors(case, args.device, "TND")
+            exact_output, _ = torch_npu.npu_fused_infer_attention_score(
+                **_fia_kwargs(case, exact_tensors, "TND", args)
+            )
+            exact_benchmark = _benchmark(case, args)
+            exact_benchmark["signature"] = "exact-kv-lengths"
+            report["benchmarks"].append(exact_benchmark)
+            if args.benchmark_fixed_kv_capacity:
+                fixed = _fixed_kv_capacity_case(case, args.benchmark_fixed_kv_capacity)
+                fixed_tensors = _device_tensors(fixed, args.device, "TND")
+                fixed_output, _ = torch_npu.npu_fused_infer_attention_score(
+                    **_fia_kwargs(fixed, fixed_tensors, "TND", args)
+                )
+                fixed_benchmark = _benchmark(fixed, args)
+                fixed_benchmark["signature"] = "fixed-kv-capacity"
+                fixed_benchmark["fixed_vs_exact"] = _comparison(
+                    fixed_output,
+                    exact_output,
+                    args,
+                )
+                report["benchmarks"].append(fixed_benchmark)
             save()
         checks = []
         for row in report["cases"]:

@@ -32,6 +32,10 @@ class SpecRhythmRuntimeState:
     slo_tpot_ms: float | None = None
     slo_class: str | None = None
     max_gamma: int | None = None
+    # Total output-token horizon used by the paper Goodput objective.  It is
+    # optional for generic scheduler users, but production request states set
+    # it from SamplingParams.max_tokens.
+    output_token_budget: int | None = None
     # ``N`` in the paper is the number of tokens delivered before the first
     # verification round.  The denominator is guarded with ``max(1, N)``
     # where it is used, so a fresh request must start at zero rather than one.
@@ -45,6 +49,11 @@ class SpecRhythmRuntimeState:
     # separate prevents TPOT from charging a request for time before it was
     # admitted to the decode stage while still allowing urgency to catch up.
     arrival_wait_ms: float = 0.0
+    # Optional bound on how much pre-admission wait may contribute to a_need.
+    # The unit is request-local SLO token intervals, so a value of four means
+    # at most one fixed-gamma=4 window of catch-up pressure.  ``None`` keeps
+    # the established unbounded-debt policy.
+    arrival_debt_cap_tokens: int | None = None
     acceptance_ema: float = 1.0
     # Probability that the *entire* proposal window is accepted.  Rolling
     # Eager continuations are useful only in that event, so the per-token
@@ -63,6 +72,10 @@ class SpecRhythmRuntimeState:
             raise ValueError("SpecRhythm TPOT SLO must be positive when supplied.")
         if self.max_gamma is not None and self.max_gamma <= 0:
             raise ValueError("SpecRhythm per-request max gamma must be positive.")
+        if self.output_token_budget is not None and self.output_token_budget <= 0:
+            raise ValueError("SpecRhythm output-token budget must be positive.")
+        if self.arrival_debt_cap_tokens is not None and self.arrival_debt_cap_tokens <= 0:
+            raise ValueError("SpecRhythm arrival debt cap must be positive when supplied.")
         if (
             self.delivered_tokens < 0
             or self.decode_elapsed_ms < 0
@@ -91,7 +104,13 @@ class SpecRhythmRuntimeState:
     @property
     def effective_elapsed_ms(self) -> float:
         """Elapsed time used by the scheduler, including admission debt."""
-        return self.decode_elapsed_ms + self.arrival_wait_ms
+        arrival_debt_ms = self.arrival_wait_ms
+        if self.arrival_debt_cap_tokens is not None and self.slo_tpot_ms is not None:
+            arrival_debt_ms = min(
+                arrival_debt_ms,
+                float(self.arrival_debt_cap_tokens) * self.slo_tpot_ms,
+            )
+        return self.decode_elapsed_ms + arrival_debt_ms
 
     def projected_progress_gap(self, projected_wait_ms: float) -> int:
         """Return ``a_need`` from section 4.3 of the SpecRhythm paper."""
@@ -108,6 +127,20 @@ class SpecRhythmRuntimeState:
             1, self.delivered_tokens
         )
         return max(0.0, projected_tpot / self.slo_tpot_ms)
+
+    def terminal_slack_ms(self, projected_wait_ms: float = 0.0) -> float:
+        """Return remaining decode time before final TPOT becomes impossible.
+
+        The benchmark's paper TPOT excludes admission/TTFT, so this terminal
+        feasibility clock deliberately uses ``decode_elapsed_ms`` rather than
+        ``effective_elapsed_ms``.  Once the value is non-positive, no future
+        scheduling decision can make the request attain its final TPOT SLO.
+        """
+
+        if self.slo_tpot_ms is None or self.output_token_budget is None:
+            return math.inf
+        deadline_ms = self.slo_tpot_ms * self.output_token_budget
+        return deadline_ms - self.decode_elapsed_ms - max(0.0, float(projected_wait_ms))
 
     def add_decode_time(self, elapsed_ms: float) -> None:
         self.decode_elapsed_ms += max(0.0, float(elapsed_ms))
@@ -590,6 +623,9 @@ class SpecRhythmPipelineController:
         priority: bool = False,
         projected_wait_ms: float = 0.0,
         priority_burst: int = 2,
+        goodput_edf: bool = False,
+        target_slo_first: bool = False,
+        defer_loose: bool = False,
         merge_ready_homes: bool = False,
         max_target_requests: int | None = None,
         verification_budget: int | None = None,
@@ -689,7 +725,13 @@ class SpecRhythmPipelineController:
                 "A ready SpecRhythm proposal exceeds the verification budget; "
                 "rebuild or ancestor-safely prune it before scheduling."
             )
-        constrained = (max_target_requests is not None and len(target_candidates) > max_target_requests) or (
+        constrained = (
+            defer_loose
+            and any(
+                (self.request_states[index].slo_class or "").strip().lower() == "loose"
+                for index in target_candidates
+            )
+        ) or (max_target_requests is not None and len(target_candidates) > max_target_requests) or (
             verification_budget is not None and sum(candidate_counts.values()) > verification_budget
         )
         if constrained:
@@ -702,13 +744,33 @@ class SpecRhythmPipelineController:
             # still starvation-safe because their a_need grows while waiting.
             def target_priority(index: int):
                 age = self._ready_wait_cycles.get(index, 0)
-                urgency = self.request_states[index].urgency(projected_wait_ms)
+                state = self.request_states[index]
+                urgency = state.urgency(projected_wait_ms)
                 if priority:
+                    slo_priority = (
+                        -float(state.slo_tpot_ms)
+                        if target_slo_first and state.slo_tpot_ms is not None
+                        else -math.inf
+                    )
+                    if goodput_edf:
+                        terminal_slack = state.terminal_slack_ms(projected_wait_ms)
+                        if math.isfinite(terminal_slack):
+                            terminal_feasible = terminal_slack > 0.0
+                            terminal_priority = (
+                                int(terminal_feasible),
+                                -terminal_slack if terminal_feasible else terminal_slack,
+                            )
+                        else:
+                            terminal_priority = (0, -math.inf)
+                    else:
+                        terminal_priority = ()
                     return (
-                        self.request_states[index].projected_progress_gap(projected_wait_ms),
+                        slo_priority,
+                        *terminal_priority,
+                        state.projected_progress_gap(projected_wait_ms),
                         urgency,
                         age,
-                        self.request_states[index].home_batch_id == self.next_target_home_batch_id,
+                        state.home_batch_id == self.next_target_home_batch_id,
                         -index,
                     )
                 return (
@@ -726,6 +788,8 @@ class SpecRhythmPipelineController:
             selected: list[int] = []
             selected_tokens = 0
             for index in ordered:
+                if defer_loose and (self.request_states[index].slo_class or "").strip().lower() == "loose":
+                    continue
                 if max_target_requests is not None and len(selected) >= max_target_requests:
                     break
                 if verification_budget is not None and selected_tokens + candidate_counts[index] > verification_budget:

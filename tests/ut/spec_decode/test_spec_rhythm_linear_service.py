@@ -33,6 +33,7 @@ class _LinearLoopHarness:
         arrivals=None,
         target_fallback: bool | int = False,
         slo=None,
+        slo_classes=None,
         profile_host_steps=0,
         remote_draft_compute_ms=4.0,
         full_window=False,
@@ -135,12 +136,17 @@ class _LinearLoopHarness:
         if is_draft:
             self.engine._draft_spec_rhythm_device_batch = self.draft
 
+        if slo_classes is None:
+            slo_classes = (None,) * request_count
+        if len(slo_classes) != request_count:
+            raise ValueError("slo_classes must be request-aligned")
         self.params = [
             native.NativeSamplingParams(
                 temperature=0.0,
                 max_tokens=limit,
                 ignore_eos=True,
                 slo_tpot_ms=slo,
+                slo_class=slo_classes[index],
                 arrival_ts=None if arrivals is None else arrivals[index],
                 request_id=f"request-{index}",
             )
@@ -160,6 +166,7 @@ class _LinearLoopHarness:
                 max_tokens=max_tokens[index],
                 ignore_eos=True,
                 slo_tpot_ms=slo,
+                slo_class=slo_classes[index],
             )
             for index in range(request_count)
         ]
@@ -534,6 +541,67 @@ def test_token_chunk_prefill_samples_only_prompt_final_rows(monkeypatch):
     assert sample_args.kwargs["logit_indices"] == [0]
 
 
+def test_token_chunk_prefill_reuses_precomputed_target_sample(monkeypatch):
+    monkeypatch.setattr(native.dist, "broadcast", lambda *_args, **_kwargs: None)
+    engine = native.NativePearlEngine.__new__(native.NativePearlEngine)
+    engine.config = SimpleNamespace(
+        enable_prefix_caching=False,
+        spec_rhythm_prefill_token_chunk_size=4,
+    )
+    engine.cache_allocation = SimpleNamespace(num_cached_tokens=[0])
+    engine.device = torch.device("cpu")
+    engine.is_draft = False
+    engine._run_packed_hidden = Mock()
+    engine._run_packed_sample = Mock()
+    engine._vote_spec_rhythm_prefill_finiteness = Mock()
+    engine.topology = PearlTopology.from_tensor_parallel_sizes(1, 3)
+    engine.groups = SimpleNamespace(verification_coordination_group=None)
+    state = native.PearlPipelineState([10, 11, 12], 3)
+
+    completed = engine._prefill_spec_rhythm_token_chunk_batch(
+        {0: state.token_ids},
+        {0: state},
+        (native.SpecRhythmPrefillTokenChunk(0, 2, 3, 3),),
+        precomputed_target_tokens=torch.tensor([777]),
+    )
+
+    assert completed == {0: 777}
+    engine._run_packed_hidden.assert_not_called()
+    engine._run_packed_sample.assert_not_called()
+
+
+def test_token_chunk_prefill_reuses_completed_draft_prompt(monkeypatch):
+    broadcast = Mock()
+    monkeypatch.setattr(native.dist, "broadcast", broadcast)
+    engine = native.NativePearlEngine.__new__(native.NativePearlEngine)
+    engine.config = SimpleNamespace(
+        enable_prefix_caching=False,
+        spec_rhythm_prefill_token_chunk_size=4,
+    )
+    engine.cache_allocation = SimpleNamespace(num_cached_tokens=[0])
+    engine.device = torch.device("cpu")
+    engine.is_draft = True
+    engine._run_packed_hidden = Mock()
+    engine._run_packed_sample = Mock()
+    engine._vote_spec_rhythm_prefill_finiteness = Mock()
+    engine.topology = PearlTopology.from_tensor_parallel_sizes(1, 3)
+    engine.groups = SimpleNamespace(verification_coordination_group=None)
+    state = native.PearlPipelineState([10, 11, 12], 3)
+
+    completed = engine._prefill_spec_rhythm_token_chunk_batch(
+        {0: state.token_ids},
+        {0: state},
+        (native.SpecRhythmPrefillTokenChunk(0, 2, 3, 3),),
+        draft_prefill_completed=True,
+    )
+
+    assert completed == {0: 0}
+    engine._run_packed_hidden.assert_not_called()
+    engine._run_packed_sample.assert_not_called()
+    engine._vote_spec_rhythm_prefill_finiteness.assert_called_once_with()
+    broadcast.assert_called_once()
+
+
 def test_cross_cycle_token_chunk_prefill_is_private_until_final_chunk(
     monkeypatch,
 ):
@@ -695,6 +763,39 @@ def test_online_prefill_coalesces_two_ready_arrivals(monkeypatch):
     assert diagnostics["spec_rhythm_prefill_coalesce_deferred_polls"] >= 1
     assert diagnostics["spec_rhythm_prefill_coalesce_size_releases"] >= 1
     assert diagnostics["spec_rhythm_prefill_pair_batches"] >= 1
+
+
+def test_tight_arrival_preempts_and_later_resumes_borrowed_loose_rows(monkeypatch):
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_PREEMPT_LOOSE_FOR_TIGHT", "1")
+    wall = [99.9]
+
+    def advance_wall():
+        wall[0] += 0.1
+        return wall[0]
+
+    monkeypatch.setattr(native.time, "time", advance_wall)
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(30, 30, 30, 30, 5, 5, 5, 5),
+        capacity=4,
+        online_prefill=True,
+        arrivals=(100.0, 100.0, 100.0, 100.0, 100.4, 100.4, 100.4, 100.4),
+        full_window=True,
+        prefill_coalesce_min_requests=4,
+        prefill_coalesce_max_wait_ms=1100.0,
+        slo=40.0,
+        slo_classes=("loose", "loose", "loose", "loose", "tight", "tight", "tight", "tight"),
+    )
+
+    results = harness.run()
+
+    assert len(results) == 8
+    assert all(result["completion_token_ids"] for result in results)
+    diagnostics = results[0]["spec_rhythm"]
+    assert diagnostics["spec_rhythm_preempt_loose_for_tight_enabled"] == 1
+    assert diagnostics["spec_rhythm_preempted_loose_requests"] == 4
+    assert diagnostics["spec_rhythm_resumed_loose_requests"] == 4
+    assert diagnostics["spec_rhythm_max_suspended_requests"] == 4
 
 
 def test_online_prefill_coalescing_releases_one_request_at_timeout(monkeypatch):
@@ -1827,6 +1928,110 @@ def test_linear_fixed_gamma_w_can_explicitly_cross_graph_bucket_within_w_and_cap
     assert 20 + len(selected) > native._next_linear_draft_graph_bucket(20, 24)
 
 
+def test_linear_fixed_gamma_w_rounds_cross_bucket_capacity_down_to_resident_graph():
+    states = {
+        index: native.SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=index % 2,
+            slo_tpot_ms=10.0,
+            delivered_tokens=1,
+            decode_elapsed_ms=100.0 + index,
+            acceptance_ema=0.9,
+        )
+        for index in range(16)
+    }
+    estimator = native.DraftWindowEstimator(ema_alpha=1.0)
+    # B32 gamma4 takes 32 ms: a 38 ms target window has scalar capacity for
+    # 38 physical rows, which must round down to the resident B36 graph.
+    estimator.observe(
+        draft_compute_ms=32.0,
+        drafted_tokens=32 * 4,
+        target_verify_ms=38.0,
+        eager_work=False,
+    )
+
+    selected, window = native._gate_linear_eager_candidates(
+        list(states),
+        states=states,
+        projected_wait_ms=1.0,
+        normal_request_count=32,
+        gamma=4,
+        estimator=estimator,
+        max_rows=64,
+        allow_cross_graph_bucket=True,
+    )
+
+    assert window.draft_token_budget == 38 * 4
+    assert window.eager_row_budget == 4
+    assert len(selected) == 4
+
+    estimator.observe(
+        draft_compute_ms=32.0,
+        drafted_tokens=32 * 4,
+        target_verify_ms=40.0,
+        eager_work=False,
+    )
+    selected, window = native._gate_linear_eager_candidates(
+        list(states),
+        states=states,
+        projected_wait_ms=1.0,
+        normal_request_count=32,
+        gamma=4,
+        estimator=estimator,
+        max_rows=64,
+        allow_cross_graph_bucket=True,
+    )
+
+    assert window.eager_row_budget == 8
+    assert len(selected) == 8
+
+
+def test_linear_fixed_gamma_w_bucket_timing_blocks_exposed_larger_graph(
+    monkeypatch,
+):
+    states = {
+        index: native.SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=index % 2,
+            slo_tpot_ms=10.0,
+            delivered_tokens=1,
+            decode_elapsed_ms=100.0 + index,
+            acceptance_ema=0.9,
+        )
+        for index in range(8)
+    }
+    estimator = native.DraftWindowEstimator(ema_alpha=1.0)
+    estimator.observe(
+        draft_compute_ms=32.0,
+        drafted_tokens=32 * 4,
+        target_verify_ms=38.0,
+        eager_work=False,
+    )
+    # The scalar model extrapolates B36 to 36 ms and would admit it, while a
+    # real B36 observation proves the next graph step takes 42 ms.
+    estimator.draft_compute_ms_by_token_count[36 * 4] = 42.0
+    monkeypatch.setattr(
+        native.envs,
+        "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_BUCKET_TIMING",
+        True,
+    )
+
+    selected, window = native._gate_linear_eager_candidates(
+        list(states),
+        states=states,
+        projected_wait_ms=1.0,
+        normal_request_count=32,
+        gamma=4,
+        estimator=estimator,
+        max_rows=64,
+        allow_cross_graph_bucket=True,
+    )
+
+    assert window.calibrated
+    assert window.eager_row_budget == 0
+    assert selected == []
+
+
 def test_linear_fixed_gamma_w_does_not_fill_paid_rows_beyond_scalar_w():
     states = {
         index: native.SpecRhythmRuntimeState(
@@ -1938,6 +2143,51 @@ def test_linear_fixed_gamma_w_keeps_urgent_rows_ahead_of_idle_residual_rows():
     assert selected == [0]
 
 
+def test_linear_fixed_gamma_w_ranks_urgent_rows_by_full_window_promotion_value():
+    states = {
+        # This request has the better average token acceptance, but almost
+        # never accepts the complete dependency window.  Its concurrently
+        # drafted child is therefore unlikely to survive verification.
+        0: native.SpecRhythmRuntimeState(
+            request_index=0,
+            home_batch_id=0,
+            slo_tpot_ms=10.0,
+            delivered_tokens=1,
+            decode_elapsed_ms=100.0,
+            acceptance_ema=0.95,
+            full_acceptance_ema=0.05,
+        ),
+        1: native.SpecRhythmRuntimeState(
+            request_index=1,
+            home_batch_id=1,
+            slo_tpot_ms=10.0,
+            delivered_tokens=1,
+            decode_elapsed_ms=100.0,
+            acceptance_ema=0.70,
+            full_acceptance_ema=0.80,
+        ),
+    }
+    estimator = native.DraftWindowEstimator(ema_alpha=1.0)
+    estimator.observe(
+        draft_compute_ms=4.0,
+        drafted_tokens=4,
+        target_verify_ms=4.0,
+        eager_work=False,
+    )
+
+    selected, _ = native._gate_linear_eager_candidates(
+        [0, 1],
+        states=states,
+        projected_wait_ms=1.0,
+        normal_request_count=0,
+        gamma=4,
+        estimator=estimator,
+        max_rows=1,
+    )
+
+    assert selected == [1]
+
+
 def test_linear_idle_residual_eager_turns_single_home_target_only_into_continuation(
     monkeypatch,
 ):
@@ -1989,6 +2239,103 @@ def test_linear_idle_residual_eager_turns_single_home_target_only_into_continuat
     counters = results[0]["spec_rhythm"]
     assert counters["spec_rhythm_linear_idle_residual_eligible_rows"] > 0
     assert counters["spec_rhythm_linear_idle_residual_admitted_rows"] > 0
+
+
+def test_linear_residual_eager_uses_measured_headroom_after_normal_rows(monkeypatch):
+    clock = [0.0]
+    monkeypatch.setattr(native.time, "perf_counter", lambda: clock[0])
+    monkeypatch.setattr(native.time, "time", lambda: 100.0)
+
+    def ample_window(_self, *, normal_tokens, max_draft_tokens, eager_work=False):
+        del eager_work
+        return native.DraftWindowBudget(
+            draft_window_ms=16.0,
+            draft_ms_per_token=1.0,
+            normal_tokens=normal_tokens,
+            draft_token_budget=max_draft_tokens,
+            eager_token_budget=max_draft_tokens - normal_tokens,
+            residual_window_ms=16.0,
+            predicted_exposed_draft_ms=0.0,
+            calibrated=True,
+        )
+
+    monkeypatch.setattr(native.DraftWindowEstimator, "estimate", ample_window)
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(24, 24, 24, 24),
+        capacity=4,
+        slo=1000.0,
+        full_window=True,
+        eager_cross_graph_bucket=True,
+        idle_residual_eager=True,
+        remote_draft_compute_ms=4.0,
+        profile_host_steps=8,
+    )
+
+    results = harness.run(max_rounds=8)
+
+    counters = results[0]["spec_rhythm"]
+    assert counters["spec_rhythm_linear_idle_residual_eligible_rows"] > 0
+    assert counters["spec_rhythm_linear_idle_residual_admitted_rows"] > 0
+    assert any(
+        trace["linear_w_normal_bucket"] == 2
+        and trace["linear_w_admitted_eager_rows"] == 2
+        and trace["draft_requests"] == 4
+        for trace in harness.engine.last_worker_decode_host_timeline
+    )
+
+
+def test_linear_idle_residual_tight_only_excludes_relaxed_rows(monkeypatch):
+    clock = [0.0]
+    monkeypatch.setattr(native.time, "perf_counter", lambda: clock[0])
+    monkeypatch.setattr(native.time, "time", lambda: 100.0)
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_RESIDUAL_EAGER_TIGHT_ONLY", "1")
+
+    def ample_window(_self, *, normal_tokens, max_draft_tokens, eager_work=False):
+        del eager_work
+        return native.DraftWindowBudget(
+            draft_window_ms=16.0,
+            draft_ms_per_token=1.0,
+            normal_tokens=normal_tokens,
+            draft_token_budget=max_draft_tokens,
+            eager_token_budget=max_draft_tokens - normal_tokens,
+            residual_window_ms=16.0,
+            predicted_exposed_draft_ms=0.0,
+            calibrated=True,
+        )
+
+    monkeypatch.setattr(native.DraftWindowEstimator, "estimate", ample_window)
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(24, 24, 24, 24),
+        capacity=4,
+        slo=1000.0,
+        full_window=True,
+        eager_cross_graph_bucket=True,
+        idle_residual_eager=True,
+        remote_draft_compute_ms=4.0,
+    )
+    for index in range(4):
+        tight = index < 2
+        deadline = 500.0 if tight else 1000.0
+        label = "tight" if tight else "loose"
+        harness.params[index] = replace(
+            harness.params[index],
+            slo_tpot_ms=deadline,
+            slo_class=label,
+        )
+        for states in (harness.draft_states, harness.target_states):
+            states[index].slo_tpot_ms = deadline
+            states[index].slo_class = label
+
+    results = harness.run(max_rounds=8)
+
+    counters = results[0]["spec_rhythm"]
+    assert counters["spec_rhythm_residual_eager_tight_only_enabled"] == 1
+    assert counters["spec_rhythm_linear_idle_residual_eligible_tight"] > 0
+    assert counters["spec_rhythm_linear_idle_residual_admitted_tight"] > 0
+    assert counters["spec_rhythm_linear_idle_residual_eligible_loose"] == 0
+    assert counters["spec_rhythm_linear_idle_residual_admitted_loose"] == 0
 
 
 def test_linear_fixed_gamma_w_telemetry_and_cycle_bootstrap(monkeypatch):

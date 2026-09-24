@@ -23,7 +23,12 @@
 #include <c10/util/Exception.h>
 #include <dlfcn.h>
 #include <functional>
+#include <limits>
+#include <memory>
+#include <mutex>
+#include <string>
 #include <type_traits>
+#include <unordered_map>
 #include <vector>
 
 #include <torch_npu/csrc/framework/utils/CalcuOpUtil.h>
@@ -277,7 +282,7 @@ inline std::vector<std::string> get_packaged_custom_lib_path()
     }
 
     std::string packaged_lib_path =
-        module_path.substr(0, last_slash) + "/_cann_ops_custom/vendors/vllm-ascend/op_api/lib/";
+        module_path.substr(0, last_slash) + "/_cann_ops_custom/vendors/custom_transformer/op_api/lib/";
     packaged_lib_path = real_path(packaged_lib_path);
     if (packaged_lib_path.empty()) {
         return std::vector<std::string>();
@@ -358,6 +363,85 @@ inline void *GetOpApiFuncAddr(const char *apiName)
         return nullptr;
     }
     return GetOpApiFuncAddrInLib(opApiHandler, GetOpApiLibName(), apiName);
+}
+
+struct CachedOpApiSymbol {
+    std::once_flag once;
+    void *address{nullptr};
+};
+
+inline std::shared_ptr<CachedOpApiSymbol> GetCachedOpApiSymbol(const std::string &api_name)
+{
+    static std::mutex cache_mutex;
+    static std::unordered_map<std::string, std::shared_ptr<CachedOpApiSymbol>> cache;
+    std::lock_guard<std::mutex> guard(cache_mutex);
+    auto &entry = cache[api_name];
+    if (entry == nullptr) {
+        entry = std::make_shared<CachedOpApiSymbol>();
+    }
+    return entry;
+}
+
+inline void *GetCachedOpApiFuncAddr(const char *api_name)
+{
+    const std::string name(api_name);
+    auto entry = GetCachedOpApiSymbol(name);
+    // Resolve outside the global map mutex: dlopen may run DSO constructors.
+    // The per-symbol once_flag also freezes a missing optional helper instead
+    // of confusing a cached nullptr with an unresolved symbol.
+    std::call_once(entry->once, [entry, name]() {
+        entry->address = GetOpApiFuncAddr(name.c_str());
+    });
+    return entry->address;
+}
+
+inline std::vector<std::string> FreezeAndGetOpApiSymbolProviders(
+    const std::vector<std::string> &required_symbol_names)
+{
+    static const std::vector<std::string> optional_symbol_names = {
+        "InitHugeMemThreadLocal",
+        "UnInitHugeMemThreadLocal",
+        "ReleaseHugeMem",
+    };
+    std::vector<std::string> symbol_names(required_symbol_names);
+    symbol_names.insert(
+        symbol_names.end(),
+        optional_symbol_names.begin(),
+        optional_symbol_names.end());
+    std::vector<std::string> providers;
+    providers.reserve(symbol_names.size());
+    for (const auto &name : symbol_names) {
+        void *address = GetCachedOpApiFuncAddr(name.c_str());
+        std::string provider;
+        if (address != nullptr) {
+            Dl_info info;
+            TORCH_CHECK(
+                dladdr(address, &info) != 0 && info.dli_fname != nullptr,
+                "Cannot identify the provider DSO for frozen OPAPI symbol ", name);
+            provider = real_path(info.dli_fname);
+            if (provider.empty()) {
+                provider = std::string(info.dli_fname);
+            }
+        }
+        providers.emplace_back(name + "=" + provider);
+    }
+    return providers;
+}
+
+inline std::vector<std::string> FreezeAndGetMc2OpApiSymbolProviders()
+{
+    return FreezeAndGetOpApiSymbolProviders({
+        "aclnnMatmulAllreduceAddRmsnormGetWorkspaceSize",
+        "aclnnMatmulAllreduceAddRmsnorm",
+    });
+}
+
+inline std::vector<std::string> FreezeAndGetAllreduceAddRmsnormOpApiSymbolProviders()
+{
+    return FreezeAndGetOpApiSymbolProviders({
+        "aclnnAllreduceAddRmsnormGetWorkspaceSize",
+        "aclnnAllreduceAddRmsnorm",
+    });
 }
 
 inline c10::Scalar ConvertTensorToScalar(const at::Tensor &tensor) {
@@ -733,13 +817,14 @@ typedef void (*ReleaseHugeMem)(void *, bool);
 #define EXEC_NPU_CMD(aclnn_api, ...)                                          \
   do {                                                                        \
     static const auto getWorkspaceSizeFuncAddr =                              \
-        GetOpApiFuncAddr(#aclnn_api "GetWorkspaceSize");                      \
-    static const auto opApiFuncAddr = GetOpApiFuncAddr(#aclnn_api);           \
+        GetCachedOpApiFuncAddr(#aclnn_api "GetWorkspaceSize");                \
+    static const auto opApiFuncAddr = GetCachedOpApiFuncAddr(#aclnn_api);     \
     static const auto initMemAddr =                                           \
-        GetOpApiFuncAddr("InitHugeMemThreadLocal");                           \
+        GetCachedOpApiFuncAddr("InitHugeMemThreadLocal");                     \
     static const auto unInitMemAddr =                                         \
-        GetOpApiFuncAddr("UnInitHugeMemThreadLocal");                         \
-    static const auto releaseMemAddr = GetOpApiFuncAddr("ReleaseHugeMem");    \
+        GetCachedOpApiFuncAddr("UnInitHugeMemThreadLocal");                   \
+    static const auto releaseMemAddr =                                        \
+        GetCachedOpApiFuncAddr("ReleaseHugeMem");                             \
     TORCH_CHECK(                                                              \
         getWorkspaceSizeFuncAddr != nullptr && opApiFuncAddr != nullptr,      \
         #aclnn_api, " or ", #aclnn_api "GetWorkspaceSize", " not in ",        \
@@ -764,15 +849,26 @@ typedef void (*ReleaseHugeMem)(void *, bool);
     TORCH_CHECK(workspace_status == 0,                                        \
                 "call " #aclnn_api " failed, detail:", aclGetRecentErrMsg()); \
     void *workspace_addr = nullptr;                                           \
+    /* Keep the owning tensor alive until after OpCommand::Run.  Declaring */ \
+    /* it inside the allocation branch destroys it before the custom */       \
+    /* handler consumes workspace_addr, leaving an allocator-owned raw */     \
+    /* pointer that can be reused during a large ACLGraph capture. */          \
+    at::Tensor workspace_tensor;                                              \
     if (workspace_size != 0) {                                                \
+      TORCH_CHECK(                                                            \
+          workspace_size <=                                                  \
+              static_cast<uint64_t>(std::numeric_limits<int64_t>::max()),    \
+          #aclnn_api, " workspace exceeds the Tensor size limit: ",          \
+          workspace_size);                                                    \
       at::TensorOptions options =                                             \
           at::TensorOptions(torch_npu::utils::get_npu_device_type());         \
-      auto workspace_tensor =                                                 \
-          at::empty({workspace_size}, options.dtype(kByte));                  \
+      workspace_tensor = at::empty(                                           \
+          {static_cast<int64_t>(workspace_size)}, options.dtype(kByte));      \
       workspace_addr = const_cast<void *>(workspace_tensor.storage().data()); \
     }                                                                         \
     auto acl_call = [converted_params, workspace_addr, workspace_size,        \
-                     acl_stream, executor]() -> int {                         \
+                     acl_stream, executor, workspace_tensor]() -> int {       \
+      (void)workspace_tensor;                                                 \
       typedef int (*OpApiFunc)(void *, uint64_t, aclOpExecutor *,             \
                                const aclrtStream);                            \
       OpApiFunc opApiFunc = reinterpret_cast<OpApiFunc>(opApiFuncAddr);       \

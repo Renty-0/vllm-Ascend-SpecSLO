@@ -76,8 +76,38 @@ def test_pack_and_unpack_return_zero_copy_views() -> None:
     assert [row.tolist() for row in views.verification_rows] == [[11], [21, 22, 23]]
     assert views.draft_compute_us is not None
     assert views.draft_compute_us.item() == 1234
+    assert views.draft_confidences is None
     message[0] = 99
     assert views.verification_rows[0].item() == 99
+
+
+def test_full_window_envelope_transports_quantized_real_confidence() -> None:
+    layout = transport.CompactFixedGreedyEnvelopeLayout.full_window(
+        2,
+        4,
+        include_draft_timing=True,
+        include_draft_confidence=True,
+    )
+    continuations = torch.tensor(
+        [[11, 12, 13, 14], [21, 22, 23, 24]],
+        dtype=torch.long,
+    )
+    confidences = torch.tensor([0.125, 0.987654], dtype=torch.float32)
+
+    message = transport.pack_compact_fixed_greedy_envelope(
+        layout,
+        continuations.flatten(),
+        continuations,
+        draft_confidences=confidences,
+        draft_compute_us=4321,
+    )
+    views = transport.unpack_compact_fixed_greedy_envelope(layout, message)
+
+    assert layout.message_numel == 11
+    assert views.draft_confidences is not None
+    assert views.draft_confidences.tolist() == [125000, 987654]
+    assert views.draft_compute_us is not None
+    assert views.draft_compute_us.item() == 4321
 
 
 def test_pack_validates_payload_contract_without_reading_device_values() -> None:
@@ -201,3 +231,129 @@ def test_receiver_rejects_source_payload() -> None:
             device="cpu",
             verification_tokens=torch.tensor([1], dtype=torch.long),
         )
+
+
+def test_cpu_broadcast_source_keeps_device_message_and_reports_timing(monkeypatch) -> None:
+    layout = transport.CompactFixedGreedyEnvelopeLayout.full_window(
+        1,
+        2,
+        include_draft_timing=True,
+        include_draft_confidence=True,
+    )
+
+    def broadcast(message, *, src, group):
+        assert message.device.type == "cpu"
+        assert message.tolist() == [7, 8, 250000, 900]
+        assert src == 0
+        assert group == "coordination-group"
+
+    monkeypatch.setattr(transport.dist, "broadcast", broadcast)
+    views, timing = transport.broadcast_compact_fixed_greedy_via_cpu(
+        layout,
+        rank=0,
+        source_rank=0,
+        group="coordination-group",
+        device="cpu",
+        verification_tokens=torch.tensor([7, 8], dtype=torch.long),
+        continuation_tokens=torch.tensor([[7, 8]], dtype=torch.long),
+        draft_confidences=torch.tensor([0.25]),
+        draft_compute_us=900,
+    )
+
+    assert views.continuation_tokens.tolist() == [[7, 8]]
+    assert views.draft_confidences.tolist() == [250000]
+    assert views.draft_compute_us.item() == 900
+    assert timing.device_to_host_seconds >= 0
+    assert timing.broadcast_seconds >= 0
+    assert timing.host_to_device_submit_seconds == 0
+    assert timing.host_continuation_tokens is not None
+    assert timing.host_continuation_tokens.tolist() == [[7, 8]]
+
+
+def test_cpu_broadcast_source_reuses_fixed_buffers(monkeypatch) -> None:
+    layout = transport.CompactFixedGreedyEnvelopeLayout.full_window(
+        1,
+        2,
+        include_draft_timing=True,
+        include_draft_confidence=True,
+    )
+    source_device_buffer = torch.full(
+        (layout.message_numel,),
+        -1,
+        dtype=torch.long,
+    )
+    source_cpu_buffer = torch.full(
+        (layout.message_numel,),
+        -2,
+        dtype=torch.long,
+    )
+
+    def broadcast(message, *, src, group):
+        assert message.data_ptr() == source_cpu_buffer.data_ptr()
+        assert message.tolist() == [7, 8, 250000, 900]
+        assert src == 0
+        assert group == "coordination-group"
+
+    monkeypatch.setattr(transport.dist, "broadcast", broadcast)
+    views, _ = transport.broadcast_compact_fixed_greedy_via_cpu(
+        layout,
+        rank=0,
+        source_rank=0,
+        group="coordination-group",
+        device="cpu",
+        verification_tokens=torch.tensor([7, 8], dtype=torch.long),
+        continuation_tokens=torch.tensor([[7, 8]], dtype=torch.long),
+        draft_confidences=torch.tensor([0.25]),
+        draft_compute_us=900,
+        source_device_buffer=source_device_buffer,
+        source_cpu_buffer=source_cpu_buffer,
+    )
+
+    assert views.verification_tokens.data_ptr() == source_device_buffer.data_ptr()
+    assert views.continuation_tokens.tolist() == [[7, 8]]
+
+
+def test_cpu_broadcast_receiver_rejects_source_buffers() -> None:
+    layout = transport.CompactFixedGreedyEnvelopeLayout.full_window(1, 2)
+    with pytest.raises(ValueError, match="receivers cannot provide source buffers"):
+        transport.broadcast_compact_fixed_greedy_via_cpu(
+            layout,
+            rank=1,
+            source_rank=0,
+            group=None,
+            device="cpu",
+            source_device_buffer=torch.empty(layout.message_numel, dtype=torch.long),
+        )
+
+
+def test_cpu_broadcast_receiver_copies_completed_message(monkeypatch) -> None:
+    layout = transport.CompactFixedGreedyEnvelopeLayout.full_window(
+        1,
+        2,
+        include_draft_timing=True,
+        include_draft_confidence=True,
+    )
+
+    def broadcast(message, *, src, group):
+        assert src == 0
+        assert group == "coordination-group"
+        message.copy_(torch.tensor([11, 12, 750000, 1234]))
+
+    monkeypatch.setattr(transport.dist, "broadcast", broadcast)
+    views, timing = transport.broadcast_compact_fixed_greedy_via_cpu(
+        layout,
+        rank=1,
+        source_rank=0,
+        group="coordination-group",
+        device="cpu",
+    )
+
+    assert views.verification_tokens.tolist() == [11, 12]
+    assert views.continuation_tokens.tolist() == [[11, 12]]
+    assert views.draft_confidences.tolist() == [750000]
+    assert views.draft_compute_us.item() == 1234
+    assert timing.device_to_host_seconds == 0
+    assert timing.broadcast_seconds >= 0
+    assert timing.host_to_device_submit_seconds >= 0
+    assert timing.host_continuation_tokens is not None
+    assert timing.host_continuation_tokens.tolist() == [[11, 12]]

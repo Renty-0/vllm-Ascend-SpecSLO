@@ -25,6 +25,29 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--profile-steps", type=int, default=200)
     parser.add_argument("--collectives-only", action="store_true")
     parser.add_argument(
+        "--hccl-expansion-mode",
+        choices=("AIV", "runtime-default"),
+        default="AIV",
+        help="Select AIV explicitly or leave HCCL_OP_EXPANSION_MODE unset.",
+    )
+    parser.add_argument(
+        "--strategies",
+        nargs="+",
+        choices=(
+            "all_reduce",
+            "reduce_broadcast",
+            "all_gather_sum",
+            "quant_all_gather_sum",
+            "quant_all_reduce",
+        ),
+        default=None,
+        help=(
+            "Only benchmark the selected collective strategies. This is useful "
+            "for isolating unsupported experimental collectives from the HCCL "
+            "communicator used by the production all-reduce path."
+        ),
+    )
+    parser.add_argument(
         "--custom-opp-path",
         help="Development-only custom-operator vendor path to prioritize.",
     )
@@ -61,7 +84,10 @@ def main() -> None:
     args = _parse_args()
     if dist.is_initialized():
         raise RuntimeError("The TP3 collective benchmark must initialize its own process group.")
-    os.environ.setdefault("HCCL_OP_EXPANSION_MODE", "AIV")
+    if args.hccl_expansion_mode == "AIV":
+        os.environ["HCCL_OP_EXPANSION_MODE"] = "AIV"
+    else:
+        os.environ.pop("HCCL_OP_EXPANSION_MODE", None)
     local_rank = int(os.environ["LOCAL_RANK"])
     torch.npu.set_device(local_rank)
     dist.init_process_group(backend="hccl")
@@ -160,13 +186,14 @@ def main() -> None:
                 return operation
             raise ValueError(f"Unknown TP3 collective strategy: {name}")
 
-        for name in (
+        strategy_names = args.strategies or (
             "all_reduce",
             "reduce_broadcast",
             "all_gather_sum",
             "quant_all_gather_sum",
             "quant_all_reduce",
-        ):
+        )
+        for name in strategy_names:
             dist.barrier()
             try:
                 operation = make_operation(name)

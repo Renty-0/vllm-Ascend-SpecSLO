@@ -406,6 +406,13 @@ function(add_ops_src_copy)
         file(GLOB SRC_FILES ${SRC_COPY_SRC}/*)
     endif()
     list(FILTER SRC_FILES EXCLUDE REGEX "op_host")
+    # SRC_FILES intentionally contains directories because the copy command
+    # preserves the operator source tree.  Depending on a directory does not
+    # make CMake rebuild when an existing header changes, so track every leaf
+    # as a separate dependency as well.  Without this, an AscendC header edit
+    # can be packaged beside stale device .o files from an earlier build.
+    file(GLOB_RECURSE SRC_DEPEND_FILES CONFIGURE_DEPENDS ${SRC_COPY_SRC}/*)
+    list(FILTER SRC_DEPEND_FILES EXCLUDE REGEX "op_host")
 
     get_filename_component(PARENT_PTH "${SRC_COPY_SRC}" DIRECTORY)
     get_filename_component(CUR_NAME "${SRC_COPY_SRC}" NAME)
@@ -424,12 +431,14 @@ function(add_ops_src_copy)
                     COMMAND cp -rf ${SRC_FILES} ${SRC_COPY_DST}
                     COMMAND rm -rf ${SRC_COPY_DST}/op_kernel/
                     COMMAND touch ${_BUILD_FLAG}
+                    DEPENDS ${SRC_DEPEND_FILES}
             )
         else()
             add_custom_command(OUTPUT ${_BUILD_FLAG}
                     COMMAND mkdir -p ${SRC_COPY_DST}
                     COMMAND cp -rf ${SRC_FILES} ${SRC_COPY_DST}
                     COMMAND touch ${_BUILD_FLAG}
+                    DEPENDS ${SRC_DEPEND_FILES}
             )
         endif()
 
@@ -623,6 +632,10 @@ function(add_bin_compile_target)
                     COMMAND ${_BUILD_COMMAND}
                     COMMAND touch ${_BUILD_FLAG}
                     WORKING_DIRECTORY ${GEN_OUT_DIR}
+                    DEPENDS
+                        ${bin_script}
+                        ${DYNAMIC_PY_FILE}
+                        ${OP_SRC_OUT_DIR}/${OP_TARGET_NAME}_src_copy.done
             )
 
             add_custom_target(${OP_TARGET_NAME}_${op_index}

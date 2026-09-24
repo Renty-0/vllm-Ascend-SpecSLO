@@ -40,6 +40,7 @@
 #include "gmm/grouped_matmul_swiglu_quant_weight_nz_tensor_list/grouped_matmul_swiglu_quant_torch_adpt.h"
 #include "gmm/grouped_matmul_swiglu_quant_v2/grouped_matmul_swiglu_quant_v2_torch_adpt.h"
 #include "attention/lightning_indexer/lightning_indexer_torch_adpt.h"
+#include "mc2/allreduce_add_rmsnorm/allreduce_add_rmsnorm_torch_adpt.h"
 #include "mc2/matmul_allreduce_add_rmsnorm/matmul_allreduce_add_rmsnorm_torch_adpt.h"
 #include "moe/moe_gating_top_k/moe_gating_top_k_torch_adpt.h"
 #include "moe/moe_init_routing_custom/moe_init_routing_custom_torch_adpt.h"
@@ -2204,6 +2205,16 @@ std::vector<int64_t> get_npu_storage_shape(const at::Tensor& tensor)
     return std::vector<int64_t>(desc.storage_sizes_.begin(), desc.storage_sizes_.end());
 }
 
+std::vector<std::string> freeze_and_get_mc2_opapi_symbol_providers()
+{
+    return FreezeAndGetMc2OpApiSymbolProviders();
+}
+
+std::vector<std::string> freeze_and_get_allreduce_add_rmsnorm_opapi_symbol_providers()
+{
+    return FreezeAndGetAllreduceAddRmsnormOpApiSymbolProviders();
+}
+
 
 } // namespace vllm_ascend
 
@@ -2345,6 +2356,19 @@ TORCH_LIBRARY_EXPAND(CONCAT(_C, _ascend), ops)
     ops.impl("get_npu_storage_shape", c10::DispatchKey::CompositeExplicitAutograd,
              &vllm_ascend::get_npu_storage_shape);
 
+    // This host-only call freezes the exact OPAPI symbol addresses that the
+    // MC2 adapter will use and reports each provider DSO via dladdr. Invoke it
+    // once after custom-op bootstrap and outside compile/ACLGraph capture.
+    ops.def("freeze_and_get_mc2_opapi_symbol_providers() -> str[]");
+    ops.impl("freeze_and_get_mc2_opapi_symbol_providers",
+             c10::DispatchKey::CompositeExplicitAutograd,
+             &vllm_ascend::freeze_and_get_mc2_opapi_symbol_providers);
+
+    ops.def("freeze_and_get_allreduce_add_rmsnorm_opapi_symbol_providers() -> str[]");
+    ops.impl("freeze_and_get_allreduce_add_rmsnorm_opapi_symbol_providers",
+             c10::DispatchKey::CompositeExplicitAutograd,
+             &vllm_ascend::freeze_and_get_allreduce_add_rmsnorm_opapi_symbol_providers);
+
     ops.def(
         "grouped_matmul_swiglu_quant(Tensor x, Tensor weight, Tensor weight_scale, Tensor x_scale,"
         "                            Tensor group_list, *, Tensor? bias=None,"
@@ -2426,8 +2450,21 @@ TORCH_LIBRARY_EXPAND(CONCAT(_C, _ascend), ops)
     ops.impl("dispatch_ffn_combine", torch::kPrivateUse1, &vllm_ascend::dispatch_ffn_combine);
 
     ops.def("matmul_allreduce_add_rmsnorm(Tensor x1, Tensor x2, Tensor residual, Tensor gamma, \
-        str groupTp, int tpRankSize, int tpRankId, float epsilon, bool isTransB, bool isGatherAddOut) -> (Tensor output, Tensor add_out)");
+        str groupTp, int tpRankSize, int tpRankId, float epsilon, bool isTransB, bool isGatherAddOut, \
+        bool projectionOnly=False) -> (Tensor output, Tensor add_out)");
     ops.impl("matmul_allreduce_add_rmsnorm", torch::kPrivateUse1, &vllm_ascend::matmul_allreduce_add_rmsnorm);
+
+    ops.def("allreduce_add_rmsnorm(Tensor localProjection, Tensor residual, Tensor gamma, \
+        str groupTp, int tpRankSize, int tpRankId, float epsilon, bool isGatherAddOut) \
+        -> (Tensor output, Tensor add_out)");
+    ops.impl("allreduce_add_rmsnorm", torch::kPrivateUse1, &vllm_ascend::allreduce_add_rmsnorm);
+
+    ops.def("allreduce_add_rmsnorm_chained(Tensor localProjection, Tensor residual, Tensor gamma, \
+        Tensor chainState, str groupTp, int tpRankSize, int tpRankId, float epsilon, \
+        bool isGatherAddOut, bool flushChain) \
+        -> (Tensor output, Tensor add_out, Tensor next_chain_state)");
+    ops.impl("allreduce_add_rmsnorm_chained", torch::kPrivateUse1,
+             &vllm_ascend::allreduce_add_rmsnorm_chained);
 
     ops.def(
         "npu_moe_init_routing_custom(Tensor x, Tensor expert_idx, *, Tensor? scale=None, Tensor? offset=None, int active_num=-1, "

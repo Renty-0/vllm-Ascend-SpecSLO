@@ -39,6 +39,30 @@ def _runtime_environment() -> dict[str, str | None]:
     )
 
 
+def test_capture_runtime_environment_records_mc2_input_probe_contract():
+    environment = capture_runtime_environment(
+        {
+            "VLLM_ASCEND_PEARL_MC2_CAPTURE_DIR": "/tmp/mc2-inputs",
+            "VLLM_ASCEND_PEARL_MC2_CAPTURE_ROWS": "64,100",
+        }
+    )
+
+    assert environment["VLLM_ASCEND_PEARL_MC2_CAPTURE_DIR"] == "/tmp/mc2-inputs"
+    assert environment["VLLM_ASCEND_PEARL_MC2_CAPTURE_ROWS"] == "64,100"
+
+
+def test_capture_runtime_environment_records_draft_device_pa_ab_switch_and_profiler():
+    environment = capture_runtime_environment(
+        {
+            "VLLM_ASCEND_SPECSLO_DRAFT_DEVICE_PAGED_ATTENTION": "1",
+            "VLLM_ASCEND_PEARL_PROFILE_PA_TASK_UPDATE": "0",
+        }
+    )
+
+    assert environment["VLLM_ASCEND_SPECSLO_DRAFT_DEVICE_PAGED_ATTENTION"] == "1"
+    assert environment["VLLM_ASCEND_PEARL_PROFILE_PA_TASK_UPDATE"] == "0"
+
+
 def _profile_worker(rank: int, *, is_draft: bool) -> dict:
     return {
         "rank": rank,
@@ -288,6 +312,9 @@ def test_provenance_records_cards_environment_command_and_artifact_hashes(tmp_pa
     result_path = tmp_path / "result.json"
     log_path = tmp_path / "run.log"
     provenance_path = tmp_path / "provenance.json"
+    device_pa_path = tmp_path / "vllm_ascend/ops/triton/spec_decode/device_paged_attention.py"
+    device_pa_path.parent.mkdir(parents=True)
+    device_pa_path.write_text("# device PA prototype\n", encoding="utf-8")
     environment = {
         "ASCEND_RT_VISIBLE_DEVICES": "1, 2,3,4",
         "TASK_QUEUE_ENABLE": "1",
@@ -319,6 +346,9 @@ def test_provenance_records_cards_environment_command_and_artifact_hashes(tmp_pa
     assert "VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_RANKED_KV" in finalized["environment"]
     assert finalized["command"] == ["python", "benchmark.py"]
     assert finalized["git"]["revision"] == "abc123"
+    assert finalized["critical_source_artifacts"] == {
+        "vllm_ascend/ops/triton/spec_decode/device_paged_attention.py": sha256_file(device_pa_path)
+    }
     assert finalized["artifacts"]["result_json_sha256"] == sha256_file(result_path)
     assert finalized["artifacts"]["log_file_sha256"] == sha256_file(log_path)
     assert finalized["exit_code"] == 0

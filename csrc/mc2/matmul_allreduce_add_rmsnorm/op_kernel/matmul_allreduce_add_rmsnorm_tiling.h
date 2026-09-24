@@ -48,11 +48,14 @@ struct PPTilingData {
     int32_t swizzlDirect = 0;
     uint32_t tilingKey = 0;
     int32_t blockDim = 1;
-    int32_t splitK = 0;
+    // Keep epsilon in the plain fixed-layout PP header. Embedding it after
+    // CANN's RmsNormTiling is not host/device ABI-stable on 910B.
+    float epsilon = 0.0F;
     bool weightNz = false;
     bool isTransA = false;
     bool isTransB = false;
     bool isGatherAddOut = false;
+    bool projectionOnly = false;
 };
 
 struct CommTilingData {

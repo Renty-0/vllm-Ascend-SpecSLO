@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Compare linear dispatch paths for Qwen2.5-14B TP3 matrix shapes."""
+"""Compare graph-safe linear layouts for native PEARL TP3 matrix shapes."""
 
 from __future__ import annotations
 
@@ -21,6 +21,42 @@ TP3_PROJECTIONS = (
     ("down_nz", 4608, 5120, True, False),
 )
 
+# Qwen3-32B uses 64 Q / 8 KV heads and an intermediate width of 25,600.
+# Native dynamic TP pads those to 72 / 9 heads and 25,632 elements for TP3,
+# yielding the exact local shapes below.  Measure both ND and FRACTAL_NZ with
+# the same F.linear dispatch used by the production target graph.
+QWEN3_32B_TP3_PROJECTIONS = (
+    ("qkv_nd", 5120, 3840, False, False),
+    ("qkv_nz", 5120, 3840, True, False),
+    ("gate_up_nd", 5120, 17088, False, False),
+    ("gate_up_nz", 5120, 17088, True, False),
+    ("attention_out_nd", 3072, 5120, False, False),
+    ("attention_out_nz", 3072, 5120, True, False),
+    ("down_nd", 8544, 5120, False, False),
+    ("down_nz", 8544, 5120, True, False),
+    ("lm_head_nd", 5120, 50646, False, False),
+    ("lm_head_nz", 5120, 50646, True, False),
+)
+
+# Qwen3-0.6B is the TP1 draft paired with the Qwen3-32B TP3 target.  The
+# full-chain draft graph executes four consecutive decode forwards, so its
+# exposed latency can become the pipeline bottleneck once the target's
+# down-projection uses the faster TP3 NZ layout.  Keep both layouts here to
+# select a production policy using the exact TP1 matrix shapes rather than a
+# target-only proxy.
+QWEN3_06B_TP1_PROJECTIONS = (
+    ("qkv_nd", 1024, 2048, False, False),
+    ("qkv_nz", 1024, 2048, True, False),
+    ("gate_up_nd", 1024, 6144, False, False),
+    ("gate_up_nz", 1024, 6144, True, False),
+    ("attention_out_nd", 1024, 1024, False, False),
+    ("attention_out_nz", 1024, 1024, True, False),
+    ("down_nd", 3072, 1024, False, False),
+    ("down_nz", 3072, 1024, True, False),
+    ("lm_head_nd", 1024, 151936, False, False),
+    ("lm_head_nz", 1024, 151936, True, False),
+)
+
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
@@ -32,6 +68,11 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--token-counts", type=int, nargs="+", default=[320, 464, 512])
     parser.add_argument("--warmup-steps", type=int, default=20)
     parser.add_argument("--profile-steps", type=int, default=200)
+    parser.add_argument(
+        "--shape-set",
+        choices=("qwen25-14b", "qwen3-32b", "qwen3-0.6b"),
+        default="qwen25-14b",
+    )
     parser.add_argument("--output-json")
     return parser.parse_args()
 
@@ -71,7 +112,12 @@ def main() -> None:
     torch.npu.config.allow_internal_format = True
     torch.manual_seed(20260810)
     results: list[dict[str, float | int | str | bool]] = []
-    for projection, input_size, output_size, use_nz, use_bias in TP3_PROJECTIONS:
+    projections = {
+        "qwen25-14b": TP3_PROJECTIONS,
+        "qwen3-32b": QWEN3_32B_TP3_PROJECTIONS,
+        "qwen3-0.6b": QWEN3_06B_TP1_PROJECTIONS,
+    }[args.shape_set]
+    for projection, input_size, output_size, use_nz, use_bias in projections:
         weight = (
             torch.randn(output_size, input_size, dtype=torch.float32, device="npu") * 0.02
         ).to(dtype)
@@ -137,7 +183,7 @@ def main() -> None:
                             expected,
                         )
 
-    payload = {"dtype": args.dtype, "results": results}
+    payload = {"dtype": args.dtype, "shape_set": args.shape_set, "results": results}
     rendered = json.dumps(payload, indent=2)
     print(rendered)
     if args.output_json:

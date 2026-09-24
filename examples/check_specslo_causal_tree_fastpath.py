@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import replace
 from pathlib import Path
 
 
@@ -26,6 +27,15 @@ def _parser():
     parser.add_argument("--max-probability-error", type=float, default=0.002)
     parser.add_argument("--max-total-variation", type=float, default=0.01)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.85)
+    parser.add_argument(
+        "--fixed-kv-capacity",
+        type=int,
+        default=0,
+        help=(
+            "Qualify a FULL-mask target graph whose host KV lengths remain "
+            "fixed at this capacity so every layer can skip task refresh."
+        ),
+    )
     parser.add_argument("--output", required=True)
     return parser
 
@@ -93,7 +103,14 @@ def _target_case(engine, args, filler):
     from vllm_ascend.spec_decode.pearl.roofline import attention_backend_identity
     from vllm_ascend.spec_decode.pearl.tree import build_tree_speculation_plan, pack_selected_tree_plan
 
-    prompts = [(filler * ((length + len(filler) - 1) // len(filler)))[:length] for length in args.contexts]
+    # Keep one additional prefetched token so a second same-shape request can
+    # advance every KV length by one.  Replaying that second request exercises
+    # the dynamic FIA task-update path rather than only the unchanged-length
+    # graph fast path.
+    prompts = [
+        (filler * ((length + 1 + len(filler) - 1) // len(filler)))[: length + 1]
+        for length in args.contexts
+    ]
     engine._allocate_cache(prompts, enable_prefix_caching=False)
     for sequence, prompt in enumerate(prompts):
         engine._run_packed_hidden(
@@ -106,20 +123,41 @@ def _target_case(engine, args, filler):
     selections = ([0], [0, 1])
     plans = [
         pack_selected_tree_plan(
-            build_tree_speculation_plan(2, 2, len(prompt) - 1, args.max_model_len, device=engine.device),
+            build_tree_speculation_plan(2, 2, len(prompt) - 2, args.max_model_len, device=engine.device),
             selected,
         )
         for prompt, selected in zip(prompts, selections)
     ]
-    roots = [prompt[-1] for prompt in prompts]
+    roots = [prompt[-2] for prompt in prompts]
     candidates = [
         [(root + 17 + index) % engine.target_vocab_size for index in range(len(selected))]
         for root, selected in zip(roots, selections)
     ]
+    changed_plans = [
+        pack_selected_tree_plan(
+            build_tree_speculation_plan(
+                2,
+                2,
+                len(prompt) - 1,
+                args.max_model_len,
+                device=engine.device,
+            ),
+            selected,
+        )
+        for prompt, selected in zip(prompts, selections)
+    ]
+    changed_roots = [prompt[-1] for prompt in prompts]
+    changed_candidates = [
+        [
+            (root + 29 + index) % engine.target_vocab_size
+            for index in range(len(selected))
+        ]
+        for root, selected in zip(changed_roots, selections)
+    ]
     branched_selections = ([0], [0, 1, 2])
     branched_plans = [
         pack_selected_tree_plan(
-            build_tree_speculation_plan(2, 2, len(prompt) - 1, args.max_model_len, device=engine.device),
+            build_tree_speculation_plan(2, 2, len(prompt) - 2, args.max_model_len, device=engine.device),
             selected,
         )
         for prompt, selected in zip(prompts, branched_selections)
@@ -131,13 +169,13 @@ def _target_case(engine, args, filler):
     engine._ensure_cache_capacity(
         [
             sequence
-            for rows in (plans, branched_plans)
+            for rows in (plans, changed_plans, branched_plans)
             for sequence, plan in enumerate(rows)
             for _ in plan.cache_positions
         ],
         [
             int(position)
-            for rows in (plans, branched_plans)
+            for rows in (plans, changed_plans, branched_plans)
             for plan in rows
             for position in plan.cache_positions.cpu().tolist()
         ],
@@ -153,6 +191,34 @@ def _target_case(engine, args, filler):
         sequence_ids=list(range(len(plans))),
         allow_causal_fast_path=False,
     )
+    changed = engine.model.make_tree_attention_metadata(
+        changed_plans,
+        changed_roots,
+        changed_candidates,
+        engine.cache_block_tables,
+        sequence_ids=list(range(len(changed_plans))),
+    )
+    fixed_full = None
+    if args.fixed_kv_capacity:
+        if max(full[2].sequence_lens) > args.fixed_kv_capacity:
+            raise ValueError("Fixed KV capacity does not cover the exact linear-tree context")
+        fixed_tables = full[2].request_block_tables.clone()
+        for row in range(fixed_tables.shape[0]):
+            valid = fixed_tables[row] >= 0
+            if not bool(valid.any()):
+                raise RuntimeError("Fixed-KV qualification found an empty request page table")
+            first_page = fixed_tables[row, valid][0]
+            fixed_tables[row].masked_fill_(~valid, first_page)
+        fixed_full = (
+            full[0],
+            full[1],
+            replace(
+                full[2],
+                block_tables=fixed_tables,
+                request_block_tables=fixed_tables,
+                sequence_lens=(args.fixed_kv_capacity,) * len(full[2].sequence_lens),
+            ),
+        )
     branched = engine.model.make_tree_attention_metadata(
         branched_plans,
         roots,
@@ -166,7 +232,13 @@ def _target_case(engine, args, filler):
         raise RuntimeError("Forced reference did not enter FULL tree FIA")
     if attention_backend_identity(branched[2]) != "fused_infer_attention_tree_v1":
         raise RuntimeError("Branched selected tree did not enter FULL tree FIA")
-    slots = torch.cat((fast[2].slot_mapping.long(), branched[2].slot_mapping.long())).unique()
+    slots = torch.cat(
+        (
+            fast[2].slot_mapping.long(),
+            changed[2].slot_mapping.long(),
+            branched[2].slot_mapping.long(),
+        )
+    ).unique()
     before = _snapshot(engine.model, slots)
     fast_hidden, fast_logits, _ = _forward(engine, fast, graph=False)
     fast_kv = _snapshot(engine.model, slots)
@@ -174,6 +246,12 @@ def _target_case(engine, args, filler):
     full_hidden, full_logits, _ = _forward(engine, full, graph=False)
     full_kv = _snapshot(engine.model, slots)
     _restore(engine.model, slots, before)
+    changed_hidden, changed_logits, _ = _forward(engine, changed, graph=False)
+    _restore(engine.model, slots, before)
+    fixed_hidden = fixed_logits = None
+    if fixed_full is not None:
+        fixed_hidden, fixed_logits, _ = _forward(engine, fixed_full, graph=False)
+        _restore(engine.model, slots, before)
     branched_hidden, branched_logits, _ = _forward(engine, branched, graph=False)
     _restore(engine.model, slots, before)
     graph_hidden, graph_logits, used_graph = _forward(engine, fast, graph=True)
@@ -181,12 +259,49 @@ def _target_case(engine, args, filler):
     # setup. The runner also performs its own eager validation on first reuse.
     graph_hidden, graph_logits, used_graph_second = _forward(engine, fast, graph=True)
     _restore(engine.model, slots, before)
+    parallel_update_before = engine.graph_runner.target_fia_parallel_update_replays
+    changed_graph_hidden, changed_graph_logits, used_changed_graph = _forward(
+        engine,
+        changed,
+        graph=True,
+    )
+    _restore(engine.model, slots, before)
     full_capture_before = engine.graph_runner.capture_count
     full_replay_before = engine.graph_runner.replay_count
     full_graph_hidden, full_graph_logits, used_full_graph = _forward(engine, branched, graph=True)
     # Reuse the resident FULL-mask graph as well.  This is the path that must
     # remain live once the selected tree contains a sibling branch.
     full_graph_hidden, full_graph_logits, used_full_graph_second = _forward(engine, branched, graph=True)
+    fixed_graph_reference = None
+    if fixed_full is not None:
+        fixed_capture_before = engine.graph_runner.capture_count
+        fixed_replay_before = engine.graph_runner.replay_count
+        fixed_skip_before = engine.graph_runner.task_update_skip_replay_count
+        fixed_graph_hidden, fixed_graph_logits, fixed_used_graph = _forward(engine, fixed_full, graph=True)
+        fixed_graph_hidden, fixed_graph_logits, fixed_used_graph_second = _forward(engine, fixed_full, graph=True)
+        fixed_graph_reference = {
+            "kv_capacity": args.fixed_kv_capacity,
+            "eager_hidden_vs_exact_full": _compare(fixed_hidden, full_hidden, atol=args.atol, rtol=args.rtol),
+            "eager_logits_vs_exact_full": _compare(fixed_logits, full_logits, atol=args.atol, rtol=args.rtol),
+            "graph_hidden_vs_fixed_eager": _compare(
+                fixed_graph_hidden,
+                fixed_hidden,
+                atol=0.001,
+                rtol=0.001,
+            ),
+            "graph_logits_vs_fixed_eager": _compare(
+                fixed_graph_logits,
+                fixed_logits,
+                atol=0.001,
+                rtol=0.001,
+            ),
+            "used_aclgraph": fixed_used_graph and fixed_used_graph_second,
+            "capture_count_delta": engine.graph_runner.capture_count - fixed_capture_before,
+            "replay_count_delta": engine.graph_runner.replay_count - fixed_replay_before,
+            "task_update_skip_replay_count_delta": (
+                engine.graph_runner.task_update_skip_replay_count - fixed_skip_before
+            ),
+        }
     kv_rows = []
     for layer, (fast_pair, full_pair) in enumerate(zip(fast_kv, full_kv)):
         for cache, actual, reference in zip(("key", "value"), fast_pair, full_pair):
@@ -209,6 +324,30 @@ def _target_case(engine, args, filler):
         "capture_count": engine.graph_runner.capture_count,
         "replay_count": engine.graph_runner.replay_count,
     }
+    changed_length_graph_reference = {
+        "sequence_lens_before": list(fast[2].sequence_lens),
+        "sequence_lens_after": list(changed[2].sequence_lens),
+        "hidden": _compare(
+            changed_graph_hidden,
+            changed_hidden,
+            atol=0.001,
+            rtol=0.001,
+        ),
+        "logits": _compare(
+            changed_graph_logits,
+            changed_logits,
+            atol=0.001,
+            rtol=0.001,
+        ),
+        "used_aclgraph": used_changed_graph,
+        "parallel_update_replays_delta": (
+            engine.graph_runner.target_fia_parallel_update_replays
+            - parallel_update_before
+        ),
+        "configured_parallel_update_workers": (
+            engine.graph_runner.target_fia_task_update_workers
+        ),
+    }
     full_graph_reference = {
         "candidate_counts": [len(row) for row in branched_candidates],
         "hidden": _compare(full_graph_hidden, branched_hidden, atol=0.001, rtol=0.001),
@@ -225,12 +364,34 @@ def _target_case(engine, args, filler):
         and graph_reference["logits"]["allclose"]
         and graph_reference["logits"]["argmax_exact"]
         and graph_reference["used_aclgraph"]
+        and changed_length_graph_reference["hidden"]["allclose"]
+        and changed_length_graph_reference["logits"]["allclose"]
+        and changed_length_graph_reference["logits"]["argmax_exact"]
+        and changed_length_graph_reference["used_aclgraph"]
+        and (
+            changed_length_graph_reference["configured_parallel_update_workers"] == 1
+            or changed_length_graph_reference["parallel_update_replays_delta"] >= 1
+        )
         and full_graph_reference["hidden"]["allclose"]
         and full_graph_reference["logits"]["allclose"]
         and full_graph_reference["logits"]["argmax_exact"]
         and full_graph_reference["used_aclgraph"]
         and full_graph_reference["capture_count_delta"] == 1
         and full_graph_reference["replay_count_delta"] >= 2
+        and (
+            fixed_graph_reference is None
+            or (
+                fixed_graph_reference["eager_hidden_vs_exact_full"]["finite"]
+                and fixed_graph_reference["eager_logits_vs_exact_full"]["argmax_exact"]
+                and fixed_graph_reference["graph_hidden_vs_fixed_eager"]["allclose"]
+                and fixed_graph_reference["graph_logits_vs_fixed_eager"]["allclose"]
+                and fixed_graph_reference["graph_logits_vs_fixed_eager"]["argmax_exact"]
+                and fixed_graph_reference["used_aclgraph"]
+                and fixed_graph_reference["capture_count_delta"] == 1
+                and fixed_graph_reference["replay_count_delta"] >= 2
+                and fixed_graph_reference["task_update_skip_replay_count_delta"] >= 1
+            )
+        )
     )
     engine.graph_runner.release_target_graph_entries()
     engine._release_cache()
@@ -240,7 +401,9 @@ def _target_case(engine, args, filler):
         "tree_fia_reference": tree_reference,
         "tree_fia_reference_is_cross_backend_diagnostic_not_acceptance_oracle": True,
         "causal_aclgraph_reference": graph_reference,
+        "changed_length_causal_aclgraph_reference": changed_length_graph_reference,
         "full_tree_aclgraph_reference": full_graph_reference,
+        "fixed_kv_full_tree_aclgraph_reference": fixed_graph_reference,
         "passed": passed,
     }
 
@@ -249,6 +412,8 @@ def main(argv=None):
     args = _parser().parse_args(argv)
     if min(args.contexts) < 2 or max(args.contexts) + 4 > args.max_model_len:
         raise ValueError("Contexts and tree slots must fit max_model_len")
+    if args.fixed_kv_capacity < 0 or args.fixed_kv_capacity > args.max_model_len:
+        raise ValueError("Fixed KV capacity must fit max_model_len")
     if min(args.atol, args.rtol, args.max_probability_error, args.max_total_variation) < 0:
         raise ValueError("Tolerances must be non-negative")
     import torch

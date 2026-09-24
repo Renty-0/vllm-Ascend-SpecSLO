@@ -59,6 +59,7 @@ public:
         this->Attr("epsilon").AttrType(OPTIONAL).Float(1e-6);
         this->Attr("is_trans_b").AttrType(OPTIONAL).Bool(false);
         this->Attr("is_gather_add_out").AttrType(OPTIONAL).Bool(false);
+        this->Attr("projection_only").AttrType(OPTIONAL).Bool(false);
 
         this->MC2().HcclGroup({"group_tp"});
         this->AICore().AddConfig("ascend910b");

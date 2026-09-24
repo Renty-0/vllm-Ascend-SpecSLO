@@ -171,12 +171,19 @@ class PEARLConfig:
     # Experimental fixed-gamma policy. When enabled, measured W may select a
     # serial-draft graph bucket larger than the mandatory normal-row bucket.
     spec_rhythm_linear_eager_cross_graph_bucket: bool = False
-    # Fill an otherwise idle draft side with dependency-exact continuations,
-    # ordered by full-window acceptance and still bounded by measured W.
+    # Use residual measured W for dependency-exact continuations after urgent
+    # and mandatory normal work.  The historical field name is retained for
+    # CLI/result compatibility; admission is still bounded by the measured
+    # draft window and graph bucket capacity.
     spec_rhythm_linear_idle_residual_eager: bool = False
     # With an arrival-aware manifest, prefill only the initial decode bucket;
     # later requests are prefetched when they enter a free slot.
     spec_rhythm_online_prefill: bool = False
+    # Paper-faithful decode-stage evaluation: build every prompt KV before
+    # measurement, then replay the original relative arrival offsets at the
+    # decode scheduler.  This models the separate prefill pool in Section 6.1
+    # without admitting all queued requests at time zero.
+    spec_rhythm_kv_ready_arrivals: bool = False
     # Opt-in bounded coalescing for arrival-gated fixed-gamma serial prefill.
     # The 1/0 defaults preserve immediate admission exactly.
     spec_rhythm_prefill_coalesce_min_requests: int = 1
@@ -189,6 +196,10 @@ class PEARLConfig:
     # both logical homes into one target forward is an opt-in throughput probe
     # because it removes the rolling-eager scheduling window.
     spec_rhythm_merge_ready_homes: bool = False
+    # Experimental capacity-bounded SLO-aware dual-home placement.  Prefer
+    # the tightest class in one home and residual traffic in the other, but
+    # spill at the physical half-batch boundary so neither home is overfull.
+    spec_rhythm_slo_home_partition: bool = False
     spec_rhythm_priority_mode: bool = False
     spec_rhythm_priority_burst: int = 2
     spec_rhythm_target_fallback_max_batch: int = 0
@@ -279,7 +290,7 @@ class PEARLConfig:
             raise ValueError("Unknown SpecRhythm ablation mode.")
         if self.spec_rhythm_ablation_mode != "auto" and not (
             self.enable_spec_rhythm
-            and self.spec_rhythm_online_prefill
+            and (self.spec_rhythm_online_prefill or self.spec_rhythm_kv_ready_arrivals)
             and self.spec_rhythm_linear_full_window
             and self.gamma > 0
             and self.spec_rhythm_min_gamma == self.gamma
@@ -292,6 +303,18 @@ class PEARLConfig:
             )
         if self.spec_rhythm_ablation_mode != "auto" and self.spec_rhythm_merge_ready_homes:
             raise ValueError("Explicit SpecRhythm ablations cannot merge logical homes.")
+        if self.spec_rhythm_online_prefill and self.spec_rhythm_kv_ready_arrivals:
+            raise ValueError("Online prefill and KV-ready arrival replay are mutually exclusive.")
+        if self.spec_rhythm_kv_ready_arrivals and not self.enable_spec_rhythm:
+            raise ValueError("KV-ready arrival replay requires SpecRhythm.")
+        if self.spec_rhythm_kv_ready_arrivals and not (
+            self.spec_rhythm_linear_full_window
+            and self.spec_rhythm_tree_width == 1
+            and self.spec_rhythm_tree_depth == 1
+        ):
+            raise ValueError("KV-ready arrival replay currently requires linear full-window SpecRhythm.")
+        if self.spec_rhythm_kv_ready_arrivals and self.enable_prefix_caching:
+            raise ValueError("KV-ready host staging currently requires prefix caching to be disabled.")
         if self.spec_rhythm_linear_full_window and (
             not self.enable_spec_rhythm
             or self.gamma <= 0
@@ -335,12 +358,15 @@ class PEARLConfig:
         prefill_coalescing = (
             self.spec_rhythm_prefill_coalesce_min_requests != 1 or self.spec_rhythm_prefill_coalesce_max_wait_ms != 0
         )
+        tree_scheduler = self.spec_rhythm_tree_width > 1 or self.spec_rhythm_tree_depth > 1
         if prefill_coalescing and not (
-            self.enable_spec_rhythm and self.spec_rhythm_online_prefill and self.spec_rhythm_linear_full_window
+            self.enable_spec_rhythm
+            and self.spec_rhythm_online_prefill
+            and (self.spec_rhythm_linear_full_window or tree_scheduler)
         ):
             raise ValueError(
                 "SpecRhythm prefill coalescing requires enable_spec_rhythm, "
-                "online prefill, and linear full-window mode."
+                "online prefill, and either linear full-window or tree scheduling."
             )
         if prefill_coalescing and (
             self.spec_rhythm_prefill_coalesce_min_requests <= 1 or self.spec_rhythm_prefill_coalesce_max_wait_ms <= 0
@@ -558,10 +584,12 @@ class PEARLConfig:
             spec_rhythm_linear_eager_cross_graph_bucket=(self.spec_rhythm_linear_eager_cross_graph_bucket),
             spec_rhythm_linear_idle_residual_eager=(self.spec_rhythm_linear_idle_residual_eager),
             spec_rhythm_online_prefill=self.spec_rhythm_online_prefill,
+            spec_rhythm_kv_ready_arrivals=self.spec_rhythm_kv_ready_arrivals,
             spec_rhythm_prefill_coalesce_min_requests=(self.spec_rhythm_prefill_coalesce_min_requests),
             spec_rhythm_prefill_coalesce_max_wait_ms=(self.spec_rhythm_prefill_coalesce_max_wait_ms),
             spec_rhythm_prefill_token_chunk_size=(self.spec_rhythm_prefill_token_chunk_size),
             spec_rhythm_merge_ready_homes=self.spec_rhythm_merge_ready_homes,
+            spec_rhythm_slo_home_partition=self.spec_rhythm_slo_home_partition,
             spec_rhythm_priority_mode=self.spec_rhythm_priority_mode,
             spec_rhythm_priority_burst=self.spec_rhythm_priority_burst,
             spec_rhythm_target_fallback_max_batch=self.spec_rhythm_target_fallback_max_batch,
@@ -1203,7 +1231,16 @@ def _pearl_worker(
     os.environ["RANK"] = str(rank)
     os.environ["WORLD_SIZE"] = str(config.draft_tp_size + config.target_tp_size)
     os.environ["LOCAL_RANK"] = str(rank)
-    os.environ.setdefault("HCCL_NPU_SOCKET_PORT_RANGE", "auto")
+    # CANN 9.0's MTE/symmetric-window MC2 transport deadlocks when the worker
+    # injects the special ``auto`` socket-port value.  The regular HCCL path
+    # accepts it, so preserve the historical default everywhere except the
+    # qualified TP3 MC2 deployment.  An explicit administrator-provided
+    # numeric range is retained.
+    if config.enable_mc2 and config.target_tp_size == 3:
+        if os.environ.get("HCCL_NPU_SOCKET_PORT_RANGE") == "auto":
+            os.environ.pop("HCCL_NPU_SOCKET_PORT_RANGE")
+    else:
+        os.environ.setdefault("HCCL_NPU_SOCKET_PORT_RANGE", "auto")
     engine: NativePearlEngine | None = None
     try:
         engine = NativePearlEngine(config)

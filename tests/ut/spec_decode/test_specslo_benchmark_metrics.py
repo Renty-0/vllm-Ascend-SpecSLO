@@ -95,6 +95,28 @@ def test_native_paper_and_baseline_use_identical_denominator_and_goodput_window(
     assert legacy["paper"]["attained_requests"] == 0
 
 
+def test_native_paper_reports_explicit_decode_stage_goodput():
+    row = {
+        "request_id": "r",
+        "completion_token_ids": [7] * 8,
+        "slo_tpot_ms": 40,
+        "slo_class": "tight",
+        "observed_tpot_ms": 20,
+        "paper_tpot_ms": 20,
+        "slo_attained": True,
+        "slo_goodput_tokens": 8,
+    }
+    result = _summarize_slo_metrics(
+        [row],
+        1.5,
+        2.0,
+        paper_decode_elapsed=1.0,
+    )
+    assert result["paper"]["goodput_tokens_per_e2e_second"] == 4
+    assert result["paper"]["decode_stage_measurement_seconds"] == 1
+    assert result["paper"]["goodput_tokens_per_decode_second"] == 8
+
+
 def test_partial_missing_group_timing_keeps_missing_requests_in_attainment_denominator():
     result = summarize_slo_rows(
         [

@@ -106,7 +106,9 @@ class PearlProcessGroups:
     target_group: dist.ProcessGroup
     verification_group: dist.ProcessGroup
     correction_group: dist.ProcessGroup
+    world_coordination_group: dist.ProcessGroup
     verification_coordination_group: dist.ProcessGroup
+    correction_coordination_group: dist.ProcessGroup
 
     @classmethod
     def create(cls, topology: PearlTopology, backend: str | None = None) -> PearlProcessGroups:
@@ -134,6 +136,15 @@ class PearlProcessGroups:
         target_group = dist.new_group(ranks=list(topology.target_ranks), backend=selected_backend)
         verification_group = dist.new_group(ranks=list(topology.verification_ranks), backend=selected_backend)
         correction_group = dist.new_group(ranks=list(topology.correction_ranks), backend=selected_backend)
+        # MC2 startup admission must include every draft and target rank.  It
+        # cannot reuse ``verification_coordination_group`` because that group
+        # contains only the draft leader when draft TP > 1.  Keep a dedicated
+        # all-world CPU group so startup failures never submit HCCL work and
+        # every worker executes the same group-construction order.
+        world_coordination_group = dist.new_group(
+            ranks=list(range(world_size)),
+            backend="gloo",
+        )
         # HCCL collectives from an overlapping process group must not be
         # submitted while target TP all-reduces are still in flight.  A tiny
         # host-side rendezvous lets every verification rank announce that its
@@ -144,6 +155,16 @@ class PearlProcessGroups:
             ranks=list(topology.verification_ranks),
             backend="gloo",
         )
+        # Greedy target verification is replicated across the target TP
+        # ranks.  Only the authoritative target leader and draft ranks need
+        # to exchange the compact correction envelope; target followers can
+        # consume their identical rank-local verdict.  Keep this CPU group
+        # separate from the wider proposal/compute rendezvous so a two-value
+        # correction does not serialize every target follower each cycle.
+        correction_coordination_group = dist.new_group(
+            ranks=list(topology.correction_ranks),
+            backend="gloo",
+        )
 
         return cls(
             topology=topology,
@@ -152,7 +173,9 @@ class PearlProcessGroups:
             target_group=target_group,
             verification_group=verification_group,
             correction_group=correction_group,
+            world_coordination_group=world_coordination_group,
             verification_coordination_group=verification_coordination_group,
+            correction_coordination_group=correction_coordination_group,
         )
 
     @property

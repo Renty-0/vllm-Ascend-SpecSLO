@@ -41,6 +41,7 @@ extern aclnnStatus aclnnInnerMatmulAllreduceAddRmsnormGetWorkspaceSize(
     double epsilon,
     bool isTransB,
     bool isGatherAddOut,
+    bool projectionOnly,
     const aclTensor *yOut,
     const aclTensor *addOutOut,
     uint64_t *workspaceSize,
@@ -63,13 +64,15 @@ aclnnStatus aclnnMatmulAllreduceAddRmsnormGetWorkspaceSize(
     double epsilon,
     bool isTransB,
     bool isGatherAddOut,
+    bool projectionOnly,
     const aclTensor *y,
     const aclTensor *addOut,
     uint64_t *workspaceSize,
     aclOpExecutor **executor)
 {
     return aclnnInnerMatmulAllreduceAddRmsnormGetWorkspaceSize(x1, x2, residual,
-        gamma, groupTp, tpRankSize, tpRankId, epsilon, isTransB, isGatherAddOut, y, addOut, workspaceSize, executor);
+        gamma, groupTp, tpRankSize, tpRankId, epsilon, isTransB, isGatherAddOut, projectionOnly,
+        y, addOut, workspaceSize, executor);
 }
 
 aclnnStatus aclnnMatmulAllreduceAddRmsnorm(
@@ -79,6 +82,10 @@ aclnnStatus aclnnMatmulAllreduceAddRmsnorm(
     aclrtStream stream)
 {
     if (NnopbaseSetHcclServerType) {
+        // The qualified direct-window TP3 protocol relies on the historical
+        // MTE server lifecycle.  Switching this executor to AICPU makes the
+        // first ACLGraph replay wait forever even with byte-identical device
+        // kernels.
         NnopbaseSetHcclServerType(executor, NNOPBASE_HCCL_SERVER_TYPE_MTE);
     }
     return aclnnInnerMatmulAllreduceAddRmsnorm(workspace, workspaceSize, executor, stream);

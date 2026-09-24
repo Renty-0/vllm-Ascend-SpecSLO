@@ -23,6 +23,9 @@
 
 using namespace AscendC;
 
+// Keep the correctness-first rank-3 path comfortably below the 910B2 UB
+// ceiling.  Larger tiles are admitted only after an eager/graph numerical
+// sweep proves that every independently owned source buffer remains disjoint.
 constexpr int32_t DIFUSION_ADD_LEN = 512;
 constexpr int32_t TQUE_DEPTH = 1;
 constexpr uint32_t TBUF_POOL_MAX_BUFID_SIZE = 8;
@@ -102,6 +105,7 @@ public:
         m = ppTilingData->opShape.m;
         k = ppTilingData->opShape.k;
         n = ppTilingData->opShape.n;
+        avg_factor = (n != 0) ? (float)1.0 / n : 0;
 
         m0 = ppTilingData->m0;
         k0 = ppTilingData->k0;
@@ -129,10 +133,11 @@ public:
         dequant_group_size = quantInfo->dequantGroupSize;
         quant_granularity = static_cast<QuantGranularity>(quantInfo->quantGranularity);
         quant_group_size = quantInfo->quantGroupSize;
-        epsilon = tilingData->matmulAllreduceAddRmsnormInfo.rmsnormTilingData.epsilon;
+        epsilon = ppTilingData->epsilon;
         swizzl_direct = (tiling_key & SWIZZL_MASK) ? true : false;
         trans_a = ppTilingData->isTransA;
         trans_b = ppTilingData->isTransB;
+        projection_only = ppTilingData->projectionOnly;
         is_int8 = false;
         ag_dim = 0;
         rs_dim = 0;
@@ -182,16 +187,53 @@ public:
         step2BufPool.InitBuffer(allgatherBuf[0], max_ub_ping_pong_size * sizeof(MmadDtype));
         step2BufPool.InitBuffer(allgatherBuf[1], max_ub_ping_pong_size * sizeof(MmadDtype));
 
-        CopyInGamma();
+        if (!projection_only) {
+            CopyInGamma();
+        }
     }
 
     __aicore__ inline void Process(const MatmulAllreduceAddRmsnormTilingData *tilingData)
     {
-        // AIV AllReduce & Add & RMSNorm func, waits for AIC to complete [Matmul].
+        // AIV AllReduce & Add & RMSNorm func, releases AIC [Matmul].
         FFTSCrossCoreSync<PIPE_MTE3>(FFTS_SYNC_AICORE_GROUP_MODE, AIC_WAIT_AIV_FINISH_ALIGN_FLAG_ID);
         PipeBarrier<PIPE_ALL>();
 
-        ResetIpcFlags(FLAG_NUM);
+        // TP3 cannot use CANN's public fused MatMul+AllReduce on Atlas A2.
+        // For the small verify windows used by SpecSLO, every rank reduces
+        // the complete window directly from the three symmetric buffers.
+        // This avoids the generic path's 16/rank_size owner partition, which
+        // is only balanced for the production 2/4/8-rank configurations.
+        if (rank_size == 3 && m <= 160) {
+            // Wait for the explicit per-Cube completion epoch.  Only one AIV
+            // sub-core polls; SyncAll releases its paired sub-core after every
+            // Cube core has published the current invocation.
+            WaitEvent(0);
+            AscendC::SyncAll<true>();
+            ResetTp3DirectIpcFlags(false);
+            CrossRankSyncEx(FLAG_NUM, true);
+            Tp3PublishAndWait(FLAG_ZERO_IDX, 1, true);
+
+            // One barrier publishes all AIC matmul results.  The second keeps
+            // a following layer from overwriting a peer window while another
+            // rank still reads it.  The generic path's split-reduce and
+            // all-gather phase barriers are unnecessary for replicated output.
+            int32_t logical_core = core_idx * 2 + aiv_idx;
+            int32_t logical_core_count = core_num * 2;
+            int32_t m_per_core = DivCeil(m, logical_core_count);
+            int32_t m_cur_core = LimitRange(m - logical_core * m_per_core, 0, m_per_core);
+            int32_t core_offset_m = logical_core * m_per_core;
+            ParallelWithSplitStepOneAddNorm(core_offset_m * n, m_cur_core, true);
+            PipeBarrier<PIPE_ALL>();
+            AscendC::SyncAll<true>();
+            Tp3PublishAndWait(FLAG_ONE_IDX, 1, true);
+            return;
+        }
+
+        if (rank_size == 3) {
+            ResetTp3IpcFlags(FLAG_NUM);
+        } else {
+            ResetIpcFlags(FLAG_NUM);
+        }
         CrossRankSyncEx(FLAG_NUM);
         // Every rank must own the same number of gather cores. Using all 16
         // cores for TP3 maps core 15 to a non-existent fourth rank.
@@ -200,7 +242,6 @@ public:
         int32_t loop_num_per_comm = one_comm_count * n_loop;
         int32_t comm_count = DivCeil(core_loop, loop_num_per_comm);
         int32_t pipe_depth = is_91093 ? BLOCK_COUNT_4 : MAX_BLOCK_COUNT;
-
         for (int cal_idx = 0; cal_idx < comm_count; ++cal_idx) {
             uint64_t flag_idx = cal_idx % pipe_depth;
             int32_t m_total = (cal_idx == comm_count - 1) ?
@@ -210,7 +251,11 @@ public:
 
             WaitEvent(flag_idx);
             SetAndWaitAivSync(flag_idx, is_91093 ? BLOCK_COUNT_4 : MAX_BLOCK_COUNT);
-            CrossRankSyncV1(FLAG_ZERO_IDX, cal_idx + 1);
+            if (rank_size == 3) {
+                Tp3PublishAndWait(FLAG_ZERO_IDX, cal_idx + 1);
+            } else {
+                CrossRankSyncV1(FLAG_ZERO_IDX, cal_idx + 1);
+            }
             SetAndWaitAivSync(flag_idx, is_91093 ? BLOCK_COUNT_4 : MAX_BLOCK_COUNT);
 
             if (aiv_idx == 0 && core_idx < allreduce_used_core) {
@@ -218,13 +263,17 @@ public:
                 int32_t m_per_core = DivCeil(m_cur_rank, allreduce_used_core);
                 int32_t m_cur_core = LimitRange(m_cur_rank - core_idx * m_per_core, 0, m_per_core);
                 int32_t core_offset_m = loop_offset + rank * m_per_rank + core_idx * m_per_core;
-                ParallelWithSplitStepOneAddNorm(core_offset_m * n, m_cur_core);
+                ParallelWithSplitStepOneAddNorm(core_offset_m * n, m_cur_core, false);
             }
 
             PipeBarrier<PIPE_ALL>();
 
             SetAndWaitAivSync(flag_idx, is_91093 ? BLOCK_COUNT_4 : MAX_BLOCK_COUNT);
-            CrossRankSyncV1(FLAG_ADD_IDX, cal_idx + 1);
+            if (rank_size == 3) {
+                Tp3PublishAndWait(FLAG_ADD_IDX, cal_idx + 1);
+            } else {
+                CrossRankSyncV1(FLAG_ADD_IDX, cal_idx + 1);
+            }
             SetAndWaitAivSync(flag_idx, is_91093 ? BLOCK_COUNT_4 : MAX_BLOCK_COUNT);
 
             { // ParallelWithSplitStepTwo
@@ -243,7 +292,11 @@ public:
                 }
 
                 SetAndWaitAivSync(flag_idx);
-                CrossRankSyncV2(FLAG_TWO_IDX, cal_idx + 1);
+                if (rank_size == 3) {
+                    Tp3PublishAndWait(FLAG_TWO_IDX, cal_idx + 1);
+                } else {
+                    CrossRankSyncV2(FLAG_TWO_IDX, cal_idx + 1);
+                }
                 SetAndWaitAivSync(flag_idx);
 
                 if constexpr (GatherAddOut) {
@@ -252,7 +305,11 @@ public:
                     }
 
                     SetAndWaitAivSync(flag_idx);
-                    CrossRankSyncV2(FLAG_GATHER_ADD_OUT_STEP1, cal_idx + 1);
+                    if (rank_size == 3) {
+                        Tp3PublishAndWait(FLAG_GATHER_ADD_OUT_STEP1, cal_idx + 1);
+                    } else {
+                        CrossRankSyncV2(FLAG_GATHER_ADD_OUT_STEP1, cal_idx + 1);
+                    }
                     SetAndWaitAivSync(flag_idx);
 
                     if (filter_core_cond && gather_rank_id != rank) {
@@ -260,7 +317,11 @@ public:
                     }
 
                     SetAndWaitAivSync(flag_idx);
-                    CrossRankSyncV2(FLAG_GATHER_ADD_OUT_STEP2, cal_idx + 1);
+                    if (rank_size == 3) {
+                        Tp3PublishAndWait(FLAG_GATHER_ADD_OUT_STEP2, cal_idx + 1);
+                    } else {
+                        CrossRankSyncV2(FLAG_GATHER_ADD_OUT_STEP2, cal_idx + 1);
+                    }
                     SetAndWaitAivSync(flag_idx);
                 }
             }
@@ -269,10 +330,15 @@ public:
                 SetAicSync(flag_idx);
             }
         }
-        ResetIpcFlags(FLAG_NUM);
-        if (aiv_idx == 0 && core_idx < rank_size) {
-            __gm__ int32_t *state_buff = (__gm__ int32_t *)hccl_.GetWindowsOutAddr(other_rank);
-            CheckBuffFlag(ub_ctrl_flag, state_buff + FLAG_ZERO_IDX, 0);
+        if (rank_size == 3) {
+            ResetTp3IpcFlags(FLAG_NUM);
+            CrossRankSyncEx(FLAG_NUM);
+        } else {
+            ResetIpcFlags(FLAG_NUM);
+            if (aiv_idx == 0 && core_idx < rank_size) {
+                __gm__ int32_t *state_buff = (__gm__ int32_t *)hccl_.GetWindowsOutAddr(other_rank);
+                CheckBuffFlag(ub_ctrl_flag, state_buff + FLAG_ZERO_IDX, 0);
+            }
         }
     }
 
@@ -283,6 +349,11 @@ private:
         SetFlag<HardEvent::S_MTE3>(EVENT_ID2);
         WaitFlag<HardEvent::S_MTE3>(EVENT_ID2);
         CopyUbufToGmAlignB16(buff, ub_ctrl_flag, 1, sizeof(int32_t), 0, 0);
+        // Callers reuse the same 32-byte UB control line immediately.  Wait
+        // for MTE3 to consume it and make the GM flag visible first; without
+        // this edge consecutive TP3 ready/read-complete publications can
+        // collapse into one another across graph/eager invocations.
+        PipeSync<HardEvent::MTE3_S>();
     }
 
     __aicore__ void SetBuffFlagByAdd(__ubuf__ int32_t *ub_ctrl_flag, __gm__ int32_t *buff, int32_t flag)
@@ -325,6 +396,108 @@ private:
                 SetBuffFlag(ub_ctrl_flag, state_buff + idx, 0);
             }
         }
+    }
+
+    // Atlas A2 remote reads are not a reliable completion notification for
+    // a peer's FIX-pipe payload.  Follow CANN's small-M MC2 protocol instead:
+    // every producer writes one source-owned slot in every consumer's local
+    // state window, then each consumer waits only on its three local slots.
+    // The 3x3 layout also avoids atomic aggregation and makes a missing source
+    // observable instead of allowing a stale aggregate counter to pass.
+    __aicore__ void ResetTp3IpcFlags(int32_t num_flags)
+    {
+        if (aiv_idx == 0 && core_idx == 0) {
+            __gm__ int32_t *local_state = reinterpret_cast<__gm__ int32_t *>(
+                reinterpret_cast<__gm__ uint8_t *>(
+                    hccl_.GetWindowsInAddr(rank)) +
+                TP3_IPC_FLAG_OFFSET_BYTES);
+            for (int32_t phase = 0; phase < num_flags; ++phase) {
+                for (int32_t source = 0; source < rank_size; ++source) {
+                    SetBuffFlag(
+                        ub_ctrl_flag,
+                        local_state + phase * rank_size + source,
+                        0);
+                }
+            }
+        }
+        AscendC::SyncAll<true>();
+    }
+
+    // The replicated TP3 path has only two cross-rank phases: payload-ready
+    // and read-complete.  Clearing all seven generic owner/gather phases on
+    // both sides of every graph replay adds 30 serialized GM flag writes to
+    // the critical path without protecting any memory used by this path.
+    __aicore__ void ResetTp3DirectIpcFlags(bool sync_after = true)
+    {
+        if (aiv_idx == 0 && core_idx == 0) {
+            __gm__ int32_t *local_state = reinterpret_cast<__gm__ int32_t *>(
+                reinterpret_cast<__gm__ uint8_t *>(
+                    hccl_.GetWindowsInAddr(rank)) +
+                TP3_IPC_FLAG_OFFSET_BYTES);
+            // Direct mode deliberately uses the first two phase rows, so all
+            // six TP3 source slots are contiguous and can be reset by one GM
+            // transfer instead of six serialized 4-byte transfers.
+            for (int32_t slot = 0; slot < 2 * rank_size; ++slot) {
+                ub_ctrl_flag[slot] = 0;
+            }
+            SetFlag<HardEvent::S_MTE3>(EVENT_ID2);
+            WaitFlag<HardEvent::S_MTE3>(EVENT_ID2);
+            CopyUbufToGmAlignB16(
+                local_state,
+                ub_ctrl_flag,
+                1,
+                2 * rank_size * sizeof(int32_t),
+                0,
+                0);
+            PipeSync<HardEvent::MTE3_S>();
+        }
+        // The direct caller may reuse CrossRankSyncEx's exit barrier as the
+        // reset fan-out.  Its leader cannot enter the global barrier until
+        // the local MTE3 reset is visible, so that exit proves every rank's
+        // reset completed before any ready flag is published.
+        if (sync_after) {
+            AscendC::SyncAll<true>();
+        }
+    }
+
+    __aicore__ void Tp3PublishAndWait(
+        int32_t phase, int32_t epoch, bool concurrent_publish_poll = false)
+    {
+        // One vector sub-core per destination publishes this source rank's
+        // completion.  Each slot has exactly one writer, so no atomic add is
+        // needed and the epoch cannot be satisfied by a stale partial count.
+        if (aiv_idx == 1 && core_idx < rank_size) {
+            // Keep readiness in the same registered symmetric data window as
+            // the payload.  A write to GetWindowsOutAddr() belongs to a
+            // separate control allocation and does not establish visibility
+            // for peer reads of GetWindowsInAddr().
+            __gm__ int32_t *target_state = reinterpret_cast<__gm__ int32_t *>(
+                reinterpret_cast<__gm__ uint8_t *>(
+                    hccl_.GetWindowsInAddr(core_idx)) +
+                TP3_IPC_FLAG_OFFSET_BYTES);
+            SetBuffFlag(
+                ub_ctrl_flag,
+                target_state + phase * rank_size + rank,
+                epoch);
+        }
+        // In direct TP3, publishers flush their GM flag in SetBuffFlag and
+        // pollers may safely start immediately; an early poll simply spins
+        // until its source publishes.  Generic phases keep the old barrier.
+        if (!concurrent_publish_poll) {
+            AscendC::SyncAll<true>();
+        }
+
+        if (aiv_idx == 0 && core_idx < rank_size) {
+            __gm__ int32_t *local_state = reinterpret_cast<__gm__ int32_t *>(
+                reinterpret_cast<__gm__ uint8_t *>(
+                    hccl_.GetWindowsInAddr(rank)) +
+                TP3_IPC_FLAG_OFFSET_BYTES);
+            CheckBuffFlag(
+                ub_ctrl_flag,
+                local_state + phase * rank_size + core_idx,
+                epoch);
+        }
+        AscendC::SyncAll<true>();
     }
 
     __aicore__ void CrossRankSyncV1(int32_t flag_idx, int32_t flag_data)
@@ -370,9 +543,15 @@ private:
         copy_ubuf_to_gm_align_b32(gm_addr, ub_ctrl_flag, 0, 1, sizeof(uint32_t), 0, 0, 0, 0);
     }
 
-    __aicore__ inline void CrossRankSyncEx(uint32_t flag_idx)
+    __aicore__ inline void CrossRankSyncEx(
+        uint32_t flag_idx, bool already_locally_synced = false)
     {
-        AscendC::SyncAll<true>();
+        // ResetTp3DirectIpcFlags already ends with SyncAll.  Let its direct
+        // caller reuse that barrier; generic callers retain the original
+        // entry barrier through the default argument.
+        if (!already_locally_synced) {
+            AscendC::SyncAll<true>();
+        }
         __asm__ __volatile__("");
         if (aiv_idx == 0 && core_idx == 0) {
             auto flag_addr = (GM_ADDR)hccl_.GetWindowsOutAddr(0) + flag_idx * AscendC::ONE_BLK_SIZE;
@@ -422,6 +601,77 @@ private:
         AscendC::WaitFlag<EVENT>(event_id);
     }
 
+    // Reproduce the FP32 reduction tree used by CANN AddRmsNorm key 30.
+    // AscendC's generic ReduceSum uses a different 910B implementation and
+    // can perturb rstd enough to change the final BF16 result by one ULP.
+    // This helper is selected only by the qualified TP3 BF16 direct path;
+    // all other paths retain the generic reduction below.
+    __aicore__ inline void Tp3NativeReduceSumFp32(
+        const LocalTensor<float>& dst_local,
+        const LocalTensor<float>& src_local,
+        const LocalTensor<float>& work_local,
+        int32_t count)
+    {
+        uint64_t mask = NUM_PER_REP_FP32;
+        int32_t repeat_times = count / NUM_PER_REP_FP32;
+        int32_t tail_count = count % NUM_PER_REP_FP32;
+        int32_t body_count = repeat_times * NUM_PER_REP_FP32;
+        BinaryRepeatParams repeat_params;
+        repeat_params.src0RepStride = ONE_REPEAT_BYTE_SIZE / ONE_BLK_SIZE;
+        repeat_params.src0BlkStride = 1;
+        repeat_params.src1RepStride = 0;
+        repeat_params.src1BlkStride = 1;
+        repeat_params.dstRepStride = 0;
+        repeat_params.dstBlkStride = 1;
+
+        Duplicate(work_local, (float)0.0, NUM_PER_REP_FP32);
+        PipeBarrier<PIPE_V>();
+        if (likely(repeat_times > 0)) {
+            Add(
+                work_local,
+                src_local,
+                work_local,
+                mask,
+                repeat_times,
+                repeat_params);
+            PipeBarrier<PIPE_V>();
+        }
+        if (unlikely(tail_count != 0)) {
+            Add(
+                work_local,
+                src_local[body_count],
+                work_local,
+                tail_count,
+                1,
+                repeat_params);
+            PipeBarrier<PIPE_V>();
+        }
+
+        AscendCUtils::SetMask<float>(NUM_PER_REP_FP32);
+#if defined(__CCE_AICORE__) && __CCE_AICORE__ == 220
+        if (g_coreType == AIV) {
+            WholeReduceSum<float, false>(
+                dst_local,
+                work_local,
+                MASK_PLACEHOLDER,
+                1,
+                0,
+                1,
+                0);
+        }
+#elif !(defined(__NPU_ARCH__) && (__NPU_ARCH__ == 3003 || __NPU_ARCH__ == 3113))
+        WholeReduceSum<float, false>(
+            dst_local,
+            work_local,
+            MASK_PLACEHOLDER,
+            1,
+            1,
+            1,
+            DEFAULT_REPEAT_STRIDE);
+#endif
+        PipeBarrier<PIPE_V>();
+    }
+
     __aicore__ inline void CopyInGamma()
     {
         GlobalTensor<MmadDtype> gamma_global;
@@ -430,13 +680,15 @@ private:
         PipeSync<HardEvent::MTE2_V>();
     }
 
-    __aicore__ void ParallelWithSplitStepOneAddNorm(uint32_t core_buf_offset, uint32_t m_cur_core)
+    __aicore__ void ParallelWithSplitStepOneAddNorm(
+        uint32_t core_buf_offset, uint32_t m_cur_core, bool rank_ordered_direct_output)
     {
         if (m_cur_core <= 0) {
             return;
         }
 
-        auto buff = (__gm__ MmadDtype *)hccl_.GetWindowsInAddr(rank);
+        auto buff = (__gm__ MmadDtype *)hccl_.GetWindowsInAddr(
+            rank_ordered_direct_output ? 0 : rank);
 
         GlobalTensor<MmadDtype> x_global;
         GlobalTensor<MmadDtype> y_global;
@@ -444,10 +696,15 @@ private:
         GlobalTensor<MmadDtype> add_out_global;
 
         x_global.SetGlobalBuffer(buff + core_buf_offset);
-        out_global.SetGlobalBuffer(buff + core_buf_offset);
+        out_global.SetGlobalBuffer(
+            rank_ordered_direct_output ? gm_out + core_buf_offset : buff + core_buf_offset);
         add_out_global.SetGlobalBuffer(gm_add_output + core_buf_offset);
 
         uint32_t add_count = DivCeil(n, DIFUSION_ADD_LEN);
+        // Keep the original ownership-based reduction as the correctness
+        // reference.  The replicated TP3 path is enabled only after its
+        // independent eager/graph qualification succeeds.
+        bool dedicated_tp3_reduce = rank_ordered_direct_output;
 
         LocalTensor<MmadDtype> x_local;
         LocalTensor<MmadDtype> y_local;
@@ -455,53 +712,161 @@ private:
         for (uint32_t i = 0; i < m_cur_core; i++) {
             LocalTensor<float> x_fp32 = xFp32Buf.Get<float>();
             LocalTensor<float> sqx = sqxBuf.Get<float>();
+            LocalTensor<float> reduce_fp32 = reduceFp32Buf.Get<float>();
 
+            // Keep every direct-reduce temporary inside the original seven
+            // TBufPool IDs.  The pool has an eight-ID hardware limit; adding
+            // one independent TBuf per peer aliases later buffers and can
+            // silently turn rank0+rank1+rank2 into rank0+2*rank2.
             x_local = inQueueX.AllocTensor<MmadDtype>();
             for (uint32_t j = 0; j < add_count; j++) {
                 uint32_t add_offset = j * DIFUSION_ADD_LEN;
                 uint32_t add_len = min<uint32_t>(n - add_offset, DIFUSION_ADD_LEN);
 
-                DataCopy(x_local[add_offset], x_global[i * n + add_offset], add_len);
-                inQueueX.EnQue(x_local);
-
-                uint32_t iterate_end = (rank + 1) % rank_size;
-                y_local = inQueueY.AllocTensor<MmadDtype>();
-                for (uint32_t k = 0; k < rank_size; ++k) {
-                    uint32_t iterate_idx = iterate_end + k;
-                    if (iterate_idx >= rank_size) {
-                        iterate_idx -= rank_size;
+                if (dedicated_tp3_reduce) {
+                    uint32_t peer1_rank = rank_ordered_direct_output ? 1 : (rank + 1) % rank_size;
+                    uint32_t peer2_rank = rank_ordered_direct_output ? 2 : (rank + 2) % rank_size;
+                    auto peer1_buff = (__gm__ MmadDtype *)hccl_.GetWindowsInAddr(peer1_rank);
+                    auto peer2_buff = (__gm__ MmadDtype *)hccl_.GetWindowsInAddr(peer2_rank);
+                    GlobalTensor<MmadDtype> peer1_global;
+                    GlobalTensor<MmadDtype> peer2_global;
+                    peer1_global.SetGlobalBuffer(peer1_buff + core_buf_offset);
+                    peer2_global.SetGlobalBuffer(peer2_buff + core_buf_offset);
+                    DataCopy(x_local[add_offset], x_global[i * n + add_offset], add_len);
+                    inQueueX.EnQue(x_local);
+                    y_local = inQueueY.AllocTensor<MmadDtype>();
+                    DataCopy(y_local, peer1_global[i * n + add_offset], add_len);
+                    DataCopy(y_local[add_len], peer2_global[i * n + add_offset], add_len);
+                    if (!projection_only) {
+                        GlobalTensor<MmadDtype> residual_global;
+                        residual_global.SetGlobalBuffer(gm_add_input + core_buf_offset);
+                        DataCopy(y_local[2 * add_len], residual_global[i * n + add_offset], add_len);
                     }
-
-                    if (iterate_idx == rank) {
-                        y_global.SetGlobalBuffer(gm_add_input + core_buf_offset);
-                    } else {
-                        auto other_buff = (__gm__ MmadDtype *)hccl_.GetWindowsInAddr(iterate_idx);
-                        y_global.SetGlobalBuffer(other_buff + core_buf_offset);
+                    inQueueY.EnQue(y_local);
+                } else {
+                    DataCopy(x_local[add_offset], x_global[i * n + add_offset], add_len);
+                    inQueueX.EnQue(x_local);
+                    y_local = inQueueY.AllocTensor<MmadDtype>();
+                    for (uint32_t k = 0; k < rank_size; ++k) {
+                        uint32_t iterate_idx = (rank + 1 + k) % rank_size;
+                        if (iterate_idx == rank) {
+                            if (projection_only) {
+                                Duplicate(
+                                    y_local[k * add_len],
+                                    static_cast<MmadDtype>(0),
+                                    add_len);
+                                PipeBarrier<PIPE_V>();
+                                continue;
+                            }
+                            y_global.SetGlobalBuffer(gm_add_input + core_buf_offset);
+                        } else {
+                            auto other_buff = (__gm__ MmadDtype *)hccl_.GetWindowsInAddr(iterate_idx);
+                            y_global.SetGlobalBuffer(other_buff + core_buf_offset);
+                        }
+                        DataCopy(y_local[k * add_len], y_global[i * n + add_offset], add_len);
                     }
-                    DataCopy(y_local[k * add_len], y_global[i * n + add_offset], add_len);
+                    inQueueY.EnQue(y_local);
                 }
-                inQueueY.EnQue(y_local);
                 x_local = inQueueX.DeQue<MmadDtype>();
                 y_local = inQueueY.DeQue<MmadDtype>();
 
-                Cast(x_fp32[add_offset], x_local[add_offset], RoundMode::CAST_NONE, add_len);
-                PipeBarrier<PIPE_V>();
-                for (uint32_t k = 0; k < rank_size; ++k) {
-                    // use sqx as shared buf, required n >= add_len
-                    Cast(sqx, y_local[k * add_len], RoundMode::CAST_NONE, add_len);
+                if (dedicated_tp3_reduce) {
+                    // HCCL_OP_EXPANSION_MODE=AIV uses a deterministic global
+                    // 01->2 BF16 tree for the qualified TP3 deployment.  The
+                    // first pair must be materialized to BF16 before rank2;
+                    // summing all three partials in FP32 and casting once can
+                    // change a low-margin greedy token even though the local
+                    // projection differs by only one BF16 ULP.
+                    Cast(x_fp32[add_offset], x_local[add_offset], RoundMode::CAST_NONE, add_len);
+                    Cast(sqx, y_local, RoundMode::CAST_NONE, add_len);
                     PipeBarrier<PIPE_V>();
-                    Add(x_fp32[add_offset], x_fp32[add_offset], sqx, add_len);
+                    Add(reduce_fp32[add_offset], x_fp32[add_offset], sqx, add_len);
                     PipeBarrier<PIPE_V>();
+                    if constexpr (std::is_same<MmadDtype, bfloat16_t>::value) {
+                        Cast(
+                            x_local[add_offset],
+                            reduce_fp32[add_offset],
+                            RoundMode::CAST_RINT,
+                            add_len);
+                        PipeBarrier<PIPE_V>();
+                        Cast(
+                            reduce_fp32[add_offset],
+                            x_local[add_offset],
+                            RoundMode::CAST_NONE,
+                            add_len);
+                    }
+                    Cast(sqx, y_local[add_len], RoundMode::CAST_NONE, add_len);
+                    PipeBarrier<PIPE_V>();
+                    Add(x_fp32[add_offset], reduce_fp32[add_offset], sqx, add_len);
+                    PipeBarrier<PIPE_V>();
+                    if (!projection_only) {
+                        // Match the split HCCL + AddRMSNorm contract: the
+                        // all-reduce result is materialized as BF16 before
+                        // residual addition. Keeping both operations in FP32
+                        // until the final cast changes add_out by up to one
+                        // large BF16 ULP on real Qwen3 activations.
+                        Cast(
+                            x_local[add_offset],
+                            x_fp32[add_offset],
+                            RoundMode::CAST_RINT,
+                            add_len);
+                        PipeBarrier<PIPE_V>();
+                        Cast(
+                            reduce_fp32[add_offset],
+                            x_local[add_offset],
+                            RoundMode::CAST_NONE,
+                            add_len);
+                        Cast(
+                            sqx,
+                            y_local[2 * add_len],
+                            RoundMode::CAST_NONE,
+                            add_len);
+                        PipeBarrier<PIPE_V>();
+                        Add(
+                            reduce_fp32[add_offset],
+                            reduce_fp32[add_offset],
+                            sqx,
+                            add_len);
+                        PipeBarrier<PIPE_V>();
+                    }
+                } else {
+                    Cast(x_fp32[add_offset], x_local[add_offset], RoundMode::CAST_NONE, add_len);
+                    PipeBarrier<PIPE_V>();
+                    for (uint32_t k = 0; k < rank_size; ++k) {
+                        // use sqx as shared buf, required n >= add_len
+                        Cast(sqx, y_local[k * add_len], RoundMode::CAST_NONE, add_len);
+                        PipeBarrier<PIPE_V>();
+                        Add(x_fp32[add_offset], x_fp32[add_offset], sqx, add_len);
+                        PipeBarrier<PIPE_V>();
+                    }
                 }
 
                 inQueueY.FreeTensor(y_local);
             }
             inQueueX.FreeTensor(x_local);
 
+            // The generic owner-reduce path accumulates in x_fp32, whereas
+            // the replicated TP3 tree writes result_fp32.  Selecting the
+            // wrong buffer here silently normalizes stale UB contents and
+            // can look like a missing rank contribution.
+            LocalTensor<float> reduced_fp32 =
+                dedicated_tp3_reduce && !projection_only ? reduce_fp32 : x_fp32;
+
+            if (projection_only) {
+                LocalTensor<MmadDtype> out_local = outQueue.AllocTensor<MmadDtype>();
+                Cast(out_local, reduced_fp32, RoundMode::CAST_RINT, n);
+                PipeBarrier<PIPE_V>();
+                outQueue.EnQue(out_local);
+                out_local = outQueue.DeQue<MmadDtype>();
+                DataCopy(out_global[i * n], out_local, n);
+                outQueue.FreeTensor(out_local);
+                continue;
+            }
+
             if constexpr (GatherAddOut) {
                 // copy add result out
                 LocalTensor<MmadDtype> add_out = addOutQueue.AllocTensor<MmadDtype>();
-                Cast(add_out, x_fp32, RoundMode::CAST_RINT, n);
+                Cast(add_out, reduced_fp32, RoundMode::CAST_RINT, n);
                 addOutQueue.EnQue(add_out);
                 add_out = addOutQueue.DeQue<MmadDtype>();
                 DataCopy(add_out_global[i * n], add_out, n);
@@ -510,58 +875,104 @@ private:
 
             LocalTensor<MmadDtype> gamma_local = gammaBuf.Get<MmadDtype>();
             LocalTensor<MmadDtype> out_local = outQueue.AllocTensor<MmadDtype>();
-            LocalTensor<float> reduce_buf_local = reduceFp32Buf.Get<float>();
+            // The dedicated path already owns the native pre-round residual
+            // sum in reduce_fp32.  Normalize it in place and reuse x_fp32 as
+            // the 64-lane reduction workspace.  Besides avoiding a full-row
+            // copy, this makes it impossible for the normalization input to
+            // silently acquire the independently materialized BF16 add_out
+            // value through a queue/buffer reuse.
+            LocalTensor<float> norm_fp32 =
+                dedicated_tp3_reduce ? reduced_fp32 : x_fp32;
+            LocalTensor<float> reduce_buf_local = dedicated_tp3_reduce ?
+                x_fp32 : reduceFp32Buf.Get<float>();
 
-            // make sure precision is same in bf16 case
-            Cast(out_local, x_fp32, RoundMode::CAST_RINT, n);
+            if (!dedicated_tp3_reduce) {
+                // Keep the original generic-path BF16 materialization.
+                Cast(out_local, reduced_fp32, RoundMode::CAST_RINT, n);
+                PipeBarrier<PIPE_V>();
+
+                Cast(norm_fp32, out_local, RoundMode::CAST_NONE, n);
+                PipeBarrier<PIPE_V>();
+            }
+
+            Mul(sqx, norm_fp32, norm_fp32, n);
             PipeBarrier<PIPE_V>();
 
-            Cast(x_fp32, out_local, RoundMode::CAST_NONE, n);
+            Muls(sqx, sqx, avg_factor, n);
             PipeBarrier<PIPE_V>();
 
-            Mul(sqx, x_fp32, x_fp32, n);
-            PipeBarrier<PIPE_V>();
-
-            Muls(sqx, sqx, (float)1.0 / n, n);
-            PipeBarrier<PIPE_V>();
-
-            ReduceSum(sqx, sqx, reduce_buf_local, n);
+            if constexpr (std::is_same<MmadDtype, bfloat16_t>::value) {
+                if (dedicated_tp3_reduce) {
+                    Tp3NativeReduceSumFp32(
+                        sqx,
+                        sqx,
+                        reduce_buf_local,
+                        n);
+                } else {
+                    ReduceSum(sqx, sqx, reduce_buf_local, n);
+                }
+            } else {
+                ReduceSum(sqx, sqx, reduce_buf_local, n);
+            }
             PipeBarrier<PIPE_V>();
 
             Adds(sqx, sqx, epsilon, 1);
             PipeBarrier<PIPE_V>();
 
             Sqrt(sqx, sqx, 1);
-            Duplicate(reduce_buf_local, (float)1.0, 1);
             PipeBarrier<PIPE_V>();
 
-            Div(sqx, reduce_buf_local, sqx, 1);
-            PipeBarrier<PIPE_V>();
+            if (dedicated_tp3_reduce) {
+                // Match CANN AddRmsNorm's FP32 rounding order exactly:
+                // compute one scalar reciprocal, transfer it from V to S,
+                // then scale the row with Muls.  Dividing every element by
+                // sqrt(mean + eps) is algebraically equivalent but can differ
+                // by one BF16 ULP after the following materialization.
+                Duplicate(reduce_buf_local, (float)1.0, 1);
+                PipeBarrier<PIPE_V>();
 
-            PipeSync<HardEvent::V_S>();
-            float rstd_value = sqx.GetValue(0);
-            PipeSync<HardEvent::S_V>();
-            PipeBarrier<PIPE_V>();
+                Div(sqx, reduce_buf_local, sqx, 1);
+                PipeBarrier<PIPE_V>();
 
-            Muls(x_fp32, x_fp32, rstd_value, n);
-            PipeBarrier<PIPE_V>();
+                PipeSync<HardEvent::V_S>();
+                float rstd_value = sqx.GetValue(0);
+                PipeSync<HardEvent::S_V>();
+                PipeBarrier<PIPE_V>();
+
+                Muls(norm_fp32, norm_fp32, rstd_value, n);
+                PipeBarrier<PIPE_V>();
+            } else {
+                Duplicate(reduce_buf_local, (float)1.0, 1);
+                PipeBarrier<PIPE_V>();
+
+                Div(sqx, reduce_buf_local, sqx, 1);
+                PipeBarrier<PIPE_V>();
+
+                PipeSync<HardEvent::V_S>();
+                float rstd_value = sqx.GetValue(0);
+                PipeSync<HardEvent::S_V>();
+                PipeBarrier<PIPE_V>();
+
+                Muls(norm_fp32, norm_fp32, rstd_value, n);
+                PipeBarrier<PIPE_V>();
+            }
 
             if constexpr (std::is_same<MmadDtype, half>::value) {
-                Cast(out_local, x_fp32, RoundMode::CAST_NONE, n);
+                Cast(out_local, norm_fp32, RoundMode::CAST_NONE, n);
                 PipeBarrier<PIPE_V>();
                 Mul(out_local, gamma_local, out_local, n);
                 PipeBarrier<PIPE_V>();
             } else if constexpr (std::is_same<MmadDtype, bfloat16_t>::value) {
-                Cast(out_local, x_fp32, RoundMode::CAST_RINT, n);
+                Cast(out_local, norm_fp32, RoundMode::CAST_RINT, n);
                 PipeBarrier<PIPE_V>();
-                Cast(x_fp32, out_local, RoundMode::CAST_NONE, n);
+                Cast(norm_fp32, out_local, RoundMode::CAST_NONE, n);
                 PipeBarrier<PIPE_V>();
                 Cast(sqx, gamma_local, RoundMode::CAST_NONE, n);
                 PipeBarrier<PIPE_V>();
 
-                Mul(x_fp32, x_fp32, sqx, n);
+                Mul(norm_fp32, norm_fp32, sqx, n);
                 PipeBarrier<PIPE_V>();
-                Cast(out_local, x_fp32, RoundMode::CAST_RINT, n);
+                Cast(out_local, norm_fp32, RoundMode::CAST_RINT, n);
                 PipeBarrier<PIPE_V>();
                 PipeSync<HardEvent::V_MTE2>();
             }
@@ -652,6 +1063,7 @@ private:
 
     bool trans_a;
     bool trans_b;
+    bool projection_only;
     bool is_int8;
     bool is_91093;
 
@@ -683,6 +1095,7 @@ private:
     bool weight_nz{false};
 
     float epsilon;
+    float avg_factor;
 
     TPipe pipe;
     AscendC::TBufPool<TPosition::VECCALC, TBUF_POOL_MAX_BUFID_SIZE> step1BufPool;

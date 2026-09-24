@@ -13,10 +13,12 @@ only as the CPU test fallback.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+import os
+import tempfile
+from collections.abc import Mapping, Sequence
 from copy import deepcopy
 from dataclasses import dataclass
-from math import ceil
+from math import ceil, prod
 from pathlib import Path
 
 import torch
@@ -30,9 +32,20 @@ from vllm.model_executor.layers.rotary_embedding import get_rope
 from vllm_ascend import envs as ascend_envs
 from vllm_ascend.device.device_op import DeviceOperator
 from vllm_ascend.spec_decode.pearl.mc2 import (
+    MC2_TP3_NATIVE_EPILOGUE_OPERATOR,
     MC2Profile,
+    MC2Qualification,
+    MC2StaticRoute,
+    MC2StaticRouteManifest,
+    _bind_mc2_dispatch_ticket,
+    _MC2DispatchTicket,
+    bind_mc2_static_route,
+    build_mc2_static_route,
+    build_mc2_static_route_manifest,
+    detect_mc2_capability,
     matmul_allreduce_add_rmsnorm_or_fallback,
     resolve_hccl_comm_name,
+    validate_mc2_static_environment,
 )
 from vllm_ascend.spec_decode.pearl.native_graph import (
     run_native_fused_infer_attention,
@@ -48,6 +61,8 @@ MIN_PAGED_ATTENTION_BLOCKS = 16
 SUPPORTED_NATIVE_ARCHITECTURES = frozenset(("LlamaForCausalLM", "Qwen2ForCausalLM", "Qwen3ForCausalLM"))
 TENSOR_CORE_TILE_SIZE = 128
 ACL_FORMAT_FRACTAL_NZ = 29
+TP3_DOWN_MC2_LOCAL_K = 8576
+"""Qualified Qwen3-32B TP3 down-projection width per target rank."""
 
 # TP3 is intentionally opt-in: older Ascend CANN releases reject the fused
 # communicator during allocation.  Once a worker sees one failure, keep the
@@ -133,6 +148,73 @@ def prepare_native_model_config(config, tensor_parallel_size: int):
         * TENSOR_CORE_TILE_SIZE
     )
     prepared.vocab_size = ceil(config.vocab_size / tensor_parallel_size) * tensor_parallel_size
+    ffn_shift = int(getattr(prepared, "pearl_tp3_balanced_ffn_shift", 0))
+    light_rank = int(getattr(prepared, "pearl_tp3_light_rank", -1))
+    if light_rank not in (-1, 0, 1, 2):
+        raise ValueError("PEARL TP3 light rank must be -1, 0, 1, or 2.")
+    if ffn_shift and light_rank >= 0:
+        raise ValueError("Balanced FFN shift and TP3 light-rank sharding are mutually exclusive.")
+    if ffn_shift or light_rank >= 0:
+        if tensor_parallel_size != 3:
+            raise ValueError("Exact PEARL attention/FFN shards currently require TP3.")
+        if ffn_shift % TENSOR_CORE_TILE_SIZE:
+            raise ValueError(
+                f"Balanced PEARL FFN shift must be a multiple of {TENSOR_CORE_TILE_SIZE}."
+            )
+        valid_kv_heads = int(prepared.valid_num_key_value_heads)
+        valid_q_heads = int(prepared.valid_num_attention_heads)
+        if valid_q_heads % valid_kv_heads:
+            raise ValueError("Balanced PEARL shards require integral GQA groups.")
+        kv_base, kv_remainder = divmod(valid_kv_heads, tensor_parallel_size)
+        if light_rank >= 0:
+            # Qwen3-32B has eight KV groups.  TP3 therefore has two heavy
+            # shards and one naturally light shard.  Put the light shard on
+            # the observed target leader/critical rank without increasing
+            # either peer above the padded default (3 KV groups each).
+            if kv_remainder != tensor_parallel_size - 1:
+                raise ValueError(
+                    "TP3 light-rank sharding requires exactly one short KV partition."
+                )
+            kv_partitions = tuple(
+                kv_base + int(rank != light_rank) for rank in range(tensor_parallel_size)
+            )
+        else:
+            kv_partitions = tuple(
+                kv_base + int(rank < kv_remainder) for rank in range(tensor_parallel_size)
+            )
+        gqa_ratio = valid_q_heads // valid_kv_heads
+        q_partitions = tuple(kv_heads * gqa_ratio for kv_heads in kv_partitions)
+        intermediate_units = int(prepared.valid_intermediate_size) // TENSOR_CORE_TILE_SIZE
+        if intermediate_units * TENSOR_CORE_TILE_SIZE != int(prepared.valid_intermediate_size):
+            raise ValueError("Balanced PEARL FFN size must align to the tensor-core tile.")
+        unit_base, unit_remainder = divmod(intermediate_units, tensor_parallel_size)
+        intermediate_partitions = [
+            (unit_base + int(rank < unit_remainder)) * TENSOR_CORE_TILE_SIZE
+            for rank in range(tensor_parallel_size)
+        ]
+        if light_rank >= 0:
+            # Rotate the one naturally short exact FFN shard to the same
+            # leader rank.  The two peers retain the padded-default width;
+            # no rank receives extra matrix work.
+            short_size = min(intermediate_partitions)
+            long_size = max(intermediate_partitions)
+            if intermediate_partitions.count(short_size) != 1:
+                raise ValueError(
+                    "TP3 light-rank sharding requires exactly one short FFN partition."
+                )
+            intermediate_partitions = [
+                short_size if rank == light_rank else long_size
+                for rank in range(tensor_parallel_size)
+            ]
+        else:
+            intermediate_partitions[0] -= ffn_shift
+            intermediate_partitions[1] -= ffn_shift
+            intermediate_partitions[2] += 2 * ffn_shift
+        if min(intermediate_partitions) <= 0:
+            raise ValueError("Balanced PEARL FFN shift leaves an empty TP shard.")
+        prepared.pearl_q_head_partitions = q_partitions
+        prepared.pearl_kv_head_partitions = kv_partitions
+        prepared.pearl_intermediate_partitions = tuple(intermediate_partitions)
     return prepared
 
 
@@ -150,6 +232,24 @@ def _copy_padded_shard(
         destination.narrow(dim, 0, available).copy_(loaded.narrow(dim, start, available))
 
 
+def _pad_token_rows(
+    hidden_states: torch.Tensor,
+    multiple: int,
+) -> tuple[torch.Tensor, int]:
+    """Pad a packed 2-D token matrix for shape-stable target GEMMs.
+
+    The padded rows are local to one projection and are removed immediately
+    after it.  They therefore never enter attention metadata or the KV cache.
+    """
+    real_rows = int(hidden_states.shape[0])
+    if multiple <= 1 or hidden_states.ndim != 2:
+        return hidden_states, real_rows
+    padded_rows = ((real_rows + multiple - 1) // multiple) * multiple
+    if padded_rows == real_rows:
+        return hidden_states, real_rows
+    return F.pad(hidden_states, (0, 0, 0, padded_rows - real_rows)), real_rows
+
+
 @dataclass(frozen=True)
 class NativeTPContext:
     """The model-parallel coordinates for one PEARL model group."""
@@ -158,6 +258,327 @@ class NativeTPContext:
     rank: int
     size: int
     leader_rank: int
+
+
+@dataclass
+class _MC2IntraLayerChain:
+    """Carry one explicit MC2 mailbox dependency across the whole model.
+
+    Attention publishes its READ_DONE records without waiting for both peers.
+    The following down projection performs its independent local MatMul first,
+    then consumes this state before reusing the symmetric payload window.  The
+    chain continues through later layers and only the final down projection
+    flushes, so every ACLGraph replay still starts and ends with a drained
+    mailbox while intermediate communication tails can overlap useful work.
+    """
+
+    state: torch.Tensor
+    layer_count: int
+    defer_read_done: bool = True
+    next_step: int = 0
+    _pending_key: tuple[int, str] | None = None
+
+    def begin(self, route: MC2StaticRoute) -> tuple[torch.Tensor, bool]:
+        if self._pending_key is not None:
+            raise RuntimeError("MC2 chain dispatch was begun twice without committing its state")
+        expected_layer = self.next_step // 2
+        expected_kind = "attention" if self.next_step % 2 == 0 else "down"
+        key = (int(route.layer_index), str(route.projection_kind))
+        if key != (expected_layer, expected_kind):
+            raise RuntimeError(
+                "MC2 intra-layer chain route order changed after static admission: "
+                f"expected {(expected_layer, expected_kind)!r}, got {key!r}"
+            )
+        if expected_layer >= self.layer_count:
+            raise RuntimeError("MC2 intra-layer chain consumed more routes than the model owns")
+        self._pending_key = key
+        flush = not self.defer_read_done or (
+            expected_kind == "down" and expected_layer + 1 == self.layer_count
+        )
+        return self.state, flush
+
+    def commit(self, route: MC2StaticRoute, next_state: torch.Tensor) -> None:
+        key = (int(route.layer_index), str(route.projection_kind))
+        if self._pending_key != key:
+            raise RuntimeError("MC2 chain state was committed by a different static route")
+        if next_state.dtype != torch.int64 or tuple(next_state.shape) != (64, 4):
+            raise RuntimeError("MC2 chained operator returned an invalid dependency state")
+        self.state = next_state
+        self.next_step += 1
+        self._pending_key = None
+
+    def finish(self) -> None:
+        if self._pending_key is not None or self.next_step != 2 * self.layer_count:
+            raise RuntimeError(
+                "MC2 intra-layer chain did not consume exactly one attention/down pair per layer"
+            )
+
+
+def _qualified_mc2_chain_row_counts(
+    profile: MC2Profile,
+    routes: Sequence[MC2StaticRoute],
+    *,
+    layer_count: int,
+    graph_execution: bool = True,
+) -> frozenset[int]:
+    """Return rows admitted by every route and explicit chain evidence."""
+
+    chain_evidence = profile.metadata.get("deferred_read_done_chain")
+    if (
+        not graph_execution
+        or profile.metadata.get("operator") != MC2_TP3_NATIVE_EPILOGUE_OPERATOR
+        or not isinstance(chain_evidence, Mapping)
+        or chain_evidence.get("qualified") is not True
+        or chain_evidence.get("execution_mode") != "graph"
+        or chain_evidence.get("chain_scope") != "whole_model"
+        or int(chain_evidence.get("layer_count", 0)) != layer_count
+        or int(chain_evidence.get("operations_per_chain", 0)) != 2 * layer_count
+        or len(routes) != 2 * layer_count
+        or not all(route.enabled for route in routes)
+    ):
+        return frozenset()
+    qualified_sets = [
+        {
+            int(rows)
+            for rows, qualification in route.decisions.items()
+            if qualification.qualified
+        }
+        for route in routes
+    ]
+    return (
+        frozenset(set.intersection(*qualified_sets))
+        if qualified_sets
+        else frozenset()
+    )
+
+
+def _qualified_mc2_chained_flush_row_counts(
+    profile: MC2Profile,
+    routes: Sequence[MC2StaticRoute],
+    *,
+    layer_count: int,
+    graph_execution: bool = True,
+) -> frozenset[int]:
+    """Return rows measured with the allocation-free chained flush ABI."""
+
+    if (
+        not graph_execution
+        or profile.metadata.get("operator") != MC2_TP3_NATIVE_EPILOGUE_OPERATOR
+        or profile.metadata.get("standalone_chained_flush") is not True
+        or len(routes) != 2 * layer_count
+        or not all(route.enabled for route in routes)
+    ):
+        return frozenset()
+    qualified_sets = [
+        {
+            int(rows)
+            for rows, qualification in route.decisions.items()
+            if qualification.qualified
+        }
+        for route in routes
+    ]
+    return (
+        frozenset(set.intersection(*qualified_sets))
+        if qualified_sets
+        else frozenset()
+    )
+
+
+class _MC2RealInputCapture:
+    """One-shot real-layer inputs for offline MC2 qualification.
+
+    This probe is intentionally incompatible with ACLGraph capture and must
+    not be enabled during performance measurements. Its output is consumed by
+    ``examples/measure_specslo_mc2.py --input-dir
+    <capture-dir>/<kind>/layer-<L>/m<M>``.  Projection and layer are part of
+    the path so an attention o_proj observation can never consume or replace
+    the down_proj observation for the same flattened row count.
+    """
+
+    def __init__(
+        self,
+        directory: Path,
+        rows: frozenset[int],
+        context: NativeTPContext,
+        *,
+        enforce_eager: bool | None,
+        projection_kind: str = "attention",
+        layer_filter: frozenset[int] | None = None,
+    ) -> None:
+        self.directory = directory
+        self.rows = rows
+        self.rank = int(context.rank)
+        self.tp_size = int(context.size)
+        self.enforce_eager = enforce_eager
+        self.projection_kind = projection_kind
+        self.layer_filter = layer_filter
+        self._implicit_layer: int | None = None
+        self._completed: set[tuple[int, int]] = set()
+
+    @classmethod
+    def from_env(
+        cls,
+        config: object,
+        context: NativeTPContext,
+    ) -> _MC2RealInputCapture | None:
+        raw_directory = ascend_envs.VLLM_ASCEND_PEARL_MC2_CAPTURE_DIR
+        raw_rows = ascend_envs.VLLM_ASCEND_PEARL_MC2_CAPTURE_ROWS
+        raw_kind = ascend_envs.VLLM_ASCEND_PEARL_MC2_CAPTURE_KIND
+        raw_layers = ascend_envs.VLLM_ASCEND_PEARL_MC2_CAPTURE_LAYERS
+        if not raw_directory and not raw_rows:
+            if raw_layers or raw_kind.strip().lower() != "attention":
+                raise ValueError(
+                    "MC2 capture kind/layers require "
+                    "VLLM_ASCEND_PEARL_MC2_CAPTURE_DIR and "
+                    "VLLM_ASCEND_PEARL_MC2_CAPTURE_ROWS."
+                )
+            return None
+        if not raw_directory or not raw_rows:
+            raise ValueError(
+                "VLLM_ASCEND_PEARL_MC2_CAPTURE_DIR and "
+                "VLLM_ASCEND_PEARL_MC2_CAPTURE_ROWS must be set together; "
+                "the MC2 input probe is enforce-eager diagnostics only."
+            )
+
+        directory = Path(raw_directory).expanduser()
+        if not directory.is_absolute() or directory == Path(directory.anchor):
+            raise ValueError("MC2 capture directory must be an absolute, non-root path.")
+        if directory.exists() and not directory.is_dir():
+            raise ValueError(f"MC2 capture path is not a directory: {directory}")
+
+        tokens = raw_rows.split(",")
+        if any(not token.strip() or not token.strip().isdigit() for token in tokens):
+            raise ValueError("MC2 capture rows must be comma-separated positive integers.")
+        parsed_rows = tuple(int(token.strip()) for token in tokens)
+        if any(row <= 0 for row in parsed_rows) or len(set(parsed_rows)) != len(parsed_rows):
+            raise ValueError("MC2 capture rows must be unique positive integers.")
+
+        projection_kind = raw_kind.strip().lower()
+        if projection_kind not in {"attention", "down"}:
+            raise ValueError("MC2 capture kind must be 'attention' or 'down'.")
+        layer_filter: frozenset[int] | None = None
+        if raw_layers:
+            layer_tokens = raw_layers.split(",")
+            if any(not token.strip() or not token.strip().isdigit() for token in layer_tokens):
+                raise ValueError("MC2 capture layers must be comma-separated non-negative integers.")
+            parsed_layers = tuple(int(token.strip()) for token in layer_tokens)
+            if len(set(parsed_layers)) != len(parsed_layers):
+                raise ValueError("MC2 capture layers must be unique non-negative integers.")
+            num_hidden_layers = getattr(config, "num_hidden_layers", None)
+            if num_hidden_layers is not None and any(
+                layer >= int(num_hidden_layers) for layer in parsed_layers
+            ):
+                raise ValueError("MC2 capture layer is outside the configured decoder.")
+            layer_filter = frozenset(parsed_layers)
+
+        configured_eager = getattr(
+            config,
+            "pearl_enforce_eager",
+            getattr(config, "enforce_eager", None),
+        )
+        enforce_eager = None if configured_eager is None else bool(configured_eager)
+        if enforce_eager is False:
+            raise ValueError(
+                "MC2 real-input capture is allowed only for enforce-eager diagnostics; "
+                "disable ACLGraph and do not use the probe for performance measurements."
+            )
+        if context.size <= 1 or not 0 <= context.rank < context.size:
+            raise ValueError("MC2 capture requires valid tensor-parallel rank metadata.")
+        return cls(
+            directory.resolve(strict=False),
+            frozenset(parsed_rows),
+            context,
+            enforce_eager=enforce_eager,
+            projection_kind=projection_kind,
+            layer_filter=layer_filter,
+        )
+
+    def _reject_graph_capture(self, activation: torch.Tensor) -> None:
+        if self.enforce_eager is True or activation.device.type != "npu":
+            return
+        is_capturing = getattr(getattr(torch, "npu", None), "is_current_stream_capturing", None)
+        if is_capturing is None:
+            raise RuntimeError(
+                "Cannot verify enforce-eager mode for MC2 input capture; pass an "
+                "enforce_eager=True model config and do not run performance measurements."
+            )
+        if bool(is_capturing()):
+            raise RuntimeError(
+                "MC2 real-input capture cannot run during ACLGraph capture; "
+                "use enforce-eager diagnostics and remove the capture environment variables before measurements."
+            )
+
+    def maybe_capture(
+        self,
+        activation: torch.Tensor,
+        weight: torch.Tensor,
+        residual: torch.Tensor,
+        gamma: torch.Tensor,
+        *,
+        projection_kind: str = "attention",
+        layer_index: int = 0,
+    ) -> None:
+        if projection_kind not in {"attention", "down"}:
+            raise ValueError("MC2 capture projection kind must be 'attention' or 'down'.")
+        if projection_kind != self.projection_kind:
+            return
+        layer_index = int(layer_index)
+        if layer_index < 0:
+            raise ValueError("MC2 capture layer index must be non-negative.")
+        if self.layer_filter is not None:
+            if layer_index not in self.layer_filter:
+                return
+        elif self._implicit_layer is not None and layer_index != self._implicit_layer:
+            return
+        if activation.ndim < 2:
+            raise ValueError("MC2 capture activation must have at least two dimensions.")
+        rows = int(prod(activation.shape[:-1]))
+        if rows not in self.rows or (layer_index, rows) in self._completed:
+            return
+        if self.layer_filter is None and self._implicit_layer is None:
+            self._implicit_layer = layer_index
+        self._reject_graph_capture(activation)
+
+        local_width = int(activation.shape[-1])
+        if weight.ndim != 2 or tuple(weight.shape) != (int(residual.shape[-1]), local_width):
+            raise ValueError("MC2 capture projection weight is incompatible with activation/residual shapes.")
+        if residual.shape[:-1] != activation.shape[:-1] or gamma.numel() != residual.shape[-1]:
+            raise ValueError("MC2 capture residual/gamma shapes are incompatible with the activation.")
+
+        row_directory = (
+            self.directory
+            / projection_kind
+            / f"layer-{layer_index}"
+            / f"m{rows}"
+        )
+        destination = row_directory / f"rank-{self.rank}.pt"
+        if destination.exists():
+            self._completed.add((layer_index, rows))
+            return
+        row_directory.mkdir(parents=True, exist_ok=True)
+        if destination.exists():
+            self._completed.add((layer_index, rows))
+            return
+
+        payload = {
+            "activation": activation.detach().reshape(rows, local_width).to(device="cpu").contiguous().clone(),
+            "weight": weight.detach().to(device="cpu").contiguous().clone(),
+            "residual": residual.detach().reshape(rows, int(residual.shape[-1])).to(device="cpu").contiguous().clone(),
+            "gamma": gamma.detach().reshape(-1).to(device="cpu").contiguous().clone(),
+        }
+        file_descriptor, temporary_name = tempfile.mkstemp(
+            prefix=f".rank-{self.rank}.",
+            suffix=".tmp",
+            dir=row_directory,
+        )
+        os.close(file_descriptor)
+        temporary = Path(temporary_name)
+        try:
+            torch.save(payload, temporary)
+            os.replace(temporary, destination)
+        finally:
+            temporary.unlink(missing_ok=True)
+        self._completed.add((layer_index, rows))
 
 
 @dataclass(frozen=True)
@@ -232,6 +653,87 @@ class NativeRMSNorm(nn.Module):
             return normalized
         return normalized, residual
 
+    def qualify_forward_mc2(
+        self,
+        local_hidden_states: torch.Tensor,
+        residual: torch.Tensor,
+        projection_weight: torch.Tensor,
+        context: NativeTPContext,
+        *,
+        projection_bias: torch.Tensor | None = None,
+        profile: MC2Profile | None = None,
+    ) -> _MC2DispatchTicket:
+        """Qualify this exact projection once before entering the MC2 adapter.
+
+        Native PEARL's ordinary attention output path owns several production
+        optimizations, including row padding, alternate weight formats and the
+        native AddRMSNorm operator.  An unavailable or unprofiled MC2 shape
+        must therefore stay on that path instead of entering the adapter's
+        generic correctness fallback.
+        """
+
+        if projection_bias is not None:
+            qualification = MC2Qualification(False, "MC2 production ABI does not support projection bias")
+        elif profile is None:
+            qualification = MC2Qualification(False, "no identity-bound MC2 qualification profile")
+        else:
+            operator_kind = getattr(profile, "metadata", {}).get("operator")
+            capability = (
+                detect_mc2_capability(
+                    local_hidden_states.device,
+                    context.size,
+                    operator=operator_kind,
+                )
+                if operator_kind == MC2_TP3_NATIVE_EPILOGUE_OPERATOR
+                else detect_mc2_capability(local_hidden_states.device, context.size)
+            )
+            qualification = (
+                profile.qualify(
+                    local_hidden_states,
+                    projection_weight,
+                    residual,
+                    tp_size=context.size,
+                    is_trans_b=True,
+                    tp_rank_id=context.rank,
+                    epsilon=self.eps,
+                )
+                if capability.available
+                else MC2Qualification(False, capability.reason)
+            )
+        return _bind_mc2_dispatch_ticket(
+            qualification,
+            local_hidden_states,
+            projection_weight,
+            residual,
+            self.weight,
+            tp_rank_size=context.size,
+            tp_rank_id=context.rank,
+            epsilon=self.eps,
+            is_trans_b=True,
+            profile=profile,
+        )
+
+    def can_forward_mc2(
+        self,
+        local_hidden_states: torch.Tensor,
+        residual: torch.Tensor,
+        projection_weight: torch.Tensor,
+        context: NativeTPContext,
+        *,
+        projection_bias: torch.Tensor | None = None,
+        profile: MC2Profile | None = None,
+    ) -> bool:
+        """Compatibility boolean wrapper around the single qualification path."""
+
+        return self.qualify_forward_mc2(
+            local_hidden_states,
+            residual,
+            projection_weight,
+            context,
+            projection_bias=projection_bias,
+            profile=profile,
+        ).qualification.qualified
+
     def forward_mc2(
         self,
         local_hidden_states: torch.Tensor,
@@ -241,21 +743,37 @@ class NativeRMSNorm(nn.Module):
         *,
         projection_bias: torch.Tensor | None = None,
         profile: MC2Profile | None = None,
+        qualification: _MC2DispatchTicket | None = None,
+        static_route: MC2StaticRoute | None = None,
+        mc2_chain: _MC2IntraLayerChain | None = None,
     ) -> tuple[torch.Tensor, torch.Tensor]:
         """Fuse TP projection, all-reduce, residual add and RMSNorm when available."""
         if projection_bias is not None:
-            # The production MC2 ABI has no bias input. Preserve exact
-            # semantics through the regular path when a model enables bias.
-            projected = F.linear(local_hidden_states, projection_weight, projection_bias)
-            if context.size > 1 and dist.is_available() and dist.is_initialized():
-                dist.all_reduce(projected, group=context.group)
-            return self.forward(projected, residual)  # type: ignore[return-value]
-        comm_name = resolve_hccl_comm_name(
-            context.group,
-            device=local_hidden_states.device,
-            rank=context.rank,
-        )
-        return matmul_allreduce_add_rmsnorm_or_fallback(
+            raise RuntimeError("Qualified MC2 dispatch cannot consume projection bias")
+        if static_route is not None:
+            if (
+                static_route.tp_rank_size != context.size
+                or static_route.tp_rank_id != context.rank
+                or static_route.weight_identity != id(projection_weight)
+                or static_route.gamma_identity != id(self.weight)
+            ):
+                raise RuntimeError("MC2 static route does not match this decoder projection")
+            comm_name = static_route.group_tp
+        else:
+            comm_name = resolve_hccl_comm_name(
+                context.group,
+                device=local_hidden_states.device,
+                rank=context.rank,
+            )
+        if context.size > 1 and not comm_name:
+            raise RuntimeError("Qualified MC2 dispatch could not resolve the target HCCL communicator.")
+        chain_state = None
+        flush_chain = True
+        if mc2_chain is not None:
+            if static_route is None:
+                raise RuntimeError("MC2 chaining requires a frozen static route")
+            chain_state, flush_chain = mc2_chain.begin(static_route)
+        outputs = matmul_allreduce_add_rmsnorm_or_fallback(
             local_hidden_states,
             projection_weight,
             residual,
@@ -264,32 +782,70 @@ class NativeRMSNorm(nn.Module):
             tp_rank_size=context.size,
             tp_rank_id=context.rank,
             epsilon=self.eps,
+            # The following decoder layer consumes the pre-normalization
+            # residual.  The custom MC2 kernel only materializes that second
+            # result for the GatherAddOut specialization, so production must
+            # request it explicitly instead of relying on the wrapper default.
+            is_gather_add_out=True,
             process_group=context.group,
             use_fused=True,
+            # ``can_forward_mc2`` has already established an exact qualified
+            # shape.  An exception here must abort graph capture instead of
+            # silently baking the split fallback into an allegedly MC2 graph.
+            strict_fused=True,
             profile=profile,
+            prequalification=qualification,
+            chain_state=chain_state,
+            flush_chain=flush_chain,
         )
+        if mc2_chain is None:
+            # Preserve the legacy two-output object's identity.  Besides
+            # avoiding an unnecessary tuple rebuild, a few model-runner
+            # adapters use identity to distinguish the native non-chained
+            # ABI from the explicit three-output chained ABI below.
+            return outputs  # type: ignore[return-value]
+        if len(outputs) != 3:
+            raise RuntimeError("MC2 chained dispatch did not return its next dependency state")
+        normalized, next_residual, next_chain_state = outputs
+        assert static_route is not None
+        mc2_chain.commit(static_route, next_chain_state)
+        return normalized, next_residual
 
 
 class NativeColumnLinear(nn.Module):
-    def __init__(self, input_size: int, output_size: int, context: NativeTPContext, bias: bool = False) -> None:
+    def __init__(
+        self,
+        input_size: int,
+        output_size: int,
+        context: NativeTPContext,
+        bias: bool = False,
+        output_partition_sizes: Sequence[int] | None = None,
+    ) -> None:
         super().__init__()
         self.context = context
         self.output_size = output_size
-        self.output_size_per_rank = _divide(output_size, context.size)
+        if output_partition_sizes is None:
+            output_partition_sizes = (_divide(output_size, context.size),) * context.size
+        if len(output_partition_sizes) != context.size or sum(output_partition_sizes) != output_size:
+            raise ValueError("Column-parallel partition sizes must cover the complete output.")
+        self.output_partition_sizes = tuple(int(size) for size in output_partition_sizes)
+        self.output_size_per_rank = self.output_partition_sizes[context.rank]
+        self.output_start = sum(self.output_partition_sizes[: context.rank])
         self.weight = nn.Parameter(torch.empty(self.output_size_per_rank, input_size))
         self.bias = nn.Parameter(torch.empty(self.output_size_per_rank)) if bias else None
+        self.token_pad_multiple = 1
 
     def load_weight(self, loaded_weight: torch.Tensor) -> None:
-        start = self.context.rank * self.output_size_per_rank
-        _copy_padded_shard(self.weight.data, loaded_weight, dim=0, start=start)
+        _copy_padded_shard(self.weight.data, loaded_weight, dim=0, start=self.output_start)
 
     def load_bias(self, loaded_bias: torch.Tensor) -> None:
         assert self.bias is not None
-        start = self.context.rank * self.output_size_per_rank
-        _copy_padded_shard(self.bias.data, loaded_bias, dim=0, start=start)
+        _copy_padded_shard(self.bias.data, loaded_bias, dim=0, start=self.output_start)
 
     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
-        return F.linear(hidden_states, self.weight, self.bias)
+        padded_states, real_rows = _pad_token_rows(hidden_states, self.token_pad_multiple)
+        output = F.linear(padded_states, self.weight, self.bias)
+        return output[:real_rows]
 
 
 class NativeMergedColumnLinear(NativeColumnLinear):
@@ -299,15 +855,41 @@ class NativeMergedColumnLinear(NativeColumnLinear):
         output_sizes: tuple[int, int],
         context: NativeTPContext,
         bias: bool = False,
+        shard_partition_sizes: Sequence[int] | None = None,
     ) -> None:
         self.output_sizes = output_sizes
-        super().__init__(input_size, sum(output_sizes), context, bias=bias)
+        self.shard_partition_sizes = (
+            tuple(int(size) for size in shard_partition_sizes)
+            if shard_partition_sizes is not None
+            else None
+        )
+        if self.shard_partition_sizes is not None:
+            if len(self.shard_partition_sizes) != context.size:
+                raise ValueError("Merged-column shard partitions must match TP size.")
+            if any(sum(self.shard_partition_sizes) != size for size in output_sizes):
+                raise ValueError("Merged-column shard partitions must cover every logical output.")
+            output_partition_sizes = tuple(
+                len(output_sizes) * size for size in self.shard_partition_sizes
+            )
+        else:
+            output_partition_sizes = None
+        super().__init__(
+            input_size,
+            sum(output_sizes),
+            context,
+            bias=bias,
+            output_partition_sizes=output_partition_sizes,
+        )
 
     def load_shard(self, loaded_weight: torch.Tensor, shard_id: int, is_bias: bool = False) -> None:
         shard_output_size = self.output_sizes[shard_id]
-        shard_per_rank = _divide(shard_output_size, self.context.size)
-        destination_start = sum(self.output_sizes[:shard_id]) // self.context.size
-        source_start = self.context.rank * shard_per_rank
+        if self.shard_partition_sizes is None:
+            shard_per_rank = _divide(shard_output_size, self.context.size)
+            source_start = self.context.rank * shard_per_rank
+        else:
+            shard_per_rank = self.shard_partition_sizes[self.context.rank]
+            source_start = sum(self.shard_partition_sizes[: self.context.rank])
+        destination_start = shard_id * shard_per_rank
         destination = self.bias if is_bias else self.weight
         assert destination is not None
         _copy_padded_shard(
@@ -327,17 +909,39 @@ class NativeQKVLinear(NativeColumnLinear):
         num_kv_heads: int,
         context: NativeTPContext,
         bias: bool,
+        q_head_partitions: Sequence[int] | None = None,
+        kv_head_partitions: Sequence[int] | None = None,
     ) -> None:
         self.head_dim = head_dim
-        self.num_heads_per_rank = _divide(num_heads, context.size)
-        self.num_kv_heads_per_rank = _divide(num_kv_heads, context.size)
+        if (q_head_partitions is None) != (kv_head_partitions is None):
+            raise ValueError("Q and KV head partitions must be configured together.")
+        if q_head_partitions is None:
+            q_head_partitions = (_divide(num_heads, context.size),) * context.size
+            kv_head_partitions = (_divide(num_kv_heads, context.size),) * context.size
+        assert kv_head_partitions is not None
+        if (
+            len(q_head_partitions) != context.size
+            or len(kv_head_partitions) != context.size
+            or sum(q_head_partitions) != num_heads
+            or sum(kv_head_partitions) != num_kv_heads
+        ):
+            raise ValueError("QKV head partitions must cover all configured heads.")
+        self.q_head_partitions = tuple(int(size) for size in q_head_partitions)
+        self.kv_head_partitions = tuple(int(size) for size in kv_head_partitions)
+        self.num_heads_per_rank = self.q_head_partitions[context.rank]
+        self.num_kv_heads_per_rank = self.kv_head_partitions[context.rank]
         self.q_size = self.num_heads_per_rank * head_dim
         self.kv_size = self.num_kv_heads_per_rank * head_dim
+        output_partition_sizes = tuple(
+            (q_heads + 2 * kv_heads) * head_dim
+            for q_heads, kv_heads in zip(self.q_head_partitions, self.kv_head_partitions)
+        )
         super().__init__(
             hidden_size,
             (num_heads + 2 * num_kv_heads) * head_dim,
             context,
             bias=bias,
+            output_partition_sizes=output_partition_sizes,
         )
 
     def load_shard(self, loaded_weight: torch.Tensor, shard_id: str, is_bias: bool = False) -> None:
@@ -349,7 +953,8 @@ class NativeQKVLinear(NativeColumnLinear):
             destination_start, shard_size = self.q_size + self.kv_size, self.kv_size
         else:
             raise ValueError(f"Unknown QKV shard {shard_id!r}.")
-        source_start = self.context.rank * shard_size
+        partitions = self.q_head_partitions if shard_id == "q" else self.kv_head_partitions
+        source_start = sum(partitions[: self.context.rank]) * self.head_dim
         destination = self.bias if is_bias else self.weight
         assert destination is not None
         _copy_padded_shard(
@@ -361,16 +966,32 @@ class NativeQKVLinear(NativeColumnLinear):
 
 
 class NativeRowLinear(nn.Module):
-    def __init__(self, input_size: int, output_size: int, context: NativeTPContext, bias: bool = False) -> None:
+    def __init__(
+        self,
+        input_size: int,
+        output_size: int,
+        context: NativeTPContext,
+        bias: bool = False,
+        input_partition_sizes: Sequence[int] | None = None,
+    ) -> None:
         super().__init__()
         self.context = context
-        self.input_size_per_rank = _divide(input_size, context.size)
+        if input_partition_sizes is None:
+            input_partition_sizes = (_divide(input_size, context.size),) * context.size
+        if len(input_partition_sizes) != context.size or sum(input_partition_sizes) != input_size:
+            raise ValueError("Row-parallel partition sizes must cover the complete input.")
+        self.input_partition_sizes = tuple(int(size) for size in input_partition_sizes)
+        self.input_size_per_rank = self.input_partition_sizes[context.rank]
+        self.input_start = sum(self.input_partition_sizes[: context.rank])
         self.weight = nn.Parameter(torch.empty(output_size, self.input_size_per_rank))
         self.bias = nn.Parameter(torch.empty(output_size)) if bias else None
+        self.token_pad_multiple = 1
+        self.register_buffer("large_m_nz_weight", None, persistent=False)
+        self.large_m_nz_min_rows = 0
+        self.pre_resolved_comm_name: str | None = None
 
     def load_weight(self, loaded_weight: torch.Tensor) -> None:
-        start = self.context.rank * self.input_size_per_rank
-        _copy_padded_shard(self.weight.data, loaded_weight, dim=1, start=start)
+        _copy_padded_shard(self.weight.data, loaded_weight, dim=1, start=self.input_start)
 
     def load_bias(self, loaded_bias: torch.Tensor) -> None:
         assert self.bias is not None
@@ -386,6 +1007,14 @@ class NativeRowLinear(nn.Module):
         # on TP3 target workers.  Keep the ordinary path for CPU tests,
         # unsupported CANN builds, and biased layers whose ABI is unavailable.
         global _TP3_MM_ALL_REDUCE_DISABLED
+        hidden_states, real_rows = _pad_token_rows(hidden_states, self.token_pad_multiple)
+        projection_weight = self.weight
+        if (
+            self.large_m_nz_weight is not None
+            and self.large_m_nz_min_rows > 0
+            and real_rows >= self.large_m_nz_min_rows
+        ):
+            projection_weight = self.large_m_nz_weight
         fused_mm_reduce = getattr(torch_npu, "npu_mm_all_reduce_base", None)
         allow_tp3_fused = self.context.size == 3 and _use_native_fused_mm_all_reduce(
             self.context.size, hidden_states.device.type
@@ -394,19 +1023,22 @@ class NativeRowLinear(nn.Module):
             _use_native_fused_mm_all_reduce(self.context.size, hidden_states.device.type)
             and fused_mm_reduce is not None
         ):
-            hcomm_info = resolve_hccl_comm_name(
-                self.context.group,
-                device=hidden_states.device,
-                rank=self.context.rank,
-            )
+            hcomm_info = self.pre_resolved_comm_name
+            if hcomm_info is None:
+                hcomm_info = resolve_hccl_comm_name(
+                    self.context.group,
+                    device=hidden_states.device,
+                    rank=self.context.rank,
+                )
             if hcomm_info:
                 try:
-                    return fused_mm_reduce(
+                    output = fused_mm_reduce(
                         hidden_states,
-                        self.weight.t(),
+                        projection_weight.t(),
                         hcomm_info,
                         bias=self.bias,
                     )
+                    return output[:real_rows]
                 except (RuntimeError, ValueError) as error:
                     if allow_tp3_fused:
                         _TP3_MM_ALL_REDUCE_DISABLED = True
@@ -417,10 +1049,10 @@ class NativeRowLinear(nn.Module):
                             )
                     else:
                         raise
-        output = F.linear(hidden_states, self.weight, self.bias)
+        output = F.linear(hidden_states, projection_weight, self.bias)
         if self.context.size > 1:
             dist.all_reduce(output, group=self.context.group)
-        return output
+        return output[:real_rows]
 
 
 class NativeVocabEmbedding(nn.Module):
@@ -461,7 +1093,12 @@ class NativeLMHead(NativeVocabEmbedding):
             raise ValueError("The greedy argmax fast path is supported only for TP1.")
         self.track_cache_finiteness = track_cache_finiteness
         self.tp1_greedy_argmax = tp1_greedy_argmax
+        self.token_pad_multiple = 1
         self.register_buffer("logits_nonfinite", torch.zeros((), dtype=torch.bool), persistent=False)
+
+    def _project_local(self, hidden_states: torch.Tensor) -> torch.Tensor:
+        padded_states, real_rows = _pad_token_rows(hidden_states, self.token_pad_multiple)
+        return F.linear(padded_states, self.weight)[:real_rows]
 
     def _track_logits(self, logits: torch.Tensor) -> None:
         if self.track_cache_finiteness:
@@ -470,7 +1107,7 @@ class NativeLMHead(NativeVocabEmbedding):
             self.logits_nonfinite.logical_or_(~torch.isfinite(logits).all())
 
     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
-        local_logits = F.linear(hidden_states, self.weight)
+        local_logits = self._project_local(hidden_states)
         self._track_logits(local_logits)
         if self.context.size == 1:
             return local_logits
@@ -493,7 +1130,7 @@ class NativeLMHead(NativeVocabEmbedding):
             # consumed by the NZ matmul kernel. Project the complete local TP
             # shard first, then remove a target-only vocabulary suffix from the
             # much smaller logits tensor.
-            local_logits = F.linear(hidden_states, self.weight)
+            local_logits = self._project_local(hidden_states)
             local_logits = local_logits[:, :local_vocabulary_size]
             self._track_logits(local_logits)
             if self.tp1_greedy_argmax:
@@ -537,14 +1174,26 @@ class NativeLMHead(NativeVocabEmbedding):
             local_token_ids = torch.zeros(hidden_states.shape[0], dtype=torch.long, device=hidden_states.device)
             local_logsumexp = local_values
         else:
-            local_logits = F.linear(hidden_states, self.weight)[:, :local_vocabulary_size]
+            local_logits = self._project_local(hidden_states)[:, :local_vocabulary_size]
             self._track_logits(local_logits)
-            local_values, local_token_ids = local_logits.float().max(dim=-1)
+            if self.context.size == 1:
+                # TP1 owns the complete vocabulary.  Computing max(logits)
+                # and logsumexp(logits) separately materializes the 151K-wide
+                # FP32 view twice on Ascend.  A single FP32 softmax followed by
+                # max returns the exact greedy token probability and uses one
+                # cast/reduction path, which is also stable under ACLGraph.
+                probabilities = torch.softmax(
+                    local_logits,
+                    dim=-1,
+                    dtype=torch.float32,
+                )
+                confidence, local_token_ids = probabilities.max(dim=-1)
+                return local_token_ids, confidence
+            local_logits_float = local_logits.float()
+            local_values, local_token_ids = local_logits_float.max(dim=-1)
             if self.vocab_start:
                 local_token_ids += self.vocab_start
-            local_logsumexp = torch.logsumexp(local_logits.float(), dim=-1)
-        if self.context.size == 1:
-            return local_token_ids, (local_values - local_logsumexp).exp()
+            local_logsumexp = torch.logsumexp(local_logits_float, dim=-1)
 
         local_summary = torch.stack((local_values, local_token_ids.float(), local_logsumexp), dim=-1)
         gathered = [torch.empty_like(local_summary) for _ in range(self.context.size)]
@@ -623,10 +1272,29 @@ class NativeAttention(nn.Module):
         super().__init__()
         self.context = context
         self.track_cache_finiteness = bool(getattr(config, "pearl_track_cache_finiteness", False))
+        self.use_device_paged_attention = bool(
+            getattr(config, "pearl_device_paged_attention", False)
+        )
         architecture = getattr(config, "architectures", ("Qwen2ForCausalLM",))[0]
         self.head_dim = getattr(config, "head_dim", config.hidden_size // config.num_attention_heads)
-        self.num_heads = _divide(config.num_attention_heads, context.size)
-        self.num_kv_heads = _divide(config.num_key_value_heads, context.size)
+        q_head_partitions = getattr(config, "pearl_q_head_partitions", None)
+        kv_head_partitions = getattr(config, "pearl_kv_head_partitions", None)
+        if q_head_partitions is None:
+            total_num_heads = config.num_attention_heads
+            total_num_kv_heads = config.num_key_value_heads
+            self.num_heads = _divide(total_num_heads, context.size)
+            self.num_kv_heads = _divide(total_num_kv_heads, context.size)
+            attention_input_partitions = None
+        else:
+            if kv_head_partitions is None:
+                raise ValueError("Balanced Q partitions require KV partitions.")
+            total_num_heads = sum(q_head_partitions)
+            total_num_kv_heads = sum(kv_head_partitions)
+            self.num_heads = int(q_head_partitions[context.rank])
+            self.num_kv_heads = int(kv_head_partitions[context.rank])
+            attention_input_partitions = tuple(
+                int(heads) * self.head_dim for heads in q_head_partitions
+            )
         self.scale = self.head_dim**-0.5
         self.q_size = self.num_heads * self.head_dim
         self.kv_size = self.num_kv_heads * self.head_dim
@@ -637,16 +1305,19 @@ class NativeAttention(nn.Module):
         self.qkv_proj = NativeQKVLinear(
             config.hidden_size,
             self.head_dim,
-            config.num_attention_heads,
-            config.num_key_value_heads,
+            total_num_heads,
+            total_num_kv_heads,
             context,
             bias=qkv_bias,
+            q_head_partitions=q_head_partitions,
+            kv_head_partitions=kv_head_partitions,
         )
         self.o_proj = NativeRowLinear(
-            config.num_attention_heads * self.head_dim,
+            total_num_heads * self.head_dim,
             config.hidden_size,
             context,
             bias=attention_bias if architecture == "LlamaForCausalLM" else False,
+            input_partition_sizes=attention_input_partitions,
         )
         rope_parameters = getattr(config, "rope_parameters", None) or getattr(config, "rope_scaling", None)
         rope_type = (rope_parameters or {}).get("rope_type", "default")
@@ -749,9 +1420,35 @@ class NativeAttention(nn.Module):
         self.key_cache[slot_mapping] = key
         self.value_cache[slot_mapping] = value
 
-    def _paged_attention(self, query: torch.Tensor, metadata: NativeAttentionMetadata) -> torch.Tensor:
+    def _paged_attention(
+        self,
+        query: torch.Tensor,
+        positions: torch.Tensor,
+        metadata: NativeAttentionMetadata,
+    ) -> torch.Tensor:
         assert self.key_cache is not None and self.value_cache is not None
         attended = torch.empty_like(query)
+        if self.use_device_paged_attention:
+            from vllm_ascend.ops.triton.spec_decode.device_paged_attention import (
+                device_paged_attention,
+            )
+
+            return device_paged_attention(
+                query,
+                self.key_cache,
+                self.value_cache,
+                metadata.block_tables,
+                positions,
+                scale=self.scale,
+                output=attended,
+                # A 64-token tile is the fastest numerically-qualified shape
+                # on 910B2 for Qwen3's GQA=2 draft attention.  The 128-token
+                # physical page still divides exactly, while halving the
+                # online-softmax loop count compared with the prototype's
+                # original 32-token tile.
+                tokens_per_iteration=64,
+                lengths_are_positions=True,
+            )
         run_native_paged_attention(
             query=query,
             key_cache=self.key_cache,
@@ -923,7 +1620,7 @@ class NativeAttention(nn.Module):
         if metadata.use_fused_infer_attention:
             attended = self._fused_infer_attention(query, metadata)
         elif self.uses_paged_attention and metadata.attention_mask is None:
-            attended = self._paged_attention(query, metadata)
+            attended = self._paged_attention(query, positions, metadata)
         else:
             attended = self._dense_attention(query, metadata)
         if track_layer_finiteness:
@@ -937,29 +1634,180 @@ class NativeAttention(nn.Module):
 class NativeQwen2MLP(nn.Module):
     def __init__(self, config, context: NativeTPContext) -> None:
         super().__init__()
+        intermediate_partitions = getattr(config, "pearl_intermediate_partitions", None)
+        intermediate_size = (
+            sum(intermediate_partitions)
+            if intermediate_partitions is not None
+            else config.intermediate_size
+        )
         self.gate_up_proj = NativeMergedColumnLinear(
             config.hidden_size,
-            (config.intermediate_size, config.intermediate_size),
+            (intermediate_size, intermediate_size),
             context,
             bias=bool(getattr(config, "mlp_bias", False)),
+            shard_partition_sizes=intermediate_partitions,
         )
         self.down_proj = NativeRowLinear(
-            config.intermediate_size,
+            intermediate_size,
             config.hidden_size,
             context,
             bias=bool(getattr(config, "mlp_bias", False)),
+            input_partition_sizes=intermediate_partitions,
         )
 
-    def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
+    def _activate(self, hidden_states: torch.Tensor) -> torch.Tensor:
         gate_up = self.gate_up_proj(hidden_states)
         if gate_up.device.type == "npu":
-            return self.down_proj(torch_npu.npu_swiglu(gate_up))
+            return torch_npu.npu_swiglu(gate_up)
         gate, up = gate_up.chunk(2, dim=-1)
-        return self.down_proj(F.silu(gate) * up)
+        return F.silu(gate) * up
+
+    def _maybe_capture_down(
+        self,
+        activation: torch.Tensor,
+        *,
+        mc2_input_capture: _MC2RealInputCapture | None,
+        residual: torch.Tensor | None,
+        next_layernorm_gamma: torch.Tensor | None,
+        layer_index: int,
+    ) -> None:
+        if mc2_input_capture is None:
+            return
+        if residual is None or next_layernorm_gamma is None:
+            if mc2_input_capture.projection_kind == "down":
+                raise ValueError(
+                    "down_proj MC2 capture requires the residual and next normalization gamma."
+                )
+            return
+        mc2_input_capture.maybe_capture(
+            activation,
+            self.down_proj.weight,
+            residual,
+            next_layernorm_gamma,
+            projection_kind="down",
+            layer_index=layer_index,
+        )
+
+    def forward(
+        self,
+        hidden_states: torch.Tensor,
+        *,
+        mc2_input_capture: _MC2RealInputCapture | None = None,
+        residual: torch.Tensor | None = None,
+        next_layernorm_gamma: torch.Tensor | None = None,
+        layer_index: int = 0,
+    ) -> torch.Tensor:
+        activation = self._activate(hidden_states)
+        self._maybe_capture_down(
+            activation,
+            mc2_input_capture=mc2_input_capture,
+            residual=residual,
+            next_layernorm_gamma=next_layernorm_gamma,
+            layer_index=layer_index,
+        )
+        return self.down_proj(activation)
+
+    def forward_down_mc2(
+        self,
+        hidden_states: torch.Tensor,
+        residual: torch.Tensor,
+        next_layernorm: NativeRMSNorm,
+        context: NativeTPContext,
+        *,
+        profile: MC2Profile,
+        static_route: MC2StaticRoute | None = None,
+        mc2_input_capture: _MC2RealInputCapture | None = None,
+        layer_index: int = 0,
+        mc2_chain: _MC2IntraLayerChain | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor, bool]:
+        """Try down_proj + all-reduce + the following RMSNorm as one op.
+
+        The third result is a host/static execution-state bit.  When true,
+        the returned hidden state is already normalized for the next decoder
+        layer (or by the model's final norm) and the returned residual is the
+        pre-normalization add output.  A false result keeps the ordinary
+        down-projection semantics and leaves ``residual`` unchanged.
+        """
+
+        activation = self._activate(hidden_states)
+        self._maybe_capture_down(
+            activation,
+            mc2_input_capture=mc2_input_capture,
+            residual=residual,
+            next_layernorm_gamma=next_layernorm.weight,
+            layer_index=layer_index,
+        )
+        if static_route is None:
+            qualification = next_layernorm.qualify_forward_mc2(
+                activation,
+                residual,
+                self.down_proj.weight,
+                context,
+                projection_bias=self.down_proj.bias,
+                profile=profile,
+            )
+        else:
+            qualification = bind_mc2_static_route(
+                static_route,
+                profile,
+                activation,
+                self.down_proj.weight,
+                residual,
+                next_layernorm.weight,
+            )
+        if not qualification.qualification.qualified:
+            if mc2_chain is not None:
+                raise RuntimeError(
+                    "MC2 intra-layer chain lost its qualified down route after static admission"
+                )
+            return self.down_proj(activation), residual, False
+        normalized, next_residual = next_layernorm.forward_mc2(
+            activation,
+            residual,
+            self.down_proj.weight,
+            context,
+            projection_bias=self.down_proj.bias,
+            profile=profile,
+            qualification=qualification,
+            static_route=static_route,
+            mc2_chain=mc2_chain,
+        )
+        return normalized, next_residual, True
+
+
+def _enable_tp3_down_mc2(
+    mlp: NativeQwen2MLP,
+    context: NativeTPContext,
+    *,
+    enable_mc2: bool,
+    profile: MC2Profile | None,
+) -> bool:
+    """Fail closed unless the qualified Qwen3-32B TP3 FFN is exact."""
+
+    down_partitions = mlp.down_proj.input_partition_sizes
+    return bool(
+        ascend_envs.VLLM_ASCEND_PEARL_MC2_DOWN_PROJ
+        and enable_mc2
+        and profile is not None
+        and context.size == 3
+        and down_partitions == (TP3_DOWN_MC2_LOCAL_K,) * 3
+        and mlp.down_proj.weight.shape[1] == TP3_DOWN_MC2_LOCAL_K
+        and mlp.down_proj.bias is None
+        and mlp.gate_up_proj.bias is None
+    )
 
 
 class NativeQwen2DecoderLayer(nn.Module):
-    def __init__(self, config, context: NativeTPContext) -> None:
+    mc2_input_capture: _MC2RealInputCapture | None = None
+
+    def __init__(
+        self,
+        config,
+        context: NativeTPContext,
+        mc2_input_capture: _MC2RealInputCapture | None = None,
+        *,
+        layer_index: int = 0,
+    ) -> None:
         super().__init__()
         self.self_attn = NativeAttention(config, context)
         self.input_layernorm = NativeRMSNorm(config.hidden_size, config.rms_norm_eps)
@@ -968,6 +1816,17 @@ class NativeQwen2DecoderLayer(nn.Module):
         self.context = context
         self.enable_mc2 = bool(getattr(config, "pearl_enable_mc2", False))
         self.mc2_profile = getattr(config, "pearl_mc2_profile", None)
+        self.mc2_input_capture = mc2_input_capture
+        self.layer_index = int(layer_index)
+        self.mc2_attention_route: MC2StaticRoute | None = None
+        self.mc2_down_route: MC2StaticRoute | None = None
+        self.mc2_routes_frozen = False
+        self.enable_down_mc2 = _enable_tp3_down_mc2(
+            self.mlp,
+            context,
+            enable_mc2=self.enable_mc2,
+            profile=self.mc2_profile,
+        )
 
     def forward(
         self,
@@ -975,31 +1834,119 @@ class NativeQwen2DecoderLayer(nn.Module):
         hidden_states: torch.Tensor,
         residual: torch.Tensor | None,
         attention_metadata: NativeAttentionMetadata | None = None,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
-        if residual is None:
+        *,
+        next_layernorm_gamma: torch.Tensor | None = None,
+        next_layernorm: NativeRMSNorm | None = None,
+        input_is_normalized: bool = False,
+        return_normalization_state: bool = False,
+        mc2_chain: _MC2IntraLayerChain | None = None,
+    ) -> tuple[torch.Tensor, torch.Tensor] | tuple[torch.Tensor, torch.Tensor, bool]:
+        if input_is_normalized:
+            if residual is None:
+                raise ValueError("A pre-normalized decoder input requires its residual state.")
+        elif residual is None:
             residual = hidden_states
             hidden_states = self.input_layernorm(hidden_states)
         else:
             hidden_states, residual = self.input_layernorm(hidden_states, residual)
         if self.enable_mc2:
+            routes_frozen = bool(getattr(self, "mc2_routes_frozen", False))
+            if routes_frozen and (
+                getattr(self, "mc2_attention_route", None) is None
+                or getattr(self, "mc2_down_route", None) is None
+            ):
+                raise RuntimeError("Frozen MC2 decoder layer is missing a static route")
             local_attended = self.self_attn(
                 positions,
                 hidden_states,
                 attention_metadata,
                 return_pre_projection=True,
             )
-            hidden_states, residual = self.post_attention_layernorm.forward_mc2(
-                local_attended,
-                residual,
-                self.self_attn.o_proj.weight,
-                self.context,
-                projection_bias=self.self_attn.o_proj.bias,
-                profile=self.mc2_profile,
-            )
+            if self.mc2_input_capture is not None:
+                self.mc2_input_capture.maybe_capture(
+                    local_attended,
+                    self.self_attn.o_proj.weight,
+                    residual,
+                    self.post_attention_layernorm.weight,
+                    projection_kind="attention",
+                    layer_index=self.layer_index,
+                )
+            static_route = getattr(self, "mc2_attention_route", None)
+            if static_route is None:
+                if routes_frozen:
+                    raise RuntimeError("Frozen MC2 attention route cannot use dynamic qualification")
+                qualification = self.post_attention_layernorm.qualify_forward_mc2(
+                    local_attended,
+                    residual,
+                    self.self_attn.o_proj.weight,
+                    self.context,
+                    projection_bias=self.self_attn.o_proj.bias,
+                    profile=self.mc2_profile,
+                )
+            else:
+                qualification = bind_mc2_static_route(
+                    static_route,
+                    self.mc2_profile,
+                    local_attended,
+                    self.self_attn.o_proj.weight,
+                    residual,
+                    self.post_attention_layernorm.weight,
+                )
+            if qualification.qualification.qualified:
+                hidden_states, residual = self.post_attention_layernorm.forward_mc2(
+                    local_attended,
+                    residual,
+                    self.self_attn.o_proj.weight,
+                    self.context,
+                    projection_bias=self.self_attn.o_proj.bias,
+                    profile=self.mc2_profile,
+                    qualification=qualification,
+                    static_route=static_route,
+                    mc2_chain=mc2_chain,
+                )
+            else:
+                if mc2_chain is not None:
+                    raise RuntimeError(
+                        "MC2 intra-layer chain lost its qualified attention route after static admission"
+                    )
+                hidden_states = self.self_attn.o_proj(local_attended)
+                hidden_states, residual = self.post_attention_layernorm(
+                    hidden_states,
+                    residual,
+                )
         else:
             hidden_states = self.self_attn(positions, hidden_states, attention_metadata)
             hidden_states, residual = self.post_attention_layernorm(hidden_states, residual)
-        hidden_states = self.mlp(hidden_states)
+        down_mc2_fused = False
+        if (
+            return_normalization_state
+            and self.enable_down_mc2
+            and next_layernorm is not None
+        ):
+            hidden_states, residual, down_mc2_fused = self.mlp.forward_down_mc2(
+                hidden_states,
+                residual,
+                next_layernorm,
+                self.context,
+                profile=self.mc2_profile,
+                static_route=getattr(self, "mc2_down_route", None),
+                mc2_input_capture=self.mc2_input_capture,
+                layer_index=self.layer_index,
+                mc2_chain=mc2_chain,
+            )
+        else:
+            if self.mc2_input_capture is None:
+                hidden_states = self.mlp(hidden_states)
+            else:
+                hidden_states = self.mlp(
+                    hidden_states,
+                    mc2_input_capture=self.mc2_input_capture,
+                    residual=residual,
+                    next_layernorm_gamma=next_layernorm_gamma,
+                    layer_index=self.layer_index,
+                )
+        if return_normalization_state:
+            return hidden_states, residual, down_mc2_fused
         return hidden_states, residual
 
 
@@ -1021,7 +1968,23 @@ class NativeQwen2ForCausalLM(nn.Module):
         self.track_cache_finiteness = bool(getattr(config, "pearl_track_cache_finiteness", False))
         self.register_buffer("output_nonfinite", torch.zeros((), dtype=torch.bool), persistent=False)
         self.embed_tokens = NativeVocabEmbedding(config.vocab_size, config.hidden_size, context)
-        self.layers = nn.ModuleList(NativeQwen2DecoderLayer(config, context) for _ in range(config.num_hidden_layers))
+        # PEARL target-only diagnostics still launch the TP1 draft rank. MC2
+        # qualification is meaningful only for a sharded projection, so do
+        # not let the process-wide capture environment opt that TP1 model in.
+        mc2_input_capture = (
+            _MC2RealInputCapture.from_env(config, context)
+            if context.size > 1
+            else None
+        )
+        self.layers = nn.ModuleList(
+            NativeQwen2DecoderLayer(
+                config,
+                context,
+                mc2_input_capture,
+                layer_index=layer_index,
+            )
+            for layer_index in range(config.num_hidden_layers)
+        )
         self.norm = NativeRMSNorm(config.hidden_size, config.rms_norm_eps)
         self.lm_head = NativeLMHead(
             config.vocab_size,
@@ -1033,6 +1996,173 @@ class NativeQwen2ForCausalLM(nn.Module):
         self.register_buffer("attention_mask", None, persistent=False)
         if getattr(config, "tie_word_embeddings", False):
             self.lm_head.weight = self.embed_tokens.weight
+        token_pad_multiple = int(getattr(config, "pearl_token_pad_multiple", 1))
+        if token_pad_multiple < 1:
+            raise ValueError("PEARL token-row padding multiple must be positive.")
+        for module in self.modules():
+            if isinstance(module, (NativeColumnLinear, NativeRowLinear, NativeLMHead)):
+                module.token_pad_multiple = token_pad_multiple
+            if isinstance(module, NativeRowLinear):
+                module.large_m_nz_min_rows = int(
+                    getattr(config, "pearl_large_m_nz_min_rows", 0)
+                )
+        self._mc2_static_route_manifest: MC2StaticRouteManifest | None = None
+        self._mc2_static_routes_frozen = False
+        self._mc2_chained_row_counts: frozenset[int] = frozenset()
+        self._mc2_deferred_row_counts: frozenset[int] = frozenset()
+        self.register_buffer(
+            "_mc2_chain_zero",
+            torch.zeros((64, 4), dtype=torch.int64),
+            persistent=False,
+        )
+
+    def freeze_mc2_static_routes(self) -> MC2StaticRouteManifest:
+        """Resolve and freeze every target-layer MC2 route before capture.
+
+        Weight layout conversion is complete when this method runs.  The
+        resulting routes therefore bind the final parameter objects/formats
+        and one communicator resolved from the target TP process group.  A
+        later forward may vary only its profiled token-row count.
+        """
+
+        existing = self._mc2_static_route_manifest
+        if existing is not None:
+            return existing
+        profile = getattr(self.config, "pearl_mc2_profile", None)
+        if not bool(getattr(self.config, "pearl_enable_mc2", False)) or not isinstance(
+            profile, MC2Profile
+        ):
+            raise RuntimeError("MC2 static routes require an enabled, normalized target profile")
+        if not self.layers:
+            raise RuntimeError("MC2 static routes require at least one decoder layer")
+        device = self.embed_tokens.weight.device
+        operator_kind = getattr(profile, "metadata", {}).get("operator")
+        capability = (
+            detect_mc2_capability(
+                device,
+                self.context.size,
+                operator=operator_kind,
+            )
+            if operator_kind == MC2_TP3_NATIVE_EPILOGUE_OPERATOR
+            else detect_mc2_capability(device, self.context.size)
+        )
+        if not capability.available:
+            raise RuntimeError(f"MC2 static route capability failed: {capability.reason}")
+        environment_error = validate_mc2_static_environment(
+            profile,
+            device,
+            tp_size=self.context.size,
+            epsilon=float(self.config.rms_norm_eps),
+        )
+        if environment_error is not None:
+            raise RuntimeError(f"MC2 static route environment failed: {environment_error}")
+        comm_name = resolve_hccl_comm_name(
+            self.context.group,
+            device=device,
+            rank=self.context.rank,
+        )
+        if not comm_name:
+            raise RuntimeError("MC2 static routes could not resolve the target HCCL communicator")
+
+        pending: list[tuple[NativeQwen2DecoderLayer, MC2StaticRoute, MC2StaticRoute]] = []
+        routes: list[MC2StaticRoute] = []
+        for layer_index, layer in enumerate(self.layers):
+            attention_enabled = layer.self_attn.o_proj.bias is None
+            attention_route = build_mc2_static_route(
+                profile,
+                projection_kind="attention",
+                layer_index=layer_index,
+                group_tp=comm_name,
+                tp_rank_size=self.context.size,
+                tp_rank_id=self.context.rank,
+                epsilon=layer.post_attention_layernorm.eps,
+                weight=layer.self_attn.o_proj.weight,
+                gamma=layer.post_attention_layernorm.weight,
+                enabled=attention_enabled,
+                disabled_reason=(
+                    "MC2 production ABI does not support projection bias"
+                    if not attention_enabled
+                    else ""
+                ),
+            )
+            next_layernorm = (
+                self.layers[layer_index + 1].input_layernorm
+                if layer_index + 1 < len(self.layers)
+                else self.norm
+            )
+            down_enabled = layer.enable_down_mc2
+            down_disabled_reason = (
+                "TP3 down-projection MC2 is disabled by model policy"
+                if not down_enabled
+                else ""
+            )
+            if (
+                down_enabled
+                and operator_kind == MC2_TP3_NATIVE_EPILOGUE_OPERATOR
+                and layer.mlp.down_proj.large_m_nz_weight is not None
+                and 0 < layer.mlp.down_proj.large_m_nz_min_rows <= 160
+            ):
+                # The v126 route binds the base weight object once before graph
+                # capture.  Mode 11 would switch to another NZ tensor for part
+                # of the admitted M envelope; disable this route until routes
+                # can bind one exact weight per row bucket.
+                down_enabled = False
+                down_disabled_reason = (
+                    "native-MatMul MC2 epilogue cannot bind the mode-11 alternate "
+                    "down-projection weight within its M<=160 envelope"
+                )
+            down_route = build_mc2_static_route(
+                profile,
+                projection_kind="down",
+                layer_index=layer_index,
+                group_tp=comm_name,
+                tp_rank_size=self.context.size,
+                tp_rank_id=self.context.rank,
+                epsilon=next_layernorm.eps,
+                weight=layer.mlp.down_proj.weight,
+                gamma=next_layernorm.weight,
+                enabled=down_enabled,
+                disabled_reason=down_disabled_reason,
+            )
+            pending.append((layer, attention_route, down_route))
+            routes.extend((attention_route, down_route))
+        manifest = build_mc2_static_route_manifest(profile, routes)
+        if not any(
+            qualification.qualified
+            for route in manifest.routes
+            if route.enabled
+            for qualification in route.decisions.values()
+        ):
+            raise RuntimeError(
+                "Explicit MC2 configuration has zero qualified production row routes"
+            )
+        chained_row_counts = _qualified_mc2_chained_flush_row_counts(
+            profile,
+            manifest.routes,
+            layer_count=len(self.layers),
+            graph_execution=not bool(
+                getattr(self.config, "pearl_enforce_eager", False)
+            ),
+        )
+        deferred_row_counts = _qualified_mc2_chain_row_counts(
+            profile,
+            manifest.routes,
+            layer_count=len(self.layers),
+            graph_execution=not bool(
+                getattr(self.config, "pearl_enforce_eager", False)
+            ),
+        )
+        for layer, attention_route, down_route in pending:
+            layer.mc2_attention_route = attention_route
+            layer.mc2_down_route = down_route
+            layer.self_attn.o_proj.pre_resolved_comm_name = comm_name
+            layer.mlp.down_proj.pre_resolved_comm_name = comm_name
+            layer.mc2_routes_frozen = True
+        self._mc2_static_route_manifest = manifest
+        self._mc2_static_routes_frozen = True
+        self._mc2_chained_row_counts = chained_row_counts
+        self._mc2_deferred_row_counts = deferred_row_counts
+        return manifest
 
     def configure_cache(
         self,
@@ -1391,11 +2521,47 @@ class NativeQwen2ForCausalLM(nn.Module):
     ) -> torch.Tensor:
         hidden_states = self.embed_tokens(input_ids)
         residual = None
-        for layer in self.layers:
-            hidden_states, residual = layer(positions, hidden_states, residual, attention_metadata)
+        input_is_normalized = False
+        row_count = prod(hidden_states.shape[:-1])
+        chained_row_counts = getattr(self, "_mc2_chained_row_counts", frozenset())
+        deferred_row_counts = getattr(self, "_mc2_deferred_row_counts", frozenset())
+        chain_zero = getattr(self, "_mc2_chain_zero", None)
+        mc2_chain = (
+            _MC2IntraLayerChain(
+                chain_zero,
+                len(self.layers),
+                defer_read_done=row_count in deferred_row_counts,
+            )
+            if row_count in chained_row_counts and isinstance(chain_zero, torch.Tensor)
+            else None
+        )
+        for layer_index, layer in enumerate(self.layers):
+            next_layernorm = (
+                self.layers[layer_index + 1].input_layernorm
+                if layer_index + 1 < len(self.layers)
+                else self.norm
+            )
+            layer_kwargs = {
+                "next_layernorm_gamma": next_layernorm.weight,
+                "next_layernorm": next_layernorm,
+                "input_is_normalized": input_is_normalized,
+                "return_normalization_state": True,
+            }
+            if mc2_chain is not None:
+                layer_kwargs["mc2_chain"] = mc2_chain
+            hidden_states, residual, input_is_normalized = layer(
+                positions,
+                hidden_states,
+                residual,
+                attention_metadata,
+                **layer_kwargs,
+            )
+        if mc2_chain is not None:
+            mc2_chain.finish()
         if self.track_cache_finiteness:
             self.output_nonfinite.logical_or_(~(torch.isfinite(hidden_states).all() & torch.isfinite(residual).all()))
-        hidden_states, _ = self.norm(hidden_states, residual)
+        if not input_is_normalized:
+            hidden_states, _ = self.norm(hidden_states, residual)
         if self.track_cache_finiteness:
             self.output_nonfinite.logical_or_(~torch.isfinite(hidden_states).all())
         return hidden_states
@@ -1501,16 +2667,83 @@ def load_native_model_weights(model: NativeQwen2ForCausalLM, model_path: str) ->
                     # from config in this implementation.
                     if "rotary_emb" not in weight_name:
                         raise
+    _maybe_untie_lm_head_for_nz(model)
     _maybe_convert_linear_weights_to_nz(model)
 
 
-def _maybe_convert_linear_weights_to_nz(model: NativeQwen2ForCausalLM) -> None:
-    """Match vLLM-Ascend's opt-in BF16/FP16 FRACTAL_NZ weight path."""
-    if ascend_envs.VLLM_ASCEND_ENABLE_NZ != 2:
+def _maybe_untie_lm_head_for_nz(model: NativeQwen2ForCausalLM) -> None:
+    """Give a tied draft LM head its own inference-only NZ-capable weight.
+
+    Qwen3-0.6B ties the output projection to the token embedding table.  The
+    embedding must remain ND for GatherV2, whereas the much hotter full-vocab
+    projection benefits from FRACTAL_NZ.  Mode 9 therefore clones the already
+    loaded table exactly once before layout conversion.  This preserves model
+    values and leaves all non-mode-9 configurations genuinely tied.
+    """
+    if getattr(model.config, "pearl_weight_nz_mode", None) != 9:
         return
-    tied_embeddings = getattr(model.config, "tie_word_embeddings", False)
+    if model.lm_head.weight is not model.embed_tokens.weight:
+        return
+    model.lm_head.weight = nn.Parameter(
+        model.embed_tokens.weight.detach().clone(),
+        requires_grad=False,
+    )
+
+
+def _maybe_convert_linear_weights_to_nz(model: NativeQwen2ForCausalLM) -> None:
+    """Apply the model-local BF16/FP16 FRACTAL_NZ weight policy.
+
+    Mode 2 converts every eligible linear. TP3 target modes 3/4/5 convert
+    respectively both FFN projections, only ``down_proj``, or only
+    ``gate_up_proj``. Modes 6/7 split ``down_proj`` across even/odd decoder
+    layers. Mode 8 converts QKV, attention output, down projection and LM
+    head while retaining gate-up in ND. Mode 9 converts only the LM head and,
+    for tied models, uses a private inference copy so embeddings remain ND.
+    Mode 10 is the TP3 small-M candidate: QKV plus ``down_proj`` in NZ while
+    leaving the less reliable attention-output and vocabulary projections ND.
+    Mode 11 retains ``down_proj`` in ND and stores a second NZ copy for matrix
+    row counts at or above ``pearl_large_m_nz_min_rows``.
+    """
+    configured_mode = getattr(model.config, "pearl_weight_nz_mode", None)
+    if not isinstance(configured_mode, int):
+        configured_mode = int(ascend_envs.VLLM_ASCEND_ENABLE_NZ)
+    if configured_mode not in (2, 3, 4, 5, 6, 7, 8, 9, 10, 11):
+        return
+    tied_embeddings = model.lm_head.weight is model.embed_tokens.weight
     linear_types = (NativeColumnLinear, NativeRowLinear, NativeLMHead)
-    for module in model.modules():
+    named_modules = (
+        model.named_modules()
+        if configured_mode in (3, 4, 5, 6, 7, 8, 9, 10, 11)
+        else (("", module) for module in model.modules())
+    )
+    for module_name, module in named_modules:
+        if configured_mode in (3, 4, 5, 6, 7, 8, 9, 10, 11):
+            suffixes = {
+                3: (".mlp.gate_up_proj", ".mlp.down_proj"),
+                4: (".mlp.down_proj",),
+                5: (".mlp.gate_up_proj",),
+                6: (".mlp.down_proj",),
+                7: (".mlp.down_proj",),
+                8: (
+                    ".self_attn.qkv_proj",
+                    ".self_attn.o_proj",
+                    ".mlp.down_proj",
+                    "lm_head",
+                ),
+                9: ("lm_head",),
+                10: (".self_attn.qkv_proj", ".mlp.down_proj"),
+                11: (".mlp.down_proj",),
+            }[configured_mode]
+            if not module_name.endswith(suffixes):
+                continue
+            if configured_mode in (6, 7):
+                components = module_name.split(".")
+                try:
+                    layer_index = int(components[components.index("layers") + 1])
+                except (ValueError, IndexError):
+                    continue
+                if layer_index % 2 != configured_mode - 6:
+                    continue
         if tied_embeddings and isinstance(module, NativeLMHead):
             # GatherV2 requires the tied embedding table to stay in ND format.
             continue
@@ -1519,10 +2752,14 @@ def _maybe_convert_linear_weights_to_nz(model: NativeQwen2ForCausalLM) -> None:
             and getattr(module, "bias", None) is None
             and module.weight.device.type == "npu"
         ):
-            module.weight.data = torch_npu.npu_format_cast(
+            converted = torch_npu.npu_format_cast(
                 module.weight.data,
                 ACL_FORMAT_FRACTAL_NZ,
             )
+            if configured_mode == 11:
+                module.large_m_nz_weight = converted
+            else:
+                module.weight.data = converted
 
 
 def load_native_qwen2_weights(model: NativeQwen2ForCausalLM, model_path: str) -> None:

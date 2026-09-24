@@ -23,6 +23,11 @@ using namespace AscendC;
 
 constexpr int64_t ND2NZ_STRIDE_LIMIT = 65536;
 constexpr int32_t AIC_WAIT_AIV_FINISH_ALIGN_FLAG_ID = 12;
+constexpr int32_t AIC_GROUP_BARRIER_FLAG_ID = 6;
+// CANN's small-M MC2 kernels reserve the tail of the 200-MiB symmetric
+// window for producer/consumer state. Keep TP3 IPC flags there so they never
+// alias the matrix payload at offset zero.
+constexpr int64_t TP3_IPC_FLAG_OFFSET_BYTES = 180LL * 1024 * 1024 + 4096;
 constexpr int32_t MAX_BLOCK_COUNT = 2;
 constexpr int32_t BLOCK_COUNT_3 = 3;
 constexpr int32_t BLOCK_COUNT_4 = 4;

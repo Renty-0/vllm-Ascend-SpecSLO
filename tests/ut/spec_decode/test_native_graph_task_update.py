@@ -30,7 +30,7 @@ def _exact_stable_fia_entry(attention_mask):
         sequence_lens=(4, 6),
         graph=MagicMock(),
         output=torch.tensor([10, 11, 12, 13]),
-        tasks=[],
+        tasks=[SimpleNamespace(event=MagicMock())],
         attention_mask=attention_mask.clone(),
         runtime_validated=True,
         validated_real_row_count=4,
@@ -53,6 +53,10 @@ def _draft_replay_runner():
         output=torch.tensor([[4, 5]]),
         graph=MagicMock(),
     )
+    entry.positions = (torch.tensor([2]), torch.tensor([3]))
+    entry.tasks = [SimpleNamespace(event=MagicMock()), SimpleNamespace(event=MagicMock())]
+    entry.tasks_per_step = 1
+    entry.taskless_device_attention = False
     entry.actual_seq_lengths_q = ((), ())
     entry.sequence_lens = ((), ())
     runner.draft_entries[("draft-greedy:8|steps:2|paged", 1)] = entry
@@ -111,6 +115,29 @@ def _run_stable_task_barrier_draft_replay(runner, *, sequence_length=3):
         vocabulary_size=8,
         stable_task_barrier=True,
     )
+
+
+def test_draft_graph_output_carries_real_per_step_confidence() -> None:
+    runner = NativeACLGraphRunner.__new__(NativeACLGraphRunner)
+    model = MagicMock()
+    model.side_effect = [torch.tensor([[1.0]]), torch.tensor([[2.0]])]
+    model.compute_greedy_tokens_with_confidence.side_effect = [
+        (torch.tensor([11]), torch.tensor([0.25])),
+        (torch.tensor([12]), torch.tensor([0.875])),
+    ]
+    runner.model = model
+
+    output = runner._execute_draft(
+        torch.tensor([10]),
+        [torch.tensor([1]), torch.tensor([2])],
+        [SimpleNamespace(), SimpleNamespace()],
+        vocabulary_size=32,
+        return_confidence=True,
+    )
+
+    assert output.dtype == torch.long
+    assert output.tolist() == [[[11, 250000], [12, 875000]]]
+    assert model.call_args_list[1].args[0].tolist() == [11]
 
 
 @pytest.mark.parametrize("priority", [-1, 0])
@@ -177,6 +204,97 @@ def test_target_fia_task_event_group_size_rejects_unknown_value():
         pytest.raises(ValueError, match="must be 1, 2, or 4"),
     ):
         NativeACLGraphRunner(MagicMock(), enabled=False)
+
+
+def test_target_fia_task_prefix_event_group_is_validated_at_runner_init():
+    envs = __import__("vllm_ascend.spec_decode.pearl.native_graph", fromlist=["envs"]).envs
+    with (
+        patch.object(envs, "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_EVENT_GROUP_SIZE", 4),
+        patch.object(
+            envs,
+            "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_PREFIX_EVENT_GROUP_SIZE",
+            2,
+        ),
+    ):
+        runner = NativeACLGraphRunner(MagicMock(), enabled=False)
+
+    assert runner.target_fia_task_prefix_event_group_size == 2
+    assert runner.graph_execution_metrics()["target_fia_task_prefix_event_group_size"] == 2
+
+
+def test_target_fia_task_prefix_event_group_must_be_shorter_than_steady_group():
+    envs = __import__("vllm_ascend.spec_decode.pearl.native_graph", fromlist=["envs"]).envs
+    with (
+        patch.object(envs, "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_EVENT_GROUP_SIZE", 2),
+        patch.object(
+            envs,
+            "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_PREFIX_EVENT_GROUP_SIZE",
+            2,
+        ),
+        pytest.raises(ValueError, match="must be smaller"),
+    ):
+        NativeACLGraphRunner(MagicMock(), enabled=False)
+
+
+@pytest.mark.parametrize("workers", [1, 2, 4])
+def test_target_fia_task_update_worker_count_is_validated_at_runner_init(
+    workers,
+):
+    envs = __import__("vllm_ascend.spec_decode.pearl.native_graph", fromlist=["envs"]).envs
+    with (
+        patch.object(
+            envs,
+            "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS",
+            workers,
+        ),
+        patch.object(
+            envs,
+            "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_EVENT_GROUP_SIZE",
+            1,
+        ),
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream") as stream,
+    ):
+        runner = NativeACLGraphRunner(
+            MagicMock(),
+            enabled=True,
+            is_target_worker=True,
+        )
+
+    assert runner.target_fia_task_update_workers == workers
+    assert stream.call_count == workers
+    if runner._target_fia_update_executor is not None:
+        runner._target_fia_update_executor.shutdown()
+
+
+@pytest.mark.parametrize("group_size", [2, 4])
+def test_parallel_target_fia_task_update_accepts_complete_shared_event_groups(
+    group_size,
+):
+    envs = __import__("vllm_ascend.spec_decode.pearl.native_graph", fromlist=["envs"]).envs
+    with (
+        patch.object(
+            envs,
+            "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS",
+            2,
+        ),
+        patch.object(
+            envs,
+            "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_EVENT_GROUP_SIZE",
+            group_size,
+        ),
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream") as stream,
+    ):
+        runner = NativeACLGraphRunner(
+            MagicMock(),
+            enabled=True,
+            is_target_worker=True,
+        )
+
+    assert runner.target_fia_task_update_workers == 2
+    assert runner.target_fia_task_event_group_size == group_size
+    assert stream.call_count == 2
+    assert runner._target_fia_update_executor is not None
+    runner._target_fia_update_executor.shutdown()
 
 
 def test_shared_graph_pool_is_created_only_when_opted_in():
@@ -261,6 +379,7 @@ def _generic_replay_runner():
     )
     entry.runtime_validated = True
     entry.validated_real_row_count = 1
+    entry.taskless_device_attention = False
     entry.tasks = [
         SimpleNamespace(event=MagicMock()),
         SimpleNamespace(event=MagicMock()),
@@ -270,6 +389,56 @@ def _generic_replay_runner():
     runner._copy_inputs = MagicMock()
     runner._update_attention_tasks = MagicMock()
     return runner, entry, update_stream
+
+
+def test_generic_taskless_device_attention_skips_all_update_dependencies():
+    runner, entry, update_stream = _generic_replay_runner()
+    current_stream = MagicMock()
+    runner.update_stream = None
+    entry.tasks = []
+    entry.taskless_device_attention = True
+
+    with (
+        patch.dict(
+            os.environ,
+            {
+                # Neither task-update policy applies to taskless device PA;
+                # even a globally conflicting pair must not gate its replay.
+                "VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE": "1",
+                "VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE": "1",
+                "VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS": "0",
+                "VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE": "0",
+                "VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY": "0",
+            },
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.current_stream",
+            return_value=current_stream,
+        ),
+    ):
+        output = _run_generic_replay(runner)
+
+    assert output.tolist() == [[4, 5]]
+    runner._copy_inputs.assert_called_once()
+    runner._update_attention_tasks.assert_not_called()
+    entry.graph.replay.assert_called_once_with()
+    update_stream.wait_event.assert_not_called()
+    update_stream.wait_stream.assert_not_called()
+    current_stream.wait_stream.assert_not_called()
+    assert runner.generic_taskless_replays == 1
+    assert runner.task_update_skip_replay_count == 0
+
+
+def test_generic_empty_task_list_without_device_attention_origin_fails_closed():
+    runner, entry, _ = _generic_replay_runner()
+    entry.tasks = []
+    entry.taskless_device_attention = False
+
+    with pytest.raises(RuntimeError, match="not an explicit device-position"):
+        _run_generic_replay(runner)
+
+    runner._copy_inputs.assert_not_called()
+    entry.graph.replay.assert_not_called()
 
 
 def _stable_fia_metadata(query_lengths, *, total_tokens):
@@ -1136,27 +1305,51 @@ def test_copy_draft_inputs_preflight_failure_is_atomic(broken_contract):
     _assert_draft_copy_entry_unchanged(entry, snapshot)
 
 
-def test_copy_draft_inputs_accepts_zero_suffix_for_paged_graph_padding():
+def test_copy_draft_inputs_accepts_finite_suffix_for_paged_graph_padding():
     entry, input_ids, positions, metadatas = _atomic_draft_copy_case()
+    entry.taskless_device_attention = True
     entry.request_block_tables = (None, None)
     entry.tree_attention_masks = (None, None)
     entry.tree_attention_modes = (False, False)
     entry.actual_seq_lengths_q = ((1,), (1,))
-    entry.sequence_lens = ((11, 0), (12, 0))
+    entry.sequence_lens = ((11, 1), (12, 1))
     for step, metadata in enumerate(metadatas):
         metadata.request_block_tables = None
         metadata.tree_attention_mask = None
         metadata.tree_attention = False
         metadata.use_fused_infer_attention = False
         metadata.actual_seq_lengths_q = (1,)
-        metadata.sequence_lens = (21 + step, 0)
+        metadata.sequence_lens = (21 + step, 1)
 
     NativeACLGraphRunner._copy_draft_inputs(entry, input_ids, positions, metadatas)
 
-    assert entry.sequence_lens == ((21, 0), (22, 0))
+    assert entry.sequence_lens == ((21, 1), (22, 1))
     for step, metadata in enumerate(metadatas):
         assert torch.equal(entry.context_lens[step], metadata.context_lens)
         assert torch.equal(entry.block_tables[step], metadata.block_tables)
+
+
+def test_copy_taskless_device_attention_rejects_missing_padding_kv_suffix():
+    entry, input_ids, positions, metadatas = _atomic_draft_copy_case()
+    entry.taskless_device_attention = True
+    entry.request_block_tables = (None, None)
+    entry.tree_attention_masks = (None, None)
+    entry.tree_attention_modes = (False, False)
+    entry.actual_seq_lengths_q = ((1,), (1,))
+    entry.sequence_lens = ((11, 1), (12, 1))
+    for step, metadata in enumerate(metadatas):
+        metadata.request_block_tables = None
+        metadata.tree_attention_mask = None
+        metadata.tree_attention = False
+        metadata.use_fused_infer_attention = False
+        metadata.actual_seq_lengths_q = (1,)
+        # Missing the exact length-one dummy-row suffix.
+        metadata.sequence_lens = (21 + step,)
+
+    snapshot = _snapshot_draft_copy_entry(entry)
+    with pytest.raises(RuntimeError, match="one KV length per real or padded row"):
+        NativeACLGraphRunner._copy_draft_inputs(entry, input_ids, positions, metadatas)
+    _assert_draft_copy_entry_unchanged(entry, snapshot)
 
 
 @pytest.mark.parametrize(
@@ -1177,6 +1370,14 @@ def test_draft_graph_reports_capture_outcome(
         return_value=update_stream,
     ):
         runner = NativeACLGraphRunner(MagicMock(), enabled=True)
+    runner.model.layers = [
+        SimpleNamespace(
+            self_attn=SimpleNamespace(
+                uses_paged_attention=True,
+                use_device_paged_attention=True,
+            )
+        )
+    ]
     runner._execute_draft = MagicMock(side_effect=[torch.tensor([[4, 5]]), capture_output])
     runner._update_draft_attention_tasks = MagicMock()
     warning_context = (
@@ -1202,6 +1403,8 @@ def test_draft_graph_reports_capture_outcome(
     assert runner.last_draft_execution.fallback_reason == expected_reason
     assert runner.last_draft_execution.capture_attempted
     assert runner.last_draft_execution.replay_executed
+    assert runner.draft_taskless_replays == 1
+    runner._update_draft_attention_tasks.assert_not_called()
     if expected_reason is None:
         assert output.tolist() == [[4, 5]]
         assert runner.last_draft_execution.used_aclgraph
@@ -1232,6 +1435,69 @@ def test_draft_graph_auxiliary_task_update_has_reverse_stream_dependency():
     entry.graph.replay.assert_called_once_with()
     assert runner.last_draft_execution.mode == "replay"
     assert runner.last_draft_execution.replay_executed
+
+
+def test_taskless_device_attention_replays_without_update_stream_dependency():
+    runner, entry, update_stream = _draft_replay_runner()
+    current_stream = MagicMock()
+    runner.update_stream = None
+    entry.tasks = []
+    entry.positions = [torch.tensor([2]), torch.tensor([3])]
+    entry.tasks_per_step = 0
+    entry.taskless_device_attention = True
+
+    with (
+        patch.dict(
+            os.environ,
+            {
+                # Taskless device PA has no task-update policy to conflict.
+                "VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE": "1",
+                "VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE": "1",
+            },
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.current_stream",
+            return_value=current_stream,
+        ),
+    ):
+        output = _run_draft_replay(runner)
+
+    assert output.tolist() == [[4, 5]]
+    entry.graph.replay.assert_called_once_with()
+    runner._copy_draft_inputs.assert_called_once()
+    runner._update_draft_attention_tasks.assert_not_called()
+    update_stream.wait_stream.assert_not_called()
+    update_stream.wait_event.assert_not_called()
+    current_stream.wait_stream.assert_not_called()
+    assert runner.draft_taskless_replays == 1
+    assert runner.task_update_replay_counts["draft"] == 0
+
+
+def test_empty_task_list_without_device_attention_origin_fails_before_replay():
+    runner, entry, update_stream = _draft_replay_runner()
+    entry.tasks = []
+    entry.tasks_per_step = 0
+    entry.taskless_device_attention = False
+
+    with pytest.raises(RuntimeError, match="not an explicit device-position"):
+        _run_draft_replay(runner)
+
+    runner._copy_draft_inputs.assert_not_called()
+    runner._update_draft_attention_tasks.assert_not_called()
+    entry.graph.replay.assert_not_called()
+    update_stream.wait_stream.assert_not_called()
+    assert runner.draft_taskless_replays == 0
+
+
+def test_taskless_device_attention_origin_rejects_captured_tasks():
+    runner, entry, _ = _draft_replay_runner()
+    entry.taskless_device_attention = True
+
+    with pytest.raises(RuntimeError, match="unexpectedly owns attention tasks"):
+        _run_draft_replay(runner)
+
+    runner._copy_draft_inputs.assert_not_called()
+    entry.graph.replay.assert_not_called()
 
 
 def test_draft_graph_can_update_tasks_inline_on_cann_runtimes_that_require_it():
@@ -1419,6 +1685,62 @@ def test_target_fia_event_groups_keep_one_handle_per_operator(
     # CANN supports only a single operator per task-group handle.  This path
     # deliberately coalesces ExternalEvents while retaining every handle.
     assert group_begin.call_count == group_end.call_count == task_count
+
+
+def test_target_fia_prefix_event_group_releases_two_then_four_layers():
+    stream = MagicMock(name="capture_stream")
+    events = [MagicMock(name=f"event_{index}") for index in range(3)]
+    query = torch.zeros((1, 2, 8))
+    key_cache = torch.zeros((4, 16, 1, 8))
+    value_cache = torch.zeros_like(key_cache)
+    block_table = torch.zeros((1, 1), dtype=torch.int32)
+    attention_mask = torch.zeros((1, 1, 1, 16), dtype=torch.bool)
+    output = torch.zeros_like(query)
+    with (
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.current_stream",
+            return_value=stream,
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.ExternalEvent",
+            side_effect=events,
+        ),
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.graph_task_group_begin"),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.graph_task_group_end",
+            side_effect=[MagicMock(name=f"handle_{index}") for index in range(10)],
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch_npu._npu_fused_infer_attention_score_get_max_workspace",
+            return_value=MagicMock(name="workspace"),
+        ),
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch_npu.npu_fused_infer_attention_score.out"),
+        native_graph._collect_graph_tasks(
+            task_event_group_size=4,
+            task_event_prefix_group_size=2,
+        ) as tasks,
+    ):
+        for _ in range(10):
+            native_graph.run_native_fused_infer_attention(
+                query=query,
+                key_cache=key_cache,
+                value_cache=value_cache,
+                num_kv_heads=1,
+                num_heads=2,
+                scale=0.125,
+                block_table=block_table,
+                attention_mask=attention_mask,
+                actual_seq_lengths_q=[1],
+                actual_seq_lengths_kv=[3],
+                block_size=16,
+                output=output,
+            )
+
+    expected_groups = ((0, 2), (2, 6), (6, 10))
+    for event, (start, stop) in zip(events, expected_groups):
+        assert all(task.event is event for task in tasks[start:stop])
+        event.wait.assert_called_once_with(stream)
+        event.reset.assert_called_once_with(stream)
 
 
 def test_stable_task_barrier_refresh_updates_all_handles_before_one_record():
@@ -1878,13 +2200,15 @@ def test_paged_attention_task_update_shares_workspace_only_for_equal_lengths():
 def test_draft_step_major_paged_attention_queries_one_workspace_per_step():
     runner = NativeACLGraphRunner(MagicMock(), enabled=False)
     runner.update_stream = MagicMock()
-    step0 = [_paged_task(context_lens=(8, 8)) for _ in range(2)]
-    step1 = [_paged_task(context_lens=(9, 9)) for _ in range(2)]
+    # The third row is graph padding.  It must retain the production
+    # length-one KV contract rather than forcing this fast path to fall back.
+    step0 = [_paged_task(context_lens=(8, 8, 1)) for _ in range(2)]
+    step1 = [_paged_task(context_lens=(9, 9, 1)) for _ in range(2)]
     entry = SimpleNamespace(
         tasks=[*step0, *step1],
         tasks_per_step=2,
         actual_seq_lengths_q=((1, 2), (1, 2)),
-        sequence_lens=((8, 8), (9, 9)),
+        sequence_lens=((8, 8, 1), (9, 9, 1)),
     )
     workspaces = [MagicMock(name="workspace_8"), MagicMock(name="workspace_9")]
     with (
@@ -1946,6 +2270,39 @@ def test_paged_attention_host_lengths_avoid_per_layer_tensor_materialization():
         )
 
     context_lens.tolist.assert_not_called()
+
+
+def test_paged_attention_finite_padding_uses_host_lengths_without_tensor_materialization():
+    runner = NativeACLGraphRunner(MagicMock(), enabled=False)
+    update_stream = MagicMock()
+    task = _paged_task(context_lens=(8, 8, 1))
+    context_lens = MagicMock(name="cpu_context_lens")
+    context_lens.numel.return_value = 3
+    context_lens.tolist.side_effect = AssertionError("the finite padded host tuple must avoid Tensor.tolist")
+    task.context_lens = context_lens
+    with (
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.stream",
+            return_value=MagicMock(),
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch_npu._npu_paged_attention_get_workspace",
+            return_value=MagicMock(),
+        ),
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch_npu._npu_paged_attention"),
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.graph_task_update_begin"),
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.graph_task_update_end"),
+    ):
+        runner._update_attention_task_list(
+            [task],
+            [((1, 2), (8, 8, 1))],
+            stream=update_stream,
+        )
+
+    context_lens.tolist.assert_not_called()
+    metrics = runner.graph_execution_metrics()
+    assert metrics["pa_workspace_host_key_tasks"] == 1
+    assert metrics["pa_workspace_tensor_key_tasks"] == 0
 
 
 def test_paged_attention_packed_queries_keep_tensor_length_fallback():
@@ -2047,6 +2404,42 @@ def test_fia_task_update_records_one_event_per_group(group_size):
     assert fused_attention.call_count == task_count
     for event in group_events:
         event.record.assert_called_once_with(update_stream)
+
+
+def test_parallel_fia_chunk_keeps_complete_event_groups_on_one_stream():
+    runner = NativeACLGraphRunner(MagicMock(), enabled=False)
+    update_stream = MagicMock(name="parallel_update_stream")
+    group_events = [MagicMock(name=f"group_event_{index}") for index in range(4)]
+    tasks = [_fia_task() for _ in range(8)]
+    for task_index, task in enumerate(tasks):
+        task.event = group_events[task_index // 2]
+    lengths = [([1, 2], [8, 8])] * len(tasks)
+    with (
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.set_device"),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.stream",
+            return_value=MagicMock(),
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch_npu.npu_fused_infer_attention_score.out"
+        ) as fused_attention,
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.graph_task_update_begin") as update_begin,
+        patch("vllm_ascend.spec_decode.pearl.native_graph.torch.npu.graph_task_update_end") as update_end,
+    ):
+        runner._update_fia_task_chunk(
+            tasks,
+            lengths,
+            (0, 1, 4, 5),
+            update_stream,
+            frozenset((1, 3, 5, 7)),
+        )
+
+    assert update_begin.call_count == update_end.call_count == 4
+    assert fused_attention.call_count == 4
+    group_events[0].record.assert_called_once_with(update_stream)
+    group_events[2].record.assert_called_once_with(update_stream)
+    group_events[1].record.assert_not_called()
+    group_events[3].record.assert_not_called()
 
 
 def test_fia_task_event_group_layout_fails_before_any_update():
@@ -2151,7 +2544,8 @@ def test_padding_preserves_token_aligned_host_sequence_lengths():
         4,
     )
 
-    assert padded.context_lens.tolist() == [3, 4, 0, 0]
+    assert padded.context_lens.tolist() == [3, 4, 1, 1]
     assert padded.actual_seq_lengths_q == (1, 2)
-    assert padded.sequence_lens == (3, 4, 0, 0)
+    assert padded.sequence_lens == (3, 4, 1, 1)
+    assert padded.block_tables.tolist() == [[1, 2], [3, 4], [1, 2], [1, 2]]
     assert padded.sentinel == "preserved"

@@ -6,6 +6,11 @@ import time
 
 import pytest
 
+from vllm_ascend.spec_decode.pearl.native_engine import (
+    order_spec_rhythm_admission_candidates,
+    spec_rhythm_class_cap_blocks,
+    spec_rhythm_home_capacities,
+)
 from vllm_ascend.spec_decode.pearl.runtime import PearlDualModelScheduler
 from vllm_ascend.spec_decode.pearl.spec_rhythm import (
     PipelinePhase,
@@ -30,6 +35,57 @@ def _states(count=4):
 
 def _publish_ready(controller, indices, gamma=4):
     controller.publish([controller.new_ticket(index, gamma=gamma, eager=False) for index in indices])
+
+
+def test_slo_aware_admission_orders_strict_ready_requests_first():
+    indices = (0, 1, 2, 3, 4)
+    slo = {0: 150.0, 1: 40.0, 2: 50.0, 3: 40.0, 4: None}
+    arrival = {0: 1.0, 1: 3.0, 2: 2.0, 3: 2.0, 4: 0.0}
+
+    assert order_spec_rhythm_admission_candidates(
+        indices,
+        slo_tpot_ms=slo,
+        arrival_ts=arrival,
+        enabled=True,
+    ) == (3, 1, 2, 0, 4)
+    assert order_spec_rhythm_admission_candidates(
+        indices,
+        slo_tpot_ms=slo,
+        arrival_ts=arrival,
+        enabled=False,
+    ) == indices
+
+
+def test_relaxed_active_cap_preserves_slots_only_while_tighter_work_is_pending():
+    counts = {"tight": 40, "normal": 12, "loose": 4}
+    caps = {"normal": 16, "loose": 4}
+
+    assert spec_rhythm_class_cap_blocks(
+        "loose",
+        active_counts=counts,
+        pending_classes=("loose", "tight"),
+        class_caps=caps,
+    )
+    assert not spec_rhythm_class_cap_blocks(
+        "loose",
+        active_counts=counts,
+        pending_classes=("loose",),
+        class_caps=caps,
+    )
+    assert not spec_rhythm_class_cap_blocks(
+        "normal",
+        active_counts=counts,
+        pending_classes=("tight",),
+        class_caps=caps,
+    )
+
+
+def test_spec_rhythm_home_capacities_support_asymmetric_dual_batches():
+    assert spec_rhythm_home_capacities(64, 0.5) == (32, 32)
+    assert spec_rhythm_home_capacities(64, 0.625) == (40, 24)
+    assert spec_rhythm_home_capacities(1, 0.625) == (1, 0)
+    with pytest.raises(ValueError, match="fraction"):
+        spec_rhythm_home_capacities(64, 1.0)
 
 
 def test_single_batch_serial_plan_never_submits_draft_with_target():
@@ -108,6 +164,36 @@ def test_arrival_wait_is_scheduler_debt_but_not_decode_tpot():
     assert state.effective_elapsed_ms == 200.0
     assert state.observed_tpot_ms == 20.0
     assert state.projected_progress_gap(0.0) == 1
+
+
+def test_arrival_wait_scheduler_debt_can_be_bounded_by_slo_intervals():
+    state = SpecRhythmRuntimeState(
+        request_index=0,
+        home_batch_id=0,
+        slo_tpot_ms=40.0,
+        arrival_wait_ms=1000.0,
+        arrival_debt_cap_tokens=4,
+        delivered_tokens=4,
+        decode_elapsed_ms=80.0,
+    )
+    assert state.effective_elapsed_ms == 240.0
+    assert state.observed_tpot_ms == 20.0
+    assert state.projected_progress_gap(0.0) == 2
+
+
+def test_terminal_slack_uses_final_decode_budget_not_arrival_wait():
+    state = SpecRhythmRuntimeState(
+        request_index=0,
+        home_batch_id=0,
+        slo_tpot_ms=40.0,
+        output_token_budget=10,
+        arrival_wait_ms=500.0,
+        decode_elapsed_ms=310.0,
+    )
+
+    assert state.terminal_slack_ms(20.0) == 70.0
+
+
 
 
 def test_budget_shaper_honors_batch_roof_and_draft_window():
@@ -684,6 +770,129 @@ def test_slo_ready_budget_prioritizes_a_need_before_deferral_age():
 
     assert plan.target_request_indices == (0,)
     assert plan.deferred_target_request_indices == (1,)
+
+
+def test_goodput_edf_does_not_let_terminally_missed_request_displace_feasible_one():
+    states = {
+        0: SpecRhythmRuntimeState(
+            request_index=0,
+            home_batch_id=0,
+            slo_tpot_ms=40.0,
+            output_token_budget=10,
+            delivered_tokens=1,
+            decode_elapsed_ms=450.0,
+        ),
+        1: SpecRhythmRuntimeState(
+            request_index=1,
+            home_batch_id=0,
+            slo_tpot_ms=40.0,
+            output_token_budget=10,
+            delivered_tokens=1,
+            decode_elapsed_ms=300.0,
+        ),
+        2: SpecRhythmRuntimeState(
+            request_index=2,
+            home_batch_id=0,
+            slo_tpot_ms=150.0,
+            output_token_budget=10,
+            delivered_tokens=1,
+            decode_elapsed_ms=300.0,
+        ),
+    }
+    controller = SpecRhythmPipelineController(states)
+    controller.publish(
+        [controller.new_ticket(index, gamma=4, eager=False) for index in states]
+    )
+
+    plan = controller.build_plan(
+        states,
+        priority=True,
+        projected_wait_ms=50.0,
+        goodput_edf=True,
+        merge_ready_homes=True,
+        max_target_requests=1,
+    )
+
+    assert plan.target_request_indices == (1,)
+    assert plan.deferred_target_request_indices == (0, 2)
+
+
+def test_target_slo_first_precedes_larger_progress_gap_from_relaxed_class():
+    states = {
+        0: SpecRhythmRuntimeState(
+            request_index=0,
+            home_batch_id=0,
+            slo_tpot_ms=40.0,
+            delivered_tokens=8,
+            decode_elapsed_ms=240.0,
+        ),
+        1: SpecRhythmRuntimeState(
+            request_index=1,
+            home_batch_id=0,
+            slo_tpot_ms=150.0,
+            delivered_tokens=1,
+            decode_elapsed_ms=1200.0,
+        ),
+    }
+    controller = SpecRhythmPipelineController(states)
+    controller.publish(
+        [controller.new_ticket(index, gamma=4, eager=False) for index in states]
+    )
+
+    legacy = controller.build_plan(
+        states,
+        priority=True,
+        projected_wait_ms=100.0,
+        merge_ready_homes=True,
+        max_target_requests=1,
+    )
+    assert legacy.target_request_indices == (1,)
+
+    strict_first = controller.build_plan(
+        states,
+        priority=True,
+        projected_wait_ms=100.0,
+        target_slo_first=True,
+        merge_ready_homes=True,
+        max_target_requests=1,
+    )
+    assert strict_first.target_request_indices == (0,)
+    assert strict_first.deferred_target_request_indices == (1,)
+
+
+def test_urgent_target_guard_defers_only_loose_ready_proposals():
+    states = {
+        index: SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=0,
+            slo_tpot_ms=(40.0, 50.0, 150.0)[index],
+            slo_class=("tight", "normal", "loose")[index],
+        )
+        for index in range(3)
+    }
+    controller = SpecRhythmPipelineController(states)
+    controller.publish(
+        [controller.new_ticket(index, gamma=4, eager=False) for index in states]
+    )
+
+    guarded = controller.build_plan(
+        states,
+        priority=True,
+        merge_ready_homes=True,
+        defer_loose=True,
+    )
+
+    assert guarded.target_request_indices == (0, 1)
+    assert guarded.deferred_target_request_indices == (2,)
+    assert controller.ready[2].lifecycle is ProposalLifecycle.AVAILABLE
+
+    released = controller.build_plan(
+        states,
+        priority=True,
+        merge_ready_homes=True,
+        defer_loose=False,
+    )
+    assert released.target_request_indices == (0, 1, 2)
 
 
 def test_ready_budget_accepts_explicit_candidate_counts():

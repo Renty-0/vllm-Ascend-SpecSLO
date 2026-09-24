@@ -36,7 +36,8 @@ typedef enum {
     ATTR_RANK_ID_INDEX,
     ATTR_EPSILON_INDEX,
     ATTR_IS_TRANS_B_INDEX,
-    ATTR_IS_GATHER_ADD_OUT_INDEX
+    ATTR_IS_GATHER_ADD_OUT_INDEX,
+    ATTR_PROJECTION_ONLY_INDEX
 } ATTR_TYPE;
 
 int32_t CeilDev(int32_t num, int32_t div)
@@ -321,7 +322,7 @@ void AllReduceEightRankFP16GetDefaultTiling(
     ppTilingData.swizzlDirect = SWIZZLE_DIRECT_ONE;
     ppTilingData.swizzlCount = DEFAULT_SWIZZLE_COUNT;
     ppTilingData.tilingKey = 0;
-    ppTilingData.splitK = 0;
+    ppTilingData.epsilon = 0.0F;
 
     uint32_t blockDim = 1U;
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
@@ -361,7 +362,7 @@ void GetDefaultTiling(gert::TilingContext *context, PPTilingData &ppTilingData, 
     ppTilingData.swizzlDirect = m > n ? 0 : 1;
     ppTilingData.swizzlCount = DEFAULT_SWIZZLE_COUNT;
     ppTilingData.tilingKey = 0;
-    ppTilingData.splitK = 0;
+    ppTilingData.epsilon = 0.0F;
 
     uint32_t blockDim = 1U;
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(context->GetPlatformInfo());
@@ -434,6 +435,7 @@ static ge::graphStatus GetAttrAndSetTilingData(
     ppTilingData.isTransA = false;
     ppTilingData.isTransB = isTransB;
     ppTilingData.isGatherAddOut = *(attrs->GetAttrPointer<bool>(ATTR_IS_GATHER_ADD_OUT_INDEX));
+    ppTilingData.projectionOnly = *(attrs->GetAttrPointer<bool>(ATTR_PROJECTION_ONLY_INDEX));
     auto weightFormat = static_cast<ge::Format>(
         ge::GetPrimaryFormat(context->GetInputDesc(DIM_INDEX_ONE)->GetStorageFormat()));
     ppTilingData.weightNz = weightFormat == ge::FORMAT_FRACTAL_NZ;
@@ -470,6 +472,10 @@ static ge::graphStatus GetAttrAndSetTilingData(
 
     commTilingData.rankSize = static_cast<int32_t>(*RankSizePtr);
     commTilingData.rank = static_cast<int32_t>(*RankIdPtr);
+    OPS_ERR_IF(
+        ppTilingData.projectionOnly && (commTilingData.rankSize != 3 || opShape.m > 160),
+        OPS_LOG_E(nodeName, "projection_only supports only TP3 windows with M <= 160."),
+        return ge::GRAPH_FAILED);
     if (commTilingData.rankSize == RANKSIZE_EIGHT) {
         AllReduceEightRankFP16GetDefaultTiling(context, ppTilingData, commTilingData);
     } else {
@@ -482,6 +488,15 @@ static ge::graphStatus GetAttrAndSetTilingData(
     std::vector<int64_t> oriShapeVec = shapeVec;
     auto EpsilonPtr = attrs->GetAttrPointer<float>(ATTR_EPSILON_INDEX);
     float epsilon = static_cast<float>(*EpsilonPtr);
+    // All default tiling branches converge here. Store epsilon in the plain
+    // PP header so AIV does not depend on the host/device layout of CANN's
+    // embedded RmsNormTiling type.
+    // The TP3 full epilogue is qualified only for the model's production
+    // epsilon.  CANN 9.0's MC2 executor has been observed to expose zero here
+    // for the optional float attr even when ACLNN receives 1e-6.  The torch
+    // adapter rejects every other full-epilogue value, so serializing the
+    // qualified constant is both explicit and fail-closed.
+    ppTilingData.epsilon = ppTilingData.projectionOnly ? epsilon : 1.0e-6F;
     GetRmsnormTilingData(
         rmsnormTilingData, shapeVec, oriShapeVec, calcBytes, commTilingData.rankSize * sLength * rankN, epsilon);
     GetQuantTilingData(quantInfo);
@@ -602,6 +617,11 @@ static ge::graphStatus MatmulAllreduceAddRmsnormTilingFuncImpl(gert::TilingConte
     auto ascendcPlatform = platform_ascendc::PlatformAscendC(platformInfoPtr);
     uint32_t aicNum_ = ascendcPlatform.GetCoreNumAic();
     context->SetBlockDim(aicNum_);
+    OPS_ERR_IF(
+        context->SetScheduleMode(1) != ge::GRAPH_SUCCESS,
+        OPS_LOG_E(nodeName,
+            "TP3 MC2 requires batch scheduling for cross-core synchronization."),
+        return ge::GRAPH_FAILED);
     return ge::GRAPH_SUCCESS;
 }
 

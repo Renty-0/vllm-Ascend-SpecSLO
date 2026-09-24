@@ -245,6 +245,27 @@ def test_draft_window_charges_and_learns_eager_batch_fixed_overhead():
     assert predicted.residual_window_ms == 6.0
 
 
+def test_draft_window_predicts_physical_bucket_latency_conservatively():
+    estimator = DraftWindowEstimator(ema_alpha=1.0)
+    estimator.observe(
+        draft_compute_ms=32.0,
+        drafted_tokens=128,
+        target_verify_ms=40.0,
+    )
+
+    assert estimator.predict_draft_compute_ms(128) == 32.0
+    assert estimator.predict_draft_compute_ms(112) == 32.0
+    assert estimator.predict_draft_compute_ms(144) == 36.0
+
+    estimator.observe(
+        draft_compute_ms=42.0,
+        drafted_tokens=144,
+        target_verify_ms=40.0,
+    )
+    assert estimator.predict_draft_compute_ms(144) == 42.0
+    assert estimator.predict_draft_compute_ms(136) == 42.0
+
+
 def test_profiled_roof_is_not_silently_increased_to_active_batch_size():
     shaper = SpecRhythmBudgetShaper(min_gamma=1, max_gamma=8, roofline={"batch:8": 3})
     assert shaper.verification_roof(8, 1024) == 3

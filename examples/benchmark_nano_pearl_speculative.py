@@ -60,6 +60,15 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Stop each request at EOS instead of forcing every output to max_tokens.",
     )
     parser.add_argument(
+        "--saturated-arrivals",
+        action="store_true",
+        help=(
+            "Submit every request-manifest row at the same measurement origin. "
+            "This preserves prompts, output limits, and SLO classes while "
+            "removing the Poisson arrival ceiling for an intrinsic Raw-throughput probe."
+        ),
+    )
+    parser.add_argument(
         "--prefill-chunk-size",
         type=int,
         help=(
@@ -198,14 +207,22 @@ def _build_parser() -> argparse.ArgumentParser:
         "--spec-rhythm-linear-idle-residual-eager",
         action="store_true",
         help=(
-            "Use measured W for dependency-exact Rolling Eager work only when "
-            "the fixed-gamma draft side would otherwise be idle."
+            "Use residual measured W for dependency-exact Rolling Eager work "
+            "after urgent and mandatory normal rows."
         ),
     )
     parser.add_argument(
         "--spec-rhythm-online-prefill",
         action="store_true",
         help="Prefill only the initial decode bucket and prefill later arrivals on admission.",
+    )
+    parser.add_argument(
+        "--spec-rhythm-kv-ready-arrivals",
+        action="store_true",
+        help=(
+            "Model the paper's separate prefill pool: build prompt KV before "
+            "decode, then replay relative online arrival offsets."
+        ),
     )
     parser.add_argument(
         "--spec-rhythm-prefill-coalesce-min-requests",
@@ -235,6 +252,14 @@ def _build_parser() -> argparse.ArgumentParser:
             "Merge both ready logical homes into one target forward. This is "
             "an opt-in throughput probe; the default follows the paper's "
             "alternating dual-batch schedule."
+        ),
+    )
+    parser.add_argument(
+        "--spec-rhythm-slo-home-partition",
+        action="store_true",
+        help=(
+            "Prefer the tightest TPOT class in one logical home, with "
+            "deterministic spill at half-batch capacity (experimental)."
         ),
     )
     parser.add_argument(
@@ -494,6 +519,8 @@ def main(argv: Sequence[str] | None = None) -> None:
         raise ValueError("--num-pearl-steps must be positive.")
     if args.num_pearl_steps is not None and args.enable_continuous_batching:
         raise ValueError("Fixed-step PEARL does not support continuous batching.")
+    if args.saturated_arrivals and args.request_manifest is None:
+        raise ValueError("--saturated-arrivals requires --request-manifest.")
     max_batch_size = max(args.batch_sizes)
     target_graph_post_counts = _parse_target_graph_post_counts(args.target_verification_graph_post_counts)
     if args.spec_rhythm_auto_eager_tokens and args.gamma <= 0:
@@ -569,10 +596,12 @@ def main(argv: Sequence[str] | None = None) -> None:
         spec_rhythm_linear_eager_cross_graph_bucket=(args.spec_rhythm_linear_eager_cross_graph_bucket),
         spec_rhythm_linear_idle_residual_eager=(args.spec_rhythm_linear_idle_residual_eager),
         spec_rhythm_online_prefill=args.spec_rhythm_online_prefill,
+        spec_rhythm_kv_ready_arrivals=args.spec_rhythm_kv_ready_arrivals,
         spec_rhythm_prefill_coalesce_min_requests=(args.spec_rhythm_prefill_coalesce_min_requests),
         spec_rhythm_prefill_coalesce_max_wait_ms=(args.spec_rhythm_prefill_coalesce_max_wait_ms),
         spec_rhythm_prefill_token_chunk_size=(args.spec_rhythm_prefill_token_chunk_size),
         spec_rhythm_merge_ready_homes=args.spec_rhythm_merge_ready_homes,
+        spec_rhythm_slo_home_partition=args.spec_rhythm_slo_home_partition,
         spec_rhythm_stable_graphs=args.spec_rhythm_stable_graphs,
         spec_rhythm_priority_mode=args.spec_rhythm_slo_priority,
         spec_rhythm_priority_burst=args.spec_rhythm_priority_burst,
@@ -700,9 +729,13 @@ def main(argv: Sequence[str] | None = None) -> None:
                     replace(
                         value,
                         arrival_ts=(
-                            float(row["arrival_ts"])
-                            if row.get("arrival_ts") is not None
-                            else arrival_origin + float(row.get("arrival_offset_sec", 0.0))
+                            arrival_origin
+                            if args.saturated_arrivals
+                            else (
+                                float(row["arrival_ts"])
+                                if row.get("arrival_ts") is not None
+                                else arrival_origin + float(row.get("arrival_offset_sec", 0.0))
+                            )
                         ),
                     )
                     for value, row in zip(
@@ -742,6 +775,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             qualification_complete = not args.require_no_graph_fallback
             qualification_issues: list[str] = []
             warmup_runs_executed = 0
+            consecutive_capture_free_traces = 0
             for warmup_run in range(warmup_run_limit):
                 # A graph entry first sees only the values used for capture.
                 # Replaying an identical deterministic trace cannot qualify
@@ -775,22 +809,43 @@ def main(argv: Sequence[str] | None = None) -> None:
                     engine.bench_generate(args.num_pearl_steps)
                 warmup_runs_executed += 1
                 if args.require_no_graph_fallback and warmup_runs_executed >= minimum_warmup_runs:
+                    qualification_deltas = _worker_aclgraph_deltas(
+                        graph_metrics_before_warmup,
+                        engine.last_worker_metrics,
+                    )
+                    discovered_graph = any(
+                        int(worker.get("aclgraph_capture_attempts_delta", 0)) != 0
+                        or int(worker.get("aclgraph_captures_delta", 0)) != 0
+                        for worker in qualification_deltas
+                    )
+                    consecutive_capture_free_traces = (
+                        0 if discovered_graph else consecutive_capture_free_traces + 1
+                    )
                     qualification_complete, qualification_issues = _graph_qualification_fixed_point(
                         graph_metrics_before_warmup,
                         engine.last_worker_metrics,
                     )
-                    if qualification_complete:
+                    # The first capture-free pass can still be faster than
+                    # the capture-heavy pass immediately before it.  For an
+                    # online-arrival workload that speedup changes which
+                    # requests overlap and may expose a new finite tree-graph
+                    # bucket when the original ordering is replayed.  Require
+                    # both deterministic prompt rotations to complete hot
+                    # before sealing the inventory.
+                    if qualification_complete and consecutive_capture_free_traces >= 2:
                         break
                     if _graph_qualification_can_prune(
                         graph_metrics_before_warmup,
                         engine.last_worker_metrics,
-                    ):
-                        # Entries left unvalidated after a capture-free full
-                        # trace belong only to an earlier cold schedule.  Drop
-                        # exactly those entries and retry.  Any genuinely hot
-                        # key must then recapture, preventing a false fixed
-                        # point before sealing.
+                    ) and consecutive_capture_free_traces >= 2:
+                        # Strict qualification alternates two deterministic
+                        # prompt orders. A graph used by only one order is not
+                        # cold merely because the other trace did not touch
+                        # it. Prune only after both traces completed without
+                        # discovery so every hot key had a chance to execute
+                        # changed-input validation.
                         engine.prune_unvalidated_graph_entries()
+                        consecutive_capture_free_traces = 0
 
             if args.require_no_graph_fallback:
                 if not qualification_complete:
@@ -846,6 +901,7 @@ def main(argv: Sequence[str] | None = None) -> None:
                 phase: sum(metric["decode_phase_seconds"][phase] for metric in chunk_metrics)
                 for phase in chunk_metrics[0]["decode_phase_seconds"]
             }
+            decode_elapsed = sum(metric["decode_elapsed_seconds"] for metric in chunk_metrics)
             measured_graph_deltas = _worker_aclgraph_deltas(
                 warmup_worker_metrics,
                 engine.last_worker_metrics,
@@ -865,7 +921,13 @@ def main(argv: Sequence[str] | None = None) -> None:
                 _require_no_graph_fallback(
                     measured_graph_deltas,
                     require_full_window=args.spec_rhythm_linear_full_window,
+                    require_mixed_prefill=(not args.spec_rhythm_kv_ready_arrivals),
                 )
+            measured_output_token_limits = _sampling_max_token_limits(
+                measured_sampling_params,
+                len(measured_prompts),
+            )
+            requested_output_tokens = sum(measured_output_token_limits)
             results.append(
                 {
                     "batch_size": batch_size,
@@ -880,10 +942,7 @@ def main(argv: Sequence[str] | None = None) -> None:
                         json.dumps(measured_prompts, separators=(",", ":")).encode()
                     ).hexdigest(),
                     "e2e_timing_scope": ONLINE_E2E_TIMING_SCOPE,
-                    "request_output_token_limits": _sampling_max_token_limits(
-                        measured_sampling_params,
-                        len(measured_prompts),
-                    ),
+                    "request_output_token_limits": measured_output_token_limits,
                     "warmup_output_token_limits": _sampling_max_token_limits(
                         current_warmup_params,
                         len(warmup_prompts),
@@ -892,13 +951,23 @@ def main(argv: Sequence[str] | None = None) -> None:
                     "e2e_elapsed_seconds": e2e_elapsed,
                     "inference_throughput_tokens_per_second": output_tokens / inference_elapsed,
                     "e2e_throughput_tokens_per_second": output_tokens / e2e_elapsed,
+                    "requested_output_throughput_tokens_per_second": requested_output_tokens / e2e_elapsed,
                     "acceptance_rate": accepted_tokens / verified_tokens if verified_tokens else 0.0,
                     "mean_accept_tokens": sum(metric["mean_accept_tokens"] for metric in metrics) / len(metrics),
                     "selected_gamma": metrics[0]["gamma"],
                     "decode_rounds": sum(metric["round_count"] for metric in chunk_metrics),
                     "prefill_elapsed_seconds": sum(metric["prefill_elapsed_seconds"] for metric in chunk_metrics),
-                    "decode_elapsed_seconds": sum(metric["decode_elapsed_seconds"] for metric in chunk_metrics),
-                    "slo": _summarize_slo_metrics(metrics, inference_elapsed, e2e_elapsed),
+                    "decode_elapsed_seconds": decode_elapsed,
+                    "slo": _summarize_slo_metrics(
+                        metrics,
+                        inference_elapsed,
+                        e2e_elapsed,
+                        paper_decode_elapsed=(
+                            decode_elapsed
+                            if args.spec_rhythm_kv_ready_arrivals
+                            else inference_elapsed
+                        ),
+                    ),
                     "request_verification_rounds": [metric["verification_rounds"] for metric in metrics],
                     "decode_phase_seconds": decode_phase_seconds,
                     "aclgraph_captures": max(metric["aclgraph_captures"] for metric in metrics),
@@ -973,10 +1042,12 @@ def main(argv: Sequence[str] | None = None) -> None:
         "spec_rhythm_linear_eager_cross_graph_bucket": (args.spec_rhythm_linear_eager_cross_graph_bucket),
         "spec_rhythm_linear_idle_residual_eager": (args.spec_rhythm_linear_idle_residual_eager),
         "spec_rhythm_online_prefill": args.spec_rhythm_online_prefill,
+        "spec_rhythm_kv_ready_arrivals": args.spec_rhythm_kv_ready_arrivals,
         "spec_rhythm_prefill_coalesce_min_requests": (args.spec_rhythm_prefill_coalesce_min_requests),
         "spec_rhythm_prefill_coalesce_max_wait_ms": (args.spec_rhythm_prefill_coalesce_max_wait_ms),
         "spec_rhythm_prefill_token_chunk_size": (args.spec_rhythm_prefill_token_chunk_size),
         "spec_rhythm_merge_ready_homes": args.spec_rhythm_merge_ready_homes,
+        "spec_rhythm_slo_home_partition": args.spec_rhythm_slo_home_partition,
         "spec_rhythm_stable_graphs": args.spec_rhythm_stable_graphs,
         "spec_rhythm_priority_mode": args.spec_rhythm_slo_priority,
         "spec_rhythm_priority_mode_resolved": (
@@ -1017,6 +1088,12 @@ def main(argv: Sequence[str] | None = None) -> None:
         "max_tokens": args.max_tokens,
         "respect_eos": args.respect_eos,
         "ignore_eos": not args.respect_eos,
+        "saturated_arrivals": args.saturated_arrivals,
+        "arrival_mode": (
+            "saturated_all_ready"
+            if args.saturated_arrivals
+            else ("manifest_trace" if request_metadata else "all_ready")
+        ),
         "request_manifest": args.request_manifest,
         "request_manifest_sha256": (sha256_file(args.request_manifest) if args.request_manifest is not None else None),
         "requested_output_tokens": (sum(request_max_tokens[:prompt_count]) if request_max_tokens is not None else None),
@@ -1041,7 +1118,13 @@ def main(argv: Sequence[str] | None = None) -> None:
     print(output)
 
 
-def _summarize_slo_metrics(metrics, inference_elapsed: float, e2e_elapsed: float):
+def _summarize_slo_metrics(
+    metrics,
+    inference_elapsed: float,
+    e2e_elapsed: float,
+    *,
+    paper_decode_elapsed: float | None = None,
+):
     """Aggregate per-request TPOT attainment and Goodput for a workload run."""
     constrained = [metric for metric in metrics if metric.get("slo_tpot_ms") is not None]
     if not constrained:
@@ -1110,6 +1193,15 @@ def _summarize_slo_metrics(metrics, inference_elapsed: float, e2e_elapsed: float
         tpot_field="paper_tpot_ms",
         definition="same_decode_elapsed_ms / output_tokens",
         elapsed_seconds=e2e_elapsed,
+    )
+    paper_goodput_tokens = summary["paper"]["goodput_tokens"]
+    if paper_decode_elapsed is None:
+        paper_decode_elapsed = inference_elapsed
+    summary["paper"]["decode_stage_measurement_seconds"] = paper_decode_elapsed
+    summary["paper"]["goodput_tokens_per_decode_second"] = (
+        paper_goodput_tokens / paper_decode_elapsed
+        if paper_decode_elapsed > 0
+        else 0.0
     )
     summary["request_metrics"] = request_rows
     return summary
@@ -1364,6 +1456,27 @@ def _aggregate_decode_host_profile(worker_metrics_by_chunk, batch_size: int):
     }
 
 
+def _counter_histogram_delta(before, after):
+    """Subtract cumulative JSON counter histograms without losing new bins."""
+
+    before_counts = (
+        {str(label): int(count) for label, count in before.items()}
+        if isinstance(before, dict)
+        else {}
+    )
+    after_counts = (
+        {str(label): int(count) for label, count in after.items()}
+        if isinstance(after, dict)
+        else {}
+    )
+    labels = before_counts.keys() | after_counts.keys()
+    return {
+        label: after_counts.get(label, 0) - before_counts.get(label, 0)
+        for label in sorted(labels)
+        if after_counts.get(label, 0) != before_counts.get(label, 0)
+    }
+
+
 def _worker_aclgraph_deltas(before_workers, after_workers):
     execution_counter_names = tuple(
         f"aclgraph_{kind}_{name}"
@@ -1388,6 +1501,25 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
         "aclgraph_failed_captures",
         "aclgraph_capacity_fallbacks",
         "aclgraph_shape_fallbacks",
+        # Keep the device-position PA comparison measurement-only.  These
+        # counters are cumulative on each worker, so reading them only from
+        # ``worker_aclgraph_metrics`` would mix graph qualification/warmup into
+        # the timed CANN-PA versus taskless replay window.
+        "aclgraph_task_update_replays",
+        "aclgraph_task_update_skipped_replays",
+        "aclgraph_draft_task_update_replays",
+        "aclgraph_draft_task_update_tasks",
+        "aclgraph_draft_taskless_replays",
+        "aclgraph_draft_step_major_pa_replays",
+        "aclgraph_draft_step_major_pa_fallback_replays",
+        "aclgraph_pa_workspace_host_key_tasks",
+        "aclgraph_pa_workspace_tensor_key_tasks",
+        "aclgraph_pa_workspace_get_calls",
+        "aclgraph_pa_workspace_cache_hits",
+        "aclgraph_pa_task_update_profiled_tasks",
+        "aclgraph_pa_task_update_host_key_ns",
+        "aclgraph_pa_task_update_host_get_workspace_ns",
+        "aclgraph_pa_task_update_host_task_update_ns",
         "aclgraph_runtime_validation_replays",
         "spec_rhythm_linear_draft_full_chain_calls",
         "spec_rhythm_linear_draft_full_chain_capture_replay_calls",
@@ -1396,7 +1528,16 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
         "spec_rhythm_linear_draft_full_chain_unclassified_calls",
         "spec_rhythm_linear_draft_stepwise_calls",
         "spec_rhythm_linear_draft_stepwise_model_calls",
+        "mc2_dispatch_fused_attempt",
+        "mc2_dispatch_fused_success",
+        "mc2_dispatch_fallback",
+        "mc2_dispatch_exception",
         *execution_counter_names,
+    )
+    replay_histogram_names = tuple(
+        f"aclgraph_{kind}_replay_{dimension}_histogram"
+        for kind in ("generic", "target")
+        for dimension in ("entry_key", "token_rows")
     )
     before_by_rank = {int(worker["rank"]): worker for worker in before_workers}
     return [
@@ -1412,6 +1553,12 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
             "spec_rhythm_mixed_target_graph_qualified_buckets": int(
                 worker.get("spec_rhythm_mixed_target_graph_qualified_buckets", 0)
             ),
+            "spec_rhythm_mixed_target_graph_prefill_only": int(
+                worker.get(
+                    "spec_rhythm_mixed_target_graph_prefill_only",
+                    0,
+                )
+            ),
             **{
                 # Stable ordinary target-verify graphs are qualified before
                 # measurement and these counters intentionally remain
@@ -1426,6 +1573,8 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
                     "spec_rhythm_stable_target_verify_graph_qualified_capacity_mask",
                     "spec_rhythm_stable_target_verify_graph_max_qualified_capacity",
                     "spec_rhythm_stable_target_verify_graph_exact_routes",
+                    "spec_rhythm_stable_target_verify_graph_routes",
+                    "spec_rhythm_stable_target_verify_request_bucket",
                     "spec_rhythm_stable_target_verify_numerical_validation_attempts",
                     "spec_rhythm_stable_target_verify_numerical_validation_passes",
                     "spec_rhythm_stable_target_verify_numerical_validation_failures",
@@ -1439,6 +1588,12 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
             **{
                 name: int(worker.get(name, 0))
                 for name in (
+                    "worker_spec_rhythm_serial_protocol",
+                    "worker_spec_rhythm_single_batch_overlap_protocol",
+                    "worker_spec_rhythm_dual_batch_overlap_protocol",
+                    "worker_spec_rhythm_concurrent_draft_target_submission_cycles",
+                    "worker_spec_rhythm_single_batch_overlap_submission_cycles",
+                    "worker_spec_rhythm_dual_batch_overlap_submission_cycles",
                     "worker_spec_rhythm_mixed_target_prefill_batches",
                     "worker_spec_rhythm_mixed_target_graph_batches",
                     "worker_spec_rhythm_mixed_target_graph_requests",
@@ -1457,6 +1612,13 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
                 f"{name}_delta": int(worker.get(name, 0))
                 - int(before_by_rank.get(int(worker["rank"]), {}).get(name, 0))
                 for name in counter_names
+            },
+            **{
+                f"{name}_delta": _counter_histogram_delta(
+                    before_by_rank.get(int(worker["rank"]), {}).get(name, {}),
+                    worker.get(name, {}),
+                )
+                for name in replay_histogram_names
             },
         }
         for worker in after_workers
@@ -1534,6 +1696,8 @@ def _graph_qualification_fixed_point(before_workers, after_workers):
                     )
                 ),
                 "exact_routes": int(delta.get("spec_rhythm_stable_target_verify_graph_exact_routes", 0)),
+                "routes": int(delta.get("spec_rhythm_stable_target_verify_graph_routes", 0)),
+                "request_bucket": int(delta.get("spec_rhythm_stable_target_verify_request_bucket", 0)),
                 "numerical_attempts": int(
                     delta.get(
                         "spec_rhythm_stable_target_verify_numerical_validation_attempts",
@@ -1567,29 +1731,50 @@ def _graph_qualification_fixed_point(before_workers, after_workers):
                     "qualified_capacity_mask": 0,
                     "max_qualified_capacity": 0,
                     "exact_routes": 0,
+                    "routes": 0,
+                    "request_bucket": 0,
                     "numerical_attempts": 0,
                     "numerical_passes": 0,
                     "numerical_failures": 0,
                     "numerical_restore_failures": 0,
                 }
                 if is_draft
-                else {
-                    "enabled": 1,
-                    "qualified": 1,
-                    "qualified_capacities": 32,
-                    "qualified_capacity_mask": 0xFFFFFFFF,
-                    "max_qualified_capacity": 32,
-                    "exact_routes": 32,
-                    "numerical_attempts": 64,
-                    "numerical_passes": 64,
-                    "numerical_failures": 0,
-                    "numerical_restore_failures": 0,
-                }
+                else None
             )
-            if stable_contract != expected:
+            max_capacity = stable_contract["max_qualified_capacity"]
+            request_bucket = stable_contract["request_bucket"]
+            expected_capacities = (
+                tuple(range(request_bucket, max_capacity + 1, request_bucket))
+                if request_bucket > 0
+                else ()
+            )
+            if max_capacity > 0 and (
+                not expected_capacities or expected_capacities[-1] != max_capacity
+            ):
+                expected_capacities = (*expected_capacities, max_capacity)
+            target_contract_valid = bool(
+                not is_draft
+                and max_capacity > 0
+                and request_bucket > 0
+                and stable_contract["enabled"] == 1
+                and stable_contract["qualified"] == 1
+                and stable_contract["qualified_capacities"] == len(expected_capacities)
+                and stable_contract["qualified_capacity_mask"]
+                == sum(1 << (capacity - 1) for capacity in expected_capacities)
+                and stable_contract["exact_routes"] == len(expected_capacities)
+                and stable_contract["routes"] == max_capacity
+                and stable_contract["numerical_attempts"] == 2 * max_capacity
+                and stable_contract["numerical_passes"] == 2 * max_capacity
+                and stable_contract["numerical_failures"] == 0
+                and stable_contract["numerical_restore_failures"] == 0
+            )
+            if (is_draft and stable_contract != expected) or (
+                not is_draft and not target_contract_valid
+            ):
                 issues.append(
                     f"rank {rank} stable target-verify graph contract "
-                    f"mismatch: actual={stable_contract}, expected={expected}"
+                    f"mismatch: actual={stable_contract}, "
+                    "expected a complete numerically-qualified bucketed graph family"
                 )
         captures = {
             name: int(delta.get(name, 0))
@@ -1703,6 +1888,7 @@ def _require_no_graph_fallback(
     *,
     require_full_window: bool = False,
     full_window_target_graph_kind: str = "auto",
+    require_mixed_prefill: bool = True,
 ) -> None:
     """Require measured calls—not only graph configuration—to be graph-only.
 
@@ -1766,6 +1952,7 @@ def _require_no_graph_fallback(
             is_draft = bool(int(worker.get("is_draft_rank", 0)))
             enabled = int(worker.get("spec_rhythm_mixed_target_graph_enabled", 0))
             qualified_buckets = int(worker.get("spec_rhythm_mixed_target_graph_qualified_buckets", 0))
+            prefill_only = int(worker.get("spec_rhythm_mixed_target_graph_prefill_only", 0))
             prefills = int(worker.get("worker_spec_rhythm_mixed_target_prefill_batches", 0))
             graph_batches = int(worker.get("worker_spec_rhythm_mixed_target_graph_batches", 0))
             fallbacks = {
@@ -1794,6 +1981,7 @@ def _require_no_graph_fallback(
             details = {
                 "enabled": enabled,
                 "qualified_buckets": qualified_buckets,
+                "prefill_only": prefill_only,
                 "stable_verify_enabled": int(worker.get("spec_rhythm_stable_target_verify_graph_enabled", 0)),
                 "stable_verify_qualified": int(worker.get("spec_rhythm_stable_target_verify_graph_qualified", 0)),
                 "stable_verify_qualified_capacities": int(
@@ -1815,6 +2003,10 @@ def _require_no_graph_fallback(
                     )
                 ),
                 "stable_verify_exact_routes": int(worker.get("spec_rhythm_stable_target_verify_graph_exact_routes", 0)),
+                "stable_verify_routes": int(worker.get("spec_rhythm_stable_target_verify_graph_routes", 0)),
+                "stable_verify_request_bucket": int(
+                    worker.get("spec_rhythm_stable_target_verify_request_bucket", 0)
+                ),
                 "stable_verify_numerical_attempts": int(
                     worker.get(
                         "spec_rhythm_stable_target_verify_numerical_validation_attempts",
@@ -1845,9 +2037,31 @@ def _require_no_graph_fallback(
                 "stable_verify_requests": stable_verify_requests,
                 **fallbacks,
             }
+            stable_max_capacity = details["stable_verify_max_qualified_capacity"]
+            stable_request_bucket = details["stable_verify_request_bucket"]
+            stable_expected_capacities = (
+                tuple(
+                    range(
+                        stable_request_bucket,
+                        stable_max_capacity + 1,
+                        stable_request_bucket,
+                    )
+                )
+                if stable_request_bucket > 0
+                else ()
+            )
+            if stable_max_capacity > 0 and (
+                not stable_expected_capacities
+                or stable_expected_capacities[-1] != stable_max_capacity
+            ):
+                stable_expected_capacities = (
+                    *stable_expected_capacities,
+                    stable_max_capacity,
+                )
             if is_draft:
                 if (
                     enabled != 0
+                    or prefill_only != 0
                     or any(
                         details[name] != 0
                         for name in (
@@ -1857,6 +2071,8 @@ def _require_no_graph_fallback(
                             "stable_verify_qualified_capacity_mask",
                             "stable_verify_max_qualified_capacity",
                             "stable_verify_exact_routes",
+                            "stable_verify_routes",
+                            "stable_verify_request_bucket",
                             "stable_verify_numerical_attempts",
                             "stable_verify_numerical_passes",
                             "stable_verify_numerical_failures",
@@ -1871,21 +2087,65 @@ def _require_no_graph_fallback(
                     mixed_target_failures.append((rank, "draft", details))
             elif (
                 enabled != 1
+                or prefill_only not in (0, 1)
                 or qualified_buckets <= 0
-                or prefills <= 0
-                or graph_batches != prefills
-                or details["stable_verify_enabled"] != 1
-                or details["stable_verify_qualified"] != 1
-                or details["stable_verify_qualified_capacities"] != 32
-                or details["stable_verify_qualified_capacity_mask"] != 0xFFFFFFFF
-                or details["stable_verify_max_qualified_capacity"] != 32
-                or details["stable_verify_exact_routes"] != 32
-                or details["stable_verify_numerical_attempts"] != 64
-                or details["stable_verify_numerical_passes"] != 64
-                or details["stable_verify_numerical_failures"] != 0
-                or details["stable_verify_numerical_restore_failures"] != 0
-                or stable_verify_batches <= 0
-                or stable_verify_requests <= 0
+                or (
+                    require_mixed_prefill
+                    and (prefills <= 0 or graph_batches != prefills)
+                )
+                or (
+                    not require_mixed_prefill
+                    and (prefills != 0 or graph_batches != 0)
+                )
+                or (
+                    prefill_only == 0
+                    and (
+                        details["stable_verify_enabled"] != 1
+                        or details["stable_verify_qualified"] != 1
+                        or stable_max_capacity <= 0
+                        or stable_request_bucket <= 0
+                        or details["stable_verify_qualified_capacities"]
+                        != len(stable_expected_capacities)
+                        or details["stable_verify_qualified_capacity_mask"]
+                        != sum(
+                            1 << (capacity - 1)
+                            for capacity in stable_expected_capacities
+                        )
+                        or details["stable_verify_exact_routes"]
+                        != len(stable_expected_capacities)
+                        or details["stable_verify_routes"] != stable_max_capacity
+                        or details["stable_verify_numerical_attempts"]
+                        != 2 * details["stable_verify_max_qualified_capacity"]
+                        or details["stable_verify_numerical_passes"]
+                        != 2 * details["stable_verify_max_qualified_capacity"]
+                        or details["stable_verify_numerical_failures"] != 0
+                        or details["stable_verify_numerical_restore_failures"] != 0
+                        or stable_verify_batches <= 0
+                        or stable_verify_requests <= 0
+                    )
+                )
+                or (
+                    prefill_only == 1
+                    and any(
+                        details[name] != 0
+                        for name in (
+                            "stable_verify_enabled",
+                            "stable_verify_qualified",
+                            "stable_verify_qualified_capacities",
+                            "stable_verify_qualified_capacity_mask",
+                            "stable_verify_max_qualified_capacity",
+                            "stable_verify_exact_routes",
+                            "stable_verify_routes",
+                            "stable_verify_request_bucket",
+                            "stable_verify_numerical_attempts",
+                            "stable_verify_numerical_passes",
+                            "stable_verify_numerical_failures",
+                            "stable_verify_numerical_restore_failures",
+                            "stable_verify_batches",
+                            "stable_verify_requests",
+                        )
+                    )
+                )
                 or any(fallbacks.values())
             ):
                 mixed_target_failures.append((rank, "target", details))

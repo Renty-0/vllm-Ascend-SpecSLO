@@ -275,13 +275,13 @@ def _observe_preflight_votes(monkeypatch, harness, *, remote_failure=False):
     def all_reduce(value, *args, **kwargs):
         # Earlier role timings and strict graph checks are independent. Only
         # inject after the verdict, at the collective commit boundary.
-        if value.numel() == 1 and harness.events[-1][0] == "verdict":
+        if value.numel() == 2 and harness.events[-1][0] == "verdict":
             assert value.dtype == torch.int64
             assert kwargs.get("op") == dist.ReduceOp.MAX
             votes.append(value.tolist())
             previous_all_reduce(value, *args, **kwargs)
             if remote_failure:
-                value.fill_(1)
+                value[0].fill_(1)
         else:
             previous_all_reduce(value, *args, **kwargs)
 
@@ -321,7 +321,7 @@ def test_local_preflight_error_still_reaches_collective_vote(monkeypatch, failur
     with pytest.raises(RuntimeError, match="commit preflight failed on rank") as caught:
         harness.run(max_rounds=2)
     assert caught.value.__cause__ is not None
-    assert votes == [[1]], "a local exception must not strand peers waiting for their vote"
+    assert votes == [[1, 0]], "a local exception must not strand peers waiting for their vote"
     assert not chunks
     assert [state.token_ids for state in harness.target_states] == original_states
     assert all(state.delivered_tokens == 0 for state in harness.controllers[0].request_states.values())
@@ -345,7 +345,7 @@ def test_remote_preflight_error_prevents_leader_commit_mapping_and_stream_chunks
     harness.engine._preflight_spec_rhythm_tree_cache_commit = record_pending
     with pytest.raises(RuntimeError, match="preflight failed on another rank; this step was not committed"):
         harness.run(max_rounds=2)
-    assert votes == [[0]], "the simulated target leader must itself pass preflight"
+    assert votes == [[0, 0]], "the simulated target leader must itself pass preflight"
     assert inspected_mappings and inspected_mappings[0][2]
     for mappings, original, pending in inspected_mappings:
         assert set(mappings) == set(original)
@@ -365,7 +365,7 @@ def test_collective_success_keeps_streamed_tokens_equal_to_committed_outputs(mon
     votes = _observe_preflight_votes(monkeypatch, harness)
     chunks = _record_stream_chunks(harness)
     results = harness.run()
-    assert votes and all(value == [0] for value in votes)
+    assert votes and all(value == [0, 0] for value in votes)
     assert chunks
     for index, result in enumerate(results):
         streamed = [token for chunk in chunks if chunk["request_index"] == index for token in chunk["token_ids"]]
@@ -392,10 +392,10 @@ def _distributed_preflight_worker(rank, world_size, store_path, result_queue):
             votes = []
 
             def collective(value, *args, **kwargs):
-                if value.numel() == 1 and harness.events[-1][0] == "verdict":
+                if value.numel() == 2 and harness.events[-1][0] == "verdict":
                     local_vote = value.tolist()[0]
                     real_all_reduce(value, *args, **kwargs)
-                    votes.append((local_vote, value.tolist()[0]))
+                    votes.append((local_vote, value.tolist()))
                 else:
                     simulated_all_reduce(value, *args, **kwargs)
 
@@ -477,7 +477,9 @@ def test_real_four_rank_vote_aborts_all_commits_for_one_stale_rank(tmp_path):
         for record in records:
             assert "fatal" not in record, record
             assert "commit preflight failed" in record["error"]
-            assert record["votes"] == [(int(record["rank"] == 2), 1)]
+            assert record["votes"] == [
+                (int(record["rank"] == 2), [1, 0])
+            ]
             assert record["committed"] == [[], [], [], []]
             assert record["delivered"] == [0, 0, 0, 0]
             assert record["compactions"] == 0

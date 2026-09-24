@@ -32,9 +32,9 @@ def test_topology_creates_disjoint_draft_target_and_verification_groups():
     topology.validate_world_size(5)
 
 
-def test_process_groups_add_cpu_verification_coordination_group(monkeypatch):
+def test_process_groups_add_dedicated_world_cpu_coordination_group(monkeypatch):
     topology = PearlTopology.from_tensor_parallel_sizes(draft_tp_size=1, target_tp_size=3)
-    created_groups = [object() for _ in range(5)]
+    created_groups = [object() for _ in range(7)]
     new_group = Mock(side_effect=created_groups)
     monkeypatch.setattr(dist, "is_initialized", lambda: True)
     monkeypatch.setattr(dist, "get_world_size", lambda: 4)
@@ -44,9 +44,42 @@ def test_process_groups_add_cpu_verification_coordination_group(monkeypatch):
 
     groups = PearlProcessGroups.create(topology, backend="hccl")
 
-    assert groups.verification_coordination_group is created_groups[4]
-    assert new_group.call_args_list[-1].kwargs == {
+    assert groups.world_coordination_group is created_groups[4]
+    assert groups.verification_coordination_group is created_groups[5]
+    assert groups.correction_coordination_group is created_groups[6]
+    assert new_group.call_args_list[-3].kwargs == {
         "ranks": [0, 1, 2, 3],
+        "backend": "gloo",
+    }
+    assert new_group.call_args_list[-2].kwargs == {
+        "ranks": [0, 1, 2, 3],
+        "backend": "gloo",
+    }
+    assert new_group.call_args_list[-1].kwargs == {
+        "ranks": [0, 1],
+        "backend": "gloo",
+    }
+
+
+def test_world_coordination_group_includes_nonleader_draft_ranks(monkeypatch):
+    topology = PearlTopology.from_tensor_parallel_sizes(draft_tp_size=2, target_tp_size=3)
+    created_groups = [object() for _ in range(7)]
+    new_group = Mock(side_effect=created_groups)
+    monkeypatch.setattr(dist, "is_initialized", lambda: True)
+    monkeypatch.setattr(dist, "get_world_size", lambda: 5)
+    monkeypatch.setattr(dist, "get_rank", lambda: 1)
+    monkeypatch.setattr(dist, "get_backend", lambda: "hccl")
+    monkeypatch.setattr(dist, "new_group", new_group)
+
+    groups = PearlProcessGroups.create(topology, backend="hccl")
+
+    assert groups.world_coordination_group is created_groups[4]
+    assert new_group.call_args_list[4].kwargs == {
+        "ranks": [0, 1, 2, 3, 4],
+        "backend": "gloo",
+    }
+    assert new_group.call_args_list[5].kwargs == {
+        "ranks": [0, 2, 3, 4],
         "backend": "gloo",
     }
 

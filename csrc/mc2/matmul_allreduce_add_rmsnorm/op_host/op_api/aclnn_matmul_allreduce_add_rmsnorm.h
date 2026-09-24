@@ -34,6 +34,7 @@ __attribute__((visibility("default"))) aclnnStatus aclnnMatmulAllreduceAddRmsnor
     double epsilon,
     bool isTransB,
     bool isGatherAddOut,
+    bool projectionOnly,
     const aclTensor *y,
     const aclTensor *addOut,
     uint64_t *workspaceSize,

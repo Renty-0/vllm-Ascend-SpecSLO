@@ -47,6 +47,10 @@ ROOT_DIR = str(Path(__file__).resolve().parent)
 UPSTREAM_METADATA_FILE = os.path.join(ROOT_DIR, "upstream_version.json")
 DISTRIBUTION_NAME = "vllm-ascend-hust"
 logger = logging.getLogger(__name__)
+custom_op_package = load_module_from_path(
+    "_vllm_ascend_custom_op_package_for_build",
+    os.path.join(ROOT_DIR, "vllm_ascend", "custom_op_package.py"),
+)
 
 
 def load_upstream_metadata() -> dict[str, str]:
@@ -651,42 +655,46 @@ class cmake_build_ext(build_ext):
                         print(f"Copy: {src_path} -> {dst_path}")
 
         # Copy the generated package into build_lib so wheel assembly sees it.
-        # A2/A3 builds advertise kv_cache_block_gather, so reject an incomplete
-        # payload rather than failing later during worker construction.
+        # A2/A3 builds advertise kv_cache_block_gather. They also advertise MC2
+        # when its source or generated payload is present, so reject incomplete
+        # payloads rather than failing later during worker construction.
         src_cann_ops_custom = os.path.join(ROOT_DIR, "vllm_ascend", "_cann_ops_custom")
         dst_cann_ops_custom = os.path.join(self.build_lib, "vllm_ascend", "_cann_ops_custom")
         if envs.SOC_VERSION.startswith(("ascend910b", "ascend910_93")):
-            vendor_dir = os.path.join(
+            vendor_dir = Path(
                 src_cann_ops_custom,
                 "vendors",
                 "custom_transformer",
             )
             kernel_soc = "ascend910b" if envs.SOC_VERSION.startswith("ascend910b") else "ascend910_93"
-            required_gather_artifacts = [
-                os.path.join(vendor_dir, "op_api", "lib", "libcust_opapi.so"),
-                os.path.join(
+            required_operators = ["kv_cache_block_gather"]
+            # The current build recipe selects MC2 on A2. A3 packaging still
+            # detects a generated/partial MC2 payload, but does not claim the
+            # operator merely because the shared source tree contains it.
+            for operator_name in (
+                custom_op_package.CUSTOM_OP_MC2_NAME,
+                custom_op_package.CUSTOM_OP_MC2_EPILOGUE_NAME,
+            ):
+                mc2_source_dir = (
+                    Path(ROOT_DIR, "csrc", "mc2", operator_name)
+                    if kernel_soc == "ascend910b"
+                    else None
+                )
+                if custom_op_package.custom_op_payload_declared(
                     vendor_dir,
-                    "op_api",
-                    "include",
-                    "aclnnop",
-                    "aclnn_kv_cache_block_gather.h",
-                ),
-                os.path.join(
-                    vendor_dir,
-                    "op_impl",
-                    "ai_core",
-                    "tbe",
-                    "kernel",
-                    "config",
-                    kernel_soc,
-                    "kv_cache_block_gather.json",
-                ),
-            ]
-            missing = [path for path in required_gather_artifacts if not os.path.isfile(path)]
+                    operator_name,
+                    source_dir=mc2_source_dir,
+                ):
+                    required_operators.append(operator_name)
+            missing = custom_op_package.missing_custom_op_payload_artifacts(
+                vendor_dir,
+                tuple(required_operators),
+                kernel_soc=kernel_soc,
+            )
             if missing:
                 raise RuntimeError(
                     "Custom-op build did not produce the complete packaged "
-                    "kv_cache_block_gather capability; missing: " + ", ".join(missing)
+                    f"capabilities {required_operators}; missing: " + ", ".join(map(str, missing))
                 )
 
         if os.path.exists(src_cann_ops_custom):

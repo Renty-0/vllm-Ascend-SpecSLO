@@ -39,6 +39,8 @@ class _TreeLoopHarness:
         draft_window_ms=32.0,
         calibrate_window=True,
         eager_reserve_tokens=0,
+        prefill_coalesce_min_requests=1,
+        prefill_coalesce_max_wait_ms=0.0,
     ):
         self.events = []
         self.active_snapshots = []
@@ -80,9 +82,10 @@ class _TreeLoopHarness:
             # HCCL all-reduce does not support float64. The real control
             # envelope uses int64 microseconds, distinct from broadcast.
             assert timing.dtype == torch.int64
-            if timing.numel() == 1:
-                # The collective preflight vote is a failure bit, not a
-                # timing envelope. With no injected peer error MAX keeps it.
+            if timing.numel() in (1, 2):
+                # Preflight uses one structural lane plus an optional
+                # numerical-finiteness lane.  Neither is a timing envelope;
+                # with no injected peer error MAX leaves both at zero.
                 assert kwargs.get("op") == native.dist.ReduceOp.MAX
                 return
             assert timing.numel() == 6
@@ -113,6 +116,8 @@ class _TreeLoopHarness:
             spec_rhythm_tree_depth=2,
             spec_rhythm_verification_budget=budget,
             spec_rhythm_online_prefill=online_prefill,
+            spec_rhythm_prefill_coalesce_min_requests=prefill_coalesce_min_requests,
+            spec_rhythm_prefill_coalesce_max_wait_ms=prefill_coalesce_max_wait_ms,
             spec_rhythm_urgency_threshold=0.0,
             spec_rhythm_acceptance_floor=0.0,
             spec_rhythm_eager_reserve_tokens=eager_reserve_tokens,
@@ -126,6 +131,8 @@ class _TreeLoopHarness:
         self.engine.groups = SimpleNamespace(is_verification_worker=True)
         self.engine.gamma = 4
         self.engine._release_cache = Mock()
+        self.engine._activate_cache_sequence = Mock()
+        self.engine._release_cache_sequence = Mock(return_value=1)
         self.engine.graph_metrics = lambda: {}
         self.engine.compact_tree_round = Mock()
         self.engine.draft_tree_forward = self.draft
@@ -382,6 +389,42 @@ def test_tree_loop_online_admission_prefills_before_decode(monkeypatch):
     results = harness.run()
     assert harness.prefilled == {0, 1, 2}
     assert all(len(result["completion_token_ids"]) == 6 for result in results)
+    assert [call.args[0] for call in harness.engine._activate_cache_sequence.call_args_list] == [0, 1, 2]
+    assert sorted(call.args[0] for call in harness.engine._release_cache_sequence.call_args_list) == [0, 1, 2]
+    counters = results[0]["spec_rhythm"]
+    assert counters["spec_rhythm_online_cache_activated_sequences"] == 3
+    assert counters["spec_rhythm_online_cache_released_sequences"] == 3
+    assert counters["spec_rhythm_online_cache_released_blocks"] == 3
+
+
+def test_tree_loop_online_prefill_coalesces_ready_arrivals(monkeypatch):
+    wall = [99.9]
+
+    def advance_wall():
+        wall[0] += 0.1
+        return wall[0]
+
+    monkeypatch.setattr(native.time, "time", advance_wall)
+    harness = _TreeLoopHarness(
+        monkeypatch,
+        requests=3,
+        capacity=4,
+        max_tokens=30,
+        online_prefill=True,
+        arrivals=[100.0, 100.15, 100.25],
+        prefill_coalesce_min_requests=2,
+        prefill_coalesce_max_wait_ms=600.0,
+    )
+
+    results = harness.run()
+
+    prefills = [event for event in harness.events if event[0] == "prefill"]
+    assert prefills[:2] == [("prefill", (0,)), ("prefill", (1, 2))]
+    diagnostics = results[0]["spec_rhythm"]
+    assert diagnostics["spec_rhythm_prefill_coalesce_enabled"] == 1
+    assert diagnostics["spec_rhythm_prefill_coalesce_deferred_polls"] >= 1
+    assert diagnostics["spec_rhythm_prefill_coalesce_size_releases"] >= 1
+    assert diagnostics["spec_rhythm_prefill_pair_batches"] >= 1
 
 
 def test_tree_loop_polls_live_admission_once_per_active_cycle(monkeypatch):

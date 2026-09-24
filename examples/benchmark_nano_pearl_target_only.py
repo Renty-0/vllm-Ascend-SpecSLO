@@ -63,6 +63,32 @@ def _build_parser() -> argparse.ArgumentParser:
         type=int,
         help="Override the inferred graph capture ceiling for decode shapes.",
     )
+    parser.add_argument(
+        "--max-num-batched-tokens",
+        type=int,
+        help=(
+            "Override the native scheduler token budget. This can be paired "
+            "with --cudagraph-capture-sizes to give the target-only baseline "
+            "the same bounded online prefill/decode graph envelope as SpecSLO."
+        ),
+    )
+    parser.add_argument(
+        "--cudagraph-capture-sizes",
+        type=lambda value: [int(item) for item in value.split(",") if item.strip()],
+        help=(
+            "Comma-separated explicit ACLGraph token buckets. The list is "
+            "passed to native vLLM-Ascend without changing the default when omitted."
+        ),
+    )
+    parser.add_argument(
+        "--cudagraph-copy-inputs",
+        action="store_true",
+        help=(
+            "Copy dynamic model inputs into the resident ACLGraph buffers. "
+            "This is intended for numerical qualification of non-uniform "
+            "online prefill/decode graph batches."
+        ),
+    )
     parser.add_argument("--enable-prefix-caching", action="store_true")
     parser.add_argument(
         "--enable-log-stats",
@@ -209,6 +235,8 @@ def _run_online_arrivals(
         "forced_releases": 0,
         "admission_batches": 0,
         "admitted_requests": 0,
+        "admission_batches_while_service_busy": 0,
+        "admitted_requests_while_service_busy": 0,
         "singleton_batches": 0,
         "pair_batches": 0,
         "multi_batches": 0,
@@ -253,6 +281,13 @@ def _run_online_arrivals(
             release_size = len(release)
             coalesce_metrics["admission_batches"] = int(coalesce_metrics["admission_batches"]) + 1
             coalesce_metrics["admitted_requests"] = int(coalesce_metrics["admitted_requests"]) + release_size
+            if service_busy:
+                coalesce_metrics["admission_batches_while_service_busy"] = int(
+                    coalesce_metrics["admission_batches_while_service_busy"]
+                ) + 1
+                coalesce_metrics["admitted_requests_while_service_busy"] = int(
+                    coalesce_metrics["admitted_requests_while_service_busy"]
+                ) + release_size
             if release_size == 1:
                 coalesce_metrics["singleton_batches"] = int(coalesce_metrics["singleton_batches"]) + 1
             elif release_size == 2:
@@ -447,6 +482,21 @@ def main(argv: Sequence[str] | None = None) -> None:
             raise ValueError("--num-speculative-tokens must equal --tree-width * --tree-depth.")
     if args.max_cudagraph_capture_size is not None and args.max_cudagraph_capture_size <= 0:
         raise ValueError("--max-cudagraph-capture-size must be positive.")
+    if args.max_num_batched_tokens is not None and args.max_num_batched_tokens <= 0:
+        raise ValueError("--max-num-batched-tokens must be positive.")
+    if args.cudagraph_capture_sizes is not None:
+        if not args.cudagraph_capture_sizes or any(value <= 0 for value in args.cudagraph_capture_sizes):
+            raise ValueError("--cudagraph-capture-sizes must contain positive integers.")
+        if len(set(args.cudagraph_capture_sizes)) != len(args.cudagraph_capture_sizes):
+            raise ValueError("--cudagraph-capture-sizes must not contain duplicates.")
+        args.cudagraph_capture_sizes = sorted(args.cudagraph_capture_sizes)
+        if (
+            args.max_cudagraph_capture_size is not None
+            and args.cudagraph_capture_sizes[-1] > args.max_cudagraph_capture_size
+        ):
+            raise ValueError(
+                "--cudagraph-capture-sizes cannot exceed --max-cudagraph-capture-size."
+            )
     if args.num_prompts is not None and len(args.batch_sizes) != 1 and not args.static_chunks:
         raise ValueError("--num-prompts requires exactly one --batch-sizes value.")
     if max(args.batch_sizes) > args.max_num_seqs:
@@ -496,11 +546,15 @@ def main(argv: Sequence[str] | None = None) -> None:
     llm_kwargs = {}
     if args.disable_async_scheduling:
         llm_kwargs["async_scheduling"] = False
-    if args.max_cudagraph_capture_size is not None:
+    if args.max_num_batched_tokens is not None:
+        llm_kwargs["max_num_batched_tokens"] = args.max_num_batched_tokens
+    if args.max_cudagraph_capture_size is not None or args.cudagraph_capture_sizes is not None:
         from vllm.config import CompilationConfig
 
         llm_kwargs["compilation_config"] = CompilationConfig(
             max_cudagraph_capture_size=args.max_cudagraph_capture_size,
+            cudagraph_capture_sizes=args.cudagraph_capture_sizes,
+            cudagraph_copy_inputs=args.cudagraph_copy_inputs,
         )
     # Online SLO accounting consumes RequestMetrics (arrival/first/last token
     # timestamps).  Runtime stats are therefore mandatory for an online run,
@@ -623,6 +677,11 @@ def main(argv: Sequence[str] | None = None) -> None:
         output_tokens = sum(len(output.outputs[0].token_ids) for output in outputs)
         output_token_rows = [list(output.outputs[0].token_ids) for output in outputs]
         first_eos_positions = [row.index(eos_token_id) if eos_token_id in row else None for row in output_token_rows]
+        measured_output_token_limits = _sampling_max_token_limits(
+            measured_sampling_params,
+            len(measured_inputs),
+        )
+        requested_output_tokens = sum(measured_output_token_limits)
         results.append(
             {
                 "batch_size": batch_size,
@@ -639,15 +698,13 @@ def main(argv: Sequence[str] | None = None) -> None:
                     if args.online_arrivals
                     else "one synchronous llm.generate measurement; inputs pretokenized"
                 ),
-                "request_output_token_limits": _sampling_max_token_limits(
-                    measured_sampling_params,
-                    len(measured_inputs),
-                ),
+                "request_output_token_limits": measured_output_token_limits,
                 "warmup_output_token_limits": _sampling_max_token_limits(
                     current_warmup_params,
                     len(warmup_inputs),
                 ),
                 "output_throughput_tokens_per_second": output_tokens / elapsed,
+                "requested_output_throughput_tokens_per_second": requested_output_tokens / elapsed,
                 "output_token_ids_sha256": hashlib.sha256(
                     json.dumps(output_token_rows, separators=(",", ":")).encode()
                 ).hexdigest(),
@@ -684,6 +741,9 @@ def main(argv: Sequence[str] | None = None) -> None:
         "dtype": args.dtype,
         "enforce_eager": args.enforce_eager,
         "max_cudagraph_capture_size": args.max_cudagraph_capture_size,
+        "max_num_batched_tokens": args.max_num_batched_tokens,
+        "cudagraph_capture_sizes": args.cudagraph_capture_sizes,
+        "cudagraph_copy_inputs": args.cudagraph_copy_inputs,
         "max_tokens": args.max_tokens,
         "respect_eos": args.respect_eos,
         "request_manifest": args.request_manifest,

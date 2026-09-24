@@ -254,6 +254,10 @@ class DraftWindowBudget:
     # eager row is present. It is separate from exploratory-token cost.
     eager_fixed_overhead_ms: float = 0.0
     eager_fixed_overhead_hidden: bool = False
+    # Optional row-granular capacity resolved by a fixed-shape graph caller.
+    # ``eager_token_budget`` remains the generic scalar estimate; graph-backed
+    # execution may have to round that estimate down to a resident bucket.
+    eager_row_budget: int | None = None
 
 
 @dataclass
@@ -272,6 +276,7 @@ class DraftWindowEstimator:
     communication_ms: float | None = field(default=None, init=False)
     normal_cycle_compute_ms: float | None = field(default=None, init=False)
     eager_fixed_overhead_ms: float | None = field(default=None, init=False)
+    draft_compute_ms_by_token_count: dict[int, float] = field(default_factory=dict, init=False)
 
     def __post_init__(self) -> None:
         if not math.isfinite(self.ema_alpha) or not 0.0 < self.ema_alpha <= 1.0:
@@ -294,6 +299,10 @@ class DraftWindowEstimator:
             return sample if previous is None else self.ema_alpha * sample + (1.0 - self.ema_alpha) * previous
 
         if drafted_tokens and draft_compute_ms > 0.0:
+            self.draft_compute_ms_by_token_count[drafted_tokens] = update(
+                self.draft_compute_ms_by_token_count.get(drafted_tokens),
+                draft_compute_ms,
+            )
             if eager_work and self.draft_ms_per_token is not None:
                 # Rolling eager adds two batch-level paths in the current tree
                 # worker: parent-frontier prediction and selected-KV
@@ -321,6 +330,39 @@ class DraftWindowEstimator:
         if target_verify_ms > 0.0:
             self.target_verify_ms = update(self.target_verify_ms, target_verify_ms)
         self.communication_ms = update(self.communication_ms, communication_ms)
+
+    def predict_draft_compute_ms(self, drafted_tokens: int) -> float | None:
+        """Predict one physical draft-graph bucket conservatively.
+
+        Exact bucket observations are preferred.  For an unseen bucket, a
+        larger observed graph is a safe ceiling; above the largest observed
+        graph we scale its wall time by token count.  The latter intentionally
+        overestimates sublinear batching until that bucket receives its own
+        timing sample, preventing an unmeasured cross-bucket eager promotion.
+        """
+
+        if drafted_tokens < 0:
+            raise ValueError("Drafted token count must be non-negative.")
+        if drafted_tokens == 0:
+            return 0.0
+        exact = self.draft_compute_ms_by_token_count.get(drafted_tokens)
+        if exact is not None:
+            return exact
+        observed = sorted(self.draft_compute_ms_by_token_count.items())
+        if not observed:
+            return (
+                None
+                if self.draft_ms_per_token is None
+                else self.draft_ms_per_token * drafted_tokens
+            )
+        ceiling = next(
+            (duration for tokens, duration in observed if tokens > drafted_tokens),
+            None,
+        )
+        if ceiling is not None:
+            return ceiling
+        largest_tokens, largest_duration = observed[-1]
+        return largest_duration * drafted_tokens / largest_tokens
 
     def estimate(
         self,

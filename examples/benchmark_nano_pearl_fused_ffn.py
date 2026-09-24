@@ -1,5 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
-"""Benchmark CANN fused FFN against native PEARL's two NZ matmuls."""
+"""Benchmark CANN fused FFN against native PEARL's two matmuls.
+
+Both ND and FRACTAL_NZ BF16 paths are measured.  Production SpecSLO keeps
+target weights in ND by default, so comparing only an NZ baseline can hide a
+useful (or harmful) layout interaction on the exact target-model shape.
+"""
 
 from __future__ import annotations
 
@@ -68,8 +73,12 @@ def main() -> None:
     ) * 0.02).to(torch.float16)
     gate_up_bf16_nz = torch_npu.npu_format_cast(gate_up_fp16.to(torch.bfloat16), 29)
     down_bf16_nz = torch_npu.npu_format_cast(down_fp16.to(torch.bfloat16), 29)
+    gate_up_bf16 = gate_up_fp16.to(torch.bfloat16)
+    down_bf16 = down_fp16.to(torch.bfloat16)
     fused_gate_up_fp16 = gate_up_fp16.t().contiguous()
     fused_down_fp16 = down_fp16.t().contiguous()
+    fused_gate_up_bf16 = gate_up_bf16.t().contiguous()
+    fused_down_bf16 = down_bf16.t().contiguous()
 
     results: list[dict[str, float | int | str]] = []
     for token_count in args.token_counts:
@@ -79,6 +88,19 @@ def main() -> None:
         def native_bf16() -> torch.Tensor:
             gate_up = F.linear(source, gate_up_bf16_nz)
             return F.linear(torch_npu.npu_swiglu(gate_up), down_bf16_nz)
+
+        def sequential_bf16() -> torch.Tensor:
+            gate_up = F.linear(source, gate_up_bf16)
+            return F.linear(torch_npu.npu_swiglu(gate_up), down_bf16)
+
+        def fused_bf16() -> torch.Tensor:
+            return torch_npu.npu_ffn(
+                source,
+                fused_gate_up_bf16,
+                fused_down_bf16,
+                "swiglu",
+                inner_precise=1,
+            )
 
         def sequential_fp16() -> torch.Tensor:
             fp16_source = source.to(torch.float16)
@@ -97,6 +119,8 @@ def main() -> None:
         graphs: dict[str, tuple[torch.npu.NPUGraph, torch.Tensor]] = {}
         for strategy, operation in (
             ("native_bf16_nz", native_bf16),
+            ("sequential_bf16_nd", sequential_bf16),
+            ("fused_npu_ffn_bf16_nd", fused_bf16),
             ("sequential_fp16_nd", sequential_fp16),
             ("fused_npu_ffn_fp16_nd", fused_fp16),
         ):
@@ -121,7 +145,7 @@ def main() -> None:
         torch.npu.synchronize()
         if "native_bf16_nz" in graphs:
             native_output = graphs["native_bf16_nz"][1].cpu()
-            for result in results[-3:]:
+            for result in results[-5:]:
                 strategy = str(result["strategy"])
                 if strategy in graphs:
                     result["changed_input_replay_max_abs_error_vs_native_bf16"] = _max_abs_error(
@@ -133,7 +157,21 @@ def main() -> None:
                 graphs["fused_npu_ffn_fp16_nd"][1].cpu(),
                 graphs["sequential_fp16_nd"][1].cpu(),
             )
-            results[-1]["changed_input_replay_max_abs_error_vs_sequential_fp16"] = fused_error
+            next(
+                result
+                for result in results[-5:]
+                if result["strategy"] == "fused_npu_ffn_fp16_nd"
+            )["changed_input_replay_max_abs_error_vs_sequential_fp16"] = fused_error
+        if "sequential_bf16_nd" in graphs and "fused_npu_ffn_bf16_nd" in graphs:
+            fused_error = _max_abs_error(
+                graphs["fused_npu_ffn_bf16_nd"][1].cpu(),
+                graphs["sequential_bf16_nd"][1].cpu(),
+            )
+            next(
+                result
+                for result in results[-5:]
+                if result["strategy"] == "fused_npu_ffn_bf16_nd"
+            )["changed_input_replay_max_abs_error_vs_sequential_bf16"] = fused_error
 
     rendered = json.dumps({"results": results}, indent=2)
     print(rendered)
