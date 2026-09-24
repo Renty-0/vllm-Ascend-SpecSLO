@@ -81,7 +81,9 @@ find /root/data /data/shared-models /data/datasets -xdev -type f \
 
 (
     cd "$output_dir"
-    sha256sum -- * > MANIFEST.sha256
+    find . -type f ! -name MANIFEST.sha256 -print0 \
+        | sort -z \
+        | xargs -0 -r sha256sum > MANIFEST.sha256
 )
 
 echo "migration manifest written to $output_dir"
