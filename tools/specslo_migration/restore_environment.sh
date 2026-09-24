@@ -4,8 +4,9 @@ set -euo pipefail
 manifest_dir=${1:?usage: restore_environment.sh <manifest-directory> [repo-directory]}
 repo_dir=${2:-/root/data/vllm-ascend-hust}
 
+bundle="$manifest_dir/repositories/vllm-ascend-hust/repository.bundle"
 if [[ ! -d "$repo_dir/.git" ]]; then
-    git clone "$manifest_dir/vllm-ascend-specslo.bundle" "$repo_dir"
+    git clone "$bundle" "$repo_dir"
 fi
 
 if ! /root/miniconda3/bin/conda env list | grep -q '^vllm-hust-dev[[:space:]]'; then

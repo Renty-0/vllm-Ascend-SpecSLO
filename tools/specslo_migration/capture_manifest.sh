@@ -17,13 +17,26 @@ if command -v npu-smi >/dev/null 2>&1; then
     npu-smi info > "$output_dir/npu-smi-info.txt" 2>&1 || true
 fi
 
-git -C "$repo" status --short > "$output_dir/repository-status.txt"
-git -C "$repo" remote -v > "$output_dir/repository-remotes.txt"
-git -C "$repo" log --oneline --decorate -50 > "$output_dir/repository-log.txt"
-git -C "$repo" rev-parse HEAD > "$output_dir/repository-head.txt"
-git -C "$repo" bundle create "$output_dir/vllm-ascend-specslo.bundle" --all
-git -C "$repo" diff --binary > "$output_dir/unstaged.patch"
-git -C "$repo" diff --cached --binary > "$output_dir/staged.patch"
+capture_repository() {
+    local name=$1
+    local path=$2
+    local destination="$output_dir/repositories/$name"
+    [[ -d "$path/.git" || -f "$path/.git" ]] || return 0
+    mkdir -p "$destination"
+    git -C "$path" status --short > "$destination/status.txt"
+    git -C "$path" remote -v > "$destination/remotes.txt"
+    git -C "$path" log --oneline --decorate -50 > "$destination/log.txt"
+    git -C "$path" rev-parse HEAD > "$destination/head.txt"
+    git -C "$path" bundle create "$destination/repository.bundle" --all
+    git -C "$path" diff --binary > "$destination/unstaged.patch"
+    git -C "$path" diff --cached --binary > "$destination/staged.patch"
+    git -C "$path" ls-files --others --exclude-standard \
+        > "$destination/untracked-files.txt"
+}
+
+capture_repository vllm-ascend-hust "$repo"
+capture_repository vllm-hust /root/data/vllm-hust
+capture_repository vllm-hust-dev-hub /root/data/vllm-hust-dev-hub
 
 /root/miniconda3/bin/conda env export -n vllm-hust-dev --no-builds \
     > "$output_dir/vllm-hust-dev.environment.yml"
@@ -31,6 +44,21 @@ git -C "$repo" diff --cached --binary > "$output_dir/staged.patch"
     > "$output_dir/vllm-hust-dev.conda-explicit.txt"
 "$python_bin" -m pip freeze --all > "$output_dir/vllm-hust-dev.pip-freeze.txt"
 "$python_bin" -VV > "$output_dir/python-version.txt" 2>&1
+"$python_bin" -m pip show torch torch-npu vllm vllm-ascend \
+    > "$output_dir/runtime-packages.txt" 2>&1 || true
+
+for version_file in \
+    /usr/local/Ascend/ascend-toolkit/latest/version.cfg \
+    /usr/local/Ascend/ascend-toolkit/latest/x86_64-linux/ascend_toolkit_install.info \
+    /usr/local/Ascend/ascend-toolkit/latest/aarch64-linux/ascend_toolkit_install.info \
+    /usr/local/Ascend/driver/version.info \
+    /usr/local/Ascend/nnal/atb/latest/atb/version.info; do
+    if [[ -f "$version_file" ]]; then
+        safe_name=${version_file#/}
+        safe_name=${safe_name//\//-}
+        cp "$version_file" "$output_dir/$safe_name"
+    fi
+done
 
 # File-size manifests are intentionally cheap enough to refresh repeatedly.
 # Large model hashes are generated separately because reading 171+ GB on every

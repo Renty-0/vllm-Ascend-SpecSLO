@@ -11,6 +11,8 @@
 ### A. 不可替代，必须异机保存
 
 - `/root/data/vllm-ascend-hust`：SpecSLO/PEARL 源码、MC2 内核、测试和技术文档；
+- `/root/data/vllm-hust` 与 `/root/data/vllm-hust-dev-hub`：仍含未提交改动，manifest 会额外
+  保存 bundle、binary patch、状态和未跟踪文件清单；
 - `/root/data/nano-pearl-benchmark-results`：原始吞吐、Goodput、profiling 和图回退证据；
 - `/root/data/specslo-workloads`：论文 workload 与到达轨迹；
 - `/root/data/specslo-mc2-*`、`/root/data/tp3-mc2-debug-*`：自定义算子 vendor、输入捕获和资格档案；
@@ -63,5 +65,6 @@ bash tools/specslo_migration/verify_manifest.sh /path/on/external/storage/manife
 bash tools/specslo_migration/restore_environment.sh /path/to/manifest
 ```
 
-`capture_manifest.sh` 不复制模型权重，只生成文件规模清单；大文件必须通过可断点续传工具
+`capture_manifest.sh` 会为三个 dirty repo 保存 Git bundle、binary patch 和状态，但不复制
+未跟踪大文件或模型权重；大文件必须通过可断点续传工具
 （推荐 `rsync --partial --append-verify` 或对象存储 multipart upload）单独传出服务器。
