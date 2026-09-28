@@ -1,0 +1,55 @@
+diff --git a/csrc/mc2/matmul_allreduce_add_rmsnorm/op_kernel/matmul_allreduce_add_rmsnorm_aiv_kernel.h b/csrc/mc2/matmul_allreduce_add_rmsnorm/op_kernel/matmul_allreduce_add_rmsnorm_aiv_kernel.h
+--- a/csrc/mc2/matmul_allreduce_add_rmsnorm/op_kernel/matmul_allreduce_add_rmsnorm_aiv_kernel.h
++++ b/csrc/mc2/matmul_allreduce_add_rmsnorm/op_kernel/matmul_allreduce_add_rmsnorm_aiv_kernel.h
+@@ -24,3 +24,10 @@
+ using namespace AscendC;
+
++// Experimental only.  Keep disabled in the production source until the
++// eager/ACLGraph liveness and bit-exact gates documented in the TP3 sync
++// audit pass on an uncontended three-card topology.
++#ifndef VLLM_ASCEND_EXPERIMENTAL_TP3_ELIDE_SELF_IPC
++#define VLLM_ASCEND_EXPERIMENTAL_TP3_ELIDE_SELF_IPC 1
++#endif
++
+ // Keep the correctness-first rank-3 path comfortably below the 910B2 UB
+@@ -345,2 +352,17 @@
+ private:
++    __aicore__ inline bool Tp3DirectIpcPeerRequired(
++        int32_t peer_rank, bool direct_protocol) const
++    {
++#if VLLM_ASCEND_EXPERIMENTAL_TP3_ELIDE_SELF_IPC
++        // AIC WaitEvent + local SyncAll already orders this rank's own
++        // projection payload.  The pre-completion PipeBarrier + local SyncAll
++        // similarly proves that this rank has finished reading its own slot.
++        // Keep every remote source/destination edge unchanged.
++        if (direct_protocol) {
++            return peer_rank != rank;
++        }
++#endif
++        return true;
++    }
++
+     __aicore__ void SetBuffFlag(__ubuf__ int32_t *ub_ctrl_flag, __gm__ int32_t *buff, int32_t flag)
+@@ -463,8 +485,9 @@
+     __aicore__ void Tp3PublishAndWait(
+         int32_t phase, int32_t epoch, bool concurrent_publish_poll = false)
+     {
+         // One vector sub-core per destination publishes this source rank's
+         // completion.  Each slot has exactly one writer, so no atomic add is
+         // needed and the epoch cannot be satisfied by a stale partial count.
+-        if (aiv_idx == 1 && core_idx < rank_size) {
++        if (aiv_idx == 1 && core_idx < rank_size &&
++            Tp3DirectIpcPeerRequired(core_idx, concurrent_publish_poll)) {
+             // Keep readiness in the same registered symmetric data window as
+@@ -483,9 +506,10 @@
+         // In direct TP3, publishers flush their GM flag in SetBuffFlag and
+         // pollers may safely start immediately; an early poll simply spins
+         // until its source publishes.  Generic phases keep the old barrier.
+         if (!concurrent_publish_poll) {
+             AscendC::SyncAll<true>();
+         }
+
+-        if (aiv_idx == 0 && core_idx < rank_size) {
++        if (aiv_idx == 0 && core_idx < rank_size &&
++            Tp3DirectIpcPeerRequired(core_idx, concurrent_publish_poll)) {
+             __gm__ int32_t *local_state = reinterpret_cast<__gm__ int32_t *>(

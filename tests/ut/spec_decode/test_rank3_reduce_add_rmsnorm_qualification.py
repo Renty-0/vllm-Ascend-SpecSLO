@@ -4,15 +4,23 @@
 from __future__ import annotations
 
 import ast
+import json
 import re
+import subprocess
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from examples import measure_specslo_rank3_reduce_add_rmsnorm as measurement
+from examples import qualify_specslo_mc2_multishape as persistent
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 MEASUREMENT = REPO_ROOT / "examples/measure_specslo_rank3_reduce_add_rmsnorm.py"
+PERSISTENT_DRIVER = REPO_ROOT / "examples/qualify_specslo_mc2_multishape.py"
+MULTISHAPE_LAUNCHER = (
+    REPO_ROOT / "tools/specslo_experiments/qualify_mc2_multishape.sh"
+)
 EXTENSION_RUNNER = REPO_ROOT / "examples/run_with_vllm_ascend_extension.py"
 TORCH_BINDING = REPO_ROOT / "csrc/torch_binding.cpp"
 TORCH_BINDING_META = REPO_ROOT / "csrc/torch_binding_meta.cpp"
@@ -128,22 +136,26 @@ def test_measurement_rejects_non_positive_operation_counts(operations: int):
 def test_measurement_runs_the_requested_operation_count_on_both_paths():
     source = MEASUREMENT.read_text(encoding="utf-8")
     tree = ast.parse(source)
-    main = next(
-        node
-        for node in tree.body
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-        and node.name == "main"
-    )
-    nested = {
-        node.name: node
-        for node in main.body
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-    }
+    for runner_name in ("_load_graph_resources", "run_measurement_job"):
+        runner = next(
+            node
+            for node in tree.body
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name == runner_name
+        )
+        nested = {
+            node.name: node
+            for node in ast.walk(runner)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node is not runner
+        }
 
-    for name in ("baseline", "fused"):
-        loops = [node for node in ast.walk(nested[name]) if isinstance(node, ast.For)]
-        assert len(loops) == 1
-        assert ast.unparse(loops[0].iter) == "range(args.operations_per_graph)"
+        for name in ("baseline", "fused"):
+            loops = [
+                node for node in ast.walk(nested[name]) if isinstance(node, ast.For)
+            ]
+            assert len(loops) == 1
+            assert ast.unparse(loops[0].iter) == "range(args.operations_per_graph)"
 
 
 def test_result_schema_records_mode_operation_count_and_per_operation_latency():
@@ -192,6 +204,577 @@ def test_measurement_restores_original_input_before_hashing_graph_outputs():
     hashing = source.index('"fused_norm_sha256": _sha256(fused_output[0])', replay)
 
     assert restore < replay < hashing
+
+
+def test_rank_zero_finalization_converts_io_errors_into_consensus_payloads():
+    def fail_diagnostic_write():
+        raise OSError("diagnostic disk is full")
+
+    outcome = measurement._capture_rank_zero_finalization(fail_diagnostic_write)
+
+    assert outcome.admission_failure is None
+    assert outcome.fatal_failure == (
+        "rank-0 MC2 qualification finalization failed: "
+        "OSError: diagnostic disk is full"
+    )
+    rejection = measurement._capture_rank_zero_finalization(
+        lambda: "speed gate failed"
+    )
+    assert rejection.admission_failure == "speed gate failed"
+    assert rejection.fatal_failure is None
+
+
+def test_rank_zero_failure_is_broadcast_and_shared_before_teardown(monkeypatch):
+    broadcasts = []
+
+    def broadcast_object_list(payload, *, src):
+        broadcasts.append((list(payload), src))
+        payload[0] = measurement.RankZeroFinalizationOutcome(
+            fatal_failure="rank-0 finalization failed"
+        )
+
+    monkeypatch.setattr(
+        measurement.dist,
+        "broadcast_object_list",
+        broadcast_object_list,
+    )
+
+    outcome = measurement._broadcast_rank_zero_finalization(None)
+    assert outcome.fatal_failure == "rank-0 finalization failed"
+    assert broadcasts == [([None], 0)]
+
+
+def test_collective_failure_preserves_shared_error_when_teardown_fails(
+    monkeypatch,
+):
+    teardown_calls = []
+
+    def destroy_process_group():
+        teardown_calls.append(True)
+        raise OSError("teardown failed")
+
+    monkeypatch.setattr(
+        measurement.dist,
+        "destroy_process_group",
+        destroy_process_group,
+    )
+
+    with pytest.raises(RuntimeError, match="shared qualification failure"):
+        measurement._destroy_and_raise_collective_failure("shared qualification failure")
+    assert teardown_calls == [True]
+
+
+def test_comm_resolution_materializes_and_validates_every_local_handle(monkeypatch):
+    events = []
+
+    class FakeProbe:
+        def cpu(self):
+            return self
+
+        def item(self):
+            return 6
+
+    monkeypatch.setattr(measurement.dist, "barrier", lambda: events.append("barrier"))
+    monkeypatch.setattr(
+        measurement.torch,
+        "tensor",
+        lambda *args, **kwargs: FakeProbe(),
+    )
+    monkeypatch.setattr(
+        measurement.dist,
+        "all_reduce",
+        lambda probe: events.append("all_reduce"),
+    )
+    monkeypatch.setattr(measurement.dist, "get_world_size", lambda: 3)
+    monkeypatch.setattr(
+        measurement,
+        "resolve_hccl_comm_name",
+        lambda *args, **kwargs: "process-local-comm-rank-1",
+    )
+
+    def all_gather_object(outputs, value):
+        events.append(("gather", value))
+        outputs[:] = [(0, True), (1, True), (2, True)]
+
+    monkeypatch.setattr(measurement.dist, "all_gather_object", all_gather_object)
+
+    assert measurement._materialize_and_resolve_comm(1) == "process-local-comm-rank-1"
+    assert events == [
+        "barrier",
+        "all_reduce",
+        ("gather", (1, True)),
+    ]
+
+
+@pytest.mark.parametrize(
+    "statuses",
+    (
+        [(0, True), (1, False), (2, True)],
+        [(0, True), (0, True), (2, True)],
+    ),
+)
+def test_comm_resolution_rejects_missing_or_inconsistent_statuses(
+    monkeypatch,
+    statuses,
+):
+    class FakeProbe:
+        def cpu(self):
+            return self
+
+        def item(self):
+            return 6
+
+    monkeypatch.setattr(measurement.dist, "barrier", lambda: None)
+    monkeypatch.setattr(measurement.torch, "tensor", lambda *args, **kwargs: FakeProbe())
+    monkeypatch.setattr(measurement.dist, "all_reduce", lambda probe: None)
+    monkeypatch.setattr(measurement.dist, "get_world_size", lambda: 3)
+    monkeypatch.setattr(
+        measurement,
+        "resolve_hccl_comm_name",
+        lambda *args, **kwargs: "local-comm",
+    )
+    monkeypatch.setattr(
+        measurement.dist,
+        "all_gather_object",
+        lambda outputs, value: outputs.__setitem__(slice(None), statuses),
+    )
+
+    with pytest.raises(RuntimeError, match="local TP3 HCCL communicator on every rank"):
+        measurement._materialize_and_resolve_comm(0)
+
+
+def test_persistent_driver_records_gate_failure_and_reuses_runtime(
+    monkeypatch,
+    tmp_path,
+):
+    runtime = SimpleNamespace(rank=0)
+    args = SimpleNamespace(
+        attention_root=tmp_path / "attention-inputs",
+        down_root=tmp_path / "down-inputs",
+        run_dir=tmp_path,
+        warmup_replays=40,
+        replays_per_sample=50,
+        samples=11,
+        changed_input_replays=1024,
+        changed_input_delta=0.015625,
+        latency_percentile=95.0,
+        minimum_speedup=1.02,
+    )
+    calls = []
+    monkeypatch.setattr(
+        persistent.measurement,
+        "run_measurement_job",
+        lambda job_args, received_runtime: (calls.append((job_args, received_runtime)) or "bit-exact gate failed"),
+    )
+    monkeypatch.setattr(
+        persistent.measurement,
+        "release_measurement_job_resources",
+        lambda: calls.append("release"),
+    )
+    monkeypatch.setattr(persistent, "_rank_zero_action", lambda action: action())
+    monkeypatch.setattr(persistent.dist, "barrier", lambda: calls.append("barrier"))
+    status_file = tmp_path / "qualification-status.tsv"
+    status_file.write_text("kind\tlayer\tm\tstatus\n", encoding="utf-8")
+
+    assert not persistent._run_job(
+        args,
+        runtime,
+        status_file,
+        kind="attention",
+        layer=31,
+        row=64,
+    )
+    job_args, received_runtime = calls[0]
+    assert received_runtime is runtime
+    assert job_args.input_dir == args.attention_root / "attention/layer-31/m64"
+    assert job_args.chained_flush is True
+    assert calls[1:] == ["release", "barrier"]
+    assert (tmp_path / "current-job.tsv").read_text() == "attention\t31\t64\n"
+    assert "attention\t31\t64\tfail:bit-exact gate failed" in status_file.read_text()
+
+
+@pytest.mark.parametrize("rows", ("064", "64,", ",64", "64,,68", "6 4"))
+def test_persistent_driver_rejects_noncanonical_rows(rows):
+    with pytest.raises(ValueError, match="comma-separated list"):
+        persistent._parse_rows(rows)
+
+
+def test_persistent_driver_qualifies_each_projection_independently(
+    monkeypatch,
+    tmp_path,
+):
+    calls = []
+    outcomes = {
+        ("attention", 31, 40): True,
+        ("down", 31, 40): False,
+        ("attention", 31, 44): False,
+        ("down", 31, 44): True,
+        ("attention", 0, 40): True,
+        ("attention", 63, 40): True,
+        # The first down layer rejects, but layer 63 must still run so the
+        # projection-specific ledger remains complete.
+        ("down", 0, 44): False,
+        ("down", 63, 44): True,
+    }
+
+    def run_job(args, runtime, status_file, *, kind, layer, row):
+        calls.append((kind, layer, row))
+        return outcomes[(kind, layer, row)]
+
+    monkeypatch.setattr(persistent, "_run_job", run_job)
+    args = SimpleNamespace(run_dir=tmp_path)
+    runtime = SimpleNamespace(rank=0)
+    status_file = tmp_path / "qualification-status.tsv"
+
+    screened = persistent._screen_projection_rows(
+        args,
+        runtime,
+        status_file,
+        (40, 44),
+    )
+    qualified = persistent._qualify_projection_rows(
+        args,
+        runtime,
+        status_file,
+        screened,
+        (40, 44),
+    )
+
+    assert screened == {"attention": [40], "down": [44]}
+    assert qualified == {"attention": [40], "down": []}
+    assert calls == [
+        ("attention", 31, 40),
+        ("down", 31, 40),
+        ("attention", 31, 44),
+        ("down", 31, 44),
+        ("attention", 0, 40),
+        ("attention", 63, 40),
+        ("down", 0, 44),
+        ("down", 63, 44),
+    ]
+
+
+def test_projection_manifest_and_legacy_text_use_distinct_semantics(tmp_path):
+    projection_rows = {"attention": [40, 44], "down": [44, 48]}
+    manifest = tmp_path / "qualified-projection-rows.json"
+    legacy = tmp_path / "qualified-rows.txt"
+
+    persistent._write_projection_rows(
+        manifest,
+        stage="per-layer-qualification",
+        qualification_layers=(0, 31, 63),
+        projection_rows=projection_rows,
+    )
+    persistent._write_rows(
+        legacy,
+        persistent._projection_row_intersection(projection_rows),
+    )
+
+    document = json.loads(manifest.read_text(encoding="utf-8"))
+    assert document["execution_mode"] == "graph"
+    assert document["operations_per_graph"] == 1
+    assert document["qualification_layers"] == [0, 31, 63]
+    assert document["projection_rows"] == projection_rows
+    assert document["intersection_rows"] == [44]
+    assert legacy.read_text(encoding="utf-8") == "44\n"
+
+
+def test_persistent_rank_zero_action_discards_success_return_value(monkeypatch):
+    monkeypatch.setattr(persistent.dist, "get_rank", lambda: 0)
+    monkeypatch.setattr(
+        persistent.dist,
+        "broadcast_object_list",
+        lambda payload, *, src: None,
+    )
+
+    persistent._rank_zero_action(lambda: 42)
+
+
+def test_persistent_driver_skips_npu_cleanup_after_runtime_failure(
+    monkeypatch,
+    tmp_path,
+):
+    runtime = SimpleNamespace(rank=0)
+    args = SimpleNamespace(
+        attention_root=tmp_path / "attention-inputs",
+        down_root=tmp_path / "down-inputs",
+        run_dir=tmp_path,
+        warmup_replays=40,
+        replays_per_sample=50,
+        samples=11,
+        changed_input_replays=1024,
+        changed_input_delta=0.015625,
+        latency_percentile=95.0,
+        minimum_speedup=1.02,
+    )
+    monkeypatch.setattr(
+        persistent,
+        "_record_current_job",
+        lambda *args, **kwargs: None,
+    )
+    monkeypatch.setattr(
+        persistent.measurement,
+        "run_measurement_job",
+        lambda *args, **kwargs: (_ for _ in ()).throw(
+            RuntimeError("HCCL device failure")
+        ),
+    )
+    monkeypatch.setattr(
+        persistent.measurement,
+        "release_measurement_job_resources",
+        lambda: pytest.fail("must not touch NPU after a runtime failure"),
+    )
+
+    with pytest.raises(RuntimeError, match="HCCL device failure"):
+        persistent._run_job(
+            args,
+            runtime,
+            tmp_path / "qualification-status.tsv",
+            kind="attention",
+            layer=31,
+            row=64,
+        )
+    fatal = (tmp_path / "fatal-rank-0.tsv").read_text(encoding="utf-8")
+    assert "attention\t31\t64\tdevice-fail:RuntimeError:HCCL device failure" in fatal
+
+
+def test_resident_keys_isolate_layers_and_share_parameters_within_layer():
+    def payload(rows):
+        return {
+            "activation": SimpleNamespace(shape=(rows, 3072), dtype="bfloat16"),
+            "weight": SimpleNamespace(shape=(5120, 3072), dtype="bfloat16"),
+            "residual": SimpleNamespace(shape=(rows, 5120), dtype="bfloat16"),
+            "gamma": SimpleNamespace(shape=(5120,), dtype="bfloat16"),
+        }
+
+    layer_31 = _args()
+    layer_31.m = 52
+    layer_31.input_dir = Path("/captures/attention/layer-31/m52")
+    layer_0 = _args()
+    layer_0.m = 52
+    layer_0.input_dir = Path("/captures/attention/layer-0/m52")
+    next_shape = _args()
+    next_shape.m = 56
+    next_shape.input_dir = Path("/captures/attention/layer-31/m56")
+
+    assert measurement._graph_resource_key(layer_31, payload(52)) != (
+        measurement._graph_resource_key(layer_0, payload(52))
+    )
+    assert measurement._graph_resource_key(layer_31, payload(52)) != (
+        measurement._graph_resource_key(next_shape, payload(56))
+    )
+    assert measurement._parameter_resource_key(layer_31, payload(52)) == (
+        measurement._parameter_resource_key(next_shape, payload(56))
+    )
+    assert measurement._parameter_resource_key(layer_31, payload(52)) != (
+        measurement._parameter_resource_key(layer_0, payload(52))
+    )
+
+
+def test_resident_graphs_survive_job_cleanup_and_hccl_finalization(
+    monkeypatch,
+):
+    pool = measurement.MeasurementResourcePool()
+    resident = object()
+    pool.graphs[(52, 3072)] = resident
+    events = []
+    monkeypatch.setattr(measurement.gc, "collect", lambda: events.append("gc"))
+    monkeypatch.setattr(
+        measurement.torch.npu,
+        "empty_cache",
+        lambda: pytest.fail("resident campaign must not empty the NPU cache"),
+    )
+    monkeypatch.setattr(measurement.dist, "barrier", lambda: events.append("barrier"))
+    monkeypatch.setattr(
+        measurement.torch.npu,
+        "synchronize",
+        lambda: events.append("synchronize"),
+    )
+    monkeypatch.setattr(
+        measurement.dist,
+        "destroy_process_group",
+        lambda: events.append("destroy_process_group"),
+    )
+    runtime = SimpleNamespace(resources=pool)
+
+    measurement.release_measurement_job_resources()
+    assert pool.graphs[(52, 3072)] is resident
+    measurement.finalize_measurement_runtime(runtime)
+
+    assert pool.graphs[(52, 3072)] is resident
+    assert events == ["gc", "barrier", "synchronize", "destroy_process_group"]
+
+
+def test_graph_resource_pool_captures_each_shape_once_and_shares_weights(
+    monkeypatch,
+):
+    class FakeTensor:
+        def __init__(self, shape, name):
+            self.shape = shape
+            self.dtype = "bfloat16"
+            self.name = name
+            self.copies = []
+
+        def to(self, *, device):
+            assert device == "npu"
+            return FakeTensor(self.shape, f"device-{self.name}")
+
+        def copy_(self, source):
+            self.copies.append(source.name)
+            return self
+
+    class FakeGraph:
+        def replay(self):
+            return None
+
+    def payload(rows, suffix):
+        return {
+            "activation": FakeTensor((rows, 3072), f"activation-{suffix}"),
+            "weight": FakeTensor((5120, 3072), f"weight-{suffix}"),
+            "residual": FakeTensor((rows, 5120), f"residual-{suffix}"),
+            "gamma": FakeTensor((5120,), f"gamma-{suffix}"),
+        }
+
+    captures = []
+
+    def capture(operation):
+        captures.append(operation)
+        return FakeGraph(), (
+            FakeTensor((52, 5120), "output"),
+            FakeTensor((52, 5120), "added"),
+        )
+
+    monkeypatch.setattr(measurement, "_capture", capture)
+    monkeypatch.setattr(measurement.dist, "barrier", lambda: None)
+    monkeypatch.setattr(measurement.torch.npu, "synchronize", lambda: None)
+    monkeypatch.setattr(
+        measurement.torch,
+        "zeros",
+        lambda *args, **kwargs: FakeTensor(args[0], "chain-zero"),
+    )
+    runtime = SimpleNamespace(
+        resources=measurement.MeasurementResourcePool(),
+        operator=lambda *args: None,
+        comm_name="local-comm",
+        rank=0,
+    )
+    args = _args("--chained-flush")
+    args.m = 52
+    args.input_dir = Path("/captures/attention/layer-31/m52")
+
+    first = measurement._load_graph_resources(args, runtime, payload(52, "layer31"))
+    reused = measurement._load_graph_resources(
+        args,
+        runtime,
+        payload(52, "layer31-repeat"),
+    )
+    args.m = 56
+    args.input_dir = Path("/captures/attention/layer-31/m56")
+    second_shape = measurement._load_graph_resources(
+        args,
+        runtime,
+        payload(56, "layer31-m56"),
+    )
+    args.m = 52
+    args.input_dir = Path("/captures/attention/layer-0/m52")
+    second_layer = measurement._load_graph_resources(
+        args,
+        runtime,
+        payload(52, "layer0"),
+    )
+
+    assert reused is first
+    assert second_shape is not first
+    assert second_layer is not first
+    assert len(captures) == 6
+    assert len(runtime.resources.graphs) == 3
+    assert len(runtime.resources.parameters) == 2
+    assert second_shape.parameters is first.parameters
+    assert second_layer.parameters is not first.parameters
+    assert first.x.copies == ["activation-layer31-repeat"]
+    assert first.parameters.weight.copies == [
+        "weight-layer31-repeat",
+        "weight-layer31-m56",
+    ]
+
+
+def test_multishape_launcher_uses_one_persistent_torchrun():
+    launcher = MULTISHAPE_LAUNCHER.read_text(encoding="utf-8")
+    driver = PERSISTENT_DRIVER.read_text(encoding="utf-8")
+
+    assert launcher.count("-m torch.distributed.run") == 1
+    assert "qualify_specslo_mc2_multishape.py" in launcher
+    assert "def run_measurement" not in launcher
+    assert driver.count("initialize_measurement_runtime(") == 1
+    assert "for row in rows:" in driver
+    assert "run_measurement_job(args, runtime)" in driver
+    run_job = driver.index("def _run_job(")
+    cleanup = driver.index("release_measurement_job_resources()", run_job)
+    healthy_barrier = driver.index("dist.barrier()", cleanup)
+    committed_status = driver.index("_write_status(status_file", healthy_barrier)
+    assert cleanup < healthy_barrier < committed_status
+    assert launcher.count("campaign\\t-\\t-\\t%s:torchrun-exit-%s") == 1
+    assert "device_list_pattern=" in launcher
+    assert "row_list_pattern=" in launcher
+    assert "screened-projection-rows.json" in launcher
+    assert "qualified-projection-rows.json" in launcher
+    assert "production-projection-rows.json" in launcher
+    assert 'for kind in expected_k:' in launcher
+    assert 'for row in candidate_projection_rows[kind]:' in launcher
+
+
+@pytest.mark.parametrize("run_tag", (".", ".."))
+def test_multishape_launcher_rejects_path_alias_run_tags(run_tag):
+    result = subprocess.run(
+        ["bash", str(MULTISHAPE_LAUNCHER), "/missing-a", "/missing-b", run_tag],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+
+    assert result.returncode == 2
+    assert f"invalid run tag: {run_tag}" in result.stderr
+
+
+def test_all_rank_zero_finalization_work_is_guarded_before_collective_exit():
+    source = MEASUREMENT.read_text(encoding="utf-8")
+
+    finalizer = source.index("def _finalize_rank_zero()")
+    gate = source.index(
+        '"production MC2 profile requires bit-exact',
+        finalizer,
+    )
+    diagnostic_write = source.index("args.output.write_text", finalizer)
+    device_query = source.index("torch.npu.get_device_name", finalizer)
+    production_write = source.index(
+        "args.production_profile_output.write_text",
+        finalizer,
+    )
+    reporting = source.index("print(json.dumps", finalizer)
+    guarded_call = source.index(
+        "finalization_outcome = _capture_rank_zero_finalization(_finalize_rank_zero)",
+        finalizer,
+    )
+    broadcast = source.index(
+        "finalization_outcome = _broadcast_rank_zero_finalization(",
+        guarded_call,
+    )
+    final_barrier = source.index("dist.barrier()", broadcast)
+    return_failure = source.index(
+        "return finalization_outcome.admission_failure",
+        final_barrier,
+    )
+    destroy = source.index(
+        "_destroy_and_raise_collective_failure(profile_failure)",
+        return_failure,
+    )
+
+    assert finalizer < gate < guarded_call
+    assert finalizer < diagnostic_write < guarded_call
+    assert finalizer < device_query < guarded_call
+    assert finalizer < production_write < guarded_call
+    assert finalizer < reporting < guarded_call
+    assert guarded_call < broadcast < final_barrier < return_failure < destroy
 
 
 def test_torch_schema_meta_and_adapter_preserve_double_epsilon_abi():

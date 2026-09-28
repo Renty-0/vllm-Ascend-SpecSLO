@@ -9,6 +9,7 @@ from torch import nn
 
 import vllm_ascend.spec_decode.pearl.native_model as native_model_module
 from vllm_ascend.spec_decode.pearl.native_model import (
+    NativeQwen2DecoderLayer,
     NativeQwen2ForCausalLM,
     NativeQwen2MLP,
     NativeTPContext,
@@ -18,6 +19,15 @@ from vllm_ascend.spec_decode.pearl.native_model import (
 
 def _context(rank: int = 1) -> NativeTPContext:
     return NativeTPContext(group=None, rank=rank, size=3, leader_rank=0)
+
+
+@pytest.fixture(autouse=True)
+def _successful_capture_consensus(monkeypatch):
+    """Model a successful TP MAX vote for CPU-only capture unit tests."""
+
+    monkeypatch.setattr(
+        native_model_module.dist, "all_reduce", lambda *_args, **_kwargs: None
+    )
 
 
 def _configure(
@@ -122,6 +132,67 @@ def test_mc2_capture_writes_measurement_payload_once_atomically(monkeypatch, tmp
     assert len(replacements) == 1
 
 
+def test_mc2_capture_local_write_failure_is_voted_before_return(monkeypatch, tmp_path):
+    _configure(monkeypatch, str(tmp_path), "8")
+    capture = _MC2RealInputCapture.from_env(
+        SimpleNamespace(enforce_eager=True),
+        _context(),
+    )
+    assert capture is not None
+    activation = torch.zeros(8, 3)
+    weight = torch.zeros(5, 3)
+    residual = torch.zeros(8, 5)
+    gamma = torch.ones(5)
+    votes = []
+
+    def record_vote(failure, *, op, group):
+        votes.append((int(failure.item()), op, group))
+
+    monkeypatch.setattr(native_model_module.dist, "all_reduce", record_vote)
+    monkeypatch.setattr(
+        native_model_module.torch,
+        "save",
+        Mock(side_effect=OSError("synthetic disk failure")),
+    )
+
+    with pytest.raises(
+        RuntimeError,
+        match=r"local rank 1 failed with OSError: synthetic disk failure",
+    ):
+        capture.maybe_capture(activation, weight, residual, gamma)
+
+    assert votes == [(1, native_model_module.dist.ReduceOp.MAX, None)]
+    assert not (tmp_path / "attention" / "layer-0" / "m8" / "rank-1.pt").exists()
+    assert (0, 8) not in capture._completed
+
+
+def test_mc2_capture_peer_failure_prevents_local_commit(monkeypatch, tmp_path):
+    _configure(monkeypatch, str(tmp_path), "8")
+    capture = _MC2RealInputCapture.from_env(
+        SimpleNamespace(enforce_eager=True),
+        _context(),
+    )
+    assert capture is not None
+    activation = torch.zeros(8, 3)
+    weight = torch.zeros(5, 3)
+    residual = torch.zeros(8, 5)
+    gamma = torch.ones(5)
+    votes = []
+
+    def inject_peer_failure(failure, *, op, group):
+        votes.append((int(failure.item()), op, group))
+        failure.fill_(1)
+
+    monkeypatch.setattr(native_model_module.dist, "all_reduce", inject_peer_failure)
+
+    with pytest.raises(RuntimeError, match="one or more peer ranks failed"):
+        capture.maybe_capture(activation, weight, residual, gamma)
+
+    assert votes == [(0, native_model_module.dist.ReduceOp.MAX, None)]
+    assert (tmp_path / "attention" / "layer-0" / "m8" / "rank-1.pt").is_file()
+    assert (0, 8) not in capture._completed
+
+
 def test_down_capture_is_not_consumed_by_attention_and_paths_include_layer(monkeypatch, tmp_path):
     _configure(monkeypatch, str(tmp_path), "8", kind="down")
     capture = _MC2RealInputCapture.from_env(SimpleNamespace(enforce_eager=True), _context())
@@ -224,6 +295,73 @@ def test_mlp_passes_post_swiglu_down_projection_inputs_to_capture():
     assert args.args[2] is residual
     assert args.args[3] is gamma
     assert args.kwargs == {"projection_kind": "down", "layer_index": 3}
+
+
+def test_attention_capture_uses_pre_projection_path_without_enabling_mc2():
+    class Attention(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.o_proj = nn.Linear(3, 3, bias=False)
+            self.o_proj.weight.data.copy_(torch.eye(3))
+            self.return_pre_projection = None
+
+        def forward(
+            self,
+            _positions,
+            hidden_states,
+            _attention_metadata,
+            *,
+            return_pre_projection=False,
+        ):
+            self.return_pre_projection = return_pre_projection
+            if not return_pre_projection:
+                raise AssertionError(
+                    "capture-only path skipped the pre-projection activation"
+                )
+            return hidden_states + 2
+
+    class PostNorm(nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.weight = nn.Parameter(torch.ones(3))
+
+        def forward(self, hidden_states, residual):
+            return hidden_states, residual
+
+    class MLP(nn.Module):
+        def forward(self, hidden_states, **_kwargs):
+            return hidden_states
+
+    layer = NativeQwen2DecoderLayer.__new__(NativeQwen2DecoderLayer)
+    nn.Module.__init__(layer)
+    layer.self_attn = Attention()
+    layer.input_layernorm = PostNorm()
+    layer.post_attention_layernorm = PostNorm()
+    layer.mlp = MLP()
+    layer.enable_mc2 = False
+    layer.enable_down_mc2 = False
+    layer.mc2_input_capture = Mock(projection_kind="attention")
+    layer.layer_index = 31
+
+    hidden = torch.arange(6, dtype=torch.float32).reshape(2, 3)
+    residual = torch.zeros_like(hidden)
+    output, output_residual = layer(
+        torch.arange(2),
+        hidden,
+        residual,
+        input_is_normalized=True,
+    )
+
+    local_attended = hidden + 2
+    assert layer.self_attn.return_pre_projection is True
+    assert torch.equal(output, local_attended)
+    assert output_residual is residual
+    args = layer.mc2_input_capture.maybe_capture.call_args
+    assert torch.equal(args.args[0], local_attended)
+    assert args.args[1] is layer.self_attn.o_proj.weight
+    assert args.args[2] is residual
+    assert args.args[3] is layer.post_attention_layernorm.weight
+    assert args.kwargs == {"projection_kind": "attention", "layer_index": 31}
 
 
 def test_model_routes_next_input_norm_and_final_norm_gamma_to_each_layer():

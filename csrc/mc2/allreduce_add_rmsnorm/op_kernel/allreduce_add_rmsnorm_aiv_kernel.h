@@ -46,6 +46,7 @@ constexpr int32_t TP3_AIV_ONLY_RANKS = 3;
 constexpr int32_t TP3_AIV_ONLY_MAX_CORES = 64;
 constexpr int32_t TP3_AIV_ONLY_SLOT_BYTES = 32;
 constexpr int32_t TP3_CHAIN_STATE_WORDS = 4;
+constexpr uint32_t TP3_BASELINE_SINGLE_N_ROUNDTRIP = 1U << 0;
 constexpr uint64_t TP3_CHAIN_STATE_SALT = 0xC4A17E5A5A17C4E1ULL;
 enum Tp3AivOnlyPhase : int32_t {
     TP3_AIV_REQUEST = 0,
@@ -729,6 +730,19 @@ private:
         // reference.  The replicated TP3 path is enabled only after its
         // independent eager/graph qualification succeeds.
         bool dedicated_tp3_reduce = rank_ordered_direct_output;
+        bool baseline_single_n_roundtrip = false;
+        if constexpr (std::is_same<MmadDtype, bfloat16_t>::value) {
+            // The host sets bit 0 only when M is no larger than the physical
+            // AIV count, which is precisely the baseline AddRmsNorm SingleN
+            // regime.  Keep this round trip fail-closed to the dedicated TP3
+            // BF16/N=5120 path; generic and larger-M paths retain their
+            // existing arithmetic.
+            baseline_single_n_roundtrip =
+                dedicated_tp3_reduce &&
+                rank_size == TP3_AIV_ONLY_RANKS &&
+                n == 5120 &&
+                (tiling_key & TP3_BASELINE_SINGLE_N_ROUNDTRIP) != 0;
+        }
 
         LocalTensor<MmadDtype> x_local;
         LocalTensor<MmadDtype> y_local;
@@ -899,12 +913,13 @@ private:
 
             LocalTensor<MmadDtype> gamma_local = gammaBuf.Get<MmadDtype>();
             LocalTensor<MmadDtype> out_local = outQueue.AllocTensor<MmadDtype>();
-            // The dedicated path already owns the native pre-round residual
-            // sum in reduce_fp32.  Normalize it in place and reuse x_fp32 as
-            // the 64-lane reduction workspace.  Besides avoiding a full-row
-            // copy, this makes it impossible for the normalization input to
-            // silently acquire the independently materialized BF16 add_out
-            // value through a queue/buffer reuse.
+            // The dedicated path initially owns the native pre-round residual
+            // sum in reduce_fp32.  Normalize it in place (after the guarded
+            // SingleN round trip below) and reuse x_fp32 as the 64-lane
+            // reduction workspace.  Besides avoiding a full-row copy, this
+            // makes it impossible for the normalization input to silently
+            // acquire the independently materialized BF16 add_out value
+            // through a queue/buffer reuse.
             LocalTensor<float> norm_fp32 =
                 dedicated_tp3_reduce ? reduced_fp32 : x_fp32;
             LocalTensor<float> reduce_buf_local = dedicated_tp3_reduce ?
@@ -913,6 +928,17 @@ private:
             if (!dedicated_tp3_reduce) {
                 // Keep the original generic-path BF16 materialization.
                 Cast(out_local, reduced_fp32, RoundMode::CAST_RINT, n);
+                PipeBarrier<PIPE_V>();
+
+                Cast(norm_fp32, out_local, RoundMode::CAST_NONE, n);
+                PipeBarrier<PIPE_V>();
+            } else if (baseline_single_n_roundtrip) {
+                // CANN's BF16 SingleN AddRmsNorm writes the residual sum as
+                // BF16 and reloads it to FP32 before RMS.  Reproduce that
+                // observable rounding boundary for small M, without imposing
+                // it on qualified larger-M kernels that use a different
+                // baseline tiling path.
+                Cast(out_local, norm_fp32, RoundMode::CAST_RINT, n);
                 PipeBarrier<PIPE_V>();
 
                 Cast(norm_fp32, out_local, RoundMode::CAST_NONE, n);

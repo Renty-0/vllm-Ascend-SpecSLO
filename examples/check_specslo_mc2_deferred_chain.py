@@ -30,7 +30,10 @@ import torch
 import torch.distributed as dist
 import torch_npu
 
-from vllm_ascend.spec_decode.pearl.mc2 import resolve_hccl_comm_name
+from vllm_ascend.spec_decode.pearl.mc2 import (
+    mc2_source_sha256,
+    resolve_hccl_comm_name,
+)
 
 PairOutput = tuple[
     torch.Tensor,
@@ -46,7 +49,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--attention-input-dir", type=Path, required=True)
     parser.add_argument("--down-input-dir", type=Path, required=True)
     parser.add_argument("--execution-mode", choices=("eager", "graph"), required=True)
-    parser.add_argument("--layer-count", type=int, default=1)
+    parser.add_argument("--layer-count", type=int, default=64)
     parser.add_argument("--warmup-replays", type=int, default=20)
     parser.add_argument("--replays-per-sample", type=int, default=20)
     parser.add_argument("--samples", type=int, default=7)
@@ -206,6 +209,11 @@ def main() -> None:
     down = _load_payload(args.down_input_dir, rank)
     if attention["residual"].shape != down["residual"].shape:
         raise ValueError("attention and down routes must have the same [M, N] output shape")
+    if attention["residual"].ndim < 2:
+        raise ValueError("deferred chain residual payloads must have at least two dimensions")
+    row_count = math.prod(attention["residual"].shape[:-1])
+    if row_count <= 0:
+        raise ValueError("deferred chain residual payloads must contain at least one row")
     chain_zero = torch.zeros((64, 4), dtype=torch.int64, device="npu")
 
     def baseline() -> PairOutput:
@@ -341,6 +349,8 @@ def main() -> None:
         "fully_flushed": {name: 0.0 for name in initial_comparisons["fully_flushed"]["max_abs"]},
         "deferred_chain": {name: 0.0 for name in initial_comparisons["deferred_chain"]["max_abs"]},
     }
+    original_expected = tuple(value.clone() for value in outputs["baseline"])
+    changed_input_output_delta = 0.0
     for replay_index in range(args.changed_input_replays):
         units = (1, -1, 2, -2, 3)[replay_index % 5]
         attention["activation"].copy_(original_attention)
@@ -350,6 +360,19 @@ def main() -> None:
         expected = runners["baseline"]()
         torch.npu.synchronize()
         expected_copy = tuple(value.clone() for value in expected)
+        # Prove that every graph observes the mutated capture buffers instead
+        # of three stale graphs merely agreeing with one another.
+        changed_input_output_delta = max(
+            changed_input_output_delta,
+            *(
+                _max_rank_value(
+                    float((actual.float() - original.float()).abs().max().cpu())
+                )
+                for actual, original in zip(
+                    expected_copy[:4], original_expected[:4]
+                )
+            ),
+        )
         for name in ("fully_flushed", "deferred_chain"):
             actual = runners[name]()
             torch.npu.synchronize()
@@ -389,6 +412,11 @@ def main() -> None:
             "chain_scope": "whole_model",
             "layer_count": args.layer_count,
             "operations_per_chain": 2 * args.layer_count,
+            # Production admission is deliberately exact-row and exact-source.
+            # A chain report for one M must never authorize every M in the
+            # surrounding multi-shape operator profile.
+            "row_count": row_count,
+            "source_sha256": mc2_source_sha256(),
             "tp_rank_device_mapping": list(device_mapping),
             "attention_input_source": str(args.attention_input_dir.resolve()),
             "down_input_source": str(args.down_input_dir.resolve()),
@@ -398,6 +426,7 @@ def main() -> None:
                 "changed_input_exact_all_ranks": changed_exact,
                 "changed_input_max_abs": changed_max,
                 "changed_input_replays": args.changed_input_replays,
+                "changed_input_output_delta": changed_input_output_delta,
                 "final_chain_state_zero_all_ranks": final_chain_state_zero_all_ranks,
                 "deferred_down_norm_sha256": _sha256(outputs["deferred_chain"][2]),
             },

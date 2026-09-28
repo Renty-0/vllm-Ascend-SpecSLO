@@ -17,6 +17,7 @@ from contextlib import suppress
 from dataclasses import dataclass, field, replace
 from multiprocessing.connection import Connection
 from multiprocessing.connection import wait as wait_for_connections
+from multiprocessing.reduction import ForkingPickler
 from typing import Any
 
 import torch
@@ -244,6 +245,10 @@ class PEARLConfig:
     mc2_profile: Mapping[str, Any] | str | None = None
     seed: int | None = None
     worker_timeout_seconds: float = 300.0
+    # Opt-in compact multiprocess reply envelope.  Worker graph diagnostics
+    # are transported once per rank instead of being copied into every
+    # request row.  The default preserves the historical public result shape.
+    compact_worker_result_metrics: bool = False
     draft_tp1_greedy_argmax: bool = False
     draft_mode: str = SERIAL_LINEAR_DRAFT_MODE
     draft_config: PEARLModelGroupConfig = field(init=False, repr=False)
@@ -645,6 +650,7 @@ class PEARLEngine:
         self.last_metrics: list[dict[str, Any]] = []
         self.last_worker_metrics: list[dict[str, Any]] = []
         self.last_worker_metrics_by_chunk: list[dict[str, Any]] = []
+        self.last_aggregate_graph_metrics: dict[str, int | float] = {}
         self._closed = False
         self._processes: list[mp.Process] = []
         self._connections: list[Connection] = []
@@ -672,7 +678,14 @@ class PEARLEngine:
             child_admission_connection, parent_admission_connection = context.Pipe(duplex=False)
             process = context.Process(
                 target=_pearl_worker,
-                args=(native_config, rank, master_port, child_connection, child_admission_connection),
+                args=(
+                    native_config,
+                    rank,
+                    master_port,
+                    child_connection,
+                    child_admission_connection,
+                    getattr(self.config, "compact_worker_result_metrics", False),
+                ),
                 daemon=True,
             )
             process.start()
@@ -700,16 +713,26 @@ class PEARLEngine:
             sampling_params = SamplingParams()
         if not isinstance(sampling_params, SamplingParams):
             raise TypeError("PEARL sampling_params must be a SamplingParams value.")
-        sampling_params = replace(
-            sampling_params,
-            request_id=(request_id if request_id is not None else sampling_params.request_id),
-            arrival_ts=(arrival_ts if arrival_ts is not None else sampling_params.arrival_ts),
-            slo_tpot_ms=(slo_tpot_ms if slo_tpot_ms is not None else sampling_params.slo_tpot_ms),
-            slo_class=(slo_class if slo_class is not None else sampling_params.slo_class),
-            spec_rhythm_max_gamma=(
-                per_request_gamma if per_request_gamma is not None else sampling_params.spec_rhythm_max_gamma
-            ),
-        )
+        if any(
+            override is not None
+            for override in (
+                request_id,
+                arrival_ts,
+                slo_tpot_ms,
+                slo_class,
+                per_request_gamma,
+            )
+        ):
+            sampling_params = replace(
+                sampling_params,
+                request_id=(request_id if request_id is not None else sampling_params.request_id),
+                arrival_ts=(arrival_ts if arrival_ts is not None else sampling_params.arrival_ts),
+                slo_tpot_ms=(slo_tpot_ms if slo_tpot_ms is not None else sampling_params.slo_tpot_ms),
+                slo_class=(slo_class if slo_class is not None else sampling_params.slo_class),
+                spec_rhythm_max_gamma=(
+                    per_request_gamma if per_request_gamma is not None else sampling_params.spec_rhythm_max_gamma
+                ),
+            )
         if getattr(self.config, "draft_mode", SERIAL_LINEAR_DRAFT_MODE) == PARD_PARALLEL_DRAFT_MODE and (
             sampling_params.temperature != 0 or sampling_params.draft_temperature != 0
         ):
@@ -721,6 +744,11 @@ class PEARLEngine:
                 add_generation_prompt=True,
             )
             token_ids = list(self.tokenizer.encode(formatted_prompt))
+        elif isinstance(prompt, list) and all(type(token_id) is int for token_id in prompt):
+            # Retain request isolation without re-boxing an already-normalized
+            # Python token list.  Exact ``int`` keeps the historical coercion
+            # semantics for bools, int subclasses and other int-like values.
+            token_ids = prompt.copy()
         else:
             token_ids = [int(token_id) for token_id in prompt]
         if not token_ids:
@@ -958,6 +986,7 @@ class PEARLEngine:
             self.last_metrics = []
             self.last_worker_metrics = []
             self.last_worker_metrics_by_chunk = []
+            self.last_aggregate_graph_metrics = {}
             return [], [], (() if mode != "target_ar" else None), 0.0
         requests = self._requests
         self._requests = []
@@ -1054,8 +1083,19 @@ class PEARLEngine:
                         for name in metric_names
                         if any(isinstance(metrics.get(name), (int, float)) for metrics in worker_graph_metrics)
                     }
-                    for result in batch_results:
-                        result.update(aggregate_graph_metrics)
+                    self.last_aggregate_graph_metrics = aggregate_graph_metrics
+                    if getattr(self.config, "compact_worker_result_metrics", False):
+                        # Retain one numeric compatibility view without
+                        # recreating the same hundreds of counters on every
+                        # request row.  The complete per-rank diagnostics,
+                        # including strings, lists and histograms, remain in
+                        # ``last_worker_metrics``; cross-rank numeric maxima
+                        # remain in ``last_aggregate_graph_metrics``.
+                        if batch_results:
+                            batch_results[0].update(aggregate_graph_metrics)
+                    else:
+                        for result in batch_results:
+                            result.update(aggregate_graph_metrics)
                 total_elapsed += batch_results[0]["elapsed_seconds"] if batch_results else 0.0
                 if live:
                     outputs.extend(enumerate(batch_results))
@@ -1117,8 +1157,16 @@ class PEARLEngine:
     def _send_all(self, message: tuple[Any, ...]) -> None:
         if self._closed:
             raise RuntimeError("The PEARL engine is closed.")
+        if not self._connections:
+            return
+        # ``Connection.send`` pickles independently for every worker.  Its
+        # wire format is exactly ``send_bytes(ForkingPickler.dumps(value))``,
+        # so serialize the immutable command once and reuse the same payload.
+        # Worker-side ``Connection.recv`` remains protocol-compatible and
+        # preserves its existing EOF/unpickling behavior.
+        payload = ForkingPickler.dumps(message)
         for connection in self._connections:
-            connection.send(message)
+            connection.send_bytes(payload)
 
     def _receive_all(
         self,
@@ -1225,6 +1273,7 @@ def _pearl_worker(
     master_port: int,
     connection: Connection,
     admission_connection: Connection | None = None,
+    compact_worker_result_metrics: bool = False,
 ) -> None:
     os.environ["MASTER_ADDR"] = "127.0.0.1"
     os.environ["MASTER_PORT"] = str(master_port)
@@ -1236,7 +1285,7 @@ def _pearl_worker(
     # accepts it, so preserve the historical default everywhere except the
     # qualified TP3 MC2 deployment.  An explicit administrator-provided
     # numeric range is retained.
-    if config.enable_mc2 and config.target_tp_size == 3:
+    if getattr(config, "enable_mc2", False) and config.target_tp_size == 3:
         if os.environ.get("HCCL_NPU_SOCKET_PORT_RANGE") == "auto":
             os.environ.pop("HCCL_NPU_SOCKET_PORT_RANGE")
     else:
@@ -1340,22 +1389,33 @@ def _pearl_worker(
                     sampling_params,
                     on_token_commit=lambda event: connection.send(("commit", event)),
                     request_admission_callback=receive_live_admissions,
+                    **({"include_graph_metrics": False} if compact_worker_result_metrics else {}),
                 )
             elif mode == "pearl_stream":
                 result = engine.generate_batch(
                     prompts,
                     sampling_params,
                     on_token_commit=lambda event: connection.send(("commit", event)),
+                    **({"include_graph_metrics": False} if compact_worker_result_metrics else {}),
                 )
             elif mode == "pearl":
-                result = engine.generate_batch(prompts, sampling_params)
+                result = engine.generate_batch(
+                    prompts,
+                    sampling_params,
+                    **({"include_graph_metrics": False} if compact_worker_result_metrics else {}),
+                )
             elif mode == "target_ar":
-                result = engine.generate_target_ar_batch(prompts, sampling_params)
+                result = engine.generate_target_ar_batch(
+                    prompts,
+                    sampling_params,
+                    **({"include_graph_metrics": False} if compact_worker_result_metrics else {}),
+                )
             elif mode == "bench":
                 result = engine.generate_batch(
                     prompts,
                     sampling_params,
                     max_rounds=num_pearl_steps,
+                    **({"include_graph_metrics": False} if compact_worker_result_metrics else {}),
                 )
             else:
                 raise ValueError(f"Unknown PEARL worker command {mode!r}.")

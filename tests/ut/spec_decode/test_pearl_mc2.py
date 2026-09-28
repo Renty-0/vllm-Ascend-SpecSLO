@@ -1038,8 +1038,8 @@ def test_v126_profile_operator_is_normalized_and_frozen_into_route():
 @pytest.mark.parametrize(
     ("key", "tp_size", "epsilon", "message"),
     (
-        ((0, 3072, 5120, "bfloat16", "ND", True), 3, 1e-6, "1 <= M <= 160"),
-        ((161, 3072, 5120, "bfloat16", "ND", True), 3, 1e-6, "1 <= M <= 160"),
+        ((0, 3072, 5120, "bfloat16", "ND", True), 3, 1e-6, "1 <= M <= 645"),
+        ((646, 3072, 5120, "bfloat16", "ND", True), 3, 1e-6, "1 <= M <= 645"),
         ((64, 3072, 5121, "bfloat16", "ND", True), 3, 1e-6, "hidden size 5120"),
         ((64, 3072, 5120, "float16", "ND", True), 3, 1e-6, "bfloat16"),
         ((64, 3072, 5120, "bfloat16", "ND", False), 3, 1e-6, "F.linear"),
@@ -1055,7 +1055,7 @@ def test_v126_static_shape_contract_rejects_out_of_envelope(key, tp_size, epsilo
     )
 
 
-@pytest.mark.parametrize("rows", (1, 64, 160))
+@pytest.mark.parametrize("rows", (1, 160, 161, 645))
 @pytest.mark.parametrize("input_size", (3072, 8576))
 def test_v126_static_shape_contract_accepts_qwen3_tp3(rows, input_size):
     assert (
@@ -1252,6 +1252,35 @@ def test_mc2_chained_flush_mode_flushes_every_epilogue():
     assert flush
     chain.commit(down, torch.zeros_like(state))
     chain.finish()
+
+
+def test_mc2_full_model_chain_serializes_128_ops_and_flushes_only_tail():
+    layer_count = 64
+    chain = native_model_module._MC2IntraLayerChain(
+        torch.zeros((64, 4), dtype=torch.int64),
+        layer_count=layer_count,
+    )
+    flush_steps = []
+    for layer_index in range(layer_count):
+        for projection_kind in ("attention", "down"):
+            route = SimpleNamespace(
+                layer_index=layer_index,
+                projection_kind=projection_kind,
+            )
+            state, flush = chain.begin(route)
+            if flush:
+                flush_steps.append(chain.next_step)
+            next_state = (
+                torch.zeros_like(state)
+                if flush
+                else torch.full_like(state, chain.next_step + 1)
+            )
+            chain.commit(route, next_state)
+
+    chain.finish()
+    assert chain.next_step == 128
+    assert flush_steps == [127]
+    assert torch.count_nonzero(chain.state) == 0
 
 
 def test_v126_strict_epilogue_failure_never_uses_split_fallback(monkeypatch):
@@ -1989,11 +2018,23 @@ def test_model_chains_only_graph_qualified_deferred_epilogues(
             "chain_scope": "whole_model",
             "layer_count": 2,
             "operations_per_chain": 4,
+            "source_sha256": document["metadata"]["source_sha256"],
+            "qualified_row_counts": [2],
+            "minimum_samples": 3,
+            "minimum_speedup": 1.0,
+            "reports": [
+                {
+                    "row_count": 2,
+                    "report_sha256": "a" * 64,
+                    "report_path": "/tmp/mc2-chain-m2.json",
+                }
+            ],
         }
     profile = normalize_mc2_profile(document)
     qualification = MC2Qualification(True, "qualified", 1.0, 0.8)
     routes = tuple(
-        SimpleNamespace(enabled=True, decisions={2: qualification}) for _ in range(4)
+        SimpleNamespace(enabled=True, decisions={2: qualification, 3: qualification})
+        for _ in range(4)
     )
 
     rows = native_model_module._qualified_mc2_chain_row_counts(
@@ -2004,6 +2045,20 @@ def test_model_chains_only_graph_qualified_deferred_epilogues(
     )
 
     assert rows == ({2} if with_chain_evidence and graph_execution else frozenset())
+
+
+def test_profile_rejects_legacy_global_deferred_chain_evidence():
+    document = _profile_document(MC2_TP3_NATIVE_EPILOGUE_OPERATOR)
+    document["metadata"]["deferred_read_done_chain"] = {
+        "qualified": True,
+        "execution_mode": "graph",
+        "chain_scope": "whole_model",
+        "layer_count": 2,
+        "operations_per_chain": 4,
+    }
+
+    with pytest.raises(ValueError, match="source SHA"):
+        normalize_mc2_profile(document)
 
 
 @pytest.mark.parametrize("graph_execution", (False, True))

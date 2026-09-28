@@ -32,7 +32,7 @@ def test_deferred_chain_diagnostic_defaults_have_repeated_liveness_checks():
     assert args.changed_input_replays == 5
     assert args.changed_input_delta != 0.0
     assert args.samples >= 3
-    assert args.layer_count == 1
+    assert args.layer_count == 64
 
 
 @pytest.mark.parametrize(

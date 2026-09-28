@@ -437,6 +437,7 @@ def broadcast_compact_fixed_greedy_via_cpu(
     draft_compute_us: int | torch.Tensor | None = None,
     source_device_buffer: torch.Tensor | None = None,
     source_cpu_buffer: torch.Tensor | None = None,
+    expose_host_continuation: bool = True,
 ) -> tuple[
     CompactFixedGreedyEnvelopeViews,
     CompactFixedGreedyCPUBroadcastTiming,
@@ -543,10 +544,14 @@ def broadcast_compact_fixed_greedy_via_cpu(
             non_blocking=cpu_message.is_pinned(),
         )
     host_to_device_ended = time.perf_counter()
-    host_continuation_tokens = unpack_compact_fixed_greedy_envelope(
-        layout,
-        cpu_message,
-    ).continuation_tokens
+    host_continuation_tokens = (
+        unpack_compact_fixed_greedy_envelope(
+            layout,
+            cpu_message,
+        ).continuation_tokens
+        if expose_host_continuation
+        else None
+    )
     return (
         unpack_compact_fixed_greedy_envelope(layout, device_message),
         CompactFixedGreedyCPUBroadcastTiming(

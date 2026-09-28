@@ -3,12 +3,18 @@
 import random
 import threading
 import time
+from types import SimpleNamespace
 
 import pytest
 
 from vllm_ascend.spec_decode.pearl.native_engine import (
+    normalize_spec_rhythm_slo_class,
     order_spec_rhythm_admission_candidates,
+    order_spec_rhythm_admission_params,
+    spec_rhythm_active_class_counts,
+    spec_rhythm_any_when_enabled,
     spec_rhythm_class_cap_blocks,
+    spec_rhythm_class_caps_enabled,
     spec_rhythm_home_capacities,
 )
 from vllm_ascend.spec_decode.pearl.runtime import PearlDualModelScheduler
@@ -48,12 +54,94 @@ def test_slo_aware_admission_orders_strict_ready_requests_first():
         arrival_ts=arrival,
         enabled=True,
     ) == (3, 1, 2, 0, 4)
-    assert order_spec_rhythm_admission_candidates(
-        indices,
-        slo_tpot_ms=slo,
-        arrival_ts=arrival,
+    assert (
+        order_spec_rhythm_admission_candidates(
+            indices,
+            slo_tpot_ms=slo,
+            arrival_ts=arrival,
+            enabled=False,
+        )
+        == indices
+    )
+
+
+def test_admission_param_fast_path_does_not_read_metadata_when_disabled():
+    class UnreadableParams:
+        @property
+        def slo_tpot_ms(self):
+            raise AssertionError("disabled admission must not read TPOT metadata")
+
+        @property
+        def arrival_ts(self):
+            raise AssertionError("disabled admission must not read arrival metadata")
+
+    assert order_spec_rhythm_admission_params(
+        (2, 0, 1),
+        request_params=[UnreadableParams(), UnreadableParams(), UnreadableParams()],
         enabled=False,
-    ) == indices
+    ) == (2, 0, 1)
+
+
+def test_admission_param_enabled_path_matches_slo_aware_ordering():
+    params = [
+        SimpleNamespace(slo_tpot_ms=150.0, arrival_ts=1.0),
+        SimpleNamespace(slo_tpot_ms=40.0, arrival_ts=3.0),
+        SimpleNamespace(slo_tpot_ms=50.0, arrival_ts=2.0),
+        SimpleNamespace(slo_tpot_ms=40.0, arrival_ts=2.0),
+        SimpleNamespace(slo_tpot_ms=None, arrival_ts=0.0),
+    ]
+    assert order_spec_rhythm_admission_params(
+        (0, 1, 2, 3, 4),
+        request_params=params,
+        enabled=True,
+    ) == (3, 1, 2, 0, 4)
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (None, "unclassified"),
+        ("", "unclassified"),
+        (" TIGHT ", "tight"),
+        ("Normal", "normal"),
+        ("LOOSE", "loose"),
+        ("unknown", "unclassified"),
+    ],
+)
+def test_normalize_spec_rhythm_slo_class(raw, expected):
+    assert normalize_spec_rhythm_slo_class(raw) == expected
+
+
+def test_scheduler_scan_gate_does_not_consume_disabled_conditions():
+    def explode():
+        raise AssertionError("disabled scheduler policy consumed its scan")
+        yield True
+
+    # These are the two zero-cost boundaries used for an empty suspended set
+    # and a zero tight-target burst respectively.
+    assert not spec_rhythm_any_when_enabled(False, explode())
+    assert not spec_rhythm_any_when_enabled(False, explode())
+    assert spec_rhythm_any_when_enabled(True, (False, True))
+
+
+def test_active_class_count_fast_path_skips_disabled_scan():
+    def explode():
+        raise AssertionError("disabled class caps consumed active rows")
+        yield 0
+
+    assert (
+        spec_rhythm_active_class_counts(
+            explode(),
+            enabled=False,
+            class_of=lambda index: str(index),
+        )
+        is None
+    )
+    assert spec_rhythm_active_class_counts(
+        (0, 1, 2, 3),
+        enabled=True,
+        class_of=lambda index: ("tight", "normal", "normal", "unclassified")[index],
+    ) == {"tight": 1, "normal": 2, "loose": 0, "unclassified": 1}
 
 
 def test_relaxed_active_cap_preserves_slots_only_while_tighter_work_is_pending():
@@ -77,6 +165,15 @@ def test_relaxed_active_cap_preserves_slots_only_while_tighter_work_is_pending()
         active_counts=counts,
         pending_classes=("tight",),
         class_caps=caps,
+    )
+    assert not spec_rhythm_class_caps_enabled({"normal": 0, "loose": 0})
+    assert not spec_rhythm_class_caps_enabled({"normal": -1, "loose": 0})
+    assert spec_rhythm_class_caps_enabled({"normal": 1, "loose": 0})
+    assert not spec_rhythm_class_cap_blocks(
+        "loose",
+        active_counts=counts,
+        pending_classes=("tight",),
+        class_caps={"normal": 0, "loose": 0},
     )
 
 
@@ -192,8 +289,6 @@ def test_terminal_slack_uses_final_decode_budget_not_arrival_wait():
     )
 
     assert state.terminal_slack_ms(20.0) == 70.0
-
-
 
 
 def test_budget_shaper_honors_batch_roof_and_draft_window():
@@ -772,6 +867,124 @@ def test_slo_ready_budget_prioritizes_a_need_before_deferral_age():
     assert plan.deferred_target_request_indices == (1,)
 
 
+def test_drain_lrtf_selects_complete_windows_with_largest_remaining_service():
+    states = {
+        index: SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=0,
+            slo_tpot_ms=40.0,
+            output_token_budget=256,
+            delivered_tokens=33 if index < 32 else 129,
+            verification_rounds=16,
+        )
+        for index in range(64)
+    }
+    controller = SpecRhythmPipelineController(states)
+    controller.publish(
+        [controller.new_ticket(index, gamma=4, eager=False) for index in states]
+    )
+    # Make every shorter request much older. Remaining service must remain the
+    # primary drain key, with age used only to break equivalent estimates.
+    controller._ready_wait_cycles.update({index: 100 for index in range(32, 64)})
+
+    plan = controller.build_plan(
+        states,
+        remaining_service_first=True,
+        merge_ready_homes=True,
+        max_target_requests=32,
+        verification_budget=128,
+    )
+
+    assert plan.target_request_indices == tuple(range(32))
+    assert plan.deferred_target_request_indices == tuple(range(32, 64))
+    assert plan.target_candidate_budgets == {index: 4 for index in range(32)}
+    assert sum(plan.target_candidate_budgets.values()) == 128
+
+
+def test_drain_lrtf_unifies_ready_and_repair_ranking_without_changing_row_count():
+    states = {
+        index: SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=index % 2,
+            slo_tpot_ms=40.0,
+            output_token_budget=256,
+            delivered_tokens=(
+                33
+                if index in (0, 2)
+                else 225
+                if index in (4, 7)
+                else 1
+                if index == 6
+                else 65
+            ),
+            verification_rounds=1 if index == 6 else 16,
+        )
+        for index in range(8)
+    }
+    controller = SpecRhythmPipelineController(states)
+    _publish_ready(controller, (0, 2, 4))
+    # Age is a tie-break only.  Neither the almost-complete ready row 4 nor
+    # the almost-complete repair row 7 may displace a longer remaining job.
+    controller._ready_wait_cycles[4] = 100
+    controller._draft_wait_cycles[7] = 100
+
+    plan = controller.build_plan(
+        states,
+        remaining_service_first=True,
+        merge_ready_homes=True,
+        max_target_requests=2,
+        verification_budget=8,
+    )
+
+    assert plan.target_request_indices == (0, 2)
+    assert plan.deferred_target_request_indices == (4,)
+    # The legacy opposite-home lane contains exactly four rows.  Unified
+    # drain-LRTF may replace one with the longer home-0 repair (row 6), but it
+    # cannot grow the physical draft batch or alter fixed gamma/B.
+    assert len(plan.normal_draft_request_indices) == 4
+    assert set(plan.normal_draft_request_indices) == {1, 3, 5, 6}
+    assert 7 not in plan.normal_draft_request_indices
+    assert plan.target_candidate_budgets == {0: 4, 2: 4}
+    assert sum(plan.target_candidate_budgets.values()) == 8
+    assert plan.remaining_service_target_ranked
+    assert plan.remaining_service_normal_ranked
+    assert plan.remaining_service_target_candidates == 3
+    assert plan.remaining_service_normal_candidates == 5
+    assert plan.remaining_service_normal_selected == 4
+    assert plan.remaining_service_normal_cross_home_selected == 1
+
+
+def test_drain_lrtf_disabled_preserves_target_only_legacy_plan():
+    states = {
+        index: SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=index % 2,
+            output_token_budget=256,
+            delivered_tokens=1 if index == 6 else 65,
+            verification_rounds=1 if index == 6 else 16,
+        )
+        for index in range(8)
+    }
+    controller = SpecRhythmPipelineController(states)
+    _publish_ready(controller, (0, 2, 4))
+
+    plan = controller.build_plan(
+        states,
+        remaining_service_first=False,
+        merge_ready_homes=True,
+        max_target_requests=2,
+        verification_budget=8,
+    )
+
+    assert plan.normal_draft_request_indices == (1, 3, 5, 7)
+    assert not plan.remaining_service_target_ranked
+    assert not plan.remaining_service_normal_ranked
+    assert plan.remaining_service_target_candidates == 0
+    assert plan.remaining_service_normal_candidates == 0
+    assert plan.remaining_service_normal_selected == 0
+    assert plan.remaining_service_normal_cross_home_selected == 0
+
+
 def test_goodput_edf_does_not_let_terminally_missed_request_displace_feasible_one():
     states = {
         0: SpecRhythmRuntimeState(
@@ -800,9 +1013,7 @@ def test_goodput_edf_does_not_let_terminally_missed_request_displace_feasible_on
         ),
     }
     controller = SpecRhythmPipelineController(states)
-    controller.publish(
-        [controller.new_ticket(index, gamma=4, eager=False) for index in states]
-    )
+    controller.publish([controller.new_ticket(index, gamma=4, eager=False) for index in states])
 
     plan = controller.build_plan(
         states,
@@ -835,9 +1046,7 @@ def test_target_slo_first_precedes_larger_progress_gap_from_relaxed_class():
         ),
     }
     controller = SpecRhythmPipelineController(states)
-    controller.publish(
-        [controller.new_ticket(index, gamma=4, eager=False) for index in states]
-    )
+    controller.publish([controller.new_ticket(index, gamma=4, eager=False) for index in states])
 
     legacy = controller.build_plan(
         states,
@@ -871,9 +1080,7 @@ def test_urgent_target_guard_defers_only_loose_ready_proposals():
         for index in range(3)
     }
     controller = SpecRhythmPipelineController(states)
-    controller.publish(
-        [controller.new_ticket(index, gamma=4, eager=False) for index in states]
-    )
+    controller.publish([controller.new_ticket(index, gamma=4, eager=False) for index in states])
 
     guarded = controller.build_plan(
         states,

@@ -24,6 +24,7 @@ from vllm_ascend import envs
 DEFAULT_MAX_ACLGRAPH_ENTRIES = 16
 TREE_FIA_SPARSE_MODE = 1
 TARGET_FIA_TASK_EVENT_GROUP_SIZES = (1, 2, 4)
+DRAFT_PA_PARALLEL_FULL_CHAIN_STEPS = 4
 # ``inner_precise=1`` is bit-identical to mode 2 for the production FULL-mask
 # tree contract (including sparse scratch positions and graph-task updates) on
 # 910B2, while avoiding the slower high-precision update path.  Keep this
@@ -714,10 +715,39 @@ class NativeACLGraphRunner:
         )
         self._target_fia_update_executor = (
             ThreadPoolExecutor(
-                max_workers=self.target_fia_task_update_workers,
+                # The caller owns primary stream/partition zero.  Pool
+                # threads exist only for secondary streams, avoiding one
+                # Future dispatch and one redundant caller-thread hand-off on
+                # every target replay.
+                max_workers=self.target_fia_task_update_workers - 1,
                 thread_name_prefix="pearl-target-fia-update",
             )
             if self.target_fia_task_update_workers > 1
+            else None
+        )
+        draft_pa_task_update_workers = int(envs.VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS)
+        if draft_pa_task_update_workers not in (1, 2, 4):
+            raise ValueError("VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS must be 1, 2, or 4.")
+        self.draft_pa_task_update_workers = draft_pa_task_update_workers if enabled and not is_target_worker else 1
+        self._draft_pa_parallel_streams = (
+            [self.update_stream]
+            + [
+                torch.npu.Stream(priority=update_stream_priority)
+                for _ in range(self.draft_pa_task_update_workers - 1)
+            ]
+            if self.update_stream is not None
+            else []
+        )
+        self._draft_pa_update_executor = (
+            ThreadPoolExecutor(
+                # The caller always owns primary stream/partition zero.  The
+                # pool exists only for secondary streams so the host thread
+                # neither sleeps on its own Future nor adds a redundant GIL
+                # hand-off to the critical first-layer event.
+                max_workers=self.draft_pa_task_update_workers - 1,
+                thread_name_prefix="pearl-draft-pa-update",
+            )
+            if self.draft_pa_task_update_workers > 1
             else None
         )
         self.shared_graph_pool_enabled = bool(enabled and envs.VLLM_ASCEND_PEARL_SHARED_GRAPH_POOL)
@@ -727,6 +757,10 @@ class NativeACLGraphRunner:
         self.target_fia_task_prefix_event_group_size = target_fia_task_prefix_event_group_size
         self.target_fia_parallel_update_replays = 0
         self.target_fia_parallel_update_tasks = 0
+        self.draft_pa_parallel_update_replays = 0
+        self.draft_pa_parallel_update_tasks = 0
+        self.draft_pa_parallel_update_fallback_replays = 0
+        self.draft_pa_parallel_update_rejections: dict[str, int] = {}
         # ``capture_attempt_count`` is cumulative telemetry.  Capacity is a
         # separate lifetime guard so an offline profiler can explicitly
         # release one measured shape and reopen exactly those resident slots
@@ -1004,6 +1038,15 @@ class NativeACLGraphRunner:
                 "target_fia_task_update_workers": self.target_fia_task_update_workers,
                 "target_fia_parallel_update_replays": self.target_fia_parallel_update_replays,
                 "target_fia_parallel_update_tasks": self.target_fia_parallel_update_tasks,
+                "draft_pa_task_update_workers": self.draft_pa_task_update_workers,
+                "draft_pa_parallel_update_replays": self.draft_pa_parallel_update_replays,
+                "draft_pa_parallel_update_tasks": self.draft_pa_parallel_update_tasks,
+                "draft_pa_parallel_update_fallback_replays": (
+                    self.draft_pa_parallel_update_fallback_replays
+                ),
+                "draft_pa_parallel_update_rejections": dict(
+                    sorted(self.draft_pa_parallel_update_rejections.items())
+                ),
                 **{
                     f"pa_task_update_host_{phase}_ns": elapsed_ns
                     for phase, elapsed_ns in self.pa_task_update_host_ns.items()
@@ -3970,6 +4013,12 @@ class NativeACLGraphRunner:
         stream: torch.npu.Stream | None = None,
         record_events: bool = True,
     ) -> None:
+        if self.draft_pa_task_update_workers > 1 and self._try_parallel_draft_paged_attention_task_update(
+            entry,
+            stream=stream,
+            record_events=record_events,
+        ):
+            return
         if envs.VLLM_ASCEND_PEARL_DRAFT_STEP_MAJOR_PA_TASK_UPDATE:
             if self._update_draft_paged_attention_tasks_step_major(
                 entry,
@@ -4144,6 +4193,204 @@ class NativeACLGraphRunner:
                         self.pa_task_update_profiled_tasks += 1
         return True
 
+    def _reject_parallel_draft_pa_task_update(self, reason: str) -> bool:
+        """Record one opt-in draft parallel-update rejection and fall back."""
+
+        self.draft_pa_parallel_update_fallback_replays += 1
+        self.draft_pa_parallel_update_rejections[reason] = (
+            self.draft_pa_parallel_update_rejections.get(reason, 0) + 1
+        )
+        return False
+
+    def _update_paged_attention_task_chunk(
+        self,
+        tasks: list[NativePagedAttentionGraphTask],
+        task_indices: Sequence[int],
+        stream: torch.npu.Stream,
+    ) -> None:
+        """Refresh disjoint PA handles and release every per-task event."""
+
+        if not task_indices:
+            return
+        torch.npu.set_device(tasks[0].query.device)
+        with torch.npu.stream(stream):
+            for task_index in task_indices:
+                task = tasks[task_index]
+                torch.npu.graph_task_update_begin(stream, task.handle)
+                torch_npu._npu_paged_attention(
+                    query=task.query,
+                    key_cache=task.key_cache,
+                    value_cache=task.value_cache,
+                    num_kv_heads=task.num_kv_heads,
+                    num_heads=task.num_heads,
+                    scale_value=task.scale,
+                    block_table=task.block_table,
+                    context_lens=task.context_lens,
+                    out=task.output,
+                    workspace=task.workspace,
+                )
+                torch.npu.graph_task_update_end(stream)
+                task.event.record(stream)
+
+    def _try_parallel_draft_paged_attention_task_update(
+        self,
+        entry: NativeDraftACLGraphEntry,
+        *,
+        stream: torch.npu.Stream | None,
+        record_events: bool,
+    ) -> bool:
+        """Refresh a qualified gamma-4 serial PA draft graph concurrently.
+
+        The switch is deliberately narrower than the ordinary PA updater.
+        Before mutating a handle, validate the complete four-step linear
+        entry, its host-length contract, and one unique ExternalEvent per
+        task.  Rejected entries use the existing serial updater.  Once task
+        mutation starts, any exception propagates: a replay-first graph may
+        already be waiting on these events and cannot safely fall back.
+        """
+
+        executor = self._draft_pa_update_executor
+        worker_count = self.draft_pa_task_update_workers
+        if executor is None or worker_count <= 1:
+            return False
+        if not record_events:
+            return self._reject_parallel_draft_pa_task_update("record_events_disabled")
+        update_stream = self.update_stream if stream is None else stream
+        if update_stream is None or update_stream is not self.update_stream:
+            return self._reject_parallel_draft_pa_task_update("non_primary_update_stream")
+        if self.profile_pa_task_update:
+            return self._reject_parallel_draft_pa_task_update("host_profiling_enabled")
+        if getattr(entry, "stable_task_barrier", False):
+            return self._reject_parallel_draft_pa_task_update("stable_task_barrier")
+        if getattr(entry, "taskless_device_attention", False):
+            return self._reject_parallel_draft_pa_task_update("taskless_device_attention")
+
+        step_count = len(getattr(entry, "positions", ()))
+        if step_count != DRAFT_PA_PARALLEL_FULL_CHAIN_STEPS:
+            return self._reject_parallel_draft_pa_task_update("not_gamma4_full_chain")
+        output = getattr(entry, "output", None)
+        if (
+            not torch.is_tensor(output)
+            or output.ndim not in (2, 3)
+            or int(output.shape[1]) != step_count
+        ):
+            # A mixed-prefill tail with a KV-only final step can also contain
+            # four transformer calls, but exposes fewer than four proposal
+            # outputs.  It is not the qualified gamma-4 full-chain entry.
+            return self._reject_parallel_draft_pa_task_update("non_full_chain_output")
+        tree_attention_modes = tuple(getattr(entry, "tree_attention_modes", ()))
+        if len(tree_attention_modes) != step_count or any(tree_attention_modes):
+            return self._reject_parallel_draft_pa_task_update("non_linear_entry")
+        actual_seq_lengths = tuple(getattr(entry, "actual_seq_lengths_q", ()))
+        sequence_lengths = tuple(getattr(entry, "sequence_lens", ()))
+        tasks_per_step = int(getattr(entry, "tasks_per_step", 0))
+        tasks = list(getattr(entry, "tasks", ()))
+        if (
+            tasks_per_step <= 0
+            or len(actual_seq_lengths) != step_count
+            or len(sequence_lengths) != step_count
+            or len(tasks) != step_count * tasks_per_step
+        ):
+            return self._reject_parallel_draft_pa_task_update("incomplete_step_layout")
+        if len(tasks) < worker_count:
+            return self._reject_parallel_draft_pa_task_update("insufficient_tasks")
+        if any(not isinstance(task, NativePagedAttentionGraphTask) for task in tasks):
+            return self._reject_parallel_draft_pa_task_update("non_paged_attention_task")
+        typed_tasks = [task for task in tasks if isinstance(task, NativePagedAttentionGraphTask)]
+        task_events = [task.event for task in typed_tasks]
+        if (
+            any(not callable(getattr(event, "record", None)) for event in task_events)
+            or len({id(event) for event in task_events}) != len(task_events)
+        ):
+            return self._reject_parallel_draft_pa_task_update("invalid_per_task_events")
+
+        # Validate every step before changing a workspace or graph-task
+        # handle.  This is the same finite-padding contract as the serial
+        # step-major fast path, extended with the exact gamma-4 requirement.
+        step_groups: list[list[NativePagedAttentionGraphTask]] = []
+        try:
+            for step, (actual_q, sequence_lens) in enumerate(zip(actual_seq_lengths, sequence_lengths)):
+                start = step * tasks_per_step
+                group = typed_tasks[start : start + tasks_per_step]
+                context_rows = int(group[0].context_lens.numel())
+                actual_q_tuple = tuple(int(value) for value in actual_q)
+                sequence_lens_tuple = tuple(int(value) for value in sequence_lens)
+                real_rows = len(actual_q_tuple)
+                if (
+                    len(group) != tasks_per_step
+                    or real_rows <= 0
+                    or actual_q_tuple != tuple(range(1, real_rows + 1))
+                    or len(sequence_lens_tuple) != context_rows
+                    or any(value <= 0 for value in sequence_lens_tuple[:real_rows])
+                    or any(value != 1 for value in sequence_lens_tuple[real_rows:])
+                    or any(int(task.context_lens.numel()) != context_rows for task in group)
+                ):
+                    return self._reject_parallel_draft_pa_task_update("invalid_step_lengths")
+                step_groups.append(group)
+        except (IndexError, TypeError, ValueError):
+            return self._reject_parallel_draft_pa_task_update("invalid_step_lengths")
+
+        # Workspace selection is intentionally completed on the primary
+        # update stream before worker submission.  No worker mutates runner
+        # pools or telemetry, and each task keeps the workspace selected by
+        # the existing serial step-major contract.
+        with torch.npu.stream(update_stream):
+            for group in step_groups:
+                representative_by_structure: dict[int, NativePagedAttentionGraphTask] = {}
+                for task in group:
+                    structure_id = self._paged_attention_workspace_structure_id(task)
+                    representative_by_structure.setdefault(structure_id, task)
+                self.pa_workspace_host_key_tasks += len(group)
+                workspace_by_structure: dict[int, torch.Tensor] = {}
+                for structure_id, representative in representative_by_structure.items():
+                    self.pa_workspace_get_calls += 1
+                    workspace_by_structure[structure_id] = torch_npu._npu_paged_attention_get_workspace(
+                        query=representative.query,
+                        key_cache=representative.key_cache,
+                        value_cache=representative.value_cache,
+                        num_kv_heads=representative.num_kv_heads,
+                        num_heads=representative.num_heads,
+                        scale_value=representative.scale,
+                        block_table=representative.block_table,
+                        context_lens=representative.context_lens,
+                        out=representative.output,
+                    )
+                self.pa_workspace_cache_hits += len(group) - len(workspace_by_structure)
+                for task in group:
+                    task.workspace = workspace_by_structure[self._paged_attention_workspace_structure_id(task)]
+
+        streams = self._draft_pa_parallel_streams
+        if len(streams) != worker_count or streams[0] is not update_stream:
+            raise RuntimeError("Parallel draft PA update streams are inconsistent.")
+        for secondary_stream in streams[1:]:
+            # Propagate the replay-first copy dependency (or the ordinary
+            # current-stream dependency) queued on the primary update stream.
+            secondary_stream.wait_stream(update_stream)
+        partitions = [tuple(range(worker, len(typed_tasks), worker_count)) for worker in range(worker_count)]
+        if any(not partition for partition in partitions):
+            return self._reject_parallel_draft_pa_task_update("empty_worker_partition")
+        futures = [
+            executor.submit(
+                self._update_paged_attention_task_chunk,
+                typed_tasks,
+                partitions[worker],
+                streams[worker],
+            )
+            for worker in range(1, worker_count)
+        ]
+        self._update_paged_attention_task_chunk(
+            typed_tasks,
+            partitions[0],
+            streams[0],
+        )
+        for future in futures:
+            future.result()
+        for secondary_stream in streams[1:]:
+            update_stream.wait_stream(secondary_stream)
+        self.draft_pa_parallel_update_replays += 1
+        self.draft_pa_parallel_update_tasks += len(typed_tasks)
+        return True
+
     def _update_target_attention_tasks(self, entry: NativeTargetACLGraphEntry) -> None:
         task_lengths = [
             lengths
@@ -4159,12 +4406,18 @@ class NativeACLGraphRunner:
         task_indices: Sequence[int],
         stream: torch.npu.Stream,
         event_group_ends: frozenset[int],
+        *,
+        set_device_for_thread: bool = True,
     ) -> None:
         """Refresh complete FIA event groups on one NPU update stream."""
 
         if not task_indices:
             return
-        torch.npu.set_device(tasks[0].query.device)
+        # Executor threads do not inherit the caller's current NPU.  The
+        # primary partition runs on the already-initialized worker thread and
+        # must not repeat this runtime call on every replay.
+        if set_device_for_thread:
+            torch.npu.set_device(tasks[0].query.device)
         with torch.npu.stream(stream):
             for task_index in task_indices:
                 task = tasks[task_index]
@@ -4238,14 +4491,10 @@ class NativeACLGraphRunner:
         ]
         if any(not partition for partition in partitions):
             return False
-        # With one event per task, submitting every stream to the persistent
-        # pool remains faster on 910B.  Grouped events make the per-worker
-        # chunks coarse enough that handling stream zero in the caller avoids
-        # a future dispatch and wins measurably.  In both cases a complete
-        # event group stays on one stream, so its final record releases only
-        # handles that have all been refreshed.
-        caller_owns_primary = event_group_size > 1
-        first_background_worker = 1 if caller_owns_primary else 0
+        # The worker process already owns the primary NPU context.  Keep its
+        # first event-producing partition on the caller for every event-group
+        # size; the persistent pool is reserved for secondary streams only.
+        # Complete event groups remain indivisible across partitions.
         futures = [
             executor.submit(
                 self._update_fia_task_chunk,
@@ -4255,16 +4504,16 @@ class NativeACLGraphRunner:
                 streams[worker],
                 event_group_ends,
             )
-            for worker in range(first_background_worker, worker_count)
+            for worker in range(1, worker_count)
         ]
-        if caller_owns_primary:
-            self._update_fia_task_chunk(
-                typed_tasks,
-                materialized_lengths,
-                partitions[0],
-                streams[0],
-                event_group_ends,
-            )
+        self._update_fia_task_chunk(
+            typed_tasks,
+            materialized_lengths,
+            partitions[0],
+            streams[0],
+            event_group_ends,
+            set_device_for_thread=False,
+        )
         for future in futures:
             future.result()
         for stream in streams[1:]:

@@ -18,6 +18,8 @@ from enum import Enum
 
 from vllm_ascend.spec_decode.pearl.roofline import ProfiledRoofline
 
+DRAIN_SERVICE_PRIOR_ROUNDS = 8
+
 
 def _clamp(value: float, lower: float = 0.0, upper: float = 1.0) -> float:
     return max(lower, min(upper, value))
@@ -582,6 +584,15 @@ class SpecRhythmExecutionPlan:
     target_candidate_budgets: Mapping[int, int] = field(default_factory=dict)
     verification_candidate_budget: int | None = None
     deferred_target_request_indices: tuple[int, ...] = ()
+    # Drain-only diagnostics.  They are carried by the immutable plan rather
+    # than inferred by the executor so a production result can prove that the
+    # remaining-service policy reached both sides of the dual-batch pipeline.
+    remaining_service_target_ranked: bool = False
+    remaining_service_normal_ranked: bool = False
+    remaining_service_target_candidates: int = 0
+    remaining_service_normal_candidates: int = 0
+    remaining_service_normal_selected: int = 0
+    remaining_service_normal_cross_home_selected: int = 0
 
     def __post_init__(self) -> None:
         if self.target_candidate_budgets:
@@ -596,6 +607,18 @@ class SpecRhythmExecutionPlan:
                 raise ValueError("A bounded SpecRhythm target plan needs every candidate count.")
             if sum(self.target_candidate_budgets.values()) > self.verification_candidate_budget:
                 raise ValueError("SpecRhythm ready proposals exceed the verification budget.")
+        remaining_service_counts = (
+            self.remaining_service_target_candidates,
+            self.remaining_service_normal_candidates,
+            self.remaining_service_normal_selected,
+            self.remaining_service_normal_cross_home_selected,
+        )
+        if any(value < 0 for value in remaining_service_counts):
+            raise ValueError("SpecRhythm remaining-service diagnostics must be non-negative.")
+        if self.remaining_service_normal_selected > self.remaining_service_normal_candidates:
+            raise ValueError("SpecRhythm cannot select more repair rows than it ranked.")
+        if self.remaining_service_normal_cross_home_selected > self.remaining_service_normal_selected:
+            raise ValueError("SpecRhythm cross-home repair rows must be selected rows.")
 
 
 @dataclass
@@ -611,6 +634,7 @@ class SpecRhythmPipelineController:
     _priority_home_id: int | None = None
     _priority_streak: int = 0
     _ready_wait_cycles: dict[int, int] = field(default_factory=dict)
+    _draft_wait_cycles: dict[int, int] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if self.next_target_home_batch_id not in (0, 1):
@@ -625,6 +649,7 @@ class SpecRhythmPipelineController:
         priority_burst: int = 2,
         goodput_edf: bool = False,
         target_slo_first: bool = False,
+        remaining_service_first: bool = False,
         defer_loose: bool = False,
         merge_ready_homes: bool = False,
         max_target_requests: int | None = None,
@@ -642,6 +667,69 @@ class SpecRhythmPipelineController:
             raise ValueError("SpecRhythm verification candidate budget must be positive.")
         active_set = set(active)
         self._discard_inactive_payloads(active_set)
+        # Use one estimator for ready verification tickets and for requests
+        # that first need a normal/repair draft.  Keeping the denominator
+        # common is important: two independently normalized rankings would
+        # not be a unified remaining-service policy.
+        # Keep the default-off path free of request-history scans: the
+        # experiment must preserve both the scheduling decision and its host
+        # overhead when the environment switch is zero.
+        if remaining_service_first:
+            observed_service_tokens = sum(
+                max(0, self.request_states[index].delivered_tokens - 1)
+                for index in active
+            )
+            observed_service_rounds = sum(
+                self.request_states[index].verification_rounds
+                for index in active
+            )
+            global_tokens_per_round = (
+                observed_service_tokens / observed_service_rounds
+                if observed_service_rounds
+                else 1.0
+            )
+        else:
+            global_tokens_per_round = 1.0
+
+        def estimated_remaining_service(
+            index: int,
+            *,
+            needs_draft_stage: bool,
+        ) -> float:
+            state = self.request_states[index]
+            if state.output_token_budget is None:
+                remaining_rounds = 0.0
+            else:
+                remaining_tokens = max(
+                    0,
+                    int(state.output_token_budget) - int(state.delivered_tokens),
+                )
+                observed_tokens = max(0, int(state.delivered_tokens) - 1)
+                smoothed_rate = (
+                    observed_tokens
+                    + DRAIN_SERVICE_PRIOR_ROUNDS * global_tokens_per_round
+                ) / (int(state.verification_rounds) + DRAIN_SERVICE_PRIOR_ROUNDS)
+                remaining_rounds = remaining_tokens / max(smoothed_rate, 1e-6)
+            # A non-ready request cannot be verified until one normal repair
+            # stage has rebuilt its proposal.  Charge that dependency without
+            # changing gamma, B, or the proposal itself.
+            return remaining_rounds + float(needs_draft_stage)
+
+        def remaining_service_key(
+            index: int,
+            *,
+            needs_draft_stage: bool,
+            age: int,
+        ) -> tuple[float, int, bool, int]:
+            return (
+                estimated_remaining_service(
+                    index,
+                    needs_draft_stage=needs_draft_stage,
+                ),
+                int(age),
+                self.request_states[index].home_batch_id == self.next_target_home_batch_id,
+                -index,
+            )
         ready_homes = {self.request_states[index].home_batch_id for index in active if index in self.ready}
         # A promoted rolling-eager ticket belongs to the home that was just
         # verified, but paper section 4.3 requires it to join the *next*
@@ -744,6 +832,12 @@ class SpecRhythmPipelineController:
             # still starvation-safe because their a_need grows while waiting.
             def target_priority(index: int):
                 age = self._ready_wait_cycles.get(index, 0)
+                if remaining_service_first:
+                    return remaining_service_key(
+                        index,
+                        needs_draft_stage=False,
+                        age=age,
+                    )
                 state = self.request_states[index]
                 urgency = state.urgency(projected_wait_ms)
                 if priority:
@@ -804,13 +898,50 @@ class SpecRhythmPipelineController:
         for index in active:
             if index in self.ready:
                 self._ready_wait_cycles[index] = 0 if index in target_set else self._ready_wait_cycles.get(index, 0) + 1
-        normal = tuple(
+        default_normal = tuple(
             index
             for index in active
             if self.request_states[index].home_batch_id == draft_home
             and index not in self.ready
             and index not in self.staged_eager
         )
+        normal_candidates: tuple[int, ...] = ()
+        normal_cross_home_selected = 0
+        if remaining_service_first:
+            normal_candidates = tuple(
+                index
+                for index in active
+                if index not in self.ready and index not in self.staged_eager
+            )
+            # Preserve the established draft row count exactly.  The policy
+            # may replace an alternating-home row with a more critical repair
+            # row, but it cannot enlarge B, select a new graph bucket, or add
+            # draft work to the cycle.
+            normal_limit = len(default_normal)
+            ordered_normal = sorted(
+                normal_candidates,
+                key=lambda index: remaining_service_key(
+                    index,
+                    needs_draft_stage=True,
+                    age=self._draft_wait_cycles.get(index, 0),
+                ),
+                reverse=True,
+            )
+            normal = tuple(ordered_normal[:normal_limit])
+            normal_set = set(normal)
+            for index in normal_candidates:
+                self._draft_wait_cycles[index] = (
+                    0
+                    if index in normal_set
+                    else self._draft_wait_cycles.get(index, 0) + 1
+                )
+            normal_cross_home_selected = sum(
+                self.request_states[index].home_batch_id != draft_home
+                for index in normal
+            )
+        else:
+            normal = default_normal
+            self._draft_wait_cycles.clear()
         eager = tuple(index for index in target if index not in self.staged_eager)
         if target:
             phase = PipelinePhase.STEADY
@@ -831,6 +962,20 @@ class SpecRhythmPipelineController:
             target_candidate_budgets={index: candidate_counts[index] for index in target},
             verification_candidate_budget=verification_budget,
             deferred_target_request_indices=deferred,
+            remaining_service_target_ranked=bool(
+                remaining_service_first and constrained and target_candidates
+            ),
+            remaining_service_normal_ranked=bool(
+                remaining_service_first and normal_candidates
+            ),
+            remaining_service_target_candidates=(
+                len(target_candidates) if remaining_service_first else 0
+            ),
+            remaining_service_normal_candidates=len(normal_candidates),
+            remaining_service_normal_selected=(
+                len(normal) if remaining_service_first else 0
+            ),
+            remaining_service_normal_cross_home_selected=normal_cross_home_selected,
         )
         self.plan_id += 1
         return plan
@@ -1041,6 +1186,7 @@ class SpecRhythmPipelineController:
 
     def invalidate_request(self, request_index: int) -> None:
         self._ready_wait_cycles.pop(request_index, None)
+        self._draft_wait_cycles.pop(request_index, None)
         for mapping in (self.ready, self.staged_eager):
             ticket = mapping.pop(request_index, None)
             if ticket is not None:
@@ -1049,6 +1195,8 @@ class SpecRhythmPipelineController:
     def _discard_inactive_payloads(self, active: set[int]) -> None:
         for index in set(self.ready).union(self.staged_eager) - active:
             self.invalidate_request(index)
+        for index in set(self._draft_wait_cycles) - active:
+            self._draft_wait_cycles.pop(index, None)
 
 
 @dataclass(frozen=True)

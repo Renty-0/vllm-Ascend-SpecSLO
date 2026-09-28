@@ -800,8 +800,8 @@ def _native_epilogue_static_shape_error(
     rows, _input_size, output_size, dtype, _weight_format_name, is_trans_b = key
     if int(tp_size) != 3:
         return "native-MatMul MC2 epilogue requires tensor parallel size 3"
-    if not 0 < int(rows) <= 160:
-        return "native-MatMul MC2 epilogue requires 1 <= M <= 160"
+    if not 0 < int(rows) <= 645:
+        return "native-MatMul MC2 epilogue requires 1 <= M <= 645"
     if int(output_size) != 5120:
         return "native-MatMul MC2 epilogue requires hidden size 5120"
     if dtype != "bfloat16":
@@ -1083,6 +1083,108 @@ class MC2Profile:
         return MC2Qualification(True, "exact shape passed numerical and repeated p95 gates", baseline, fused)
 
 
+def _normalize_deferred_read_done_chain(
+    value: object,
+    *,
+    profile_source_sha256: str,
+    operator_kind: str,
+) -> dict[str, Any]:
+    """Validate optional row-scoped, full-model graph-chain evidence.
+
+    Schema-v1 profiles without this metadata remain valid and use the fully
+    flushed chained ABI.  Once the field is present, however, legacy global
+    evidence is rejected: one measured M must never authorize every row in a
+    multi-shape profile.
+    """
+
+    if not isinstance(value, Mapping):
+        raise ValueError("MC2 deferred_read_done_chain must be an object")
+    if operator_kind != MC2_TP3_NATIVE_EPILOGUE_OPERATOR:
+        raise ValueError("MC2 deferred READ_DONE chaining requires the TP3 native epilogue")
+    if value.get("qualified") is not True:
+        raise ValueError("MC2 deferred READ_DONE chain must be explicitly qualified")
+    if value.get("execution_mode") != "graph" or value.get("chain_scope") != "whole_model":
+        raise ValueError("MC2 deferred READ_DONE chain requires whole-model graph evidence")
+    if value.get("source_sha256") != profile_source_sha256:
+        raise ValueError("MC2 deferred READ_DONE chain source SHA does not match the profile")
+    layer_count = value.get("layer_count")
+    operations_per_chain = value.get("operations_per_chain")
+    if (
+        isinstance(layer_count, bool)
+        or not isinstance(layer_count, int)
+        or layer_count <= 0
+        or operations_per_chain != 2 * layer_count
+    ):
+        raise ValueError("MC2 deferred READ_DONE chain has an invalid model topology")
+    raw_rows = value.get("qualified_row_counts")
+    if (
+        isinstance(raw_rows, (str, bytes))
+        or not isinstance(raw_rows, Sequence)
+        or not raw_rows
+        or any(
+            isinstance(row, bool) or not isinstance(row, int) or row <= 0
+            for row in raw_rows
+        )
+    ):
+        raise ValueError(
+            "MC2 deferred READ_DONE chain requires positive qualified_row_counts"
+        )
+    qualified_rows = tuple(int(row) for row in raw_rows)
+    if tuple(sorted(set(qualified_rows))) != qualified_rows:
+        raise ValueError(
+            "MC2 deferred READ_DONE chain qualified_row_counts must be sorted and unique"
+        )
+    minimum_samples = value.get("minimum_samples")
+    minimum_speedup = value.get("minimum_speedup")
+    if (
+        isinstance(minimum_samples, bool)
+        or not isinstance(minimum_samples, int)
+        or minimum_samples < 3
+        or isinstance(minimum_speedup, bool)
+        or not isinstance(minimum_speedup, (int, float))
+        or not math.isfinite(float(minimum_speedup))
+        or float(minimum_speedup) <= 0.0
+    ):
+        raise ValueError("MC2 deferred READ_DONE chain has invalid qualification gates")
+    reports = value.get("reports")
+    if not isinstance(reports, Sequence) or isinstance(reports, (str, bytes)):
+        raise ValueError("MC2 deferred READ_DONE chain requires per-row reports")
+    report_rows: list[int] = []
+    normalized_reports: list[dict[str, Any]] = []
+    for report in reports:
+        if not isinstance(report, Mapping):
+            raise ValueError("MC2 deferred READ_DONE chain contains an invalid report")
+        row_count = report.get("row_count")
+        report_sha256 = report.get("report_sha256")
+        report_path = report.get("report_path")
+        if (
+            isinstance(row_count, bool)
+            or not isinstance(row_count, int)
+            or row_count <= 0
+            or not isinstance(report_sha256, str)
+            or re.fullmatch(r"[0-9a-f]{64}", report_sha256) is None
+            or not isinstance(report_path, str)
+            or not report_path.strip()
+        ):
+            raise ValueError("MC2 deferred READ_DONE chain report identity is invalid")
+        report_rows.append(row_count)
+        normalized_reports.append(dict(report))
+    if tuple(report_rows) != qualified_rows:
+        raise ValueError(
+            "MC2 deferred READ_DONE chain reports must exactly cover qualified_row_counts"
+        )
+    return {
+        **dict(value),
+        "layer_count": layer_count,
+        "operations_per_chain": operations_per_chain,
+        "source_sha256": profile_source_sha256,
+        "qualified_row_counts": list(qualified_rows),
+        "minimum_samples": minimum_samples,
+        "minimum_speedup": float(minimum_speedup),
+        "reports": normalized_reports,
+    }
+
+
 def normalize_mc2_profile(value: MC2Profile | Mapping[str, Any] | str | Path) -> MC2Profile:
     """Load a strict profile; handwritten enable flags never qualify MC2."""
 
@@ -1114,6 +1216,15 @@ def normalize_mc2_profile(value: MC2Profile | Mapping[str, Any] | str | Path) ->
     if metadata.get("source_sha256") != mc2_source_sha256():
         raise ValueError("MC2 profile source hash does not match the current adapter/kernel sources")
     normalized_metadata = dict(metadata)
+    deferred_chain = metadata.get("deferred_read_done_chain")
+    if deferred_chain is not None:
+        normalized_metadata["deferred_read_done_chain"] = (
+            _normalize_deferred_read_done_chain(
+                deferred_chain,
+                profile_source_sha256=str(metadata["source_sha256"]),
+                operator_kind=str(operator_kind),
+            )
+        )
     profiled_epsilon = metadata.get("rms_norm_epsilon")
     # Older schema-v1 documents remain readable for offline reports, but
     # ``qualify`` rejects them.  A newly supplied binding must be a finite,
@@ -1271,6 +1382,16 @@ def normalize_mc2_profile(value: MC2Profile | Mapping[str, Any] | str | Path) ->
             "baseline_latency_ms": timings[0],
             "fused_latency_ms": timings[1],
         }
+    normalized_chain = normalized_metadata.get("deferred_read_done_chain")
+    if isinstance(normalized_chain, Mapping):
+        qualified_rows = set(normalized_chain["qualified_row_counts"])
+        profiled_rows = {int(key[0]) for key in entries}
+        missing_rows = qualified_rows.difference(profiled_rows)
+        if missing_rows:
+            raise ValueError(
+                "MC2 deferred READ_DONE chain rows are absent from the profile: "
+                f"{sorted(missing_rows)}"
+            )
     return MC2Profile(
         _freeze_profile_value(normalized_metadata),
         _freeze_profile_value(entries),

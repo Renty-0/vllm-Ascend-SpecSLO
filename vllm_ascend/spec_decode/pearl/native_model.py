@@ -324,6 +324,11 @@ def _qualified_mc2_chain_row_counts(
     """Return rows admitted by every route and explicit chain evidence."""
 
     chain_evidence = profile.metadata.get("deferred_read_done_chain")
+    qualified_row_counts = (
+        chain_evidence.get("qualified_row_counts")
+        if isinstance(chain_evidence, Mapping)
+        else None
+    )
     if (
         not graph_execution
         or profile.metadata.get("operator") != MC2_TP3_NATIVE_EPILOGUE_OPERATOR
@@ -331,11 +336,23 @@ def _qualified_mc2_chain_row_counts(
         or chain_evidence.get("qualified") is not True
         or chain_evidence.get("execution_mode") != "graph"
         or chain_evidence.get("chain_scope") != "whole_model"
+        or chain_evidence.get("source_sha256")
+        != profile.metadata.get("source_sha256")
+        or isinstance(qualified_row_counts, (str, bytes))
+        or not isinstance(qualified_row_counts, Sequence)
+        or not qualified_row_counts
         or int(chain_evidence.get("layer_count", 0)) != layer_count
         or int(chain_evidence.get("operations_per_chain", 0)) != 2 * layer_count
         or len(routes) != 2 * layer_count
         or not all(route.enabled for route in routes)
     ):
+        return frozenset()
+    evidenced_rows = {
+        int(rows)
+        for rows in qualified_row_counts
+        if not isinstance(rows, bool) and isinstance(rows, int) and rows > 0
+    }
+    if len(evidenced_rows) != len(qualified_row_counts):
         return frozenset()
     qualified_sets = [
         {
@@ -346,7 +363,7 @@ def _qualified_mc2_chain_row_counts(
         for route in routes
     ]
     return (
-        frozenset(set.intersection(*qualified_sets))
+        frozenset(evidenced_rows.intersection(*qualified_sets))
         if qualified_sets
         else frozenset()
     )
@@ -407,6 +424,7 @@ class _MC2RealInputCapture:
     ) -> None:
         self.directory = directory
         self.rows = rows
+        self.group = context.group
         self.rank = int(context.rank)
         self.tp_size = int(context.size)
         self.enforce_eager = enforce_eager
@@ -519,7 +537,9 @@ class _MC2RealInputCapture:
         layer_index: int = 0,
     ) -> None:
         if projection_kind not in {"attention", "down"}:
-            raise ValueError("MC2 capture projection kind must be 'attention' or 'down'.")
+            raise ValueError(
+                "MC2 capture projection kind must be 'attention' or 'down'."
+            )
         if projection_kind != self.projection_kind:
             return
         layer_index = int(layer_index)
@@ -531,53 +551,109 @@ class _MC2RealInputCapture:
         elif self._implicit_layer is not None and layer_index != self._implicit_layer:
             return
         if activation.ndim < 2:
-            raise ValueError("MC2 capture activation must have at least two dimensions.")
+            raise ValueError(
+                "MC2 capture activation must have at least two dimensions."
+            )
         rows = int(prod(activation.shape[:-1]))
         if rows not in self.rows or (layer_index, rows) in self._completed:
             return
         if self.layer_filter is None and self._implicit_layer is None:
             self._implicit_layer = layer_index
+
+        # Preserve the original fail-fast graph guard before allocating any
+        # diagnostic status tensor.  Capture is an eager-only probe.
         self._reject_graph_capture(activation)
 
-        local_width = int(activation.shape[-1])
-        if weight.ndim != 2 or tuple(weight.shape) != (int(residual.shape[-1]), local_width):
-            raise ValueError("MC2 capture projection weight is incompatible with activation/residual shapes.")
-        if residual.shape[:-1] != activation.shape[:-1] or gamma.numel() != residual.shape[-1]:
-            raise ValueError("MC2 capture residual/gamma shapes are incompatible with the activation.")
-
-        row_directory = (
-            self.directory
-            / projection_kind
-            / f"layer-{layer_index}"
-            / f"m{rows}"
-        )
-        destination = row_directory / f"rank-{self.rank}.pt"
-        if destination.exists():
-            self._completed.add((layer_index, rows))
-            return
-        row_directory.mkdir(parents=True, exist_ok=True)
-        if destination.exists():
-            self._completed.add((layer_index, rows))
-            return
-
-        payload = {
-            "activation": activation.detach().reshape(rows, local_width).to(device="cpu").contiguous().clone(),
-            "weight": weight.detach().to(device="cpu").contiguous().clone(),
-            "residual": residual.detach().reshape(rows, int(residual.shape[-1])).to(device="cpu").contiguous().clone(),
-            "gamma": gamma.detach().reshape(-1).to(device="cpu").contiguous().clone(),
-        }
-        file_descriptor, temporary_name = tempfile.mkstemp(
-            prefix=f".rank-{self.rank}.",
-            suffix=".tmp",
-            dir=row_directory,
-        )
-        os.close(file_descriptor)
-        temporary = Path(temporary_name)
+        # This diagnostic path runs before the projection's ordinary TP
+        # all-reduce.  Never let one rank escape on a D2H/filesystem error
+        # while its peers continue into that collective: capture the local
+        # failure, vote once on the same TP device/group, and commit the
+        # one-shot state only after every rank reports success.
+        # Pre-create both vote values before any device-to-host transfer.  If
+        # the transfer itself raises, selecting the failure scalar below does
+        # not require another NPU kernel launch.
+        success_vote = activation.new_zeros((), dtype=torch.int32)
+        failure_vote = activation.new_ones((), dtype=torch.int32)
+        local_error: Exception | None = None
         try:
-            torch.save(payload, temporary)
-            os.replace(temporary, destination)
-        finally:
-            temporary.unlink(missing_ok=True)
+            local_width = int(activation.shape[-1])
+            if weight.ndim != 2 or tuple(weight.shape) != (
+                int(residual.shape[-1]),
+                local_width,
+            ):
+                raise ValueError(
+                    "MC2 capture projection weight is incompatible with activation/residual shapes."
+                )
+            if (
+                residual.shape[:-1] != activation.shape[:-1]
+                or gamma.numel() != residual.shape[-1]
+            ):
+                raise ValueError(
+                    "MC2 capture residual/gamma shapes are incompatible with the activation."
+                )
+
+            row_directory = (
+                self.directory / projection_kind / f"layer-{layer_index}" / f"m{rows}"
+            )
+            destination = row_directory / f"rank-{self.rank}.pt"
+            if not destination.exists():
+                row_directory.mkdir(parents=True, exist_ok=True)
+            if not destination.exists():
+                payload = {
+                    "activation": activation.detach()
+                    .reshape(rows, local_width)
+                    .to(device="cpu")
+                    .contiguous()
+                    .clone(),
+                    "weight": weight.detach().to(device="cpu").contiguous().clone(),
+                    "residual": residual.detach()
+                    .reshape(rows, int(residual.shape[-1]))
+                    .to(device="cpu")
+                    .contiguous()
+                    .clone(),
+                    "gamma": gamma.detach()
+                    .reshape(-1)
+                    .to(device="cpu")
+                    .contiguous()
+                    .clone(),
+                }
+                file_descriptor, temporary_name = tempfile.mkstemp(
+                    prefix=f".rank-{self.rank}.",
+                    suffix=".tmp",
+                    dir=row_directory,
+                )
+                os.close(file_descriptor)
+                temporary = Path(temporary_name)
+                try:
+                    torch.save(payload, temporary)
+                    os.replace(temporary, destination)
+                finally:
+                    temporary.unlink(missing_ok=True)
+        except Exception as error:
+            local_error = error
+
+        failure = failure_vote if local_error is not None else success_vote
+        try:
+            dist.all_reduce(failure, op=dist.ReduceOp.MAX, group=self.group)
+            any_rank_failed = bool(failure.item())
+        except Exception as error:
+            local_detail = (
+                f"; local rank {self.rank} also failed with {type(local_error).__name__}: {local_error}"
+                if local_error is not None
+                else ""
+            )
+            raise RuntimeError(
+                f"MC2 real-input capture rank consensus failed before the model collective{local_detail}"
+            ) from error
+
+        if any_rank_failed:
+            if local_error is None:
+                detail = "one or more peer ranks failed"
+            else:
+                detail = f"local rank {self.rank} failed with {type(local_error).__name__}: {local_error}"
+            raise RuntimeError(
+                f"MC2 real-input capture failed before the model collective: {detail}"
+            ) from local_error
         self._completed.add((layer_index, rows))
 
 
@@ -1843,17 +1919,27 @@ class NativeQwen2DecoderLayer(nn.Module):
     ) -> tuple[torch.Tensor, torch.Tensor] | tuple[torch.Tensor, torch.Tensor, bool]:
         if input_is_normalized:
             if residual is None:
-                raise ValueError("A pre-normalized decoder input requires its residual state.")
+                raise ValueError(
+                    "A pre-normalized decoder input requires its residual state."
+                )
         elif residual is None:
             residual = hidden_states
             hidden_states = self.input_layernorm(hidden_states)
         else:
             hidden_states, residual = self.input_layernorm(hidden_states, residual)
-        if self.enable_mc2:
+        capture_attention = (
+            self.mc2_input_capture is not None
+            and self.mc2_input_capture.projection_kind == "attention"
+        )
+        if self.enable_mc2 or capture_attention:
             routes_frozen = bool(getattr(self, "mc2_routes_frozen", False))
-            if routes_frozen and (
-                getattr(self, "mc2_attention_route", None) is None
-                or getattr(self, "mc2_down_route", None) is None
+            if (
+                self.enable_mc2
+                and routes_frozen
+                and (
+                    getattr(self, "mc2_attention_route", None) is None
+                    or getattr(self, "mc2_down_route", None) is None
+                )
             ):
                 raise RuntimeError("Frozen MC2 decoder layer is missing a static route")
             local_attended = self.self_attn(
@@ -1871,52 +1957,67 @@ class NativeQwen2DecoderLayer(nn.Module):
                     projection_kind="attention",
                     layer_index=self.layer_index,
                 )
-            static_route = getattr(self, "mc2_attention_route", None)
-            if static_route is None:
-                if routes_frozen:
-                    raise RuntimeError("Frozen MC2 attention route cannot use dynamic qualification")
-                qualification = self.post_attention_layernorm.qualify_forward_mc2(
-                    local_attended,
-                    residual,
-                    self.self_attn.o_proj.weight,
-                    self.context,
-                    projection_bias=self.self_attn.o_proj.bias,
-                    profile=self.mc2_profile,
-                )
-            else:
-                qualification = bind_mc2_static_route(
-                    static_route,
-                    self.mc2_profile,
-                    local_attended,
-                    self.self_attn.o_proj.weight,
-                    residual,
-                    self.post_attention_layernorm.weight,
-                )
-            if qualification.qualification.qualified:
-                hidden_states, residual = self.post_attention_layernorm.forward_mc2(
-                    local_attended,
-                    residual,
-                    self.self_attn.o_proj.weight,
-                    self.context,
-                    projection_bias=self.self_attn.o_proj.bias,
-                    profile=self.mc2_profile,
-                    qualification=qualification,
-                    static_route=static_route,
-                    mc2_chain=mc2_chain,
-                )
-            else:
-                if mc2_chain is not None:
-                    raise RuntimeError(
-                        "MC2 intra-layer chain lost its qualified attention route after static admission"
-                    )
+            if not self.enable_mc2:
+                # Real-input qualification deliberately captures in eager
+                # mode with MC2 execution disabled.  Preserve the ordinary
+                # o_proj + all-reduce + post-attention norm path while still
+                # exposing its exact pre-projection activation to the probe.
                 hidden_states = self.self_attn.o_proj(local_attended)
                 hidden_states, residual = self.post_attention_layernorm(
                     hidden_states,
                     residual,
                 )
+            else:
+                static_route = getattr(self, "mc2_attention_route", None)
+                if static_route is None:
+                    if routes_frozen:
+                        raise RuntimeError(
+                            "Frozen MC2 attention route cannot use dynamic qualification"
+                        )
+                    qualification = self.post_attention_layernorm.qualify_forward_mc2(
+                        local_attended,
+                        residual,
+                        self.self_attn.o_proj.weight,
+                        self.context,
+                        projection_bias=self.self_attn.o_proj.bias,
+                        profile=self.mc2_profile,
+                    )
+                else:
+                    qualification = bind_mc2_static_route(
+                        static_route,
+                        self.mc2_profile,
+                        local_attended,
+                        self.self_attn.o_proj.weight,
+                        residual,
+                        self.post_attention_layernorm.weight,
+                    )
+                if qualification.qualification.qualified:
+                    hidden_states, residual = self.post_attention_layernorm.forward_mc2(
+                        local_attended,
+                        residual,
+                        self.self_attn.o_proj.weight,
+                        self.context,
+                        projection_bias=self.self_attn.o_proj.bias,
+                        profile=self.mc2_profile,
+                        qualification=qualification,
+                        static_route=static_route,
+                        mc2_chain=mc2_chain,
+                    )
+                else:
+                    if mc2_chain is not None:
+                        raise RuntimeError(
+                            "MC2 intra-layer chain lost its qualified attention route after static admission"
+                        )
+                    hidden_states = self.self_attn.o_proj(local_attended)
+                    hidden_states, residual = self.post_attention_layernorm(
+                        hidden_states,
+                        residual,
+                    )
         else:
             hidden_states = self.self_attn(positions, hidden_states, attention_metadata)
-            hidden_states, residual = self.post_attention_layernorm(hidden_states, residual)
+            hidden_states, residual = self.post_attention_layernorm(
+                hidden_states, residual
+            )
         down_mc2_fused = False
         if (
             return_normalization_state

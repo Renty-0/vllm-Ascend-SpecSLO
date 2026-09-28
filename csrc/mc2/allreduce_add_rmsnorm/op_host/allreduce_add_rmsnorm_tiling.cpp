@@ -28,13 +28,17 @@ enum AttrIndex : uint32_t {
 };
 
 constexpr int32_t kTpSize = 3;
-constexpr int32_t kMaxM = 160;
+constexpr int32_t kMaxM = 645;
 constexpr int32_t kHiddenSize = 5120;
 constexpr int32_t kChainStateRows = 64;
 constexpr int32_t kChainStateWords = 4;
+// Bit 0 is independent of the legacy swizzle bit (bit 5).  It records that
+// the unfused BF16 AddRmsNorm baseline selects its one-row-per-AIV SingleN
+// kernel, whose residual sum is materialized to BF16 before RMSNorm.
+constexpr uint32_t kBaselineSingleNRoundTrip = 1U << 0;
 // The TP3 mailbox protocol performs two remote polls per launched AIV.  A
 // smaller cohort can reduce HCCS control-traffic contention while retaining
-// enough row-level parallelism for the qualified M<=160 verification window.
+// enough row-level parallelism for the qualified M<=645 verification window.
 constexpr uint32_t kMaxAivBlocks = 24;
 constexpr float kRequiredEpsilon = 1.0e-6F;
 constexpr float kEpsilonTolerance = 1.0e-12F;
@@ -179,6 +183,8 @@ ge::graphStatus FillTiling(gert::TilingContext *context, AllreduceAddRmsnormTili
     pp.coreLoop = pp.mLoop * pp.nLoop;
     pp.swizzlCount = 4;
     pp.swizzlDirect = 1;
+    pp.tilingKey = m <= static_cast<int64_t>(aivNum) ?
+        kBaselineSingleNRoundTrip : 0U;
     pp.blockDim = static_cast<int32_t>(launchedAiv);
     pp.flushChain = *flushChainPtr ? 1 : 0;
     pp.epsilon = 1.0e-6F;

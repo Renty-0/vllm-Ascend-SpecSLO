@@ -27,6 +27,7 @@ from examples.benchmark_nano_pearl_target_only import (
 )
 from examples.offline_inference_nano_pearl import parse_args as _parse_offline_args
 from examples.serve_specslo import _build_parser as _build_specslo_server_parser
+from vllm_ascend.spec_decode.pearl import api as api_module
 from vllm_ascend.spec_decode.pearl import native_engine as native_engine_module
 from vllm_ascend.spec_decode.pearl.api import PEARLConfig, PEARLEngine
 from vllm_ascend.spec_decode.pearl.native_cache import NativeCacheAllocation, NativePrefixCache
@@ -58,25 +59,36 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
     _next_power_of_two_graph_bucket,
     _next_stable_target_verify_capacity,
     _normalize_sampling_params,
+    _npu_profile_call_enabled,
     _power_of_two_graph_buckets,
     _ranked_linear_draft_fia_plan,
     _rebase_kv_ready_arrivals,
     _record_linear_draft_full_chain_metrics,
     _record_mixed_target_graph_outcome,
     _record_stable_target_verify_graph_outcome,
+    _resolve_target_replay_ahead_consume_preflight,
+    _resolve_target_replay_ahead_logical_preflight,
+    _resolve_target_replay_ahead_resource_preflight,
     _restore_completed_states,
     _restore_ranked_linear_draft_rows,
     _sample_logits,
     _select_preemptive_continuous_indices,
     _set_default_npu_environment,
+    _spec_rhythm_selected_target_signature,
+    _start_active_npu_profiler,
+    _stop_active_npu_profiler,
     _target_graph_precompile_shapes,
     _truncate_completion,
+    _with_npu_profiler_cleanup,
     plan_mixed_target_graph_envelope,
     plan_mixed_target_graph_layout,
+    plan_spec_rhythm_target_replay_ahead,
     plan_stable_target_verify_graph_envelope,
     plan_stable_target_verify_graph_layout,
     resolve_mixed_target_graph_buckets,
     resolve_mixed_target_graph_verify_capacities,
+    spec_rhythm_target_replay_ahead_fallback_safe,
+    spec_rhythm_target_replay_ahead_graph_reject_reason,
 )
 from vllm_ascend.spec_decode.pearl.native_graph import NativeACLGraphRunner, NativeGraphExecution
 from vllm_ascend.spec_decode.pearl.native_model import (
@@ -98,7 +110,11 @@ from vllm_ascend.spec_decode.pearl.native_model import (
     load_native_qwen2_weights,
     prepare_native_model_config,
 )
-from vllm_ascend.spec_decode.pearl.spec_rhythm import SpecRhythmProposalTicket
+from vllm_ascend.spec_decode.pearl.spec_rhythm import (
+    SpecRhythmPipelineController,
+    SpecRhythmProposalTicket,
+    SpecRhythmRuntimeState,
+)
 from vllm_ascend.spec_decode.pearl.topology import PearlTopology
 from vllm_ascend.spec_decode.pearl.tree import build_tree_speculation_plan, pack_selected_tree_plan
 
@@ -1709,6 +1725,108 @@ def _fixed_full_window_correction_engine(*, is_draft, events):
     return engine
 
 
+def test_staged_gloo_correction_device_continuation_path_is_counted():
+    events = []
+    engine = _fixed_full_window_correction_engine(is_draft=False, events=events)
+    continuation = torch.tensor([[31, 32, 33, 34]], dtype=torch.long)
+    verdict = torch.tensor([[4, -1]], dtype=torch.long)
+
+    with patch.dict(
+        os.environ,
+        {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "1"},
+    ):
+        engine._stage_gloo_correction_verdict(
+            verdict,
+            1,
+            continuation=continuation,
+            host_continuation=None,
+        )
+
+    assert engine._spec_rhythm_staged_gloo_correction_verdict_offset == 4
+    assert engine._spec_rhythm_staged_gloo_correction_host_continuation is None
+    assert engine._spec_rhythm_staged_gloo_correction_device_continuation_copies == 1
+    assert (
+        getattr(
+            engine,
+            "_spec_rhythm_staged_gloo_correction_host_continuation_reuses",
+            0,
+        )
+        == 0
+    )
+    assert events == [
+        ("copy", 0, 4, True),
+        ("copy", 4, 6, True),
+        "record",
+    ]
+
+
+def test_staged_gloo_correction_does_not_count_failed_device_copy_submission():
+    events = []
+    engine = _fixed_full_window_correction_engine(is_draft=False, events=events)
+    engine._fixed_full_window_host_correction_staging.copy_done_event = MagicMock()
+    engine._fixed_full_window_host_correction_staging.copy_done_event.record.side_effect = RuntimeError(
+        "event submission failed"
+    )
+
+    with (
+        patch.dict(
+            os.environ,
+            {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "1"},
+        ),
+        pytest.raises(RuntimeError, match="event submission failed"),
+    ):
+        engine._stage_gloo_correction_verdict(
+            torch.tensor([[4, -1]], dtype=torch.long),
+            1,
+            continuation=torch.tensor([[31, 32, 33, 34]], dtype=torch.long),
+            host_continuation=None,
+        )
+
+    assert (
+        getattr(
+            engine,
+            "_spec_rhythm_staged_gloo_correction_device_continuation_copies",
+            0,
+        )
+        == 0
+    )
+    assert getattr(engine, "_spec_rhythm_staged_gloo_correction_submit_calls", 0) == 0
+
+
+def test_staged_gloo_correction_host_continuation_path_skips_device_copy():
+    events = []
+    engine = _fixed_full_window_correction_engine(is_draft=False, events=events)
+    continuation = torch.tensor([[31, 32, 33, 34]], dtype=torch.long)
+    verdict = torch.tensor([[4, -1]], dtype=torch.long)
+
+    with patch.dict(
+        os.environ,
+        {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "1"},
+    ):
+        engine._stage_gloo_correction_verdict(
+            verdict,
+            1,
+            continuation=continuation,
+            host_continuation=((31, 32, 33, 34),),
+        )
+
+    assert engine._spec_rhythm_staged_gloo_correction_verdict_offset == 0
+    assert engine._spec_rhythm_staged_gloo_correction_host_continuation == ((31, 32, 33, 34),)
+    assert (
+        getattr(
+            engine,
+            "_spec_rhythm_staged_gloo_correction_device_continuation_copies",
+            0,
+        )
+        == 0
+    )
+    assert engine._spec_rhythm_staged_gloo_correction_host_continuation_reuses == 1
+    assert events == [
+        ("copy", 0, 2, True),
+        "record",
+    ]
+
+
 @pytest.mark.parametrize("batch_size", [1, 16, 32])
 def test_fixed_full_window_target_staging_overlaps_continuation_copy_and_collective_wait(batch_size):
     events = []
@@ -2645,6 +2763,325 @@ def test_device_mailbox_validates_prefix_epoch_and_variable_shapes():
     )
     with pytest.raises(RuntimeError, match="host continuation"):
         bad_host.validate_for(state)
+
+
+def _target_replay_ahead_fixture():
+    runtime_states = {
+        index: SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=0 if index < 2 else 1,
+        )
+        for index in range(4)
+    }
+    controller = SpecRhythmPipelineController(runtime_states)
+    states = [
+        PearlPipelineState(
+            [100 + index, 200 + index],
+            prompt_length=1,
+            committed_length=2,
+        )
+        for index in range(4)
+    ]
+    tickets = [
+        controller.new_ticket(index, gamma=4, eager=False)
+        for index in range(4)
+    ]
+    controller.publish(tickets)
+    payloads = {
+        ticket.proposal_id: NativeSpecRhythmDevicePayload(
+            ticket=ticket,
+            verification_tokens=torch.tensor(
+                [10 + ticket.request_index] * 4,
+            ),
+            next_tokens=torch.tensor([10 + ticket.request_index] * 4),
+            verification_size=4,
+            draft_confidence=0.5,
+            host_next_tokens=(10 + ticket.request_index,) * 4,
+        )
+        for ticket in tickets
+    }
+    return controller, states, payloads
+
+
+def test_target_replay_ahead_preview_is_exact_and_side_effect_free():
+    controller, states, payloads = _target_replay_ahead_fixture()
+    ready_before = dict(controller.ready)
+    plan_id_before = controller.plan_id
+
+    signature, reason = plan_spec_rhythm_target_replay_ahead(
+        controller=controller,
+        current_target_home_batch_id=0,
+        current_target_request_indices=(0, 1),
+        active_request_indices=(0, 1, 2, 3),
+        payloads=payloads,
+        states=states,
+        gamma=4,
+        verification_budget=16,
+        max_target_requests=None,
+        linear_full_window=True,
+        dual_batch=True,
+        immutable_frontier=True,
+        allow_next_cycle=True,
+    )
+
+    assert reason is None
+    assert signature is not None
+    assert signature.home_batch_id == 1
+    assert signature.request_indices == (2, 3)
+    assert signature.proposal_ids == (
+        controller.ready[2].proposal_id,
+        controller.ready[3].proposal_id,
+    )
+    assert signature.root_token_ids == (202, 203)
+    assert controller.plan_id == plan_id_before
+    assert controller.ready == ready_before
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected_reason"),
+    [
+        ("mutable", "mutable_frontier"),
+        ("pending_eager", "pending_eager"),
+        ("deferred_current", "schedule"),
+        ("stale_epoch", "ticket_epoch"),
+        ("small_budget", "schedule"),
+    ],
+)
+def test_target_replay_ahead_preview_fails_closed(mutation, expected_reason):
+    controller, states, payloads = _target_replay_ahead_fixture()
+    immutable_frontier = True
+    current = (0, 1)
+    budget = 16
+    if mutation == "mutable":
+        immutable_frontier = False
+    elif mutation == "pending_eager":
+        controller.publish(
+            [controller.new_ticket(0, gamma=4, eager=True)]
+        )
+    elif mutation == "deferred_current":
+        current = (0,)
+    elif mutation == "stale_epoch":
+        states[2].continuation_epoch += 1
+    elif mutation == "small_budget":
+        budget = 4
+
+    signature, reason = plan_spec_rhythm_target_replay_ahead(
+        controller=controller,
+        current_target_home_batch_id=0,
+        current_target_request_indices=current,
+        active_request_indices=(0, 1, 2, 3),
+        payloads=payloads,
+        states=states,
+        gamma=4,
+        verification_budget=budget,
+        max_target_requests=None,
+        linear_full_window=True,
+        dual_batch=True,
+        immutable_frontier=immutable_frontier,
+        allow_next_cycle=True,
+    )
+
+    assert signature is None
+    assert reason == expected_reason
+
+
+def test_target_replay_ahead_signature_detects_prefix_change():
+    controller, states, payloads = _target_replay_ahead_fixture()
+    expected, reason = _spec_rhythm_selected_target_signature(
+        controller=controller,
+        home_batch_id=1,
+        request_indices=(2, 3),
+        payloads=payloads,
+        states=states,
+        gamma=4,
+    )
+    assert reason is None
+    states[2].token_ids[states[2].committed_length - 1] += 1
+    changed, reason = _spec_rhythm_selected_target_signature(
+        controller=controller,
+        home_batch_id=1,
+        request_indices=(2, 3),
+        payloads=payloads,
+        states=states,
+        gamma=4,
+    )
+    assert reason is None
+    assert changed != expected
+
+
+def test_target_replay_ahead_requires_sealed_qualified_decode_graph():
+    contract = {
+        "request_count": 2,
+        "gamma": 4,
+        "max_committed_length": 128,
+        "max_model_len": 2048,
+        "target_use_paged_attention": False,
+        "enforce_eager": False,
+        "linear_bonus_token": False,
+        "mixed_target_graph_enabled": True,
+        "mixed_target_graph_prefill_only": False,
+        "target_aclgraph_disabled": False,
+        "validate_graph_replays": False,
+        "graph_cache_sealed": True,
+        "stable_graph_qualified": True,
+        "stable_capacity": 2,
+        "max_graph_tokens": 256,
+    }
+    assert (
+        spec_rhythm_target_replay_ahead_graph_reject_reason(**contract)
+        is None
+    )
+    for key, value in (
+        ("graph_cache_sealed", False),
+        ("stable_graph_qualified", False),
+        ("mixed_target_graph_enabled", False),
+        ("target_use_paged_attention", True),
+        ("validate_graph_replays", True),
+        ("stable_capacity", None),
+    ):
+        rejected = {**contract, key: value}
+        assert (
+            spec_rhythm_target_replay_ahead_graph_reject_reason(**rejected)
+            == "graph_contract"
+        )
+
+
+def test_target_replay_ahead_logical_preflight_skips_if_any_rank_rejects():
+    valid = [1, -1, 101, 2, 8]
+    eligible, reason = _resolve_target_replay_ahead_logical_preflight(
+        [
+            valid,
+            valid,
+            [
+                0,
+                native_engine_module.TARGET_REPLAY_AHEAD_REJECT_REASONS.index(
+                    "mutable_frontier"
+                ),
+                0,
+                0,
+                -1,
+            ],
+            valid,
+        ]
+    )
+
+    assert eligible is False
+    assert reason == "mutable_frontier"
+
+
+def test_target_replay_ahead_logical_preflight_rejects_divergent_shape():
+    with pytest.raises(RuntimeError, match="signature/count/capacity diverged"):
+        _resolve_target_replay_ahead_logical_preflight(
+            [
+                [1, -1, 101, 2, 8],
+                [1, -1, 101, 3, 8],
+            ]
+        )
+
+
+def test_target_replay_ahead_resource_preflight_is_target_only():
+    rows = [
+        [0, 1, -1, 101, -1, -1, 0],
+        [1, 1, -1, 101, 7, 11, 313],
+        [1, 1, -1, 101, 7, 11, 313],
+        [1, 1, -1, 101, 7, 11, 313],
+    ]
+    assert _resolve_target_replay_ahead_resource_preflight(rows) == (
+        True,
+        None,
+    )
+
+    rows[2] = [
+        1,
+        0,
+        native_engine_module.TARGET_REPLAY_AHEAD_REJECT_REASONS.index(
+            "resource_contract"
+        ),
+        101,
+        7,
+        11,
+        313,
+    ]
+    assert _resolve_target_replay_ahead_resource_preflight(rows) == (
+        False,
+        "resource_contract",
+    )
+
+
+def _target_replay_ahead_consume_rows():
+    return [
+        [0, 1, 1, 101, 101, -1, -1, 0, 9],
+        [1, 1, 1, 101, 101, 7, 12, 313, 9],
+        [1, 1, 1, 101, 101, 7, 12, 313, 9],
+        [1, 1, 1, 101, 101, 7, 12, 313, 9],
+    ]
+
+
+def test_target_replay_ahead_consume_preflight_accepts_exact_all_role_state():
+    assert _resolve_target_replay_ahead_consume_preflight(
+        _target_replay_ahead_consume_rows()
+    ) == (True, True)
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    ("bind_failure", "logical_mismatch", "pending_split"),
+)
+def test_target_replay_ahead_consume_preflight_rejects_rank_local_split(
+    mutation,
+):
+    rows = _target_replay_ahead_consume_rows()
+    if mutation == "bind_failure":
+        rows[2][2] = 0
+    elif mutation == "logical_mismatch":
+        rows[2][4] = 102
+    else:
+        rows[2] = [1, 0, 1, 0, 0, -1, -1, 0, 0]
+
+    assert _resolve_target_replay_ahead_consume_preflight(rows) == (
+        True,
+        False,
+    )
+
+
+@pytest.mark.parametrize(
+    ("active", "current", "fallback", "expected"),
+    [
+        (64, 32, 4, True),
+        (8, 4, 4, False),
+        (9, 4, 4, True),
+        (8, 4, 0, True),
+        (4, 0, 4, False),
+    ],
+)
+def test_target_replay_ahead_fallback_proof(
+    active,
+    current,
+    fallback,
+    expected,
+):
+    assert (
+        spec_rhythm_target_replay_ahead_fallback_safe(
+            active_request_count=active,
+            current_target_count=current,
+            fallback_max_batch=fallback,
+        )
+        is expected
+    )
+
+
+def test_target_replay_ahead_env_is_default_off(monkeypatch):
+    variable = "VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD"
+    monkeypatch.delenv(variable, raising=False)
+    assert (
+        native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD
+        is False
+    )
+    monkeypatch.setenv(variable, "1")
+    assert (
+        native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD
+        is True
+    )
 
 
 def test_native_qwen2_model_runs_with_a_single_tensor_parallel_rank_on_cpu():
@@ -5858,6 +6295,16 @@ def test_linear_draft_fia_stable_task_barrier_is_independently_opt_in(
     assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_STABLE_TASK_BARRIER is True
 
 
+def test_gloo_proposal_host_continuation_reuse_defaults_on_and_can_opt_out(
+    monkeypatch,
+):
+    variable = "VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_HOST_CONTINUATION"
+    monkeypatch.delenv(variable, raising=False)
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_HOST_CONTINUATION is True
+    monkeypatch.setenv(variable, "0")
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_HOST_CONTINUATION is False
+
+
 def test_linear_draft_fia_common_kv_keeps_30_to_31_row_bucket_signature():
     capture_size = 32
     common_limit = 48
@@ -6470,6 +6917,7 @@ def test_spec_rhythm_full_draft_graph_uses_bounded_dense_buckets(
     assert getattr(engine, "_linear_draft_stepwise_calls", 0) == 0
     engine._fixed_full_window_host_correction_staging_eligible_calls = 7
     engine._fixed_full_window_host_correction_staging_calls = 6
+    engine._spec_rhythm_staged_gloo_correction_device_continuation_copies = 5
     metrics = engine.graph_metrics()
     assert metrics[f"spec_rhythm_linear_draft_full_chain_bucket_{expected_graph_rows}_calls"] == 1
     assert metrics["spec_rhythm_linear_draft_full_chain_calls"] == 1
@@ -6479,6 +6927,7 @@ def test_spec_rhythm_full_draft_graph_uses_bounded_dense_buckets(
     assert metrics["spec_rhythm_linear_draft_stepwise_calls"] == 0
     assert metrics["spec_rhythm_fixed_full_window_host_correction_staging_eligible_calls"] == 7
     assert metrics["spec_rhythm_fixed_full_window_host_correction_staging_calls"] == 6
+    assert metrics["spec_rhythm_staged_gloo_correction_device_continuation_copies"] == 5
     assert {
         "mc2_dispatch_fused_attempt",
         "mc2_dispatch_fused_success",
@@ -7644,6 +8093,110 @@ def test_public_pearl_config_rejects_negative_host_profile_decode_steps():
         PEARLConfig("draft", "target", profile_host_decode_steps=-1)
 
 
+@pytest.mark.parametrize(
+    ("profile_dir", "measurement_only", "host_steps", "expected"),
+    [
+        (None, False, 0, False),
+        ("", False, 8, False),
+        ("/tmp/profile", False, 0, True),
+        ("/tmp/profile", True, 0, False),
+        ("/tmp/profile", True, 8, True),
+    ],
+)
+def test_npu_profile_measurement_only_uses_host_timeline_as_call_arm(
+    profile_dir,
+    measurement_only,
+    host_steps,
+    expected,
+):
+    assert (
+        _npu_profile_call_enabled(
+            profile_dir,
+            measurement_only=measurement_only,
+            profile_host_decode_steps=host_steps,
+        )
+        is expected
+    )
+
+
+def test_npu_profile_measurement_only_environment_defaults_off(monkeypatch):
+    variable = "VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY"
+    monkeypatch.delenv(variable, raising=False)
+    assert native_engine_module.envs.VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY is False
+    monkeypatch.setenv(variable, "1")
+    assert native_engine_module.envs.VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY is True
+
+
+def test_active_npu_profiler_stops_exactly_once():
+    owner = SimpleNamespace()
+    profiler = MagicMock()
+
+    _start_active_npu_profiler(owner, profiler)
+    assert owner._active_tree_profiler is profiler
+    _stop_active_npu_profiler(owner)
+    _stop_active_npu_profiler(owner)
+
+    profiler.start.assert_called_once_with()
+    profiler.stop.assert_called_once_with()
+    assert owner._active_tree_profiler is None
+
+
+def test_active_npu_profiler_stop_failure_invalidates_normal_run():
+    owner = SimpleNamespace()
+    profiler = MagicMock()
+    profiler.stop.side_effect = RuntimeError("stop failed")
+    _start_active_npu_profiler(owner, profiler)
+
+    with pytest.raises(RuntimeError, match="stop failed"):
+        _stop_active_npu_profiler(owner)
+
+    profiler.stop.assert_called_once_with()
+    assert owner._active_tree_profiler is None
+
+
+def test_active_npu_profiler_start_failure_is_cleaned_up():
+    owner = SimpleNamespace()
+    profiler = MagicMock()
+    profiler.start.side_effect = RuntimeError("start failed")
+
+    with pytest.raises(RuntimeError, match="start failed"):
+        _start_active_npu_profiler(owner, profiler)
+
+    profiler.stop.assert_called_once_with()
+    assert owner._active_tree_profiler is None
+
+
+def test_generate_batch_exception_stops_active_npu_profiler():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine._generate_batch_impl = MagicMock(side_effect=RuntimeError("decode failed"))
+    profiler = MagicMock()
+    profiler.stop.side_effect = RuntimeError("stop failed")
+    _start_active_npu_profiler(engine, profiler)
+
+    with pytest.raises(RuntimeError, match="decode failed"):
+        engine.generate_batch([[1, 2, 3]])
+
+    profiler.stop.assert_called_once_with()
+    assert engine._active_tree_profiler is None
+
+
+def test_direct_generation_cleanup_preserves_active_exception():
+    owner = SimpleNamespace()
+    profiler = MagicMock()
+    profiler.stop.side_effect = RuntimeError("stop failed")
+
+    @_with_npu_profiler_cleanup
+    def fail_after_profiler_start(value):
+        _start_active_npu_profiler(value, profiler)
+        raise RuntimeError("target decode failed")
+
+    with pytest.raises(RuntimeError, match="target decode failed"):
+        fail_after_profiler_start(owner)
+
+    profiler.stop.assert_called_once_with()
+    assert owner._active_tree_profiler is None
+
+
 def test_public_pearl_config_requires_steps_for_profiling_only():
     with pytest.raises(ValueError, match="profiling-only"):
         PEARLConfig("draft", "target", stop_after_profiled_decode_steps=True)
@@ -7726,6 +8279,91 @@ def test_profiling_only_continuous_results_can_include_unfinished_requests():
     assert result_states == [completed, unfinished]
 
 
+def test_linear_result_materialization_skips_discarded_follower_results():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 0
+    engine.topology = SimpleNamespace(target_leader_rank=1)
+    engine.graph_metrics = MagicMock()
+    engine._release_cache = MagicMock()
+
+    materialization = engine._prepare_spec_rhythm_linear_result_materialization(463)
+
+    assert materialization is None
+    engine.graph_metrics.assert_not_called()
+    engine._release_cache.assert_called_once_with()
+
+
+def test_linear_result_materialization_snapshots_leader_metadata_once_before_release():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.rank = 1
+    engine.topology = SimpleNamespace(target_leader_rank=1)
+    cached_prompt_tokens = list(range(463))
+    engine.cache_allocation = NativeCacheAllocation(
+        block_tables=[[] for _ in cached_prompt_tokens],
+        num_cached_tokens=cached_prompt_tokens,
+    )
+    events = []
+    expected_metrics = {"aclgraph_replays": 1976}
+    engine.graph_metrics = MagicMock(
+        side_effect=lambda: events.append("metrics") or expected_metrics,
+    )
+    engine._release_cache = MagicMock(
+        side_effect=lambda: events.append("release"),
+    )
+
+    materialization = engine._prepare_spec_rhythm_linear_result_materialization(463)
+
+    assert materialization == (tuple(cached_prompt_tokens), expected_metrics)
+    assert events == ["metrics", "release"]
+    engine.graph_metrics.assert_called_once_with()
+    engine._release_cache.assert_called_once_with()
+
+
+def test_linear_result_metrics_copy_keeps_request_rows_independent():
+    graph_metrics = {
+        "aclgraph_replays": 17,
+        "mc2_static_operator_kinds": ["attention", "down"],
+        "target_replay_histogram": {"m64": 3},
+        "worker_host_timeline": [{"step": 0, "elapsed_ms": 1.5}],
+    }
+
+    first = native_engine_module._copy_result_graph_metrics(graph_metrics)
+    second = native_engine_module._copy_result_graph_metrics(graph_metrics)
+
+    first["mc2_static_operator_kinds"].append("gate_up")
+    first["target_replay_histogram"]["m64"] = 99
+    first["worker_host_timeline"][0]["elapsed_ms"] = 8.0
+    assert second == graph_metrics
+    assert first is not second
+    assert first["mc2_static_operator_kinds"] is not second["mc2_static_operator_kinds"]
+    assert first["target_replay_histogram"] is not second["target_replay_histogram"]
+    assert first["worker_host_timeline"][0] is not second["worker_host_timeline"][0]
+    assert native_engine_module._copy_result_graph_metrics({}) == {}
+
+
+def test_native_result_graph_metrics_opt_out_preserves_direct_call_default():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine.graph_metrics = MagicMock(return_value={"aclgraph_replays": 17})
+
+    assert engine._result_graph_metrics() == {"aclgraph_replays": 17}
+    engine._include_graph_metrics_in_results = False
+    assert engine._result_graph_metrics() == {}
+    engine.graph_metrics.assert_called_once_with()
+
+
+def test_generate_batch_restores_result_metric_policy_after_compact_call():
+    engine = NativePearlEngine.__new__(NativePearlEngine)
+    engine._include_graph_metrics_in_results = True
+    engine._generate_batch_impl = MagicMock(
+        side_effect=lambda *_args, **_kwargs: [{"included": engine._include_graph_metrics_in_results}]
+    )
+
+    result = engine.generate_batch([[1]], include_graph_metrics=False)
+
+    assert result == [{"included": False}]
+    assert engine._include_graph_metrics_in_results is True
+
+
 @pytest.mark.parametrize("prefill_chunk_size", [0, 9])
 def test_public_pearl_config_rejects_invalid_prefill_chunk_size(prefill_chunk_size):
     with pytest.raises(ValueError, match="prefill_chunk_size"):
@@ -7778,6 +8416,123 @@ def test_public_engine_preserves_sampling_request_metadata_when_not_overridden()
     assert queued.slo_tpot_ms == 20.0
     assert queued.slo_class == "tight"
     assert queued.spec_rhythm_max_gamma == 3
+
+
+def test_public_engine_reuses_sampling_params_when_no_metadata_is_overridden():
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine.config = SimpleNamespace(max_model_len=64)
+    engine._requests = []
+    engine._next_request_id = 0
+    params = SamplingParams(max_tokens=4, request_id="trace-7")
+
+    with patch.object(api_module, "replace", wraps=api_module.replace) as replace_params:
+        engine.add_request([1, 2], params)
+
+    replace_params.assert_not_called()
+    assert engine._requests[0][2] is params
+
+
+def test_public_engine_still_applies_explicit_sampling_metadata_overrides():
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine.config = SimpleNamespace(max_model_len=64)
+    engine._requests = []
+    engine._next_request_id = 0
+    params = SamplingParams(max_tokens=4)
+
+    engine.add_request(
+        [1, 2],
+        params,
+        request_id="trace-8",
+        arrival_ts=321.5,
+        slo_tpot_ms=40.0,
+        slo_class="tight",
+        per_request_gamma=3,
+    )
+
+    queued = engine._requests[0][2]
+    assert queued is not params
+    assert queued.request_id == "trace-8"
+    assert queued.arrival_ts == 321.5
+    assert queued.slo_tpot_ms == 40.0
+    assert queued.slo_class == "tight"
+    assert queued.spec_rhythm_max_gamma == 3
+
+
+def test_public_engine_copies_normalized_token_list_without_reboxing():
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine.config = SimpleNamespace(max_model_len=64)
+    engine._requests = []
+    engine._next_request_id = 0
+    prompt = [1, 2]
+
+    engine.add_request(prompt, SamplingParams(max_tokens=4))
+    queued = engine._requests[0][1]
+    prompt.append(3)
+
+    assert queued == [1, 2]
+    assert queued is not prompt
+
+
+def test_public_engine_preserves_non_normalized_token_coercion():
+    class TokenInt(int):
+        pass
+
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine.config = SimpleNamespace(max_model_len=64)
+    engine._requests = []
+    engine._next_request_id = 0
+
+    engine.add_request([TokenInt(1), True, "3"], SamplingParams(max_tokens=4))
+
+    queued = engine._requests[0][1]
+    assert queued == [1, 1, 3]
+    assert all(type(token_id) is int for token_id in queued)
+
+
+def test_public_engine_serializes_broadcast_command_once():
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine._closed = False
+    connections = [MagicMock(), MagicMock()]
+    engine._connections = connections
+    message = ("log", "ready", None, None)
+
+    with patch.object(
+        api_module.ForkingPickler,
+        "dumps",
+        wraps=api_module.ForkingPickler.dumps,
+    ) as dumps:
+        engine._send_all(message)
+
+    dumps.assert_called_once_with(message)
+    first_payload = connections[0].send_bytes.call_args.args[0]
+    second_payload = connections[1].send_bytes.call_args.args[0]
+    assert first_payload is second_payload
+    assert api_module.ForkingPickler.loads(first_payload) == message
+
+
+def test_public_engine_send_bytes_is_compatible_with_worker_recv():
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine._closed = False
+    controller, worker = Pipe(duplex=True)
+    engine._connections = [controller]
+    message = ("log", "ready", None, None)
+    try:
+        engine._send_all(message)
+        assert worker.recv() == message
+    finally:
+        controller.close()
+        worker.close()
+
+
+def test_public_engine_empty_broadcast_preserves_noop_behavior():
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine._closed = False
+    engine._connections = []
+
+    with patch.object(api_module.ForkingPickler, "dumps") as dumps:
+        engine._send_all(("log", "ready", None, None))
+
+    dumps.assert_not_called()
 
 
 def test_public_engine_times_out_with_pending_worker_ranks():
@@ -8002,6 +8757,67 @@ def test_public_engine_aggregates_aclgraph_metrics_from_every_worker():
             "worker_metrics": [failed_rank_metrics, base_metrics],
         }
     ]
+
+
+def test_public_engine_compact_metrics_attaches_one_compatibility_view():
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine.config = SimpleNamespace(
+        gamma=4,
+        max_model_len=32,
+        max_num_seqs=2,
+        max_num_batched_tokens=32,
+        worker_timeout_seconds=1,
+        compact_worker_result_metrics=True,
+    )
+    params = SamplingParams(max_tokens=1)
+    engine._requests = [(0, [1], params), (1, [1], params)]
+    engine.last_metrics = []
+    engine.tokenizer = MagicMock()
+    engine.tokenizer.decode.return_value = "result"
+    engine._send_all = MagicMock()
+    leader_results = [
+        {"completion_token_ids": [2], "num_acc_tokens": [1], "elapsed_seconds": 1.0},
+        {"completion_token_ids": [3], "num_acc_tokens": [1], "elapsed_seconds": 1.0},
+    ]
+    metrics = {
+        "aclgraph_replays": 11,
+        "aclgraph_failed_captures": 0,
+        "mc2_static_route_digest": "route-sha256",
+        "mc2_static_operator_kinds": ["attention", "down"],
+        "target_replay_histogram": {"m64": 7},
+    }
+    engine._receive_all = MagicMock(return_value=[("result", leader_results, metrics)])
+
+    engine._generate("pearl")
+
+    assert engine.last_aggregate_graph_metrics == {
+        "aclgraph_replays": 11,
+        "aclgraph_failed_captures": 0,
+    }
+    assert engine.last_metrics[0]["aclgraph_replays"] == 11
+    assert "aclgraph_replays" not in engine.last_metrics[1]
+    assert "mc2_static_route_digest" not in engine.last_metrics[0]
+    assert "mc2_static_operator_kinds" not in engine.last_metrics[0]
+    assert "target_replay_histogram" not in engine.last_metrics[0]
+    assert engine.last_worker_metrics == [metrics]
+
+
+def test_public_engine_empty_generate_clears_aggregate_graph_metrics():
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine.config = SimpleNamespace()
+    engine._requests = []
+    engine.last_metrics = [{"completion_token_ids": [1]}]
+    engine.last_worker_metrics = [{"aclgraph_replays": 11}]
+    engine.last_worker_metrics_by_chunk = [{"worker_metrics": []}]
+    engine.last_aggregate_graph_metrics = {"aclgraph_replays": 11}
+
+    result = engine._generate("pearl")
+
+    assert result == ([], [], (), 0.0)
+    assert engine.last_metrics == []
+    assert engine.last_worker_metrics == []
+    assert engine.last_worker_metrics_by_chunk == []
+    assert engine.last_aggregate_graph_metrics == {}
 
 
 def test_decode_profile_aggregates_only_full_batch_chunks_per_step():

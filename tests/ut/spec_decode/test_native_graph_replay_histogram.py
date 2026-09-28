@@ -8,7 +8,14 @@ from unittest.mock import MagicMock, patch
 import torch
 
 from examples.benchmark_nano_pearl_speculative import _worker_aclgraph_deltas
-from vllm_ascend.spec_decode.pearl.native_engine import NativePearlEngine
+from vllm_ascend.spec_decode.pearl.mc2 import (
+    MC2Qualification,
+    MC2StaticRouteManifest,
+)
+from vllm_ascend.spec_decode.pearl.native_engine import (
+    NativePearlEngine,
+    _mc2_static_route_shape_evidence,
+)
 from vllm_ascend.spec_decode.pearl.native_graph import (
     NativeACLGraphRunner,
     NativeGraphExecution,
@@ -162,6 +169,46 @@ def test_worker_graph_metrics_expose_replay_histograms() -> None:
     json.dumps(metrics)
 
 
+def test_mc2_static_route_evidence_keeps_projection_shapes_independent() -> None:
+    qualified = MC2Qualification(True, "qualified")
+    rejected = MC2Qualification(False, "not profiled")
+
+    def route(k: int, decisions: dict[int, MC2Qualification]) -> SimpleNamespace:
+        return SimpleNamespace(
+            input_size=k,
+            output_size=5120,
+            dtype="bfloat16",
+            weight_format="ND",
+            is_trans_b=True,
+            enabled=True,
+            decisions=decisions,
+        )
+
+    manifest = MC2StaticRouteManifest(
+        routes=(
+            route(3072, {60: qualified, 64: qualified}),
+            route(3072, {60: qualified, 64: qualified}),
+            route(8576, {60: rejected, 64: qualified}),
+            route(8576, {60: rejected, 64: qualified}),
+        ),
+        profile_sha256="profile",
+        digest="manifest",
+    )
+
+    rows_by_shape, route_counts_by_shape = _mc2_static_route_shape_evidence(
+        manifest
+    )
+
+    assert rows_by_shape == {
+        "(3072, 5120, 'bfloat16', 'ND', True)": [60, 64],
+        "(8576, 5120, 'bfloat16', 'ND', True)": [64],
+    }
+    assert route_counts_by_shape == {
+        "(3072, 5120, 'bfloat16', 'ND', True)": 2,
+        "(8576, 5120, 'bfloat16', 'ND', True)": 2,
+    }
+
+
 def test_benchmark_deltas_subtract_replay_histograms_by_rank() -> None:
     first_key = "('hidden|fia-stable:first', 64)"
     second_key = "('hidden|fia-stable:second', 160)"
@@ -170,6 +217,12 @@ def test_benchmark_deltas_subtract_replay_histograms_by_rank() -> None:
         {
             "rank": 1,
             "is_draft_rank": 0,
+            "mc2_static_route_digest": "route-digest",
+            "mc2_static_route_count": 128,
+            "mc2_static_operator_kinds": ["tp3_native_matmul+allreduce_add_rmsnorm"],
+            "mc2_static_qualified_row_routes": 64,
+            "mc2_static_qualified_rows_by_shape": {"attention": [60, 64]},
+            "mc2_static_route_counts_by_shape": {"attention": 64},
             "aclgraph_generic_replay_entry_key_histogram": {
                 first_key: 3,
                 retired_key: 2,
@@ -184,6 +237,12 @@ def test_benchmark_deltas_subtract_replay_histograms_by_rank() -> None:
         {
             "rank": 1,
             "is_draft_rank": 0,
+            "mc2_static_route_digest": "route-digest",
+            "mc2_static_route_count": 128,
+            "mc2_static_operator_kinds": ["tp3_native_matmul+allreduce_add_rmsnorm"],
+            "mc2_static_qualified_row_routes": 64,
+            "mc2_static_qualified_rows_by_shape": {"attention": [60, 64]},
+            "mc2_static_route_counts_by_shape": {"attention": 64},
             "aclgraph_generic_replay_entry_key_histogram": {
                 first_key: 8,
                 second_key: 4,
@@ -198,6 +257,14 @@ def test_benchmark_deltas_subtract_replay_histograms_by_rank() -> None:
     delta = _worker_aclgraph_deltas(before, after)[0]
 
     assert delta["is_draft_rank"] == 0
+    assert delta["mc2_static_route_digest"] == "route-digest"
+    assert delta["mc2_static_route_count"] == 128
+    assert delta["mc2_static_operator_kinds"] == ["tp3_native_matmul+allreduce_add_rmsnorm"]
+    assert delta["mc2_static_qualified_row_routes"] == 64
+    assert delta["mc2_static_qualified_rows_by_shape"] == {
+        "attention": [60, 64]
+    }
+    assert delta["mc2_static_route_counts_by_shape"] == {"attention": 64}
     assert delta["aclgraph_generic_replay_entry_key_histogram_delta"] == {
         first_key: 5,
         retired_key: -2,

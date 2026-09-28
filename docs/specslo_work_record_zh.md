@@ -2,6 +2,11 @@
 
 更新时间：2026-09-18
 
+> 2026-09-28 因插件更新暂停优化。当前 coalesce1 公平口径、已验证/待验证优化、
+> 无效方向和恢复步骤见
+> [链式投机解码优化暂停检查点](specslo_optimization_checkpoint_20260928_zh.md)。
+> 该检查点优先于下文按日期保留的历史性能结论。
+
 > 当前结论：除第 6.12 节的 60 请求验收外，2026-09-18 已按作者规则生成并完成
 > 463 请求、RPS=4、batch 上限 64、固定 `gamma=4` 的四卡验收。相对同四卡 TP4
 > target-only + coalesce4 baseline，SpecSLO TP1+TP3 的 decode raw 为 **1.0048x**，

@@ -45,6 +45,7 @@ class _LinearLoopHarness:
         prompt_lengths=None,
         is_draft=False,
         bonus_token=False,
+        max_target_batch=0,
     ):
         self.events = []
         self.prefilled = set()
@@ -96,6 +97,7 @@ class _LinearLoopHarness:
             spec_rhythm_prefill_token_chunk_size=prefill_token_chunk_size,
             spec_rhythm_min_gamma=4,
             spec_rhythm_target_fallback_max_batch=(capacity if target_fallback is True else int(target_fallback)),
+            spec_rhythm_max_target_batch=max_target_batch,
             spec_rhythm_cpu_verdict=True,
             profile_host_decode_steps=profile_host_steps,
             enforce_eager=True,
@@ -413,6 +415,92 @@ def test_fixed_gamma_identity_budget_preserves_selected_row_order():
 
     assert list(normal.items()) == [(3, 4), (1, 4)]
     assert list(eager.items()) == [(4, 4), (2, 4)]
+
+
+@pytest.mark.parametrize(
+    ("enabled", "pending", "staged", "suspended", "expected"),
+    [
+        (False, (), (), (), False),
+        (True, (1,), (), (), False),
+        (True, (), (1,), (), False),
+        (True, (), (), (1,), False),
+        (True, (), (), (), True),
+    ],
+)
+def test_drain_fifo_requires_an_immutable_online_frontier(
+    enabled,
+    pending,
+    staged,
+    suspended,
+    expected,
+):
+    assert (
+        native.spec_rhythm_drain_fifo_active(
+            enabled,
+            pending_admission=pending,
+            staged_prefill_indices=staged,
+            suspended_indices=suspended,
+        )
+        is expected
+    )
+
+
+def test_drain_fifo_is_explicit_and_reports_executed_cycles(monkeypatch):
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO", "1")
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(9, 9, 9, 9),
+        capacity=4,
+        slo=40.0,
+        full_window=True,
+    )
+
+    metrics = harness.run(max_rounds=6)[0]["spec_rhythm"]
+
+    assert metrics["spec_rhythm_drain_fifo_enabled"] == 1
+    assert metrics["spec_rhythm_drain_fifo_cycles"] == 5
+
+
+def test_drain_lrtf_is_explicit_and_reuses_the_immutable_drain_boundary(monkeypatch):
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO", "1")
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF", "1")
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(9, 9, 9, 9),
+        capacity=4,
+        slo=40.0,
+        full_window=True,
+    )
+
+    metrics = harness.run(max_rounds=6)[0]["spec_rhythm"]
+
+    assert metrics["spec_rhythm_drain_lrtf_enabled"] == 1
+    assert metrics["spec_rhythm_drain_lrtf_cycles"] == metrics["spec_rhythm_drain_fifo_cycles"] == 5
+    assert metrics["spec_rhythm_drain_lrtf_normal_ranked_cycles"] > 0
+    assert metrics["spec_rhythm_drain_lrtf_normal_candidates"] > 0
+    assert metrics["spec_rhythm_drain_lrtf_repair_penalty_rows"] > 0
+    assert metrics["spec_rhythm_drain_lrtf_normal_selected"] > 0
+
+
+def test_drain_lrtf_reports_cycles_that_rank_both_pipeline_stages(monkeypatch):
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO", "1")
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF", "1")
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(13, 13, 13, 13),
+        capacity=4,
+        slo=40.0,
+        full_window=True,
+        max_target_batch=1,
+    )
+
+    metrics = harness.run(max_rounds=8)[0]["spec_rhythm"]
+
+    assert metrics["spec_rhythm_drain_lrtf_target_ranked_cycles"] > 0
+    assert metrics["spec_rhythm_drain_lrtf_normal_ranked_cycles"] > 0
+    assert metrics["spec_rhythm_drain_lrtf_unified_cycles"] > 0
+    assert metrics["spec_rhythm_drain_lrtf_target_candidates"] > 0
+    assert metrics["spec_rhythm_drain_lrtf_normal_candidates"] > 0
 
 
 @pytest.mark.parametrize(
@@ -767,6 +855,7 @@ def test_online_prefill_coalesces_two_ready_arrivals(monkeypatch):
 
 def test_tight_arrival_preempts_and_later_resumes_borrowed_loose_rows(monkeypatch):
     monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_PREEMPT_LOOSE_FOR_TIGHT", "1")
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_GLOO_ACCOUNTING", "1")
     wall = [99.9]
 
     def advance_wall():
@@ -786,6 +875,7 @@ def test_tight_arrival_preempts_and_later_resumes_borrowed_loose_rows(monkeypatc
         slo=40.0,
         slo_classes=("loose", "loose", "loose", "loose", "tight", "tight", "tight", "tight"),
     )
+    harness.engine.groups.verification_coordination_group = object()
 
     results = harness.run()
 
@@ -796,6 +886,7 @@ def test_tight_arrival_preempts_and_later_resumes_borrowed_loose_rows(monkeypatc
     assert diagnostics["spec_rhythm_preempted_loose_requests"] == 4
     assert diagnostics["spec_rhythm_resumed_loose_requests"] == 4
     assert diagnostics["spec_rhythm_max_suspended_requests"] == 4
+    assert diagnostics["spec_rhythm_tail_accounting_suspended_broadcasts"] > 0
 
 
 def test_online_prefill_coalescing_releases_one_request_at_timeout(monkeypatch):
@@ -962,6 +1053,11 @@ def test_target_fallback_respects_target_aclgraph_diagnostic_switch(
 
     assert results[0]["completion_token_ids"] == [301, 888]
     assert observed == [expected_use_aclgraph]
+    diagnostics = results[0]["spec_rhythm"]
+    assert diagnostics["spec_rhythm_target_fallback_cycles"] == 1
+    assert diagnostics["spec_rhythm_target_fallback_rows"] == 1
+    assert diagnostics["spec_rhythm_target_fallback_active_1_cycles"] == 1
+    assert diagnostics["spec_rhythm_target_fallback_wall_ms"] >= 0.0
 
 
 def test_full_fallback_batch_carries_clock_for_same_cycle_replacement(
@@ -1495,6 +1591,93 @@ def test_linear_cycle_clock_charges_tail_and_carries_accounting_collective(
     counters = result["spec_rhythm"]
     assert counters["spec_rhythm_cycle_accounted_tail_cycles"] == 3
     assert counters["spec_rhythm_cycle_accounted_tail_ms"] == pytest.approx(21.0)
+
+
+def test_gloo_unchanged_tail_skips_collective_and_carries_host_time(
+    monkeypatch,
+):
+    """A skipped tail remains visible to every surviving request next cycle."""
+
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_GLOO_ACCOUNTING", "1")
+    clock = [0.0]
+    monkeypatch.setattr(native.time, "perf_counter", lambda: clock[0])
+    monkeypatch.setattr(native.time, "time", lambda: 100.0)
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(9,),
+        capacity=1,
+        slo=40.0,
+        profile_host_steps=4,
+        full_window=True,
+    )
+    harness.engine.groups.verification_coordination_group = object()
+    original_broadcast = native.dist.broadcast
+
+    def delayed_primary_broadcast(value, *args, **kwargs):
+        result = original_broadcast(value, *args, **kwargs)
+        # Gloo primary layout: fixed-W clock (4), active/finish (2), and the
+        # piggybacked service signature (10). This delay happens after the
+        # split and must be carried into the next cycle.
+        if not kwargs.get("async_op") and value.dtype == torch.float64 and value.numel() == 16:
+            clock[0] += 0.007
+        return result
+
+    monkeypatch.setattr(native.dist, "broadcast", delayed_primary_broadcast)
+    original_target = harness.target_full_window
+
+    def timed_target(states, indices, payloads, *, proposal_matrix=None):
+        output = original_target(
+            states,
+            indices,
+            payloads,
+            proposal_matrix=proposal_matrix,
+        )
+        if indices:
+            clock[0] += 0.013
+        return output
+
+    harness.engine._target_full_window_outputs_batch = timed_target
+
+    result = harness.run()[0]
+
+    # Three primary-accounting delays and two target calls occur before the
+    # final token: (3 * 7 + 2 * 13) / (9 - 1).
+    assert result["observed_tpot_ms"] == pytest.approx(5.875)
+    counters = result["spec_rhythm"]
+    assert counters["spec_rhythm_tail_accounting_broadcasts"] == 0
+    assert counters["spec_rhythm_tail_accounting_changed_broadcasts"] == 0
+    assert counters["spec_rhythm_tail_accounting_unchanged_skips"] > 0
+    assert counters["spec_rhythm_cycle_frontier_piggybacks"] > 0
+    assert 12 not in harness.broadcast_sizes
+    traces = harness.engine.last_worker_decode_host_timeline
+    assert traces[0]["accounting_boundary_seconds"] == traces[0]["accounting_split_seconds"]
+    assert traces[1]["cycle_start_seconds"] == traces[0]["accounting_split_seconds"]
+
+
+def test_gloo_changed_tail_keeps_frontier_collective(monkeypatch):
+    """Publishing a staged arrival must retain tail validation/accounting."""
+
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_GLOO_ACCOUNTING", "1")
+    monkeypatch.setattr(native.time, "time", lambda: 100.0)
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(5, 5),
+        capacity=1,
+        online_prefill=True,
+        arrivals=(100.0, 100.0),
+        slo=40.0,
+        full_window=True,
+    )
+    harness.engine.groups.verification_coordination_group = object()
+
+    results = harness.run(continuous_batching=True)
+
+    assert len(results) == 2
+    counters = results[0]["spec_rhythm"]
+    assert counters["spec_rhythm_admitted_requests"] == 2
+    assert counters["spec_rhythm_tail_accounting_broadcasts"] >= 1
+    assert counters["spec_rhythm_tail_accounting_changed_broadcasts"] >= 1
+    assert 12 in harness.broadcast_sizes
 
 
 def test_linear_full_window_service_verifies_complete_serial_proposals(monkeypatch):

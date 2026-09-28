@@ -17,12 +17,14 @@ import json
 import logging
 import math
 import os
+import sys
 import time
 from collections import deque
-from collections.abc import Callable, Mapping, Sequence
-from contextlib import nullcontext
+from collections.abc import Callable, Iterable, Mapping, Sequence
+from contextlib import nullcontext, suppress
+from copy import deepcopy
 from dataclasses import dataclass, replace
-from functools import lru_cache
+from functools import lru_cache, wraps
 from typing import Any
 
 import torch
@@ -88,6 +90,7 @@ from vllm_ascend.spec_decode.pearl.roofline import (
     validate_roofline_hardware,
 )
 from vllm_ascend.spec_decode.pearl.spec_rhythm import (
+    ProposalLifecycle,
     SpecRhythmBudgetShaper,
     SpecRhythmPipelineController,
     SpecRhythmProposalTicket,
@@ -112,6 +115,51 @@ from vllm_ascend.spec_decode.tree_kv import (
     TreeKVCompactionGraphRunner,
     move_kv_cache_slots,
 )
+
+
+def _mc2_static_route_shape_evidence(
+    manifest: MC2StaticRouteManifest | None,
+) -> tuple[dict[str, list[int]], dict[str, int]]:
+    """Return exact per-projection-shape decisions from a frozen manifest.
+
+    A model forward may legally fuse one projection shape while another
+    projection with the same physical row count takes its ordinary split
+    path.  Keep those decisions separate: intersect decisions only across
+    decoder-layer routes that own the *same* projection shape, never across
+    attention and FFN-down shapes.
+
+    The tuple ``repr`` is deliberately identical to the shape-family key in
+    :func:`examples.specslo_benchmark_report.qualified_mc2_profile_replay_contract`.
+    It contains only rank-independent values already covered by the route
+    manifest consensus digest.
+    """
+
+    if not isinstance(manifest, MC2StaticRouteManifest):
+        return {}, {}
+    qualified_sets_by_shape: dict[str, list[set[int]]] = {}
+    route_counts_by_shape: dict[str, int] = {}
+    for route in manifest.routes:
+        signature = repr(
+            (
+                int(route.input_size),
+                int(route.output_size),
+                str(route.dtype),
+                str(route.weight_format),
+                bool(route.is_trans_b),
+            )
+        )
+        qualified = {
+            int(rows)
+            for rows, qualification in route.decisions.items()
+            if route.enabled and qualification.qualified
+        }
+        qualified_sets_by_shape.setdefault(signature, []).append(qualified)
+        route_counts_by_shape[signature] = route_counts_by_shape.get(signature, 0) + 1
+    qualified_rows_by_shape = {
+        signature: sorted(set.intersection(*row_sets) if row_sets else set())
+        for signature, row_sets in sorted(qualified_sets_by_shape.items())
+    }
+    return qualified_rows_by_shape, dict(sorted(route_counts_by_shape.items()))
 
 AUTO_GAMMA_BATCH_SIZES = (1, 2, 4, 8, 16, 32)
 AUTO_GAMMA_WARMUP_STEPS = 5
@@ -222,8 +270,7 @@ def resolve_mixed_target_graph_verify_capacities(value: str) -> tuple[int, ...]:
         requested = tuple(int(part.strip()) for part in value.split(","))
     except ValueError as error:
         raise ValueError(
-            "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_VERIFY_CAPACITIES "
-            "must be a comma-separated integer list."
+            "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_VERIFY_CAPACITIES must be a comma-separated integer list."
         ) from error
     if (
         not requested
@@ -257,9 +304,7 @@ def _next_stable_target_verify_capacity(
         None,
     )
     if capacity is None or request_count <= 0:
-        raise ValueError(
-            "Stable target-verify request count must fit its provisioned graph family."
-        )
+        raise ValueError("Stable target-verify request count must fit its provisioned graph family.")
     return capacity
 
 
@@ -599,10 +644,7 @@ def plan_mixed_target_graph_envelope(
         raise ValueError("Mixed-target graph envelope inputs must match the planned real rows.")
     expected_scratch_rows = layout.prompt_capacity + 1
     if len(scratch_ids) != expected_scratch_rows or len(set(scratch_ids)) != len(scratch_ids):
-        raise ValueError(
-            "Mixed-target graph envelope requires "
-            f"{expected_scratch_rows} unique scratch rows."
-        )
+        raise ValueError(f"Mixed-target graph envelope requires {expected_scratch_rows} unique scratch rows.")
     real_ids = (*verify_ids, *prompt_ids)
     if (
         len(set(real_ids)) != len(real_ids)
@@ -892,6 +934,84 @@ def order_spec_rhythm_admission_candidates(
     return tuple(sorted(ordered, key=priority))
 
 
+def order_spec_rhythm_admission_params(
+    request_indices: Sequence[int],
+    *,
+    request_params: Sequence[NativeSamplingParams],
+    enabled: bool,
+) -> tuple[int, ...]:
+    """Order admissions without materializing priority maps when disabled.
+
+    The common fixed-gamma throughput policy disables SLO-aware admission.
+    Keep that FIFO path independent of request metadata so polling a long
+    online queue does not rebuild two dictionaries that cannot affect the
+    result.  Tree/live admission uses this helper because its parameter list
+    may grow between polls and therefore cannot safely cache those maps.
+    """
+
+    ordered = tuple(int(index) for index in request_indices)
+    if not enabled:
+        return ordered
+    return order_spec_rhythm_admission_candidates(
+        ordered,
+        slo_tpot_ms={index: request_params[index].slo_tpot_ms for index in ordered},
+        arrival_ts={index: request_params[index].arrival_ts for index in ordered},
+        enabled=True,
+    )
+
+
+def normalize_spec_rhythm_slo_class(slo_class: str | None) -> str:
+    """Return the counter/scheduler label for one request SLO class."""
+
+    label = str(slo_class or "").strip().lower()
+    return label if label in {"tight", "normal", "loose"} else "unclassified"
+
+
+def spec_rhythm_class_caps_enabled(class_caps: Mapping[str, int]) -> bool:
+    """Return whether any positive class cap can affect admission."""
+
+    return any(int(cap) > 0 for cap in class_caps.values())
+
+
+def spec_rhythm_active_class_counts(
+    request_indices: Iterable[int],
+    *,
+    enabled: bool,
+    class_of: Callable[[int], str],
+) -> dict[str, int] | None:
+    """Count active classes only when caps can influence admission."""
+
+    if not enabled:
+        return None
+    counts = {label: 0 for label in ("tight", "normal", "loose", "unclassified")}
+    for index in request_indices:
+        counts[class_of(int(index))] += 1
+    return counts
+
+
+def spec_rhythm_any_when_enabled(enabled: bool, conditions: Iterable[bool]) -> bool:
+    """Short-circuit a potentially expensive scheduler scan behind a policy."""
+
+    return bool(enabled) and any(conditions)
+
+
+def spec_rhythm_drain_fifo_active(
+    enabled: bool,
+    *,
+    pending_admission: Sequence[int],
+    staged_prefill_indices: Sequence[int],
+    suspended_indices: Sequence[int],
+) -> bool:
+    """Return whether an online trace has reached its immutable drain phase."""
+
+    return bool(
+        enabled
+        and not pending_admission
+        and not staged_prefill_indices
+        and not suspended_indices
+    )
+
+
 def spec_rhythm_class_cap_blocks(
     slo_class: str,
     *,
@@ -907,7 +1027,7 @@ def spec_rhythm_class_cap_blocks(
     consuming every newly vacant slot and restarting their TPOT clocks.
     """
 
-    label = str(slo_class).strip().lower()
+    label = normalize_spec_rhythm_slo_class(slo_class)
     priority = {"tight": 0, "normal": 1, "loose": 2}
     if label not in priority:
         return False
@@ -915,8 +1035,7 @@ def spec_rhythm_class_cap_blocks(
     if cap <= 0 or int(active_counts.get(label, 0)) < cap:
         return False
     return any(
-        pending_label in priority and priority[pending_label] < priority[label]
-        for pending_label in pending_classes
+        pending_label in priority and priority[pending_label] < priority[label] for pending_label in pending_classes
     )
 
 
@@ -957,6 +1076,77 @@ def _full_window_eager_has_useful_horizon(
     if parent_verification_size <= 0:
         raise ValueError("A full-window parent must contain at least one token.")
     return len(state.committed_completion_token_ids) + int(parent_verification_size) < state.max_tokens
+
+
+def _npu_profile_call_enabled(
+    profile_dir: str | None,
+    *,
+    measurement_only: bool,
+    profile_host_decode_steps: int,
+) -> bool:
+    """Whether this generate call should create a heavyweight CANN trace.
+
+    Historically setting only ``VLLM_ASCEND_PEARL_NPU_PROFILE_DIR`` profiled
+    every generate call, including graph-qualification warmups.  Keep that
+    behavior by default.  The measurement-only diagnostic mode instead uses
+    the host-timeline request as an explicit per-call arm signal; the
+    benchmark sets it only after qualification immediately before the
+    measured call.
+    """
+
+    return bool(profile_dir) and (not measurement_only or int(profile_host_decode_steps) > 0)
+
+
+def _start_active_npu_profiler(owner: Any, profiler: Any) -> None:
+    """Start and register one profiler so generate cleanup can stop it."""
+
+    if getattr(owner, "_active_tree_profiler", None) is not None:
+        raise RuntimeError("A PEARL NPU profiler is already active.")
+    owner._active_tree_profiler = profiler
+    try:
+        profiler.start()
+    except BaseException:
+        owner._active_tree_profiler = None
+        with suppress(BaseException):
+            profiler.stop()
+        raise
+
+
+def _stop_active_npu_profiler(
+    owner: Any,
+    *,
+    suppress_errors: bool = False,
+) -> None:
+    """Stop a registered profiler exactly once, including exception paths."""
+
+    profiler = getattr(owner, "_active_tree_profiler", None)
+    if profiler is None:
+        return
+    # Clear first so an error from ``stop`` cannot trigger a second stop in
+    # the outer generate ``finally`` block.
+    owner._active_tree_profiler = None
+    try:
+        profiler.stop()
+    except BaseException:
+        if not suppress_errors:
+            raise
+        logger.exception("Failed to stop the NPU profiler while preserving an active generation error.")
+
+
+def _with_npu_profiler_cleanup(function: Callable[..., Any]) -> Callable[..., Any]:
+    """Ensure direct generation entry points release a profiler on failure."""
+
+    @wraps(function)
+    def wrapped(owner: Any, *args: Any, **kwargs: Any) -> Any:
+        try:
+            return function(owner, *args, **kwargs)
+        finally:
+            _stop_active_npu_profiler(
+                owner,
+                suppress_errors=sys.exc_info()[0] is not None,
+            )
+
+    return wrapped
 
 
 def _trace_region(owner: object, name: str):
@@ -1056,9 +1246,7 @@ def _gate_linear_eager_candidates(
             window.draft_token_budget // gamma,
         )
         affordable_buckets = [
-            bucket
-            for bucket in _linear_draft_graph_buckets(max_rows)
-            if bucket <= physical_row_budget
+            bucket for bucket in _linear_draft_graph_buckets(max_rows) if bucket <= physical_row_budget
         ]
         if envs.VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_BUCKET_TIMING and window.calibrated:
             # A fixed ACLGraph family is a latency staircase, not one linear
@@ -1163,6 +1351,24 @@ def _fixed_gamma_identity_budgets(
     )
 
 
+def _copy_result_graph_metrics(
+    graph_metrics: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Return an independent per-request diagnostics container.
+
+    Linear SpecRhythm snapshots graph diagnostics once because collecting the
+    same large histogram hundreds of times is pure result-materialization
+    overhead.  Preserve the historical result contract nevertheless: mutable
+    values in one request row must not alias those in another request row.
+    Compact worker replies pass an empty mapping and stay on the zero-copy
+    fast path.
+    """
+
+    if not graph_metrics:
+        return {}
+    return deepcopy(dict(graph_metrics))
+
+
 def _record_linear_draft_full_chain_metrics(
     owner: object,
     *,
@@ -1174,13 +1380,7 @@ def _record_linear_draft_full_chain_metrics(
 ) -> None:
     """Record logical work and the actual full-chain runner outcome."""
 
-    if (
-        logical_rows <= 0
-        or padded_rows < logical_rows
-        or gamma <= 0
-        or eager_rows < 0
-        or eager_rows > logical_rows
-    ):
+    if logical_rows <= 0 or padded_rows < logical_rows or gamma <= 0 or eager_rows < 0 or eager_rows > logical_rows:
         raise ValueError("Linear draft full-chain telemetry received an invalid shape.")
 
     def increment(name: str, value: int = 1) -> None:
@@ -1766,9 +1966,7 @@ def _rebase_kv_ready_arrivals(
         replace(
             params,
             arrival_ts=(
-                None
-                if params.arrival_ts is None
-                else decode_origin_wall + float(params.arrival_ts) - trace_origin
+                None if params.arrival_ts is None else decode_origin_wall + float(params.arrival_ts) - trace_origin
             ),
         )
         for params in request_params
@@ -1838,6 +2036,785 @@ class NativeSpecRhythmDevicePayload:
             return
         if not math.isfinite(self.draft_confidence) or not 0.0 <= self.draft_confidence <= 1.0:
             raise RuntimeError("SpecRhythm mailbox confidence must be finite and in [0, 1].")
+
+
+@dataclass(frozen=True)
+class SpecRhythmTargetReplayAheadSignature:
+    """Immutable proof for one decode-only target replay submitted early.
+
+    Target verification mutates KV, so a replay submitted before the current
+    correction is not allowed to discover a different next plan and fall back.
+    This signature contains every controller and role-local prefix value that
+    can change the next target query.  The following cycle must reproduce it
+    exactly before consuming the already-submitted output.
+    """
+
+    home_batch_id: int
+    request_indices: tuple[int, ...]
+    proposal_ids: tuple[int, ...]
+    required_prefix_epochs: tuple[int, ...]
+    runtime_prefix_epochs: tuple[int, ...]
+    continuation_epochs: tuple[int, ...]
+    committed_lengths: tuple[int, ...]
+    root_token_ids: tuple[int, ...]
+    verification_sizes: tuple[int, ...]
+    proposal_token_ids: tuple[tuple[int, ...], ...]
+    cache_allocation_identity: int = 0
+    kv_block_table_sequence_ids: tuple[int, ...] = ()
+    kv_block_table_rows: tuple[tuple[int, ...], ...] = ()
+    graph_entry_identity: int = 0
+    graph_entry_lease_generation: int = 0
+    graph_capture_count: int = 0
+    graph_replay_count: int = -1
+
+
+@dataclass
+class _PendingSpecRhythmTargetReplayAhead:
+    signature: SpecRhythmTargetReplayAheadSignature
+    target_tokens: torch.Tensor | None
+    target_logits: None
+    graph_outcome: tuple[str, int]
+    correction_identity_digest: int = 0
+    completion_event: Any | None = None
+    graph_timing_events: tuple[Any, Any] | None = None
+
+
+@dataclass(frozen=True)
+class _SpecRhythmStagedCorrectionIdentity:
+    """Monotonic identity for the correction queued before replay-ahead."""
+
+    correction_epoch: int
+    plan_id: int
+    home_batch_id: int
+    request_indices: tuple[int, ...]
+    proposal_digest: int
+
+
+TARGET_REPLAY_AHEAD_REJECT_REASONS = (
+    "protocol",
+    "mutable_frontier",
+    "pending_eager",
+    "schedule",
+    "ticket_epoch",
+    "payload_shape",
+    "graph_contract",
+    "resource_contract",
+    "staged_correction",
+)
+
+
+def _spec_rhythm_selected_target_signature(
+    *,
+    controller: SpecRhythmPipelineController,
+    home_batch_id: int | None,
+    request_indices: Sequence[int],
+    payloads: Mapping[int, NativeSpecRhythmDevicePayload],
+    states: Sequence[PearlPipelineState],
+    gamma: int,
+) -> tuple[SpecRhythmTargetReplayAheadSignature | None, str | None]:
+    """Build an exact, side-effect-free signature for selected target rows."""
+
+    indices = tuple(int(index) for index in request_indices)
+    if home_batch_id not in (0, 1) or not indices or len(set(indices)) != len(indices):
+        return None, "schedule"
+    proposal_ids: list[int] = []
+    required_epochs: list[int] = []
+    runtime_epochs: list[int] = []
+    continuation_epochs: list[int] = []
+    committed_lengths: list[int] = []
+    root_token_ids: list[int] = []
+    verification_sizes: list[int] = []
+    proposal_token_ids: list[tuple[int, ...]] = []
+    for index in indices:
+        ticket = controller.ready.get(index)
+        runtime = controller.request_states.get(index)
+        if ticket is None or runtime is None:
+            return None, "schedule"
+        if (
+            ticket.lifecycle is not ProposalLifecycle.AVAILABLE
+            or ticket.eager
+            or ticket.request_index != index
+            or ticket.home_batch_id != home_batch_id
+            or runtime.home_batch_id != home_batch_id
+        ):
+            return None, "schedule"
+        if ticket.gamma != gamma or ticket.required_prefix_epoch != runtime.prefix_epoch:
+            return None, "ticket_epoch"
+        if not 0 <= index < len(states):
+            return None, "schedule"
+        state = states[index]
+        if ticket.required_prefix_epoch != state.continuation_epoch:
+            return None, "ticket_epoch"
+        committed_length = int(state.committed_length or 0)
+        # Draft ranks may retain the uncommitted proposal suffix.  Only the
+        # committed root participates in target verification and must match
+        # the target ranks exactly.
+        if committed_length <= 0 or committed_length > len(state.token_ids):
+            return None, "payload_shape"
+        payload = payloads.get(ticket.proposal_id)
+        if payload is None or payload.ticket is not ticket:
+            return None, "payload_shape"
+        try:
+            payload.validate_for(state, full_window=True)
+        except RuntimeError:
+            return None, "payload_shape"
+        if payload.verification_size != gamma:
+            return None, "payload_shape"
+        if payload.host_next_tokens is None or len(payload.host_next_tokens) != gamma:
+            return None, "payload_shape"
+        proposal_ids.append(int(ticket.proposal_id))
+        required_epochs.append(int(ticket.required_prefix_epoch))
+        runtime_epochs.append(int(runtime.prefix_epoch))
+        continuation_epochs.append(int(state.continuation_epoch))
+        committed_lengths.append(committed_length)
+        root_token_ids.append(int(state.token_ids[committed_length - 1]))
+        verification_sizes.append(int(payload.verification_size))
+        proposal_token_ids.append(tuple(int(value) for value in payload.host_next_tokens))
+    return (
+        SpecRhythmTargetReplayAheadSignature(
+            home_batch_id=int(home_batch_id),
+            request_indices=indices,
+            proposal_ids=tuple(proposal_ids),
+            required_prefix_epochs=tuple(required_epochs),
+            runtime_prefix_epochs=tuple(runtime_epochs),
+            continuation_epochs=tuple(continuation_epochs),
+            committed_lengths=tuple(committed_lengths),
+            root_token_ids=tuple(root_token_ids),
+            verification_sizes=tuple(verification_sizes),
+            proposal_token_ids=tuple(proposal_token_ids),
+        ),
+        None,
+    )
+
+
+def plan_spec_rhythm_target_replay_ahead(
+    *,
+    controller: SpecRhythmPipelineController,
+    current_target_home_batch_id: int | None,
+    current_target_request_indices: Sequence[int],
+    active_request_indices: Sequence[int],
+    payloads: Mapping[int, NativeSpecRhythmDevicePayload],
+    states: Sequence[PearlPipelineState],
+    gamma: int,
+    verification_budget: int,
+    max_target_requests: int | None,
+    linear_full_window: bool,
+    dual_batch: bool,
+    immutable_frontier: bool,
+    allow_next_cycle: bool,
+) -> tuple[SpecRhythmTargetReplayAheadSignature | None, str | None]:
+    """Preview the only next target plan safe for irreversible replay-ahead.
+
+    This deliberately implements a much narrower contract than
+    :meth:`SpecRhythmPipelineController.build_plan`.  It never mutates plan
+    IDs, wait ages, priorities, or ticket lifecycles.  Current-home tickets
+    are treated as if the already-computed verdict consumed them; every other
+    available ticket must then be a normal proposal in the opposite home.
+    """
+
+    if not (linear_full_window and dual_batch and gamma == FIXED_GREEDY_FULL_WINDOW_WIDTH and allow_next_cycle):
+        return None, "protocol"
+    if not immutable_frontier:
+        return None, "mutable_frontier"
+    if controller.staged_eager or any(ticket.eager for ticket in controller.ready.values()):
+        return None, "pending_eager"
+    if current_target_home_batch_id not in (0, 1):
+        return None, "schedule"
+    current = tuple(int(index) for index in current_target_request_indices)
+    current_set = set(current)
+    if not current or len(current_set) != len(current):
+        return None, "schedule"
+    current_home = int(current_target_home_batch_id)
+    for index in current:
+        ticket = controller.ready.get(index)
+        if ticket is None or ticket.home_batch_id != current_home:
+            return None, "schedule"
+    # A deferred current-home row would remain ready after correction and can
+    # change priority/home ownership.  Such a cycle is not previewable.
+    if any(
+        ticket.home_batch_id == current_home and index not in current_set
+        for index, ticket in controller.ready.items()
+    ):
+        return None, "schedule"
+    next_home = 1 - current_home
+    remaining_ready = {
+        index: ticket
+        for index, ticket in controller.ready.items()
+        if index not in current_set
+    }
+    if not remaining_ready or any(ticket.home_batch_id != next_home for ticket in remaining_ready.values()):
+        return None, "schedule"
+    active = tuple(dict.fromkeys(int(index) for index in active_request_indices))
+    next_indices = tuple(index for index in active if index in remaining_ready)
+    if set(next_indices) != set(remaining_ready):
+        return None, "schedule"
+    if max_target_requests is not None and len(next_indices) > int(max_target_requests):
+        return None, "schedule"
+    candidate_tokens = sum(int(remaining_ready[index].gamma) for index in next_indices)
+    if candidate_tokens > int(verification_budget):
+        return None, "schedule"
+    return _spec_rhythm_selected_target_signature(
+        controller=controller,
+        home_batch_id=next_home,
+        request_indices=next_indices,
+        payloads=payloads,
+        states=states,
+        gamma=gamma,
+    )
+
+
+def spec_rhythm_target_replay_ahead_fallback_safe(
+    *,
+    active_request_count: int,
+    current_target_count: int,
+    fallback_max_batch: int,
+) -> bool:
+    """Prove the next speculative cycle cannot enter target-only fallback.
+
+    Assume the most conservative current verdict: every currently verified
+    row finishes.  Replay-ahead is safe only when the remaining population is
+    still strictly above the configured fallback threshold.
+    """
+
+    active = int(active_request_count)
+    current = int(current_target_count)
+    fallback = int(fallback_max_batch)
+    return (
+        active > 0
+        and 0 < current <= active
+        and (fallback <= 0 or active - current > fallback)
+    )
+
+
+def spec_rhythm_target_replay_ahead_graph_reject_reason(
+    *,
+    request_count: int,
+    gamma: int,
+    max_committed_length: int,
+    max_model_len: int,
+    target_use_paged_attention: bool,
+    enforce_eager: bool,
+    linear_bonus_token: bool,
+    mixed_target_graph_enabled: bool,
+    mixed_target_graph_prefill_only: bool,
+    target_aclgraph_disabled: bool,
+    validate_graph_replays: bool,
+    graph_cache_sealed: bool,
+    stable_graph_qualified: bool,
+    stable_capacity: int | None,
+    max_graph_tokens: int,
+) -> str | None:
+    """Check the resident decode-only graph proof before irreversible submit."""
+
+    if (
+        request_count <= 0
+        or gamma != FIXED_GREEDY_FULL_WINDOW_WIDTH
+        or target_use_paged_attention
+        or enforce_eager
+        or linear_bonus_token
+        or not mixed_target_graph_enabled
+        or mixed_target_graph_prefill_only
+        or target_aclgraph_disabled
+        or validate_graph_replays
+        or not graph_cache_sealed
+        or not stable_graph_qualified
+        or stable_capacity is None
+        or stable_capacity < request_count
+    ):
+        return "graph_contract"
+    layout = _cached_stable_target_verify_graph_layout(
+        request_count,
+        gamma,
+        int(stable_capacity),
+    )
+    if (
+        layout.total_query_tokens > int(max_graph_tokens)
+        or layout.dummy_verification_rows * gamma > int(max_model_len)
+        or int(max_committed_length) + gamma > int(max_model_len)
+    ):
+        return "graph_contract"
+    return None
+
+
+def _assert_resident_target_replay_ahead_entry(
+    engine: NativePearlEngine,
+    signature: SpecRhythmTargetReplayAheadSignature,
+) -> None:
+    """Prove target ranks cannot capture or fall back after early submit."""
+
+    if engine.is_draft:
+        return
+    request_count = len(signature.request_indices)
+    capacity = engine._stable_target_verify_graph_capacity_map.get(request_count)
+    if capacity is None:
+        raise RuntimeError("Target replay-ahead lost its qualified stable graph route before submission.")
+    layout = _cached_stable_target_verify_graph_layout(
+        request_count,
+        engine.gamma,
+        int(capacity),
+    )
+    entry_key = (
+        f"greedy:{engine.draft_vocab_size}|fia-stable:{layout.graph_key}",
+        layout.total_query_tokens,
+    )
+    entry = engine.graph_runner.entries.get(entry_key)
+    if (
+        engine.graph_runner.graph_cache_sealed is not True
+        or entry is None
+        or not bool(entry.runtime_validated)
+        or entry.validated_real_row_count != layout.total_query_tokens
+    ):
+        raise RuntimeError(
+            "Target replay-ahead requires one sealed, resident, changed-input-qualified graph entry."
+        )
+
+
+def _bind_target_replay_ahead_resources(
+    engine: NativePearlEngine,
+    signature: SpecRhythmTargetReplayAheadSignature,
+) -> SpecRhythmTargetReplayAheadSignature:
+    """Bind every real/scratch KV row and graph generation without mutation."""
+
+    if engine.is_draft:
+        # The draft rank does not execute target replay.  Keeping its resource
+        # fields neutral avoids coupling correctness to unrelated draft graph
+        # generations between submit and consume.
+        return signature
+    _assert_resident_target_replay_ahead_entry(engine, signature)
+    allocation = engine.cache_allocation
+    if allocation is None or engine.cache_block_tables is None:
+        raise RuntimeError("Target replay-ahead requires one live KV cache allocation.")
+    request_count = len(signature.request_indices)
+    capacity = engine._stable_target_verify_graph_capacity_map[request_count]
+    layout = _cached_stable_target_verify_graph_layout(
+        request_count,
+        engine.gamma,
+        int(capacity),
+    )
+    envelope = plan_stable_target_verify_graph_envelope(
+        layout,
+        signature.request_indices,
+        tuple(length - 1 for length in signature.committed_lengths),
+        engine._mixed_target_scratch_sequence_ids[0],
+    )
+    positions_by_sequence: dict[int, list[int]] = {}
+    for sequence_id, position in zip(
+        envelope.token_sequence_ids,
+        envelope.positions,
+    ):
+        positions_by_sequence.setdefault(int(sequence_id), []).append(
+            int(position)
+        )
+    sequence_ids = tuple(positions_by_sequence)
+    rows: list[tuple[int, ...]] = []
+    block_size = int(engine.config.kvcache_block_size)
+    for sequence_id in sequence_ids:
+        if not 0 <= sequence_id < len(allocation.block_tables):
+            raise RuntimeError(
+                "Target replay-ahead stable graph references an invalid KV row."
+            )
+        row = tuple(
+            int(value) for value in allocation.block_tables[sequence_id]
+        )
+        required_blocks = {
+            position // block_size
+            for position in positions_by_sequence[sequence_id]
+        }
+        if (
+            not required_blocks
+            or max(required_blocks) >= len(row)
+            or any(row[block] < 0 for block in required_blocks)
+        ):
+            raise RuntimeError(
+                "Target replay-ahead refuses to allocate or rebind real or "
+                "scratch KV pages after its immutable signature is formed."
+            )
+        rows.append(row)
+    entry_key = (
+        f"greedy:{engine.draft_vocab_size}|fia-stable:{layout.graph_key}",
+        layout.total_query_tokens,
+    )
+    entry = engine.graph_runner.entries[entry_key]
+    pending_lease = getattr(
+        engine,
+        "_spec_rhythm_target_replay_ahead_entry_lease",
+        None,
+    )
+    if pending_lease is not None and pending_lease != (
+        id(entry),
+        int(signature.graph_entry_lease_generation),
+    ):
+        raise RuntimeError(
+            "Target replay-ahead graph output entry is leased by another generation."
+        )
+    return replace(
+        signature,
+        cache_allocation_identity=id(allocation),
+        kv_block_table_sequence_ids=sequence_ids,
+        kv_block_table_rows=tuple(rows),
+        graph_entry_identity=id(entry),
+        graph_capture_count=int(engine.graph_runner.capture_count),
+        graph_replay_count=int(engine.graph_runner.replay_count),
+    )
+
+
+def _target_replay_ahead_consensus_digest(
+    signature: SpecRhythmTargetReplayAheadSignature,
+) -> int:
+    """Return a stable rank-independent digest of the logical query."""
+
+    logical = (
+        signature.home_batch_id,
+        signature.request_indices,
+        signature.proposal_ids,
+        signature.required_prefix_epochs,
+        signature.runtime_prefix_epochs,
+        signature.continuation_epochs,
+        signature.committed_lengths,
+        signature.root_token_ids,
+        signature.verification_sizes,
+        signature.proposal_token_ids,
+    )
+    digest = hashlib.sha256(repr(logical).encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], byteorder="little", signed=False) & ((1 << 63) - 1)
+
+
+def _target_replay_ahead_proposal_digest(
+    request_indices: Sequence[int],
+    payloads: Sequence[NativeSpecRhythmDevicePayload],
+) -> int:
+    logical = tuple(
+        (
+            int(index),
+            int(payload.ticket.proposal_id),
+            int(payload.ticket.required_prefix_epoch),
+            tuple(int(value) for value in (payload.host_next_tokens or ())),
+        )
+        for index, payload in zip(request_indices, payloads)
+    )
+    digest = hashlib.sha256(repr(logical).encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], byteorder="little", signed=False) & (
+        (1 << 63) - 1
+    )
+
+
+def _target_replay_ahead_correction_digest(
+    identity: _SpecRhythmStagedCorrectionIdentity,
+) -> int:
+    digest = hashlib.sha256(repr(identity).encode("utf-8")).digest()
+    return int.from_bytes(digest[:8], byteorder="little", signed=False) & (
+        (1 << 63) - 1
+    )
+
+
+def _resolve_target_replay_ahead_logical_preflight(
+    rows: Sequence[Sequence[int]],
+) -> tuple[bool, str | None]:
+    """Resolve gathered logical envelopes identically on every rank."""
+
+    values = [tuple(int(value) for value in row) for row in rows]
+    if not values or any(len(row) != 5 for row in values):
+        raise RuntimeError("Target replay-ahead received an invalid logical preflight envelope.")
+    rejected_codes = [row[1] for row in values if row[0] == 0]
+    if rejected_codes:
+        if any(not 0 <= code < len(TARGET_REPLAY_AHEAD_REJECT_REASONS) for code in rejected_codes):
+            raise RuntimeError("Target replay-ahead received an invalid rejection code.")
+        # A cycle may be ineligible for several local reasons.  Every rank
+        # reports the same deterministic reason and skips; no device work has
+        # been submitted yet.
+        reason_code = min(rejected_codes)
+        return False, TARGET_REPLAY_AHEAD_REJECT_REASONS[reason_code]
+    if any(row[0] != 1 or row[1] != -1 for row in values):
+        raise RuntimeError("Target replay-ahead logical eligibility envelope is malformed.")
+    logical_values = {(row[2], row[3], row[4]) for row in values}
+    if len(logical_values) != 1:
+        raise RuntimeError(
+            "Target replay-ahead logical signature/count/capacity diverged "
+            "across proposal recipients before submission."
+        )
+    return True, None
+
+
+def _target_replay_ahead_logical_preflight(
+    signature: SpecRhythmTargetReplayAheadSignature | None,
+    *,
+    reject_reason: str | None,
+    stable_capacity: int | None,
+    group: dist.ProcessGroup,
+) -> tuple[bool, str | None]:
+    """Collectively decide logical eligibility before any target KV write."""
+
+    if str(dist.get_backend(group)).lower() != "gloo":
+        raise RuntimeError("Target replay-ahead preflight consensus requires a CPU/Gloo group.")
+    reason_code = (
+        -1
+        if reject_reason is None
+        else TARGET_REPLAY_AHEAD_REJECT_REASONS.index(reject_reason)
+    )
+    local = torch.tensor(
+        [
+            int(signature is not None and reject_reason is None),
+            reason_code,
+            (
+                _target_replay_ahead_consensus_digest(signature)
+                if signature is not None
+                else 0
+            ),
+            0 if signature is None else len(signature.request_indices),
+            -1 if stable_capacity is None else int(stable_capacity),
+        ],
+        dtype=torch.int64,
+        device="cpu",
+    )
+    gathered = [torch.empty_like(local) for _ in range(dist.get_world_size(group))]
+    dist.all_gather(gathered, local, group=group)
+    return _resolve_target_replay_ahead_logical_preflight(
+        [row.tolist() for row in gathered]
+    )
+
+
+def _resolve_target_replay_ahead_resource_preflight(
+    rows: Sequence[Sequence[int]],
+) -> tuple[bool, str | None]:
+    """Resolve a target-only resource proof with a neutral draft member."""
+
+    values = [tuple(int(value) for value in row) for row in rows]
+    if not values or any(len(row) != 7 for row in values):
+        raise RuntimeError("Target replay-ahead received an invalid resource preflight envelope.")
+    logical_digests = {row[3] for row in values}
+    if len(logical_digests) != 1:
+        raise RuntimeError("Target replay-ahead logical digest changed during resource preflight.")
+    targets = [row for row in values if row[0] == 1]
+    drafts = [row for row in values if row[0] == 0]
+    if not targets or not drafts:
+        raise RuntimeError("Target replay-ahead resource preflight requires draft and target members.")
+    if any(row[1] != 1 for row in targets):
+        rejected_codes = [row[2] for row in targets if row[1] != 1]
+        if any(
+            not 0 <= code < len(TARGET_REPLAY_AHEAD_REJECT_REASONS)
+            for code in rejected_codes
+        ):
+            raise RuntimeError("Target replay-ahead received an invalid resource rejection code.")
+        return (
+            False,
+            TARGET_REPLAY_AHEAD_REJECT_REASONS[min(rejected_codes)],
+        )
+    if any(
+        row[1] != 1 or row[2] != -1 or row[4:] != (-1, -1, 0)
+        for row in drafts
+    ):
+        raise RuntimeError("Target replay-ahead draft resource envelope is not neutral.")
+    # Target graph generations and the staged correction identity are
+    # logically replicated even though allocation/entry object identities are
+    # process-local and are checked again only against each rank's pending
+    # signature at consume time.
+    target_generations = {(row[4], row[5], row[6]) for row in targets}
+    if len(target_generations) != 1:
+        raise RuntimeError(
+            "Target replay-ahead graph generation or staged correction "
+            "identity diverged across target ranks."
+        )
+    return True, None
+
+
+def _target_replay_ahead_resource_preflight(
+    signature: SpecRhythmTargetReplayAheadSignature,
+    *,
+    resource_ready: bool,
+    reject_reason: str | None,
+    is_target_rank: bool,
+    correction_identity: _SpecRhythmStagedCorrectionIdentity | None,
+    group: dist.ProcessGroup,
+) -> tuple[bool, str | None]:
+    """Require every target rank's immutable resources before TP replay."""
+
+    if str(dist.get_backend(group)).lower() != "gloo":
+        raise RuntimeError("Target replay-ahead resource preflight requires a CPU/Gloo group.")
+    local = torch.tensor(
+        [
+            int(is_target_rank),
+            int(resource_ready),
+            (
+                -1
+                if reject_reason is None
+                else TARGET_REPLAY_AHEAD_REJECT_REASONS.index(reject_reason)
+            ),
+            _target_replay_ahead_consensus_digest(signature),
+            int(signature.graph_capture_count) if is_target_rank else -1,
+            int(signature.graph_replay_count) if is_target_rank else -1,
+            (
+                _target_replay_ahead_correction_digest(correction_identity)
+                if is_target_rank and correction_identity is not None
+                else 0
+            ),
+        ],
+        dtype=torch.int64,
+        device="cpu",
+    )
+    gathered = [torch.empty_like(local) for _ in range(dist.get_world_size(group))]
+    dist.all_gather(gathered, local, group=group)
+    return _resolve_target_replay_ahead_resource_preflight(
+        [row.tolist() for row in gathered]
+    )
+
+
+def _resolve_target_replay_ahead_consume_preflight(
+    rows: Sequence[Sequence[int]],
+) -> tuple[bool, bool]:
+    """Return ``(pending_present, valid)`` for one all-role consume fence."""
+
+    values = [tuple(int(value) for value in row) for row in rows]
+    if not values or any(len(row) != 9 for row in values):
+        raise RuntimeError("Target replay-ahead received an invalid consume envelope.")
+    targets = [row for row in values if row[0] == 1]
+    drafts = [row for row in values if row[0] == 0]
+    if not targets or not drafts:
+        raise RuntimeError("Target replay-ahead consume preflight requires draft and target members.")
+    present_values = {row[1] for row in values}
+    if present_values == {0}:
+        valid_empty = all(
+            row[2] == 1
+            and row[3:5] == (0, 0)
+            and row[8] == 0
+            for row in values
+        )
+        return False, valid_empty
+    if present_values != {1} or any(row[2] != 1 for row in values):
+        return True, False
+    pending_digests = {row[3] for row in values}
+    recomputed_digests = {row[4] for row in values}
+    lease_generations = {row[8] for row in values}
+    if (
+        len(pending_digests) != 1
+        or len(recomputed_digests) != 1
+        or pending_digests != recomputed_digests
+        or len(lease_generations) != 1
+        or next(iter(lease_generations)) <= 0
+    ):
+        return True, False
+    if any(row[5:8] != (-1, -1, 0) for row in drafts):
+        return True, False
+    target_resources = {(row[5], row[6], row[7]) for row in targets}
+    if len(target_resources) != 1:
+        return True, False
+    capture_count, replay_count, correction_digest = next(
+        iter(target_resources)
+    )
+    return (
+        True,
+        capture_count >= 0
+        and replay_count >= 0
+        and correction_digest > 0,
+    )
+
+
+def _target_replay_ahead_consume_preflight(
+    pending: _PendingSpecRhythmTargetReplayAhead | None,
+    recomputed: SpecRhythmTargetReplayAheadSignature | None,
+    *,
+    local_ready: bool,
+    is_target_rank: bool,
+    group: dist.ProcessGroup,
+) -> tuple[bool, bool]:
+    """Make rank-local bind/signature failures an all-role decision."""
+
+    if str(dist.get_backend(group)).lower() != "gloo":
+        raise RuntimeError("Target replay-ahead consume preflight requires a CPU/Gloo group.")
+    local = torch.tensor(
+        [
+            int(is_target_rank),
+            int(pending is not None),
+            int(local_ready),
+            (
+                _target_replay_ahead_consensus_digest(pending.signature)
+                if pending is not None
+                else 0
+            ),
+            (
+                _target_replay_ahead_consensus_digest(recomputed)
+                if recomputed is not None
+                else 0
+            ),
+            (
+                int(pending.signature.graph_capture_count)
+                if pending is not None and is_target_rank
+                else -1
+            ),
+            (
+                int(pending.signature.graph_replay_count)
+                if pending is not None and is_target_rank
+                else -1
+            ),
+            (
+                int(pending.correction_identity_digest)
+                if pending is not None and is_target_rank
+                else 0
+            ),
+            (
+                int(pending.signature.graph_entry_lease_generation)
+                if pending is not None
+                else 0
+            ),
+        ],
+        dtype=torch.int64,
+        device="cpu",
+    )
+    gathered = [torch.empty_like(local) for _ in range(dist.get_world_size(group))]
+    dist.all_gather(gathered, local, group=group)
+    return _resolve_target_replay_ahead_consume_preflight(
+        [row.tolist() for row in gathered]
+    )
+
+
+def _fence_target_replay_ahead_before_fatal(
+    pending: _PendingSpecRhythmTargetReplayAhead,
+    *,
+    is_target_rank: bool,
+    device_type: str,
+) -> None:
+    """Finish an irreversible replay before raising or tearing down state."""
+
+    if not is_target_rank or device_type != "npu":
+        return
+    if pending.completion_event is not None:
+        pending.completion_event.synchronize()
+    else:
+        # Fail closed even if construction of the per-rank event itself was
+        # interrupted after the graph had entered the target stream.
+        torch.npu.synchronize()
+
+
+def _claim_target_replay_ahead_entry(
+    engine: NativePearlEngine,
+    signature: SpecRhythmTargetReplayAheadSignature,
+    *,
+    generation: int,
+) -> SpecRhythmTargetReplayAheadSignature:
+    if engine.is_draft:
+        return replace(
+            signature,
+            graph_entry_lease_generation=int(generation),
+        )
+    if getattr(engine, "_spec_rhythm_target_replay_ahead_entry_lease", None) is not None:
+        raise RuntimeError("Target replay-ahead graph output entry already has a pending lease.")
+    lease = (int(signature.graph_entry_identity), int(generation))
+    engine._spec_rhythm_target_replay_ahead_entry_lease = lease
+    return replace(signature, graph_entry_lease_generation=int(generation))
+
+
+def _release_target_replay_ahead_entry(
+    engine: NativePearlEngine,
+    signature: SpecRhythmTargetReplayAheadSignature,
+) -> None:
+    if engine.is_draft:
+        return
+    expected = (
+        int(signature.graph_entry_identity),
+        int(signature.graph_entry_lease_generation),
+    )
+    if getattr(engine, "_spec_rhythm_target_replay_ahead_entry_lease", None) != expected:
+        raise RuntimeError("Target replay-ahead graph output lease changed before release.")
+    engine._spec_rhythm_target_replay_ahead_entry_lease = None
 
 
 @dataclass(frozen=True)
@@ -2010,15 +2987,9 @@ def _freeze_mc2_worker_routes(
     for expected_rank, item in enumerate(gathered):
         if item.get("rank") != expected_rank:
             raise RuntimeError("MC2 static route Gloo consensus rank order is invalid")
-    gathered_errors = [
-        f"rank {item['rank']}: {item['error']}"
-        for item in gathered
-        if item.get("error") is not None
-    ]
+    gathered_errors = [f"rank {item['rank']}: {item['error']}" for item in gathered if item.get("error") is not None]
     if gathered_errors:
-        raise RuntimeError(
-            "MC2 static route admission failed: " + "; ".join(gathered_errors)
-        )
+        raise RuntimeError("MC2 static route admission failed: " + "; ".join(gathered_errors))
     if normalized_target_ranks is None or target_group_identity is None:
         raise RuntimeError("MC2 static route local group identity was not constructed")
     expected_target_ranks = normalized_target_ranks
@@ -2035,16 +3006,15 @@ def _freeze_mc2_worker_routes(
         if expected_role == "draft" and item.get("digest") is not None:
             raise RuntimeError("MC2 draft worker unexpectedly published a target route digest")
     target_digests = {
-        str(item["digest"])
-        for item in gathered
-        if item.get("role") == "target" and item.get("digest") is not None
+        str(item["digest"]) for item in gathered if item.get("role") == "target" and item.get("digest") is not None
     }
     valid_target_digests = all(
-        len(value) == 64 and all(character in "0123456789abcdef" for character in value)
-        for value in target_digests
+        len(value) == 64 and all(character in "0123456789abcdef" for character in value) for value in target_digests
     )
-    if not valid_target_digests or len(target_digests) != 1 or any(
-        item.get("digest") is None for item in gathered if item.get("role") == "target"
+    if (
+        not valid_target_digests
+        or len(target_digests) != 1
+        or any(item.get("digest") is None for item in gathered if item.get("role") == "target")
     ):
         raise RuntimeError("MC2 static route manifest digest differs across target ranks")
     return manifest
@@ -2067,13 +3037,9 @@ def _validate_mc2_target_attention_sharding(
     kv_heads = int(target_model_config.num_key_value_heads)
     base, remainder = divmod(kv_heads, config.target_tp_size)
     if light_rank >= 0:
-        partitions = tuple(
-            base + int(rank != light_rank) for rank in range(config.target_tp_size)
-        )
+        partitions = tuple(base + int(rank != light_rank) for rank in range(config.target_tp_size))
     else:
-        partitions = tuple(
-            base + int(rank < remainder) for rank in range(config.target_tp_size)
-        )
+        partitions = tuple(base + int(rank < remainder) for rank in range(config.target_tp_size))
     if len(set(partitions)) != 1:
         raise ValueError(
             "MC2 target TP3 requires uniform attention partitions across all ranks; "
@@ -2519,8 +3485,7 @@ class NativePearlEngine:
         self.is_draft = self.groups.is_draft_worker
         self._mixed_target_graph_enabled = bool(not self.is_draft and envs.VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH)
         self._mixed_target_graph_prefill_only = bool(
-            self._mixed_target_graph_enabled
-            and envs.VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PREFILL_ONLY
+            self._mixed_target_graph_enabled and envs.VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PREFILL_ONLY
         )
         self._mixed_target_graph_prompt_buckets = resolve_mixed_target_graph_buckets(
             envs.VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_BUCKETS
@@ -2528,26 +3493,17 @@ class NativePearlEngine:
         self._mixed_target_graph_verify_capacities = resolve_mixed_target_graph_verify_capacities(
             envs.VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_VERIFY_CAPACITIES
         )
-        mixed_target_graph_prompt_capacity = int(
-            envs.VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PROMPT_CAPACITY
-        )
+        mixed_target_graph_prompt_capacity = int(envs.VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PROMPT_CAPACITY)
         if not 1 <= mixed_target_graph_prompt_capacity <= 16:
-            raise ValueError(
-                "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PROMPT_CAPACITY "
-                "must be in [1, 16]."
-            )
+            raise ValueError("VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PROMPT_CAPACITY must be in [1, 16].")
         self._mixed_target_graph_prompt_capacity = mixed_target_graph_prompt_capacity
-        stable_target_verify_max_capacity = int(
-            envs.VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_MAX_CAPACITY
-        )
+        stable_target_verify_max_capacity = int(envs.VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_MAX_CAPACITY)
         if not 1 <= stable_target_verify_max_capacity <= max(MIXED_TARGET_VERIFY_CAPACITIES):
             raise ValueError(
                 "VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_MAX_CAPACITY "
                 f"must be in [1, {max(MIXED_TARGET_VERIFY_CAPACITIES)}]."
             )
-        stable_target_verify_request_bucket = int(
-            envs.VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_REQUEST_BUCKET
-        )
+        stable_target_verify_request_bucket = int(envs.VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_REQUEST_BUCKET)
         if not 1 <= stable_target_verify_request_bucket <= stable_target_verify_max_capacity:
             raise ValueError(
                 "VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_REQUEST_BUCKET "
@@ -2603,31 +3559,19 @@ class NativePearlEngine:
         _configure_mc2_model_flags(config, draft_model_config, target_model_config)
         draft_nz_mode = int(envs.VLLM_ASCEND_PEARL_DRAFT_NZ_MODE)
         if draft_nz_mode not in (-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10):
-            raise ValueError(
-                "VLLM_ASCEND_PEARL_DRAFT_NZ_MODE must be one of -1 through 10."
-            )
+            raise ValueError("VLLM_ASCEND_PEARL_DRAFT_NZ_MODE must be one of -1 through 10.")
         draft_model_config.pearl_weight_nz_mode = (
-            int(envs.VLLM_ASCEND_ENABLE_NZ)
-            if draft_nz_mode == -1
-            else draft_nz_mode
+            int(envs.VLLM_ASCEND_ENABLE_NZ) if draft_nz_mode == -1 else draft_nz_mode
         )
         target_nz_mode = int(envs.VLLM_ASCEND_PEARL_TARGET_NZ_MODE)
         if target_nz_mode not in (-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11):
-            raise ValueError(
-                "VLLM_ASCEND_PEARL_TARGET_NZ_MODE must be one of -1 through 11."
-            )
+            raise ValueError("VLLM_ASCEND_PEARL_TARGET_NZ_MODE must be one of -1 through 11.")
         target_model_config.pearl_weight_nz_mode = (
-            int(envs.VLLM_ASCEND_ENABLE_NZ)
-            if target_nz_mode == -1
-            else target_nz_mode
+            int(envs.VLLM_ASCEND_ENABLE_NZ) if target_nz_mode == -1 else target_nz_mode
         )
-        target_large_m_nz_min_rows = int(
-            envs.VLLM_ASCEND_PEARL_TARGET_LARGE_M_NZ_MIN_ROWS
-        )
+        target_large_m_nz_min_rows = int(envs.VLLM_ASCEND_PEARL_TARGET_LARGE_M_NZ_MIN_ROWS)
         if not 1 <= target_large_m_nz_min_rows <= 4096:
-            raise ValueError(
-                "VLLM_ASCEND_PEARL_TARGET_LARGE_M_NZ_MIN_ROWS must be in [1, 4096]."
-            )
+            raise ValueError("VLLM_ASCEND_PEARL_TARGET_LARGE_M_NZ_MIN_ROWS must be in [1, 4096].")
         if target_nz_mode == 11 and config.target_tp_size != 3:
             raise ValueError("Target NZ mode 11 requires target TP3.")
         draft_model_config.pearl_large_m_nz_min_rows = 0
@@ -2637,30 +3581,18 @@ class NativePearlEngine:
             raise ValueError("VLLM_ASCEND_PEARL_TARGET_TOKEN_PAD_MULTIPLE must be in [1, 64].")
         draft_model_config.pearl_token_pad_multiple = 1
         target_model_config.pearl_token_pad_multiple = target_token_pad_multiple
-        target_tp3_balanced_ffn_shift = int(
-            envs.VLLM_ASCEND_PEARL_TARGET_TP3_BALANCED_FFN_SHIFT
-        )
+        target_tp3_balanced_ffn_shift = int(envs.VLLM_ASCEND_PEARL_TARGET_TP3_BALANCED_FFN_SHIFT)
         if target_tp3_balanced_ffn_shift < 0:
-            raise ValueError(
-                "VLLM_ASCEND_PEARL_TARGET_TP3_BALANCED_FFN_SHIFT must be non-negative."
-            )
+            raise ValueError("VLLM_ASCEND_PEARL_TARGET_TP3_BALANCED_FFN_SHIFT must be non-negative.")
         if target_tp3_balanced_ffn_shift and config.target_tp_size != 3:
-            raise ValueError(
-                "VLLM_ASCEND_PEARL_TARGET_TP3_BALANCED_FFN_SHIFT requires target TP3."
-            )
+            raise ValueError("VLLM_ASCEND_PEARL_TARGET_TP3_BALANCED_FFN_SHIFT requires target TP3.")
         target_tp3_light_rank = int(envs.VLLM_ASCEND_PEARL_TARGET_TP3_LIGHT_RANK)
         if target_tp3_light_rank not in (-1, 0, 1, 2):
-            raise ValueError(
-                "VLLM_ASCEND_PEARL_TARGET_TP3_LIGHT_RANK must be -1, 0, 1, or 2."
-            )
+            raise ValueError("VLLM_ASCEND_PEARL_TARGET_TP3_LIGHT_RANK must be -1, 0, 1, or 2.")
         if target_tp3_light_rank >= 0 and config.target_tp_size != 3:
-            raise ValueError(
-                "VLLM_ASCEND_PEARL_TARGET_TP3_LIGHT_RANK requires target TP3."
-            )
+            raise ValueError("VLLM_ASCEND_PEARL_TARGET_TP3_LIGHT_RANK requires target TP3.")
         if target_tp3_light_rank >= 0 and target_tp3_balanced_ffn_shift:
-            raise ValueError(
-                "TP3 light-rank exact sharding and balanced FFN shift are mutually exclusive."
-            )
+            raise ValueError("TP3 light-rank exact sharding and balanced FFN shift are mutually exclusive.")
         _validate_mc2_target_attention_sharding(
             config,
             target_model_config,
@@ -2673,9 +3605,7 @@ class NativePearlEngine:
         target_model_config.pearl_tp3_light_rank = target_tp3_light_rank
         draft_model_config.pearl_tp1_greedy_argmax = config.draft_tp1_greedy_argmax
         target_model_config.pearl_tp1_greedy_argmax = False
-        draft_model_config.pearl_device_paged_attention = bool(
-            envs.VLLM_ASCEND_SPECSLO_DRAFT_DEVICE_PAGED_ATTENTION
-        )
+        draft_model_config.pearl_device_paged_attention = bool(envs.VLLM_ASCEND_SPECSLO_DRAFT_DEVICE_PAGED_ATTENTION)
         target_model_config.pearl_device_paged_attention = False
         for model_config, dtype_name in (
             (draft_model_config, config.draft_dtype),
@@ -2881,6 +3811,10 @@ class NativePearlEngine:
     def graph_metrics(self) -> dict[str, Any]:
         """Return this worker's cumulative ACLGraph counters."""
         mc2_manifest = getattr(self, "mc2_static_route_manifest", None)
+        (
+            mc2_qualified_rows_by_shape,
+            mc2_route_counts_by_shape,
+        ) = _mc2_static_route_shape_evidence(mc2_manifest)
         metrics: dict[str, Any] = {
             "rank": self.rank,
             "is_draft_rank": int(self.is_draft),
@@ -2904,6 +3838,8 @@ class NativePearlEngine:
                 if isinstance(mc2_manifest, MC2StaticRouteManifest)
                 else 0
             ),
+            "mc2_static_qualified_rows_by_shape": mc2_qualified_rows_by_shape,
+            "mc2_static_route_counts_by_shape": mc2_route_counts_by_shape,
             "aclgraph_entries": (
                 len(self.graph_runner.entries)
                 + len(self.graph_runner.draft_entries)
@@ -2987,8 +3923,7 @@ class NativePearlEngine:
             ),
             "spec_rhythm_stable_target_verify_request_bucket": int(
                 0
-                if self.is_draft
-                or getattr(self, "_mixed_target_graph_prefill_only", False)
+                if self.is_draft or getattr(self, "_mixed_target_graph_prefill_only", False)
                 else getattr(self, "_stable_target_verify_request_bucket", 1)
             ),
             "spec_rhythm_stable_target_verify_numerical_validation_attempts": int(
@@ -3058,6 +3993,13 @@ class NativePearlEngine:
                 getattr(
                     self,
                     "_spec_rhythm_staged_gloo_correction_host_continuation_reuses",
+                    0,
+                )
+            ),
+            "spec_rhythm_staged_gloo_correction_device_continuation_copies": int(
+                getattr(
+                    self,
+                    "_spec_rhythm_staged_gloo_correction_device_continuation_copies",
                     0,
                 )
             ),
@@ -3200,14 +4142,23 @@ class NativePearlEngine:
                 for name, attribute in packed_causal_probe_metrics.items()
             }
         )
-        metrics.update(
-            {
-                f"mc2_dispatch_{name}": value
-                for name, value in snapshot_mc2_dispatch_counters().items()
-            }
-        )
+        metrics.update({f"mc2_dispatch_{name}": value for name, value in snapshot_mc2_dispatch_counters().items()})
         metrics["worker_host_timeline"] = list(self.last_worker_decode_host_timeline)
         return metrics
+
+    def _result_graph_metrics(self) -> dict[str, Any]:
+        """Return diagnostics only when the current caller requested row copies.
+
+        Direct ``NativePearlEngine`` calls historically expose the worker
+        counters on every request result.  The multiprocess controller already
+        receives the same counters once in its worker reply envelope, however,
+        so production benchmarks may opt out of those per-row copies without
+        changing the direct-call contract.
+        """
+
+        if not getattr(self, "_include_graph_metrics_in_results", True):
+            return {}
+        return self.graph_metrics()
 
     def seal_graph_cache(self) -> dict[str, Any]:
         """Seal the changed-input-qualified graph inventory for measurement."""
@@ -3310,10 +4261,7 @@ class NativePearlEngine:
         """Stable dummy rows used only to close tree ACLGraph buckets."""
 
         config = self.config
-        service_capacity = int(
-            getattr(config, "max_num_queued_seqs", None)
-            or getattr(config, "max_num_seqs", 0)
-        )
+        service_capacity = int(getattr(config, "max_num_queued_seqs", None) or getattr(config, "max_num_seqs", 0))
         tree_graph_enabled = bool(
             service_capacity > 0
             and getattr(config, "enable_spec_rhythm", False)
@@ -3467,8 +4415,7 @@ class NativePearlEngine:
             device="cpu",
         )
         contiguous_blocks = all(
-            block_id == flat_block_ids[0] + offset
-            for offset, block_id in enumerate(flat_block_ids)
+            block_id == flat_block_ids[0] + offset for offset, block_id in enumerate(flat_block_ids)
         )
         if contiguous_blocks:
             # Prompt cohorts are normally allocated from consecutive physical
@@ -3532,13 +4479,10 @@ class NativePearlEngine:
             flat_block_ids.extend(block_ids)
             restored_bytes += int(snapshot.layer_kv.numel() * snapshot.layer_kv.element_size())
         contiguous_blocks = all(
-            block_id == flat_block_ids[0] + offset
-            for offset, block_id in enumerate(flat_block_ids)
+            block_id == flat_block_ids[0] + offset for offset, block_id in enumerate(flat_block_ids)
         )
         device_block_ids = (
-            None
-            if contiguous_blocks
-            else torch.tensor(flat_block_ids, dtype=torch.long, device=self.device)
+            None if contiguous_blocks else torch.tensor(flat_block_ids, dtype=torch.long, device=self.device)
         )
         for layer_index, (key_cache, value_cache) in enumerate(self._tree_layer_caches):
             if len(snapshots) == 1:
@@ -3611,7 +4555,14 @@ class NativePearlEngine:
         on_token_commit: Callable[[dict[str, Any]], None] | None = None,
         request_admission_callback: Callable[[bool], tuple[bool, Sequence[tuple[list[int], NativeSamplingParams]]]]
         | None = None,
+        include_graph_metrics: bool = True,
     ):
+        previous_include_graph_metrics = getattr(
+            self,
+            "_include_graph_metrics_in_results",
+            True,
+        )
+        self._include_graph_metrics_in_results = bool(include_graph_metrics)
         self._token_commit_callback = on_token_commit
         self._request_admission_callback = request_admission_callback
         self._token_commit_error = None
@@ -3625,13 +4576,14 @@ class NativePearlEngine:
                 ) from self._token_commit_error
             return result
         finally:
+            self._include_graph_metrics_in_results = previous_include_graph_metrics
             self._token_commit_callback = None
             self._request_admission_callback = None
             self._token_commit_error = None
-            profiler = getattr(self, "_active_tree_profiler", None)
-            if profiler is not None:
-                profiler.stop()
-                self._active_tree_profiler = None
+            _stop_active_npu_profiler(
+                self,
+                suppress_errors=sys.exc_info()[0] is not None,
+            )
 
     @torch.inference_mode()
     def _generate_batch_impl(
@@ -3726,10 +4678,7 @@ class NativePearlEngine:
             [] if lazy_online_cache else all_tokens,
             enable_prefix_caching=self.config.enable_prefix_caching,
             reserve_sequence_capacity=(
-                live_admission
-                or online_prefill
-                or kv_ready_arrivals
-                or bool(tree_graph_scratch_ids)
+                live_admission or online_prefill or kv_ready_arrivals or bool(tree_graph_scratch_ids)
             ),
         )
         # Scratch rows carry a one-token synthetic prefix and never enter the
@@ -3840,10 +4789,7 @@ class NativePearlEngine:
                     prefill_tokens[sequence_id],
                     enable_prefix_caching=False,
                 )
-            preload_snapshots = [
-                kv_ready_snapshots[sequence_id]
-                for sequence_id in sorted(kv_ready_preloaded_indices)
-            ]
+            preload_snapshots = [kv_ready_snapshots[sequence_id] for sequence_id in sorted(kv_ready_preloaded_indices)]
             preload_started = time.perf_counter()
             kv_ready_preload_bytes = self._restore_prompt_kv_batch_from_host(
                 sorted(kv_ready_preloaded_indices),
@@ -3870,12 +4816,7 @@ class NativePearlEngine:
         # can write graph state into a shared KV allocation that also owns the
         # later rows; let the decode runner lazily capture each actual shape
         # instead.  Static batches retain the eager capture fast path.
-        if (
-            not online_prefill
-            and not kv_ready_arrivals
-            and not continuous_batching
-            and not tree_mode
-        ):
+        if not online_prefill and not kv_ready_arrivals and not continuous_batching and not tree_mode:
             self._capture_decode_graphs(
                 prefill_tokens[:initial_batch_size],
                 target_tokens[:initial_batch_size],
@@ -3954,12 +4895,17 @@ class NativePearlEngine:
                     self._kv_ready_preload_host_ms = 0.0
         npu_profiler = None
         npu_profile_dir = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_DIR
-        if npu_profile_dir:
+        npu_profile_enabled = _npu_profile_call_enabled(
+            npu_profile_dir,
+            measurement_only=envs.VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY,
+            profile_host_decode_steps=self.config.profile_host_decode_steps,
+        )
+        if npu_profile_enabled:
             configured_rank = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_RANK
             npu_profile_rank = self.topology.target_leader_rank if configured_rank is None else configured_rank
             if npu_profile_rank != -1 and not 0 <= npu_profile_rank < self.topology.world_size:
                 raise ValueError("VLLM_ASCEND_PEARL_NPU_PROFILE_RANK must be -1 or identify a PEARL worker.")
-        if npu_profile_dir and (npu_profile_rank == -1 or self.rank == npu_profile_rank):
+        if npu_profile_enabled and (npu_profile_rank == -1 or self.rank == npu_profile_rank):
             import torch_npu
 
             npu_profile_wait_steps = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS
@@ -3982,7 +4928,7 @@ class NativePearlEngine:
                 ),
                 record_shapes=True,
             )
-            npu_profiler.start()
+            _start_active_npu_profiler(self, npu_profiler)
         round_count = 0
         completed_states: dict[int, PearlPipelineState] = {}
         completed_request_states: dict[int, PearlPipelineState] = {}
@@ -4247,7 +5193,7 @@ class NativePearlEngine:
                 break
 
         if npu_profiler is not None:
-            npu_profiler.stop()
+            _stop_active_npu_profiler(self)
         torch.npu.synchronize()
         decode_elapsed = time.perf_counter() - started
         self.last_worker_decode_phase_seconds = dict(decode_phase_seconds)
@@ -4338,7 +5284,7 @@ class NativePearlEngine:
                     "decode_elapsed_seconds": decode_elapsed,
                     "cached_prompt_tokens": num_cached_tokens,
                     "gamma": self.gamma,
-                    **self.graph_metrics(),
+                    **self._result_graph_metrics(),
                 }
             )
         self._release_cache()
@@ -4741,9 +5687,7 @@ class NativePearlEngine:
             # three/four-token dummy row look branched and forced the whole
             # target batch through the substantially slower FULL-mask FIA.
             padding_state = (
-                PearlPipelineState([0], prompt_length=1)
-                if request_id in scratch_set
-                else states[request_id]
+                PearlPipelineState([0], prompt_length=1) if request_id in scratch_set else states[request_id]
             )
             padding_plan = cached_cpu_tree_speculation_plan(
                 1,
@@ -4776,10 +5720,12 @@ class NativePearlEngine:
 
         padded = list(requests)
         config = getattr(self, "config", None)
-        if not padded or config is None or not (
-            envs.VLLM_ASCEND_SPECRHYTHM_TREE_GRAPH
-            and not config.enforce_eager
-            and config.spec_rhythm_stable_graphs
+        if (
+            not padded
+            or config is None
+            or not (
+                envs.VLLM_ASCEND_SPECRHYTHM_TREE_GRAPH and not config.enforce_eager and config.spec_rhythm_stable_graphs
+            )
         ):
             return padded, 0
         scratch_ids = self._tree_graph_scratch_sequence_ids
@@ -4792,10 +5738,7 @@ class NativePearlEngine:
                 f"than available: required={padding_count}, available={len(scratch_ids)}."
             )
 
-        query_lengths = [
-            1 if isinstance(request[3], int) else len(request[3])
-            for request in padded
-        ]
+        query_lengths = [1 if isinstance(request[3], int) else len(request[3]) for request in padded]
         tree_capacity = int(self.config.spec_rhythm_tree_width) * int(self.config.spec_rhythm_tree_depth)
         materialization_cap = max(1, tree_capacity - int(self.config.spec_rhythm_tree_depth) + 1)
         query_cap = max(int(self.config.spec_rhythm_tree_depth) + 1, materialization_cap)
@@ -4935,10 +5878,7 @@ class NativePearlEngine:
                     )
                 indices = list(range(-1, query_count - 1))
                 tokens = [int(changed) + offset for offset in range(query_count)]
-                positions = [
-                    int(plan.cache_positions[index + 1 if index >= 0 else 0])
-                    for index in indices
-                ]
+                positions = [int(plan.cache_positions[index + 1 if index >= 0 else 0]) for index in indices]
                 self._ensure_cache_capacity([row] * query_count, positions)
                 requests.append(
                     (
@@ -5274,9 +6214,7 @@ class NativePearlEngine:
                 slo_class=params.slo_class,
                 max_gamma=params.spec_rhythm_max_gamma,
                 output_token_budget=params.max_tokens,
-                arrival_debt_cap_tokens=(
-                    envs.VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS or None
-                ),
+                arrival_debt_cap_tokens=(envs.VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS or None),
             )
             for index, params in enumerate(request_params)
         }
@@ -5310,9 +6248,7 @@ class NativePearlEngine:
             else set()
         )
         cache_activated = (
-            set(kv_ready_preloaded)
-            if self.config.spec_rhythm_kv_ready_arrivals
-            else set(prefilled_indices or ())
+            set(kv_ready_preloaded) if self.config.spec_rhythm_kv_ready_arrivals else set(prefilled_indices or ())
         )
         cache_released: set[int] = set()
         # Keep normal and staged-eager proposals separate.  A request can have
@@ -5347,15 +6283,9 @@ class NativePearlEngine:
             "spec_rhythm_prefill_batches": 0,
             "spec_rhythm_prefill_requests": 0,
             "spec_rhythm_prefill_coalesce_enabled": int(prefill_coalescing),
-            "spec_rhythm_slo_aware_admission_enabled": int(
-                envs.VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION
-            ),
-            "spec_rhythm_target_slo_first_enabled": int(
-                envs.VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST
-            ),
-            "spec_rhythm_arrival_debt_cap_tokens": int(
-                envs.VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS
-            ),
+            "spec_rhythm_slo_aware_admission_enabled": int(envs.VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION),
+            "spec_rhythm_target_slo_first_enabled": int(envs.VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST),
+            "spec_rhythm_arrival_debt_cap_tokens": int(envs.VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS),
             "spec_rhythm_prefill_coalesce_deferred_polls": 0,
             "spec_rhythm_prefill_coalesce_size_releases": 0,
             "spec_rhythm_prefill_coalesce_timeout_releases": 0,
@@ -5386,17 +6316,11 @@ class NativePearlEngine:
             "spec_rhythm_online_cache_activated_sequences": len(kv_ready_preloaded),
             "spec_rhythm_online_cache_released_sequences": 0,
             "spec_rhythm_online_cache_released_blocks": 0,
-            "spec_rhythm_kv_ready_host_staging_enabled": int(
-                self.config.spec_rhythm_kv_ready_arrivals
-            ),
+            "spec_rhythm_kv_ready_host_staging_enabled": int(self.config.spec_rhythm_kv_ready_arrivals),
             "spec_rhythm_kv_ready_restored_sequences": len(kv_ready_preloaded),
-            "spec_rhythm_kv_ready_restored_bytes": int(
-                getattr(self, "_kv_ready_preload_bytes", 0)
-            ),
+            "spec_rhythm_kv_ready_restored_bytes": int(getattr(self, "_kv_ready_preload_bytes", 0)),
             "spec_rhythm_kv_ready_restore_batches": int(bool(kv_ready_preloaded)),
-            "spec_rhythm_kv_ready_restore_host_ms": float(
-                getattr(self, "_kv_ready_preload_host_ms", 0.0)
-            ),
+            "spec_rhythm_kv_ready_restore_host_ms": float(getattr(self, "_kv_ready_preload_host_ms", 0.0)),
             # The rank-local role calls are deliberately ordered so draft
             # worker compute and target worker compute begin in the same
             # round before the proposal/verdict collectives.
@@ -5412,7 +6336,13 @@ class NativePearlEngine:
         # the production execution path.
         host_timeline: list[dict[str, int | float]] = []
         npu_profiler = None
-        if envs.VLLM_ASCEND_PEARL_NPU_PROFILE_DIR:
+        npu_profile_dir = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_DIR
+        npu_profile_enabled = _npu_profile_call_enabled(
+            npu_profile_dir,
+            measurement_only=envs.VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY,
+            profile_host_decode_steps=self.config.profile_host_decode_steps,
+        )
+        if npu_profile_enabled:
             profile_rank = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_RANK
             if profile_rank is None or profile_rank == -1 or profile_rank == self.rank:
                 import torch_npu
@@ -5421,13 +6351,12 @@ class NativePearlEngine:
                     activities=[torch_npu.profiler.ProfilerActivity.CPU, torch_npu.profiler.ProfilerActivity.NPU],
                     schedule=torch_npu.profiler.schedule(wait=1, warmup=1, active=3, repeat=1),
                     on_trace_ready=torch_npu.profiler.tensorboard_trace_handler(
-                        envs.VLLM_ASCEND_PEARL_NPU_PROFILE_DIR,
+                        npu_profile_dir,
                         worker_name=f"specslo-tree-rank-{self.rank}",
                     ),
                     record_shapes=True,
                 )
-                self._active_tree_profiler = npu_profiler
-                npu_profiler.start()
+                _start_active_npu_profiler(self, npu_profiler)
         phase_seconds = {
             "draft": 0.0,
             "target": 0.0,
@@ -5535,10 +6464,7 @@ class NativePearlEngine:
                 )
             if self.config.spec_rhythm_kv_ready_arrivals:
                 snapshots = getattr(self, "_kv_ready_host_snapshots", None)
-                batch_snapshots = [
-                    None if snapshots is None else snapshots.get(index)
-                    for index in new_indices
-                ]
+                batch_snapshots = [None if snapshots is None else snapshots.get(index) for index in new_indices]
                 if any(snapshot is None for snapshot in batch_snapshots):
                     raise RuntimeError("KV-ready admission lost its staged prompt KV.")
                 restore_started = time.perf_counter()
@@ -5546,9 +6472,7 @@ class NativePearlEngine:
                     new_indices,
                     batch_snapshots,
                 )
-                counters["spec_rhythm_kv_ready_restore_host_ms"] += (
-                    time.perf_counter() - restore_started
-                ) * 1000.0
+                counters["spec_rhythm_kv_ready_restore_host_ms"] += (time.perf_counter() - restore_started) * 1000.0
                 counters["spec_rhythm_kv_ready_restore_batches"] += 1
                 counters["spec_rhythm_kv_ready_restored_sequences"] += len(new_indices)
                 counters["spec_rhythm_kv_ready_restored_bytes"] += restored_bytes
@@ -5657,9 +6581,7 @@ class NativePearlEngine:
                     slo_class=params.slo_class,
                     max_gamma=params.spec_rhythm_max_gamma,
                     output_token_budget=params.max_tokens,
-                    arrival_debt_cap_tokens=(
-                        envs.VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS or None
-                    ),
+                    arrival_debt_cap_tokens=(envs.VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS or None),
                 )
                 pending_admission.append(index)
                 counters["spec_rhythm_live_admitted_requests"] += 1
@@ -5673,9 +6595,7 @@ class NativePearlEngine:
             closed = receive_live_admissions(block=block_live) if poll_live else False
             if not pending_admission or len(active) >= initial_batch_size:
                 return closed
-            arrival_gated = bool(
-                self.config.spec_rhythm_online_prefill or self.config.spec_rhythm_kv_ready_arrivals
-            )
+            arrival_gated = bool(self.config.spec_rhythm_online_prefill or self.config.spec_rhythm_kv_ready_arrivals)
             now_tensor = torch.tensor(
                 [time.time() if self.rank == self.topology.target_leader_rank else 0.0],
                 dtype=torch.float64,
@@ -5687,14 +6607,10 @@ class NativePearlEngine:
             admitted: list[int] = []
             packed_prompt_tokens = 0
             token_budget_saturated = False
-            admission_candidates = order_spec_rhythm_admission_candidates(
+            admission_candidates = order_spec_rhythm_admission_params(
                 pending_admission,
-                slo_tpot_ms={index: request_params[index].slo_tpot_ms for index in pending_admission},
-                arrival_ts={index: request_params[index].arrival_ts for index in pending_admission},
-                enabled=(
-                    has_slo_constraints
-                    and envs.VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION
-                ),
+                request_params=request_params,
+                enabled=(has_slo_constraints and envs.VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION),
             )
             for index in admission_candidates:
                 if (
@@ -5708,9 +6624,7 @@ class NativePearlEngine:
                     len(admitted) >= vacant_capacity
                     or packed_prompt_tokens + prompt_tokens > self.config.max_num_batched_tokens
                 ):
-                    token_budget_saturated = (
-                        packed_prompt_tokens + prompt_tokens > self.config.max_num_batched_tokens
-                    )
+                    token_budget_saturated = packed_prompt_tokens + prompt_tokens > self.config.max_num_batched_tokens
                     break
                 if prompt_tokens > self.config.max_num_batched_tokens:
                     raise ValueError("An online PEARL prefill request exceeds max_num_batched_tokens.")
@@ -5757,11 +6671,7 @@ class NativePearlEngine:
                 if arrival_gated and arrival is not None:
                     states[index].arrival_wait_ms = max(0.0, (now - arrival) * 1000.0)
             needs_prefill = [index for index in admitted if index not in prefetched]
-            cache_activation_indices = (
-                admitted
-                if self.config.spec_rhythm_kv_ready_arrivals
-                else needs_prefill
-            )
+            cache_activation_indices = admitted if self.config.spec_rhythm_kv_ready_arrivals else needs_prefill
             if cache_activation_indices:
                 activate_online_cache(cache_activation_indices)
             if needs_prefill:
@@ -6870,18 +7780,14 @@ class NativePearlEngine:
                         dtype=torch.int64,
                         device=self.device,
                     ),
-                    self._spec_rhythm_nonfinite_flag(include_layer_cache=False)
-                    .reshape(1)
-                    .to(dtype=torch.int64),
+                    self._spec_rhythm_nonfinite_flag(include_layer_cache=False).reshape(1).to(dtype=torch.int64),
                 )
             )
             dist.all_reduce(preflight_status, op=dist.ReduceOp.MAX)
             # One synchronization at the collective commit boundary.
             # Earlier forward/transport failures abort the worker, and later
             # hardware/OOM failures during KV moves are not transactional.
-            structural_failed, numerical_failed = (
-                int(value) for value in preflight_status.cpu().tolist()
-            )
+            structural_failed, numerical_failed = (int(value) for value in preflight_status.cpu().tolist())
             if host_trace is not None:
                 host_trace["state_consensus_end_seconds"] = time.perf_counter()
             profile_detail_end(consensus_profile_started, "commit_consensus")
@@ -7108,8 +8014,7 @@ class NativePearlEngine:
                 break
         torch.npu.synchronize()
         if npu_profiler is not None:
-            npu_profiler.stop()
-            self._active_tree_profiler = None
+            _stop_active_npu_profiler(self)
         self._profile_tree_subphases = False
         self._defer_tree_materialization = False
         decode_elapsed = time.perf_counter() - started
@@ -7191,10 +8096,37 @@ class NativePearlEngine:
                     "decode_timeline": decode_timeline,
                     "tree_width": self.config.spec_rhythm_tree_width,
                     "tree_depth": self.config.spec_rhythm_tree_depth,
-                    **self.graph_metrics(),
+                    **self._result_graph_metrics(),
                 }
             )
         return results
+
+    def _prepare_spec_rhythm_linear_result_materialization(
+        self,
+        result_count: int,
+    ) -> tuple[tuple[int, ...], dict[str, Any]] | None:
+        """Snapshot leader-only result metadata, then release the KV cache.
+
+        Every PEARL rank executes the linear decode loop, but only the target
+        leader returns request results.  Keep graph metrics ahead of cache
+        release so cache-backed counters retain their existing meaning, while
+        avoiding one full result list and one metrics snapshot per request on
+        ranks whose lists would otherwise be discarded.
+        """
+
+        if self.rank != self.topology.target_leader_rank:
+            self._release_cache()
+            return None
+        if self.cache_allocation is None:
+            raise RuntimeError("Linear SpecRhythm result materialization requires an active cache allocation.")
+        try:
+            cached_prompt_tokens = tuple(
+                self.cache_allocation.num_cached_tokens[index] for index in range(result_count)
+            )
+            graph_metrics = self._result_graph_metrics()
+        finally:
+            self._release_cache()
+        return cached_prompt_tokens, graph_metrics
 
     def _generate_spec_rhythm_decode(
         self,
@@ -7235,19 +8167,14 @@ class NativePearlEngine:
         )
         strictest_slo_ms = partition_deadlines[0] if partition_deadlines else None
         partition_cutoff_ms = partition_deadlines[0] if len(partition_deadlines) > 1 else None
-        slo_home_partition = bool(
-            self.config.spec_rhythm_slo_home_partition and partition_cutoff_ms is not None
-        )
+        slo_home_partition = bool(self.config.spec_rhythm_slo_home_partition and partition_cutoff_ms is not None)
 
-        tight_home_fraction = (
-            envs.VLLM_ASCEND_SPECRHYTHM_TIGHT_HOME_FRACTION
-            if slo_home_partition
-            else 0.5
-        )
+        tight_home_fraction = envs.VLLM_ASCEND_SPECRHYTHM_TIGHT_HOME_FRACTION if slo_home_partition else 0.5
         home_capacities = spec_rhythm_home_capacities(
             initial_batch_size,
             tight_home_fraction,
         )
+        normalized_slo_classes = tuple(normalize_spec_rhythm_slo_class(params.slo_class) for params in request_params)
 
         def preferred_request_home(index: int) -> int:
             deadline = request_params[index].slo_tpot_ms
@@ -7285,8 +8212,7 @@ class NativePearlEngine:
             return 0 if home_counts[0] <= home_counts[1] else 1
 
         def slo_counter_class(index: int) -> str:
-            label = (request_params[index].slo_class or "").strip().lower()
-            return label if label in {"tight", "normal", "loose"} else "unclassified"
+            return normalized_slo_classes[index]
 
         runtime_states = {
             index: SpecRhythmRuntimeState(
@@ -7296,9 +8222,7 @@ class NativePearlEngine:
                 slo_class=params.slo_class,
                 max_gamma=params.spec_rhythm_max_gamma,
                 output_token_budget=params.max_tokens,
-                arrival_debt_cap_tokens=(
-                    envs.VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS or None
-                ),
+                arrival_debt_cap_tokens=(envs.VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS or None),
             )
             for index, params in enumerate(request_params)
         }
@@ -7319,6 +8243,31 @@ class NativePearlEngine:
         # bounded gamma window only for SLO-constrained requests.
         has_slo_constraints = any(
             params.slo_tpot_ms is not None or params.slo_class is not None for params in request_params
+        )
+        preempt_loose_for_tight_enabled = bool(
+            has_slo_constraints and envs.VLLM_ASCEND_SPECRHYTHM_PREEMPT_LOOSE_FOR_TIGHT
+        )
+        admission_priority_enabled = bool(
+            has_slo_constraints and (envs.VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION or preempt_loose_for_tight_enabled)
+        )
+        admission_slo_tpot_ms = (
+            {index: params.slo_tpot_ms for index, params in enumerate(request_params)}
+            if admission_priority_enabled
+            else None
+        )
+        admission_arrival_ts = (
+            {index: params.arrival_ts for index, params in enumerate(request_params)}
+            if admission_priority_enabled
+            else None
+        )
+        class_caps = {
+            "normal": int(envs.VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP),
+            "loose": int(envs.VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP),
+        }
+        class_caps_enabled = spec_rhythm_class_caps_enabled(class_caps)
+        tight_target_burst = max(
+            0,
+            int(envs.VLLM_ASCEND_SPECRHYTHM_TIGHT_TARGET_BURST),
         )
         ablation_mode = self.config.spec_rhythm_ablation_mode
         serial_ablation = ablation_mode == "serial"
@@ -7419,19 +8368,14 @@ class NativePearlEngine:
             else set()
         )
         cache_activated = (
-            set(kv_ready_preloaded)
-            if self.config.spec_rhythm_kv_ready_arrivals
-            else set(prefilled_indices or ())
+            set(kv_ready_preloaded) if self.config.spec_rhythm_kv_ready_arrivals else set(prefilled_indices or ())
         )
         cache_released: set[int] = set()
 
         def activate_online_cache(request_indices: Sequence[int]) -> None:
             """Lazily bind physical KV pages when an online prompt is served."""
 
-            if not (
-                self.config.spec_rhythm_online_prefill
-                or self.config.spec_rhythm_kv_ready_arrivals
-            ):
+            if not (self.config.spec_rhythm_online_prefill or self.config.spec_rhythm_kv_ready_arrivals):
                 return
             new_indices = [index for index in request_indices if index not in cache_activated]
             if not new_indices:
@@ -7442,16 +8386,12 @@ class NativePearlEngine:
                     index,
                     prompt,
                     enable_prefix_caching=(
-                        self.config.enable_prefix_caching
-                        and not self.config.spec_rhythm_kv_ready_arrivals
+                        self.config.enable_prefix_caching and not self.config.spec_rhythm_kv_ready_arrivals
                     ),
                 )
             if self.config.spec_rhythm_kv_ready_arrivals:
                 snapshots = getattr(self, "_kv_ready_host_snapshots", None)
-                batch_snapshots = [
-                    None if snapshots is None else snapshots.get(index)
-                    for index in new_indices
-                ]
+                batch_snapshots = [None if snapshots is None else snapshots.get(index) for index in new_indices]
                 if any(snapshot is None for snapshot in batch_snapshots):
                     raise RuntimeError("KV-ready admission lost its staged prompt KV.")
                 restore_started = time.perf_counter()
@@ -7459,9 +8399,7 @@ class NativePearlEngine:
                     new_indices,
                     batch_snapshots,
                 )
-                counters["spec_rhythm_kv_ready_restore_host_ms"] += (
-                    time.perf_counter() - restore_started
-                ) * 1000.0
+                counters["spec_rhythm_kv_ready_restore_host_ms"] += (time.perf_counter() - restore_started) * 1000.0
                 counters["spec_rhythm_kv_ready_restore_batches"] += 1
                 counters["spec_rhythm_kv_ready_restored_sequences"] += len(new_indices)
                 counters["spec_rhythm_kv_ready_restored_bytes"] += restored_bytes
@@ -7475,10 +8413,7 @@ class NativePearlEngine:
         def release_online_cache(request_indices: Sequence[int]) -> None:
             """Return completed online rows to the shared physical page pool."""
 
-            if not (
-                self.config.spec_rhythm_online_prefill
-                or self.config.spec_rhythm_kv_ready_arrivals
-            ):
+            if not (self.config.spec_rhythm_online_prefill or self.config.spec_rhythm_kv_ready_arrivals):
                 return
             for index in request_indices:
                 if index not in cache_activated or index in cache_released:
@@ -7509,15 +8444,9 @@ class NativePearlEngine:
         if gloo_accounting and accounting_group is None:
             raise RuntimeError("SpecRhythm Gloo accounting requires the verification coordination process group.")
         gloo_proposal_requested = bool(envs.VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL)
-        gloo_proposal = bool(
-            gloo_proposal_requested
-            and linear_full_window
-            and len(self.topology.draft_ranks) == 1
-        )
+        gloo_proposal = bool(gloo_proposal_requested and linear_full_window and len(self.topology.draft_ranks) == 1)
         proposal_coordination_group = (
-            getattr(self.groups, "verification_coordination_group", None)
-            if gloo_proposal
-            else None
+            getattr(self.groups, "verification_coordination_group", None) if gloo_proposal else None
         )
         if gloo_proposal and proposal_coordination_group is None:
             raise RuntimeError("SpecRhythm Gloo proposal requires the verification coordination process group.")
@@ -7527,9 +8456,12 @@ class NativePearlEngine:
                 "cross-model HCCL collective is posted while target TP work is in flight."
             )
         reuse_gloo_proposal_source_buffers = bool(
-            gloo_proposal
-            and envs.VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_SOURCE_BUFFERS
+            gloo_proposal and envs.VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_SOURCE_BUFFERS
         )
+        reuse_gloo_proposal_host_continuation_requested = bool(
+            envs.VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_HOST_CONTINUATION
+        )
+        reuse_gloo_proposal_host_continuation = bool(gloo_proposal and reuse_gloo_proposal_host_continuation_requested)
         gloo_proposal_source_buffers: dict[
             CompactFixedGreedyEnvelopeLayout,
             tuple[torch.Tensor, torch.Tensor],
@@ -7596,9 +8528,53 @@ class NativePearlEngine:
         last_cycle_ms = 0.0
         round_count = 0
         tight_target_guard_streak = 0
+        target_replay_ahead_enabled = bool(
+            envs.VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD
+        )
+        target_replay_ahead_preflight_group = (
+            getattr(
+                self.groups,
+                "verification_coordination_group",
+                None,
+            )
+            if target_replay_ahead_enabled
+            else None
+        )
+        if (
+            target_replay_ahead_enabled
+            and target_replay_ahead_preflight_group is None
+        ):
+            raise RuntimeError(
+                "Target replay-ahead requires the all-role CPU/Gloo "
+                "verification coordination group."
+            )
+        target_replay_ahead_graph_event_pairs = (
+            tuple(
+                (
+                    torch.npu.Event(enable_timing=True),
+                    torch.npu.Event(enable_timing=True),
+                )
+                for _ in range(2)
+            )
+            if target_replay_ahead_enabled
+            and self.device.type == "npu"
+            and self.rank == self.topology.target_leader_rank
+            else ()
+        )
+        target_replay_ahead_completion_events = (
+            tuple(torch.npu.Event() for _ in range(2))
+            if target_replay_ahead_enabled
+            and self.device.type == "npu"
+            and self.rank in self.topology.target_ranks
+            else ()
+        )
+        pending_target_replay_ahead: (
+            _PendingSpecRhythmTargetReplayAhead | None
+        ) = None
         phase_seconds = {
             "draft": 0.0,
             "target": 0.0,
+            "target_replay_ahead": 0.0,
             "exchange": 0.0,
             "verify": 0.0,
             "broadcast": 0.0,
@@ -7634,12 +8610,10 @@ class NativePearlEngine:
             "spec_rhythm_prefill_batches": 0,
             "spec_rhythm_prefill_requests": 0,
             "spec_rhythm_slo_aware_admission_enabled": int(
-                has_slo_constraints
-                and envs.VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION
+                has_slo_constraints and envs.VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION
             ),
             "spec_rhythm_target_slo_first_enabled": int(
-                has_slo_constraints
-                and envs.VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST
+                has_slo_constraints and envs.VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST
             ),
             **{
                 f"spec_rhythm_target_{outcome}_{label}": 0
@@ -7647,30 +8621,19 @@ class NativePearlEngine:
                 for label in ("tight", "normal", "loose", "unclassified")
             },
             "spec_rhythm_residual_eager_tight_only_enabled": int(
-                has_slo_constraints
-                and envs.VLLM_ASCEND_SPECRHYTHM_RESIDUAL_EAGER_TIGHT_ONLY
+                has_slo_constraints and envs.VLLM_ASCEND_SPECRHYTHM_RESIDUAL_EAGER_TIGHT_ONLY
             ),
             "spec_rhythm_arrival_debt_cap_tokens": int(
-                envs.VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS
-                if has_slo_constraints
-                else 0
+                envs.VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS if has_slo_constraints else 0
             ),
-            "spec_rhythm_slo_home_partition_requested": int(
-                self.config.spec_rhythm_slo_home_partition
-            ),
+            "spec_rhythm_slo_home_partition_requested": int(self.config.spec_rhythm_slo_home_partition),
             "spec_rhythm_slo_home_partition_enabled": int(slo_home_partition),
             "spec_rhythm_slo_home_partition_cutoff_ms": (
                 float(partition_cutoff_ms) if partition_cutoff_ms is not None else 0.0
             ),
-            "spec_rhythm_slo_home_partition_tight_fraction": float(
-                tight_home_fraction
-            ),
-            "spec_rhythm_slo_home_partition_home0_capacity": int(
-                home_capacities[0]
-            ),
-            "spec_rhythm_slo_home_partition_home1_capacity": int(
-                home_capacities[1]
-            ),
+            "spec_rhythm_slo_home_partition_tight_fraction": float(tight_home_fraction),
+            "spec_rhythm_slo_home_partition_home0_capacity": int(home_capacities[0]),
+            "spec_rhythm_slo_home_partition_home1_capacity": int(home_capacities[1]),
             "spec_rhythm_slo_home_partition_home0_admissions": 0,
             "spec_rhythm_slo_home_partition_home1_admissions": 0,
             "spec_rhythm_slo_home_partition_spill_admissions": 0,
@@ -7682,13 +8645,9 @@ class NativePearlEngine:
             "spec_rhythm_online_cache_released_blocks": 0,
             "spec_rhythm_kv_ready_host_staging_enabled": int(self.config.spec_rhythm_kv_ready_arrivals),
             "spec_rhythm_kv_ready_restored_sequences": len(kv_ready_preloaded),
-            "spec_rhythm_kv_ready_restored_bytes": int(
-                getattr(self, "_kv_ready_preload_bytes", 0)
-            ),
+            "spec_rhythm_kv_ready_restored_bytes": int(getattr(self, "_kv_ready_preload_bytes", 0)),
             "spec_rhythm_kv_ready_restore_batches": int(bool(kv_ready_preloaded)),
-            "spec_rhythm_kv_ready_restore_host_ms": float(
-                getattr(self, "_kv_ready_preload_host_ms", 0.0)
-            ),
+            "spec_rhythm_kv_ready_restore_host_ms": float(getattr(self, "_kv_ready_preload_host_ms", 0.0)),
             "spec_rhythm_online_refill_ms": 0.0,
             "spec_rhythm_staged_prefill_overlap_enabled": int(staged_prefill_overlap),
             "spec_rhythm_staged_prefill_overlap_batches": 0,
@@ -7717,6 +8676,20 @@ class NativePearlEngine:
             "spec_rhythm_stable_target_verify_graph_bounded_shape_fallback_batches": 0,
             "spec_rhythm_stable_target_verify_graph_token_capacity_fallback_batches": 0,
             "spec_rhythm_stable_target_verify_graph_execution_fallback_batches": 0,
+            "spec_rhythm_target_replay_ahead_enabled": int(
+                target_replay_ahead_enabled
+            ),
+            "spec_rhythm_target_replay_ahead_attempts": 0,
+            "spec_rhythm_target_replay_ahead_eligible": 0,
+            "spec_rhythm_target_replay_ahead_submitted": 0,
+            "spec_rhythm_target_replay_ahead_consumed": 0,
+            "spec_rhythm_target_replay_ahead_signature_mismatches": 0,
+            "spec_rhythm_target_replay_ahead_graph_ms": 0.0,
+            "spec_rhythm_target_replay_ahead_completion_waits": 0,
+            **{
+                f"spec_rhythm_target_replay_ahead_reject_{reason}": 0
+                for reason in TARGET_REPLAY_AHEAD_REJECT_REASONS
+            },
             "spec_rhythm_mixed_draft_prefill_enabled": int(mixed_draft_prefill),
             "spec_rhythm_mixed_draft_prefill_batches": 0,
             "spec_rhythm_mixed_draft_prefill_requests": 0,
@@ -7752,38 +8725,20 @@ class NativePearlEngine:
             "spec_rhythm_admission_polls": 0,
             "spec_rhythm_admission_batches": 0,
             "spec_rhythm_admitted_requests": 0,
-            "spec_rhythm_preempt_loose_for_tight_enabled": int(
-                has_slo_constraints
-                and envs.VLLM_ASCEND_SPECRHYTHM_PREEMPT_LOOSE_FOR_TIGHT
-            ),
+            "spec_rhythm_preempt_loose_for_tight_enabled": int(preempt_loose_for_tight_enabled),
             "spec_rhythm_preempted_loose_requests": 0,
             "spec_rhythm_resumed_loose_requests": 0,
             "spec_rhythm_preemption_cohorts": 0,
             "spec_rhythm_max_suspended_requests": 0,
-            "spec_rhythm_tight_target_burst": int(
-                envs.VLLM_ASCEND_SPECRHYTHM_TIGHT_TARGET_BURST
-            ),
+            "spec_rhythm_tight_target_burst": tight_target_burst,
             "spec_rhythm_tight_target_guard_cycles": 0,
             "spec_rhythm_tight_target_release_cycles": 0,
             "spec_rhythm_tight_target_deferred_loose_rows": 0,
-            "spec_rhythm_class_active_caps_enabled": int(
-                envs.VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP > 0
-                or envs.VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP > 0
-            ),
-            "spec_rhythm_normal_active_cap": int(
-                envs.VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP
-            ),
-            "spec_rhythm_loose_active_cap": int(
-                envs.VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP
-            ),
-            **{
-                f"spec_rhythm_class_cap_deferred_{label}": 0
-                for label in ("tight", "normal", "loose", "unclassified")
-            },
-            **{
-                f"spec_rhythm_class_cap_admitted_{label}": 0
-                for label in ("tight", "normal", "loose", "unclassified")
-            },
+            "spec_rhythm_class_active_caps_enabled": int(class_caps_enabled),
+            "spec_rhythm_normal_active_cap": class_caps["normal"],
+            "spec_rhythm_loose_active_cap": class_caps["loose"],
+            **{f"spec_rhythm_class_cap_deferred_{label}": 0 for label in ("tight", "normal", "loose", "unclassified")},
+            **{f"spec_rhythm_class_cap_admitted_{label}": 0 for label in ("tight", "normal", "loose", "unclassified")},
             "spec_rhythm_first_ready_requests": 0,
             "spec_rhythm_last_admission_batch_size": 0,
             "spec_rhythm_max_admission_batch_size": 0,
@@ -7797,6 +8752,10 @@ class NativePearlEngine:
             "spec_rhythm_dual_batch_overlap_protocol": int(not single_batch_ablation),
             "spec_rhythm_serial_draft_only_cycles": 0,
             "spec_rhythm_serial_target_only_cycles": 0,
+            "spec_rhythm_target_fallback_cycles": 0,
+            "spec_rhythm_target_fallback_rows": 0,
+            "spec_rhythm_target_fallback_wall_ms": 0.0,
+            **{f"spec_rhythm_target_fallback_active_{size}_cycles": 0 for size in range(1, 5)},
             "spec_rhythm_concurrent_draft_target_submission_cycles": 0,
             "spec_rhythm_single_batch_overlap_submission_cycles": 0,
             "spec_rhythm_dual_batch_overlap_submission_cycles": 0,
@@ -7804,18 +8763,26 @@ class NativePearlEngine:
             "spec_rhythm_target_home_1_cycles": 0,
             "spec_rhythm_gloo_accounting_requested": int(gloo_accounting_requested),
             "spec_rhythm_gloo_accounting_active": int(gloo_accounting),
+            "spec_rhythm_tail_accounting_broadcasts": 0,
+            "spec_rhythm_tail_accounting_unchanged_skips": 0,
+            "spec_rhythm_tail_accounting_changed_broadcasts": 0,
+            "spec_rhythm_tail_accounting_suspended_broadcasts": 0,
+            "spec_rhythm_cycle_frontier_piggybacks": 0,
             "spec_rhythm_gloo_proposal_requested": int(gloo_proposal_requested),
             "spec_rhythm_gloo_proposal_active": int(gloo_proposal),
             "spec_rhythm_gloo_proposal_broadcasts": 0,
             "spec_rhythm_gloo_proposal_d2h_ms": 0.0,
             "spec_rhythm_gloo_proposal_broadcast_ms": 0.0,
             "spec_rhythm_gloo_proposal_h2d_submit_ms": 0.0,
-            "spec_rhythm_gloo_proposal_reuse_source_buffers": int(
-                reuse_gloo_proposal_source_buffers
-            ),
+            "spec_rhythm_gloo_proposal_reuse_source_buffers": int(reuse_gloo_proposal_source_buffers),
             "spec_rhythm_gloo_proposal_source_buffer_allocations": 0,
             "spec_rhythm_gloo_proposal_source_buffer_reuses": 0,
+            "spec_rhythm_gloo_proposal_host_continuation_reuse_requested": int(
+                reuse_gloo_proposal_host_continuation_requested
+            ),
+            "spec_rhythm_gloo_proposal_host_continuation_reuse_active": int(reuse_gloo_proposal_host_continuation),
             "spec_rhythm_gloo_proposal_host_continuation_reuses": 0,
+            "spec_rhythm_gloo_proposal_device_continuation_reads": 0,
             "spec_rhythm_compute_coordination_cycles": 0,
             "spec_rhythm_compute_stream_sync_ms": 0.0,
             "spec_rhythm_compute_gloo_barrier_ms": 0.0,
@@ -7823,6 +8790,18 @@ class NativePearlEngine:
             "spec_rhythm_linear_bonus_token": int(linear_bonus_token),
             "spec_rhythm_fixed_gamma_scheduler_fast_path": int(fixed_gamma_scheduler_fast_path),
             "spec_rhythm_fixed_gamma_scheduler_fast_path_cycles": 0,
+            "spec_rhythm_drain_fifo_enabled": int(envs.VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO),
+            "spec_rhythm_drain_fifo_cycles": 0,
+            "spec_rhythm_drain_lrtf_enabled": int(envs.VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF),
+            "spec_rhythm_drain_lrtf_cycles": 0,
+            "spec_rhythm_drain_lrtf_target_ranked_cycles": 0,
+            "spec_rhythm_drain_lrtf_normal_ranked_cycles": 0,
+            "spec_rhythm_drain_lrtf_unified_cycles": 0,
+            "spec_rhythm_drain_lrtf_target_candidates": 0,
+            "spec_rhythm_drain_lrtf_normal_candidates": 0,
+            "spec_rhythm_drain_lrtf_repair_penalty_rows": 0,
+            "spec_rhythm_drain_lrtf_normal_selected": 0,
+            "spec_rhythm_drain_lrtf_normal_cross_home_selected": 0,
             "spec_rhythm_linear_rebuilt_requests": 0,
             "spec_rhythm_linear_discarded_ready": 0,
             "spec_rhythm_linear_invalidated_eager": 0,
@@ -7854,9 +8833,7 @@ class NativePearlEngine:
             "spec_rhythm_linear_w_cross_graph_bucket_enabled": int(
                 self.config.spec_rhythm_linear_eager_cross_graph_bucket
             ),
-            "spec_rhythm_linear_w_bucket_timing_enabled": int(
-                envs.VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_BUCKET_TIMING
-            ),
+            "spec_rhythm_linear_w_bucket_timing_enabled": int(envs.VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_BUCKET_TIMING),
             "spec_rhythm_linear_w_bucket_timing_samples": 0,
             "spec_rhythm_linear_w_last_normal_bucket_ms": 0.0,
             "spec_rhythm_linear_w_last_selected_bucket_ms": 0.0,
@@ -7887,7 +8864,12 @@ class NativePearlEngine:
         profiled_decode_steps = 0
         npu_profiler = None
         npu_profile_dir = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_DIR
-        if npu_profile_dir:
+        npu_profile_enabled = _npu_profile_call_enabled(
+            npu_profile_dir,
+            measurement_only=envs.VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY,
+            profile_host_decode_steps=self.config.profile_host_decode_steps,
+        )
+        if npu_profile_enabled:
             configured_rank = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_RANK
             npu_profile_rank = self.topology.target_leader_rank if configured_rank is None else configured_rank
             if npu_profile_rank != -1 and not 0 <= npu_profile_rank < self.topology.world_size:
@@ -7915,7 +8897,7 @@ class NativePearlEngine:
                     ),
                     record_shapes=True,
                 )
-                npu_profiler.start()
+                _start_active_npu_profiler(self, npu_profiler)
 
         def synchronized_wall_time() -> float:
             value = torch.tensor(
@@ -7967,9 +8949,7 @@ class NativePearlEngine:
             # queue-overflow definition of ``continuous_batching`` admitted a
             # 40-request/B64 trace all at once and made a 12-second replay
             # appear to finish in only its model execution time.
-            arrival_gated = bool(
-                self.config.spec_rhythm_online_prefill or self.config.spec_rhythm_kv_ready_arrivals
-            )
+            arrival_gated = bool(self.config.spec_rhythm_online_prefill or self.config.spec_rhythm_kv_ready_arrivals)
             request_limit = min(
                 capacity,
                 self.config.prefill_chunk_size or self.config.max_num_seqs,
@@ -8014,51 +8994,47 @@ class NativePearlEngine:
             ready_indices: list[int] = []
             packed_tokens = 0
             token_budget_saturated = False
-            admission_candidates = order_spec_rhythm_admission_candidates(
-                pending_admission,
-                slo_tpot_ms={index: request_params[index].slo_tpot_ms for index in pending_admission},
-                arrival_ts={index: request_params[index].arrival_ts for index in pending_admission},
-                enabled=(
-                    has_slo_constraints
-                    and (
-                        envs.VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION
-                        or envs.VLLM_ASCEND_SPECRHYTHM_PREEMPT_LOOSE_FOR_TIGHT
-                    )
-                ),
-            )
-            class_caps = {
-                "normal": int(envs.VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP),
-                "loose": int(envs.VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP),
-            }
-            active_class_counts = {
-                label: sum(
-                    slo_counter_class(index) == label
-                    for index in (*active_indices, *staged_prefill_indices)
+            if admission_priority_enabled:
+                assert admission_slo_tpot_ms is not None
+                assert admission_arrival_ts is not None
+                admission_candidates = order_spec_rhythm_admission_candidates(
+                    pending_admission,
+                    slo_tpot_ms=admission_slo_tpot_ms,
+                    arrival_ts=admission_arrival_ts,
+                    enabled=True,
                 )
-                for label in ("tight", "normal", "loose", "unclassified")
-            }
-            selected_for_admission: set[int] = set()
+            else:
+                admission_candidates = tuple(pending_admission)
+            active_class_counts = spec_rhythm_active_class_counts(
+                (index for indices in (active_indices, staged_prefill_indices) for index in indices),
+                enabled=class_caps_enabled,
+                class_of=slo_counter_class,
+            )
+            selected_for_admission: set[int] | None = set() if class_caps_enabled else None
             for index in admission_candidates:
                 if index in staged_set:
                     continue
                 arrival = request_params[index].arrival_ts
                 if arrival_gated and arrival is not None and arrival > now:
                     continue
-                request_class = slo_counter_class(index)
-                pending_classes = tuple(
-                    slo_counter_class(pending_index)
-                    for pending_index in pending_admission
-                    if pending_index not in staged_set
-                    and pending_index not in selected_for_admission
-                )
-                if spec_rhythm_class_cap_blocks(
-                    request_class,
-                    active_counts=active_class_counts,
-                    pending_classes=pending_classes,
-                    class_caps=class_caps,
-                ):
-                    counters[f"spec_rhythm_class_cap_deferred_{request_class}"] += 1
-                    continue
+                request_class = None
+                if class_caps_enabled:
+                    assert active_class_counts is not None
+                    assert selected_for_admission is not None
+                    request_class = slo_counter_class(index)
+                    pending_classes = tuple(
+                        slo_counter_class(pending_index)
+                        for pending_index in pending_admission
+                        if pending_index not in staged_set and pending_index not in selected_for_admission
+                    )
+                    if spec_rhythm_class_cap_blocks(
+                        request_class,
+                        active_counts=active_class_counts,
+                        pending_classes=pending_classes,
+                        class_caps=class_caps,
+                    ):
+                        counters[f"spec_rhythm_class_cap_deferred_{request_class}"] += 1
+                        continue
                 prefill_budget_tokens = 0
                 if index not in prefetched:
                     # Draft and target ranks own different model KV caches;
@@ -8092,8 +9068,11 @@ class NativePearlEngine:
                 if prefill_budget_tokens > self.config.max_num_batched_tokens:
                     raise ValueError("An online PEARL prefill request exceeds max_num_batched_tokens.")
                 ready_indices.append(index)
-                selected_for_admission.add(index)
-                active_class_counts[request_class] += 1
+                if selected_for_admission is not None:
+                    selected_for_admission.add(index)
+                if active_class_counts is not None:
+                    assert request_class is not None
+                    active_class_counts[request_class] += 1
                 packed_tokens += prefill_budget_tokens
                 if len(ready_indices) >= request_limit:
                     break
@@ -8340,21 +9319,18 @@ class NativePearlEngine:
             counters["spec_rhythm_admission_batches"] += 1
             counters["spec_rhythm_admitted_requests"] += admission_size
             for index in ready_indices:
-                counters[
-                    "spec_rhythm_class_cap_admitted_"
-                    f"{slo_counter_class(index)}"
-                ] += 1
+                counters[f"spec_rhythm_class_cap_admitted_{slo_counter_class(index)}"] += 1
             counters["spec_rhythm_last_admission_batch_size"] = admission_size
             counters["spec_rhythm_max_admission_batch_size"] = max(
                 counters["spec_rhythm_max_admission_batch_size"], admission_size
             )
 
-        def admit_ready(now: float) -> None:
+        def admit_ready(now: float) -> bool:
             """Synchronously prefill/admit one batch (bootstrap and fallback)."""
 
             ready_indices = select_ready(now)
             if not ready_indices:
-                return
+                return False
             activate_online_cache(ready_indices)
             prefill_indices = [index for index in ready_indices if index not in prefetched]
             target_tokens: list[int] = []
@@ -8409,8 +9385,9 @@ class NativePearlEngine:
                 ready_indices,
                 target_tokens,
             )
+            return True
 
-        def reserve_ready(now: float) -> None:
+        def reserve_ready(now: float) -> bool:
             """Reserve an arrived batch for the next cycle's model window."""
 
             nonlocal staged_prefill_indices
@@ -8418,14 +9395,14 @@ class NativePearlEngine:
             nonlocal staged_prefill_target_tokens
             nonlocal staged_draft_prefill_completed
             if staged_prefill_indices:
-                return
+                return False
             allow_prefetch_ahead = prefetch_ahead
             ready_indices = select_ready(
                 now,
                 allow_prefetch_ahead=allow_prefetch_ahead,
             )
             if not ready_indices:
-                return
+                return False
             staged_prefill_indices = ready_indices
             staged_draft_prefill_completed = False
             activate_online_cache(ready_indices)
@@ -8438,6 +9415,7 @@ class NativePearlEngine:
             if len(active_indices) + len(ready_indices) > initial_batch_size:
                 counters["spec_rhythm_prefetch_ahead_reserved_batches"] += 1
                 counters["spec_rhythm_prefetch_ahead_reserved_requests"] += len(ready_indices)
+            return True
 
         def submit_staged_prefill(
             *,
@@ -8506,7 +9484,7 @@ class NativePearlEngine:
             else:
                 counters["spec_rhythm_prefill_token_chunk_partial_submissions"] += 1
 
-        def activate_staged_prefill() -> None:
+        def activate_staged_prefill() -> bool:
             """Publish a successfully completed staged prefill exactly once."""
 
             nonlocal staged_prefill_indices
@@ -8518,13 +9496,13 @@ class NativePearlEngine:
             if not staged_prefill_indices:
                 if staged_prefill_tokens is not None:
                     raise RuntimeError("Online PEARL retained tokens without a staged reservation.")
-                return
+                return False
             if staged_prefill_tokens is None:
                 if token_chunk_prefill and staged_prefill_cursors:
                     # A partial token chunk has populated private KV slots,
                     # but no first token/state is visible until every staged
                     # request reaches its prompt's final token.
-                    return
+                    return False
                 raise RuntimeError("Online PEARL attempted to activate an unfinished prefill.")
             if not staged_prefill_accounted:
                 counters["spec_rhythm_prefill_batches"] += 1
@@ -8535,7 +9513,7 @@ class NativePearlEngine:
             available = max(0, initial_batch_size - len(active_indices))
             if available == 0:
                 counters["spec_rhythm_prefetch_ahead_deferred_publications"] += 1
-                return
+                return False
             publish_count = min(available, len(staged_prefill_indices))
             publish_indices = staged_prefill_indices[:publish_count]
             publish_tokens = staged_prefill_tokens[:publish_count]
@@ -8547,14 +9525,10 @@ class NativePearlEngine:
             staged_prefill_indices = staged_prefill_indices[publish_count:]
             staged_prefill_tokens = staged_prefill_tokens[publish_count:]
             staged_prefill_cursors = {
-                index: cursor
-                for index, cursor in staged_prefill_cursors.items()
-                if index not in published_set
+                index: cursor for index, cursor in staged_prefill_cursors.items() if index not in published_set
             }
             staged_prefill_target_tokens = {
-                index: token
-                for index, token in staged_prefill_target_tokens.items()
-                if index not in published_set
+                index: token for index, token in staged_prefill_target_tokens.items() if index not in published_set
             }
             if staged_prefill_indices:
                 counters["spec_rhythm_prefetch_ahead_partial_publications"] += 1
@@ -8562,17 +9536,17 @@ class NativePearlEngine:
                 staged_prefill_tokens = None
                 staged_prefill_accounted = False
                 staged_draft_prefill_completed = False
+            return True
 
-        def maybe_preempt_loose_for_tight(now: float) -> None:
+        def maybe_preempt_loose_for_tight(now: float) -> bool:
             """Replace borrowed loose rows with one arrival-ready tight cohort."""
 
             if (
-                not has_slo_constraints
-                or not envs.VLLM_ASCEND_SPECRHYTHM_PREEMPT_LOOSE_FOR_TIGHT
+                not preempt_loose_for_tight_enabled
                 or staged_prefill_indices
                 or len(active_indices) < initial_batch_size
             ):
-                return
+                return False
             ready_tight = [
                 index
                 for index in pending_admission
@@ -8584,7 +9558,7 @@ class NativePearlEngine:
                 )
             ]
             if not ready_tight:
-                return
+                return False
             minimum = max(1, int(self.config.spec_rhythm_prefill_coalesce_min_requests))
             oldest_wait_ms = max(
                 (
@@ -8594,18 +9568,11 @@ class NativePearlEngine:
                 )
                 for index in ready_tight
             )
-            if (
-                len(ready_tight) < minimum
-                and oldest_wait_ms < self.config.spec_rhythm_prefill_coalesce_max_wait_ms
-            ):
-                return
-            victims = [
-                index
-                for index in active_indices
-                if slo_counter_class(index) == "loose"
-            ]
+            if len(ready_tight) < minimum and oldest_wait_ms < self.config.spec_rhythm_prefill_coalesce_max_wait_ms:
+                return False
+            victims = [index for index in active_indices if slo_counter_class(index) == "loose"]
             if not victims:
-                return
+                return False
             prompt_capacity = int(
                 getattr(
                     self,
@@ -8614,11 +9581,8 @@ class NativePearlEngine:
                 )
             )
             count = min(len(ready_tight), len(victims), prompt_capacity)
-            if (
-                count < minimum
-                and oldest_wait_ms < self.config.spec_rhythm_prefill_coalesce_max_wait_ms
-            ):
-                return
+            if count < minimum and oldest_wait_ms < self.config.spec_rhythm_prefill_coalesce_max_wait_ms:
+                return False
             victims = sorted(
                 victims,
                 key=lambda index: (
@@ -8636,9 +9600,7 @@ class NativePearlEngine:
                 state = local_states[index]
                 committed = int(state.committed_length or 0)
                 if committed <= 0 or committed > len(state.token_ids):
-                    raise RuntimeError(
-                        "SpecRhythm cannot preempt a request with an invalid committed frontier."
-                    )
+                    raise RuntimeError("SpecRhythm cannot preempt a request with an invalid committed frontier.")
                 del state.token_ids[committed:]
                 state.pending_window_size = 0
                 state.continuation_epoch = runtime_states[index].prefix_epoch
@@ -8652,14 +9614,14 @@ class NativePearlEngine:
                 counters["spec_rhythm_max_suspended_requests"],
                 len(suspended_indices),
             )
+            return True
 
-        def resume_suspended() -> None:
+        def resume_suspended() -> bool:
             available = initial_batch_size - len(active_indices) - len(staged_prefill_indices)
             if available <= 0 or not suspended_indices:
-                return
+                return False
             home_counts = [
-                sum(runtime_states[index].home_batch_id == home for index in active_indices)
-                for home in (0, 1)
+                sum(runtime_states[index].home_batch_id == home for index in active_indices) for home in (0, 1)
             ]
             resumed = suspended_indices[:available]
             del suspended_indices[: len(resumed)]
@@ -8669,12 +9631,13 @@ class NativePearlEngine:
                 home_counts[home] += 1
                 active_indices.append(index)
             counters["spec_rhythm_resumed_loose_requests"] += len(resumed)
+            return True
 
         def admit_available(
             *,
             now: float | None = None,
             stage_for_overlap: bool = False,
-        ) -> None:
+        ) -> bool:
             """Admit ready requests without a clock collective when the queue is empty.
 
             Once a fixed SpecSLO batch has been prefetched, repeated wall-clock
@@ -8682,43 +9645,42 @@ class NativePearlEngine:
             online/future arrivals, where every rank must observe the same time.
             """
             if staged_prefill_indices:
-                return
-            arrival_gated = bool(
-                self.config.spec_rhythm_online_prefill or self.config.spec_rhythm_kv_ready_arrivals
-            )
+                return False
+            frontier_mutated = False
+            arrival_gated = bool(self.config.spec_rhythm_online_prefill or self.config.spec_rhythm_kv_ready_arrivals)
             # A static/non-online queue has no time predicate.  During active
             # online decode, callers pass the target-leader timestamp already
             # carried by the cycle accounting broadcast, avoiding a second
             # WORLD broadcast + D2H read on every no-arrival cycle.
-            resolved_now = (
-                synchronized_wall_time()
-                if arrival_gated and now is None
-                else float(now or 0.0)
-            )
+            resolved_now = synchronized_wall_time() if arrival_gated and now is None else float(now or 0.0)
             if pending_admission:
-                maybe_preempt_loose_for_tight(resolved_now)
-            ready_strict_pending = any(
-                slo_counter_class(index) in {"tight", "normal"}
-                and (
-                    not arrival_gated
-                    or request_params[index].arrival_ts is None
-                    or float(request_params[index].arrival_ts) <= resolved_now
-                )
-                for index in pending_admission
+                frontier_mutated = maybe_preempt_loose_for_tight(resolved_now)
+            ready_strict_pending = spec_rhythm_any_when_enabled(
+                bool(suspended_indices),
+                (
+                    slo_counter_class(index) in {"tight", "normal"}
+                    and (
+                        not arrival_gated
+                        or request_params[index].arrival_ts is None
+                        or float(request_params[index].arrival_ts) <= resolved_now
+                    )
+                    for index in pending_admission
+                ),
             )
             if suspended_indices and not ready_strict_pending:
-                resume_suspended()
+                frontier_mutated = resume_suspended() or frontier_mutated
             if not (stage_for_overlap and prefetch_ahead) and len(active_indices) >= initial_batch_size:
-                return
+                return frontier_mutated
             if pending_admission:
                 if not arrival_gated:
-                    admit_ready(0.0)
+                    frontier_mutated = admit_ready(0.0) or frontier_mutated
                 elif stage_for_overlap and staged_prefill_overlap:
-                    reserve_ready(resolved_now)
+                    frontier_mutated = reserve_ready(resolved_now) or frontier_mutated
                 else:
-                    admit_ready(resolved_now)
+                    frontier_mutated = admit_ready(resolved_now) or frontier_mutated
             if not staged_prefill_indices:
-                resume_suspended()
+                frontier_mutated = resume_suspended() or frontier_mutated
+            return frontier_mutated
 
         def invalidate_request(request_index: int) -> None:
             controller.invalidate_request(request_index)
@@ -8735,30 +9697,22 @@ class NativePearlEngine:
             loop while another rank enters the next collective, turning a
             deterministic state bug into a five-minute distributed timeout.
             All values below are small exact integers when represented as
-            float64, so they can ride on the existing tail timing broadcast at
-            effectively no additional communication cost.
+            float64. Changed tails retain the dedicated timing envelope;
+            unchanged Gloo cycles piggyback the same signature on the primary
+            accounting envelope before safely omitting the redundant tail
+            collective.
             """
 
             committed_fingerprint = sum(
                 (index + 1) * (int(local_states[index].committed_length or 0) + 1) for index in active_indices
             ) + sum(
-                (index + 1)
-                * (
-                    int(local_states[index].committed_length or 0)
-                    + 1
-                    + self.config.max_model_len
-                )
+                (index + 1) * (int(local_states[index].committed_length or 0) + 1 + self.config.max_model_len)
                 for index in suspended_indices
             )
             epoch_fingerprint = sum(
                 (index + 1) * (int(runtime_states[index].prefix_epoch) + 1) for index in active_indices
             ) + sum(
-                (index + 1)
-                * (
-                    int(runtime_states[index].prefix_epoch)
-                    + 1
-                    + self.config.max_model_len
-                )
+                (index + 1) * (int(runtime_states[index].prefix_epoch) + 1 + self.config.max_model_len)
                 for index in suspended_indices
             )
             # Keep the existing ten-scalar signature (the tail envelope also
@@ -8782,8 +9736,7 @@ class NativePearlEngine:
             return (
                 int(round_count),
                 len(active_indices),
-                len(pending_admission)
-                + len(suspended_indices) * (len(request_params) + 1),
+                len(pending_admission) + len(suspended_indices) * (len(request_params) + 1),
                 prefill_fingerprint,
                 len(completed_states),
                 len(controller.ready),
@@ -8793,10 +9746,18 @@ class NativePearlEngine:
                 epoch_fingerprint,
             )
 
-        def validate_service_frontier(values: Sequence[float]) -> None:
+        def validate_service_frontier(
+            values: Sequence[float],
+            *,
+            local_signature: Sequence[int] | None = None,
+        ) -> None:
             target_signature = tuple(int(round(value)) for value in values)
-            local_signature = service_frontier_signature()
-            if local_signature != target_signature:
+            resolved_local_signature = (
+                service_frontier_signature()
+                if local_signature is None
+                else tuple(int(value) for value in local_signature)
+            )
+            if resolved_local_signature != target_signature:
                 ready_detail = {int(index): int(ticket.proposal_id) for index, ticket in controller.ready.items()}
                 eager_detail = {
                     int(index): int(ticket.proposal_id) for index, ticket in controller.staged_eager.items()
@@ -8807,7 +9768,7 @@ class NativePearlEngine:
                 raise RuntimeError(
                     "SpecRhythm rank-local service frontier diverged before "
                     "the next cycle: "
-                    f"rank={self.rank}, local={local_signature}, "
+                    f"rank={self.rank}, local={resolved_local_signature}, "
                     f"target_leader={target_signature}, "
                     f"local_ready={ready_detail}, "
                     f"local_staged_eager={eager_detail}, "
@@ -8924,25 +9885,29 @@ class NativePearlEngine:
         }
         admit_available()
         accounting_buffer_device: torch.device | str = "cpu" if gloo_accounting else self.device
+        service_frontier_width = len(service_frontier_signature())
         cycle_accounting_envelope = ReusableSpecRhythmEnvelope(
-            2 + (2 if linear_window_estimator is not None else 0) + 2 * initial_batch_size,
+            2
+            + (2 if linear_window_estimator is not None else 0)
+            + 2 * initial_batch_size
+            + (service_frontier_width if gloo_accounting else 0),
             device=accounting_buffer_device,
         )
         fallback_accounting_envelope = ReusableSpecRhythmEnvelope(
-            2 + 2 * initial_batch_size,
+            2 + 2 * initial_batch_size + (service_frontier_width if gloo_accounting else 0),
             device=accounting_buffer_device,
         )
         tail_accounting_envelope = ReusableSpecRhythmEnvelope(
-            2 + len(service_frontier_signature()),
+            2 + service_frontier_width,
             device=accounting_buffer_device,
         )
         # This is a persistent accounting boundary, rather than merely the
-        # host entry time of the current Python iteration.  At the end of each
-        # cycle it is moved to the instant immediately before the tail timing
-        # collective.  Consequently that collective, its D2H read, and the
-        # remaining loop bookkeeping become the beginning of the next
-        # request-visible interval instead of disappearing between two calls
-        # to ``perf_counter``.
+        # host entry time of the current Python iteration.  A changed service
+        # frontier retains the explicit tail envelope and moves the boundary
+        # to the instant immediately before that collective.  The Gloo
+        # no-change fast path instead keeps ``cycle_accounting_split`` as the
+        # boundary, so the skipped collective's surrounding refill/host work
+        # remains in the next request-visible interval.
         cycle_accounting_started = take_activation_cycle_start(time.perf_counter())
         while (active_indices or pending_admission or suspended_indices) and (
             max_rounds is None or round_count < max_rounds
@@ -8992,9 +9957,17 @@ class NativePearlEngine:
                 cycle_started = cycle_accounting_started
                 fallback_cycle_indices = tuple(active_indices)
                 fallback_suspended_indices = tuple(suspended_indices)
+                counters["spec_rhythm_target_fallback_cycles"] += 1
+                counters["spec_rhythm_target_fallback_rows"] += len(fallback_cycle_indices)
+                active_size_key = f"spec_rhythm_target_fallback_active_{len(fallback_cycle_indices)}_cycles"
+                if active_size_key in counters:
+                    counters[active_size_key] += 1
                 fallback_finish_endpoints = run_target_fallback(fallback_cycle_indices)
                 torch.npu.synchronize()
                 cycle_accounting_split = time.perf_counter()
+                counters["spec_rhythm_target_fallback_wall_ms"] += (
+                    cycle_accounting_split - cycle_started
+                ) * 1000.0
                 needs_admission_clock = bool(
                     pending_admission
                     and (self.config.spec_rhythm_online_prefill or self.config.spec_rhythm_kv_ready_arrivals)
@@ -9017,6 +9990,14 @@ class NativePearlEngine:
                     *fallback_cycle_ids,
                     *fallback_finish_offsets,
                 ]
+                fallback_frontier_start = len(fallback_clock_values)
+                fallback_cycle_frontier = service_frontier_signature() if gloo_accounting else ()
+                if gloo_accounting:
+                    fallback_clock_values.extend(
+                        fallback_cycle_frontier
+                        if self.rank == self.topology.target_leader_rank
+                        else (0,) * service_frontier_width
+                    )
                 fallback_accounting_envelope.rewrite(fallback_clock_values)
                 fallback_clock_values = fallback_accounting_envelope.broadcast_and_materialize(
                     source_rank=self.topology.target_leader_rank,
@@ -9031,6 +10012,15 @@ class NativePearlEngine:
                 fallback_finish_offsets = [
                     float(value) for value in fallback_clock_values[2 + initial_batch_size : 2 + 2 * initial_batch_size]
                 ]
+                if gloo_accounting:
+                    counters["spec_rhythm_cycle_frontier_piggybacks"] += 1
+                    if self.device.type != "cpu":
+                        validate_service_frontier(
+                            fallback_clock_values[
+                                fallback_frontier_start : fallback_frontier_start + service_frontier_width
+                            ],
+                            local_signature=fallback_cycle_frontier,
+                        )
                 if round_count < self.config.profile_decode_steps:
                     profiled_decode_steps += 1
                 if npu_profiler is not None:
@@ -9085,9 +10075,31 @@ class NativePearlEngine:
                         and profiled_decode_steps >= self.config.profile_decode_steps
                     )
                 )
+                tail_frontier_changed = False
                 if not stopping_after_cycle:
-                    admit_available(now=admission_now)
+                    tail_frontier_changed = admit_available(now=admission_now)
                 cycle_tail_ended = time.perf_counter()
+                skip_tail_accounting = bool(
+                    gloo_accounting
+                    and not tail_frontier_changed
+                    and not activation_tail_starts
+                    and not tail_suspended_indices
+                    and not suspended_indices
+                    and (not stopping_after_cycle or not tail_incumbent_indices)
+                )
+                if skip_tail_accounting:
+                    counters["spec_rhythm_tail_accounting_unchanged_skips"] += 1
+                    # Do not charge the refill/host tail eagerly.  Keeping the
+                    # pre-tail split makes the next primary accounting record
+                    # include it exactly once for every surviving request.
+                    cycle_accounting_started = cycle_accounting_split
+                    round_count += 1
+                    if (
+                        self.config.stop_after_profiled_decode_steps
+                        and profiled_decode_steps >= self.config.profile_decode_steps
+                    ):
+                        break
+                    continue
                 local_frontier_signature = service_frontier_signature()
                 tail_elapsed_values = [
                     cycle_tail_ended - cycle_accounting_split if self.rank == self.topology.target_leader_rank else 0.0,
@@ -9102,6 +10114,11 @@ class NativePearlEngine:
                 tail_elapsed_values = tail_accounting_envelope.broadcast_and_materialize(
                     source_rank=self.topology.target_leader_rank,
                     group=accounting_group,
+                )
+                counters["spec_rhythm_tail_accounting_broadcasts"] += 1
+                counters["spec_rhythm_tail_accounting_changed_broadcasts"] += int(tail_frontier_changed)
+                counters["spec_rhythm_tail_accounting_suspended_broadcasts"] += int(
+                    bool(tail_suspended_indices or suspended_indices)
                 )
                 tail_elapsed_ms = float(tail_elapsed_values[0]) * 1000.0
                 if self.device.type != "cpu":
@@ -9178,17 +10195,15 @@ class NativePearlEngine:
                 else None
             )
             projected_wait_ms = max(last_cycle_ms * 2.0, 1e-6)
-            tight_target_burst = max(
-                0,
-                int(envs.VLLM_ASCEND_SPECRHYTHM_TIGHT_TARGET_BURST),
-            )
-            urgent_tight_ready = any(
-                index in controller.ready
-                and slo_counter_class(index) == "tight"
-                and runtime_states[index].projected_progress_gap(projected_wait_ms) > 0
-                and runtime_states[index].urgency(projected_wait_ms)
-                >= self.config.spec_rhythm_urgency_threshold
-                for index in active_indices
+            urgent_tight_ready = spec_rhythm_any_when_enabled(
+                tight_target_burst > 0,
+                (
+                    index in controller.ready
+                    and slo_counter_class(index) == "tight"
+                    and runtime_states[index].projected_progress_gap(projected_wait_ms) > 0
+                    and runtime_states[index].urgency(projected_wait_ms) >= self.config.spec_rhythm_urgency_threshold
+                    for index in active_indices
+                ),
             )
             defer_loose_target = False
             if tight_target_burst > 0 and urgent_tight_ready and not single_batch_ablation:
@@ -9201,6 +10216,24 @@ class NativePearlEngine:
                     counters["spec_rhythm_tight_target_release_cycles"] += 1
             else:
                 tight_target_guard_streak = 0
+            # a_need is valuable while future arrivals, prefills, or
+            # preempted rows can still change the feasible SLO allocation.
+            # After the online trace is completely admitted, however, using
+            # a_need to repeatedly prefer already-doomed relaxed requests can
+            # leave older ready rows as makespan stragglers.  The controller's
+            # non-priority ordering is ready-wait-first and starvation-safe;
+            # switching only at this immutable drain boundary preserves the
+            # online/SLO policy and proposal/graph shapes of all earlier
+            # cycles.
+            drain_fifo = spec_rhythm_drain_fifo_active(
+                envs.VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO,
+                pending_admission=pending_admission,
+                staged_prefill_indices=staged_prefill_indices,
+                suspended_indices=suspended_indices,
+            )
+            counters["spec_rhythm_drain_fifo_cycles"] += int(drain_fifo)
+            drain_lrtf = bool(drain_fifo and envs.VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF)
+            counters["spec_rhythm_drain_lrtf_cycles"] += int(drain_lrtf)
             if single_batch_ablation:
                 plan = controller.build_single_batch_plan(
                     active_indices,
@@ -9214,36 +10247,54 @@ class NativePearlEngine:
                     active_indices,
                     verification_budget=verification_roof,
                     ready_candidate_counts=ready_candidate_counts,
-                    priority=effective_priority,
+                    priority=effective_priority and not drain_fifo,
                     projected_wait_ms=projected_wait_ms,
                     priority_burst=self.config.spec_rhythm_priority_burst,
-                    goodput_edf=envs.VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF,
-                    target_slo_first=envs.VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST,
-                    defer_loose=defer_loose_target,
+                    goodput_edf=envs.VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF and not drain_fifo,
+                    target_slo_first=envs.VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST and not drain_fifo,
+                    remaining_service_first=drain_lrtf,
+                    defer_loose=defer_loose_target and not drain_fifo,
                     merge_ready_homes=(
                         has_slo_constraints and self.config.spec_rhythm_merge_ready_homes and not explicit_ablation
                     ),
                     max_target_requests=max_target_requests,
+                )
+            if drain_lrtf:
+                counters["spec_rhythm_drain_lrtf_target_ranked_cycles"] += int(
+                    plan.remaining_service_target_ranked
+                )
+                counters["spec_rhythm_drain_lrtf_normal_ranked_cycles"] += int(
+                    plan.remaining_service_normal_ranked
+                )
+                counters["spec_rhythm_drain_lrtf_unified_cycles"] += int(
+                    plan.remaining_service_target_ranked
+                    and plan.remaining_service_normal_ranked
+                )
+                counters["spec_rhythm_drain_lrtf_target_candidates"] += int(
+                    plan.remaining_service_target_candidates
+                )
+                counters["spec_rhythm_drain_lrtf_normal_candidates"] += int(
+                    plan.remaining_service_normal_candidates
+                )
+                counters["spec_rhythm_drain_lrtf_repair_penalty_rows"] += int(
+                    plan.remaining_service_normal_candidates
+                )
+                counters["spec_rhythm_drain_lrtf_normal_selected"] += int(
+                    plan.remaining_service_normal_selected
+                )
+                counters["spec_rhythm_drain_lrtf_normal_cross_home_selected"] += int(
+                    plan.remaining_service_normal_cross_home_selected
                 )
             ready_target_indices = (
                 *plan.target_request_indices,
                 *plan.deferred_target_request_indices,
             )
             for request_index in ready_target_indices:
-                counters[
-                    "spec_rhythm_target_ready_"
-                    f"{slo_counter_class(request_index)}"
-                ] += 1
+                counters[f"spec_rhythm_target_ready_{slo_counter_class(request_index)}"] += 1
             for request_index in plan.target_request_indices:
-                counters[
-                    "spec_rhythm_target_selected_"
-                    f"{slo_counter_class(request_index)}"
-                ] += 1
+                counters[f"spec_rhythm_target_selected_{slo_counter_class(request_index)}"] += 1
             for request_index in plan.deferred_target_request_indices:
-                counters[
-                    "spec_rhythm_target_deferred_"
-                    f"{slo_counter_class(request_index)}"
-                ] += 1
+                counters[f"spec_rhythm_target_deferred_{slo_counter_class(request_index)}"] += 1
                 if defer_loose_target and slo_counter_class(request_index) == "loose":
                     counters["spec_rhythm_tight_target_deferred_loose_rows"] += 1
             if trace_requests and self.rank in self.topology.correction_ranks:
@@ -9294,6 +10345,101 @@ class NativePearlEngine:
                 )
                 target_payloads.append(payload)
             target_payload_by_index = {payload.ticket.request_index: payload for payload in target_payloads}
+            target_replay_ahead_for_cycle: (
+                _PendingSpecRhythmTargetReplayAhead | None
+            ) = None
+            current_replay_signature = None
+            consume_local_ready = True
+            if pending_target_replay_ahead is not None:
+                if (
+                    self.rank in self.topology.target_ranks
+                    and self.device.type == "npu"
+                ):
+                    completion_event = (
+                        pending_target_replay_ahead.completion_event
+                    )
+                    if completion_event is None:
+                        consume_local_ready = False
+                    else:
+                        torch.npu.current_stream().wait_event(completion_event)
+                        counters[
+                            "spec_rhythm_target_replay_ahead_completion_waits"
+                        ] += 1
+                signature_reason = None
+                try:
+                    current_replay_signature, signature_reason = (
+                        _spec_rhythm_selected_target_signature(
+                            controller=controller,
+                            home_batch_id=plan.target_home_batch_id,
+                            request_indices=target_indices,
+                            payloads=payloads,
+                            states=local_states,
+                            gamma=self.gamma,
+                        )
+                    )
+                    if current_replay_signature is not None:
+                        current_replay_signature = replace(
+                            current_replay_signature,
+                            graph_entry_lease_generation=(
+                                pending_target_replay_ahead.signature.graph_entry_lease_generation
+                            ),
+                        )
+                        current_replay_signature = (
+                            _bind_target_replay_ahead_resources(
+                                self,
+                                current_replay_signature,
+                            )
+                        )
+                except RuntimeError:
+                    consume_local_ready = False
+                consume_local_ready = consume_local_ready and not (
+                    signature_reason is not None
+                    or current_replay_signature
+                    != pending_target_replay_ahead.signature
+                )
+            if target_replay_ahead_enabled:
+                assert target_replay_ahead_preflight_group is not None
+                consume_pending, consume_valid = (
+                    _target_replay_ahead_consume_preflight(
+                        pending_target_replay_ahead,
+                        current_replay_signature,
+                        local_ready=consume_local_ready,
+                        is_target_rank=(
+                            self.rank in self.topology.target_ranks
+                        ),
+                        group=target_replay_ahead_preflight_group,
+                    )
+                )
+                if not consume_valid:
+                    counters[
+                        "spec_rhythm_target_replay_ahead_signature_mismatches"
+                    ] += 1
+                    if pending_target_replay_ahead is not None:
+                        _fence_target_replay_ahead_before_fatal(
+                            pending_target_replay_ahead,
+                            is_target_rank=(
+                                self.rank in self.topology.target_ranks
+                            ),
+                            device_type=self.device.type,
+                        )
+                        with suppress(RuntimeError):
+                            _release_target_replay_ahead_entry(
+                                self,
+                                pending_target_replay_ahead.signature,
+                            )
+                    raise RuntimeError(
+                        "SpecRhythm target replay-ahead consume state diverged "
+                        "across ranks after irreversible graph submission."
+                    )
+                if consume_pending:
+                    assert pending_target_replay_ahead is not None
+                    assert current_replay_signature is not None
+                else:
+                    assert pending_target_replay_ahead is None
+            if pending_target_replay_ahead is not None:
+                target_replay_ahead_for_cycle = pending_target_replay_ahead
+                pending_target_replay_ahead = None
+                counters["spec_rhythm_target_replay_ahead_consumed"] += 1
             projected_wait_ms = max(last_cycle_ms * 2.0, 1e-6)
             normal_indices = list(plan.normal_draft_request_indices)
             eager_candidates: list[int] = []
@@ -9400,16 +10546,10 @@ class NativePearlEngine:
                 counters["spec_rhythm_linear_idle_residual_eligible_rows"] += len(residual_eager_indices)
                 counters["spec_rhythm_linear_idle_residual_admitted_rows"] += admitted_residual_eager_rows
                 for request_index in residual_eager_indices:
-                    counters[
-                        "spec_rhythm_linear_idle_residual_eligible_"
-                        f"{slo_counter_class(request_index)}"
-                    ] += 1
+                    counters[f"spec_rhythm_linear_idle_residual_eligible_{slo_counter_class(request_index)}"] += 1
                 for request_index in eager_candidates:
                     if request_index in residual_eager_indices:
-                        counters[
-                            "spec_rhythm_linear_idle_residual_admitted_"
-                            f"{slo_counter_class(request_index)}"
-                        ] += 1
+                        counters[f"spec_rhythm_linear_idle_residual_admitted_{slo_counter_class(request_index)}"] += 1
                 counters["spec_rhythm_linear_w_deferred_eager_rows"] += eligible_eager_rows - admitted_eager_rows
                 counters["spec_rhythm_linear_w_bucket_deferred_eager_rows"] += max(
                     0,
@@ -9591,15 +10731,10 @@ class NativePearlEngine:
 
             staged_prefill_chunks: tuple[SpecRhythmPrefillTokenChunk, ...] = ()
             if staged_prefill_indices and token_chunk_prefill:
-                staged_chunk_indices = [
-                    index for index in staged_prefill_indices if index not in prefetched
-                ]
+                staged_chunk_indices = [index for index in staged_prefill_indices if index not in prefetched]
                 staged_prefill_chunks = plan_spec_rhythm_prefill_token_chunk(
                     staged_chunk_indices,
-                    prompt_lengths={
-                        index: local_states[index].prompt_length
-                        for index in staged_chunk_indices
-                    },
+                    prompt_lengths={index: local_states[index].prompt_length for index in staged_chunk_indices},
                     cursors=staged_prefill_cursors,
                     token_cap=prefill_token_chunk_size,
                 )
@@ -9773,10 +10908,7 @@ class NativePearlEngine:
                     + (
                         sum(chunk.token_count for chunk in staged_prefill_chunks)
                         if token_chunk_prefill
-                        else sum(
-                            local_states[index].prompt_length
-                            for index in staged_prefill_indices
-                        )
+                        else sum(local_states[index].prompt_length for index in staged_prefill_indices)
                     )
                     <= self.config.max_num_batched_tokens
                 )
@@ -9808,10 +10940,26 @@ class NativePearlEngine:
                 )
             target_started = time.perf_counter()
             phase_started = target_started
-            if target_window_events is not None and target_indices:
+            if (
+                target_window_events is not None
+                and target_indices
+                and target_replay_ahead_for_cycle is None
+            ):
                 target_window_events[0].record()
             if target_indices and linear_full_window:
-                if mixed_prefill_this_cycle:
+                if target_replay_ahead_for_cycle is not None:
+                    if mixed_prefill_this_cycle:
+                        raise RuntimeError(
+                            "A decode-only target replay-ahead result cannot be "
+                            "consumed by a mixed-prefill cycle."
+                        )
+                    target_tokens = target_replay_ahead_for_cycle.target_tokens
+                    target_logits = target_replay_ahead_for_cycle.target_logits
+                    _record_stable_target_verify_graph_outcome(
+                        counters,
+                        target_replay_ahead_for_cycle.graph_outcome,
+                    )
+                elif mixed_prefill_this_cycle:
                     (
                         target_tokens,
                         target_logits,
@@ -9826,17 +10974,11 @@ class NativePearlEngine:
                             else staged_prefill_indices
                         ),
                         proposal_matrix=current_next,
-                        prefill_chunks=(
-                            staged_prefill_chunks
-                            if token_chunk_prefill
-                            else None
-                        ),
+                        prefill_chunks=(staged_prefill_chunks if token_chunk_prefill else None),
                     )
                     counters["spec_rhythm_mixed_target_prefill_batches"] += 1
                     counters["spec_rhythm_mixed_target_prefill_requests"] += (
-                        len(staged_prefill_chunks)
-                        if token_chunk_prefill
-                        else len(staged_prefill_indices)
+                        len(staged_prefill_chunks) if token_chunk_prefill else len(staged_prefill_indices)
                     )
                     counters["spec_rhythm_mixed_target_prefill_verification_tokens"] += sum(current_verification_sizes)
                     _record_mixed_target_graph_outcome(
@@ -9928,6 +11070,14 @@ class NativePearlEngine:
                     )
                 verdict_started = time.perf_counter()
                 phase_started = verdict_started
+                if (
+                    target_window_events is not None
+                    and target_replay_ahead_for_cycle is not None
+                ):
+                    # The replay graph was timed at its earlier submission;
+                    # use the ordinary pair for only the verdict kernel, then
+                    # add both NPU durations when updating W below.
+                    target_window_events[0].record()
                 verdict = self._verify_target_tokens_batch(
                     target_tokens,
                     target_logits,
@@ -9952,6 +11102,20 @@ class NativePearlEngine:
                             if all(payload.host_next_tokens is not None for payload in target_payloads)
                             else None
                         ),
+                        plan_id=plan.plan_id,
+                        home_batch_id=plan.target_home_batch_id,
+                        request_indices=target_indices,
+                        proposal_digest=(
+                            _target_replay_ahead_proposal_digest(
+                                target_indices,
+                                target_payloads,
+                            )
+                        ),
+                    )
+                if target_replay_ahead_for_cycle is not None:
+                    _release_target_replay_ahead_entry(
+                        self,
+                        target_replay_ahead_for_cycle.signature,
                     )
                 if target_window_events is not None:
                     # Rolling-eager may overlap both the target forward and
@@ -9994,9 +11158,7 @@ class NativePearlEngine:
                     precomputed_target_tokens=mixed_prefill_target_tokens,
                     draft_prefill_completed=(staged_draft_prefill_completed and self.is_draft),
                     precomputed_chunks=(
-                        staged_prefill_chunks
-                        if mixed_prefill_this_cycle and token_chunk_prefill
-                        else None
+                        staged_prefill_chunks if mixed_prefill_this_cycle and token_chunk_prefill else None
                     ),
                 )
                 # Retain the side-stream result until the join above has been
@@ -10032,11 +11194,7 @@ class NativePearlEngine:
                     "verification_coordination_group",
                     None,
                 )
-                if (
-                    coordination_group is not None
-                    and not prefill_compute_coordinated
-                    and not gloo_proposal
-                ):
+                if coordination_group is not None and not prefill_compute_coordinated and not gloo_proposal:
                     coordination_started = time.perf_counter()
                     torch.npu.current_stream().synchronize()
                     stream_synchronized = time.perf_counter()
@@ -10063,9 +11221,7 @@ class NativePearlEngine:
                         "continuation_tokens": draft_next,
                         "draft_confidences": draft_confidence,
                         "draft_compute_us": (
-                            round(local_draft_compute_ms * 1000.0)
-                            if linear_fixed_gamma_window
-                            else None
+                            round(local_draft_compute_ms * 1000.0) if linear_fixed_gamma_window else None
                         ),
                     }
                 if gloo_proposal:
@@ -10086,13 +11242,9 @@ class NativePearlEngine:
                                 ),
                             )
                             gloo_proposal_source_buffers[compact_layout] = source_buffers
-                            counters[
-                                "spec_rhythm_gloo_proposal_source_buffer_allocations"
-                            ] += 1
+                            counters["spec_rhythm_gloo_proposal_source_buffer_allocations"] += 1
                         else:
-                            counters[
-                                "spec_rhythm_gloo_proposal_source_buffer_reuses"
-                            ] += 1
+                            counters["spec_rhythm_gloo_proposal_source_buffer_reuses"] += 1
                         compact_source_kwargs.update(
                             source_device_buffer=source_buffers[0],
                             source_cpu_buffer=source_buffers[1],
@@ -10103,12 +11255,11 @@ class NativePearlEngine:
                         source_rank=self.topology.draft_leader_rank,
                         group=proposal_coordination_group,
                         device=self.device,
+                        expose_host_continuation=(reuse_gloo_proposal_host_continuation),
                         **compact_source_kwargs,
                     )
                     counters["spec_rhythm_gloo_proposal_broadcasts"] += 1
-                    counters["spec_rhythm_gloo_proposal_d2h_ms"] += (
-                        gloo_proposal_timing.device_to_host_seconds * 1000.0
-                    )
+                    counters["spec_rhythm_gloo_proposal_d2h_ms"] += gloo_proposal_timing.device_to_host_seconds * 1000.0
                     counters["spec_rhythm_gloo_proposal_broadcast_ms"] += (
                         gloo_proposal_timing.broadcast_seconds * 1000.0
                     )
@@ -10116,9 +11267,7 @@ class NativePearlEngine:
                         gloo_proposal_timing.host_to_device_submit_seconds * 1000.0
                     )
                     if gloo_proposal_timing.host_continuation_tokens is not None:
-                        host_continuation_rows = (
-                            gloo_proposal_timing.host_continuation_tokens.tolist()
-                        )
+                        host_continuation_rows = gloo_proposal_timing.host_continuation_tokens.tolist()
                 else:
                     compact_pending = begin_compact_fixed_greedy_broadcast(
                         compact_layout,
@@ -10137,18 +11286,14 @@ class NativePearlEngine:
                 # path has already copied the exact compact envelope to host;
                 # reuse its continuation view instead of synchronizing and
                 # copying ``draft_next`` a second time.
-                host_continuation = (
-                    gloo_proposal_timing.host_continuation_tokens
-                    if gloo_proposal
-                    else None
-                )
+                host_continuation = gloo_proposal_timing.host_continuation_tokens if gloo_proposal else None
                 if host_continuation is not None:
                     draft_next_cpu = host_continuation.tolist()
-                    counters[
-                        "spec_rhythm_gloo_proposal_host_continuation_reuses"
-                    ] += 1
+                    counters["spec_rhythm_gloo_proposal_host_continuation_reuses"] += 1
                 else:
                     draft_next_cpu = draft_next.detach().cpu().tolist()
+                    if gloo_proposal:
+                        counters["spec_rhythm_gloo_proposal_device_continuation_reads"] += 1
                 for row, (request_index, budget) in enumerate(zip(work_indices, work_budgets)):
                     draft_states[request_index].token_ids.extend(int(value) for value in draft_next_cpu[row][:budget])
 
@@ -10223,9 +11368,7 @@ class NativePearlEngine:
                 counters["spec_rhythm_eager_proposals"] += sum(work_is_eager)
                 for request_index, is_eager in zip(work_indices, work_is_eager):
                     if is_eager:
-                        counters[
-                            f"spec_rhythm_eager_proposals_{slo_counter_class(request_index)}"
-                        ] += 1
+                        counters[f"spec_rhythm_eager_proposals_{slo_counter_class(request_index)}"] += 1
             if profile_this_round and self.groups.is_verification_worker:
                 torch.npu.synchronize()
             exchange_ended = time.perf_counter()
@@ -10238,6 +11381,424 @@ class NativePearlEngine:
             if host_trace is not None:
                 host_trace["exchange_start_seconds"] = exchange_started
                 host_trace["exchange_end_seconds"] = exchange_ended
+
+            if target_replay_ahead_enabled:
+                counters["spec_rhythm_target_replay_ahead_attempts"] += 1
+                assert target_replay_ahead_preflight_group is not None
+                allow_next_cycle = bool(
+                    (max_rounds is None or round_count + 1 < max_rounds)
+                    and (
+                        not self.config.stop_after_profiled_decode_steps
+                        or profiled_decode_steps + int(profile_this_round)
+                        < self.config.profile_decode_steps
+                    )
+                )
+                immutable_frontier = not (
+                    pending_admission
+                    or staged_prefill_indices
+                    or suspended_indices
+                )
+                replay_signature, replay_reject_reason = (
+                    plan_spec_rhythm_target_replay_ahead(
+                        controller=controller,
+                        current_target_home_batch_id=(
+                            plan.target_home_batch_id
+                        ),
+                        current_target_request_indices=target_indices,
+                        active_request_indices=active_indices,
+                        payloads=payloads,
+                        states=local_states,
+                        gamma=self.gamma,
+                        verification_budget=verification_roof,
+                        max_target_requests=max_target_requests,
+                        linear_full_window=linear_full_window,
+                        dual_batch=not single_batch_ablation,
+                        immutable_frontier=immutable_frontier,
+                        allow_next_cycle=allow_next_cycle,
+                    )
+                )
+                if replay_reject_reason is None and not (
+                    envs.VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION
+                    and gloo_proposal
+                    and reuse_gloo_proposal_host_continuation
+                    and len(self.topology.draft_ranks) == 1
+                    and self.device.type == "npu"
+                    and not envs.VLLM_ASCEND_SPECRHYTHM_VALIDATE_PACKED_CAUSAL_LEAKAGE
+                    and 0 < len(target_indices)
+                    <= FIXED_FULL_WINDOW_HOST_STAGING_MAX_BATCH
+                    and spec_rhythm_target_replay_ahead_fallback_safe(
+                        active_request_count=len(active_indices),
+                        current_target_count=len(target_indices),
+                        fallback_max_batch=(
+                            self.config.spec_rhythm_target_fallback_max_batch
+                        ),
+                    )
+                    and tight_target_burst == 0
+                    and not preempt_loose_for_tight_enabled
+                ):
+                    replay_reject_reason = "protocol"
+                replay_capacity = None
+                if replay_reject_reason is None:
+                    assert replay_signature is not None
+                    replay_request_count = len(
+                        replay_signature.request_indices
+                    )
+                    if self.is_draft:
+                        try:
+                            replay_capacity = (
+                                _next_stable_target_verify_capacity(
+                                    replay_request_count,
+                                    self._stable_target_verify_capacities,
+                                )
+                            )
+                        except ValueError:
+                            replay_capacity = None
+                    else:
+                        replay_capacity = (
+                            self._stable_target_verify_graph_capacity_map.get(
+                                replay_request_count
+                            )
+                        )
+                    replay_reject_reason = (
+                        spec_rhythm_target_replay_ahead_graph_reject_reason(
+                            request_count=replay_request_count,
+                            gamma=self.gamma,
+                            max_committed_length=max(
+                                replay_signature.committed_lengths
+                            ),
+                            max_model_len=self.config.max_model_len,
+                            target_use_paged_attention=(
+                                self.config.target_use_paged_attention
+                            ),
+                            enforce_eager=self.config.enforce_eager,
+                            linear_bonus_token=linear_bonus_token,
+                            mixed_target_graph_enabled=(
+                                envs.VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH
+                            ),
+                            mixed_target_graph_prefill_only=(
+                                envs.VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PREFILL_ONLY
+                            ),
+                            target_aclgraph_disabled=(
+                                envs.VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH
+                            ),
+                            validate_graph_replays=(
+                                envs.VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS
+                            ),
+                            graph_cache_sealed=(
+                                True
+                                if self.is_draft
+                                else self.graph_runner.graph_cache_sealed
+                            ),
+                            stable_graph_qualified=(
+                                True
+                                if self.is_draft
+                                else bool(
+                                    self._stable_target_verify_graph_qualified
+                                )
+                            ),
+                            stable_capacity=replay_capacity,
+                            max_graph_tokens=self.graph_runner.max_graph_tokens,
+                        )
+                    )
+                # Feature-enabled ranks enter this CPU collective on every
+                # service cycle, including ineligible cycles.  No rank may
+                # infer eligibility locally and skip a rendezvous that a peer
+                # enters.
+                logical_eligible, collective_reject_reason = (
+                    _target_replay_ahead_logical_preflight(
+                        replay_signature,
+                        reject_reason=replay_reject_reason,
+                        stable_capacity=replay_capacity,
+                        group=target_replay_ahead_preflight_group,
+                    )
+                )
+                if not logical_eligible:
+                    replay_reject_reason = collective_reject_reason
+                bound_replay_signature = replay_signature
+                staged_correction_identity = None
+                if logical_eligible:
+                    assert replay_signature is not None
+                    if pending_target_replay_ahead is not None:
+                        _fence_target_replay_ahead_before_fatal(
+                            pending_target_replay_ahead,
+                            is_target_rank=(
+                                self.rank in self.topology.target_ranks
+                            ),
+                            device_type=self.device.type,
+                        )
+                        _release_target_replay_ahead_entry(
+                            self,
+                            pending_target_replay_ahead.signature,
+                        )
+                        raise RuntimeError(
+                            "SpecRhythm attempted to overwrite an unconsumed "
+                            "target replay-ahead result."
+                        )
+                    local_resource_ready = True
+                    local_resource_reject_reason = None
+                    if self.rank in self.topology.target_ranks:
+                        staged_correction_identity = getattr(
+                            self,
+                            "_spec_rhythm_staged_gloo_correction_identity",
+                            None,
+                        )
+                        expected_proposal_digest = (
+                            _target_replay_ahead_proposal_digest(
+                                target_indices,
+                                target_payloads,
+                            )
+                        )
+                        last_correction_epoch = int(
+                            getattr(
+                                self,
+                                "_spec_rhythm_target_replay_ahead_last_correction_epoch",
+                                0,
+                            )
+                        )
+                        if not (
+                            isinstance(
+                                staged_correction_identity,
+                                _SpecRhythmStagedCorrectionIdentity,
+                            )
+                            and staged_correction_identity.correction_epoch
+                            > last_correction_epoch
+                            and staged_correction_identity.plan_id
+                            == int(plan.plan_id)
+                            and staged_correction_identity.home_batch_id
+                            == int(plan.target_home_batch_id)
+                            and staged_correction_identity.request_indices
+                            == tuple(target_indices)
+                            and staged_correction_identity.proposal_digest
+                            == expected_proposal_digest
+                            and getattr(
+                                self,
+                                "_spec_rhythm_staged_gloo_correction_batch_size",
+                                None,
+                            )
+                            == len(target_indices)
+                        ):
+                            local_resource_ready = False
+                            local_resource_reject_reason = (
+                                "staged_correction"
+                            )
+                    if local_resource_ready:
+                        try:
+                            bound_replay_signature = (
+                                _bind_target_replay_ahead_resources(
+                                    self,
+                                    replay_signature,
+                                )
+                            )
+                        except RuntimeError:
+                            local_resource_ready = False
+                            local_resource_reject_reason = (
+                                "resource_contract"
+                            )
+                    assert bound_replay_signature is not None
+                    resources_eligible, resource_reject_reason = (
+                        _target_replay_ahead_resource_preflight(
+                            bound_replay_signature,
+                            resource_ready=local_resource_ready,
+                            reject_reason=(
+                                local_resource_reject_reason
+                            ),
+                            is_target_rank=(
+                                self.rank in self.topology.target_ranks
+                            ),
+                            correction_identity=(
+                                staged_correction_identity
+                            ),
+                            group=target_replay_ahead_preflight_group,
+                        )
+                    )
+                    if not resources_eligible:
+                        replay_reject_reason = resource_reject_reason
+                if replay_reject_reason is not None:
+                    if (
+                        replay_reject_reason
+                        not in TARGET_REPLAY_AHEAD_REJECT_REASONS
+                    ):
+                        raise RuntimeError(
+                            "Target replay-ahead returned an unknown rejection reason."
+                        )
+                    counters[
+                        "spec_rhythm_target_replay_ahead_reject_"
+                        f"{replay_reject_reason}"
+                    ] += 1
+                else:
+                    assert replay_signature is not None
+                    assert bound_replay_signature is not None
+                    counters["spec_rhythm_target_replay_ahead_eligible"] += 1
+                    bound_replay_signature = (
+                        _claim_target_replay_ahead_entry(
+                            self,
+                            bound_replay_signature,
+                            generation=int(plan.plan_id),
+                        )
+                    )
+                    replay_payloads = [
+                        payloads[proposal_id]
+                        for proposal_id in replay_signature.proposal_ids
+                    ]
+                    replay_proposals = torch.stack(
+                        [payload.next_tokens for payload in replay_payloads]
+                    )
+                    replay_graph_events = (
+                        target_replay_ahead_graph_event_pairs[
+                            counters[
+                                "spec_rhythm_target_replay_ahead_submitted"
+                            ]
+                            % len(target_replay_ahead_graph_event_pairs)
+                        ]
+                        if target_replay_ahead_graph_event_pairs
+                        else None
+                    )
+                    if replay_graph_events is not None:
+                        replay_graph_events[0].record()
+                    replay_completion_event = (
+                        target_replay_ahead_completion_events[
+                            counters[
+                                "spec_rhythm_target_replay_ahead_submitted"
+                            ]
+                            % len(target_replay_ahead_completion_events)
+                        ]
+                        if target_replay_ahead_completion_events
+                        else None
+                    )
+                    replay_submit_started = time.perf_counter()
+                    if self.rank in self.topology.target_ranks:
+                        self._spec_rhythm_target_replay_ahead_no_capacity_mutation = True
+                    try:
+                        replay_target_tokens, replay_target_logits = (
+                            self._target_full_window_outputs_batch(
+                                target_states,
+                                list(replay_signature.request_indices),
+                                replay_payloads,
+                                proposal_matrix=replay_proposals,
+                            )
+                        )
+                    except BaseException:
+                        if self.rank in self.topology.target_ranks:
+                            torch.npu.synchronize()
+                        _release_target_replay_ahead_entry(
+                            self,
+                            bound_replay_signature,
+                        )
+                        raise
+                    finally:
+                        if self.rank in self.topology.target_ranks:
+                            self._spec_rhythm_target_replay_ahead_no_capacity_mutation = False
+                    if replay_graph_events is not None:
+                        replay_graph_events[1].record()
+                    if replay_completion_event is not None:
+                        replay_completion_event.record()
+                    phase_seconds["target_replay_ahead"] += (
+                        time.perf_counter() - replay_submit_started
+                    )
+                    replay_graph_outcome = getattr(
+                        self,
+                        "_last_stable_target_verify_graph_outcome",
+                        ("disabled", 0),
+                    )
+                    local_post_ready = True
+                    try:
+                        post_replay_signature = (
+                            _bind_target_replay_ahead_resources(
+                                self,
+                                bound_replay_signature,
+                            )
+                        )
+                    except RuntimeError:
+                        post_replay_signature = bound_replay_signature
+                        local_post_ready = False
+                    if self.rank in self.topology.target_ranks:
+                        local_post_ready = local_post_ready and bool(
+                            replay_graph_outcome
+                            == ("graph", replay_request_count)
+                            and post_replay_signature.graph_capture_count
+                            == bound_replay_signature.graph_capture_count
+                            and post_replay_signature.graph_replay_count
+                            == bound_replay_signature.graph_replay_count + 1
+                        )
+                    post_eligible, _ = (
+                        _target_replay_ahead_resource_preflight(
+                            post_replay_signature,
+                            resource_ready=local_post_ready,
+                            reject_reason=(
+                                None
+                                if local_post_ready
+                                else "resource_contract"
+                            ),
+                            is_target_rank=(
+                                self.rank in self.topology.target_ranks
+                            ),
+                            correction_identity=(
+                                staged_correction_identity
+                            ),
+                            group=target_replay_ahead_preflight_group,
+                        )
+                    )
+                    if not post_eligible:
+                        failed_pending = _PendingSpecRhythmTargetReplayAhead(
+                            signature=post_replay_signature,
+                            target_tokens=replay_target_tokens,
+                            target_logits=replay_target_logits,
+                            graph_outcome=replay_graph_outcome,
+                            correction_identity_digest=(
+                                _target_replay_ahead_correction_digest(
+                                    staged_correction_identity
+                                )
+                                if staged_correction_identity is not None
+                                else 0
+                            ),
+                            completion_event=replay_completion_event,
+                            graph_timing_events=replay_graph_events,
+                        )
+                        _fence_target_replay_ahead_before_fatal(
+                            failed_pending,
+                            is_target_rank=(
+                                self.rank in self.topology.target_ranks
+                            ),
+                            device_type=self.device.type,
+                        )
+                        _release_target_replay_ahead_entry(
+                            self,
+                            failed_pending.signature,
+                        )
+                        raise RuntimeError(
+                            "Target replay-ahead changed graph generation or "
+                            "left its resident graph route after submission."
+                        )
+                    if (
+                        self.rank in self.topology.target_ranks
+                        and staged_correction_identity is not None
+                    ):
+                        self._spec_rhythm_target_replay_ahead_last_correction_epoch = (
+                            staged_correction_identity.correction_epoch
+                        )
+                    pending_target_replay_ahead = (
+                        _PendingSpecRhythmTargetReplayAhead(
+                            signature=post_replay_signature,
+                            target_tokens=replay_target_tokens,
+                            target_logits=replay_target_logits,
+                            graph_outcome=replay_graph_outcome,
+                            correction_identity_digest=(
+                                _target_replay_ahead_correction_digest(
+                                    staged_correction_identity
+                                )
+                                if staged_correction_identity is not None
+                                else 0
+                            ),
+                            completion_event=replay_completion_event,
+                            graph_timing_events=replay_graph_events,
+                        )
+                    )
+                    counters["spec_rhythm_target_replay_ahead_submitted"] += 1
+                    if host_trace is not None:
+                        host_trace["target_replay_ahead_submitted"] = 1
+                        host_trace["target_replay_ahead_requests"] = (
+                            replay_request_count
+                        )
 
             finished_this_cycle: list[int] = []
             finished_publication_endpoints: dict[int, float] = {}
@@ -10393,11 +11954,7 @@ class NativePearlEngine:
                     resolved_draft_confidence = (
                         self._last_device_round_extra_values[row]
                         if proposal_confidences is not None
-                        else (
-                            None
-                            if payload.draft_confidence is None
-                            else float(payload.draft_confidence)
-                        )
+                        else (None if payload.draft_confidence is None else float(payload.draft_confidence))
                     )
                     if resolved_draft_confidence is not None:
                         counters["spec_rhythm_draft_confidence_samples"] += 1
@@ -10425,15 +11982,11 @@ class NativePearlEngine:
                     if eager_ticket is not None:
                         if promoted is None:
                             counters["spec_rhythm_eager_invalidated"] += 1
-                            counters[
-                                f"spec_rhythm_eager_invalidated_{slo_counter_class(request_index)}"
-                            ] += 1
+                            counters[f"spec_rhythm_eager_invalidated_{slo_counter_class(request_index)}"] += 1
                             payloads.pop(eager_ticket.proposal_id, None)
                         else:
                             counters["spec_rhythm_eager_promoted"] += 1
-                            counters[
-                                f"spec_rhythm_eager_promoted_{slo_counter_class(request_index)}"
-                            ] += 1
+                            counters[f"spec_rhythm_eager_promoted_{slo_counter_class(request_index)}"] += 1
                     counters["spec_rhythm_verified_tokens"] += expected
                     self._deliver_committed_tokens(
                         request_index, request_params[request_index], local_states[request_index]
@@ -10464,18 +12017,47 @@ class NativePearlEngine:
 
             local_target_compute_ms = 0.0
             if target_indices and self.rank == self.topology.target_leader_rank:
-                measured_target_compute_ms = (
-                    float(target_window_events[0].elapsed_time(target_window_events[1]))
-                    if target_window_events is not None
-                    else (target_ended - target_started) * 1000.0
-                )
-                local_target_compute_ms = _linear_window_target_sample_ms(
-                    measured_target_compute_ms,
-                    mixed_prefill=mixed_prefill_this_cycle,
-                )
-                counters["spec_rhythm_linear_w_ignored_mixed_prefill_samples"] += int(
-                    mixed_prefill_this_cycle
-                )
+                if target_replay_ahead_for_cycle is not None:
+                    graph_events = (
+                        target_replay_ahead_for_cycle.graph_timing_events
+                    )
+                    if graph_events is None or target_window_events is None:
+                        raise RuntimeError(
+                            "Target replay-ahead lost its NPU timing events "
+                            "before the W estimator consumed them."
+                        )
+                    replay_ahead_graph_ms = float(
+                        graph_events[0].elapsed_time(graph_events[1])
+                    )
+                    counters[
+                        "spec_rhythm_target_replay_ahead_graph_ms"
+                    ] += replay_ahead_graph_ms
+                    measured_target_compute_ms = replay_ahead_graph_ms + float(
+                        target_window_events[0].elapsed_time(
+                            target_window_events[1]
+                        )
+                    )
+                    local_target_compute_ms = (
+                        _linear_window_target_sample_ms(
+                            measured_target_compute_ms,
+                            mixed_prefill=False,
+                        )
+                    )
+                else:
+                    measured_target_compute_ms = (
+                        float(
+                            target_window_events[0].elapsed_time(
+                                target_window_events[1]
+                            )
+                        )
+                        if target_window_events is not None
+                        else (target_ended - target_started) * 1000.0
+                    )
+                    local_target_compute_ms = _linear_window_target_sample_ms(
+                        measured_target_compute_ms,
+                        mixed_prefill=mixed_prefill_this_cycle,
+                    )
+                counters["spec_rhythm_linear_w_ignored_mixed_prefill_samples"] += int(mixed_prefill_this_cycle)
             # Split the request-visible interval at the last token commit.
             # Requests finishing in this cycle stop here; surviving requests
             # must additionally observe the accounting collective, host/D2H
@@ -10511,6 +12093,12 @@ class NativePearlEngine:
                         endpoint - cycle_started,
                     )
             elapsed_values.extend(finish_offsets)
+            cycle_frontier_start = len(elapsed_values)
+            cycle_frontier = service_frontier_signature() if gloo_accounting else ()
+            if gloo_accounting:
+                elapsed_values.extend(
+                    cycle_frontier if self.rank == self.topology.target_leader_rank else (0,) * service_frontier_width
+                )
             elapsed_tensor = cycle_accounting_envelope.rewrite(elapsed_values)
             if (
                 linear_window_estimator is not None
@@ -10563,6 +12151,13 @@ class NativePearlEngine:
                 float(value)
                 for value in elapsed_results[finish_offset_start : finish_offset_start + initial_batch_size]
             ]
+            if gloo_accounting:
+                counters["spec_rhythm_cycle_frontier_piggybacks"] += 1
+                if self.device.type != "cpu":
+                    validate_service_frontier(
+                        elapsed_results[cycle_frontier_start : cycle_frontier_start + service_frontier_width],
+                        local_signature=cycle_frontier,
+                    )
             last_cycle_ms = cycle_elapsed_value * 1000.0
             local_finished_set = set(finished_this_cycle)
             leader_finished_set = decode_finish_envelope(
@@ -10603,7 +12198,7 @@ class NativePearlEngine:
             # communication phase above.  Publish its first token only at the
             # cycle boundary: incumbents observe the real model cost, while a
             # new request never inherits time preceding its first token.
-            activate_staged_prefill()
+            tail_frontier_changed = activate_staged_prefill()
             stopping_after_cycle = bool(
                 (max_rounds is not None and round_count + 1 >= max_rounds)
                 or (
@@ -10617,9 +12212,12 @@ class NativePearlEngine:
                 and len(active_indices) <= self.config.spec_rhythm_target_fallback_max_batch
             )
             if not stopping_after_cycle:
-                admit_available(
-                    now=cycle_wall_time,
-                    stage_for_overlap=bool(active_indices and not next_cycle_uses_fallback),
+                tail_frontier_changed = (
+                    admit_available(
+                        now=cycle_wall_time,
+                        stage_for_overlap=bool(active_indices and not next_cycle_uses_fallback),
+                    )
+                    or tail_frontier_changed
                 )
             refill_ended = time.perf_counter()
             phase_seconds["refill"] += refill_ended - refill_started
@@ -10628,7 +12226,6 @@ class NativePearlEngine:
                 host_trace["refill_end_seconds"] = refill_ended
                 host_trace["cycle_end_seconds"] = refill_ended
                 host_timeline.append(host_trace)
-            local_frontier_signature = service_frontier_signature()
             if trace_requests and self.rank == self.topology.target_leader_rank:
                 ready_detail = {int(index): int(ticket.proposal_id) for index, ticket in controller.ready.items()}
                 eager_detail = {
@@ -10644,6 +12241,32 @@ class NativePearlEngine:
                     f"payloads={payload_detail}",
                     flush=True,
                 )
+            skip_tail_accounting = bool(
+                gloo_accounting
+                and not tail_frontier_changed
+                and not activation_tail_starts
+                and not tail_suspended_indices
+                and not suspended_indices
+                and (not stopping_after_cycle or not tail_incumbent_indices)
+            )
+            if skip_tail_accounting:
+                counters["spec_rhythm_tail_accounting_unchanged_skips"] += 1
+                if host_trace is not None:
+                    host_trace["accounted_tail_ms"] = 0.0
+                    host_trace["new_activation_tail_request_ms"] = 0.0
+                    host_trace["accounting_boundary_seconds"] = cycle_accounting_split
+                # ``refill_ended`` would drop the refill/host tail now that no
+                # envelope materializes it.  Carry from the split instead;
+                # the next primary record then charges every unfinished row.
+                cycle_accounting_started = cycle_accounting_split
+                round_count += 1
+                if (
+                    self.config.stop_after_profiled_decode_steps
+                    and profiled_decode_steps >= self.config.profile_decode_steps
+                ):
+                    break
+                continue
+            local_frontier_signature = service_frontier_signature()
             tail_elapsed_values = [
                 refill_ended - cycle_accounting_split if self.rank == self.topology.target_leader_rank else 0.0,
                 refill_ended if self.rank == self.topology.target_leader_rank else 0.0,
@@ -10657,6 +12280,11 @@ class NativePearlEngine:
             tail_elapsed_values = tail_accounting_envelope.broadcast_and_materialize(
                 source_rank=self.topology.target_leader_rank,
                 group=accounting_group,
+            )
+            counters["spec_rhythm_tail_accounting_broadcasts"] += 1
+            counters["spec_rhythm_tail_accounting_changed_broadcasts"] += int(tail_frontier_changed)
+            counters["spec_rhythm_tail_accounting_suspended_broadcasts"] += int(
+                bool(tail_suspended_indices or suspended_indices)
             )
             tail_elapsed_ms = float(tail_elapsed_values[0]) * 1000.0
             if self.device.type != "cpu":
@@ -10687,10 +12315,24 @@ class NativePearlEngine:
             ):
                 break
 
+        if pending_target_replay_ahead is not None:
+            _fence_target_replay_ahead_before_fatal(
+                pending_target_replay_ahead,
+                is_target_rank=(self.rank in self.topology.target_ranks),
+                device_type=self.device.type,
+            )
+            _release_target_replay_ahead_entry(
+                self,
+                pending_target_replay_ahead.signature,
+            )
+            raise RuntimeError(
+                "SpecRhythm stopped with an unconsumed target replay-ahead "
+                "result; refusing to discard an irreversible KV mutation."
+            )
         for request_index in (*active_indices, *suspended_indices):
             invalidate_request(request_index)
         if npu_profiler is not None:
-            npu_profiler.stop()
+            _stop_active_npu_profiler(self)
         torch.npu.synchronize()
         decode_elapsed = time.perf_counter() - started
         self.last_worker_decode_phase_seconds = dict(phase_seconds)
@@ -10704,15 +12346,20 @@ class NativePearlEngine:
                 "spec_rhythm_slo_adaptive": int(has_slo_constraints),
                 "spec_rhythm_eager_enabled": int(bool(effective_eager_cap)),
                 "spec_rhythm_priority_enabled": int(effective_priority),
-                "spec_rhythm_goodput_edf_enabled": int(
-                    envs.VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF
-                ),
+                "spec_rhythm_goodput_edf_enabled": int(envs.VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF),
                 "spec_rhythm_effective_eager_cap": int(effective_eager_cap),
                 "spec_rhythm_merge_ready_homes": int(bool(self.config.spec_rhythm_merge_ready_homes)),
                 "spec_rhythm_slo_home_partition": int(slo_home_partition),
             }
         )
         elapsed = prefill_elapsed + decode_elapsed
+        result_count = len(local_states) if continuous_batching else len(target_states)
+        result_materialization = self._prepare_spec_rhythm_linear_result_materialization(
+            result_count,
+        )
+        if result_materialization is None:
+            return None
+        cached_prompt_tokens, graph_metrics = result_materialization
         if continuous_batching:
             result_states = [completed_states.get(index, local_states[index]) for index in range(len(local_states))]
         else:
@@ -10788,23 +12435,25 @@ class NativePearlEngine:
                     "elapsed_seconds": elapsed,
                     "prefill_elapsed_seconds": prefill_elapsed,
                     "decode_elapsed_seconds": decode_elapsed,
-                    "cached_prompt_tokens": self.cache_allocation.num_cached_tokens[sequence_index],
+                    "cached_prompt_tokens": cached_prompt_tokens[sequence_index],
                     "tree_mode": False,
                     "linear_full_window": linear_full_window,
                     "gamma": self.gamma,
                     "tree_width": 1,
                     "tree_depth": 1,
-                    **self.graph_metrics(),
+                    **_copy_result_graph_metrics(graph_metrics),
                 }
             )
-        self._release_cache()
-        return results if self.rank == self.topology.target_leader_rank else None
+        return results
 
+    @_with_npu_profiler_cleanup
     @torch.inference_mode()
     def generate_target_ar_batch(
         self,
         prompt_token_ids: list[list[int]],
         sampling_params: NativeSamplingParams | Sequence[NativeSamplingParams] | None = None,
+        *,
+        include_graph_metrics: bool = True,
     ) -> list[dict[str, Any]] | None:
         """Generate a static batch autoregressively on the target model only."""
         if not prompt_token_ids or len(prompt_token_ids) > self.config.max_num_seqs:
@@ -10873,7 +12522,12 @@ class NativePearlEngine:
         # whether a fused kernel actually shortens the device critical path.
         npu_profiler = None
         npu_profile_dir = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_DIR
-        if npu_profile_dir:
+        npu_profile_enabled = _npu_profile_call_enabled(
+            npu_profile_dir,
+            measurement_only=envs.VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY,
+            profile_host_decode_steps=self.config.profile_host_decode_steps,
+        )
+        if npu_profile_enabled:
             configured_rank = envs.VLLM_ASCEND_PEARL_NPU_PROFILE_RANK
             npu_profile_rank = self.topology.target_leader_rank if configured_rank is None else configured_rank
             if npu_profile_rank != -1 and not 0 <= npu_profile_rank < self.topology.world_size:
@@ -10901,7 +12555,7 @@ class NativePearlEngine:
                     ),
                     record_shapes=True,
                 )
-                npu_profiler.start()
+                _start_active_npu_profiler(self, npu_profiler)
 
         torch.npu.synchronize()
         started = time.perf_counter()
@@ -10937,7 +12591,7 @@ class NativePearlEngine:
                 npu_profiler.step()
 
         if npu_profiler is not None:
-            npu_profiler.stop()
+            _stop_active_npu_profiler(self)
         torch.npu.synchronize()
         decode_elapsed = time.perf_counter() - started
         elapsed = prefill_elapsed + decode_elapsed
@@ -10991,7 +12645,7 @@ class NativePearlEngine:
                     "decode_elapsed_seconds": decode_elapsed,
                     "cached_prompt_tokens": self.cache_allocation.num_cached_tokens[sequence_index],
                     "gamma": 0,
-                    **self.graph_metrics(),
+                    **(self.graph_metrics() if include_graph_metrics else {}),
                 }
             )
         self._release_cache()
@@ -11425,9 +13079,7 @@ class NativePearlEngine:
                 real_rows = sum(request_id not in scratch_ids for request_id in request_sequence_ids)
                 scratch_rows = len(request_sequence_ids) - real_rows
                 if scratch_rows:
-                    tree_capacity = int(self.config.spec_rhythm_tree_width) * int(
-                        self.config.spec_rhythm_tree_depth
-                    )
+                    tree_capacity = int(self.config.spec_rhythm_tree_width) * int(self.config.spec_rhythm_tree_depth)
                     materialization_cap = max(
                         1,
                         tree_capacity - int(self.config.spec_rhythm_tree_depth) + 1,
@@ -11443,9 +13095,7 @@ class NativePearlEngine:
                     # mask in that bucket to this width removes N/timing from
                     # the ACLGraph key while keeping the packed token total at
                     # the much smaller ``query_cap * B`` envelope.
-                    maximum_scratch_queries = (
-                        (query_cap - 1) * len(request_sequence_ids) + 1
-                    )
+                    maximum_scratch_queries = (query_cap - 1) * len(request_sequence_ids) + 1
                     if tree_attention_mask.shape[2] < maximum_scratch_queries:
                         padded_mask = torch.ones(
                             (
@@ -11567,10 +13217,7 @@ class NativePearlEngine:
         if profile_subphases:
             torch.npu.synchronize()
             metadata_started = time.perf_counter()
-        logical_query_count = sum(
-            1 if isinstance(request[3], int) else len(request[3])
-            for request in requests
-        )
+        logical_query_count = sum(1 if isinstance(request[3], int) else len(request[3]) for request in requests)
         requests, graph_padding_queries = self._pad_tree_draft_graph_requests(requests)
         with _trace_region(self, "SpecSLO/DraftMaterializeMetadata"):
             input_ids, positions, metadata = self._pack_tree_draft_level(requests)
@@ -11766,9 +13413,7 @@ class NativePearlEngine:
             # target bonus position.  This removes the former second model
             # invocation that blindly replayed the whole committed suffix.
             adopted_kv_queries = 0
-            for row, (plan, request_id, catchup) in enumerate(
-                zip(work_plans, request_ids, catchup_rows)
-            ):
+            for row, (plan, request_id, catchup) in enumerate(zip(work_plans, request_ids, catchup_rows)):
                 if request_id in (eager_parent_sources or {}):
                     if catchup:
                         raise ValueError("ahead-of-turn draft rows cannot also carry committed catch-up")
@@ -11809,9 +13454,7 @@ class NativePearlEngine:
                 len(request_ids),
                 max(1, int(getattr(self.config, "max_num_seqs", len(request_ids)))),
             )
-            graph_calls += int(
-                getattr(self.graph_runner, "last_draft_execution", NativeGraphExecution()).used_aclgraph
-            )
+            graph_calls += int(getattr(self.graph_runner, "last_draft_execution", NativeGraphExecution()).used_aclgraph)
             query_count += graph_bucket * (self.gamma + 1)
             graph_padding_query_count += (graph_bucket - len(request_ids)) * (self.gamma + 1)
             self._spec_rhythm_linear_adopted_kv_rounds = getattr(
@@ -11819,11 +13462,14 @@ class NativePearlEngine:
                 "_spec_rhythm_linear_adopted_kv_rounds",
                 0,
             ) + int(adopted_kv_queries > 0)
-            self._spec_rhythm_linear_adopted_kv_queries = getattr(
-                self,
-                "_spec_rhythm_linear_adopted_kv_queries",
-                0,
-            ) + adopted_kv_queries
+            self._spec_rhythm_linear_adopted_kv_queries = (
+                getattr(
+                    self,
+                    "_spec_rhythm_linear_adopted_kv_queries",
+                    0,
+                )
+                + adopted_kv_queries
+            )
             cache_slot_mapping = None
             if frontier_requests:
                 mapping_values: list[int] = []
@@ -11850,8 +13496,7 @@ class NativePearlEngine:
                 # keeps global request ranking meaningful without inventing
                 # per-node confidence values discarded by the graph ABI.
                 "node_confidences": [
-                    torch.full((self.gamma,), value, dtype=torch.float32)
-                    for value in confidence_values
+                    torch.full((self.gamma,), value, dtype=torch.float32) for value in confidence_values
                 ],
                 "cache_slot_mapping": cache_slot_mapping,
                 "query_count": query_count,
@@ -13664,10 +15309,7 @@ class NativePearlEngine:
         )
         minimum_service_rows = prompt_capacity + 1
         if self._cache_sequence_capacity < minimum_service_rows:
-            raise RuntimeError(
-                "Mixed-target graph qualification needs at least "
-                f"{minimum_service_rows} service rows."
-            )
+            raise RuntimeError(f"Mixed-target graph qualification needs at least {minimum_service_rows} service rows.")
         scratch_ids = self._mixed_target_scratch_sequence_ids
         query_width = self.gamma + int(getattr(self.config, "spec_rhythm_linear_bonus_token", False))
         if query_width <= 0:
@@ -13945,8 +15587,7 @@ class NativePearlEngine:
         )
         if self._cache_sequence_capacity < capacities[-1]:
             raise RuntimeError(
-                "Stable target-verify graph qualification requires enough service rows "
-                f"for capacity {capacities[-1]}."
+                f"Stable target-verify graph qualification requires enough service rows for capacity {capacities[-1]}."
             )
         query_width = self.gamma + int(getattr(self.config, "spec_rhythm_linear_bonus_token", False))
         if max(capacities) * query_width > (self.graph_runner.max_graph_tokens):
@@ -13969,9 +15610,7 @@ class NativePearlEngine:
         max_capacity = capacities[-1]
         capacity_map: dict[int, int] = {}
         captured_capacities: set[int] = set()
-        for qualification_index, request_count in enumerate(
-            range(max_capacity, 0, -1)
-        ):
+        for qualification_index, request_count in enumerate(range(max_capacity, 0, -1)):
             capacity = _next_stable_target_verify_capacity(
                 request_count,
                 capacities,
@@ -14060,8 +15699,7 @@ class NativePearlEngine:
             if (
                 entry is None
                 or not entry.runtime_validated
-                or counters["changed_input_validation_calls"]
-                != validation_calls_before + int(is_new_capacity)
+                or counters["changed_input_validation_calls"] != validation_calls_before + int(is_new_capacity)
                 or counters["runtime_validation_failures"] != validation_failures_before
             ):
                 raise RuntimeError(
@@ -14525,9 +16163,7 @@ class NativePearlEngine:
         if len(budgets) != len(active_indices) or any(value <= 0 or value > self.gamma for value in budgets):
             raise ValueError("SpecRhythm draft budgets must be in [1, gamma].")
         if eager_row_count is None:
-            eager_row_count = int(
-                getattr(self, "_scheduled_linear_draft_eager_rows", 0)
-            )
+            eager_row_count = int(getattr(self, "_scheduled_linear_draft_eager_rows", 0))
         if eager_row_count < 0 or eager_row_count > len(active_indices):
             raise ValueError("SpecRhythm eager rows must fit inside the draft batch.")
         if getattr(self.config, "draft_mode", SERIAL_LINEAR_DRAFT_MODE) == PARD_PARALLEL_DRAFT_MODE:
@@ -14863,9 +16499,7 @@ class NativePearlEngine:
             # redundant and expensive on the TP1 draft rank.  This switch is
             # deliberately restricted to the width-one fixed-window path;
             # tree shaping still requires exact per-node confidence.
-            linear_acceptance_only = bool(
-                envs.VLLM_ASCEND_SPECRHYTHM_LINEAR_ACCEPTANCE_ONLY
-            )
+            linear_acceptance_only = bool(envs.VLLM_ASCEND_SPECRHYTHM_LINEAR_ACCEPTANCE_ONLY)
             graph_windows = self.graph_runner.run_draft_greedy(
                 graph_input_ids,
                 position_tensors,
@@ -14879,14 +16513,9 @@ class NativePearlEngine:
                 proposal_steps,
                 2,
             ):
-                graph_confidence = (
-                    graph_windows[:, : self.gamma, 1].float().mean(dim=1)
-                    * 1e-6
-                )
+                graph_confidence = graph_windows[:, : self.gamma, 1].float().mean(dim=1) * 1e-6
                 graph_windows = graph_windows[:, :, 0]
-            elif graph_windows.ndim == 2 and tuple(graph_windows.shape[1:]) == (
-                proposal_steps,
-            ):
+            elif graph_windows.ndim == 2 and tuple(graph_windows.shape[1:]) == (proposal_steps,):
                 # Acceptance-only execution, CPU protocol harnesses and older
                 # out-of-tree graph-runner doubles use the token-only contract.
                 # A confidence of one makes expected benefit equal the exact
@@ -14897,9 +16526,7 @@ class NativePearlEngine:
                     device=self.device,
                 )
             else:
-                raise RuntimeError(
-                    "Full-chain draft graph did not return token/confidence pairs."
-                )
+                raise RuntimeError("Full-chain draft graph did not return token/confidence pairs.")
             if ranked_kv_plan is not None:
                 graph_windows = _restore_ranked_linear_draft_rows(
                     graph_windows,
@@ -15172,9 +16799,7 @@ class NativePearlEngine:
         ):
             tail_confidence = tail_output[:, :, 1].float() * 1e-6
             tail_windows = tail_output[:, :, 0]
-        elif tail_output.ndim == 2 and tuple(tail_output.shape[1:]) == (
-            proposal_tail_steps,
-        ):
+        elif tail_output.ndim == 2 and tuple(tail_output.shape[1:]) == (proposal_tail_steps,):
             # Preserve the protocol-harness contract for out-of-tree graph
             # runner doubles. Production ACLGraph entries return exact
             # token/confidence pairs.
@@ -15185,9 +16810,7 @@ class NativePearlEngine:
                 device=self.device,
             )
         else:
-            raise RuntimeError(
-                "Mixed draft-tail ACLGraph did not return token/confidence pairs."
-            )
+            raise RuntimeError("Mixed draft-tail ACLGraph did not return token/confidence pairs.")
         if tail_windows.shape != (len(active_indices), proposal_tail_steps):
             raise RuntimeError("Mixed draft-tail ACLGraph returned an invalid proposal shape.")
         next_windows = torch.cat(
@@ -15197,9 +16820,7 @@ class NativePearlEngine:
             ),
             dim=1,
         )
-        confidence = (
-            first_confidence.float() + tail_confidence.sum(dim=1)
-        ) / float(self.gamma)
+        confidence = (first_confidence.float() + tail_confidence.sum(dim=1)) / float(self.gamma)
         return next_windows.flatten(), next_windows, confidence
 
     def _validate_packed_causal_fia_leakage_once(
@@ -15500,6 +17121,19 @@ class NativePearlEngine:
         """
 
         self._last_stable_target_verify_graph_outcome = ("disabled", 0)
+        pending_entry_lease = getattr(
+            self,
+            "_spec_rhythm_target_replay_ahead_entry_lease",
+            None,
+        )
+        if pending_entry_lease is not None and not getattr(
+            self,
+            "_spec_rhythm_target_replay_ahead_no_capacity_mutation",
+            False,
+        ):
+            raise RuntimeError(
+                "Stable target graph output is still leased by replay-ahead."
+            )
         request_count = len(active_indices)
         if not (
             getattr(self, "_mixed_target_graph_enabled", False)
@@ -15569,10 +17203,15 @@ class NativePearlEngine:
             # as temporary NPU tensors and then copied by the graph runner.
             token_sequence_ids = list(envelope.token_sequence_ids)
             graph_position_values = list(envelope.positions)
-            self._ensure_cache_capacity(
-                token_sequence_ids,
-                graph_position_values,
-            )
+            if not getattr(
+                self,
+                "_spec_rhythm_target_replay_ahead_no_capacity_mutation",
+                False,
+            ):
+                self._ensure_cache_capacity(
+                    token_sequence_ids,
+                    graph_position_values,
+                )
             slot_mapping = self._cache_slot_mapping(
                 token_sequence_ids,
                 graph_position_values,
@@ -16007,13 +17646,10 @@ class NativePearlEngine:
         verification_token_count = int(verification_inputs.numel())
         assert self.cache_allocation is not None
         chunk_by_index = (
-            None
-            if prefill_chunks is None
-            else {int(chunk.request_index): chunk for chunk in prefill_chunks}
+            None if prefill_chunks is None else {int(chunk.request_index): chunk for chunk in prefill_chunks}
         )
         if chunk_by_index is not None and (
-            len(chunk_by_index) != len(prefill_chunks)
-            or set(chunk_by_index) != set(prefill_indices)
+            len(chunk_by_index) != len(prefill_chunks) or set(chunk_by_index) != set(prefill_indices)
         ):
             raise ValueError("Mixed target token chunks must align one-to-one with prefill rows.")
         for index in prefill_indices:
@@ -16038,9 +17674,7 @@ class NativePearlEngine:
             prefill_starts.append(start)
             prefill_lengths.append(end - start)
             if completes_prompt:
-                prefill_last_hidden_indices.append(
-                    verification_token_count + len(prefill_token_ids) - 1
-                )
+                prefill_last_hidden_indices.append(verification_token_count + len(prefill_token_ids) - 1)
 
         mixed_token_count = verification_token_count + len(prefill_token_ids)
         if mixed_token_count > self.config.max_num_batched_tokens:
@@ -16194,8 +17828,7 @@ class NativePearlEngine:
                             layout.prompt_output_indices,
                             prefill_indices,
                         )
-                        if chunk_by_index is None
-                        or chunk_by_index[index].completes_prompt
+                        if chunk_by_index is None or chunk_by_index[index].completes_prompt
                     ),
                 ],
                 dtype=torch.long,
@@ -16840,6 +18473,10 @@ class NativePearlEngine:
         *,
         continuation: torch.Tensor | None = None,
         host_continuation: Sequence[Sequence[int] | None] | None = None,
+        plan_id: int | None = None,
+        home_batch_id: int | None = None,
+        request_indices: Sequence[int] | None = None,
+        proposal_digest: int | None = None,
     ) -> None:
         """Queue the fixed-window correction D2H before proposal rendezvous.
 
@@ -16874,6 +18511,7 @@ class NativePearlEngine:
         if packed_size > FIXED_FULL_WINDOW_HOST_STAGING_VALUES:
             raise RuntimeError("The staged Gloo correction exceeds its persistent host envelope.")
         staging = self._fixed_full_window_host_correction_buffers()
+        submitted_device_continuation_copy = host_continuation is None
         if host_continuation is None:
             staging.host_values[:continuation_size].copy_(
                 continuation.flatten(),
@@ -16882,16 +18520,32 @@ class NativePearlEngine:
             verdict_offset = continuation_size
             staged_host_continuation = None
         else:
-            if (
-                len(host_continuation) != batch_size
-                or any(row is None or len(row) != self.gamma for row in host_continuation)
+            if len(host_continuation) != batch_size or any(
+                row is None or len(row) != self.gamma for row in host_continuation
             ):
                 raise RuntimeError("The staged Gloo correction host continuation has an invalid shape.")
-            staged_host_continuation = tuple(
-                tuple(int(value) for value in row)
-                for row in host_continuation
-            )
+            staged_host_continuation = tuple(tuple(int(value) for value in row) for row in host_continuation)
             verdict_offset = 0
+        staging.host_values[verdict_offset : verdict_offset + verdict_size].copy_(
+            verdict_result,
+            non_blocking=True,
+        )
+        staging.copy_done_event.record()
+        if submitted_device_continuation_copy:
+            # Count only a continuation D2H whose complete correction envelope
+            # and completion event were successfully submitted.  The event is
+            # synchronized before the host values are consumed below; counting
+            # any earlier would mislabel a partial/failed staging attempt as a
+            # usable copy.
+            self._spec_rhythm_staged_gloo_correction_device_continuation_copies = (
+                getattr(
+                    self,
+                    "_spec_rhythm_staged_gloo_correction_device_continuation_copies",
+                    0,
+                )
+                + 1
+            )
+        else:
             self._spec_rhythm_staged_gloo_correction_host_continuation_reuses = (
                 getattr(
                     self,
@@ -16900,14 +18554,39 @@ class NativePearlEngine:
                 )
                 + 1
             )
-        staging.host_values[verdict_offset : verdict_offset + verdict_size].copy_(
-            verdict_result,
-            non_blocking=True,
-        )
-        staging.copy_done_event.record()
         self._spec_rhythm_staged_gloo_correction_batch_size = batch_size
         self._spec_rhythm_staged_gloo_correction_verdict_offset = verdict_offset
         self._spec_rhythm_staged_gloo_correction_host_continuation = staged_host_continuation
+        correction_metadata = (
+            plan_id,
+            home_batch_id,
+            request_indices,
+            proposal_digest,
+        )
+        if all(value is None for value in correction_metadata):
+            self._spec_rhythm_staged_gloo_correction_identity = None
+        elif any(value is None for value in correction_metadata):
+            raise RuntimeError(
+                "The staged Gloo correction identity must be complete when provided."
+            )
+        else:
+            correction_epoch = int(
+                getattr(
+                    self,
+                    "_spec_rhythm_staged_gloo_correction_epoch",
+                    0,
+                )
+            ) + 1
+            self._spec_rhythm_staged_gloo_correction_epoch = correction_epoch
+            self._spec_rhythm_staged_gloo_correction_identity = (
+                _SpecRhythmStagedCorrectionIdentity(
+                    correction_epoch=correction_epoch,
+                    plan_id=int(plan_id),
+                    home_batch_id=int(home_batch_id),
+                    request_indices=tuple(int(index) for index in request_indices),
+                    proposal_digest=int(proposal_digest),
+                )
+            )
         self._spec_rhythm_staged_gloo_correction_submit_calls = (
             getattr(self, "_spec_rhythm_staged_gloo_correction_submit_calls", 0) + 1
         )
@@ -17013,8 +18692,7 @@ class NativePearlEngine:
             # target followers retain their identical local verdict instead
             # of joining a four-rank host collective on every decode cycle.
             participates_in_gloo_correction = (
-                correction_coordination_group is None
-                or self.rank in self.topology.correction_ranks
+                correction_coordination_group is None or self.rank in self.topology.correction_ranks
             )
             if participates_in_gloo_correction:
                 gloo_host_staging = self._fixed_full_window_host_correction_buffers()
@@ -17029,11 +18707,14 @@ class NativePearlEngine:
                         staged_wait_started = time.perf_counter()
                         gloo_host_staging.copy_done_event.synchronize()
                         staged_wait_ended = time.perf_counter()
-                        self._spec_rhythm_staged_gloo_correction_wait_ms = getattr(
-                            self,
-                            "_spec_rhythm_staged_gloo_correction_wait_ms",
-                            0.0,
-                        ) + (staged_wait_ended - staged_wait_started) * 1000.0
+                        self._spec_rhythm_staged_gloo_correction_wait_ms = (
+                            getattr(
+                                self,
+                                "_spec_rhythm_staged_gloo_correction_wait_ms",
+                                0.0,
+                            )
+                            + (staged_wait_ended - staged_wait_started) * 1000.0
+                        )
                         verdict_offset = int(
                             getattr(
                                 self,
@@ -17061,9 +18742,7 @@ class NativePearlEngine:
                             + 1
                         )
                         verdict_offset = 0
-                    gloo_verdict_result = gloo_host_staging.host_values[
-                        verdict_offset : verdict_offset + verdict_size
-                    ]
+                    gloo_verdict_result = gloo_host_staging.host_values[verdict_offset : verdict_offset + verdict_size]
                 else:
                     # A persistent pinned receiver removes the per-cycle
                     # pageable allocation and lets Gloo write directly into
@@ -17091,11 +18770,14 @@ class NativePearlEngine:
                         staged_wait_started = time.perf_counter()
                         target_staging.copy_done_event.synchronize()
                         staged_wait_ended = time.perf_counter()
-                        self._spec_rhythm_staged_gloo_correction_wait_ms = getattr(
-                            self,
-                            "_spec_rhythm_staged_gloo_correction_wait_ms",
-                            0.0,
-                        ) + (staged_wait_ended - staged_wait_started) * 1000.0
+                        self._spec_rhythm_staged_gloo_correction_wait_ms = (
+                            getattr(
+                                self,
+                                "_spec_rhythm_staged_gloo_correction_wait_ms",
+                                0.0,
+                            )
+                            + (staged_wait_ended - staged_wait_started) * 1000.0
+                        )
                     verdict_size = batch_size * 2
                     verdict_offset = int(
                         getattr(
@@ -17114,18 +18796,13 @@ class NativePearlEngine:
                         staged_gloo_target_values = target_staging.host_values[:packed_size].tolist()
                     else:
                         staged_gloo_target_values = [
-                            *(
-                                int(value)
-                                for row in host_continuation
-                                for value in row
-                            ),
-                            *target_staging.host_values[
-                                verdict_offset : verdict_offset + verdict_size
-                            ].tolist(),
+                            *(int(value) for row in host_continuation for value in row),
+                            *target_staging.host_values[verdict_offset : verdict_offset + verdict_size].tolist(),
                         ]
                     self._spec_rhythm_staged_gloo_correction_batch_size = None
                     self._spec_rhythm_staged_gloo_correction_verdict_offset = None
                     self._spec_rhythm_staged_gloo_correction_host_continuation = None
+                    self._spec_rhythm_staged_gloo_correction_identity = None
         elif replicated_target_verdict:
             if self.rank in self.topology.correction_ranks:
                 participated_in_broadcast = True
@@ -18358,10 +20035,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--spec-rhythm-linear-idle-residual-eager",
         action="store_true",
-        help=(
-            "Use residual measured W for dependency-exact continuations after "
-            "urgent and mandatory normal rows."
-        ),
+        help=("Use residual measured W for dependency-exact continuations after urgent and mandatory normal rows."),
     )
     parser.add_argument(
         "--spec-rhythm-online-prefill",

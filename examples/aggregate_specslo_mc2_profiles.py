@@ -35,6 +35,9 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from examples.specslo_mc2_deferred_chain_evidence import (
+    load_deferred_chain_evidence,
+)
 from vllm_ascend.spec_decode.pearl.mc2 import (
     MC2_TP3_NATIVE_EPILOGUE_OPERATOR,
     normalize_mc2_profile,
@@ -42,6 +45,7 @@ from vllm_ascend.spec_decode.pearl.mc2 import (
 
 _IDENTITY_METADATA_FIELDS = (
     "operator",
+    "standalone_chained_flush",
     "hardware",
     "tensor_parallel_size",
     "source_sha256",
@@ -87,6 +91,18 @@ def _parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument("--output", type=Path, required=True, help="Destination MC2 qualification profile.")
+    parser.add_argument(
+        "--deferred-chain",
+        type=Path,
+        nargs="+",
+        default=(),
+        help=(
+            "Full-model graph chain reports to attach. Each report authorizes "
+            "only its explicit row_count."
+        ),
+    )
+    parser.add_argument("--minimum-chain-samples", type=int, default=7)
+    parser.add_argument("--minimum-chain-speedup", type=float, default=1.0)
     return parser
 
 
@@ -730,18 +746,106 @@ def _union_mc2_envelopes(envelopes: Sequence[Mapping[str, Any]]) -> dict[str, An
     return result
 
 
-def aggregate_mc2_profile_groups(groups: Sequence[Sequence[Path]]) -> dict[str, Any]:
+def _attach_deferred_chain_evidence(
+    profile: Mapping[str, Any],
+    paths: Sequence[Path],
+    *,
+    minimum_samples: int,
+    minimum_speedup: float,
+) -> dict[str, Any]:
+    """Bind row-scoped full-model graph reports to an aggregated profile."""
+
+    result = deepcopy(profile)
+    metadata = result.get("metadata")
+    if not isinstance(metadata, dict):
+        raise ValueError("MC2 aggregate lacks mutable metadata")
+    if metadata.get("operator") != MC2_TP3_NATIVE_EPILOGUE_OPERATOR:
+        raise ValueError(
+            "deferred READ_DONE chaining requires the TP3 native epilogue profile"
+        )
+    runtime_binding = metadata.get("runtime_binding")
+    if not isinstance(runtime_binding, Mapping):
+        raise ValueError("deferred chain profile lacks a runtime binding")
+    mapping = runtime_binding.get("tp_rank_device_mapping")
+    if isinstance(mapping, (str, bytes)) or not isinstance(mapping, Sequence):
+        raise ValueError("deferred chain profile has an invalid TP rank mapping")
+
+    provenance = metadata.get("aggregation_provenance")
+    if not isinstance(provenance, Mapping):
+        raise ValueError("deferred chain profile lacks aggregation provenance")
+    provenance_inputs = provenance.get("inputs")
+    if not isinstance(provenance_inputs, list) or not provenance_inputs:
+        raise ValueError("deferred chain profile lacks real-input provenance")
+    input_sources = []
+    for item in provenance_inputs:
+        if not isinstance(item, Mapping) or not isinstance(item.get("input_source"), str):
+            raise ValueError("deferred chain profile has invalid real-input provenance")
+        input_sources.append(item["input_source"])
+
+    projection_rows: dict[int, set[int]] = {3072: set(), 8576: set()}
+    measurements = result.get("measurements")
+    if not isinstance(measurements, list):
+        raise ValueError("deferred chain profile lacks measurements")
+    for row in measurements:
+        if not isinstance(row, Mapping):
+            continue
+        k = row.get("k")
+        m = row.get("m")
+        n = row.get("n")
+        if k in projection_rows and isinstance(m, int) and n == 5120:
+            projection_rows[int(k)].add(int(m))
+    allowed_rows = projection_rows[3072].intersection(projection_rows[8576])
+    if not allowed_rows:
+        raise ValueError(
+            "deferred chain profile has no row count shared by attention and down routes"
+        )
+    evidence = load_deferred_chain_evidence(
+        paths,
+        expected_source_sha256=str(metadata.get("source_sha256", "")),
+        expected_mapping=tuple(str(value) for value in mapping),
+        minimum_samples=minimum_samples,
+        minimum_speedup=minimum_speedup,
+        allowed_input_sources=input_sources,
+        allowed_row_counts=allowed_rows,
+    )
+    metadata["deferred_read_done_chain"] = evidence
+    # Re-run the public loader after attachment so an offline tool cannot
+    # emit metadata that production would interpret differently.
+    normalize_mc2_profile(result)
+    return result
+
+
+def aggregate_mc2_profile_groups(
+    groups: Sequence[Sequence[Path]],
+    *,
+    deferred_chain_paths: Sequence[Path] = (),
+    minimum_chain_samples: int = 7,
+    minimum_chain_speedup: float = 1.0,
+) -> dict[str, Any]:
     """Aggregate each real-layer group, then union disjoint exact shapes."""
 
     if not groups:
         raise ValueError("MC2 aggregation requires at least one input group")
     envelopes = [aggregate_mc2_profiles(group) for group in groups]
-    return envelopes[0] if len(envelopes) == 1 else _union_mc2_envelopes(envelopes)
+    result = envelopes[0] if len(envelopes) == 1 else _union_mc2_envelopes(envelopes)
+    if deferred_chain_paths:
+        result = _attach_deferred_chain_evidence(
+            result,
+            deferred_chain_paths,
+            minimum_samples=minimum_chain_samples,
+            minimum_speedup=minimum_chain_speedup,
+        )
+    return result
 
 
 def main() -> None:
     args = _parser().parse_args()
-    result = aggregate_mc2_profile_groups(args.input)
+    result = aggregate_mc2_profile_groups(
+        args.input,
+        deferred_chain_paths=args.deferred_chain,
+        minimum_chain_samples=args.minimum_chain_samples,
+        minimum_chain_speedup=args.minimum_chain_speedup,
+    )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 

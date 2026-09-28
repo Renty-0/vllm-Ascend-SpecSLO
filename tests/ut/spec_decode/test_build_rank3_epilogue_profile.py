@@ -73,6 +73,8 @@ def _deferred_chain(path: Path, *, attention_source: Path, down_source: Path) ->
         "chain_scope": "whole_model",
         "layer_count": 64,
         "operations_per_chain": 128,
+        "row_count": 100,
+        "source_sha256": builder.mc2_source_sha256(),
         "tp_rank_device_mapping": ["1", "2", "4"],
         "attention_input_source": str(attention_source),
         "down_input_source": str(down_source),
@@ -90,6 +92,7 @@ def _deferred_chain(path: Path, *, attention_source: Path, down_source: Path) ->
                 "deferred_chain": zero_errors,
             },
             "changed_input_replays": 5,
+            "changed_input_output_delta": 0.125,
             "final_chain_state_zero_all_ranks": True,
         },
         "samples": {
@@ -219,8 +222,10 @@ def test_builder_admits_only_explicit_bit_exact_deferred_chain(tmp_path: Path, m
     assert evidence["chain_scope"] == "whole_model"
     assert evidence["layer_count"] == 64
     assert evidence["operations_per_chain"] == 128
-    assert evidence["p95_speedup"] > 1.0
-    assert len(evidence["report_sha256"]) == 64
+    assert evidence["source_sha256"] == builder.mc2_source_sha256()
+    assert evidence["qualified_row_counts"] == [100]
+    assert evidence["reports"][0]["p95_speedup"] > 1.0
+    assert len(evidence["reports"][0]["report_sha256"]) == 64
 
     broken = json.loads(chain.read_text(encoding="utf-8"))
     broken["correctness"]["final_chain_state_zero_all_ranks"] = False
@@ -232,4 +237,33 @@ def test_builder_admits_only_explicit_bit_exact_deferred_chain(tmp_path: Path, m
     broken["samples"]["deferred_chain_latency_ms"] = [0.4] * 5
     chain.write_text(json.dumps(broken), encoding="utf-8")
     with pytest.raises(ValueError, match="below the required"):
+        builder.build_profile(args)
+
+
+def test_builder_rejects_legacy_or_stale_deferred_chain_identity(
+    tmp_path: Path,
+    monkeypatch,
+):
+    attention = tmp_path / "attention.json"
+    down = tmp_path / "down.json"
+    attention_source = tmp_path / "attention-input"
+    down_source = tmp_path / "down-input"
+    _measurement(attention, (100, 3072, 5120), input_source=attention_source)
+    _measurement(down, (100, 8576, 5120), input_source=down_source)
+    chain = tmp_path / "chain.json"
+    _deferred_chain(chain, attention_source=attention_source, down_source=down_source)
+    monkeypatch.setattr(builder, "current_mc2_runtime_binding", lambda **_: _binding())
+    args = _args(attention, down, tmp_path / "profile.json")
+    args.deferred_chain = chain
+
+    payload = json.loads(chain.read_text(encoding="utf-8"))
+    payload.pop("row_count")
+    chain.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match="explicit row_count"):
+        builder.build_profile(args)
+
+    payload["row_count"] = 100
+    payload["source_sha256"] = "0" * 64
+    chain.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match="source SHA"):
         builder.build_profile(args)

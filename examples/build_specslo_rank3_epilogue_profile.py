@@ -11,12 +11,14 @@ Torch adapter, OPAPI provider, CANN/HCCL versions, and physical TP mapping.
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import math
 from pathlib import Path
 from typing import Any
 
+from examples.specslo_mc2_deferred_chain_evidence import (
+    load_deferred_chain_evidence,
+)
 from vllm_ascend.spec_decode.pearl.mc2 import (
     MC2_TP3_NATIVE_EPILOGUE_OPERATOR,
     current_mc2_runtime_binding,
@@ -107,91 +109,15 @@ def _load_deferred_chain(
     minimum_samples: int,
     minimum_speedup: float,
 ) -> dict[str, Any]:
-    payload_bytes = path.resolve(strict=True).read_bytes()
-    payload = json.loads(payload_bytes)
-    if payload.get("schema_version") != 1 or payload.get("status") != "measured":
-        raise ValueError(f"{path}: expected a measured schema_version=1 chain document")
-    if payload.get("execution_mode") != "graph" or payload.get("tensor_parallel_size") != 3:
-        raise ValueError(f"{path}: deferred chain production admission requires graph TP3")
-    if payload.get("chain_scope") != "whole_model":
-        raise ValueError(f"{path}: deferred chain does not cover a whole model")
-    layer_count = int(payload.get("layer_count", 0))
-    operations_per_chain = int(payload.get("operations_per_chain", 0))
-    if layer_count <= 0 or operations_per_chain != 2 * layer_count:
-        raise ValueError(f"{path}: deferred chain has an invalid model-length operation count")
-    if tuple(str(value) for value in payload.get("tp_rank_device_mapping", ())) != expected_mapping:
-        raise ValueError(f"{path}: deferred chain TP rank mapping differs from qualification")
-    if Path(payload.get("attention_input_source", "")).resolve() != attention_source.resolve():
-        raise ValueError(f"{path}: deferred chain attention payload differs from qualification")
-    if Path(payload.get("down_input_source", "")).resolve() != down_source.resolve():
-        raise ValueError(f"{path}: deferred chain down payload differs from qualification")
-    correctness = payload.get("correctness")
-    samples = payload.get("samples")
-    summary = payload.get("summary")
-    if not all(isinstance(value, dict) for value in (correctness, samples, summary)):
-        raise ValueError(f"{path}: incomplete deferred chain qualification")
-    initial = correctness.get("initial")
-    changed_exact = correctness.get("changed_input_exact_all_ranks")
-    changed_max = correctness.get("changed_input_max_abs")
-    if not all(isinstance(value, dict) for value in (initial, changed_exact, changed_max)):
-        raise ValueError(f"{path}: incomplete deferred chain correctness evidence")
-    for mode in ("fully_flushed", "deferred_chain"):
-        mode_initial = initial.get(mode)
-        mode_changed_max = changed_max.get(mode)
-        if not isinstance(mode_initial, dict) or mode_initial.get("exact_all_ranks") is not True:
-            raise ValueError(f"{path}: {mode} initial result is not exact on every rank")
-        if changed_exact.get(mode) is not True:
-            raise ValueError(f"{path}: {mode} changed-input result is not exact on every rank")
-        if not isinstance(mode_changed_max, dict) or any(
-            float(value) != 0.0 for value in mode_changed_max.values()
-        ):
-            raise ValueError(f"{path}: {mode} changed-input result is not bit-exact")
-    if correctness.get("final_chain_state_zero_all_ranks") is not True:
-        raise ValueError(f"{path}: deferred chain did not drain its mailbox state")
-    if int(correctness.get("changed_input_replays", 0)) < 2:
-        raise ValueError(f"{path}: deferred chain has insufficient changed-input replays")
-    fully_flushed = [float(value) for value in samples.get("fully_flushed_latency_ms", ())]
-    deferred = [float(value) for value in samples.get("deferred_chain_latency_ms", ())]
-    if len(fully_flushed) < minimum_samples or len(deferred) < minimum_samples:
-        raise ValueError(f"{path}: deferred chain has fewer than {minimum_samples} latency samples")
-    if any(not math.isfinite(value) or value <= 0.0 for value in (*fully_flushed, *deferred)):
-        raise ValueError(f"{path}: deferred chain contains invalid latency samples")
-    fully_flushed_p50 = _percentile(fully_flushed, 50.0)
-    fully_flushed_p95 = _percentile(fully_flushed, 95.0)
-    deferred_p50 = _percentile(deferred, 50.0)
-    deferred_p95 = _percentile(deferred, 95.0)
-    p50_speedup = fully_flushed_p50 / deferred_p50
-    p95_speedup = fully_flushed_p95 / deferred_p95
-    if p95_speedup < minimum_speedup:
-        raise ValueError(
-            f"{path}: deferred chain p95 speedup {p95_speedup:.6f} is below "
-            f"the required {minimum_speedup:.6f}"
-        )
-    return {
-        "qualified": True,
-        "execution_mode": "graph",
-        "chain_scope": "whole_model",
-        "layer_count": layer_count,
-        "operations_per_chain": operations_per_chain,
-        "report_sha256": hashlib.sha256(payload_bytes).hexdigest(),
-        "report_path": str(path.resolve()),
-        "fully_flushed_latency_ms": fully_flushed,
-        "deferred_chain_latency_ms": deferred,
-        "minimum_speedup": minimum_speedup,
-        "p50_speedup": p50_speedup,
-        "p95_speedup": p95_speedup,
-    }
-
-
-def _percentile(values: list[float], percentile: float) -> float:
-    ordered = sorted(values)
-    position = (len(ordered) - 1) * percentile / 100.0
-    lower = math.floor(position)
-    upper = math.ceil(position)
-    if lower == upper:
-        return ordered[lower]
-    fraction = position - lower
-    return ordered[lower] * (1.0 - fraction) + ordered[upper] * fraction
+    return load_deferred_chain_evidence(
+        (path,),
+        expected_source_sha256=mc2_source_sha256(),
+        expected_mapping=expected_mapping,
+        minimum_samples=minimum_samples,
+        minimum_speedup=minimum_speedup,
+        allowed_input_sources=(attention_source, down_source),
+        allowed_row_counts=(100,),
+    )
 
 
 def _profile_row(payload: dict[str, Any], *, minimum_samples: int) -> dict[str, Any]:

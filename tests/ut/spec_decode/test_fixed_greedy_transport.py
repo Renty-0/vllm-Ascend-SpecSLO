@@ -270,6 +270,25 @@ def test_cpu_broadcast_source_keeps_device_message_and_reports_timing(monkeypatc
     assert timing.host_continuation_tokens.tolist() == [[7, 8]]
 
 
+def test_cpu_broadcast_source_can_hide_host_continuation(monkeypatch) -> None:
+    layout = transport.CompactFixedGreedyEnvelopeLayout.full_window(1, 2)
+    monkeypatch.setattr(transport.dist, "broadcast", lambda *_args, **_kwargs: None)
+
+    views, timing = transport.broadcast_compact_fixed_greedy_via_cpu(
+        layout,
+        rank=0,
+        source_rank=0,
+        group=None,
+        device="cpu",
+        verification_tokens=torch.tensor([7, 8], dtype=torch.long),
+        continuation_tokens=torch.tensor([[7, 8]], dtype=torch.long),
+        expose_host_continuation=False,
+    )
+
+    assert views.continuation_tokens.tolist() == [[7, 8]]
+    assert timing.host_continuation_tokens is None
+
+
 def test_cpu_broadcast_source_reuses_fixed_buffers(monkeypatch) -> None:
     layout = transport.CompactFixedGreedyEnvelopeLayout.full_window(
         1,
@@ -357,3 +376,23 @@ def test_cpu_broadcast_receiver_copies_completed_message(monkeypatch) -> None:
     assert timing.host_to_device_submit_seconds >= 0
     assert timing.host_continuation_tokens is not None
     assert timing.host_continuation_tokens.tolist() == [[11, 12]]
+
+
+def test_cpu_broadcast_receiver_can_hide_host_continuation(monkeypatch) -> None:
+    layout = transport.CompactFixedGreedyEnvelopeLayout.full_window(1, 2)
+
+    def broadcast(message, *, src, group):
+        message.copy_(torch.tensor([11, 12]))
+
+    monkeypatch.setattr(transport.dist, "broadcast", broadcast)
+    views, timing = transport.broadcast_compact_fixed_greedy_via_cpu(
+        layout,
+        rank=1,
+        source_rank=0,
+        group=None,
+        device="cpu",
+        expose_host_continuation=False,
+    )
+
+    assert views.continuation_tokens.tolist() == [[11, 12]]
+    assert timing.host_continuation_tokens is None

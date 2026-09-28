@@ -6,7 +6,11 @@ from types import SimpleNamespace
 
 import pytest
 
-from examples.benchmark_nano_pearl_speculative import _summarize_slo_metrics
+from examples.benchmark_nano_pearl_speculative import (
+    _host_continuation_measurement_issues,
+    _summarize_slo_metrics,
+    _worker_aclgraph_deltas,
+)
 from examples.benchmark_nano_pearl_target_only import _online_slo_summary
 from examples.specslo_slo_metrics import summarize_slo_rows
 
@@ -115,6 +119,193 @@ def test_native_paper_reports_explicit_decode_stage_goodput():
     assert result["paper"]["goodput_tokens_per_e2e_second"] == 4
     assert result["paper"]["decode_stage_measurement_seconds"] == 1
     assert result["paper"]["goodput_tokens_per_decode_second"] == 8
+
+
+def test_worker_graph_deltas_report_measured_staged_correction_path():
+    before = [
+        {
+            "rank": 1,
+            "spec_rhythm_staged_gloo_correction_submit_calls": 10,
+            "spec_rhythm_staged_gloo_correction_fallback_calls": 2,
+            "spec_rhythm_staged_gloo_correction_host_continuation_reuses": 7,
+            "spec_rhythm_staged_gloo_correction_device_continuation_copies": 3,
+            "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_requested": 0,
+            "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_active": 0,
+        }
+    ]
+    after = [
+        {
+            "rank": 1,
+            "spec_rhythm_staged_gloo_correction_submit_calls": 16,
+            "spec_rhythm_staged_gloo_correction_fallback_calls": 4,
+            "spec_rhythm_staged_gloo_correction_host_continuation_reuses": 12,
+            "spec_rhythm_staged_gloo_correction_device_continuation_copies": 4,
+            "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_requested": 1,
+            "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_active": 1,
+        }
+    ]
+
+    delta = _worker_aclgraph_deltas(before, after)[0]
+
+    assert delta["spec_rhythm_staged_gloo_correction_submit_calls_delta"] == 6
+    assert delta["spec_rhythm_staged_gloo_correction_fallback_calls_delta"] == 2
+    assert delta["spec_rhythm_staged_gloo_correction_host_continuation_reuses_delta"] == 5
+    assert delta["spec_rhythm_staged_gloo_correction_device_continuation_copies_delta"] == 1
+    assert delta["worker_spec_rhythm_gloo_proposal_host_continuation_reuse_requested"] == 1
+    assert delta["worker_spec_rhythm_gloo_proposal_host_continuation_reuse_active"] == 1
+    assert "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_active_delta" not in delta
+
+
+def test_worker_graph_deltas_preserve_measured_draft_continuation_path():
+    before = [
+        {
+            "rank": 0,
+            "is_draft_rank": 1,
+            "worker_spec_rhythm_gloo_proposal_host_continuation_reuses": 99,
+            "worker_spec_rhythm_gloo_proposal_device_continuation_reads": 88,
+        }
+    ]
+    after = [
+        {
+            "rank": 0,
+            "is_draft_rank": 1,
+            "worker_spec_rhythm_gloo_proposal_host_continuation_reuses": 17,
+            "worker_spec_rhythm_gloo_proposal_device_continuation_reads": 0,
+        }
+    ]
+
+    delta = _worker_aclgraph_deltas(before, after)[0]
+
+    assert delta["worker_spec_rhythm_gloo_proposal_host_continuation_reuses"] == 17
+    assert delta["worker_spec_rhythm_gloo_proposal_device_continuation_reads"] == 0
+    assert "worker_spec_rhythm_gloo_proposal_host_continuation_reuses_delta" not in delta
+
+
+def test_worker_graph_deltas_include_measured_target_fia_parallel_updates():
+    before = [
+        {
+            "rank": 1,
+            "is_draft_rank": 0,
+            "aclgraph_target_fia_task_update_workers": 2,
+            "aclgraph_target_fia_parallel_update_replays": 5,
+            "aclgraph_target_fia_parallel_update_tasks": 320,
+        }
+    ]
+    after = [
+        {
+            **before[0],
+            "aclgraph_target_fia_parallel_update_replays": 12,
+            "aclgraph_target_fia_parallel_update_tasks": 768,
+        }
+    ]
+
+    delta = _worker_aclgraph_deltas(before, after)[0]
+
+    assert delta["aclgraph_target_fia_task_update_workers"] == 2
+    assert delta["aclgraph_target_fia_parallel_update_replays_delta"] == 7
+    assert delta["aclgraph_target_fia_parallel_update_tasks_delta"] == 448
+
+
+def test_worker_graph_deltas_include_measured_draft_pa_parallel_updates():
+    before = [
+        {
+            "rank": 0,
+            "is_draft_rank": 1,
+            "aclgraph_draft_pa_task_update_workers": 2,
+            "aclgraph_draft_pa_parallel_update_replays": 5,
+            "aclgraph_draft_pa_parallel_update_tasks": 1280,
+            "aclgraph_draft_pa_parallel_update_fallback_replays": 1,
+            "aclgraph_draft_pa_parallel_update_rejections": {
+                "invalid_step_lengths": 1,
+            },
+        }
+    ]
+    after = [
+        {
+            **before[0],
+            "aclgraph_draft_pa_parallel_update_replays": 12,
+            "aclgraph_draft_pa_parallel_update_tasks": 3072,
+            "aclgraph_draft_pa_parallel_update_fallback_replays": 3,
+            "aclgraph_draft_pa_parallel_update_rejections": {
+                "invalid_step_lengths": 1,
+                "non_linear_entry": 2,
+            },
+        }
+    ]
+
+    delta = _worker_aclgraph_deltas(before, after)[0]
+
+    assert delta["aclgraph_draft_pa_task_update_workers"] == 2
+    assert delta["aclgraph_draft_pa_parallel_update_replays_delta"] == 7
+    assert delta["aclgraph_draft_pa_parallel_update_tasks_delta"] == 1792
+    assert delta["aclgraph_draft_pa_parallel_update_fallback_replays_delta"] == 2
+    assert delta["aclgraph_draft_pa_parallel_update_rejections_delta"] == {
+        "non_linear_entry": 2,
+    }
+
+
+def _continuation_evidence(*, reuse: bool):
+    selected_draft = {
+        "worker_spec_rhythm_gloo_proposal_host_continuation_reuses": 7 if reuse else 0,
+        "worker_spec_rhythm_gloo_proposal_device_continuation_reads": 0 if reuse else 7,
+    }
+    workers = [
+        {
+            "rank": 0,
+            "is_draft_rank": 1,
+            "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_requested": int(reuse),
+            "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_active": int(reuse),
+            **selected_draft,
+        }
+    ]
+    for rank in (1, 2, 3):
+        workers.append(
+            {
+                "rank": rank,
+                "is_draft_rank": 0,
+                "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_requested": int(reuse),
+                "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_active": int(reuse),
+                "worker_spec_rhythm_gloo_proposal_host_continuation_reuses": 0,
+                "worker_spec_rhythm_gloo_proposal_device_continuation_reads": 0,
+                "spec_rhythm_staged_gloo_correction_submit_calls_delta": 5,
+                "spec_rhythm_staged_gloo_correction_fallback_calls_delta": 0,
+                "spec_rhythm_staged_gloo_correction_host_continuation_reuses_delta": (
+                    5 if reuse else 0
+                ),
+                "spec_rhythm_staged_gloo_correction_device_continuation_copies_delta": (
+                    0 if reuse else 5
+                ),
+            }
+        )
+    return workers
+
+
+@pytest.mark.parametrize("reuse", [False, True])
+def test_host_continuation_measurement_accepts_only_selected_path(reuse):
+    assert not _host_continuation_measurement_issues(
+        _continuation_evidence(reuse=reuse),
+        expected_reuse=reuse,
+    )
+
+
+def test_host_continuation_measurement_rejects_inactive_and_mixed_paths():
+    workers = _continuation_evidence(reuse=True)
+    workers[0]["worker_spec_rhythm_gloo_proposal_device_continuation_reads"] = 1
+    workers[1]["worker_spec_rhythm_gloo_proposal_host_continuation_reuse_active"] = 0
+    workers[2]["spec_rhythm_staged_gloo_correction_host_continuation_reuses_delta"] = 4
+    workers[3]["spec_rhythm_staged_gloo_correction_device_continuation_copies_delta"] = 1
+    workers[3]["spec_rhythm_staged_gloo_correction_fallback_calls_delta"] = 1
+
+    issues = _host_continuation_measurement_issues(
+        workers,
+        expected_reuse=True,
+    )
+
+    assert any("rank 1 host-continuation active=0" in issue for issue in issues)
+    assert any("draft rank 0 measured 1 unexpected device read" in issue for issue in issues)
+    assert any("target rank 2 measured 4 host reuse calls for 5" in issue for issue in issues)
+    assert any("target rank 3 measured 1 unexpected device copy" in issue for issue in issues)
+    assert any("target rank 3 measured 1 unstaged correction fallbacks" in issue for issue in issues)
 
 
 def test_partial_missing_group_timing_keeps_missing_requests_in_attainment_denominator():

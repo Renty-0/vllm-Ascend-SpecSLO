@@ -44,6 +44,14 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS": lambda: int(
         os.getenv("VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS", "0")
     ),
+    # When enabled, create a CANN profiler only for a generate call whose
+    # non-synchronizing host timeline has been explicitly requested.  The
+    # benchmark configures that timeline after graph qualification, so this
+    # prevents untimed warmups from emitting ambiguous extra trace sets.
+    # Default 0 preserves the historical env-only profiling behavior.
+    "VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY", "0"))
+    ),
     # PEARL/SpecSLO experimental diagnostics and compatibility switches.
     # All are non-sensitive. Production defaults keep diagnostics disabled
     # and select the native packed-tree/ACLGraph route.
@@ -173,6 +181,16 @@ env_variables: dict[str, Callable[[], Any]] = {
     # improvement alone did not improve the current end-to-end workload.
     "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS": lambda: int(
         os.getenv("VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS", "1")
+    ),
+    # Parallelize host-side refreshes for the 112 independent PagedAttention
+    # handles in a fixed-gamma4 serial draft ACLGraph.  The default of one
+    # preserves the production serial path.  Experimental values 2 and 4 are
+    # accepted only by a pure-PA, complete four-step draft entry; every other
+    # shape fails closed to the existing serial updater.  Non-sensitive NPU
+    # performance switch; complete-model numerical qualification is required
+    # before enabling it in a benchmark launcher.
+    "VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS": lambda: int(
+        os.getenv("VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS", "1")
     ),
     "VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE": lambda: bool(
         int(os.getenv("VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE", "0"))
@@ -344,6 +362,22 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST": lambda: bool(
         int(os.getenv("VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST", "0"))
     ),
+    # Once every online request has arrived, been prefetched and become
+    # runnable, a_need can no longer improve admission Goodput.  Allow the
+    # final drain to use the controller's starvation-safe ready-wait order so
+    # relaxed stragglers do not extend the workload makespan.  This switch is
+    # intentionally fail-closed and is enabled explicitly by the formal
+    # SpecSLO launcher.
+    "VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO", "0"))
+    ),
+    # In a DRAIN_FIFO-enabled immutable final drain, prioritize both ready
+    # target tickets and normal/repair draft admission by one smoothed
+    # remaining-service estimate.  The native engine ignores this switch at
+    # every mutable frontier, and the default remains fail-closed.
+    "VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF", "0"))
+    ),
     # Restrict optional idle-window rolling continuations to requests in the
     # strictest TPOT class. Mandatory normal proposals and urgent a_need work
     # are unchanged; this only prevents relaxed rows from consuming residual
@@ -472,6 +506,15 @@ env_variables: dict[str, Callable[[], Any]] = {
             "1",
         )
     ),
+    # Submit the next opposite-home fixed-gamma4 target graph after its draft
+    # proposal exchange, before the current cycle's host correction wait.
+    # This is an irreversible KV mutation, so the native engine enables it
+    # only for an immutable dual-home frontier with an exact ticket/epoch
+    # signature and a sealed resident decode-only graph.  Default off until a
+    # complete-system numerical and performance gate has passed.
+    "VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD", "0"))
+    ),
     # Experimental target-only GEMM row padding.  Each native linear pads its
     # packed token matrix to this multiple and slices the result immediately,
     # keeping attention/KV semantics unchanged while making exact and bucketed
@@ -532,6 +575,19 @@ env_variables: dict[str, Callable[[], Any]] = {
             os.getenv(
                 "VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_SOURCE_BUFFERS",
                 "0",
+            )
+        )
+    ),
+    # The compact Gloo envelope already contains the complete continuation on
+    # every host. Reusing that view avoids a second draft D2H copy and lets the
+    # target stage correction without copying the continuation again. Keep the
+    # current behavior by default, but expose a narrow opt-out so the older
+    # device-derived continuation path can be reproduced in timing A/B tests.
+    "VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_HOST_CONTINUATION": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_HOST_CONTINUATION",
+                "1",
             )
         )
     ),

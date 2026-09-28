@@ -10,12 +10,14 @@ Both paths are captured independently and measured in alternating order.
 from __future__ import annotations
 
 import argparse
+import gc
 import hashlib
 import json
 import math
 import os
 import time
 from collections.abc import Callable
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +34,71 @@ from vllm_ascend.spec_decode.pearl.mc2 import (
 )
 
 Output = tuple[torch.Tensor, torch.Tensor]
+
+
+@dataclass
+class SharedProjectionParameters:
+    """Stable parameter buffers shared by every resident graph of one kind."""
+
+    weight: torch.Tensor
+    gamma: torch.Tensor
+
+
+@dataclass
+class ResidentGraphResources:
+    """All device objects whose addresses are captured by one graph pair."""
+
+    x: torch.Tensor
+    residual: torch.Tensor
+    chain_zero: torch.Tensor
+    parameters: SharedProjectionParameters
+    baseline_graph: torch.npu.NPUGraph
+    baseline_output: Output
+    fused_graph: torch.npu.NPUGraph
+    fused_output: Output
+
+    def baseline_runner(self) -> Output:
+        self.baseline_graph.replay()
+        return self.baseline_output
+
+    def fused_runner(self) -> Output:
+        self.fused_graph.replay()
+        return self.fused_output
+
+
+@dataclass
+class MeasurementResourcePool:
+    """Campaign-lifetime graph cache; never reset between qualification jobs."""
+
+    parameters: dict[tuple[Any, ...], SharedProjectionParameters] = field(
+        default_factory=dict
+    )
+    graphs: dict[tuple[Any, ...], ResidentGraphResources] = field(
+        default_factory=dict
+    )
+
+
+@dataclass(frozen=True)
+class MeasurementRuntime:
+    """Process-group resources shared by one or more measurement jobs."""
+
+    local_rank: int
+    rank: int
+    operator_name: str
+    operator: Callable[..., Any]
+    comm_name: str
+    device_mapping: tuple[str, ...]
+    runtime_binding: dict[str, Any]
+    chained_flush: bool
+    resources: MeasurementResourcePool
+
+
+@dataclass(frozen=True)
+class RankZeroFinalizationOutcome:
+    """Collective distinction between a rejected row and a fatal error."""
+
+    admission_failure: str | None = None
+    fatal_failure: str | None = None
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -118,6 +185,168 @@ def _capture(operation: Callable[[], Output]) -> tuple[torch.npu.NPUGraph, Outpu
     return graph, output
 
 
+def _validate_payload_shapes(
+    args: argparse.Namespace,
+    payload: dict[str, torch.Tensor],
+) -> None:
+    actual_shapes = {
+        "activation": tuple(payload["activation"].shape),
+        "weight": tuple(payload["weight"].shape),
+        "residual": tuple(payload["residual"].shape),
+        "gamma": tuple(payload["gamma"].shape),
+    }
+    expected_shapes = {
+        "activation": (args.m, args.k),
+        "weight": (args.n, args.k),
+        "residual": (args.m, args.n),
+        "gamma": (args.n,),
+    }
+    if actual_shapes != expected_shapes:
+        raise ValueError(f"real payload shapes {actual_shapes} != {expected_shapes}")
+
+
+def _parameter_resource_key(
+    args: argparse.Namespace,
+    payload: dict[str, torch.Tensor],
+) -> tuple[Any, ...]:
+    """Key stable weight/gamma buffers independently of M within one layer."""
+
+    return (
+        str(args.input_dir.parent.resolve()),
+        args.k,
+        args.n,
+        tuple(payload["weight"].shape),
+        str(payload["weight"].dtype),
+        tuple(payload["gamma"].shape),
+        str(payload["gamma"].dtype),
+    )
+
+
+def _graph_resource_key(
+    args: argparse.Namespace,
+    payload: dict[str, torch.Tensor],
+) -> tuple[Any, ...]:
+    """Key one layer-bound graph pair; only the same layer/shape reuses it."""
+
+    return (
+        str(args.input_dir.parent.resolve()),
+        args.m,
+        args.k,
+        args.n,
+        str(payload["activation"].dtype),
+        str(payload["residual"].dtype),
+        args.operations_per_graph,
+        args.chained_flush,
+    )
+
+
+def _copy_stable_buffer(
+    destination: torch.Tensor,
+    source: torch.Tensor,
+    *,
+    name: str,
+) -> None:
+    if destination.shape != source.shape or destination.dtype != source.dtype:
+        raise ValueError(
+            f"resident {name} buffer {tuple(destination.shape)}/{destination.dtype} "
+            f"cannot load {tuple(source.shape)}/{source.dtype}"
+        )
+    destination.copy_(source)
+
+
+def _load_graph_resources(
+    args: argparse.Namespace,
+    runtime: MeasurementRuntime,
+    payload: dict[str, torch.Tensor],
+) -> ResidentGraphResources:
+    """Load one job into stable buffers, capturing its shape only once."""
+
+    parameter_key = _parameter_resource_key(args, payload)
+    parameters = runtime.resources.parameters.get(parameter_key)
+    if parameters is None:
+        parameters = SharedProjectionParameters(
+            weight=payload["weight"].to(device="npu"),
+            gamma=payload["gamma"].to(device="npu"),
+        )
+        runtime.resources.parameters[parameter_key] = parameters
+    else:
+        _copy_stable_buffer(parameters.weight, payload["weight"], name="weight")
+        _copy_stable_buffer(parameters.gamma, payload["gamma"], name="gamma")
+
+    graph_key = _graph_resource_key(args, payload)
+    resources = runtime.resources.graphs.get(graph_key)
+    if resources is not None:
+        if resources.parameters is not parameters:
+            raise RuntimeError("resident graph resolved a different shared parameter buffer")
+        _copy_stable_buffer(resources.x, payload["activation"], name="activation")
+        _copy_stable_buffer(resources.residual, payload["residual"], name="residual")
+        torch.npu.synchronize()
+        return resources
+
+    x = payload["activation"].to(device="npu")
+    residual = payload["residual"].to(device="npu")
+    chain_zero = torch.zeros((64, 4), dtype=torch.int64, device="npu")
+
+    def baseline() -> Output:
+        for _ in range(args.operations_per_graph):
+            projected = torch.nn.functional.linear(x, parameters.weight)
+            dist.all_reduce(projected)
+            normalized, _, added = torch_npu.npu_add_rms_norm(
+                projected,
+                residual,
+                parameters.gamma,
+                1e-6,
+            )
+        return normalized, added
+
+    def fused() -> Output:
+        for _ in range(args.operations_per_graph):
+            local_projection = torch.nn.functional.linear(x, parameters.weight)
+            if args.chained_flush:
+                chained_output = runtime.operator(
+                    local_projection,
+                    residual,
+                    parameters.gamma,
+                    chain_zero,
+                    runtime.comm_name,
+                    3,
+                    runtime.rank,
+                    1e-6,
+                    True,
+                    True,
+                )
+                output = (chained_output[0], chained_output[1])
+            else:
+                output = runtime.operator(
+                    local_projection,
+                    residual,
+                    parameters.gamma,
+                    runtime.comm_name,
+                    3,
+                    runtime.rank,
+                    1e-6,
+                    True,
+                )
+        return output
+
+    dist.barrier()
+    baseline_graph, baseline_output = _capture(baseline)
+    dist.barrier()
+    fused_graph, fused_output = _capture(fused)
+    resources = ResidentGraphResources(
+        x=x,
+        residual=residual,
+        chain_zero=chain_zero,
+        parameters=parameters,
+        baseline_graph=baseline_graph,
+        baseline_output=baseline_output,
+        fused_graph=fused_graph,
+        fused_output=fused_output,
+    )
+    runtime.resources.graphs[graph_key] = resources
+    return resources
+
+
 def _max_rank_samples(local: list[float]) -> list[float]:
     gathered: list[list[float] | None] = [None] * dist.get_world_size()
     dist.all_gather_object(gathered, local)
@@ -178,6 +407,57 @@ def _sha256(value: torch.Tensor) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def _capture_rank_zero_finalization(
+    finalizer: Callable[[], str | None],
+) -> RankZeroFinalizationOutcome:
+    """Convert every rank-0-only finalization error into consensus data."""
+
+    try:
+        admission_failure = finalizer()
+    except Exception as error:
+        return RankZeroFinalizationOutcome(
+            fatal_failure=(
+                "rank-0 MC2 qualification finalization failed: "
+                f"{type(error).__name__}: {error}"
+            )
+        )
+    if admission_failure is not None and not isinstance(admission_failure, str):
+        return RankZeroFinalizationOutcome(
+            fatal_failure=(
+                "rank-0 MC2 qualification finalization returned an invalid "
+                f"admission payload: {type(admission_failure).__name__}"
+            )
+        )
+    return RankZeroFinalizationOutcome(admission_failure=admission_failure)
+
+
+def _broadcast_rank_zero_finalization(
+    outcome: RankZeroFinalizationOutcome | None,
+) -> RankZeroFinalizationOutcome:
+    """Publish the rank-0 finalization result before any rank can exit."""
+
+    outcome_box = [outcome]
+    dist.broadcast_object_list(outcome_box, src=0)
+    received = outcome_box[0]
+    if not isinstance(received, RankZeroFinalizationOutcome):
+        return RankZeroFinalizationOutcome(
+            fatal_failure=(
+                "rank-0 MC2 qualification finalization returned an invalid "
+                f"outcome payload: {type(received).__name__}"
+            )
+        )
+    return received
+
+
+def _destroy_and_raise_collective_failure(profile_failure: str) -> None:
+    """Make teardown best-effort while preserving the shared gate failure."""
+
+    try:
+        dist.destroy_process_group()
+    finally:
+        raise RuntimeError(profile_failure)
+
+
 def _mapping(local_rank: int) -> tuple[str, ...]:
     visible = os.environ.get("ASCEND_RT_VISIBLE_DEVICES", "")
     devices = tuple(part.strip() for part in visible.split(",") if part.strip())
@@ -192,9 +472,43 @@ def _mapping(local_rank: int) -> tuple[str, ...]:
     return result
 
 
-def main() -> None:
-    args = _parser().parse_args()
-    _validate_args(args)
+def _materialize_and_resolve_comm(rank: int) -> str:
+    """Materialize HCCL before resolving and collectively validate its name."""
+
+    dist.barrier()
+    probe = torch.tensor([rank + 1], dtype=torch.int32, device="npu")
+    dist.all_reduce(probe)
+    expected = dist.get_world_size() * (dist.get_world_size() + 1) // 2
+    if int(probe.cpu().item()) != expected:
+        raise RuntimeError("TP3 HCCL materialization probe produced an invalid sum")
+
+    local_comm_name = resolve_hccl_comm_name(
+        dist.group.WORLD,
+        device="npu",
+        rank=rank,
+    )
+    # HCCL handles may be process-local.  Reach consensus on successful
+    # resolution, but each rank must retain its own handle rather than copying
+    # rank 0's opaque value.
+    local_status = (rank, bool(local_comm_name))
+    gathered_status: list[tuple[int, bool] | None] = [None] * dist.get_world_size()
+    dist.all_gather_object(gathered_status, local_status)
+    expected_status = [(index, True) for index in range(dist.get_world_size())]
+    if gathered_status != expected_status:
+        raise RuntimeError(
+            "could not resolve a local TP3 HCCL communicator on every rank: "
+            f"{gathered_status}"
+        )
+    return local_comm_name
+
+
+def initialize_measurement_runtime(
+    *,
+    chained_flush: bool,
+    require_production_operator: bool,
+) -> MeasurementRuntime:
+    """Initialize one TP3 HCCL group that may serve multiple shape jobs."""
+
     local_rank = int(os.environ["LOCAL_RANK"])
     torch.npu.set_device(local_rank)
     dist.init_process_group("hccl")
@@ -207,114 +521,154 @@ def main() -> None:
 
     if not enable_custom_op():
         raise RuntimeError("vLLM-Ascend custom operators could not be loaded")
-    operator_name, operator = _resolve_operator(chained=args.chained_flush)
-    required_production_operator = (
+    operator_name, operator = _resolve_operator(chained=chained_flush)
+    required_operator = (
         "torch.ops._C_ascend.allreduce_add_rmsnorm_chained"
-        if args.chained_flush
+        if chained_flush
         else "torch.ops._C_ascend.allreduce_add_rmsnorm"
     )
-    if (
-        args.production_profile_output is not None
-        and operator_name != required_production_operator
-    ):
-        raise RuntimeError("a production profile requires the in-tree _C_ascend registration")
-    comm_name = resolve_hccl_comm_name(dist.group.WORLD, device="npu", rank=rank)
-    if not comm_name:
-        raise RuntimeError("could not resolve TP3 HCCL communicator")
+    if require_production_operator and operator_name != required_operator:
+        raise RuntimeError(
+            "a production profile requires the in-tree _C_ascend registration"
+        )
+    comm_name = _materialize_and_resolve_comm(rank)
+    device_mapping = _mapping(local_rank)
+    runtime_binding = current_mc2_runtime_binding(
+        tp_rank_device_mapping=device_mapping,
+        operator=MC2_TP3_NATIVE_EPILOGUE_OPERATOR,
+    )
+    return MeasurementRuntime(
+        local_rank=local_rank,
+        rank=rank,
+        operator_name=operator_name,
+        operator=operator,
+        comm_name=comm_name,
+        device_mapping=device_mapping,
+        runtime_binding=runtime_binding,
+        chained_flush=chained_flush,
+        resources=MeasurementResourcePool(),
+    )
+
+
+def release_measurement_job_resources() -> None:
+    """Collect per-job temporaries while resident captured resources survive."""
+
+    gc.collect()
+
+
+def finalize_measurement_runtime(runtime: MeasurementRuntime) -> None:
+    """End HCCL only after all resident graphs have completed their campaign."""
+
+    dist.barrier()
+    torch.npu.synchronize()
+    dist.destroy_process_group()
+    # Do not reset or empty the resident graph pool here.  CANN graph-task
+    # handles may still own TP3 stream state; process teardown releases them
+    # after the communicator lifecycle, with no subsequent capture to poison.
+
+
+def run_measurement_job(
+    args: argparse.Namespace,
+    runtime: MeasurementRuntime,
+) -> str | None:
+    """Run one shape/layer qualification without recreating the HCCL group.
+
+    A normal numerical or latency admission failure is returned as a string on
+    every rank, allowing a persistent caller to record the rejected row and
+    continue.  Unexpected runtime/device/HCCL exceptions are deliberately not
+    swallowed so ``torchrun`` can terminate all ranks immediately.
+    """
+
+    _validate_args(args)
+    if args.chained_flush != runtime.chained_flush:
+        raise ValueError(
+            "measurement job chained-flush mode differs from its runtime"
+        )
+    local_rank = runtime.local_rank
+    rank = runtime.rank
+    operator_name = runtime.operator_name
 
     payload = torch.load(
         args.input_dir / f"rank-{rank}.pt",
         map_location="cpu",
         weights_only=True,
     )
-    x = payload["activation"].to(device="npu")
-    weight = payload["weight"].to(device="npu")
-    residual = payload["residual"].to(device="npu")
-    gamma = payload["gamma"].to(device="npu")
-    chain_zero = torch.zeros((64, 4), dtype=torch.int64, device="npu")
-    actual_shapes = {
-        "activation": tuple(x.shape),
-        "weight": tuple(weight.shape),
-        "residual": tuple(residual.shape),
-        "gamma": tuple(gamma.shape),
-    }
-    expected_shapes = {
-        "activation": (args.m, args.k),
-        "weight": (args.n, args.k),
-        "residual": (args.m, args.n),
-        "gamma": (args.n,),
-    }
-    if actual_shapes != expected_shapes:
-        raise ValueError(f"real payload shapes {actual_shapes} != {expected_shapes}")
-
-    def baseline() -> Output:
-        for _ in range(args.operations_per_graph):
-            projected = torch.nn.functional.linear(x, weight)
-            dist.all_reduce(projected)
-            normalized, _, added = torch_npu.npu_add_rms_norm(
-                projected,
-                residual,
-                gamma,
-                1e-6,
-            )
-        return normalized, added
-
-    def fused() -> Output:
-        for _ in range(args.operations_per_graph):
-            local_projection = torch.nn.functional.linear(x, weight)
-            if args.chained_flush:
-                chained_output = operator(
-                    local_projection,
-                    residual,
-                    gamma,
-                    chain_zero,
-                    comm_name,
-                    3,
-                    rank,
-                    1e-6,
-                    True,
-                    True,
-                )
-                output = (chained_output[0], chained_output[1])
-            else:
-                output = operator(
-                    local_projection,
-                    residual,
-                    gamma,
-                    comm_name,
-                    3,
-                    rank,
-                    1e-6,
-                    True,
-                )
-        return output
-
-    dist.barrier()
+    _validate_payload_shapes(args, payload)
     if args.execution_mode == "graph":
-        baseline_graph, baseline_output = _capture(baseline)
-
-        def baseline_runner() -> Output:
-            baseline_graph.replay()
-            return baseline_output
+        resources = _load_graph_resources(args, runtime, payload)
+        x = resources.x
+        residual = resources.residual
+        weight = resources.parameters.weight
+        gamma = resources.parameters.gamma
+        baseline_runner = resources.baseline_runner
+        fused_runner = resources.fused_runner
 
     else:
+        x = payload["activation"].to(device="npu")
+        weight = payload["weight"].to(device="npu")
+        residual = payload["residual"].to(device="npu")
+        gamma = payload["gamma"].to(device="npu")
+        chain_zero = torch.zeros((64, 4), dtype=torch.int64, device="npu")
+
+        def baseline() -> Output:
+            for _ in range(args.operations_per_graph):
+                projected = torch.nn.functional.linear(x, weight)
+                dist.all_reduce(projected)
+                normalized, _, added = torch_npu.npu_add_rms_norm(
+                    projected,
+                    residual,
+                    gamma,
+                    1e-6,
+                )
+            return normalized, added
+
+        def fused() -> Output:
+            for _ in range(args.operations_per_graph):
+                local_projection = torch.nn.functional.linear(x, weight)
+                if args.chained_flush:
+                    chained_output = runtime.operator(
+                        local_projection,
+                        residual,
+                        gamma,
+                        chain_zero,
+                        runtime.comm_name,
+                        3,
+                        rank,
+                        1e-6,
+                        True,
+                        True,
+                    )
+                    output = (chained_output[0], chained_output[1])
+                else:
+                    output = runtime.operator(
+                        local_projection,
+                        residual,
+                        gamma,
+                        runtime.comm_name,
+                        3,
+                        rank,
+                        1e-6,
+                        True,
+                    )
+            return output
+
         baseline_output = baseline()
         torch.npu.synchronize()
         baseline_runner = baseline
-    baseline_reference = (baseline_output[0].clone(), baseline_output[1].clone())
-    torch.npu.synchronize()
-    dist.barrier()
-    if args.execution_mode == "graph":
-        fused_graph, fused_output = _capture(fused)
-
-        def fused_runner() -> Output:
-            fused_graph.replay()
-            return fused_output
-
-    else:
         fused_output = fused()
         torch.npu.synchronize()
         fused_runner = fused
+
+    # Replay both paths after loading this job into the stable buffers.  The
+    # graph path may be reusing a capture created for another real layer.
+    dist.barrier()
+    baseline_output = baseline_runner()
+    torch.npu.synchronize()
+    baseline_reference = (baseline_output[0].clone(), baseline_output[1].clone())
+    torch.npu.synchronize()
+    dist.barrier()
+    fused_output = fused_runner()
+    torch.npu.synchronize()
     max_norm_error = _max_rank_value(
         float((fused_output[0].float() - baseline_reference[0].float()).abs().max().cpu())
     )
@@ -374,13 +728,11 @@ def main() -> None:
     )
     baseline_samples = _max_rank_samples(local_baseline)
     fused_samples = _max_rank_samples(local_fused)
-    device_mapping = _mapping(local_rank)
-    runtime_binding = current_mc2_runtime_binding(
-        tp_rank_device_mapping=device_mapping,
-        operator=MC2_TP3_NATIVE_EPILOGUE_OPERATOR,
-    )
+    device_mapping = runtime.device_mapping
+    runtime_binding = runtime.runtime_binding
 
-    if rank == 0:
+    def _finalize_rank_zero() -> str | None:
+        profile_failure: str | None = None
         baseline_p50 = _percentile(baseline_samples, 50.0)
         baseline_p95 = _percentile(baseline_samples, 95.0)
         fused_p50 = _percentile(fused_samples, 50.0)
@@ -446,72 +798,122 @@ def main() -> None:
         args.output.write_text(json.dumps(document, indent=2) + "\n")
         if args.production_profile_output is not None:
             if not exact_all_ranks or not changed_exact_all_ranks:
-                raise RuntimeError("production MC2 profile requires bit-exact original and changed-input outputs")
-            gate_baseline = _percentile(baseline_samples, args.latency_percentile)
-            gate_fused = _percentile(fused_samples, args.latency_percentile)
-            if gate_fused * args.minimum_speedup > gate_baseline:
-                raise RuntimeError(
-                    "native-MatMul MC2 epilogue did not pass the configured repeated latency gate"
+                profile_failure = (
+                    "production MC2 profile requires bit-exact original and "
+                    "changed-input outputs"
                 )
-            production_profile = {
-                "schema_version": 1,
-                "status": "measured",
-                "metadata": {
-                    "operator": MC2_TP3_NATIVE_EPILOGUE_OPERATOR,
-                    "hardware": str(torch.npu.get_device_name(local_rank)),
-                    "tensor_parallel_size": 3,
-                    "source_sha256": mc2_source_sha256(),
-                    "rms_norm_epsilon": 1e-6,
-                    "runtime_binding": runtime_binding,
-                    "measurement_scope": "captured_operator_replay",
-                    "input_source": str(args.input_dir.resolve()),
-                },
-                "latency_percentile": args.latency_percentile,
-                "minimum_samples": args.samples,
-                "minimum_speedup": args.minimum_speedup,
-                "measurements": [
-                    {
-                        "m": args.m,
-                        "k": args.k,
-                        "n": args.n,
-                        "dtype": "bfloat16",
-                        "weight_format": str(torch_npu.get_npu_format(weight)),
-                        "is_trans_b": True,
-                        "activation_layout": "contiguous",
-                        "weight_layout": "contiguous",
-                        "residual_layout": "contiguous",
-                        "gamma_layout": "contiguous",
-                        "baseline_latency_ms": baseline_samples,
-                        "fused_latency_ms": fused_samples,
-                        "max_abs_norm": max(max_norm_error, changed_max_norm),
-                        "norm_atol": 0.0,
-                        "norm_rtol": 1e-3,
-                        "max_scaled_norm": 0.0,
-                        "max_abs_added": max(max_added_error, changed_max_added),
-                        "added_atol": 0.0,
-                        "added_rtol": 1e-3,
-                        "max_scaled_added": 0.0,
-                        "changed_input_replays": args.changed_input_replays,
-                        "changed_input_delta": args.changed_input_delta,
-                        "changed_input_max_abs_norm": changed_max_norm,
-                        "changed_input_max_abs_added": changed_max_added,
-                        "changed_input_max_scaled_norm": 0.0,
-                        "changed_input_max_scaled_added": 0.0,
-                    }
-                ],
-            }
-            # Re-run the exact production loader before persisting a profile;
-            # malformed or slower rows must remain diagnostics only.
-            normalize_mc2_profile(production_profile)
-            args.production_profile_output.parent.mkdir(parents=True, exist_ok=True)
-            args.production_profile_output.write_text(
-                json.dumps(production_profile, indent=2) + "\n",
-                encoding="utf-8",
-            )
+            else:
+                gate_baseline = _percentile(baseline_samples, args.latency_percentile)
+                gate_fused = _percentile(fused_samples, args.latency_percentile)
+                if gate_fused * args.minimum_speedup > gate_baseline:
+                    profile_failure = (
+                        "native-MatMul MC2 epilogue did not pass the "
+                        "configured repeated latency gate"
+                    )
+            if profile_failure is None:
+                production_profile = {
+                    "schema_version": 1,
+                    "status": "measured",
+                    "metadata": {
+                        "operator": MC2_TP3_NATIVE_EPILOGUE_OPERATOR,
+                        # Production Native PEARL selects the allocation-free
+                        # three-output ABI only when the qualification artifact
+                        # proves that the chained state was flushed on every
+                        # measured invocation.  Preserve that distinction when
+                        # single-shape profiles are later aggregated.
+                        "standalone_chained_flush": bool(args.chained_flush),
+                        "hardware": str(torch.npu.get_device_name(local_rank)),
+                        "tensor_parallel_size": 3,
+                        "source_sha256": mc2_source_sha256(),
+                        "rms_norm_epsilon": 1e-6,
+                        "runtime_binding": runtime_binding,
+                        "measurement_scope": "captured_operator_replay",
+                        "input_source": str(args.input_dir.resolve()),
+                    },
+                    "latency_percentile": args.latency_percentile,
+                    "minimum_samples": args.samples,
+                    "minimum_speedup": args.minimum_speedup,
+                    "measurements": [
+                        {
+                            "m": args.m,
+                            "k": args.k,
+                            "n": args.n,
+                            "dtype": "bfloat16",
+                            "weight_format": str(torch_npu.get_npu_format(weight)),
+                            "is_trans_b": True,
+                            "activation_layout": "contiguous",
+                            "weight_layout": "contiguous",
+                            "residual_layout": "contiguous",
+                            "gamma_layout": "contiguous",
+                            "baseline_latency_ms": baseline_samples,
+                            "fused_latency_ms": fused_samples,
+                            "max_abs_norm": max(max_norm_error, changed_max_norm),
+                            "norm_atol": 0.0,
+                            "norm_rtol": 1e-3,
+                            "max_scaled_norm": 0.0,
+                            "max_abs_added": max(max_added_error, changed_max_added),
+                            "added_atol": 0.0,
+                            "added_rtol": 1e-3,
+                            "max_scaled_added": 0.0,
+                            "changed_input_replays": args.changed_input_replays,
+                            "changed_input_delta": args.changed_input_delta,
+                            "changed_input_max_abs_norm": changed_max_norm,
+                            "changed_input_max_abs_added": changed_max_added,
+                            "changed_input_max_scaled_norm": 0.0,
+                            "changed_input_max_scaled_added": 0.0,
+                        }
+                    ],
+                }
+                try:
+                    # Re-run the exact production loader before persisting a
+                    # profile; malformed or slower rows must remain diagnostics
+                    # only.  This is the sole expected validation rejection;
+                    # I/O and device-query exceptions remain campaign-fatal.
+                    normalize_mc2_profile(production_profile)
+                except ValueError as error:
+                    profile_failure = (
+                        "production MC2 profile validation failed: "
+                        f"{type(error).__name__}: {error}"
+                    )
+                if profile_failure is None:
+                    args.production_profile_output.parent.mkdir(
+                        parents=True, exist_ok=True
+                    )
+                    args.production_profile_output.write_text(
+                        json.dumps(production_profile, indent=2) + "\n",
+                        encoding="utf-8",
+                    )
         print(json.dumps({**document["correctness"], **document["summary"]}, indent=2))
+        return profile_failure
 
+    finalization_outcome = None
+    if rank == 0:
+        finalization_outcome = _capture_rank_zero_finalization(_finalize_rank_zero)
+
+    # A rank-0-only exception leaves the other ranks inside the final HCCL
+    # barrier.  Besides hanging the qualifier, peer teardown can surface as a
+    # misleading SDMA/MTE device error.  Broadcast the structured result so
+    # every rank either returns one admission rejection or raises one fatal.
+    finalization_outcome = _broadcast_rank_zero_finalization(
+        finalization_outcome
+    )
+    if finalization_outcome.fatal_failure is not None:
+        raise RuntimeError(finalization_outcome.fatal_failure)
     dist.barrier()
-    dist.destroy_process_group()
+    return finalization_outcome.admission_failure
+
+
+def main() -> None:
+    args = _parser().parse_args()
+    _validate_args(args)
+    runtime = initialize_measurement_runtime(
+        chained_flush=args.chained_flush,
+        require_production_operator=args.production_profile_output is not None,
+    )
+    profile_failure = run_measurement_job(args, runtime)
+    if profile_failure is not None:
+        _destroy_and_raise_collective_failure(profile_failure)
+    finalize_measurement_runtime(runtime)
 
 
 if __name__ == "__main__":

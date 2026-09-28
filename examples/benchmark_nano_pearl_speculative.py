@@ -15,6 +15,8 @@ from pathlib import Path
 from examples.specslo_benchmark_report import (
     ONLINE_E2E_TIMING_SCOPE,
     capture_runtime_environment,
+    measure_qualified_mc2_replay_coverage,
+    qualified_mc2_profile_replay_contract,
     sha256_file,
 )
 
@@ -207,8 +209,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--spec-rhythm-linear-idle-residual-eager",
         action="store_true",
         help=(
-            "Use residual measured W for dependency-exact Rolling Eager work "
-            "after urgent and mandatory normal rows."
+            "Use residual measured W for dependency-exact Rolling Eager work after urgent and mandatory normal rows."
         ),
     )
     parser.add_argument(
@@ -636,6 +637,17 @@ def main(argv: Sequence[str] | None = None) -> None:
         gamma=args.gamma,
         seed=args.seed,
         worker_timeout_seconds=args.worker_timeout_seconds,
+        # Diagnostics already travel once per rank in the worker envelope.
+        # Keep request rows lean during the timed multiprocess benchmark.
+        compact_worker_result_metrics=True,
+    )
+    mc2_replay_profile_contract = (
+        qualified_mc2_profile_replay_contract(
+            config.mc2_profile,
+            profile_path=args.mc2_profile,
+        )
+        if args.enable_mc2
+        else None
     )
     sampling_params = (
         [
@@ -818,9 +830,7 @@ def main(argv: Sequence[str] | None = None) -> None:
                         or int(worker.get("aclgraph_captures_delta", 0)) != 0
                         for worker in qualification_deltas
                     )
-                    consecutive_capture_free_traces = (
-                        0 if discovered_graph else consecutive_capture_free_traces + 1
-                    )
+                    consecutive_capture_free_traces = 0 if discovered_graph else consecutive_capture_free_traces + 1
                     qualification_complete, qualification_issues = _graph_qualification_fixed_point(
                         graph_metrics_before_warmup,
                         engine.last_worker_metrics,
@@ -834,10 +844,13 @@ def main(argv: Sequence[str] | None = None) -> None:
                     # before sealing the inventory.
                     if qualification_complete and consecutive_capture_free_traces >= 2:
                         break
-                    if _graph_qualification_can_prune(
-                        graph_metrics_before_warmup,
-                        engine.last_worker_metrics,
-                    ) and consecutive_capture_free_traces >= 2:
+                    if (
+                        _graph_qualification_can_prune(
+                            graph_metrics_before_warmup,
+                            engine.last_worker_metrics,
+                        )
+                        and consecutive_capture_free_traces >= 2
+                    ):
                         # Strict qualification alternates two deterministic
                         # prompt orders. A graph used by only one order is not
                         # cold merely because the other trace did not touch
@@ -893,6 +906,9 @@ def main(argv: Sequence[str] | None = None) -> None:
             e2e_elapsed = time.perf_counter() - started
             output_tokens = sum(num_tokens)
             metrics = engine.last_metrics
+            aggregate_graph_metrics = dict(
+                engine.last_aggregate_graph_metrics
+            )
             output_token_rows = [metric["completion_token_ids"] for metric in metrics]
             verified_tokens = sum(metric["verified_draft_tokens"] for metric in metrics)
             accepted_tokens = sum(metric["accepted_draft_tokens"] for metric in metrics)
@@ -905,6 +921,14 @@ def main(argv: Sequence[str] | None = None) -> None:
             measured_graph_deltas = _worker_aclgraph_deltas(
                 warmup_worker_metrics,
                 engine.last_worker_metrics,
+            )
+            measured_mc2_replay_coverage = (
+                measure_qualified_mc2_replay_coverage(
+                    measured_graph_deltas,
+                    mc2_replay_profile_contract,
+                )
+                if mc2_replay_profile_contract is not None
+                else None
             )
             # ``batch_size`` is the configured capacity.  A continuous/live
             # run may contain fewer requests (for example the p40 smoke test
@@ -963,21 +987,28 @@ def main(argv: Sequence[str] | None = None) -> None:
                         inference_elapsed,
                         e2e_elapsed,
                         paper_decode_elapsed=(
-                            decode_elapsed
-                            if args.spec_rhythm_kv_ready_arrivals
-                            else inference_elapsed
+                            decode_elapsed if args.spec_rhythm_kv_ready_arrivals else inference_elapsed
                         ),
                     ),
                     "request_verification_rounds": [metric["verification_rounds"] for metric in metrics],
                     "decode_phase_seconds": decode_phase_seconds,
-                    "aclgraph_captures": max(metric["aclgraph_captures"] for metric in metrics),
-                    "aclgraph_capture_attempts": max(metric["aclgraph_capture_attempts"] for metric in metrics),
-                    "aclgraph_replays": max(metric["aclgraph_replays"] for metric in metrics),
-                    "aclgraph_failed_captures": max(metric["aclgraph_failed_captures"] for metric in metrics),
-                    "aclgraph_capacity_fallbacks": max(metric["aclgraph_capacity_fallbacks"] for metric in metrics),
-                    "aclgraph_shape_fallbacks": max(metric["aclgraph_shape_fallbacks"] for metric in metrics),
+                    "aclgraph_captures": int(aggregate_graph_metrics["aclgraph_captures"]),
+                    "aclgraph_capture_attempts": int(
+                        aggregate_graph_metrics["aclgraph_capture_attempts"]
+                    ),
+                    "aclgraph_replays": int(aggregate_graph_metrics["aclgraph_replays"]),
+                    "aclgraph_failed_captures": int(
+                        aggregate_graph_metrics["aclgraph_failed_captures"]
+                    ),
+                    "aclgraph_capacity_fallbacks": int(
+                        aggregate_graph_metrics["aclgraph_capacity_fallbacks"]
+                    ),
+                    "aclgraph_shape_fallbacks": int(
+                        aggregate_graph_metrics["aclgraph_shape_fallbacks"]
+                    ),
                     "worker_aclgraph_metrics": engine.last_worker_metrics,
                     "measured_worker_aclgraph_deltas": measured_graph_deltas,
+                    "mc2_measured_replay_coverage": measured_mc2_replay_coverage,
                     "worker_metrics_by_chunk": engine.last_worker_metrics_by_chunk,
                     "decode_profile": _aggregate_decode_profile(
                         engine.last_worker_metrics_by_chunk,
@@ -1080,11 +1111,13 @@ def main(argv: Sequence[str] | None = None) -> None:
         "target_use_paged_attention": args.target_use_paged_attention,
         "enable_mc2": args.enable_mc2,
         "mc2_profile": args.mc2_profile,
+        "mc2_replay_profile_contract": mc2_replay_profile_contract,
         "draft_use_production_rope": args.draft_use_production_rope,
         "target_use_production_rope": args.target_use_production_rope,
         "precompile_decode_graphs": args.precompile_decode_graphs,
         "precompile_serial_draft_graphs": args.precompile_serial_draft_graphs,
         "enable_cpu_binding": not args.disable_cpu_binding,
+        "compact_worker_result_metrics": True,
         "max_tokens": args.max_tokens,
         "respect_eos": args.respect_eos,
         "ignore_eos": not args.respect_eos,
@@ -1199,9 +1232,7 @@ def _summarize_slo_metrics(
         paper_decode_elapsed = inference_elapsed
     summary["paper"]["decode_stage_measurement_seconds"] = paper_decode_elapsed
     summary["paper"]["goodput_tokens_per_decode_second"] = (
-        paper_goodput_tokens / paper_decode_elapsed
-        if paper_decode_elapsed > 0
-        else 0.0
+        paper_goodput_tokens / paper_decode_elapsed if paper_decode_elapsed > 0 else 0.0
     )
     summary["request_metrics"] = request_rows
     return summary
@@ -1459,16 +1490,8 @@ def _aggregate_decode_host_profile(worker_metrics_by_chunk, batch_size: int):
 def _counter_histogram_delta(before, after):
     """Subtract cumulative JSON counter histograms without losing new bins."""
 
-    before_counts = (
-        {str(label): int(count) for label, count in before.items()}
-        if isinstance(before, dict)
-        else {}
-    )
-    after_counts = (
-        {str(label): int(count) for label, count in after.items()}
-        if isinstance(after, dict)
-        else {}
-    )
+    before_counts = {str(label): int(count) for label, count in before.items()} if isinstance(before, dict) else {}
+    after_counts = {str(label): int(count) for label, count in after.items()} if isinstance(after, dict) else {}
     labels = before_counts.keys() | after_counts.keys()
     return {
         label: after_counts.get(label, 0) - before_counts.get(label, 0)
@@ -1512,6 +1535,11 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
         "aclgraph_draft_taskless_replays",
         "aclgraph_draft_step_major_pa_replays",
         "aclgraph_draft_step_major_pa_fallback_replays",
+        "aclgraph_draft_pa_parallel_update_replays",
+        "aclgraph_draft_pa_parallel_update_tasks",
+        "aclgraph_draft_pa_parallel_update_fallback_replays",
+        "aclgraph_target_fia_parallel_update_replays",
+        "aclgraph_target_fia_parallel_update_tasks",
         "aclgraph_pa_workspace_host_key_tasks",
         "aclgraph_pa_workspace_tensor_key_tasks",
         "aclgraph_pa_workspace_get_calls",
@@ -1528,6 +1556,15 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
         "spec_rhythm_linear_draft_full_chain_unclassified_calls",
         "spec_rhythm_linear_draft_stepwise_calls",
         "spec_rhythm_linear_draft_stepwise_model_calls",
+        # These are lifetime native-engine counters (and therefore do not
+        # carry the ``worker_`` prefix used by per-generate service
+        # counters).  Subtract the post-warmup snapshot so the report proves
+        # which correction-continuation path the measured request window
+        # actually exercised.
+        "spec_rhythm_staged_gloo_correction_submit_calls",
+        "spec_rhythm_staged_gloo_correction_fallback_calls",
+        "spec_rhythm_staged_gloo_correction_host_continuation_reuses",
+        "spec_rhythm_staged_gloo_correction_device_continuation_copies",
         "mc2_dispatch_fused_attempt",
         "mc2_dispatch_fused_success",
         "mc2_dispatch_fallback",
@@ -1538,12 +1575,26 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
         f"aclgraph_{kind}_replay_{dimension}_histogram"
         for kind in ("generic", "target")
         for dimension in ("entry_key", "token_rows")
-    )
+    ) + ("aclgraph_draft_pa_parallel_update_rejections",)
     before_by_rank = {int(worker["rank"]): worker for worker in before_workers}
     return [
         {
             "rank": int(worker["rank"]),
             "is_draft_rank": int(worker.get("is_draft_rank", 0)),
+            # Static-route admission happens before graph capture.  Preserve
+            # its absolute identity beside measurement deltas so a timed
+            # replay histogram can be bound to the exact route manifest that
+            # was embedded into every target graph.
+            "mc2_static_route_digest": str(worker.get("mc2_static_route_digest", "")),
+            "mc2_static_route_count": int(worker.get("mc2_static_route_count", 0)),
+            "mc2_static_operator_kinds": list(worker.get("mc2_static_operator_kinds", ())),
+            "mc2_static_qualified_row_routes": int(worker.get("mc2_static_qualified_row_routes", 0)),
+            "mc2_static_qualified_rows_by_shape": dict(
+                worker.get("mc2_static_qualified_rows_by_shape", {})
+            ),
+            "mc2_static_route_counts_by_shape": dict(
+                worker.get("mc2_static_route_counts_by_shape", {})
+            ),
             # These describe the sealed graph contract rather than measured
             # work, so retain the absolute post-warmup values next to the
             # measurement deltas.  Without them a run can report ordinary
@@ -1558,6 +1609,12 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
                     "spec_rhythm_mixed_target_graph_prefill_only",
                     0,
                 )
+            ),
+            "aclgraph_target_fia_task_update_workers": int(
+                worker.get("aclgraph_target_fia_task_update_workers", 1)
+            ),
+            "aclgraph_draft_pa_task_update_workers": int(
+                worker.get("aclgraph_draft_pa_task_update_workers", 1)
             ),
             **{
                 # Stable ordinary target-verify graphs are qualified before
@@ -1591,6 +1648,18 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
                     "worker_spec_rhythm_serial_protocol",
                     "worker_spec_rhythm_single_batch_overlap_protocol",
                     "worker_spec_rhythm_dual_batch_overlap_protocol",
+                    # These are resolved once for the measured generate call,
+                    # so retain the absolute requested/active state instead
+                    # of subtracting the warmup call's independent state.
+                    "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_requested",
+                    "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_active",
+                    # These per-generate service counters prove which draft
+                    # continuation source the measured call actually consumed.
+                    # They are already reset at the start of each generate call,
+                    # so preserve their absolute values instead of subtracting
+                    # the unrelated warmup call.
+                    "worker_spec_rhythm_gloo_proposal_host_continuation_reuses",
+                    "worker_spec_rhythm_gloo_proposal_device_continuation_reads",
                     "worker_spec_rhythm_concurrent_draft_target_submission_cycles",
                     "worker_spec_rhythm_single_batch_overlap_submission_cycles",
                     "worker_spec_rhythm_dual_batch_overlap_submission_cycles",
@@ -1623,6 +1692,116 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
         }
         for worker in after_workers
     ]
+
+
+def _host_continuation_measurement_issues(
+    worker_deltas,
+    *,
+    expected_reuse: bool,
+) -> list[str]:
+    """Validate measured draft/target continuation-source evidence.
+
+    The proposal-side counters are per-generate ``worker_`` values while the
+    staged-correction counters are native-engine lifetime deltas.  Keeping the
+    two schemas explicit prevents a recorded environment switch from being
+    mistaken for proof that the selected path actually ran.
+    """
+
+    issues: list[str] = []
+    expected = int(bool(expected_reuse))
+    workers = list(worker_deltas or ())
+    draft_workers = [worker for worker in workers if int(worker.get("is_draft_rank", 0))]
+    target_workers = [worker for worker in workers if not int(worker.get("is_draft_rank", 0))]
+    if len(draft_workers) != 1:
+        issues.append(f"host-continuation evidence expected one draft worker, got {len(draft_workers)}")
+    if not target_workers:
+        issues.append("host-continuation evidence has no target workers")
+
+    for worker in workers:
+        rank = int(worker.get("rank", -1))
+        requested = int(
+            worker.get(
+                "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_requested",
+                -1,
+            )
+        )
+        active = int(
+            worker.get(
+                "worker_spec_rhythm_gloo_proposal_host_continuation_reuse_active",
+                -1,
+            )
+        )
+        if requested != expected:
+            issues.append(f"rank {rank} host-continuation requested={requested}, expected {expected}")
+        if active != expected:
+            issues.append(f"rank {rank} host-continuation active={active}, expected {expected}")
+
+    if len(draft_workers) == 1:
+        draft = draft_workers[0]
+        rank = int(draft.get("rank", -1))
+        host_reuses = int(
+            draft.get(
+                "worker_spec_rhythm_gloo_proposal_host_continuation_reuses",
+                -1,
+            )
+        )
+        device_reads = int(
+            draft.get(
+                "worker_spec_rhythm_gloo_proposal_device_continuation_reads",
+                -1,
+            )
+        )
+        selected = host_reuses if expected_reuse else device_reads
+        rejected = device_reads if expected_reuse else host_reuses
+        selected_name = "host reuse" if expected_reuse else "device read"
+        rejected_name = "device read" if expected_reuse else "host reuse"
+        if selected <= 0:
+            issues.append(f"draft rank {rank} measured no {selected_name} continuation path")
+        if rejected != 0:
+            issues.append(f"draft rank {rank} measured {rejected} unexpected {rejected_name} continuation calls")
+
+    for target in target_workers:
+        rank = int(target.get("rank", -1))
+        submits = int(
+            target.get(
+                "spec_rhythm_staged_gloo_correction_submit_calls_delta",
+                -1,
+            )
+        )
+        fallbacks = int(
+            target.get(
+                "spec_rhythm_staged_gloo_correction_fallback_calls_delta",
+                -1,
+            )
+        )
+        host_reuses = int(
+            target.get(
+                "spec_rhythm_staged_gloo_correction_host_continuation_reuses_delta",
+                -1,
+            )
+        )
+        device_copies = int(
+            target.get(
+                "spec_rhythm_staged_gloo_correction_device_continuation_copies_delta",
+                -1,
+            )
+        )
+        selected = host_reuses if expected_reuse else device_copies
+        rejected = device_copies if expected_reuse else host_reuses
+        selected_name = "host reuse" if expected_reuse else "device copy"
+        rejected_name = "device copy" if expected_reuse else "host reuse"
+        if submits <= 0:
+            issues.append(f"target rank {rank} measured no staged correction submissions")
+        elif selected != submits:
+            issues.append(
+                f"target rank {rank} measured {selected} {selected_name} calls "
+                f"for {submits} staged correction submissions"
+            )
+        if rejected != 0:
+            issues.append(f"target rank {rank} measured {rejected} unexpected {rejected_name} calls")
+        if fallbacks != 0:
+            issues.append(f"target rank {rank} measured {fallbacks} unstaged correction fallbacks")
+    return issues
 
 
 def _graph_qualification_fixed_point(before_workers, after_workers):
@@ -1744,13 +1923,9 @@ def _graph_qualification_fixed_point(before_workers, after_workers):
             max_capacity = stable_contract["max_qualified_capacity"]
             request_bucket = stable_contract["request_bucket"]
             expected_capacities = (
-                tuple(range(request_bucket, max_capacity + 1, request_bucket))
-                if request_bucket > 0
-                else ()
+                tuple(range(request_bucket, max_capacity + 1, request_bucket)) if request_bucket > 0 else ()
             )
-            if max_capacity > 0 and (
-                not expected_capacities or expected_capacities[-1] != max_capacity
-            ):
+            if max_capacity > 0 and (not expected_capacities or expected_capacities[-1] != max_capacity):
                 expected_capacities = (*expected_capacities, max_capacity)
             target_contract_valid = bool(
                 not is_draft
@@ -1768,9 +1943,7 @@ def _graph_qualification_fixed_point(before_workers, after_workers):
                 and stable_contract["numerical_failures"] == 0
                 and stable_contract["numerical_restore_failures"] == 0
             )
-            if (is_draft and stable_contract != expected) or (
-                not is_draft and not target_contract_valid
-            ):
+            if (is_draft and stable_contract != expected) or (not is_draft and not target_contract_valid):
                 issues.append(
                     f"rank {rank} stable target-verify graph contract "
                     f"mismatch: actual={stable_contract}, "
@@ -2004,9 +2177,7 @@ def _require_no_graph_fallback(
                 ),
                 "stable_verify_exact_routes": int(worker.get("spec_rhythm_stable_target_verify_graph_exact_routes", 0)),
                 "stable_verify_routes": int(worker.get("spec_rhythm_stable_target_verify_graph_routes", 0)),
-                "stable_verify_request_bucket": int(
-                    worker.get("spec_rhythm_stable_target_verify_request_bucket", 0)
-                ),
+                "stable_verify_request_bucket": int(worker.get("spec_rhythm_stable_target_verify_request_bucket", 0)),
                 "stable_verify_numerical_attempts": int(
                     worker.get(
                         "spec_rhythm_stable_target_verify_numerical_validation_attempts",
@@ -2051,8 +2222,7 @@ def _require_no_graph_fallback(
                 else ()
             )
             if stable_max_capacity > 0 and (
-                not stable_expected_capacities
-                or stable_expected_capacities[-1] != stable_max_capacity
+                not stable_expected_capacities or stable_expected_capacities[-1] != stable_max_capacity
             ):
                 stable_expected_capacities = (
                     *stable_expected_capacities,
@@ -2089,14 +2259,8 @@ def _require_no_graph_fallback(
                 enabled != 1
                 or prefill_only not in (0, 1)
                 or qualified_buckets <= 0
-                or (
-                    require_mixed_prefill
-                    and (prefills <= 0 or graph_batches != prefills)
-                )
-                or (
-                    not require_mixed_prefill
-                    and (prefills != 0 or graph_batches != 0)
-                )
+                or (require_mixed_prefill and (prefills <= 0 or graph_batches != prefills))
+                or (not require_mixed_prefill and (prefills != 0 or graph_batches != 0))
                 or (
                     prefill_only == 0
                     and (
@@ -2104,15 +2268,10 @@ def _require_no_graph_fallback(
                         or details["stable_verify_qualified"] != 1
                         or stable_max_capacity <= 0
                         or stable_request_bucket <= 0
-                        or details["stable_verify_qualified_capacities"]
-                        != len(stable_expected_capacities)
+                        or details["stable_verify_qualified_capacities"] != len(stable_expected_capacities)
                         or details["stable_verify_qualified_capacity_mask"]
-                        != sum(
-                            1 << (capacity - 1)
-                            for capacity in stable_expected_capacities
-                        )
-                        or details["stable_verify_exact_routes"]
-                        != len(stable_expected_capacities)
+                        != sum(1 << (capacity - 1) for capacity in stable_expected_capacities)
+                        or details["stable_verify_exact_routes"] != len(stable_expected_capacities)
                         or details["stable_verify_routes"] != stable_max_capacity
                         or details["stable_verify_numerical_attempts"]
                         != 2 * details["stable_verify_max_qualified_capacity"]

@@ -199,9 +199,43 @@ def test_worker_sends_commit_events_before_final_result(monkeypatch):
         ("pearl_stream", [[1]], [SamplingParams(max_tokens=2)], None),
         ("exit", None, None, None),
     ]
-    config = SimpleNamespace(draft_tp_size=1, target_tp_size=3)
+    config = SimpleNamespace(draft_tp_size=1, target_tp_size=3, enable_mc2=False)
     with patch.dict(os.environ):
         api._pearl_worker(config, 1, 12345, connection)
     assert [call.args[0][0] for call in connection.send.call_args_list] == ["ready", "commit", "result"]
     assert connection.send.call_args_list[1].args[0][1] == event
     connection.close.assert_called_once()
+
+
+def test_worker_compact_reply_disables_per_request_graph_metrics(monkeypatch):
+    engine = Mock()
+    engine.graph_metrics.return_value = {"aclgraph_replays": 23}
+    engine.generate_batch.return_value = [{"completion_token_ids": [7]}]
+    monkeypatch.setattr(api, "NativePearlEngine", lambda config: engine)
+    monkeypatch.setattr("torch.distributed.is_initialized", lambda: False)
+    connection = Mock()
+    connection.recv.side_effect = [
+        ("pearl", [[1]], [SamplingParams(max_tokens=1)], None),
+        ("exit", None, None, None),
+    ]
+    config = SimpleNamespace(draft_tp_size=1, target_tp_size=3, enable_mc2=False)
+
+    with patch.dict(os.environ):
+        api._pearl_worker(
+            config,
+            1,
+            12345,
+            connection,
+            compact_worker_result_metrics=True,
+        )
+
+    engine.generate_batch.assert_called_once_with(
+        [[1]],
+        [SamplingParams(max_tokens=1)],
+        include_graph_metrics=False,
+    )
+    assert connection.send.call_args_list[-1].args[0] == (
+        "result",
+        [{"completion_token_ids": [7]}],
+        {"aclgraph_replays": 23},
+    )
