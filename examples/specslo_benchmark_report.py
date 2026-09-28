@@ -834,6 +834,98 @@ def draft_pa_parallel_update_evidence(
     }
 
 
+def target_replay_ahead_evidence(
+    worker_metrics: Sequence[Mapping[str, Any]],
+    *,
+    enabled: bool,
+    require_submissions: bool = True,
+) -> dict[str, Any]:
+    """Check that every rank consumed exactly the target graph it submitted.
+
+    The worker service counters are reset for the measured generate call.
+    They are in worker metrics, not the ACLGraph-only delta rows. A
+    replay-ahead result mutates target KV before the next
+    scheduler cycle, so a missing or mismatched rank is a hard failure.
+    """
+
+    errors: list[str] = []
+    rows: dict[int, dict[str, Any]] = {}
+    counter_names = (
+        "attempts",
+        "eligible",
+        "submitted",
+        "consumed",
+        "signature_mismatches",
+    )
+    prefix = "worker_spec_rhythm_target_replay_ahead_"
+    for worker in worker_metrics:
+        try:
+            rank = int(worker["rank"])
+        except (KeyError, TypeError, ValueError):
+            errors.append("replay-ahead evidence has a worker without an integer rank")
+            continue
+        if rank in rows:
+            errors.append(f"replay-ahead evidence has duplicate rank {rank}")
+            continue
+        counters: dict[str, int] = {}
+        for name in counter_names:
+            field = prefix + name
+            try:
+                value = int(worker[field])
+            except (KeyError, TypeError, ValueError):
+                errors.append(f"rank {rank} lacks integer {field}")
+                value = -1
+            if value < 0:
+                errors.append(f"rank {rank} has negative {field}")
+            counters[name] = value
+        active = int(worker.get(prefix + "enabled", -1))
+        if active != int(enabled):
+            errors.append(f"rank {rank} replay-ahead enablement differs from the campaign")
+        rejects: dict[str, int] = {}
+        for reason in TARGET_REPLAY_AHEAD_REJECT_REASONS:
+            field = prefix + "reject_" + reason
+            try:
+                count = int(worker[field])
+            except (KeyError, TypeError, ValueError):
+                errors.append(f"rank {rank} lacks integer {field}")
+                count = -1
+            if count < 0:
+                errors.append(f"rank {rank} has negative {field}")
+            rejects[reason] = count
+        if enabled:
+            if counters["attempts"] <= 0:
+                errors.append(f"rank {rank} made no replay-ahead attempt")
+            if require_submissions and counters["submitted"] <= 0:
+                errors.append(f"rank {rank} submitted no replay-ahead target graph")
+            if counters["eligible"] != counters["submitted"]:
+                errors.append(f"rank {rank} eligible/submitted replay-ahead counts differ")
+            if counters["submitted"] != counters["consumed"]:
+                errors.append(f"rank {rank} submitted/consumed replay-ahead counts differ")
+            if counters["signature_mismatches"] != 0:
+                errors.append(f"rank {rank} observed a replay-ahead signature mismatch")
+            if counters["attempts"] != counters["eligible"] + sum(rejects.values()):
+                errors.append(f"rank {rank} replay-ahead attempts are not accounted for")
+        elif any(counters.values()) or any(rejects.values()):
+            errors.append(f"rank {rank} used replay-ahead while it was disabled")
+        rows[rank] = {"enabled": active, **counters, "rejects": rejects}
+
+    if set(rows) != {0, 1, 2, 3}:
+        errors.append("replay-ahead evidence does not cover ranks 0,1,2,3")
+    if enabled and len(rows) == 4:
+        for name in counter_names:
+            if len({row[name] for row in rows.values()}) != 1:
+                errors.append(f"replay-ahead {name} differs across ranks")
+        if len({tuple(row["rejects"].items()) for row in rows.values()}) != 1:
+            errors.append("replay-ahead rejection reasons differ across ranks")
+    return {
+        "schema": "specslo-target-replay-ahead-evidence-v1",
+        "enabled": enabled,
+        "ranks": {str(rank): row for rank, row in sorted(rows.items())},
+        "passed": not errors,
+        "errors": errors,
+    }
+
+
 def capture_runtime_environment(
     environment: Mapping[str, str] | None = None,
 ) -> dict[str, str | None]:

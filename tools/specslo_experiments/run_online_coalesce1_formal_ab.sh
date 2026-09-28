@@ -19,6 +19,8 @@ Environment:
   SPECSLO_MC2_VENDOR        Installed current-source MC2 vendor root
   SPECSLO_DRAFT_PA_TASK_UPDATE_WORKERS
                             Draft PA update workers (1, 2, or 4; default: 1)
+  SPECSLO_TARGET_REPLAY_AHEAD
+                            Early target graph replay (0 or 1; default: 0)
 
 The launch order is deliberately interleaved:
   round 1: TP4 baseline -> TP1+TP3 candidate
@@ -61,6 +63,7 @@ extension=$repo/vllm_ascend/vllm_ascend_C.cpython-311-aarch64-linux-gnu.so
 visible_devices=${SPECSLO_VISIBLE_DEVICES:-0,1,2,3}
 campaign_dir=$result_root/formal-ab-$campaign_tag
 draft_pa_task_update_workers=${SPECSLO_DRAFT_PA_TASK_UPDATE_WORKERS:-1}
+target_replay_ahead=${SPECSLO_TARGET_REPLAY_AHEAD:-0}
 
 IFS=',' read -r -a devices <<< "$visible_devices"
 if [[ ${#devices[@]} -ne 4 ]]; then
@@ -85,6 +88,10 @@ if [[ $draft_pa_task_update_workers != 1 && \
       $draft_pa_task_update_workers != 2 && \
       $draft_pa_task_update_workers != 4 ]]; then
   echo "SPECSLO_DRAFT_PA_TASK_UPDATE_WORKERS must be 1, 2, or 4" >&2
+  exit 2
+fi
+if [[ $target_replay_ahead != 0 && $target_replay_ahead != 1 ]]; then
+  echo "SPECSLO_TARGET_REPLAY_AHEAD must be 0 or 1" >&2
   exit 2
 fi
 
@@ -115,6 +122,7 @@ profile=$profile
 vendor=$vendor
 baseline_wrapper=$baseline_wrapper
 draft_pa_task_update_workers=$draft_pa_task_update_workers
+target_replay_ahead=$target_replay_ahead
 contract=online Poisson RPS4; coalesce1/wait0; gamma4; P463/B64/T256; SLO 40/50/150 ms
 round_1=baseline,candidate
 round_2=candidate,baseline
@@ -231,7 +239,8 @@ PY
 write_input_identity() {
   "$python" - "$repo" "$manifest" "$provenance" "$profile" \
     "$baseline_wrapper" "$extension" "$vendor" "$visible_devices" \
-    "$draft_pa_task_update_workers" "$campaign_dir/input-identity.json" <<'PY'
+    "$draft_pa_task_update_workers" "$target_replay_ahead" \
+    "$campaign_dir/input-identity.json" <<'PY'
 import hashlib
 import json
 import math
@@ -244,7 +253,8 @@ repo, manifest_path, provenance_path, profile_path, baseline_wrapper, extension,
 )
 devices = sys.argv[8].split(",")
 draft_pa_task_update_workers = int(sys.argv[9])
-output_path = Path(sys.argv[10])
+target_replay_ahead = int(sys.argv[10])
+output_path = Path(sys.argv[11])
 
 
 def sha256(path: Path) -> str:
@@ -349,6 +359,7 @@ document = {
     "status": "pass" if not errors else "fail",
     "physical_npus": [int(value) for value in devices],
     "draft_pa_task_update_workers": draft_pa_task_update_workers,
+    "target_replay_ahead": target_replay_ahead,
     "manifest": str(manifest_path.resolve()),
     "manifest_sha256": manifest_sha,
     "manifest_class_counts": dict(sorted(class_counts.items())),
@@ -534,6 +545,7 @@ extension_sha = input_identity["extension_sha256"]
 expected_draft_pa_task_update_workers = int(
     input_identity.get("draft_pa_task_update_workers", -1)
 )
+expected_target_replay_ahead = int(input_identity.get("target_replay_ahead", -1))
 
 # Exact workload and execution envelopes.
 require(baseline.get("backend") == "vllm-ascend-target-only", "baseline backend mismatch")
@@ -577,6 +589,11 @@ require(
     candidate_environment.get("VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS")
     == str(expected_draft_pa_task_update_workers),
     "candidate draft-PA task-update worker runtime contract mismatch",
+)
+require(
+    candidate_environment.get("VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD")
+    == str(expected_target_replay_ahead),
+    "candidate target replay-ahead runtime contract mismatch",
 )
 
 for label, payload, row in (
@@ -679,6 +696,18 @@ if isinstance(draft_pa_evidence, dict):
             "candidate draft-PA evidence does not keep target workers at one")
     require(set(draft_pa_evidence.get("ranks", {})) == {"0", "1", "2", "3"},
             "candidate draft-PA evidence does not cover ranks 0,1,2,3")
+target_replay_evidence = candidate_gate.get("target_replay_ahead", {})
+require(isinstance(target_replay_evidence, dict),
+        "candidate launcher gate lacks target replay-ahead evidence")
+if isinstance(target_replay_evidence, dict):
+    require(target_replay_evidence.get("passed") is True,
+            "candidate target replay-ahead evidence failed")
+    require(target_replay_evidence.get("errors") == [],
+            "candidate target replay-ahead evidence contains errors")
+    require(target_replay_evidence.get("enabled") is bool(expected_target_replay_ahead),
+            "candidate target replay-ahead enablement mismatch")
+    require(set(target_replay_evidence.get("ranks", {})) == {"0", "1", "2", "3"},
+            "candidate target replay-ahead evidence does not cover ranks 0,1,2,3")
 require(candidate_row.get("graph_qualification_fixed_point") is True,
         "candidate graph qualification did not reach a fixed point")
 require(int(candidate_row.get("aclgraph_replays", 0)) > 0,
@@ -854,6 +883,8 @@ require(
     == str(expected_draft_pa_task_update_workers),
     "candidate contract draft-PA task-update worker mismatch",
 )
+require(candidate_contract.get("target_replay_ahead") == str(expected_target_replay_ahead),
+        "candidate contract target replay-ahead mismatch")
 candidate_inputs = parse_sha256sum(candidate_dir / "input.sha256")
 require(candidate_inputs.get(manifest_path) == manifest_sha,
         "candidate input manifest identity mismatch")
@@ -941,6 +972,8 @@ document = {
     "mc2_measured_replay_coverage": gate_replay_coverage,
     "draft_pa_task_update_workers": expected_draft_pa_task_update_workers,
     "draft_pa_task_update": draft_pa_evidence,
+    "target_replay_ahead": target_replay_evidence,
+    "target_replay_ahead_enabled": expected_target_replay_ahead,
     "errors": errors,
 }
 output_path.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
@@ -971,6 +1004,7 @@ profile_hashes = {row.get("profile_sha256") for row in rounds}
 vendor_hashes = {row.get("vendor_sha256") for row in rounds}
 physical_mappings = {tuple(row.get("physical_npus", [])) for row in rounds}
 draft_pa_worker_counts = {row.get("draft_pa_task_update_workers") for row in rounds}
+target_replay_modes = {row.get("target_replay_ahead_enabled") for row in rounds}
 if len(source_identities) != 1:
     errors.append("source identity differs across rounds")
 if len(manifest_hashes) != 1:
@@ -983,6 +1017,8 @@ if len(physical_mappings) != 1:
     errors.append("physical NPU mapping differs across rounds")
 if len(draft_pa_worker_counts) != 1 or not draft_pa_worker_counts.issubset({1, 2, 4}):
     errors.append("draft-PA task-update worker contract differs across rounds")
+if len(target_replay_modes) != 1 or not target_replay_modes.issubset({0, 1}):
+    errors.append("target replay-ahead contract differs across rounds")
 raw_speedups = [float(row["raw_speedup"]) for row in rounds]
 goodput_speedups = [float(row["paper_goodput_speedup"]) for row in rounds]
 all_rounds_raw_above_baseline = all(value > 1.0 for value in raw_speedups)
@@ -1003,6 +1039,9 @@ document = {
     "rounds": rounds,
     "draft_pa_task_update_workers": (
         next(iter(draft_pa_worker_counts)) if len(draft_pa_worker_counts) == 1 else None
+    ),
+    "target_replay_ahead_enabled": (
+        next(iter(target_replay_modes)) if len(target_replay_modes) == 1 else None
     ),
     "raw_speedup_min": min(raw_speedups),
     "raw_speedup_median": statistics.median(raw_speedups),
@@ -1061,6 +1100,7 @@ export SPECSLO_MC2_VENDOR=$vendor
 # separately overwrites the VLLM runtime variable, so an inherited runtime
 # setting cannot contaminate the formal campaign.
 export SPECSLO_DRAFT_PA_TASK_UPDATE_WORKERS=$draft_pa_task_update_workers
+export SPECSLO_TARGET_REPLAY_AHEAD=$target_replay_ahead
 
 run_baseline() {
   local round=$1

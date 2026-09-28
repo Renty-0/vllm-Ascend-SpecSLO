@@ -2103,6 +2103,58 @@ TARGET_REPLAY_AHEAD_REJECT_REASONS = (
 )
 
 
+def spec_rhythm_target_replay_ahead_frontier_immutable(
+    *,
+    pending_admission: Sequence[int],
+    staged_prefill_indices: Sequence[int],
+    suspended_indices: Sequence[int],
+    active_request_indices: Sequence[int],
+    current_target_request_indices: Sequence[int],
+    states: Sequence[PearlPipelineState],
+    batch_capacity: int,
+    gamma: int,
+    prefetch_ahead: bool,
+    preempt_loose_for_tight: bool,
+) -> bool:
+    """Prove online arrivals cannot change the next target plan.
+
+    A pending arrival is harmless only when the service batch is full and
+    the current verification cannot finish any row. With no speculative
+    prefetch or priority preemption, ``admit_available`` then has no vacant
+    slot at the tail boundary. The next cycle sees the same active frontier.
+    EOS and abort must be disabled for every currently verified row; a full
+    gamma window plus one bonus token is the largest possible commit.
+    """
+
+    if staged_prefill_indices or suspended_indices:
+        return False
+    if not pending_admission:
+        return True
+    if (
+        prefetch_ahead
+        or preempt_loose_for_tight
+        or batch_capacity <= 0
+        or len(active_request_indices) != batch_capacity
+        or len(set(active_request_indices)) != batch_capacity
+        or gamma <= 0
+    ):
+        return False
+    if not set(current_target_request_indices).issubset(active_request_indices):
+        return False
+    for index in current_target_request_indices:
+        if not 0 <= index < len(states):
+            return False
+        state = states[index]
+        if (
+            state.aborted
+            or not state.ignore_eos
+            or state.max_tokens - len(state.committed_completion_token_ids)
+            <= gamma + 1
+        ):
+            return False
+    return True
+
+
 def _spec_rhythm_selected_target_signature(
     *,
     controller: SpecRhythmPipelineController,
@@ -11393,10 +11445,19 @@ class NativePearlEngine:
                         < self.config.profile_decode_steps
                     )
                 )
-                immutable_frontier = not (
-                    pending_admission
-                    or staged_prefill_indices
-                    or suspended_indices
+                immutable_frontier = (
+                    spec_rhythm_target_replay_ahead_frontier_immutable(
+                        pending_admission=pending_admission,
+                        staged_prefill_indices=staged_prefill_indices,
+                        suspended_indices=suspended_indices,
+                        active_request_indices=active_indices,
+                        current_target_request_indices=target_indices,
+                        states=local_states,
+                        batch_capacity=initial_batch_size,
+                        gamma=self.gamma,
+                        prefetch_ahead=prefetch_ahead,
+                        preempt_loose_for_tight=preempt_loose_for_tight_enabled,
+                    )
                 )
                 replay_signature, replay_reject_reason = (
                     plan_spec_rhythm_target_replay_ahead(

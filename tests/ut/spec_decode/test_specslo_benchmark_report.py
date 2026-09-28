@@ -26,6 +26,7 @@ from examples.specslo_benchmark_report import (
     qualified_mc2_profile_replay_contract,
     sha256_file,
     target_fia_parallel_update_evidence,
+    target_replay_ahead_evidence,
     write_json_exclusive,
 )
 from vllm_ascend.spec_decode.pearl.mc2 import (
@@ -95,6 +96,73 @@ def test_capture_runtime_environment_records_draft_pa_update_workers():
     )
 
     assert environment["VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS"] == "4"
+
+
+def _target_replay_ahead_rows(*, enabled: bool) -> list[dict]:
+    fields = (
+        "attempts",
+        "eligible",
+        "submitted",
+        "consumed",
+        "signature_mismatches",
+    )
+    counters = (6, 2, 2, 2, 0) if enabled else (0, 0, 0, 0, 0)
+    return [
+        {
+            "rank": rank,
+            "worker_spec_rhythm_target_replay_ahead_enabled": int(enabled),
+            **{
+                f"worker_spec_rhythm_target_replay_ahead_{name}": value
+                for name, value in zip(fields, counters)
+            },
+            **{
+                f"worker_spec_rhythm_target_replay_ahead_reject_{reason}": (
+                    4 if enabled and reason == "mutable_frontier" else 0
+                )
+                for reason in (
+                    "protocol",
+                    "mutable_frontier",
+                    "pending_eager",
+                    "schedule",
+                    "ticket_epoch",
+                    "payload_shape",
+                    "graph_contract",
+                    "resource_contract",
+                    "staged_correction",
+                )
+            },
+        }
+        for rank in range(4)
+    ]
+
+
+@pytest.mark.parametrize("enabled", [False, True])
+def test_target_replay_ahead_evidence_accepts_consistent_ranks(enabled):
+    result = target_replay_ahead_evidence(
+        _target_replay_ahead_rows(enabled=enabled), enabled=enabled
+    )
+    assert result["passed"] is True
+    assert result["errors"] == []
+
+
+def test_target_replay_ahead_evidence_rejects_unconsumed_target_graph():
+    rows = _target_replay_ahead_rows(enabled=True)
+    rows[1]["worker_spec_rhythm_target_replay_ahead_consumed"] = 1
+    result = target_replay_ahead_evidence(rows, enabled=True)
+    assert result["passed"] is False
+    assert any("submitted/consumed" in error for error in result["errors"])
+    assert any("differs across ranks" in error for error in result["errors"])
+
+
+def test_target_replay_ahead_evidence_requires_measured_submission():
+    rows = _target_replay_ahead_rows(enabled=True)
+    for row in rows:
+        row["worker_spec_rhythm_target_replay_ahead_attempts"] = 4
+        for field in ("eligible", "submitted", "consumed"):
+            row[f"worker_spec_rhythm_target_replay_ahead_{field}"] = 0
+    result = target_replay_ahead_evidence(rows, enabled=True)
+    assert result["passed"] is False
+    assert any("submitted no replay-ahead" in error for error in result["errors"])
 
 
 def _target_fia_evidence_rows(

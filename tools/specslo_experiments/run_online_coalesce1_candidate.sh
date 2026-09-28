@@ -33,6 +33,9 @@ profile_host_decode_steps=${SPECSLO_PROFILE_HOST_DECODE_STEPS:-0}
 profile_wait_steps=${SPECSLO_NPU_PROFILE_WAIT_STEPS:-16}
 target_fia_task_update_workers=${SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS:-1}
 draft_pa_task_update_workers=${SPECSLO_DRAFT_PA_TASK_UPDATE_WORKERS:-1}
+target_replay_ahead=${SPECSLO_TARGET_REPLAY_AHEAD:-0}
+target_nz_mode=${SPECSLO_TARGET_NZ_MODE:-default}
+validate_only=${SPECSLO_VALIDATE_ONLY:-0}
 
 if [[ ! $run_tag =~ ^[A-Za-z0-9._-]+$ ]]; then
   echo "invalid run tag: $run_tag" >&2
@@ -44,7 +47,8 @@ if [[ ${#devices[@]} -ne 4 ]]; then
   exit 2
 fi
 for value in "$acceptance_only" "$prefill_only" "$residual_tight_only" \
-  "$host_continuation_reuse" "$drain_fifo" "$drain_lrtf"; do
+  "$host_continuation_reuse" "$drain_fifo" "$drain_lrtf" \
+  "$target_replay_ahead" "$validate_only"; do
   if [[ $value != 0 && $value != 1 ]]; then
     echo "boolean experiment switches must be 0 or 1" >&2
     exit 2
@@ -52,6 +56,10 @@ for value in "$acceptance_only" "$prefill_only" "$residual_tight_only" \
 done
 if [[ $drain_lrtf == 1 && $drain_fifo != 1 ]]; then
   echo "SPECSLO_DRAIN_LRTF=1 requires SPECSLO_DRAIN_FIFO=1" >&2
+  exit 2
+fi
+if [[ $target_nz_mode != default && $target_nz_mode != 5 ]]; then
+  echo "SPECSLO_TARGET_NZ_MODE must be default or 5" >&2
   exit 2
 fi
 for value in "$profile_host_decode_steps" "$profile_wait_steps"; do
@@ -84,11 +92,18 @@ if [[ ! -d $vendor || ! -f $vendor/op_api/lib/libcust_opapi.so ]]; then
 fi
 
 run_dir=${result_root}/runs/candidate-${mc2_mode}-${run_tag}
-if [[ -e $run_dir ]]; then
-  echo "refusing to overwrite existing run: $run_dir" >&2
-  exit 3
+if [[ $validate_only == 1 ]]; then
+  if [[ ! -f $run_dir/result.json ]]; then
+    echo "validation result is missing: $run_dir/result.json" >&2
+    exit 2
+  fi
+else
+  if [[ -e $run_dir ]]; then
+    echo "refusing to overwrite existing run: $run_dir" >&2
+    exit 3
+  fi
+  mkdir -p "$run_dir"
 fi
-mkdir -p "$run_dir"
 
 assert_cards_free() {
   npu-smi info > "$run_dir/npu-before.txt"
@@ -102,8 +117,9 @@ assert_cards_free() {
     fi
   done
 }
-assert_cards_free
-
+if [[ $validate_only == 0 ]]; then
+  assert_cards_free
+fi
 source /usr/local/Ascend/cann-9.0.0/set_env.sh
 export PYTHONPATH=$repo:${PYTHONPATH:-}
 export ASCEND_RT_VISIBLE_DEVICES=$visible_devices
@@ -138,7 +154,11 @@ else
 fi
 
 export VLLM_ASCEND_PEARL_DRAFT_NZ_MODE=-1
-unset VLLM_ASCEND_PEARL_TARGET_NZ_MODE
+if [[ $target_nz_mode == default ]]; then
+  unset VLLM_ASCEND_PEARL_TARGET_NZ_MODE
+else
+  export VLLM_ASCEND_PEARL_TARGET_NZ_MODE=$target_nz_mode
+fi
 unset VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE
 export VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE=1
 export VLLM_ASCEND_PEARL_DRAFT_STEP_MAJOR_PA_TASK_UPDATE=0
@@ -180,6 +200,7 @@ export VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF=0
 export VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST=0
 export VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO=$drain_fifo
 export VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF=$drain_lrtf
+export VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD=$target_replay_ahead
 export VLLM_ASCEND_SPECRHYTHM_RESIDUAL_EAGER_TIGHT_ONLY=$residual_tight_only
 export VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION=0
 export VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS=0
@@ -205,12 +226,13 @@ if [[ $mc2_mode == on ]]; then
   mc2_args=(--enable-mc2 --mc2-profile "$profile")
 fi
 
-cd "$repo"
-git rev-parse HEAD > "$run_dir/git-head.txt"
-git diff --binary > "$run_dir/working-tree.patch"
-git status --porcelain=v1 --untracked-files=all > "$run_dir/git-status.txt"
-sha256sum "$manifest" "$profile" "$extension" > "$run_dir/input.sha256"
-{
+if [[ $validate_only == 0 ]]; then
+  cd "$repo"
+  git rev-parse HEAD > "$run_dir/git-head.txt"
+  git diff --binary > "$run_dir/working-tree.patch"
+  git status --porcelain=v1 --untracked-files=all > "$run_dir/git-status.txt"
+  sha256sum "$manifest" "$profile" "$extension" > "$run_dir/input.sha256"
+  {
   printf 'mode=%s\nrun_tag=%s\nvisible_devices=%s\n' "$mc2_mode" "$run_tag" "$visible_devices"
   printf 'result_root=%s\nrun_dir=%s\n' "$result_root" "$run_dir"
   printf 'fallback_max_batch=%s\nacceptance_only=%s\nprefill_only=%s\n' "$fallback_max_batch" "$acceptance_only" "$prefill_only"
@@ -220,13 +242,15 @@ sha256sum "$manifest" "$profile" "$extension" > "$run_dir/input.sha256"
   printf 'profile_host_decode_steps=%s\nnpu_profile_wait_steps=%s\n' "$profile_host_decode_steps" "$profile_wait_steps"
   printf 'target_fia_task_update_workers=%s\n' "$target_fia_task_update_workers"
   printf 'draft_pa_task_update_workers=%s\n' "$draft_pa_task_update_workers"
+  printf 'target_replay_ahead=%s\n' "$target_replay_ahead"
+  printf 'target_nz_mode=%s\n' "$target_nz_mode"
   printf 'npu_profile_measurement_only=%s\nnpu_profile_dir=%s\n' \
     "$(( profile_host_decode_steps > 0 ))" "$npu_profile_dir"
   printf 'mc2_down_proj=1\n'
   printf 'profile=%s\nvendor=%s\n' "$profile" "$vendor"
-} > "$run_dir/contract.env"
+  } > "$run_dir/contract.env"
 
-timeout 2400 "$python" -u examples/run_with_vllm_ascend_extension.py \
+  timeout 2400 "$python" -u examples/run_with_vllm_ascend_extension.py \
   --extension "$extension" --required-op allreduce_add_rmsnorm_chained \
   examples/benchmark_nano_pearl_speculative.py \
   --draft-model /data/shared-models/Qwen3-0.6B \
@@ -252,13 +276,15 @@ timeout 2400 "$python" -u examples/run_with_vllm_ascend_extension.py \
   --warmup-runs 1 --graph-qualification-max-runs 8 \
   "${profile_args[@]}" \
   --worker-timeout-seconds 1800 --output-json "$run_dir/result.json.tmp" \
-  > "$run_dir/run.log" 2>&1
-mv "$run_dir/result.json.tmp" "$run_dir/result.json"
+    > "$run_dir/run.log" 2>&1
+  mv "$run_dir/result.json.tmp" "$run_dir/result.json"
+fi
 
 "$python" - "$run_dir/result.json" "$run_dir/gate.json" "$mc2_mode" \
   "$fallback_max_batch" "$prefill_only" "$residual_tight_only" \
   "$acceptance_only" "$host_continuation_reuse" "$drain_fifo" "$drain_lrtf" \
-  "$target_fia_task_update_workers" "$draft_pa_task_update_workers" "$profile" <<'PY'
+  "$target_fia_task_update_workers" "$draft_pa_task_update_workers" \
+  "$target_replay_ahead" "$target_nz_mode" "$profile" <<'PY'
 import json
 import sys
 from pathlib import Path
@@ -271,6 +297,7 @@ from examples.specslo_benchmark_report import (
     measure_qualified_mc2_replay_coverage,
     qualified_mc2_profile_replay_contract,
     target_fia_parallel_update_evidence,
+    target_replay_ahead_evidence,
 )
 
 result_path, gate_path = map(Path, sys.argv[1:3])
@@ -284,7 +311,9 @@ expected_drain_fifo = bool(int(sys.argv[9]))
 expected_drain_lrtf = bool(int(sys.argv[10]))
 expected_target_fia_task_update_workers = int(sys.argv[11])
 expected_draft_pa_task_update_workers = int(sys.argv[12])
-profile_path = Path(sys.argv[13]).resolve()
+expected_target_replay_ahead = bool(int(sys.argv[13]))
+expected_target_nz_mode = sys.argv[14]
+profile_path = Path(sys.argv[15]).resolve()
 payload = json.loads(result_path.read_text(encoding="utf-8"))
 row = payload["results"][0]
 errors = []
@@ -311,6 +340,12 @@ if environment.get("VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS") != str(ex
     errors.append("target-FIA task-update worker contract mismatch")
 if environment.get("VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS") != str(expected_draft_pa_task_update_workers):
     errors.append("draft-PA task-update worker contract mismatch")
+if environment.get("VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD") != str(int(expected_target_replay_ahead)):
+    errors.append("target replay-ahead contract mismatch")
+if environment.get("VLLM_ASCEND_PEARL_TARGET_NZ_MODE") != (
+    None if expected_target_nz_mode == "default" else expected_target_nz_mode
+):
+    errors.append("target NZ mode contract mismatch")
 if row.get("output_tokens") != 463 * 256:
     errors.append("not fixed 463x256 output")
 if row.get("graph_qualification_fixed_point") is not True:
@@ -346,6 +381,14 @@ draft_pa_evidence = draft_pa_parallel_update_evidence(
 errors.extend(
     f"draft-PA evidence: {message}"
     for message in draft_pa_evidence.get("errors", ())
+)
+target_replay_evidence = target_replay_ahead_evidence(
+    workers,
+    enabled=expected_target_replay_ahead,
+)
+errors.extend(
+    f"target replay-ahead evidence: {message}"
+    for message in target_replay_evidence.get("errors", ())
 )
 profile_contract = (
     qualified_mc2_profile_replay_contract(profile_path)
@@ -477,6 +520,7 @@ for worker in workers:
 gate = {
     "status": "pass" if not errors else "fail",
     "mode": mode,
+    "target_nz_mode": expected_target_nz_mode,
     "raw_tokens_per_second": row.get("e2e_throughput_tokens_per_second"),
     "paper_goodput_tokens_per_second": row.get("slo", {}).get("paper", {}).get("goodput_tokens_per_e2e_second"),
     "paper_attainment": row.get("slo", {}).get("paper", {}).get("attainment"),
@@ -488,6 +532,7 @@ gate = {
     "mc2_measured_replay_coverage": mc2_replay_coverage,
     "target_fia_task_update": target_fia_evidence,
     "draft_pa_task_update": draft_pa_evidence,
+    "target_replay_ahead": target_replay_evidence,
     "dual_batch_overlap_submission_cycles_by_rank": {
         str(int(worker.get("rank", -1))): int(
             worker.get("worker_spec_rhythm_dual_batch_overlap_submission_cycles", 0)

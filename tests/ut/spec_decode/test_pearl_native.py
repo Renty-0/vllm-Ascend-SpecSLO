@@ -88,6 +88,7 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
     resolve_mixed_target_graph_buckets,
     resolve_mixed_target_graph_verify_capacities,
     spec_rhythm_target_replay_ahead_fallback_safe,
+    spec_rhythm_target_replay_ahead_frontier_immutable,
     spec_rhythm_target_replay_ahead_graph_reject_reason,
 )
 from vllm_ascend.spec_decode.pearl.native_graph import NativeACLGraphRunner, NativeGraphExecution
@@ -2801,6 +2802,74 @@ def _target_replay_ahead_fixture():
         for ticket in tickets
     }
     return controller, states, payloads
+
+
+@pytest.mark.parametrize(
+    ("mutation", "expected"),
+    [
+        ("safe_full_batch", True),
+        ("vacant_slot", False),
+        ("prefetch_ahead", False),
+        ("preempt", False),
+        ("staged_prefill", False),
+        ("suspended", False),
+        ("respect_eos", False),
+        ("could_reach_limit", False),
+        ("aborted", False),
+        ("invalid_target", False),
+    ],
+)
+def test_target_replay_ahead_online_frontier_proof(mutation, expected):
+    _, states, _ = _target_replay_ahead_fixture()
+    for state in states:
+        state.ignore_eos = True
+    options = {
+        "pending_admission": (4,),
+        "staged_prefill_indices": (),
+        "suspended_indices": (),
+        "active_request_indices": (0, 1, 2, 3),
+        "current_target_request_indices": (0, 1),
+        "states": states,
+        "batch_capacity": 4,
+        "gamma": 4,
+        "prefetch_ahead": False,
+        "preempt_loose_for_tight": False,
+    }
+    if mutation == "vacant_slot":
+        options["batch_capacity"] = 5
+    elif mutation == "prefetch_ahead":
+        options["prefetch_ahead"] = True
+    elif mutation == "preempt":
+        options["preempt_loose_for_tight"] = True
+    elif mutation == "staged_prefill":
+        options["staged_prefill_indices"] = (4,)
+    elif mutation == "suspended":
+        options["suspended_indices"] = (4,)
+    elif mutation == "respect_eos":
+        states[0].ignore_eos = False
+    elif mutation == "could_reach_limit":
+        states[0].max_tokens = 6
+    elif mutation == "aborted":
+        states[0].aborted = True
+    elif mutation == "invalid_target":
+        options["current_target_request_indices"] = (0, 4)
+    assert spec_rhythm_target_replay_ahead_frontier_immutable(**options) is expected
+
+
+def test_target_replay_ahead_drain_frontier_needs_no_online_proof():
+    _, states, _ = _target_replay_ahead_fixture()
+    assert spec_rhythm_target_replay_ahead_frontier_immutable(
+        pending_admission=(),
+        staged_prefill_indices=(),
+        suspended_indices=(),
+        active_request_indices=(0, 1, 2, 3),
+        current_target_request_indices=(0, 1),
+        states=states,
+        batch_capacity=64,
+        gamma=4,
+        prefetch_ahead=False,
+        preempt_loose_for_tight=False,
+    )
 
 
 def test_target_replay_ahead_preview_is_exact_and_side_effect_free():
