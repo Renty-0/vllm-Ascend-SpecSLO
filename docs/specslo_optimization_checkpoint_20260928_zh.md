@@ -243,3 +243,20 @@ ACLGraph 无回退或系统吞吐已经通过。
 
 恢复时先从本文件和 `docs/specslo_work_record_zh.md` 读取上下文，再查看具体结果
 JSON 和 git diff；聊天记录只作为补充，不能取代源码、结果和本检查点。
+
+## 10. Git 与外部数据边界
+
+本检查点提交保存源码、测试、实验 runner、技术文档和一个未应用的实验 patch，
+不保存可重建的 `csrc/build.*`、`extra-info/data-dump`、模型权重以及数 GB 的原始
+benchmark 目录。它们不会因为 Git push 自动离开当前服务器。
+
+如果接下来不仅更新插件，还会清空容器或宿主机，必须按
+`docs/specslo_container_migration_zh.md` 将以下内容复制到异机存储并校验：
+
+- `/root/data/nano-pearl-benchmark-results`；
+- `/root/data/specslo-workloads`；
+- `/root/data/specslo-mc2-*` 和需要保留的 custom vendor/capture；
+- `/data/shared-models`、`/data/datasets` 和 Conda 环境清单。
+
+仅有 `SpecSLO-Chain` 分支足以恢复代码，不足以原样恢复本文件引用的实测证据和
+已编译 vendor。
