@@ -1,0 +1,17 @@
+model	bytes	files	incomplete_parts	safetensors	index_files
+Eagle-Qwen2.5-14B-Instruct	2212560896	15	0	0	1
+Llama-3.1-70B-Instruct	11851022336	33	30	0	2
+Llama-3.2-1B-Instruct	571363328	14	2	0	2
+MiniCPM-o-4_5	20048781312	54	0	4	3
+PARD-Qwen3-0.6B	1519276032	36	0	1	2
+Qwen2.5-0.5B-Instruct	999682048	33	0	1	2
+Qwen2.5-14B-Instruct	29551816704	57	0	8	3
+Qwen3-0.6B	1519288320	33	0	1	2
+Qwen3-1.7B	4079550464	39	0	2	3
+Qwen3-32B	65540485120	84	0	17	3
+Qwen3-8B	16397582336	48	0	5	3
+Qwen3-8B-speculator.eagle3	2044342272	30	0	1	2
+SmolLM2-135M-Instruct	272760832	70	0	1	2
+opt-125m	251965440	24	0	0	2
+opt-13b	25708789760	39	0	0	5
+pearl-e2e-logs	0	1	0	0	0

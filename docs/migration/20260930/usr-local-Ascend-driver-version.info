@@ -1,0 +1,12 @@
+Version=26.0.rc1
+ascendhal_version=7.35.23
+aicpu_version=1.0
+tdt_version=1.0
+log_version=1.0
+prof_version=2.0
+dvppkernels_version=1.1
+tsfw_version=1.0
+Innerversion=V100R001C10SPC001B260
+compatible_version=[V100R001C21],[V100R001C22],[V100R001C23],[V100R001C25],[V100R001C10]
+compatible_version_fw=[7.0.0,9.9.9]
+package_version=26.0.rc1

@@ -1,0 +1,45 @@
+Name: torch
+Version: 2.10.0
+Summary: Tensors and Dynamic neural networks in Python with strong GPU acceleration
+Home-page: https://pytorch.org
+Author: 
+Author-email: PyTorch Team <packages@pytorch.org>
+License: BSD-3-Clause
+Location: /root/miniconda3/envs/vllm-hust-dev/lib/python3.11/site-packages
+Requires: filelock, fsspec, jinja2, networkx, sympy, typing-extensions
+Required-by: compressed-tensors, torch_npu, vllm-ascend-hust, xgrammar
+---
+Name: torch_npu
+Version: 2.10.0
+Summary: NPU bridge for PyTorch
+Home-page: https://gitcode.com/ascend/pytorch
+Author: 
+Author-email: 
+License: BSD License
+Location: /root/miniconda3/envs/vllm-hust-dev/lib/python3.11/site-packages
+Requires: torch
+Required-by: vllm-ascend-hust
+---
+Name: vllm
+Version: 0.23.1.post1.dev669+g933842ab0.empty
+Summary: A high-throughput and memory-efficient inference and serving engine for LLMs
+Home-page: https://github.com/vllm-project/vllm
+Author: vLLM Team
+Author-email: 
+License-Expression: Apache-2.0
+Location: /root/miniconda3/envs/vllm-hust-dev/lib/python3.11/site-packages
+Editable project location: /root/data/vllm-hust
+Requires: aiohttp, anthropic, blake3, cachetools, cbor2, cloudpickle, compressed-tensors, depyf, diskcache, einops, fastapi, filelock, ijson, jsonschema, lark, llguidance, lm-format-enforcer, mcp, mistral_common, model-hosting-container-standards, msgspec, ninja, numpy, openai, openai-harmony, opencv-python-headless, opentelemetry-api, opentelemetry-exporter-otlp, opentelemetry-sdk, opentelemetry-semantic-conventions-ai, outlines_core, partial-json-parser, pillow, prometheus-fastapi-instrumentator, prometheus_client, protobuf, psutil, py-cpuinfo, pybase64, pydantic, python-json-logger, pyyaml, pyzmq, regex, requests, safetensors, sentencepiece, setproctitle, starlette, tiktoken, tokenizers, tqdm, transformers, typing_extensions, watchfiles, xgrammar, xxhash
+Required-by: 
+---
+Name: vllm-ascend-hust
+Version: 0.19.1.post1.dev456+ga36e8081
+Summary: vLLM Ascend backend plugin
+Home-page: https://github.com/vllm-project/vllm-ascend
+Author: vLLM-Ascend team
+Author-email: 
+License: Apache 2.0
+Location: /root/miniconda3/envs/vllm-hust-dev/lib/python3.11/site-packages
+Editable project location: /root/data/vllm-ascend-hust
+Requires: arctic-inference, cmake, compressed_tensors, decorator, einops, fastapi, memcache_hybrid, memfabric_hybrid, msgpack, numba, numpy, packaging, pandas, pandas-stubs, pip, psutil, pybind11, pyyaml, quart, regex, scipy, setuptools, setuptools-scm, torch, torch-npu, torchaudio, torchvision, transformers, triton-ascend, wheel, xgrammar
+Required-by: 

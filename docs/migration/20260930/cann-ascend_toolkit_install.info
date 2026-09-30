@@ -1,0 +1,7 @@
+package_name=Ascend-cann-toolkit
+version=9.0.0
+innerversion=V100R001C10SPC001B250
+compatible_version=[V100R001C21],[V100R001C22],[V100R001C23],[V100R001C25],[V100R001C10]
+arch=aarch64
+os=linux
+path=/usr/local/Ascend/cann-9.0.0

@@ -1,0 +1,61 @@
+diff --git a/scripts/quickstart.sh b/scripts/quickstart.sh
+index 6ad4e70..0550bd7 100755
+--- a/scripts/quickstart.sh
++++ b/scripts/quickstart.sh
+@@ -846,6 +846,30 @@ resolve_local_triton_ascend_repo() {
+   return 1
+ }
+ 
++local_triton_ascend_satisfies_repo_requirement() {
++  local repo_path="$1"
++  local triton_ascend_repo="$2"
++  local required_spec
++  local local_version_file
++  local local_version
++
++  required_spec="$(read_requirement_spec_from_requirements_file "$repo_path" "triton-ascend" || true)"
++  # A non-exact requirement is left to pip's normal resolver. For an exact
++  # requirement, compiling a differently-versioned local checkout only to
++  # replace it later is both expensive and misleading.
++  if [[ ! "$required_spec" =~ ^triton-ascend==([^[:space:];]+)$ ]]; then
++    return 0
++  fi
++
++  local_version_file="$triton_ascend_repo/version.txt"
++  if [[ ! -f "$local_version_file" ]]; then
++    return 0
++  fi
++  local_version="$(tr -d '[:space:]' < "$local_version_file")"
++
++  [[ "$local_version" == "${BASH_REMATCH[1]}" ]]
++}
++
+ ensure_ascend_build_python_packages() {
+   local repo_path="$1"
+   local compile_custom_kernels="$2"
+@@ -881,6 +905,13 @@ ensure_ascend_build_python_packages() {
+   done
+ 
+   if triton_ascend_repo="$(resolve_local_triton_ascend_repo)"; then
++    if ! local_triton_ascend_satisfies_repo_requirement "$repo_path" "$triton_ascend_repo"; then
++      log "Skipping local triton-ascend source because its version does not match $(read_requirement_spec_from_requirements_file "$repo_path" "triton-ascend" || true)"
++      triton_ascend_repo=""
++    fi
++  fi
++
++  if [[ -n "$triton_ascend_repo" ]]; then
+     # Local editable installs use --no-build-isolation, so every requirement
+     # from the local project's build-system.requires must already be present.
+     # In particular, setup.py imports pybind11 while pip is only preparing
+@@ -2617,6 +2648,11 @@ reconcile_ascend_runtime_with_manager() {
+     return 0
+   fi
+ 
++  # --all resolves the initial manifest before clone-workspace-repos.sh creates
++  # ascend-runtime-manager. Re-resolve here so a freshly cloned CANN9 manifest
++  # is selected instead of the CANN8 fallback.
++  MANAGER_MANIFEST_DEFAULT="$(resolve_default_manifest)"
++
+   # Log detected CANN version and selected manifest for transparency
+   local _cann_ver
+   _cann_ver="$(detect_cann_major_version 2>/dev/null || echo "unknown")"

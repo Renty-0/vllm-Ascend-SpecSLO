@@ -1,0 +1,2 @@
+ASCEND_HOME_PATH=/usr/local/Ascend/cann-9.0.0
+ASCEND_OPP_PATH=/usr/local/Ascend/cann-9.0.0/opp
