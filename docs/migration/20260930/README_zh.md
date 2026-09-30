@@ -1,5 +1,9 @@
 # SpecSLO 新容器完整恢复审计（2026-09-30）
 
+从空容器开始的逐步恢复、重建、图/MC2 资格化和正式 A/B 验收命令见
+[`REPRODUCTION_RUNBOOK_zh.md`](REPRODUCTION_RUNBOOK_zh.md)。本文保留资产边界和灾备审计，
+不再用高层“恢复顺序”代替可执行手册。
+
 ## 1. 本次已经保存到私人 GitHub 的内容
 
 私人仓库为 `git@github.com:Renty-0/vllm-Ascend-SpecSLO.git`。
@@ -135,3 +139,12 @@ bash tools/specslo_migration/verify_portable_archives.sh \
   Conda/LLVM/log 等异机副本，以及由管理员保证的宿主驱动/固件和共享数据集挂载。
 - 当前服务器上的任何 `/root`、`/data`、`/tmp` 归档都不算灾备；只有复制离开该宿主机并在
   目标端再次验证 SHA256，才算完成完整备份。
+
+## 7. 文档化重建与外部大包的边界
+
+模型、Conda、Triton LLVM、CANN profiler 和 MC2 张量捕获可以在手册中记录来源、重建步骤
+和验收门，使新容器重新生成**功能等价的新资产**。但文档本身不会包含这些大文件，也不能
+从无到有恢复某个历史时点的 profiler、失败 trace、真实层输入或未记录 revision 的模型
+字节。需要审计历史原件或 bit-exact 恢复时，仍必须在旧服务器清空前完成第 4 节的异机
+归档。新容器自动重建的完整步骤和明确的停止条件见
+[`REPRODUCTION_RUNBOOK_zh.md`](REPRODUCTION_RUNBOOK_zh.md)。
