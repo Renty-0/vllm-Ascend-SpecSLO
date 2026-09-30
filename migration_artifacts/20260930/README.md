@@ -19,6 +19,11 @@ installation listed in `docs/migration/20260930/README_zh.md`.
   compression).
 - `COMPILED_RUNTIME_SOURCE_SHA256SUMS.zst`: hashes for the compiled-runtime
   archive.
+- `specslo-tp4-baseline-result-20260928.json.zst`: the complete 463-request
+  TP4 target-only baseline result.  It is stored separately because the
+  original file ended in `.json.tmp` and was consequently omitted by the
+  first portable-evidence selection.  Its decompressed SHA256 is
+  `2b957c1e59b1443e9d9cddd0bc2481a248d94db24808cbe06d590eb1bee198cd`.
 - `SHA256SUMS`: hashes for all Git-stored compressed files.
 
 The compiled runtime is an exact rollback aid, not a portable substitute for
@@ -42,3 +47,13 @@ zstd -dc /path/to/COMPILED_RUNTIME_SOURCE_SHA256SUMS.zst | sha256sum -c -
 
 Extract to a temporary root first. Do not copy the archived CANN vendor or
 extension into a live environment until its ABI has been checked.
+
+Restore the full historical baseline evidence with:
+
+```bash
+zstd -dc specslo-tp4-baseline-result-20260928.json.zst \
+  > /tmp/specslo-tp4-baseline-result-20260928.json
+printf '%s  %s\n' \
+  2b957c1e59b1443e9d9cddd0bc2481a248d94db24808cbe06d590eb1bee198cd \
+  /tmp/specslo-tp4-baseline-result-20260928.json | sha256sum -c -
+```

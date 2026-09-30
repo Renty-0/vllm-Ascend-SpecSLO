@@ -4,6 +4,9 @@
 > 环境和模型、重跑同一实验，并判断是否复现了旧容器当前最优检查点。不要在读完“结果
 > 口径”和“不可自动恢复边界”之前宣称复现成功。
 
+本手册的实际空目录演练记录、清机前 P0 外部备份和 OCI 镜像缺口见
+[`ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md`](ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md)。
+
 ## 1. 先回答：私人 Git 仓库能不能下载后直接运行
 
 **不能单独运行。** 私人仓库保存的是集成了 SpecSLO、PEARL 和 TP3 MC2 的
@@ -30,13 +33,13 @@ workload 与设计来源，不是最终二进制的运行时依赖。精确 work
 
 | 用途 | 地址/分支/提交 | 是否运行必需 |
 | --- | --- | --- |
-| 冻结的复现源码、补丁、结果和文档 | `git@github.com:Renty-0/vllm-Ascend-SpecSLO.git`，标签 `specslo-reproduction-20260930` | 是，复现必须用它 |
+| 冻结的复现源码、补丁、结果和文档 | `git@github.com:Renty-0/vllm-Ascend-SpecSLO.git`，标签 `specslo-reproduction-20260930-v2` | 是，复现必须用它 |
 | 后续开发分支 | 同一私库分支 `SpecSLO-Chain` | 继续调优时使用，不替代冻结标签 |
 | 性能源码检查点 | 私库提交 `31b3cde3296c00867e8d9e23558598debed276a6`；其后到冻结标签只有文档、补丁和迁移资产变化 | 是，冻结标签已包含 |
 | vLLM 核心 | `git@github.com:vLLM-HUST/vllm-hust.git`，基线 `933842ab0fdd53ee47dee8148bca1671d7d6da61` | 是 |
 | vLLM 核心修改 | 私库 `patches/vllm-hust/specslo-core.patch` | V1/HTTP 必需；统一恢复时必须应用 |
 | Catlass 子模块 | 私库 submodule 固定 `41bf90da655bba3c66d0acd7e00abe33960ecfd6` | 编译自定义算子时需要 |
-| Codex 历史 | 同一私库孤立分支 `codex-conversations-backup-20260924`，当前头 `ca06fca23d7b935139d28d2eff04f0868de168d6` | 理解历史、继续调优需要 |
+| Codex 历史 | 同一私库孤立分支 `codex-conversations-backup-20260924`，当前头 `59906b004691776bc590a09b094914e3c94689b8` | 理解历史、继续调优需要 |
 | quickstart 管理器 | `git@github.com:intellistream/vllm-hust-dev-hub.git`，基线 `a61b3183ea8394f16059ae4084eeb19c18aa9251`，私库有补丁 | 可选，不是正式 runner 的运行依赖 |
 | workload 原始生成器 | `git@github.com:rzwang22/eurosys27.git`，提交 `22c196bdf571e84887e5573607bd8e734faa0625` | 仅溯源；精确 workload 已归档 |
 | 早期论文代码 | `https://github.com/rzwang22/atc26v0` | 仅设计审计，不是最终运行依赖 |
@@ -45,7 +48,7 @@ workload 与设计来源，不是最终二进制的运行时依赖。精确 work
 源代码浏览入口：
 
 - `https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/SpecSLO-Chain`
-- `https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/specslo-reproduction-20260930`
+- `https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/specslo-reproduction-20260930-v2`
 - `https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/codex-conversations-backup-20260924`
 - `https://github.com/vLLM-HUST/vllm-hust/commit/933842ab0fdd53ee47dee8148bca1671d7d6da61`
 
@@ -56,8 +59,8 @@ token、GitHub token 或代理凭据。
 
 ```text
 vLLM-HUST commit:       933842ab0fdd53ee47dee8148bca1671d7d6da61
-SpecSLO frozen tag:     specslo-reproduction-20260930
-conversation branch:    ca06fca23d7b935139d28d2eff04f0868de168d6
+SpecSLO frozen tag:     specslo-reproduction-20260930-v2
+conversation branch:    59906b004691776bc590a09b094914e3c94689b8
 ```
 
 以后 `SpecSLO-Chain` 会因文档或代码提交继续前移；完美复现始终使用冻结标签，并以
@@ -115,7 +118,7 @@ vLLM-HUST HTTPS:   https://github.com/vLLM-HUST/vllm-hust.git
 ssh -T git@github.com || true
 
 git ls-remote git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
-  refs/tags/specslo-reproduction-20260930
+  refs/tags/specslo-reproduction-20260930-v2
 git ls-remote git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
   refs/heads/codex-conversations-backup-20260924
 ```
@@ -125,7 +128,7 @@ git ls-remote git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
 ```bash
 mkdir -p /root/data
 
-git clone --branch specslo-reproduction-20260930 --single-branch \
+git clone --branch specslo-reproduction-20260930-v2 --single-branch \
   git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
   /root/data/vllm-ascend-hust
 
@@ -219,6 +222,16 @@ test "$(git -C /root/data/vllm-ascend-hust/csrc/third_party/catlass \
 test -f /root/data/vllm-hust/vllm/v1/spec_decode/spec_rhythm.py
 ```
 
+源码、证据、环境和模型恢复后，再运行统一只读预检：
+
+```bash
+bash /root/data/vllm-ascend-hust/tools/specslo_migration/\
+preflight_zero_container.sh --full-model-hash
+```
+
+旧容器实测为 22 PASS / 1 WARN / 0 FAIL；唯一 warning 要求正式实验前人工检查 NPU 进程
+占用。脚本不会运行占卡程序，也不会清理别人的进程。
+
 不要从私人仓库的 `main` 获取代码；完美复现用冻结标签，继续开发才切换
 `SpecSLO-Chain`。运行源码位于私库，
 旧实验执行时为 `c3bd269f` 加工作树 patch，随后已整理为提交 `31b3cde3`。此后分支只增加
@@ -280,12 +293,14 @@ cd /root/data/codex-conversations-backup
 sha256sum -c SHA256SUMS
 sha256sum -c SHA256SUMS_INCREMENTAL_20260930
 sha256sum -c SHA256SUMS_TAIL_20260930
+sha256sum -c SHA256SUMS_TAIL_20260930_0458
 bash restore.sh /tmp/codex-conversations-restore
 ```
 
-该分支包含 296 个 JSONL、三个经过 SQLite `integrity_check` 的数据库、9 月 24 日全量层、
-9 月 30 日增量层和 03:12 UTC 活跃会话尾包。最终实验发生在该时间点之前，因而相关设计、
-失败方案和性能推理已覆盖。它不含 `auth.json`、`.env`、`config.toml`、SSH key 或 token。
+该分支包含 296 个历史 JSONL、三个经过 SQLite `integrity_check` 的数据库、9 月 24 日全量
+层、9 月 30 日增量层，以及覆盖两个当日活动 rollout 的 04:58 UTC 最终尾包。相关设计、
+失败方案、性能推理和本次空容器恢复演练均已覆盖。它不含 `auth.json`、`.env`、
+`config.toml`、SSH key 或 token。
 
 不要直接覆盖新容器的 `/root/.codex`。聊天备份不会自动进入新 Codex 的上下文；用户应先让
 新 Codex 阅读本文和下面列出的技术文档，需要历史细节时再在
@@ -381,6 +396,15 @@ candidate-on-v149-drain-padding-repair-target457-r1/result.json
 
 候选 `result.json` SHA256：
 `943cba8031561a23aef795541d1f07aebb9769886817871596317a6b4289095b`。
+
+TP4 baseline 的完整历史结果也已补入 Git：
+
+```text
+migration_artifacts/20260930/specslo-tp4-baseline-result-20260928.json.zst
+```
+
+解压后 SHA256：
+`2b957c1e59b1443e9d9cddd0bc2481a248d94db24808cbe06d590eb1bee198cd`。
 
 ### 8.1 “完美复现”验收定义
 
@@ -534,8 +558,8 @@ vendor；依赖默认值运行不算复现。
 - SSH、Codex、GitHub 等认证凭据。
 
 这些内容中，模型、环境、vendor、profile 可以按文档重新下载或生成；历史 trace/capture
-原件只能从外部备份恢复。重新生成得到的是新证据，不是旧文件。完整边界见
-`README_zh.md`。
+原件只能从外部备份恢复。重新生成得到的是新证据，不是旧文件。完整边界和实际空目录恢复
+演练见 `ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md`。
 
 ## 12. 可直接交给新 Codex 的指令
 
@@ -545,10 +569,11 @@ vendor；依赖默认值运行不算复现。
 SPECSLO_FINAL_EXPERIMENT_HANDOFF_zh.md
 
 然后严格按 REPRODUCTION_RUNBOOK_zh.md 执行。复现源码必须来自私人仓库标签
-specslo-reproduction-20260930；继续开发才使用 SpecSLO-Chain。vLLM-HUST 必须固定到
+specslo-reproduction-20260930-v2；继续开发才使用 SpecSLO-Chain。vLLM-HUST 必须固定到
 933842ab 并应用 specslo-core.patch。
 先运行 tools/specslo_migration/bootstrap_from_github.sh，并确认五项源码审计全部通过。
 恢复 GitHub evidence archive 和固定 workload，验证 workload 与核心模型 SHA256。
+运行 tools/specslo_migration/preflight_zero_container.sh --full-model-hash，所有 FAIL 必须为 0。
 不要使用占卡程序，不要沿用旧机器 MC2 profile，不要依赖 runner 的 v134 默认路径。
 先完成 CPU、数值、graph 零回退、MC2 和 device-overlap 门，再跑 TP4 baseline 与
 TP1+TP3 candidate。以 FINAL_EXPERIMENT_TARGET.json 为旧检查点目标，先复现

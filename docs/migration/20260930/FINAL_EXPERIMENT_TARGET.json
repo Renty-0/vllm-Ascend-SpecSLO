@@ -50,7 +50,9 @@
       "loose": {"attained": 96, "total": 96, "mean_paper_tpot_ms": 49.66311112556809}
     },
     "legacy_local_evidence_path": "/root/data/nano-pearl-benchmark-results/20260928-specslo-paired-baseline-target3457-precheck/runs/baseline-target-only-tp4-cards3-4-5-7-target-only-tp4-cards3-4-5-7-current-source-r1/result.json.tmp",
-    "note": "The full legacy result remained .tmp after post-run promotion; the compact metrics in this file are the Git-persisted target. Re-run the baseline to create new full evidence."
+    "portable_evidence_relative_path": "migration_artifacts/20260930/specslo-tp4-baseline-result-20260928.json.zst",
+    "portable_evidence_compressed_sha256": "69d98c49a7cbe6ff7f6732df763135e707e506bddcede9744188deed46d33efe",
+    "note": "The complete legacy .json.tmp result is now Git-persisted as a zstd artifact; its decompressed SHA256 equals result_file_sha256. A new baseline must still be measured on a replacement machine before making new performance claims."
   },
   "candidate": {
     "name": "SpecSLO fixed-gamma4 serial-chain TP1+TP3",

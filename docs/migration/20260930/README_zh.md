@@ -9,6 +9,9 @@
 的机器可读目标和模型逐文件哈希分别见 `FINAL_EXPERIMENT_TARGET.json` 与
 `CORE_MODEL_SHA256SUMS`。
 
+本次从空目录实际恢复的结果、真正必须离机备份的 P0 项、OCI 镜像缺口和管理员操作见
+[`ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md`](ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md)。
+
 从 GitHub 恢复两个源码树时优先运行
 `tools/specslo_migration/bootstrap_from_github.sh`；该脚本已在空临时目录实测完成
 `vLLM-HUST@933842ab + specslo-core.patch` 的 14 文件恢复和反向补丁校验。
@@ -16,16 +19,17 @@
 ## 1. 本次已经保存到私人 GitHub 的内容
 
 私人仓库为 `git@github.com:Renty-0/vllm-Ascend-SpecSLO.git`。
-完美复现使用冻结标签 `specslo-reproduction-20260930`；`SpecSLO-Chain` 是会继续前移的开发
+完美复现使用冻结标签 `specslo-reproduction-20260930-v2`；原标签
+`specslo-reproduction-20260930` 保留为首版恢复快照；`SpecSLO-Chain` 是会继续前移的开发
 分支，不应作为未来 bit-identical 源码身份。
 
 | 内容 | 分支/目录 | 状态 |
 | --- | --- | --- |
 | SpecSLO/PEARL、TP3 MC2、测试、启动器和技术文档 | `SpecSLO-Chain` | 已推送；本审计提交完成后以远端分支头为准 |
-| Codex 对话全量快照 | `codex-conversations-backup-20260924` | 2026-09-24 全量包 + 2026-09-30 增量包 + 03:12 UTC 活跃会话尾包；远端分支头 `ca06fca2` |
+| Codex 对话全量快照 | `codex-conversations-backup-20260924` | 2026-09-24 全量包 + 2026-09-30 增量包 + 04:58 UTC 最终尾包；远端分支头 `59906b00` |
 | vLLM-HUST 未提交的核心层修改 | `patches/vllm-hust/specslo-core.patch` | 包含 10 个修改文件和 4 个原未跟踪文件，基线 `933842ab` |
 | dev-hub quickstart 修改 | `patches/vllm-hust-dev-hub-quickstart.patch` | 基线 `a61b3183` |
-| 可移植实验结果和数据集 | `migration_artifacts/20260930/` | 21,937 个文件；压缩前 1,704,355,840 B，含所有 `result.json`、小型 JSON、报告、CSV/TSV、脚本、论文 workload 和 `/data/datasets` |
+| 可移植实验结果和数据集 | `migration_artifacts/20260930/` | 21,937 个归档文件及补充 TP4 baseline 原件；含 `result.json`、小型 JSON、报告、CSV/TSV、脚本、论文 workload 和 `/data/datasets` |
 | 当前编译运行时回滚包 | `migration_artifacts/20260930/` | 703 个文件；压缩前 232,284,160 B，含三个自定义 CANN vendor 和 `vllm_ascend` 扩展库 |
 | 环境和存储清单 | 本目录 | Conda/Pip 锁定信息、软件版本、模型/数据集/仓库/挂载清单及 672,013 个文件的路径/大小/mtime 清单 |
 
@@ -46,7 +50,7 @@ GitHub 普通 Git 的 100 MiB 单文件上限。模型和张量权重本身也�
 
 ## 3. 仍须离开本服务器备份的内容
 
-### P0：不可从 GitHub 当前内容无损重建
+### 历史取证原件：不可从 GitHub 当前内容无损重建
 
 1. `/root/data/nano-pearl-benchmark-results` 中未进入便携证据包的 raw CANN profile、
    大型 trace JSON/JSONL、`.pt` 真实层输入捕获、`.db`、`.slice_*`、`.op_range` 和
@@ -66,7 +70,7 @@ GitHub 普通 Git 的 100 MiB 单文件上限。模型和张量权重本身也�
    直接复制。`Llama-3.1-70B-Instruct` 有 30 个 `.incomplete` 分片，
    `Llama-3.2-1B-Instruct` 有 2 个 `.incomplete` 文件，二者不是完整模型，不能当作
    成功备份。完整列表见 `model_inventory.tsv`。
-2. `/root/miniconda3`（11.77 GB）。同架构镜像可复制，但更稳妥的方式是在新容器按
+2. `/root/miniconda3`（当前约 11 GB，其中实验 env 约 3.3 GB）。同架构镜像可复制，但更稳妥的方式是在新容器按
    `vllm-hust-dev.conda-explicit.txt`、`vllm-hust-dev.environment.yml` 和
    `vllm-hust-dev.pip-freeze.txt` 重建，再以 editable 方式安装两个源码仓库。
 3. `/root/.triton/llvm`（4.83 GB），无外网时需要；有稳定镜像时可重新下载。
@@ -126,7 +130,8 @@ bash tools/specslo_migration/verify_portable_archives.sh \
 ## 5. 新容器恢复顺序
 
 1. 要求管理员提供匹配的 910B2 驱动/固件和 CANN 9.0.0 镜像，先核对 ABI。
-2. 克隆私人仓库的 `SpecSLO-Chain`，校验远端提交；不要从 public `origin` 猜测项目状态。
+2. 克隆私人仓库冻结标签 `specslo-reproduction-20260930-v2` 并校验；只有继续优化时才切换
+   `SpecSLO-Chain`，不要从 public `origin` 猜测项目状态。
 3. 克隆 vLLM-HUST 到基线 `933842ab`，应用
    `patches/vllm-hust/specslo-core.patch`；按需对 dev-hub 基线 `a61b3183` 应用 quickstart
    补丁。
@@ -148,6 +153,8 @@ bash tools/specslo_migration/verify_portable_archives.sh \
   GitHub 内容足以重建并重新测试 SpecSLO。
 - **逐文件复原当前容器：尚未完成。** 仍缺约 300+ GB 的模型、tensor capture、raw profile、
   Conda/LLVM/log 等异机副本，以及由管理员保证的宿主驱动/固件和共享数据集挂载。
+- **最终实验的 bit-exact 输入复原：仍需离机保存两个核心模型和 OCI 镜像身份。** raw
+  profiler/tensor capture 不属于重跑最终吞吐的输入，可在新机重新生成，但旧原件无法凭文档恢复。
 - 当前服务器上的任何 `/root`、`/data`、`/tmp` 归档都不算灾备；只有复制离开该宿主机并在
   目标端再次验证 SHA256，才算完成完整备份。
 

@@ -4,6 +4,9 @@
 [`README_zh.md`](README_zh.md) 的分工是：审计文档说明“保存了什么、还缺什么”，本文说明
 “在新容器上按什么顺序恢复、重建和验收”。
 
+已经实际执行过的空目录恢复步骤、OCI 镜像缺口和清机前外部备份命令见
+[`ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md`](ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md)。
+
 ## 1. 能恢复到什么程度
 
 | 恢复等级 | 仅依赖私人 GitHub | 还需要什么 | 结论 |
@@ -53,7 +56,7 @@ GitHub 中的已编译 `.so` 和 CANN vendor 只能用于取证，不能直接�
 
 ```bash
 mkdir -p /root/data
-git clone --branch specslo-reproduction-20260930 --single-branch \
+git clone --branch specslo-reproduction-20260930-v2 --single-branch \
   git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
   /root/data/vllm-ascend-hust
 
@@ -457,8 +460,9 @@ bash tools/specslo_experiments/run_online_coalesce1_formal_ab.sh \
 
 只有全部勾选后，才可以声称新容器完成 SpecSLO 功能级复现：
 
-- [ ] 冻结标签 `specslo-reproduction-20260930` 的来源和提交已记录；
+- [ ] 冻结标签 `specslo-reproduction-20260930-v2` 的来源和提交已记录；
 - [ ] `bootstrap_from_github.sh` 输出 `Source bootstrap passed.`；
+- [ ] `preflight_zero_container.sh --full-model-hash` 输出 `FAIL=0`；
 - [ ] vLLM-HUST 固定基线、核心补丁和 Catlass 提交均已校验；
 - [ ] Driver/CANN/torch/torch-npu/架构与快照匹配；
 - [ ] 两个 Qwen3 模型完整、没有 `.incomplete`，且 `CORE_MODEL_SHA256SUMS` 全部通过；
