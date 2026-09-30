@@ -53,7 +53,7 @@ GitHub 中的已编译 `.so` 和 CANN vendor 只能用于取证，不能直接�
 
 ```bash
 mkdir -p /root/data
-git clone --branch SpecSLO-Chain --single-branch \
+git clone --branch specslo-reproduction-20260930 --single-branch \
   git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
   /root/data/vllm-ascend-hust
 
@@ -61,16 +61,30 @@ git -C /root/data/vllm-ascend-hust status --short --branch
 git -C /root/data/vllm-ascend-hust rev-parse HEAD
 ```
 
-不要 checkout 私人仓库的 `main`，也不要用 public `origin` 的分支头代替
-`SpecSLO-Chain`。复现实验前把实际提交写入实验目录。
+不要 checkout 私人仓库的 `main`，也不要用活动的 `SpecSLO-Chain` 分支头代替冻结标签。
+活动分支只用于复刻完成后的后续调优。复现实验前把实际提交和标签写入实验目录。
 
 SpecSLO 的 V1 scheduler/请求/输出等核心层修改属于另一个仓库。恢复它时必须从固定基线
-应用本仓库保存的补丁：
+应用本仓库保存的补丁。推荐直接运行经过幂等和 fail-closed 检查的恢复器：
 
 ```bash
-git clone git@github.com:vLLM-HUST/vllm-hust.git /root/data/vllm-hust
-git -C /root/data/vllm-hust checkout \
+bash /root/data/vllm-ascend-hust/tools/specslo_migration/\
+bootstrap_from_github.sh
+```
+
+脚本从 `git@github.com:vLLM-HUST/vllm-hust.git` 按完整 SHA
+`933842ab0fdd53ee47dee8148bca1671d7d6da61` 直接 fetch，不依赖默认分支；然后校验
+`specslo-core.patch` SHA、应用补丁、反向检查完整补丁并固定 Catlass 子模块。若必须手工审核，
+等价命令是：
+
+```bash
+mkdir -p /root/data/vllm-hust
+git -C /root/data/vllm-hust init
+git -C /root/data/vllm-hust remote add origin \
+  git@github.com:vLLM-HUST/vllm-hust.git
+git -C /root/data/vllm-hust fetch --depth=1 origin \
   933842ab0fdd53ee47dee8148bca1671d7d6da61
+git -C /root/data/vllm-hust checkout --detach FETCH_HEAD
 
 git -C /root/data/vllm-hust apply --check \
   /root/data/vllm-ascend-hust/patches/vllm-hust/specslo-core.patch
@@ -228,10 +242,11 @@ snapshot_download("Qwen/Qwen3-32B", local_dir="/data/shared-models/Qwen3-32B")
 PY
 ```
 
-旧容器没有保存这两个目录的下载 revision，因此上述命令只能保证**功能级重下载**，不能
-证明权重字节与旧容器完全相同。需要 bit-exact 恢复时，必须从外部大包复制旧权重，并使用
-外部 manifest 校验；不能臆造 revision。四个派生 Qwen2.5 draft/vocab 模型也没有足够的
-转换配方从基础模型自动恢复，历史 Qwen2.5 回归需要从外部包恢复它们。
+旧容器没有保存这两个目录的下载 revision，但现在已经保存两套核心模型逐文件 SHA256。
+ModelScope 下载后只有 `CORE_MODEL_SHA256SUMS` 全部通过，才可以宣称权重 bit-exact；若上游
+revision 已变化，则只能算功能级重下载，必须从外部大包复制旧权重才能完美复现。不能臆造
+revision。四个派生 Qwen2.5 draft/vocab 模型也没有足够的转换配方从基础模型自动恢复，历史
+Qwen2.5 回归需要从外部包恢复它们。
 
 模型完整性最低检查：
 
@@ -243,6 +258,9 @@ if find /data/shared-models/Qwen3-0.6B /data/shared-models/Qwen3-32B \
   echo 'model contains incomplete files' >&2
   exit 1
 fi
+
+sha256sum -c /root/data/vllm-ascend-hust/docs/migration/20260930/\
+CORE_MODEL_SHA256SUMS
 ```
 
 ## 7. 先过源码和 CPU 回归
@@ -439,10 +457,11 @@ bash tools/specslo_experiments/run_online_coalesce1_formal_ab.sh \
 
 只有全部勾选后，才可以声称新容器完成 SpecSLO 功能级复现：
 
-- [ ] `SpecSLO-Chain` 来源和提交已记录；
-- [ ] vLLM-HUST 固定基线和核心补丁均已应用；
+- [ ] 冻结标签 `specslo-reproduction-20260930` 的来源和提交已记录；
+- [ ] `bootstrap_from_github.sh` 输出 `Source bootstrap passed.`；
+- [ ] vLLM-HUST 固定基线、核心补丁和 Catlass 提交均已校验；
 - [ ] Driver/CANN/torch/torch-npu/架构与快照匹配；
-- [ ] 两个 Qwen3 模型完整，没有 `.incomplete`；
+- [ ] 两个 Qwen3 模型完整、没有 `.incomplete`，且 `CORE_MODEL_SHA256SUMS` 全部通过；
 - [ ] workload SHA256 精确匹配；
 - [ ] CPU 控制面测试通过；
 - [ ] eager/graph × MC2-off/on 数值门通过；
@@ -457,7 +476,8 @@ bash tools/specslo_experiments/run_online_coalesce1_formal_ab.sh \
 
 1. 宿主驱动、固件、CANN 和共享挂载需要管理员提供；
 2. 私人 GitHub/SSH/ModelScope 登录需要用户重新授权；
-3. 模型旧 revision 未记录，重下载不能证明 bit-exact；
+3. 模型旧 revision 未记录；当前 SHA 清单可以判定是否 bit-exact，但若上游已更换文件，仍需
+   外部旧权重副本才能恢复；
 4. 原始 100+ GB profiler/tensor capture 若没有外部副本，只能重新生成，不能恢复历史内容；
 5. 物理 NPU 拓扑、HCCL 状态和系统噪声变化会改变性能，旧 MC2 profile 不能跨机器直接晋升；
 6. 当前最优候选尚未同时稳定满足 Raw 超 TP4 和 Goodput 三轮均 >=1.3x，因此恢复完成与最终

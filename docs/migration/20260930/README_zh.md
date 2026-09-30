@@ -9,9 +9,15 @@
 的机器可读目标和模型逐文件哈希分别见 `FINAL_EXPERIMENT_TARGET.json` 与
 `CORE_MODEL_SHA256SUMS`。
 
+从 GitHub 恢复两个源码树时优先运行
+`tools/specslo_migration/bootstrap_from_github.sh`；该脚本已在空临时目录实测完成
+`vLLM-HUST@933842ab + specslo-core.patch` 的 14 文件恢复和反向补丁校验。
+
 ## 1. 本次已经保存到私人 GitHub 的内容
 
 私人仓库为 `git@github.com:Renty-0/vllm-Ascend-SpecSLO.git`。
+完美复现使用冻结标签 `specslo-reproduction-20260930`；`SpecSLO-Chain` 是会继续前移的开发
+分支，不应作为未来 bit-identical 源码身份。
 
 | 内容 | 分支/目录 | 状态 |
 | --- | --- | --- |
