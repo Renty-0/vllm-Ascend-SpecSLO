@@ -41,9 +41,7 @@ env_variables: dict[str, Callable[[], Any]] = {
     # Skip this many worker decode cycles before the profiler's own warmup
     # and active windows.  Online service traces need this to exclude initial
     # pipeline-fill cycles and capture steady-state draft/target concurrency.
-    "VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS": lambda: int(
-        os.getenv("VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS", "0")
-    ),
+    "VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS": lambda: int(os.getenv("VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS", "0")),
     # When enabled, create a CANN profiler only for a generate call whose
     # non-synchronizing host timeline has been explicitly requested.  The
     # benchmark configures that timeline after graph qualification, so this
@@ -61,28 +59,20 @@ env_variables: dict[str, Callable[[], Any]] = {
     # Optional absolute directory for one-shot real-layer MC2 qualification
     # inputs. Empty (default) disables the probe. This non-secret diagnostic
     # must be used only with enforce-eager and removed before measurements.
-    "VLLM_ASCEND_PEARL_MC2_CAPTURE_DIR": lambda: os.getenv(
-        "VLLM_ASCEND_PEARL_MC2_CAPTURE_DIR", ""
-    ),
+    "VLLM_ASCEND_PEARL_MC2_CAPTURE_DIR": lambda: os.getenv("VLLM_ASCEND_PEARL_MC2_CAPTURE_DIR", ""),
     # Comma-separated positive, exact flattened M rows to capture. Empty
     # (default) disables the probe. Both capture variables must be set
     # together; ACLGraph capture and performance measurements are unsupported.
-    "VLLM_ASCEND_PEARL_MC2_CAPTURE_ROWS": lambda: os.getenv(
-        "VLLM_ASCEND_PEARL_MC2_CAPTURE_ROWS", ""
-    ),
+    "VLLM_ASCEND_PEARL_MC2_CAPTURE_ROWS": lambda: os.getenv("VLLM_ASCEND_PEARL_MC2_CAPTURE_ROWS", ""),
     # Projection family captured by the real-input probe. ``attention`` keeps
     # the historical o_proj behavior; ``down`` captures the MLP down_proj
     # inputs needed to qualify a cross-layer MC2 candidate. This selector is
     # diagnostic-only and has no effect while capture DIR/ROWS are unset.
-    "VLLM_ASCEND_PEARL_MC2_CAPTURE_KIND": lambda: os.getenv(
-        "VLLM_ASCEND_PEARL_MC2_CAPTURE_KIND", "attention"
-    ),
+    "VLLM_ASCEND_PEARL_MC2_CAPTURE_KIND": lambda: os.getenv("VLLM_ASCEND_PEARL_MC2_CAPTURE_KIND", "attention"),
     # Optional comma-separated decoder layer indices. Empty preserves the
     # historical one-shot behavior by capturing only the first matching
     # layer. Explicit indices may be used for cross-layer numerical audits.
-    "VLLM_ASCEND_PEARL_MC2_CAPTURE_LAYERS": lambda: os.getenv(
-        "VLLM_ASCEND_PEARL_MC2_CAPTURE_LAYERS", ""
-    ),
+    "VLLM_ASCEND_PEARL_MC2_CAPTURE_LAYERS": lambda: os.getenv("VLLM_ASCEND_PEARL_MC2_CAPTURE_LAYERS", ""),
     # Diagnostic-only escape hatch for a native-epilogue MC2 correctness A/B.
     # Default 0 keeps production fail-closed.  When set to 1, an exact
     # identity-bound ``tp3_matmul_allreduce+native_add_rmsnorm`` profile may
@@ -96,29 +86,32 @@ env_variables: dict[str, Callable[[], Any]] = {
     # off and is further fail-closed by the native model: only target TP3,
     # MC2-enabled, bias-free, uniform K=8576 FFNs with an exact qualified
     # profile entry may replace down_proj + all-reduce + the following RMSNorm.
-    "VLLM_ASCEND_PEARL_MC2_DOWN_PROJ": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_PEARL_MC2_DOWN_PROJ", "0"))
-    ),
+    "VLLM_ASCEND_PEARL_MC2_DOWN_PROJ": lambda: bool(int(os.getenv("VLLM_ASCEND_PEARL_MC2_DOWN_PROJ", "0"))),
     # Optional native-draft-only weight layout. -1 inherits the global
     # VLLM_ASCEND_ENABLE_NZ mode; 0/1 keep ND, 2 converts all supported
     # linears, 3/4/5 select both/down-only/gate-only FFN projections, and
     # 6/7 select down_proj on even/odd decoder layers.
     # This lets draft and target layouts be qualified independently.
     # 9 is an inference-only LM-head NZ policy; tied embeddings stay ND.
-    "VLLM_ASCEND_PEARL_DRAFT_NZ_MODE": lambda: int(
-        os.getenv("VLLM_ASCEND_PEARL_DRAFT_NZ_MODE", "-1")
-    ),
+    "VLLM_ASCEND_PEARL_DRAFT_NZ_MODE": lambda: int(os.getenv("VLLM_ASCEND_PEARL_DRAFT_NZ_MODE", "-1")),
     # Optional target-local layout override. Mode 3 converts both FFN
     # projections; mode 4 converts only down_proj, mode 5 only gate_up_proj,
     # modes 6/7 select down_proj on even/odd decoder layers, and mode 8 uses
     # NZ for QKV/O/down/LM-head while deliberately retaining gate-up in ND.
     # Mode 11 retains an ND down projection for verify graphs and adds an NZ
-    # copy used only by larger mixed-prefill matrices.
-    "VLLM_ASCEND_PEARL_TARGET_NZ_MODE": lambda: int(
-        os.getenv("VLLM_ASCEND_PEARL_TARGET_NZ_MODE", "-1")
-    ),
+    # copy used only by larger mixed-prefill matrices. Modes 12/13 apply that
+    # dual-layout policy to even/odd decoder layers to reduce HBM overhead.
+    "VLLM_ASCEND_PEARL_TARGET_NZ_MODE": lambda: int(os.getenv("VLLM_ASCEND_PEARL_TARGET_NZ_MODE", "-1")),
     "VLLM_ASCEND_PEARL_TARGET_LARGE_M_NZ_MIN_ROWS": lambda: int(
         os.getenv("VLLM_ASCEND_PEARL_TARGET_LARGE_M_NZ_MIN_ROWS", "192")
+    ),
+    # Experimental TP3 target input-embedding replication.  The native model
+    # normally shards the vocabulary table and all-reduces every embedding
+    # lookup.  Replication performs one target-group all-gather after weight
+    # loading so graph replays can use a local GatherV2 while the sharded LM
+    # head and all output-projection semantics remain unchanged.
+    "VLLM_ASCEND_PEARL_TARGET_REPLICATE_INPUT_EMBEDDING": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_TARGET_REPLICATE_INPUT_EMBEDDING", "0"))
     ),
     # Strict qualification gate for native PARD eager execution.  Default off
     # keeps the public engine fail-closed.  This never enables draft ACLGraph;
@@ -229,6 +222,13 @@ env_variables: dict[str, Callable[[], Any]] = {
                 "0",
             )
         )
+    ),
+    # Keep the earliest serial-draft graph prefix on the caller-owned update
+    # stream while background streams prepare later consecutive steps.  The
+    # legacy round-robin partition can make replay block at layer 1 even when
+    # most later handles are already refreshed.
+    "VLLM_ASCEND_PEARL_DRAFT_PA_CONTIGUOUS_PARTITION": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_PEARL_DRAFT_PA_CONTIGUOUS_PARTITION", "0"))
     ),
     # Replace the fixed-gamma serial draft's one-token PA calls with a
     # request-major FULL-mask FIA contract.  Every request keeps its exact
@@ -351,9 +351,7 @@ env_variables: dict[str, Callable[[], Any]] = {
     # final TPOT budget is still attainable are ordered by remaining terminal
     # slack; requests that have already exhausted that immutable budget no
     # longer displace an attainable request merely because their a_need grows.
-    "VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF", "0"))
-    ),
+    "VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF": lambda: bool(int(os.getenv("VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF", "0"))),
     # Experimental target-side class priority.  When a fixed verification
     # envelope cannot consume every ready proposal, select the smallest TPOT
     # SLO first and retain a_need/urgency/age as tie breakers within a class.
@@ -368,15 +366,46 @@ env_variables: dict[str, Callable[[], Any]] = {
     # relaxed stragglers do not extend the workload makespan.  This switch is
     # intentionally fail-closed and is enabled explicitly by the formal
     # SpecSLO launcher.
-    "VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO", "0"))
+    "VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO": lambda: bool(int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO", "0"))),
+    # Optional two-phase target cohort.  A positive value caps verification
+    # rows while arrivals/prefills/preempted requests can still change the
+    # online schedule; the configured graph maximum becomes available only
+    # after the trace reaches its immutable final drain.  Zero preserves the
+    # single-cap scheduler exactly.
+    "VLLM_ASCEND_SPECRHYTHM_ONLINE_TARGET_MAX_BATCH": lambda: int(
+        os.getenv("VLLM_ASCEND_SPECRHYTHM_ONLINE_TARGET_MAX_BATCH", "0")
     ),
     # In a DRAIN_FIFO-enabled immutable final drain, prioritize both ready
     # target tickets and normal/repair draft admission by one smoothed
     # remaining-service estimate.  The native engine ignores this switch at
     # every mutable frontier, and the default remains fail-closed.
-    "VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF", "0"))
+    "VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF": lambda: bool(int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF", "0"))),
+    # Optional active-row guard for the unified final-drain LRTF experiment.
+    # Zero preserves the original whole-drain behaviour; a positive value
+    # delays cross-home substitutions until the immutable tail has at most
+    # this many active requests.
+    "VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF_MAX_ACTIVE": lambda: int(
+        os.getenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF_MAX_ACTIVE", "0")
+    ),
+    # Narrow final-drain experiment: rank only already-ready target tickets
+    # by longest remaining service while preserving the established draft
+    # home/repair rotation.  This isolates makespan balancing from the
+    # cross-home draft substitutions performed by the unified LRTF policy.
+    "VLLM_ASCEND_SPECRHYTHM_DRAIN_TARGET_LRTF": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_TARGET_LRTF", "0"))
+    ),
+    # In the immutable final drain, reuse otherwise padded rows in the
+    # already-selected serial-draft ACLGraph bucket for cross-home repair
+    # proposals. The optimization never grows the bucket or displaces a
+    # normal/rolling-eager row.
+    "VLLM_ASCEND_SPECRHYTHM_DRAIN_PADDING_REPAIR": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_PADDING_REPAIR", "0"))
+    ),
+    # Paper-style second-stage target selection: requests with positive
+    # a_need keep strict priority, while only the residual a_need==0 slots are
+    # ranked by longest remaining service to avoid relaxed makespan tails.
+    "VLLM_ASCEND_SPECRHYTHM_TARGET_RESIDUAL_LRTF": lambda: bool(
+        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_TARGET_RESIDUAL_LRTF", "0"))
     ),
     # Restrict optional idle-window rolling continuations to requests in the
     # strictest TPOT class. Mandatory normal proposals and urgent a_need work
@@ -401,12 +430,8 @@ env_variables: dict[str, Callable[[], Any]] = {
     # Soft active-set caps for relaxed traffic.  A cap is enforced only while
     # a tighter-class request remains pending, and is released for tail drain.
     # Zero disables the corresponding cap.
-    "VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP": lambda: int(
-        os.getenv("VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP", "0")
-    ),
-    "VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP": lambda: int(
-        os.getenv("VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP", "0")
-    ),
+    "VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP": lambda: int(os.getenv("VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP", "0")),
+    "VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP": lambda: int(os.getenv("VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP", "0")),
     # Allow relaxed requests to borrow otherwise idle active slots, then
     # suspend them at a cycle boundary when a coalesced tight cohort arrives.
     # Their KV and request state remain resident and their TPOT clock keeps
@@ -483,9 +508,7 @@ env_variables: dict[str, Callable[[], Any]] = {
     # slot becomes vacant.  Its first token remains private until an
     # incumbent completes, so service batch capacity and TPOT semantics are
     # unchanged while prompt work can be hidden behind full-batch decode.
-    "VLLM_ASCEND_SPECRHYTHM_PREFETCH_AHEAD": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_PREFETCH_AHEAD", "0"))
-    ),
+    "VLLM_ASCEND_SPECRHYTHM_PREFETCH_AHEAD": lambda: bool(int(os.getenv("VLLM_ASCEND_SPECRHYTHM_PREFETCH_AHEAD", "0"))),
     # Highest exact-Q ordinary target-verify graph captured ahead of sealed
     # service.  Keep the historical 32-row family by default; services that
     # deliberately admit larger target batches must raise this together with
@@ -495,6 +518,12 @@ env_variables: dict[str, Callable[[], Any]] = {
             "VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_MAX_CAPACITY",
             "32",
         )
+    ),
+    # Keep the latency-sensitive online graph family dense only through this
+    # capacity, then add the configured maximum as one sparse tail entry.
+    # Zero preserves the historical dense 1..max family.
+    "VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_DENSE_MAX_CAPACITY": lambda: int(
+        os.getenv("VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_DENSE_MAX_CAPACITY", "0")
     ),
     # Optional request-row bucket for ordinary fixed-gamma target graphs.
     # gamma=4 and bucket=4 make every target GEMM row count a multiple of 16,
@@ -515,6 +544,34 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD": lambda: bool(
         int(os.getenv("VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD", "0"))
     ),
+    # Submit the *current* decode-only target verification graph immediately
+    # after its controller-authoritative payload has been validated.  The
+    # replicated scheduler may then finish selecting the next draft batch
+    # while target TP ranks execute the already-fixed verification.  This is
+    # narrower than target replay-ahead: it does not predict the next plan or
+    # mutate a future frontier.  The engine fails closed for online prefill,
+    # bonus-token, profiling, eager/stepwise, or non-resident graph cycles.
+    # Default off until complete-system numerical and throughput A/B passes.
+    "VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_TARGET_SUBMIT": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_TARGET_SUBMIT",
+                "0",
+            )
+        )
+    ),
+    # Extend current-target early submission to the fixed mixed
+    # verify+online-prefill graph.  This is separated from the decode-only
+    # switch because complete-system A/B found correct full coverage but no
+    # Raw-throughput gain on the author workload.
+    "VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT": lambda: bool(
+        int(
+            os.getenv(
+                "VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT",
+                "0",
+            )
+        )
+    ),
     # Experimental target-only GEMM row padding.  Each native linear pads its
     # packed token matrix to this multiple and slices the result immediately,
     # keeping attention/KV semantics unchanged while making exact and bucketed
@@ -529,9 +586,7 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_PEARL_TARGET_TP3_BALANCED_FFN_SHIFT": lambda: int(
         os.getenv("VLLM_ASCEND_PEARL_TARGET_TP3_BALANCED_FFN_SHIFT", "0")
     ),
-    "VLLM_ASCEND_PEARL_TARGET_TP3_LIGHT_RANK": lambda: int(
-        os.getenv("VLLM_ASCEND_PEARL_TARGET_TP3_LIGHT_RANK", "-1")
-    ),
+    "VLLM_ASCEND_PEARL_TARGET_TP3_LIGHT_RANK": lambda: int(os.getenv("VLLM_ASCEND_PEARL_TARGET_TP3_LIGHT_RANK", "-1")),
     # Pair the target fusion above with a draft-side mixed first step: staged
     # prompt rows share the first eager FIA model pass with incumbent draft
     # roots, then a qualified three-step PA graph completes gamma=4.
@@ -564,9 +619,7 @@ env_variables: dict[str, Callable[[], Any]] = {
     # stream before an overlapping-group HCCL broadcast.  The corresponding
     # correction must also use Gloo so no cross-model HCCL collective is
     # posted while target TP all-reduces are still in flight.
-    "VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL": lambda: bool(
-        int(os.getenv("VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL", "0"))
-    ),
+    "VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL": lambda: bool(int(os.getenv("VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL", "0"))),
     # Reuse the fixed-shape device and pinned-host source buffers used by the
     # compact Gloo proposal path. The synchronous Gloo broadcast releases
     # both buffers before the next cycle.

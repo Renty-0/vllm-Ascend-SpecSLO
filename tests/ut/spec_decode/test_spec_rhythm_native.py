@@ -43,6 +43,60 @@ def _publish_ready(controller, indices, gamma=4):
     controller.publish([controller.new_ticket(index, gamma=gamma, eager=False) for index in indices])
 
 
+@pytest.mark.parametrize("projected_wait_ms", [-1.0, 0.0, 87.5])
+def test_paired_scheduling_metrics_match_standalone_definitions(projected_wait_ms):
+    state = SpecRhythmRuntimeState(
+        request_index=0,
+        home_batch_id=0,
+        slo_tpot_ms=40.0,
+        delivered_tokens=65,
+        decode_elapsed_ms=1987.5,
+        arrival_wait_ms=320.0,
+        arrival_debt_cap_tokens=4,
+    )
+
+    assert state.scheduling_metrics(projected_wait_ms) == (
+        state.projected_progress_gap(projected_wait_ms),
+        state.urgency(projected_wait_ms),
+    )
+
+
+def test_registered_unique_active_fast_path_preserves_execution_plan():
+    states_checked = _states(64)
+    states_trusted = _states(64)
+    for states in (states_checked, states_trusted):
+        for index, state in states.items():
+            state.delivered_tokens = 65 + index % 8
+            state.decode_elapsed_ms = 2400.0 + index
+    checked = SpecRhythmPipelineController(states_checked)
+    trusted = SpecRhythmPipelineController(states_trusted)
+    for controller in (checked, trusted):
+        _publish_ready(controller, range(64))
+
+    kwargs = {
+        "priority": True,
+        "projected_wait_ms": 86.0,
+        "merge_ready_homes": True,
+        "max_target_requests": 32,
+        "verification_budget": 128,
+        "ready_candidate_counts": {index: 4 for index in range(64)},
+    }
+    checked_plan = checked.build_plan(range(64), **kwargs)
+    trusted_plan = trusted.build_plan(
+        tuple(range(64)),
+        active_indices_registered_unique=True,
+        **kwargs,
+    )
+
+    assert trusted_plan == checked_plan
+    assert trusted_plan.target_scheduling_metrics == checked_plan.target_scheduling_metrics
+    assert trusted_plan.target_scheduling_metrics == {
+        index: states_trusted[index].scheduling_metrics(86.0)
+        for index in trusted_plan.target_request_indices
+    }
+    assert trusted._ready_wait_cycles == checked._ready_wait_cycles
+
+
 def test_slo_aware_admission_orders_strict_ready_requests_first():
     indices = (0, 1, 2, 3, 4)
     slo = {0: 150.0, 1: 40.0, 2: 50.0, 3: 40.0, 4: None}
@@ -654,6 +708,64 @@ def test_slo_pipeline_can_merge_ready_home_batches():
     assert set(merged.target_request_indices) == {0, 1, 2, 3}
 
 
+def test_target_replay_reservation_defers_promoted_eager_rows():
+    states = _states()
+    controller = SpecRhythmPipelineController(states)
+    controller.publish([controller.new_ticket(index, gamma=4, eager=False) for index in (0, 2)])
+    promoted = {index: controller.new_ticket(index, gamma=4, eager=True) for index in (0, 2)}
+    controller.publish(list(promoted.values()))
+    for index in (0, 2):
+        assert _finish_simulated_proposal(controller, index) is promoted[index]
+    controller.publish([controller.new_ticket(index, gamma=4, eager=False) for index in (1, 3)])
+
+    plan = controller.build_plan(
+        [0, 1, 2, 3],
+        merge_ready_homes=True,
+        max_target_requests=2,
+        verification_budget=8,
+        reserved_target_request_indices=(1, 2),
+        reserved_target_home_batch_id=1,
+    )
+
+    assert plan.target_home_batch_id == 1
+    assert plan.target_request_indices == (1, 2)
+    assert plan.deferred_target_request_indices == (0, 3)
+    assert plan.target_candidate_budgets == {1: 4, 2: 4}
+
+
+@pytest.mark.parametrize(
+    ("reserved", "home", "match"),
+    [
+        ((1, 3), None, "both rows and a home"),
+        ((3, 1), 1, "active-row order"),
+        ((1, 3), 1, "row limit"),
+    ],
+)
+def test_target_replay_reservation_fails_closed(reserved, home, match):
+    controller = SpecRhythmPipelineController(_states())
+    _publish_ready(controller, (0, 1, 2, 3))
+    kwargs = {
+        "reserved_target_request_indices": reserved,
+        "reserved_target_home_batch_id": home,
+        "max_target_requests": 1 if match == "row limit" else 2,
+    }
+    with pytest.raises(ValueError, match=match):
+        controller.build_plan([0, 1, 2, 3], **kwargs)
+
+
+def test_target_replay_reservation_rejects_stale_row_route():
+    controller = SpecRhythmPipelineController(_states())
+    _publish_ready(controller, (1, 3))
+    controller.request_states[1].home_batch_id = 0
+
+    with pytest.raises(ValueError, match="stale or misrouted"):
+        controller.build_plan(
+            [0, 1, 2, 3],
+            reserved_target_request_indices=(1, 3),
+            reserved_target_home_batch_id=1,
+        )
+
+
 def test_slo_pipeline_keeps_alternating_home_by_default():
     states = _states()
     controller = SpecRhythmPipelineController(states)
@@ -880,9 +992,7 @@ def test_drain_lrtf_selects_complete_windows_with_largest_remaining_service():
         for index in range(64)
     }
     controller = SpecRhythmPipelineController(states)
-    controller.publish(
-        [controller.new_ticket(index, gamma=4, eager=False) for index in states]
-    )
+    controller.publish([controller.new_ticket(index, gamma=4, eager=False) for index in states])
     # Make every shorter request much older. Remaining service must remain the
     # primary drain key, with age used only to break equivalent estimates.
     controller._ready_wait_cycles.update({index: 100 for index in range(32, 64)})
@@ -908,15 +1018,7 @@ def test_drain_lrtf_unifies_ready_and_repair_ranking_without_changing_row_count(
             home_batch_id=index % 2,
             slo_tpot_ms=40.0,
             output_token_budget=256,
-            delivered_tokens=(
-                33
-                if index in (0, 2)
-                else 225
-                if index in (4, 7)
-                else 1
-                if index == 6
-                else 65
-            ),
+            delivered_tokens=(33 if index in (0, 2) else 225 if index in (4, 7) else 1 if index == 6 else 65),
             verification_rounds=1 if index == 6 else 16,
         )
         for index in range(8)
@@ -952,6 +1054,99 @@ def test_drain_lrtf_unifies_ready_and_repair_ranking_without_changing_row_count(
     assert plan.remaining_service_normal_candidates == 5
     assert plan.remaining_service_normal_selected == 4
     assert plan.remaining_service_normal_cross_home_selected == 1
+
+
+def test_drain_target_lrtf_preserves_the_legacy_draft_home_rotation():
+    states = {
+        index: SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=index % 2,
+            output_token_budget=256,
+            delivered_tokens=(33 if index in (0, 2, 6) else 225 if index in (4, 7) else 65),
+            verification_rounds=16,
+        )
+        for index in range(8)
+    }
+    controller = SpecRhythmPipelineController(states)
+    _publish_ready(controller, (0, 2, 4))
+
+    plan = controller.build_plan(
+        states,
+        remaining_service_target_first=True,
+        merge_ready_homes=True,
+        max_target_requests=2,
+        verification_budget=8,
+    )
+
+    assert plan.target_request_indices == (0, 2)
+    assert plan.deferred_target_request_indices == (4,)
+    assert plan.normal_draft_request_indices == (1, 3, 5, 7)
+    assert plan.remaining_service_target_ranked
+    assert not plan.remaining_service_normal_ranked
+    assert plan.remaining_service_target_candidates == 3
+    assert plan.remaining_service_normal_candidates == 0
+    assert plan.remaining_service_normal_selected == 0
+    assert plan.remaining_service_normal_cross_home_selected == 0
+
+
+def test_residual_target_lrtf_keeps_a_need_and_slo_class_before_remaining_service():
+    states = {
+        0: SpecRhythmRuntimeState(
+            request_index=0,
+            home_batch_id=0,
+            slo_tpot_ms=40.0,
+            output_token_budget=256,
+            delivered_tokens=1,
+            decode_elapsed_ms=200.0,
+            verification_rounds=16,
+        ),
+        1: SpecRhythmRuntimeState(
+            request_index=1,
+            home_batch_id=0,
+            slo_tpot_ms=40.0,
+            output_token_budget=256,
+            delivered_tokens=225,
+            verification_rounds=16,
+        ),
+        2: SpecRhythmRuntimeState(
+            request_index=2,
+            home_batch_id=0,
+            slo_tpot_ms=50.0,
+            slo_class="normal",
+            output_token_budget=256,
+            delivered_tokens=225,
+            verification_rounds=16,
+        ),
+        3: SpecRhythmRuntimeState(
+            request_index=3,
+            home_batch_id=0,
+            slo_tpot_ms=150.0,
+            slo_class="loose",
+            output_token_budget=256,
+            delivered_tokens=33,
+            verification_rounds=16,
+        ),
+    }
+    states[0].slo_class = "tight"
+    states[1].slo_class = "tight"
+    controller = SpecRhythmPipelineController(states)
+    _publish_ready(controller, states)
+
+    plan = controller.build_plan(
+        states,
+        priority=True,
+        projected_wait_ms=0.0,
+        residual_remaining_service_target_first=True,
+        merge_ready_homes=True,
+        max_target_requests=3,
+        verification_budget=12,
+    )
+
+    assert plan.target_request_indices == (0, 1, 2)
+    assert plan.deferred_target_request_indices == (3,)
+    assert plan.residual_remaining_service_target_ranked
+    assert plan.residual_remaining_service_target_candidates == 3
+    assert plan.residual_remaining_service_target_selected == 2
 
 
 def test_drain_lrtf_disabled_preserves_target_only_legacy_plan():

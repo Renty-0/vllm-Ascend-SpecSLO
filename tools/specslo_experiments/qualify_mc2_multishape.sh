@@ -71,6 +71,11 @@ if [[ ! -d $vendor || ! -f $vendor/op_api/lib/libcust_opapi.so ]]; then
   echo "MC2 vendor is not an installed custom-op tree: $vendor" >&2
   exit 3
 fi
+if ! nm -D "$vendor/op_api/lib/libcust_opapi.so" 2>/dev/null \
+  | grep -q 'aclnnAllreduceAddRmsnormGetWorkspaceSize'; then
+  echo "MC2 vendor does not provide aclnnAllreduceAddRmsnorm: $vendor" >&2
+  exit 3
+fi
 if [[ -e $run_dir ]]; then
   echo "refusing to overwrite existing run: $run_dir" >&2
   exit 4
@@ -176,7 +181,7 @@ export ASCEND_RT_VISIBLE_DEVICES=$target_devices
 export TASK_QUEUE_ENABLE=1
 export HCCL_OP_EXPANSION_MODE=AIV
 export HCCL_DETERMINISTIC=true
-export ASCEND_CUSTOM_OPP_PATH=$base_vendor:$vendor
+export ASCEND_CUSTOM_OPP_PATH=$vendor:$base_vendor
 export LD_LIBRARY_PATH=$vendor/op_api/lib:$repo/vllm_ascend:$repo/vllm_ascend/lib64:$repo/build/temp.linux-aarch64-cpython-311:$torch_lib:$torch_npu_lib:/usr/local/Ascend/cann-9.0.0/lib64:${LD_LIBRARY_PATH:-}
 export PYTHONHASHSEED=0
 export PYTHONUNBUFFERED=1

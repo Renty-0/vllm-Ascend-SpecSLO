@@ -17,6 +17,7 @@ QUALIFY = TOOLS / "qualify_mc2_multishape.sh"
 BASELINE = TOOLS / "run_online_coalesce1_baseline.sh"
 CANDIDATE = TOOLS / "run_online_coalesce1_candidate.sh"
 FORMAL = TOOLS / "run_online_coalesce1_formal_ab.sh"
+NATIVE_ENGINE = REPO_ROOT / "vllm_ascend/spec_decode/pearl/native_engine.py"
 
 DEFAULT_QUALIFICATION_ROOT = "/root/data/nano-pearl-benchmark-results/20260927-specslo-mc2-v134-large-m-qualification"
 DEFAULT_ONLINE_ROOT = "/root/data/nano-pearl-benchmark-results/20260927-specslo-v134-large-m-online-coalesce1"
@@ -59,6 +60,7 @@ def _write_round_gates(
             "vendor_sha256": "vendor",
             "physical_npus": [2, 3, 4, 5],
             "draft_pa_task_update_workers": 1,
+            "target_replay_ahead_enabled": 0,
             "raw_speedup": raw_speedup,
             "paper_goodput_speedup": goodput_speedup,
         }
@@ -122,11 +124,12 @@ def test_candidate_cann_profile_is_explicit_and_measurement_only():
     source = CANDIDATE.read_text(encoding="utf-8")
 
     assert "profile_host_decode_steps=${SPECSLO_PROFILE_HOST_DECODE_STEPS:-0}" in source
+    assert "enable_npu_profile=${SPECSLO_ENABLE_NPU_PROFILE:-1}" in source
     assert "profile_args=(--profile-host-decode-steps" in source
     assert "export VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY=1" in source
     assert "unset VLLM_ASCEND_PEARL_NPU_PROFILE_DIR" in source
     assert "unset VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY" in source
-    assert "profile_host_decode_steps=%s\\nnpu_profile_wait_steps=%s\\n" in source
+    assert "profile_host_decode_steps=%s\\nnpu_profile_wait_steps=%s\\nenable_npu_profile=%s\\n" in source
     assert "npu_profile_measurement_only=%s\\nnpu_profile_dir=%s\\n" in source
 
 
@@ -134,15 +137,100 @@ def test_candidate_target_fia_worker_experiment_is_explicit_and_fail_closed():
     source = CANDIDATE.read_text(encoding="utf-8")
 
     assert "target_fia_task_update_workers=${SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS:-1}" in source
-    assert "SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS must be 1, 2, or 4" in source
+    assert "SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS must be 1, 2, 3, or 4" in source
     assert "export VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS=$target_fia_task_update_workers" in source
     assert "target_fia_task_update_workers=%s\\n" in source
     assert "target_fia_parallel_update_evidence(" in source
 
 
+def test_candidate_linear_bonus_token_experiment_is_explicit_and_fail_closed():
+    source = CANDIDATE.read_text(encoding="utf-8")
+
+    assert "linear_bonus_token=${SPECSLO_LINEAR_BONUS_TOKEN:-0}" in source
+    assert "bonus_args=(--spec-rhythm-linear-bonus-token)" in source
+    assert "linear_bonus_token=%s\\n" in source
+    assert "645 + 32 * linear_bonus_token" in source
+    assert "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_MAX_TOKENS=$mixed_target_graph_max_tokens" in source
+    assert 'errors.append("linear bonus-token contract mismatch")' in source
+    assert 'errors.append("mixed-target graph token-capacity contract mismatch")' in source
+    assert '"linear_bonus_token": bonus_evidence' in source
+
+
+def test_candidate_target_cohort_experiment_is_explicit_and_fail_closed():
+    source = CANDIDATE.read_text(encoding="utf-8")
+
+    assert "target_max_batch=${SPECSLO_MAX_TARGET_BATCH:-32}" in source
+    assert "SPECSLO_MAX_TARGET_BATCH must be 32, 48, or 64" in source
+    assert "mixed_target_verify_capacities=8,16,24,32" in source
+    assert "VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_MAX_CAPACITY=$target_max_batch" in source
+    assert "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_VERIFY_CAPACITIES=$mixed_target_verify_capacities" in source
+    assert '--spec-rhythm-max-target-batch "$target_max_batch"' in source
+    assert 'errors.append("target max-batch contract mismatch")' in source
+    assert 'errors.append("stable target max-capacity contract mismatch")' in source
+    assert 'errors.append("mixed-target verify-capacity contract mismatch")' in source
+
+
+def test_mixed_target_cohort_is_a_world_wide_scheduler_contract():
+    source = NATIVE_ENGINE.read_text(encoding="utf-8")
+
+    assert "self._mixed_target_graph_collective_enabled = bool(" in source
+    assert "not self.is_draft and self._mixed_target_graph_collective_enabled" in source
+    assert 'getattr(self, "_mixed_target_graph_collective_enabled", False)' in source
+    assert "spec_rhythm_mixed_target_scheduler_cap_cycles" in source
+    assert "spec_rhythm_mixed_target_scheduler_deferred_slots" in source
+
+
+def test_candidate_rejects_invalid_target_cohort_before_npu_use():
+    environment = os.environ.copy()
+    environment["SPECSLO_MAX_TARGET_BATCH"] = "40"
+    result = subprocess.run(
+        ["bash", str(CANDIDATE), "on", "invalid-target-cohort"],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    assert result.returncode == 2
+    assert "SPECSLO_MAX_TARGET_BATCH must be 32, 48, or 64" in result.stderr
+
+
+def test_candidate_acceptance_floor_experiment_is_explicit_and_provenanced():
+    source = CANDIDATE.read_text(encoding="utf-8")
+
+    assert "acceptance_floor=${SPECSLO_ACCEPTANCE_FLOOR:-0.4}" in source
+    assert '--spec-rhythm-acceptance-floor "$acceptance_floor"' in source
+    assert "acceptance_floor=%s\\n" in source
+    assert 'errors.append("acceptance-floor contract mismatch")' in source
+
+
+def test_candidate_rejects_invalid_acceptance_floor_before_npu_use():
+    environment = os.environ.copy()
+    environment["SPECSLO_ACCEPTANCE_FLOOR"] = "1.1"
+    result = subprocess.run(
+        ["bash", str(CANDIDATE), "on", "invalid-acceptance-floor"],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    assert result.returncode == 2
+    assert "SPECSLO_ACCEPTANCE_FLOOR must be a decimal in [0, 1]" in result.stderr
+
+
+def test_candidate_prefetch_ahead_experiment_is_explicit_and_provenanced():
+    source = CANDIDATE.read_text(encoding="utf-8")
+
+    assert "prefetch_ahead=${SPECSLO_PREFETCH_AHEAD:-0}" in source
+    assert "export VLLM_ASCEND_SPECRHYTHM_PREFETCH_AHEAD=$prefetch_ahead" in source
+    assert "prefetch_ahead=%s\\n" in source
+    assert 'errors.append("prefetch-ahead contract mismatch")' in source
+
+
 def test_candidate_rejects_invalid_target_fia_worker_count_before_npu_use():
     environment = os.environ.copy()
-    environment["SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS"] = "3"
+    environment["SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS"] = "5"
     result = subprocess.run(
         ["bash", str(CANDIDATE), "on", "invalid-fia-workers"],
         check=False,
@@ -152,7 +240,7 @@ def test_candidate_rejects_invalid_target_fia_worker_count_before_npu_use():
     )
 
     assert result.returncode == 2
-    assert "SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS must be 1, 2, or 4" in result.stderr
+    assert "SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS must be 1, 2, 3, or 4" in result.stderr
 
 
 def test_candidate_draft_pa_worker_experiment_is_explicit_and_fail_closed():
@@ -201,7 +289,9 @@ def test_candidate_unified_drain_lrtf_is_explicit_provenanced_and_gated():
     formal = FORMAL.read_text(encoding="utf-8")
 
     assert "drain_lrtf=${SPECSLO_DRAIN_LRTF:-0}" in candidate
+    assert "drain_lrtf_max_active=${SPECSLO_DRAIN_LRTF_MAX_ACTIVE:-0}" in candidate
     assert "export VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF=$drain_lrtf" in candidate
+    assert "export VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF_MAX_ACTIVE=$drain_lrtf_max_active" in candidate
     assert "drain_fifo=%s\\ndrain_lrtf=%s\\n" in candidate
     for metric in (
         "target_ranked_cycles",
@@ -242,6 +332,22 @@ def test_candidate_rejects_drain_lrtf_without_immutable_drain_fifo():
 
     assert result.returncode == 2
     assert "SPECSLO_DRAIN_LRTF=1 requires SPECSLO_DRAIN_FIFO=1" in result.stderr
+
+
+def test_candidate_rejects_drain_lrtf_active_guard_without_lrtf():
+    environment = os.environ.copy()
+    environment["SPECSLO_DRAIN_LRTF"] = "0"
+    environment["SPECSLO_DRAIN_LRTF_MAX_ACTIVE"] = "16"
+    result = subprocess.run(
+        ["bash", str(CANDIDATE), "on", "invalid-drain-lrtf-active-guard"],
+        check=False,
+        capture_output=True,
+        text=True,
+        env=environment,
+    )
+
+    assert result.returncode == 2
+    assert "SPECSLO_DRAIN_LRTF_MAX_ACTIVE requires SPECSLO_DRAIN_LRTF=1" in result.stderr
 
 
 @pytest.mark.parametrize("profile_filename", ("../profile.json", "nested/p.json"))

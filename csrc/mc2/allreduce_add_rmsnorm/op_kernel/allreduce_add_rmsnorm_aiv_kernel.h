@@ -973,24 +973,50 @@ private:
             PipeBarrier<PIPE_V>();
 
             if (dedicated_tp3_reduce) {
-                // Match CANN AddRmsNorm's FP32 rounding order exactly:
-                // compute one scalar reciprocal, transfer it from V to S,
-                // then scale the row with Muls.  Dividing every element by
-                // sqrt(mean + eps) is algebraically equivalent but can differ
-                // by one BF16 ULP after the following materialization.
+                // Keep the reciprocal and row scaling on the vector pipe.
+                // Brcb expands the one FP32 rstd into one eight-element block;
+                // a zero-stride second Mul input then reuses that block across
+                // the row.  This removes the per-row V->S synchronization
+                // while preserving the same reciprocal and multiplication
+                // boundary as the qualified scalar Muls path.
                 Duplicate(reduce_buf_local, (float)1.0, 1);
                 PipeBarrier<PIPE_V>();
 
                 Div(sqx, reduce_buf_local, sqx, 1);
                 PipeBarrier<PIPE_V>();
 
-                PipeSync<HardEvent::V_S>();
-                float rstd_value = sqx.GetValue(0);
-                PipeSync<HardEvent::S_V>();
+                Brcb(reduce_buf_local, sqx, 1, {1, 8});
                 PipeBarrier<PIPE_V>();
 
-                Muls(norm_fp32, norm_fp32, rstd_value, n);
-                PipeBarrier<PIPE_V>();
+                BinaryRepeatParams scale_params;
+                scale_params.dstBlkStride = 1;
+                scale_params.src0BlkStride = 1;
+                scale_params.src1BlkStride = 0;
+                scale_params.dstRepStride = ONE_REPEAT_BYTE_SIZE / ONE_BLK_SIZE;
+                scale_params.src0RepStride = ONE_REPEAT_BYTE_SIZE / ONE_BLK_SIZE;
+                scale_params.src1RepStride = 0;
+                uint32_t scale_repeats = n / NUM_PER_REP_FP32;
+                uint32_t scale_body = scale_repeats * NUM_PER_REP_FP32;
+                if (likely(scale_repeats > 0)) {
+                    Mul(
+                        norm_fp32,
+                        norm_fp32,
+                        reduce_buf_local,
+                        static_cast<uint64_t>(NUM_PER_REP_FP32),
+                        scale_repeats,
+                        scale_params);
+                    PipeBarrier<PIPE_V>();
+                }
+                if (unlikely(scale_body < n)) {
+                    Mul(
+                        norm_fp32[scale_body],
+                        norm_fp32[scale_body],
+                        reduce_buf_local,
+                        n - scale_body,
+                        1,
+                        scale_params);
+                    PipeBarrier<PIPE_V>();
+                }
             } else {
                 Duplicate(reduce_buf_local, (float)1.0, 1);
                 PipeBarrier<PIPE_V>();

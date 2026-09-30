@@ -248,6 +248,11 @@ class NativeDraftACLGraphEntry:
     # a collector regression cannot later masquerade as a taskless replay and
     # silently skip required CANN graph-task updates.
     taskless_device_attention: bool = False
+    # Standard fixed-gamma speculative decoding may append one transformer
+    # call which only materializes KV for the final proposal. It adds no
+    # proposal column to ``output``. Preserve that capture-time fact so the
+    # PA updater can distinguish gamma4+KV from an arbitrary five-step graph.
+    final_kv_only: bool = False
 
 
 @dataclass
@@ -701,8 +706,8 @@ class NativeACLGraphRunner:
             )
         self.update_stream = torch.npu.Stream(priority=update_stream_priority) if enabled else None
         target_fia_task_update_workers = int(envs.VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS)
-        if target_fia_task_update_workers not in (1, 2, 4):
-            raise ValueError("VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS must be 1, 2, or 4.")
+        if target_fia_task_update_workers not in (1, 2, 3, 4):
+            raise ValueError("VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS must be 1, 2, 3, or 4.")
         self.target_fia_task_update_workers = target_fia_task_update_workers if enabled and is_target_worker else 1
         self._target_fia_parallel_streams = (
             [self.update_stream]
@@ -759,6 +764,10 @@ class NativeACLGraphRunner:
         self.target_fia_parallel_update_tasks = 0
         self.draft_pa_parallel_update_replays = 0
         self.draft_pa_parallel_update_tasks = 0
+        self.draft_pa_contiguous_partition_replays = 0
+        self.draft_pa_contiguous_partition = bool(
+            envs.VLLM_ASCEND_PEARL_DRAFT_PA_CONTIGUOUS_PARTITION
+        )
         self.draft_pa_parallel_update_fallback_replays = 0
         self.draft_pa_parallel_update_rejections: dict[str, int] = {}
         # ``capture_attempt_count`` is cumulative telemetry.  Capacity is a
@@ -1041,6 +1050,9 @@ class NativeACLGraphRunner:
                 "draft_pa_task_update_workers": self.draft_pa_task_update_workers,
                 "draft_pa_parallel_update_replays": self.draft_pa_parallel_update_replays,
                 "draft_pa_parallel_update_tasks": self.draft_pa_parallel_update_tasks,
+                "draft_pa_contiguous_partition_replays": (
+                    self.draft_pa_contiguous_partition_replays
+                ),
                 "draft_pa_parallel_update_fallback_replays": (
                     self.draft_pa_parallel_update_fallback_replays
                 ),
@@ -2855,6 +2867,7 @@ class NativeACLGraphRunner:
             stable_task_barrier=stable_task_barrier,
             stable_task_barrier_event=stable_task_barrier_event,
             taskless_device_attention=taskless_device_attention,
+            final_kv_only=final_kv_only,
         )
         self.draft_entries[entry_key] = entry
         current_stream = torch.npu.current_stream()
@@ -4242,9 +4255,10 @@ class NativeACLGraphRunner:
         """Refresh a qualified gamma-4 serial PA draft graph concurrently.
 
         The switch is deliberately narrower than the ordinary PA updater.
-        Before mutating a handle, validate the complete four-step linear
-        entry, its host-length contract, and one unique ExternalEvent per
-        task.  Rejected entries use the existing serial updater.  Once task
+        Before mutating a handle, validate either the complete four-step
+        linear entry or its five-step ``four proposals + final KV-only``
+        variant, its host-length contract, and one unique ExternalEvent per
+        task. Rejected entries use the existing serial updater. Once task
         mutation starts, any exception propagates: a replay-first graph may
         already be waiting on these events and cannot safely fall back.
         """
@@ -4266,17 +4280,19 @@ class NativeACLGraphRunner:
             return self._reject_parallel_draft_pa_task_update("taskless_device_attention")
 
         step_count = len(getattr(entry, "positions", ()))
-        if step_count != DRAFT_PA_PARALLEL_FULL_CHAIN_STEPS:
+        final_kv_only = bool(getattr(entry, "final_kv_only", False))
+        expected_step_count = DRAFT_PA_PARALLEL_FULL_CHAIN_STEPS + int(final_kv_only)
+        if step_count != expected_step_count:
             return self._reject_parallel_draft_pa_task_update("not_gamma4_full_chain")
         output = getattr(entry, "output", None)
         if (
             not torch.is_tensor(output)
             or output.ndim not in (2, 3)
-            or int(output.shape[1]) != step_count
+            or int(output.shape[1]) != DRAFT_PA_PARALLEL_FULL_CHAIN_STEPS
         ):
-            # A mixed-prefill tail with a KV-only final step can also contain
-            # four transformer calls, but exposes fewer than four proposal
-            # outputs.  It is not the qualified gamma-4 full-chain entry.
+            # A valid final KV-only call adds one attention-task step but no
+            # proposal output. Any other step/output mismatch is outside the
+            # qualified fixed-gamma contract.
             return self._reject_parallel_draft_pa_task_update("non_full_chain_output")
         tree_attention_modes = tuple(getattr(entry, "tree_attention_modes", ()))
         if len(tree_attention_modes) != step_count or any(tree_attention_modes):
@@ -4366,7 +4382,26 @@ class NativeACLGraphRunner:
             # Propagate the replay-first copy dependency (or the ordinary
             # current-stream dependency) queued on the primary update stream.
             secondary_stream.wait_stream(update_stream)
-        partitions = [tuple(range(worker, len(typed_tasks), worker_count)) for worker in range(worker_count)]
+        if self.draft_pa_contiguous_partition:
+            # ``typed_tasks`` is step-major.  A contiguous balanced split
+            # therefore keeps the graph's earliest executable prefix on the
+            # caller and lets secondary streams prepare later steps ahead of
+            # consumption.  Unlike the old round-robin split, replay cannot
+            # immediately stall on layer 1 waiting for a background thread to
+            # restore its NPU context.
+            quotient, remainder = divmod(len(typed_tasks), worker_count)
+            partitions = []
+            start = 0
+            for worker in range(worker_count):
+                stop = start + quotient + int(worker < remainder)
+                partitions.append(tuple(range(start, stop)))
+                start = stop
+            self.draft_pa_contiguous_partition_replays += 1
+        else:
+            partitions = [
+                tuple(range(worker, len(typed_tasks), worker_count))
+                for worker in range(worker_count)
+            ]
         if any(not partition for partition in partitions):
             return self._reject_parallel_draft_pa_task_update("empty_worker_partition")
         futures = [
@@ -4486,9 +4521,25 @@ class NativeACLGraphRunner:
             event_prefix_group_size,
         )
         event_group_ends = frozenset(group.stop - 1 for group in groups)
-        partitions = [
-            tuple(index for group in groups[worker::worker_count] for index in group) for worker in range(worker_count)
-        ]
+        # Keep the graph's execution prefix on the caller-owned stream.  The
+        # former round-robin assignment put layer 0 on the caller and layer 1
+        # on a background thread; every replay could then stall at its second
+        # transformer layer while that thread restored its NPU context.  A
+        # balanced contiguous split preserves the same handle/event coverage
+        # but lets the graph consume the caller-updated prefix while secondary
+        # streams prepare later layers ahead of use.
+        base_groups, extra_groups = divmod(len(groups), worker_count)
+        partitions = []
+        group_offset = 0
+        for worker in range(worker_count):
+            worker_group_count = base_groups + int(worker < extra_groups)
+            worker_groups = groups[
+                group_offset : group_offset + worker_group_count
+            ]
+            partitions.append(
+                tuple(index for group in worker_groups for index in group)
+            )
+            group_offset += worker_group_count
         if any(not partition for partition in partitions):
             return False
         # The worker process already owns the primary NPU context.  Keep its

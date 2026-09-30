@@ -25,6 +25,14 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--profile-steps", type=int, default=200)
     parser.add_argument("--collectives-only", action="store_true")
     parser.add_argument(
+        "--skip-custom-fused",
+        action="store_true",
+        help=(
+            "Skip the experimental custom fused MatMul+AllReduce projection "
+            "variants while retaining the built-in ND/NZ MC2 comparison."
+        ),
+    )
+    parser.add_argument(
         "--hccl-expansion-mode",
         choices=("AIV", "runtime-default"),
         default="AIV",
@@ -243,16 +251,23 @@ def main() -> None:
             gamma = torch.ones(args.hidden_size, dtype=torch.bfloat16, device="npu")
             epsilon = 1e-6
 
-            def baseline_projection() -> tuple[torch.Tensor, torch.Tensor]:
-                projected = torch.nn.functional.linear(source, weight_nz)
-                dist.all_reduce(projected)
-                normalized, _, add_out = torch_npu.npu_add_rms_norm(
-                    projected,
-                    residual,
-                    gamma,
-                    epsilon,
-                )
-                return normalized, add_out
+            def make_separate_projection(
+                projection_weight: torch.Tensor,
+            ) -> Callable[[], tuple[torch.Tensor, torch.Tensor]]:
+                def separate_projection() -> tuple[torch.Tensor, torch.Tensor]:
+                    projected = torch.nn.functional.linear(source, projection_weight)
+                    dist.all_reduce(projected)
+                    normalized, _, add_out = torch_npu.npu_add_rms_norm(
+                        projected,
+                        residual,
+                        gamma,
+                        epsilon,
+                    )
+                    return normalized, add_out
+
+                return separate_projection
+
+            baseline_projection = make_separate_projection(weight_nz)
 
             def quantized_projection() -> tuple[torch.Tensor, torch.Tensor]:
                 projected = torch.nn.functional.linear(source, weight_nz)
@@ -344,6 +359,45 @@ def main() -> None:
                 "normalized_max_abs_error": 0.0,
                 "add_out_max_abs_error": 0.0,
                 "status": baseline_status,
+            })
+
+            dist.barrier()
+            try:
+                separate_nd_graph, separate_nd_output = _capture(
+                    make_separate_projection(weight_nd)
+                )
+                separate_nd_latency_us = _measure(
+                    separate_nd_graph,
+                    args.warmup_steps,
+                    args.profile_steps,
+                )
+                torch.npu.synchronize()
+                if expected_normalized is None or expected_add_out is None:
+                    raise RuntimeError("The NZ baseline projection did not produce reference outputs.")
+                separate_nd_normalized_error = _max_abs_error(
+                    separate_nd_output[0].cpu(),
+                    expected_normalized,
+                )
+                separate_nd_add_out_error = _max_abs_error(
+                    separate_nd_output[1].cpu(),
+                    expected_add_out,
+                )
+                separate_nd_status = "ok"
+            except Exception as error:
+                separate_nd_latency_us = float("nan")
+                separate_nd_normalized_error = float("nan")
+                separate_nd_add_out_error = float("nan")
+                separate_nd_status = f"{type(error).__name__}: {error}"
+            projection_results.append({
+                "rank": rank,
+                "token_count": token_count,
+                "projection_input_size": projection_input_size,
+                "hidden_size": args.hidden_size,
+                "strategy": "nd_matmul_allreduce_add_rmsnorm",
+                "latency_microseconds": separate_nd_latency_us,
+                "normalized_max_abs_error": separate_nd_normalized_error,
+                "add_out_max_abs_error": separate_nd_add_out_error,
+                "status": separate_nd_status,
             })
 
             dist.barrier()
@@ -494,12 +548,17 @@ def main() -> None:
                     "status": builtin_status,
                 })
 
-            for strategy, projection_weight, gather_add_out in (
-                ("fused_matmul_allreduce_add_rmsnorm_nd", weight_nd, True),
-                ("fused_matmul_allreduce_add_rmsnorm_nz", weight_nz, True),
-                ("fused_matmul_allreduce_add_rmsnorm_nd_output_only", weight_nd, False),
-                ("fused_matmul_allreduce_add_rmsnorm_nz_output_only", weight_nz, False),
-            ):
+            custom_fused_strategies = (
+                ()
+                if args.skip_custom_fused
+                else (
+                    ("fused_matmul_allreduce_add_rmsnorm_nd", weight_nd, True),
+                    ("fused_matmul_allreduce_add_rmsnorm_nz", weight_nz, True),
+                    ("fused_matmul_allreduce_add_rmsnorm_nd_output_only", weight_nd, False),
+                    ("fused_matmul_allreduce_add_rmsnorm_nz_output_only", weight_nz, False),
+                )
+            )
+            for strategy, projection_weight, gather_add_out in custom_fused_strategies:
                 dist.barrier()
                 try:
                     fused_graph, fused_output = _capture(

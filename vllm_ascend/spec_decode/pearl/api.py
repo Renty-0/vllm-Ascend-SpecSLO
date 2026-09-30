@@ -651,6 +651,7 @@ class PEARLEngine:
         self.last_worker_metrics: list[dict[str, Any]] = []
         self.last_worker_metrics_by_chunk: list[dict[str, Any]] = []
         self.last_aggregate_graph_metrics: dict[str, int | float] = {}
+        self.last_api_phase_seconds: dict[str, float] = {}
         self._closed = False
         self._processes: list[mp.Process] = []
         self._connections: list[Connection] = []
@@ -982,11 +983,22 @@ class PEARLEngine:
         on_token_commit: Callable[[dict[str, Any]], None] | None = None,
         live: bool = False,
     ):
+        controller_generate_started = time.perf_counter()
+        api_phase_seconds = {
+            "command_send": 0.0,
+            "worker_wait_and_reply_decode": 0.0,
+            "result_aggregation": 0.0,
+            "output_sort_and_detokenize": 0.0,
+        }
         if not self._requests:
             self.last_metrics = []
             self.last_worker_metrics = []
             self.last_worker_metrics_by_chunk = []
             self.last_aggregate_graph_metrics = {}
+            self.last_api_phase_seconds = {
+                **api_phase_seconds,
+                "generate_wall": time.perf_counter() - controller_generate_started,
+            }
             return [], [], (() if mode != "target_ar" else None), 0.0
         requests = self._requests
         self._requests = []
@@ -1025,7 +1037,10 @@ class PEARLEngine:
                         replace(params, max_tokens=self.config.max_model_len, ignore_eos=True) for params in params
                     ]
                 command = "pearl_stream_live" if live else "pearl_stream" if on_token_commit is not None else mode
+                phase_started = time.perf_counter()
                 self._send_all((command, prompts, params, live_epoch if live else num_pearl_steps))
+                api_phase_seconds["command_send"] += time.perf_counter() - phase_started
+                phase_started = time.perf_counter()
                 if on_token_commit is None:
                     if live:
                         replies = self._receive_all(f"{mode} generation", live_epoch=live_epoch)
@@ -1055,6 +1070,8 @@ class PEARLEngine:
                     if live:
                         receive_kwargs["live_epoch"] = live_epoch
                     replies = self._receive_all(f"{mode} generation", **receive_kwargs)
+                api_phase_seconds["worker_wait_and_reply_decode"] += time.perf_counter() - phase_started
+                phase_started = time.perf_counter()
                 leader_payloads = [reply[1] for reply in replies if reply[0] == "result" and reply[1] is not None]
                 if len(leader_payloads) != 1:
                     raise RuntimeError("PEARL target leader did not return exactly one result batch.")
@@ -1101,6 +1118,7 @@ class PEARLEngine:
                     outputs.extend(enumerate(batch_results))
                 else:
                     outputs.extend(zip(request_ids, batch_results))
+                api_phase_seconds["result_aggregation"] += time.perf_counter() - phase_started
         except _TokenCommitDeliveryError:
             # The workers have completed and their pipes are drained. Requeue
             # only chunks not yet submitted, never replay delivered tokens.
@@ -1120,6 +1138,7 @@ class PEARLEngine:
                     self._live_epoch = None
                     self._live_sampling_signature = None
 
+        phase_started = time.perf_counter()
         outputs.sort(key=lambda item: item[0])
         results = [result for _, result in outputs]
         self.last_metrics = results
@@ -1128,6 +1147,11 @@ class PEARLEngine:
         ]
         num_tokens = [len(result["completion_token_ids"]) for result in results]
         num_acc_tokens = tuple(result["num_acc_tokens"] for result in results)
+        api_phase_seconds["output_sort_and_detokenize"] = time.perf_counter() - phase_started
+        self.last_api_phase_seconds = {
+            **api_phase_seconds,
+            "generate_wall": time.perf_counter() - controller_generate_started,
+        }
         return output_text, num_tokens, num_acc_tokens, total_elapsed
 
     def _request_chunks(
@@ -1185,6 +1209,19 @@ class PEARLEngine:
         while pending:
             for connection, (rank, process) in tuple(pending.items()):
                 if not process.is_alive():
+                    # A worker reports its traceback through the pipe and then
+                    # exits normally from the multiprocessing target.  The
+                    # process sentinel and pipe can become ready in either
+                    # order; prefer the queued traceback over the misleading
+                    # generic ``exit code 0`` message when both are ready.
+                    try:
+                        queued = connection.recv() if connection.poll() else None
+                    except (EOFError, OSError):
+                        queued = None
+                    if queued is not None and queued[0] == "error":
+                        raise RuntimeError(
+                            f"PEARL rank {rank} failed during {operation}:\n{queued[1]}"
+                        )
                     raise RuntimeError(f"PEARL rank {rank} exited during {operation} with code {process.exitcode}.")
             remaining = deadline - time.monotonic()
             if remaining <= 0:
@@ -1339,6 +1376,7 @@ def _pearl_worker(
                     )
                 )
                 continue
+            worker_generation_started = time.perf_counter()
             if mode == "pearl_stream_live":
                 if admission_connection is None:
                     raise RuntimeError("Live PEARL generation requires an admission channel")
@@ -1419,7 +1457,12 @@ def _pearl_worker(
                 )
             else:
                 raise ValueError(f"Unknown PEARL worker command {mode!r}.")
-            connection.send(("result", result, engine.graph_metrics()))
+            worker_generation_seconds = time.perf_counter() - worker_generation_started
+            metrics_started = time.perf_counter()
+            worker_metrics = engine.graph_metrics()
+            worker_metrics["worker_generation_wall_seconds"] = worker_generation_seconds
+            worker_metrics["worker_graph_metrics_snapshot_seconds"] = time.perf_counter() - metrics_started
+            connection.send(("result", result, worker_metrics))
     except BaseException:
         with suppress(BrokenPipeError, EOFError):
             connection.send(("error", traceback.format_exc()))

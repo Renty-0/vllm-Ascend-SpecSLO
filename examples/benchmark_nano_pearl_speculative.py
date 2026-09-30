@@ -894,21 +894,23 @@ def main(argv: Sequence[str] | None = None) -> None:
                 args.profile_host_decode_steps,
             )
             started = time.perf_counter()
+            enqueue_started = time.perf_counter()
             _add_requests(
                 engine,
                 measured_prompts,
                 materialize_arrivals(measured_sampling_params),
             )
+            enqueue_elapsed = time.perf_counter() - enqueue_started
+            generate_started = time.perf_counter()
             if args.num_pearl_steps is None:
                 _, num_tokens, _, inference_elapsed = engine.generate()
             else:
                 _, num_tokens, _, inference_elapsed = engine.bench_generate(args.num_pearl_steps)
+            generate_wall_elapsed = time.perf_counter() - generate_started
             e2e_elapsed = time.perf_counter() - started
             output_tokens = sum(num_tokens)
             metrics = engine.last_metrics
-            aggregate_graph_metrics = dict(
-                engine.last_aggregate_graph_metrics
-            )
+            aggregate_graph_metrics = dict(engine.last_aggregate_graph_metrics)
             output_token_rows = [metric["completion_token_ids"] for metric in metrics]
             verified_tokens = sum(metric["verified_draft_tokens"] for metric in metrics)
             accepted_tokens = sum(metric["accepted_draft_tokens"] for metric in metrics)
@@ -973,6 +975,11 @@ def main(argv: Sequence[str] | None = None) -> None:
                     ),
                     "inference_elapsed_seconds": inference_elapsed,
                     "e2e_elapsed_seconds": e2e_elapsed,
+                    "e2e_phase_seconds": {
+                        "request_enqueue": enqueue_elapsed,
+                        "engine_generate_wall": generate_wall_elapsed,
+                        **engine.last_api_phase_seconds,
+                    },
                     "inference_throughput_tokens_per_second": output_tokens / inference_elapsed,
                     "e2e_throughput_tokens_per_second": output_tokens / e2e_elapsed,
                     "requested_output_throughput_tokens_per_second": requested_output_tokens / e2e_elapsed,
@@ -993,19 +1000,11 @@ def main(argv: Sequence[str] | None = None) -> None:
                     "request_verification_rounds": [metric["verification_rounds"] for metric in metrics],
                     "decode_phase_seconds": decode_phase_seconds,
                     "aclgraph_captures": int(aggregate_graph_metrics["aclgraph_captures"]),
-                    "aclgraph_capture_attempts": int(
-                        aggregate_graph_metrics["aclgraph_capture_attempts"]
-                    ),
+                    "aclgraph_capture_attempts": int(aggregate_graph_metrics["aclgraph_capture_attempts"]),
                     "aclgraph_replays": int(aggregate_graph_metrics["aclgraph_replays"]),
-                    "aclgraph_failed_captures": int(
-                        aggregate_graph_metrics["aclgraph_failed_captures"]
-                    ),
-                    "aclgraph_capacity_fallbacks": int(
-                        aggregate_graph_metrics["aclgraph_capacity_fallbacks"]
-                    ),
-                    "aclgraph_shape_fallbacks": int(
-                        aggregate_graph_metrics["aclgraph_shape_fallbacks"]
-                    ),
+                    "aclgraph_failed_captures": int(aggregate_graph_metrics["aclgraph_failed_captures"]),
+                    "aclgraph_capacity_fallbacks": int(aggregate_graph_metrics["aclgraph_capacity_fallbacks"]),
+                    "aclgraph_shape_fallbacks": int(aggregate_graph_metrics["aclgraph_shape_fallbacks"]),
                     "worker_aclgraph_metrics": engine.last_worker_metrics,
                     "measured_worker_aclgraph_deltas": measured_graph_deltas,
                     "mc2_measured_replay_coverage": measured_mc2_replay_coverage,
@@ -1089,6 +1088,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             else args.spec_rhythm_slo_priority or request_has_slo
         ),
         "spec_rhythm_priority_burst": args.spec_rhythm_priority_burst,
+        "spec_rhythm_acceptance_floor": args.spec_rhythm_acceptance_floor,
         "spec_rhythm_target_fallback_max_batch": args.spec_rhythm_target_fallback_max_batch,
         "spec_rhythm_max_target_batch": args.spec_rhythm_max_target_batch,
         "spec_rhythm_min_gamma": args.spec_rhythm_min_gamma,
@@ -1209,6 +1209,10 @@ def _summarize_slo_metrics(
             "slo_tpot_ms": metric["slo_tpot_ms"],
             "observed_tpot_ms": metric.get("observed_tpot_ms"),
             "paper_tpot_ms": metric.get("paper_tpot_ms"),
+            "arrival_wait_ms": metric.get("arrival_wait_ms"),
+            "decode_start_elapsed_ms": metric.get("decode_start_elapsed_ms"),
+            "finished_decode_elapsed_ms": metric.get("finished_decode_elapsed_ms"),
+            "request_service_e2e_ms": metric.get("request_service_e2e_ms"),
             # Preserve the worker-visible replay clock so a malformed online
             # run (for example all arrivals admitted in the first prefill) can
             # be diagnosed from the result artifact rather than only its log.
@@ -1385,6 +1389,16 @@ def _aggregate_decode_host_profile(worker_metrics_by_chunk, batch_size: int):
                     "scheduler_critical_ms": max(
                         duration_ms(row, "cycle_start_seconds", "scheduler_end_seconds") for row in rows
                     ),
+                    # ``cycle_start`` is a request-accounting boundary and can
+                    # deliberately carry an omitted tail collective from the
+                    # previous cycle.  Split that carry from actual scheduler
+                    # work when the newer worker trace provides an entry stamp.
+                    "scheduler_entry_carry_critical_ms": max(
+                        duration_ms(row, "cycle_start_seconds", "scheduler_start_seconds") for row in rows
+                    ),
+                    "scheduler_roof_work_critical_ms": max(
+                        duration_ms(row, "scheduler_start_seconds", "scheduler_roof_end_seconds") for row in rows
+                    ),
                     "scheduler_roof_critical_ms": max(
                         duration_ms(row, "cycle_start_seconds", "scheduler_roof_end_seconds") for row in rows
                     ),
@@ -1393,6 +1407,28 @@ def _aggregate_decode_host_profile(worker_metrics_by_chunk, batch_size: int):
                     ),
                     "scheduler_budget_critical_ms": max(
                         duration_ms(row, "scheduler_plan_end_seconds", "scheduler_budget_end_seconds") for row in rows
+                    ),
+                    # The legacy ``scheduler_budget`` interval starts before
+                    # payload validation and early target submission.  The
+                    # policy-only interval below starts after that submission
+                    # and measures the fixed-gamma eager/W selection plus
+                    # budget materialization that was previously conflated
+                    # with target graph host work.
+                    "scheduler_policy_budget_critical_ms": max(
+                        duration_ms(
+                            row,
+                            "scheduler_policy_start_seconds",
+                            "scheduler_budget_end_seconds",
+                        )
+                        for row in rows
+                    ),
+                    "scheduler_pre_policy_critical_ms": max(
+                        duration_ms(
+                            row,
+                            "scheduler_plan_end_seconds",
+                            "scheduler_policy_start_seconds",
+                        )
+                        for row in rows
                     ),
                     "scheduler_tree_plan_critical_ms": max(
                         duration_ms(row, "scheduler_budget_end_seconds", "scheduler_end_seconds") for row in rows
@@ -1537,6 +1573,7 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
         "aclgraph_draft_step_major_pa_fallback_replays",
         "aclgraph_draft_pa_parallel_update_replays",
         "aclgraph_draft_pa_parallel_update_tasks",
+        "aclgraph_draft_pa_contiguous_partition_replays",
         "aclgraph_draft_pa_parallel_update_fallback_replays",
         "aclgraph_target_fia_parallel_update_replays",
         "aclgraph_target_fia_parallel_update_tasks",
@@ -1589,12 +1626,8 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
             "mc2_static_route_count": int(worker.get("mc2_static_route_count", 0)),
             "mc2_static_operator_kinds": list(worker.get("mc2_static_operator_kinds", ())),
             "mc2_static_qualified_row_routes": int(worker.get("mc2_static_qualified_row_routes", 0)),
-            "mc2_static_qualified_rows_by_shape": dict(
-                worker.get("mc2_static_qualified_rows_by_shape", {})
-            ),
-            "mc2_static_route_counts_by_shape": dict(
-                worker.get("mc2_static_route_counts_by_shape", {})
-            ),
+            "mc2_static_qualified_rows_by_shape": dict(worker.get("mc2_static_qualified_rows_by_shape", {})),
+            "mc2_static_route_counts_by_shape": dict(worker.get("mc2_static_route_counts_by_shape", {})),
             # These describe the sealed graph contract rather than measured
             # work, so retain the absolute post-warmup values next to the
             # measurement deltas.  Without them a run can report ordinary
@@ -1610,12 +1643,8 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
                     0,
                 )
             ),
-            "aclgraph_target_fia_task_update_workers": int(
-                worker.get("aclgraph_target_fia_task_update_workers", 1)
-            ),
-            "aclgraph_draft_pa_task_update_workers": int(
-                worker.get("aclgraph_draft_pa_task_update_workers", 1)
-            ),
+            "aclgraph_target_fia_task_update_workers": int(worker.get("aclgraph_target_fia_task_update_workers", 1)),
+            "aclgraph_draft_pa_task_update_workers": int(worker.get("aclgraph_draft_pa_task_update_workers", 1)),
             **{
                 # Stable ordinary target-verify graphs are qualified before
                 # measurement and these counters intentionally remain
@@ -1660,6 +1689,16 @@ def _worker_aclgraph_deltas(before_workers, after_workers):
                     # the unrelated warmup call.
                     "worker_spec_rhythm_gloo_proposal_host_continuation_reuses",
                     "worker_spec_rhythm_gloo_proposal_device_continuation_reads",
+                    "worker_spec_rhythm_gloo_proposal_host_confidence_reuses",
+                    "worker_spec_rhythm_linear_acceptance_confidence_elisions",
+                    "worker_spec_rhythm_linear_bonus_token",
+                    "worker_spec_rhythm_linear_bonus_eligible_rows",
+                    "worker_spec_rhythm_linear_bonus_committed_tokens",
+                    "worker_spec_rhythm_linear_bonus_suppressed_eager_rows",
+                    "worker_spec_rhythm_linear_bonus_suppressed_output_limit_rows",
+                    "worker_spec_rhythm_linear_bonus_draft_kv_prepared_rows",
+                    "worker_spec_rhythm_proposal_matrix_view_reuses",
+                    "worker_spec_rhythm_proposal_matrix_stack_fallbacks",
                     "worker_spec_rhythm_concurrent_draft_target_submission_cycles",
                     "worker_spec_rhythm_single_batch_overlap_submission_cycles",
                     "worker_spec_rhythm_dual_batch_overlap_submission_cycles",

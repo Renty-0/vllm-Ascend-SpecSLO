@@ -42,6 +42,13 @@ class ReusableSpecRhythmEnvelope:
         self._host_staging = (
             self._buffer if self._device.type == "cpu" else torch.empty(int(numel), dtype=torch.float64, device="cpu")
         )
+        # Keep a zero-copy NumPy view of the fixed host storage.  Constructing
+        # a fresh ``torch.as_tensor(values)`` cost ~31 us for the B=64 primary
+        # envelope on the production host, even though the destination itself
+        # was already reusable.  Slice assignment writes the Python scalar
+        # sequence directly into the persistent storage and removes that
+        # per-cycle tensor allocation/conversion.
+        self._host_staging_numpy = self._host_staging.numpy()
 
     @property
     def buffer(self) -> torch.Tensor:
@@ -57,17 +64,16 @@ class ReusableSpecRhythmEnvelope:
         """Overwrite every field and return the same collective buffer.
 
         Length is checked before either persistent tensor is mutated.  A tiny
-        temporary CPU conversion may still be created by PyTorch, but both the
-        collective allocation and the H2D destination are retained across
-        cycles, which are the expensive allocations on the NPU path.
+        scalar sequence is written through a zero-copy NumPy view of the
+        persistent host tensor.  Both the collective allocation and the H2D
+        destination are therefore retained across cycles.
         """
         if len(values) != self._buffer.numel():
             raise ValueError(
                 "SpecRhythm envelope rewrite has the wrong number of fields: "
                 f"expected {self._buffer.numel()}, got {len(values)}."
             )
-        converted = torch.as_tensor(values, dtype=torch.float64, device="cpu")
-        self._host_staging.copy_(converted)
+        self._host_staging_numpy[:] = values
         if self._host_staging is not self._buffer:
             self._buffer.copy_(self._host_staging)
         return self._buffer
@@ -86,4 +92,7 @@ class ReusableSpecRhythmEnvelope:
         collective around the scheduler/frontier validations.
         """
         dist.broadcast(self._buffer, src=int(source_rank), group=group)
-        return [float(value) for value in self._buffer.cpu().tolist()]
+        # ``Tensor.tolist`` already returns Python floats for float64 tensors;
+        # rebuilding the list with ``float`` doubled the B=64 materialization
+        # cost in a CPU microbenchmark.
+        return self._buffer.cpu().tolist()

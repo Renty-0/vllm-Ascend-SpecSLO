@@ -268,6 +268,7 @@ def test_cpu_broadcast_source_keeps_device_message_and_reports_timing(monkeypatc
     assert timing.host_to_device_submit_seconds == 0
     assert timing.host_continuation_tokens is not None
     assert timing.host_continuation_tokens.tolist() == [[7, 8]]
+    assert timing.host_draft_confidences == (0.25,)
 
 
 def test_cpu_broadcast_source_can_hide_host_continuation(monkeypatch) -> None:
@@ -287,6 +288,7 @@ def test_cpu_broadcast_source_can_hide_host_continuation(monkeypatch) -> None:
 
     assert views.continuation_tokens.tolist() == [[7, 8]]
     assert timing.host_continuation_tokens is None
+    assert timing.host_draft_confidences is None
 
 
 def test_cpu_broadcast_source_reuses_fixed_buffers(monkeypatch) -> None:
@@ -376,6 +378,7 @@ def test_cpu_broadcast_receiver_copies_completed_message(monkeypatch) -> None:
     assert timing.host_to_device_submit_seconds >= 0
     assert timing.host_continuation_tokens is not None
     assert timing.host_continuation_tokens.tolist() == [[11, 12]]
+    assert timing.host_draft_confidences == (0.75,)
 
 
 def test_cpu_broadcast_receiver_can_hide_host_continuation(monkeypatch) -> None:
@@ -396,3 +399,4 @@ def test_cpu_broadcast_receiver_can_hide_host_continuation(monkeypatch) -> None:
 
     assert views.continuation_tokens.tolist() == [[11, 12]]
     assert timing.host_continuation_tokens is None
+    assert timing.host_draft_confidences is None

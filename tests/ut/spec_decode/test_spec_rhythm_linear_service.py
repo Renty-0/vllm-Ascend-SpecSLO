@@ -22,6 +22,52 @@ from vllm_ascend.spec_decode.pearl.spec_rhythm import (
 from vllm_ascend.spec_decode.pearl.topology import PearlTopology
 
 
+@pytest.mark.parametrize(
+    ("configured_limit", "staged_prefill_count", "expected"),
+    [
+        (48, 0, 48),
+        (48, 1, 32),
+        (24, 1, 24),
+        (None, 1, 32),
+    ],
+)
+def test_mixed_prefill_bounds_only_the_mixed_target_cohort(
+    configured_limit,
+    staged_prefill_count,
+    expected,
+):
+    assert (
+        native.bound_target_requests_for_mixed_prefill(
+            configured_limit,
+            staged_prefill_count=staged_prefill_count,
+            mixed_verify_capacities=(8, 16, 24, 32),
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    ("configured_limit", "staged_prefill_count", "capacities"),
+    [
+        (48, -1, (8, 16, 24, 32)),
+        (48, 1, ()),
+        (48, 1, (8, 0, 32)),
+        (0, 1, (8, 16, 24, 32)),
+    ],
+)
+def test_mixed_prefill_target_cohort_contract_rejects_invalid_values(
+    configured_limit,
+    staged_prefill_count,
+    capacities,
+):
+    with pytest.raises(ValueError):
+        native.bound_target_requests_for_mixed_prefill(
+            configured_limit,
+            staged_prefill_count=staged_prefill_count,
+            mixed_verify_capacities=capacities,
+        )
+
+
 class _LinearLoopHarness:
     def __init__(
         self,
@@ -46,6 +92,8 @@ class _LinearLoopHarness:
         is_draft=False,
         bonus_token=False,
         max_target_batch=0,
+        mixed_target_scheduler_contract=False,
+        mixed_target_capacity=32,
     ):
         self.events = []
         self.prefilled = set()
@@ -115,6 +163,12 @@ class _LinearLoopHarness:
             correction_group=None,
         )
         self.engine.gamma = 4
+        self.engine._mixed_target_graph_collective_enabled = bool(
+            mixed_target_scheduler_contract
+        )
+        self.engine._mixed_target_graph_verify_capacities = (
+            int(mixed_target_capacity),
+        )
         self.engine.graph_runner = SimpleNamespace(set_expected_fia_batch_size=Mock())
         self.engine.greedy_verification_layouts = {}
         self.engine.cache_allocation = SimpleNamespace(num_cached_tokens=[0] * request_count)
@@ -339,6 +393,39 @@ class _LinearLoopHarness:
         )
 
 
+def test_mixed_prefill_target_cohort_cap_is_exercised_during_online_refill(
+    monkeypatch,
+):
+    wall = [99.9]
+
+    def advance_wall():
+        wall[0] += 0.05
+        return wall[0]
+
+    monkeypatch.setattr(native.time, "time", advance_wall)
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(9, 9, 9, 9),
+        capacity=4,
+        online_prefill=True,
+        arrivals=(100.0, 100.0, 100.2, 100.2),
+        slo=40.0,
+        full_window=True,
+        max_target_batch=4,
+        mixed_target_scheduler_contract=True,
+        mixed_target_capacity=2,
+    )
+
+    results = harness.run(continuous_batching=True, max_rounds=5)
+    counters = results[0]["spec_rhythm"]
+
+    assert counters["spec_rhythm_mixed_target_scheduler_contract_enabled"] == 1
+    assert counters["spec_rhythm_mixed_target_scheduler_cap_cycles"] > 0
+    assert counters["spec_rhythm_mixed_target_scheduler_deferred_slots"] == (
+        counters["spec_rhythm_mixed_target_scheduler_cap_cycles"] * 2
+    )
+
+
 def test_underfilled_online_trace_still_honors_arrival_gate(monkeypatch):
     wall = [100.0]
     sleeps = []
@@ -445,6 +532,99 @@ def test_drain_fifo_requires_an_immutable_online_frontier(
     )
 
 
+@pytest.mark.parametrize(
+    ("configured", "online", "drain", "expected"),
+    [
+        (48, 0, False, (48, False, False)),
+        (48, 32, False, (32, True, False)),
+        (48, 32, True, (48, False, True)),
+        (32, 32, False, (32, False, False)),
+        (None, 0, False, (None, False, False)),
+    ],
+)
+def test_target_cohort_limit_expands_only_in_the_immutable_drain(
+    configured,
+    online,
+    drain,
+    expected,
+):
+    assert (
+        native.spec_rhythm_target_cohort_limit(
+            configured,
+            online_max_requests=online,
+            immutable_drain=drain,
+        )
+        == expected
+    )
+
+
+@pytest.mark.parametrize(
+    ("configured", "online"),
+    [
+        (48, -1),
+        (None, 32),
+        (32, 48),
+    ],
+)
+def test_target_cohort_limit_rejects_invalid_contracts(configured, online):
+    with pytest.raises(ValueError):
+        native.spec_rhythm_target_cohort_limit(
+            configured,
+            online_max_requests=online,
+            immutable_drain=False,
+        )
+
+
+def test_drain_padding_repairs_fill_only_the_paid_graph_bucket():
+    states = {
+        index: SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=index % 2,
+            output_token_budget=64,
+            delivered_tokens=delivered,
+        )
+        for index, delivered in enumerate((8, 40, 16, 24, 56, 32))
+    }
+
+    repairs, bucket, paid_slots = native.spec_rhythm_drain_padding_repairs(
+        tuple(states),
+        normal_request_indices=(0, 2),
+        eager_request_indices=(1,),
+        ready_request_indices=(1, 4),
+        staged_eager_request_indices=(),
+        states=states,
+        max_rows=8,
+    )
+
+    assert (bucket, paid_slots) == (4, 1)
+    assert repairs == (3,)
+    assert len((0, 2, 1, *repairs)) == bucket
+
+
+def test_drain_padding_repairs_never_open_a_new_graph_bucket():
+    states = {
+        index: SpecRhythmRuntimeState(
+            request_index=index,
+            home_batch_id=index % 2,
+            output_token_budget=64,
+            delivered_tokens=8,
+        )
+        for index in range(6)
+    }
+
+    repairs, bucket, paid_slots = native.spec_rhythm_drain_padding_repairs(
+        tuple(states),
+        normal_request_indices=(0, 2, 4, 5),
+        eager_request_indices=(),
+        ready_request_indices=(),
+        staged_eager_request_indices=(),
+        states=states,
+        max_rows=8,
+    )
+
+    assert (repairs, bucket, paid_slots) == ((), 4, 0)
+
+
 def test_drain_fifo_is_explicit_and_reports_executed_cycles(monkeypatch):
     monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO", "1")
     harness = _LinearLoopHarness(
@@ -501,6 +681,70 @@ def test_drain_lrtf_reports_cycles_that_rank_both_pipeline_stages(monkeypatch):
     assert metrics["spec_rhythm_drain_lrtf_unified_cycles"] > 0
     assert metrics["spec_rhythm_drain_lrtf_target_candidates"] > 0
     assert metrics["spec_rhythm_drain_lrtf_normal_candidates"] > 0
+
+
+def test_drain_lrtf_active_guard_delays_cross_home_ranking(monkeypatch):
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO", "1")
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF", "1")
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF_MAX_ACTIVE", "2")
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(5, 5, 9, 9),
+        capacity=4,
+        slo=40.0,
+        full_window=True,
+        max_target_batch=1,
+    )
+
+    metrics = harness.run(max_rounds=10)[0]["spec_rhythm"]
+
+    assert metrics["spec_rhythm_drain_lrtf_enabled"] == 1
+    assert metrics["spec_rhythm_drain_lrtf_max_active"] == 2
+    assert metrics["spec_rhythm_drain_lrtf_threshold_skipped_cycles"] > 0
+    assert metrics["spec_rhythm_drain_lrtf_cycles"] > 0
+    assert metrics["spec_rhythm_drain_lrtf_normal_ranked_cycles"] > 0
+
+
+def test_drain_target_lrtf_ranks_only_the_target_stage(monkeypatch):
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO", "1")
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_DRAIN_TARGET_LRTF", "1")
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(13, 13, 13, 13),
+        capacity=4,
+        slo=40.0,
+        full_window=True,
+        max_target_batch=1,
+    )
+
+    metrics = harness.run(max_rounds=8)[0]["spec_rhythm"]
+
+    assert metrics["spec_rhythm_drain_target_lrtf_enabled"] == 1
+    assert metrics["spec_rhythm_drain_target_lrtf_cycles"] == metrics["spec_rhythm_drain_fifo_cycles"]
+    assert metrics["spec_rhythm_drain_target_lrtf_ranked_cycles"] > 0
+    assert metrics["spec_rhythm_drain_target_lrtf_candidates"] > 0
+    assert metrics["spec_rhythm_drain_lrtf_normal_ranked_cycles"] == 0
+    assert metrics["spec_rhythm_drain_lrtf_normal_cross_home_selected"] == 0
+
+
+def test_target_residual_lrtf_reports_selected_and_deferred_zero_gap_rows(monkeypatch):
+    monkeypatch.setenv("VLLM_ASCEND_SPECRHYTHM_TARGET_RESIDUAL_LRTF", "1")
+    harness = _LinearLoopHarness(
+        monkeypatch,
+        max_tokens=(13, 13, 13, 13),
+        capacity=4,
+        slo=40.0,
+        full_window=True,
+        max_target_batch=1,
+    )
+
+    metrics = harness.run(max_rounds=8)[0]["spec_rhythm"]
+
+    assert metrics["spec_rhythm_target_residual_lrtf_enabled"] == 1
+    assert metrics["spec_rhythm_target_residual_lrtf_ranked_cycles"] > 0
+    assert metrics["spec_rhythm_target_residual_lrtf_candidates"] > 0
+    assert metrics["spec_rhythm_target_residual_lrtf_selected"] > 0
+    assert metrics["spec_rhythm_target_residual_lrtf_deferred"] > 0
 
 
 @pytest.mark.parametrize(
@@ -1895,6 +2139,7 @@ def test_linear_host_timeline_adds_no_profiling_synchronize(monkeypatch):
     assert traces[1]["target_requests"] > 0
     assert traces[1]["draft_requests"] > 0
     for key in (
+        "scheduler_start_seconds",
         "scheduler_roof_end_seconds",
         "scheduler_plan_end_seconds",
         "scheduler_budget_end_seconds",
@@ -2758,6 +3003,10 @@ def test_slo_summary_preserves_worker_arrival_clock():
                 "slo_attained": True,
                 "slo_goodput_tokens": 2,
                 "arrival_ts": 100.0,
+                "arrival_wait_ms": 12.5,
+                "decode_start_elapsed_ms": 3.0,
+                "finished_decode_elapsed_ms": 23.0,
+                "request_service_e2e_ms": 32.5,
             },
             {
                 "request_id": "b",
@@ -2769,6 +3018,10 @@ def test_slo_summary_preserves_worker_arrival_clock():
                 "slo_attained": True,
                 "slo_goodput_tokens": 2,
                 "arrival_ts": 112.0,
+                "arrival_wait_ms": 7.5,
+                "decode_start_elapsed_ms": 4.0,
+                "finished_decode_elapsed_ms": 24.0,
+                "request_service_e2e_ms": 27.5,
             },
         ],
         1.0,
@@ -2777,3 +3030,5 @@ def test_slo_summary_preserves_worker_arrival_clock():
 
     assert [row["arrival_ts"] for row in summary["request_metrics"]] == [100.0, 112.0]
     assert [row["arrival_offset_sec"] for row in summary["request_metrics"]] == [0.0, 12.0]
+    assert [row["arrival_wait_ms"] for row in summary["request_metrics"]] == [12.5, 7.5]
+    assert [row["request_service_e2e_ms"] for row in summary["request_metrics"]] == [32.5, 27.5]

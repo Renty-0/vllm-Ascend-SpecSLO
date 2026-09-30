@@ -49,6 +49,7 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
     _canonical_active_indices,
     _continuous_bucket_indices,
     _continuous_result_states,
+    _convert_untied_target_lm_head_to_nz,
     _finished,
     _gamma_from_decode_speeds,
     _linear_draft_fia_lifetime_limits,
@@ -66,6 +67,8 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
     _record_linear_draft_full_chain_metrics,
     _record_mixed_target_graph_outcome,
     _record_stable_target_verify_graph_outcome,
+    _replicate_target_input_embedding,
+    _ReplicatedInputEmbedding,
     _resolve_target_replay_ahead_consume_preflight,
     _resolve_target_replay_ahead_logical_preflight,
     _resolve_target_replay_ahead_resource_preflight,
@@ -87,6 +90,7 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
     plan_stable_target_verify_graph_layout,
     resolve_mixed_target_graph_buckets,
     resolve_mixed_target_graph_verify_capacities,
+    resolve_stable_target_verify_capacities,
     spec_rhythm_target_replay_ahead_fallback_safe,
     spec_rhythm_target_replay_ahead_frontier_immutable,
     spec_rhythm_target_replay_ahead_graph_reject_reason,
@@ -118,6 +122,83 @@ from vllm_ascend.spec_decode.pearl.spec_rhythm import (
 )
 from vllm_ascend.spec_decode.pearl.topology import PearlTopology
 from vllm_ascend.spec_decode.pearl.tree import build_tree_speculation_plan, pack_selected_tree_plan
+
+
+def test_replicated_target_input_embedding_gathers_once_and_preserves_shard_interface(monkeypatch):
+    class ShardedEmbedding(torch.nn.Module):
+        def __init__(self):
+            super().__init__()
+            self.weight = torch.nn.Parameter(
+                torch.tensor([[1.0, 2.0], [3.0, 4.0]]),
+                requires_grad=False,
+            )
+
+    model = torch.nn.Module()
+    sharded = ShardedEmbedding()
+    model.embed_tokens = sharded
+    context = NativeTPContext(group=object(), rank=1, size=3, leader_rank=1)
+    calls = []
+
+    def fake_all_gather_into_tensor(output, local, *, group):
+        calls.append((tuple(output.shape), tuple(local.shape), group))
+        output.copy_(torch.cat((local, local + 10.0, local + 20.0), dim=0))
+
+    monkeypatch.setattr(
+        native_engine_module.dist,
+        "all_gather_into_tensor",
+        fake_all_gather_into_tensor,
+    )
+    replica_bytes = _replicate_target_input_embedding(model, context)
+
+    assert isinstance(model.embed_tokens, _ReplicatedInputEmbedding)
+    assert model.embed_tokens.weight is sharded.weight
+    assert replica_bytes == 6 * 2 * sharded.weight.element_size()
+    assert calls == [((6, 2), (2, 2), context.group)]
+    torch.testing.assert_close(
+        model.embed_tokens(torch.tensor([0, 2, 5])),
+        torch.tensor([[1.0, 2.0], [11.0, 12.0], [23.0, 24.0]]),
+    )
+
+
+def test_target_lm_head_nz15_converts_only_untied_output_weight(monkeypatch):
+    model = MagicMock()
+    model.embed_tokens.weight = MagicMock()
+    weight = MagicMock()
+    weight.device.type = "npu"
+    weight.ndim = 2
+    original = weight.data
+    model.lm_head.weight = weight
+    converted = MagicMock()
+    converted.numel.return_value = 30
+    converted.element_size.return_value = 2
+    calls = []
+
+    def fake_format_cast(value, format_id):
+        calls.append((value, format_id))
+        return converted
+
+    monkeypatch.setattr(native_engine_module.torch_npu, "npu_format_cast", fake_format_cast)
+
+    assert _convert_untied_target_lm_head_to_nz(model) == 60
+    assert calls == [(original, 29)]
+    assert model.lm_head.weight.data is converted
+
+
+def test_target_lm_head_nz15_rejects_tied_embedding():
+    model = MagicMock()
+    tied = MagicMock()
+    model.embed_tokens.weight = tied
+    model.lm_head.weight = tied
+
+    with pytest.raises(ValueError, match="requires untied"):
+        _convert_untied_target_lm_head_to_nz(model)
+
+
+def test_replicated_target_input_embedding_rejects_non_tp3():
+    model = SimpleNamespace(embed_tokens=SimpleNamespace(weight=torch.empty(2, 3)))
+    context = NativeTPContext(group=None, rank=0, size=2, leader_rank=0)
+    with pytest.raises(ValueError, match="requires target TP3"):
+        _replicate_target_input_embedding(model, context)
 
 
 @pytest.mark.parametrize("gamma", [2, 3])
@@ -373,6 +454,21 @@ def test_stable_target_verify_accepts_configured_exact_capacity_48():
     assert _next_stable_target_verify_capacity(48, capacities) == 48
     with pytest.raises(ValueError, match="provisioned graph family"):
         _next_stable_target_verify_capacity(49, capacities)
+
+
+def test_stable_target_verify_sparse_tail_preserves_dense_online_family():
+    capacities = resolve_stable_target_verify_capacities(1, 48, 32)
+    assert capacities == (*range(1, 33), 48)
+    assert _next_stable_target_verify_capacity(32, capacities) == 32
+    assert _next_stable_target_verify_capacity(33, capacities) == 48
+    assert _next_stable_target_verify_capacity(48, capacities) == 48
+
+
+def test_stable_target_verify_zero_dense_limit_preserves_legacy_family():
+    assert resolve_stable_target_verify_capacities(1, 4, 0) == (1, 2, 3, 4)
+    assert resolve_stable_target_verify_capacities(4, 10, 8) == (4, 8, 10)
+    with pytest.raises(ValueError, match="request bucket"):
+        resolve_stable_target_verify_capacities(4, 8, 2)
 
 
 def test_stable_target_verify_uses_smallest_bucketed_capacity():
@@ -1719,8 +1815,15 @@ def _fixed_full_window_correction_engine(*, is_draft, events):
     engine.topology = PearlTopology(draft_ranks=(0,), target_ranks=(1, 2))
     engine.groups = SimpleNamespace(correction_group=object())
     engine._fixed_full_window_host_correction_staging = native_engine_module._FixedFullWindowHostCorrectionStaging(
-        verdict_receive=torch.full((64,), -777, dtype=torch.long),
-        host_values=_RecordingHostBuffer(192, events),
+        verdict_receive=torch.full(
+            (native_engine_module.FIXED_FULL_WINDOW_HOST_STAGING_VERDICT_VALUES,),
+            -777,
+            dtype=torch.long,
+        ),
+        host_values=_RecordingHostBuffer(
+            native_engine_module.FIXED_FULL_WINDOW_HOST_STAGING_VALUES,
+            events,
+        ),
         copy_done_event=_RecordingCopyEvent(events),
     )
     return engine
@@ -1828,7 +1931,7 @@ def test_staged_gloo_correction_host_continuation_path_skips_device_copy():
     ]
 
 
-@pytest.mark.parametrize("batch_size", [1, 16, 32])
+@pytest.mark.parametrize("batch_size", [1, 16, 32, 48, 64])
 def test_fixed_full_window_target_staging_overlaps_continuation_copy_and_collective_wait(batch_size):
     events = []
     engine = _fixed_full_window_correction_engine(is_draft=False, events=events)
@@ -1898,7 +2001,7 @@ def test_fixed_full_window_draft_staging_reuses_receive_buffer_and_keeps_windows
         patch.dict(os.environ, {"VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION": "0"}),
         patch("vllm_ascend.spec_decode.pearl.native_engine.dist.broadcast", side_effect=broadcast),
     ):
-        for batch_size in (32, 1):
+        for batch_size in (64, 1):
             local_next = torch.arange(batch_size * 4, dtype=torch.long).reshape(batch_size, 4)
             accepted, corrections, next_windows = engine._broadcast_device_round_result(
                 None,
@@ -1919,10 +2022,10 @@ def test_fixed_full_window_draft_staging_reuses_receive_buffer_and_keeps_windows
     assert events == [
         "broadcast",
         "wait",
-        ("copy", 0, 64, True),
+        ("copy", 0, 128, True),
         "record",
         "synchronize",
-        ("tolist", 0, 64),
+        ("tolist", 0, 128),
         "broadcast",
         "wait",
         ("copy", 0, 2, True),
@@ -2766,6 +2869,50 @@ def test_device_mailbox_validates_prefix_epoch_and_variable_shapes():
         bad_host.validate_for(state)
 
 
+def test_proposal_matrix_reuses_only_consecutive_transport_rows():
+    envelope = torch.arange(12, dtype=torch.long).reshape(3, 4)
+
+    def payload(row: int) -> NativeSpecRhythmDevicePayload:
+        return NativeSpecRhythmDevicePayload(
+            ticket=SpecRhythmProposalTicket(
+                proposal_id=row,
+                request_index=row,
+                home_batch_id=0,
+                gamma=4,
+                required_prefix_epoch=0,
+            ),
+            verification_tokens=envelope[row],
+            next_tokens=envelope[row],
+            verification_size=4,
+            draft_confidence=1.0,
+        )
+
+    matrix, reused = native_engine_module._proposal_matrix_from_payload_views(
+        [payload(0), payload(1), payload(2)],
+        4,
+    )
+    assert reused
+    assert torch.equal(matrix, envelope)
+    assert matrix.untyped_storage().data_ptr() == envelope.untyped_storage().data_ptr()
+
+    gathered, reused = native_engine_module._proposal_matrix_from_payload_views(
+        [payload(0), payload(2)],
+        4,
+    )
+    assert not reused
+    assert torch.equal(gathered, envelope[[0, 2]])
+    assert gathered.untyped_storage().data_ptr() != envelope.untyped_storage().data_ptr()
+
+    stack_out = torch.empty((2, 4), dtype=torch.long)
+    gathered, reused = native_engine_module._proposal_matrix_from_payload_views(
+        [payload(0), payload(2)],
+        4,
+        stack_out=stack_out,
+    )
+    assert not reused
+    assert torch.equal(gathered, envelope[[0, 2]])
+    assert gathered.untyped_storage().data_ptr() == stack_out.untyped_storage().data_ptr()
+
 def _target_replay_ahead_fixture():
     runtime_states = {
         index: SpecRhythmRuntimeState(
@@ -2783,10 +2930,7 @@ def _target_replay_ahead_fixture():
         )
         for index in range(4)
     ]
-    tickets = [
-        controller.new_ticket(index, gamma=4, eager=False)
-        for index in range(4)
-    ]
+    tickets = [controller.new_ticket(index, gamma=4, eager=False) for index in range(4)]
     controller.publish(tickets)
     payloads = {
         ticket.proposal_id: NativeSpecRhythmDevicePayload(
@@ -2906,6 +3050,100 @@ def test_target_replay_ahead_preview_is_exact_and_side_effect_free():
     assert controller.ready == ready_before
 
 
+def test_target_replay_ahead_reserves_full_drain_batch_with_current_eager():
+    controller, states, payloads = _target_replay_ahead_fixture()
+    controller.publish([controller.new_ticket(index, gamma=4, eager=True) for index in (0, 1)])
+
+    signature, reason = plan_spec_rhythm_target_replay_ahead(
+        controller=controller,
+        current_target_home_batch_id=0,
+        current_target_request_indices=(0, 1),
+        active_request_indices=(0, 1, 2, 3),
+        payloads=payloads,
+        states=states,
+        gamma=4,
+        verification_budget=8,
+        max_target_requests=2,
+        linear_full_window=True,
+        dual_batch=True,
+        immutable_frontier=True,
+        allow_next_cycle=True,
+        reserve_immutable_drain=True,
+    )
+
+    assert reason is None
+    assert signature is not None
+    assert signature.home_batch_id == 1
+    assert signature.request_indices == (2, 3)
+    assert signature.request_home_batch_ids == (1, 1)
+
+
+def test_target_replay_ahead_reserves_mixed_home_drain_batch():
+    controller, states, payloads = _target_replay_ahead_fixture()
+    controller.publish([controller.new_ticket(index, gamma=4, eager=True) for index in (0, 2)])
+
+    signature, reason = plan_spec_rhythm_target_replay_ahead(
+        controller=controller,
+        current_target_home_batch_id=0,
+        current_target_request_indices=(0, 2),
+        active_request_indices=(0, 1, 2, 3),
+        payloads=payloads,
+        states=states,
+        gamma=4,
+        verification_budget=8,
+        max_target_requests=2,
+        linear_full_window=True,
+        dual_batch=True,
+        immutable_frontier=True,
+        allow_next_cycle=True,
+        reserve_immutable_drain=True,
+    )
+
+    assert reason is None
+    assert signature is not None
+    assert signature.request_indices == (1, 3)
+    assert signature.request_home_batch_ids == (0, 1)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "target_cap", "expected_reason"),
+    [
+        ("orphan_eager", 2, "pending_eager"),
+        ("row_cap", 1, "schedule"),
+    ],
+)
+def test_target_replay_ahead_drain_reservation_fails_closed(
+    mutation,
+    target_cap,
+    expected_reason,
+):
+    controller, states, payloads = _target_replay_ahead_fixture()
+    controller.publish([controller.new_ticket(0, gamma=4, eager=True)])
+    if mutation == "orphan_eager":
+        controller.publish([controller.new_ticket(2, gamma=4, eager=True)])
+        controller.ready.pop(2)
+
+    signature, reason = plan_spec_rhythm_target_replay_ahead(
+        controller=controller,
+        current_target_home_batch_id=0,
+        current_target_request_indices=(0, 1),
+        active_request_indices=(0, 1, 2, 3),
+        payloads=payloads,
+        states=states,
+        gamma=4,
+        verification_budget=12,
+        max_target_requests=target_cap,
+        linear_full_window=True,
+        dual_batch=True,
+        immutable_frontier=True,
+        allow_next_cycle=True,
+        reserve_immutable_drain=True,
+    )
+
+    assert signature is None
+    assert reason == expected_reason
+
+
 @pytest.mark.parametrize(
     ("mutation", "expected_reason"),
     [
@@ -2924,9 +3162,7 @@ def test_target_replay_ahead_preview_fails_closed(mutation, expected_reason):
     if mutation == "mutable":
         immutable_frontier = False
     elif mutation == "pending_eager":
-        controller.publish(
-            [controller.new_ticket(0, gamma=4, eager=True)]
-        )
+        controller.publish([controller.new_ticket(0, gamma=4, eager=True)])
     elif mutation == "deferred_current":
         current = (0,)
     elif mutation == "stale_epoch":
@@ -2996,10 +3232,7 @@ def test_target_replay_ahead_requires_sealed_qualified_decode_graph():
         "stable_capacity": 2,
         "max_graph_tokens": 256,
     }
-    assert (
-        spec_rhythm_target_replay_ahead_graph_reject_reason(**contract)
-        is None
-    )
+    assert spec_rhythm_target_replay_ahead_graph_reject_reason(**contract) is None
     for key, value in (
         ("graph_cache_sealed", False),
         ("stable_graph_qualified", False),
@@ -3009,10 +3242,7 @@ def test_target_replay_ahead_requires_sealed_qualified_decode_graph():
         ("stable_capacity", None),
     ):
         rejected = {**contract, key: value}
-        assert (
-            spec_rhythm_target_replay_ahead_graph_reject_reason(**rejected)
-            == "graph_contract"
-        )
+        assert spec_rhythm_target_replay_ahead_graph_reject_reason(**rejected) == "graph_contract"
 
 
 def test_target_replay_ahead_logical_preflight_skips_if_any_rank_rejects():
@@ -3023,9 +3253,7 @@ def test_target_replay_ahead_logical_preflight_skips_if_any_rank_rejects():
             valid,
             [
                 0,
-                native_engine_module.TARGET_REPLAY_AHEAD_REJECT_REASONS.index(
-                    "mutable_frontier"
-                ),
+                native_engine_module.TARGET_REPLAY_AHEAD_REJECT_REASONS.index("mutable_frontier"),
                 0,
                 0,
                 -1,
@@ -3063,9 +3291,7 @@ def test_target_replay_ahead_resource_preflight_is_target_only():
     rows[2] = [
         1,
         0,
-        native_engine_module.TARGET_REPLAY_AHEAD_REJECT_REASONS.index(
-            "resource_contract"
-        ),
+        native_engine_module.TARGET_REPLAY_AHEAD_REJECT_REASONS.index("resource_contract"),
         101,
         7,
         11,
@@ -3087,9 +3313,7 @@ def _target_replay_ahead_consume_rows():
 
 
 def test_target_replay_ahead_consume_preflight_accepts_exact_all_role_state():
-    assert _resolve_target_replay_ahead_consume_preflight(
-        _target_replay_ahead_consume_rows()
-    ) == (True, True)
+    assert _resolve_target_replay_ahead_consume_preflight(_target_replay_ahead_consume_rows()) == (True, True)
 
 
 @pytest.mark.parametrize(
@@ -3142,14 +3366,94 @@ def test_target_replay_ahead_fallback_proof(
 def test_target_replay_ahead_env_is_default_off(monkeypatch):
     variable = "VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD"
     monkeypatch.delenv(variable, raising=False)
-    assert (
-        native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD
-        is False
-    )
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD is False
     monkeypatch.setenv(variable, "1")
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD is True
+
+
+def test_early_current_target_submit_env_is_default_off(monkeypatch):
+    variable = "VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_TARGET_SUBMIT"
+    monkeypatch.delenv(variable, raising=False)
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_TARGET_SUBMIT is False
+    monkeypatch.setenv(variable, "1")
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_TARGET_SUBMIT is True
+
+
+def test_early_current_mixed_target_submit_env_is_default_off(monkeypatch):
+    variable = "VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT"
+    monkeypatch.delenv(variable, raising=False)
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT is False
+    monkeypatch.setenv(variable, "1")
+    assert native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT is True
+
+
+@pytest.mark.parametrize(
+    ("override", "expected"),
+    [
+        ({}, True),
+        ({"enabled": False}, False),
+        ({"has_target_work": False}, False),
+        ({"has_staged_prefill": True}, False),
+        ({"has_replay_ahead": True}, False),
+        ({"profile_this_round": True}, False),
+        ({"linear_bonus_token": True}, True),
+        ({"target_use_paged_attention": True}, False),
+        ({"mixed_target_graph_enabled": False}, False),
+        ({"mixed_target_graph_prefill_only": True}, False),
+    ],
+)
+def test_early_current_target_submit_proof(override, expected):
+    arguments = {
+        "enabled": True,
+        "has_target_work": True,
+        "has_staged_prefill": False,
+        "has_replay_ahead": False,
+        "profile_this_round": False,
+        "linear_full_window": True,
+        "linear_bonus_token": False,
+        "target_use_paged_attention": False,
+        "enforce_eager": False,
+        "stable_graphs": True,
+        "mixed_target_graph_enabled": True,
+        "mixed_target_graph_prefill_only": False,
+    }
+    arguments.update(override)
+    assert native_engine_module.spec_rhythm_early_current_target_submit_eligible(**arguments) is expected
+
+
+@pytest.mark.parametrize(
+    ("override", "expected"),
+    [
+        ({}, True),
+        ({"enabled": False}, False),
+        ({"mixed_prefill_this_cycle": False}, False),
+        ({"has_replay_ahead": True}, False),
+        ({"profile_this_round": True}, False),
+        ({"linear_full_window": False}, False),
+        ({"linear_bonus_token": True}, True),
+        ({"target_use_paged_attention": True}, False),
+        ({"enforce_eager": True}, False),
+        ({"stable_graphs": False}, False),
+        ({"mixed_target_graph_enabled": False}, False),
+    ],
+)
+def test_early_current_mixed_target_submit_proof(override, expected):
+    arguments = {
+        "enabled": True,
+        "mixed_prefill_this_cycle": True,
+        "has_replay_ahead": False,
+        "profile_this_round": False,
+        "linear_full_window": True,
+        "linear_bonus_token": False,
+        "target_use_paged_attention": False,
+        "enforce_eager": False,
+        "stable_graphs": True,
+        "mixed_target_graph_enabled": True,
+    }
+    arguments.update(override)
     assert (
-        native_engine_module.envs.VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD
-        is True
+        native_engine_module.spec_rhythm_early_current_mixed_target_submit_eligible(**arguments)
+        is expected
     )
 
 
@@ -8463,6 +8767,25 @@ def test_public_engine_collects_worker_replies_in_rank_order():
             connection.close()
 
 
+def test_public_engine_reports_queued_worker_error_after_worker_exit():
+    engine = PEARLEngine.__new__(PEARLEngine)
+    engine.config = SimpleNamespace(worker_timeout_seconds=1.0)
+    process = MagicMock()
+    process.is_alive.return_value = False
+    process.exitcode = 0
+    parent, worker = Pipe(duplex=True)
+    engine._processes = [process]
+    engine._connections = [parent]
+    try:
+        worker.send(("error", "real worker traceback"))
+
+        with pytest.raises(RuntimeError, match="real worker traceback"):
+            engine._receive_all("worker initialization")
+    finally:
+        parent.close()
+        worker.close()
+
+
 def test_public_engine_preserves_sampling_request_metadata_when_not_overridden():
     engine = PEARLEngine.__new__(PEARLEngine)
     engine.config = SimpleNamespace(max_model_len=64)
@@ -8946,8 +9269,10 @@ def test_host_decode_profile_merges_rank_local_timestamps_without_sync():
                     "rank": rank,
                     "is_draft_rank": int(is_draft),
                     "cycle_start_seconds": 1.0,
+                    "scheduler_start_seconds": 1.001,
                     "scheduler_roof_end_seconds": 1.002,
                     "scheduler_plan_end_seconds": 1.005,
+                    "scheduler_policy_start_seconds": 1.006,
                     "scheduler_budget_end_seconds": 1.007,
                     "scheduler_end_seconds": 1.01,
                     "draft_start_seconds": draft[0],
@@ -9003,9 +9328,13 @@ def test_host_decode_profile_merges_rank_local_timestamps_without_sync():
 
     cycle = profile["cycles"][0]
     assert cycle["cycle_wall_ms"] == pytest.approx(73.0)
+    assert cycle["scheduler_entry_carry_critical_ms"] == pytest.approx(1.0)
+    assert cycle["scheduler_roof_work_critical_ms"] == pytest.approx(1.0)
     assert cycle["scheduler_roof_critical_ms"] == pytest.approx(2.0)
     assert cycle["scheduler_plan_critical_ms"] == pytest.approx(3.0)
     assert cycle["scheduler_budget_critical_ms"] == pytest.approx(2.0)
+    assert cycle["scheduler_policy_budget_critical_ms"] == pytest.approx(1.0)
+    assert cycle["scheduler_pre_policy_critical_ms"] == pytest.approx(1.0)
     assert cycle["scheduler_tree_plan_critical_ms"] == pytest.approx(3.0)
     assert cycle["draft_compute_host_ms"] == pytest.approx(20.0)
     assert cycle["target_compute_host_ms"] == pytest.approx(40.0)
@@ -10702,6 +11031,87 @@ def test_native_tp3_large_m_nz_retains_nd_down_and_stores_nz_copy():
     format_cast.assert_called_once_with(original, 29)
     assert down.weight.data is original
     assert down.large_m_nz_weight is converted
+
+
+@pytest.mark.parametrize(("mode", "selected_layer"), ((12, 0), (13, 1)))
+def test_native_tp3_layered_large_m_nz_keeps_nd_and_stores_selected_copy(mode, selected_layer):
+    model = MagicMock()
+    model.config.tie_word_embeddings = False
+    model.config.pearl_weight_nz_mode = mode
+    modules = {}
+    for layer_index in range(2):
+        name = f"model.layers.{layer_index}.mlp.down_proj"
+        module = MagicMock(spec=NativeRowLinear)
+        module.bias = None
+        module.weight = MagicMock()
+        module.weight.device.type = "npu"
+        module.large_m_nz_weight = None
+        modules[name] = module
+    model.lm_head = MagicMock()
+    model.embed_tokens.weight = MagicMock()
+    model.named_modules.return_value = list(modules.items())
+    originals = {name: module.weight.data for name, module in modules.items()}
+    converted = MagicMock()
+
+    with patch(
+        "vllm_ascend.spec_decode.pearl.native_model.torch_npu.npu_format_cast",
+        return_value=converted,
+    ) as format_cast:
+        _maybe_convert_linear_weights_to_nz(model)
+
+    selected = f"model.layers.{selected_layer}.mlp.down_proj"
+    format_cast.assert_called_once_with(originals[selected], 29)
+    for name, module in modules.items():
+        assert module.weight.data is originals[name]
+        assert module.large_m_nz_weight is (converted if name == selected else None)
+
+
+def test_native_tp3_sparse_ffn_large_m_nz_keeps_nd_and_stores_selected_copies():
+    model = MagicMock()
+    model.config.tie_word_embeddings = False
+    model.config.pearl_weight_nz_mode = 14
+    modules = {}
+    for layer_index in (0, 1, 8):
+        for projection, module_type in (
+            ("gate_up_proj", NativeColumnLinear),
+            ("down_proj", NativeRowLinear),
+        ):
+            name = f"model.layers.{layer_index}.mlp.{projection}"
+            module = MagicMock(spec=module_type)
+            module.bias = None
+            module.weight = MagicMock()
+            module.weight.device.type = "npu"
+            module.large_m_nz_weight = None
+            modules[name] = module
+    model.lm_head = MagicMock()
+    model.embed_tokens.weight = MagicMock()
+    model.named_modules.return_value = list(modules.items())
+    originals = {name: module.weight.data for name, module in modules.items()}
+    converted = [MagicMock() for _ in range(4)]
+
+    with patch(
+        "vllm_ascend.spec_decode.pearl.native_model.torch_npu.npu_format_cast",
+        side_effect=converted,
+    ) as format_cast:
+        _maybe_convert_linear_weights_to_nz(model)
+
+    selected = (
+        "model.layers.0.mlp.gate_up_proj",
+        "model.layers.0.mlp.down_proj",
+        "model.layers.8.mlp.gate_up_proj",
+        "model.layers.8.mlp.down_proj",
+    )
+    assert format_cast.call_count == len(selected)
+    for name, converted_weight in zip(selected, converted):
+        assert format_cast.call_args_list[selected.index(name)].args == (
+            originals[name],
+            29,
+        )
+        assert modules[name].large_m_nz_weight is converted_weight
+        assert modules[name].weight.data is originals[name]
+    for name, module in modules.items():
+        if name not in selected:
+            assert module.large_m_nz_weight is None
 
 
 @pytest.mark.parametrize(("mode", "selected_layer"), ((6, 0), (7, 1)))

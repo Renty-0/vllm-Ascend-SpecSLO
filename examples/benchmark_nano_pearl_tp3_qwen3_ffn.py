@@ -26,6 +26,12 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--token-counts", type=int, nargs="+", default=[32, 64, 96, 128])
     parser.add_argument("--warmup-steps", type=int, default=20)
     parser.add_argument("--profile-steps", type=int, default=100)
+    parser.add_argument(
+        "--intermediate-per-rank",
+        type=int,
+        default=8576,
+        help="Rank-local Qwen3-32B TP3 FFN width (the padded production default is 8576).",
+    )
     parser.add_argument("--include-prefetch", action="store_true")
     parser.add_argument(
         "--pad-row-reduce-to",
@@ -34,6 +40,15 @@ def _parse_args() -> argparse.Namespace:
         help=(
             "Also measure an ND block whose down-projection/all-reduce is "
             "zero-padded to this row count before slicing back to the real rows."
+        ),
+    )
+    parser.add_argument(
+        "--pad-row-multiple",
+        type=int,
+        default=0,
+        help=(
+            "Also measure an ND block whose gate/up and down projections are "
+            "both padded to the next multiple before slicing back to the real rows."
         ),
     )
     parser.add_argument("--prefetch-bytes", type=int, default=18 * 1024 * 1024)
@@ -82,7 +97,9 @@ def main() -> None:
             raise RuntimeError("vLLM-Ascend custom operators could not be loaded")
 
     hidden_size = 5120
-    intermediate_per_rank = 8544
+    intermediate_per_rank = args.intermediate_per_rank
+    if intermediate_per_rank <= 0:
+        raise ValueError("--intermediate-per-rank must be positive")
     results: list[dict[str, object]] = []
     for token_count in args.token_counts:
         torch.manual_seed(20260920 + rank)
@@ -117,13 +134,13 @@ def main() -> None:
         outputs: dict[str, torch.Tensor] = {}
         graphs: dict[str, torch.npu.NPUGraph] = {}
         strategies = [
-            ("nd", gate_up_nd, down_nd, False, 0),
-            ("gate_nz", gate_up_nz, down_nd, False, 0),
-            ("down_nz", gate_up_nd, down_nz, False, 0),
-            ("nz", gate_up_nz, down_nz, False, 0),
+            ("nd", gate_up_nd, down_nd, False, 0, 0),
+            ("gate_nz", gate_up_nz, down_nd, False, 0, 0),
+            ("down_nz", gate_up_nd, down_nz, False, 0, 0),
+            ("nz", gate_up_nz, down_nz, False, 0, 0),
         ]
         if args.include_prefetch:
-            strategies.insert(1, ("nd_prefetch", gate_up_nd, down_nd, True, 0))
+            strategies.insert(1, ("nd_prefetch", gate_up_nd, down_nd, True, 0, 0))
         if args.pad_row_reduce_to > token_count:
             strategies.insert(
                 1,
@@ -133,12 +150,46 @@ def main() -> None:
                     down_nd,
                     False,
                     args.pad_row_reduce_to,
+                    0,
                 ),
             )
-        for layout, gate_up_weight, down_weight, prefetch, padded_rows in strategies:
+        padded_all_rows = 0
+        if args.pad_row_multiple > 1:
+            padded_all_rows = (
+                (token_count + args.pad_row_multiple - 1)
+                // args.pad_row_multiple
+                * args.pad_row_multiple
+            )
+            if padded_all_rows > token_count:
+                strategies.insert(
+                    1,
+                    (
+                        f"nd_pad_all_{padded_all_rows}",
+                        gate_up_nd,
+                        down_nd,
+                        False,
+                        0,
+                        padded_all_rows,
+                    ),
+                )
+        for layout, gate_up_weight, down_weight, prefetch, padded_rows, all_padded_rows in strategies:
 
-            def ffn_block() -> torch.Tensor:
-                gate_up = F.linear(source, gate_up_weight)
+            def ffn_block(
+                source: torch.Tensor = source,
+                gate_up_weight: torch.Tensor = gate_up_weight,
+                down_weight: torch.Tensor = down_weight,
+                prefetch: bool = prefetch,
+                padded_rows: int = padded_rows,
+                all_padded_rows: int = all_padded_rows,
+                token_count: int = token_count,
+            ) -> torch.Tensor:
+                gate_source = source
+                if all_padded_rows:
+                    gate_source = F.pad(
+                        gate_source,
+                        (0, 0, 0, all_padded_rows - token_count),
+                    )
+                gate_up = F.linear(gate_source, gate_up_weight)
                 if prefetch:
                     torch.ops.vllm.prefetch_preprocess(
                         weight=down_weight,
@@ -193,6 +244,7 @@ def main() -> None:
             for comparison in (
                 "nd_prefetch",
                 f"nd_pad_reduce_{args.pad_row_reduce_to}",
+                f"nd_pad_all_{padded_all_rows}",
                 "gate_nz",
                 "down_nz",
                 "nz",

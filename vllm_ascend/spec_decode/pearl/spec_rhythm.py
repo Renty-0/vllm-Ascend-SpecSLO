@@ -130,6 +130,30 @@ class SpecRhythmRuntimeState:
         )
         return max(0.0, projected_tpot / self.slo_tpot_ms)
 
+    def scheduling_metrics(self, projected_wait_ms: float) -> tuple[int, float]:
+        """Return ``(a_need, urgency)`` from one elapsed-time projection.
+
+        The online controller consumes both values for every ready row.  Keep
+        this paired form so the hot path does not recompute arrival-debt
+        clamping and projected elapsed time twice; the standalone accessors
+        above remain the public, independently testable definitions.
+        """
+
+        if self.slo_tpot_ms is None:
+            return 0, 0.0
+        projected_elapsed_ms = self.effective_elapsed_ms + max(0.0, float(projected_wait_ms))
+        progress_gap = int(
+            math.ceil(
+                max(
+                    0.0,
+                    projected_elapsed_ms / self.slo_tpot_ms - self.delivered_tokens,
+                )
+            )
+        )
+        projected_tpot = projected_elapsed_ms / max(1, self.delivered_tokens)
+        urgency = max(0.0, projected_tpot / self.slo_tpot_ms)
+        return progress_gap, urgency
+
     def terminal_slack_ms(self, projected_wait_ms: float = 0.0) -> float:
         """Return remaining decode time before final TPOT becomes impossible.
 
@@ -584,6 +608,16 @@ class SpecRhythmExecutionPlan:
     target_candidate_budgets: Mapping[int, int] = field(default_factory=dict)
     verification_candidate_budget: int | None = None
     deferred_target_request_indices: tuple[int, ...] = ()
+    # ``build_plan`` already computes the paper's ``(a_need, urgency)`` pair
+    # for every ready row when SLO priority is active.  The executor also needs
+    # the exact same pair to rank rolling-eager work.  Carry the selected-row
+    # snapshot with the immutable plan so the hot path does not repeat four
+    # request-local floating-point calculations per row and cycle.
+    target_scheduling_metrics: Mapping[int, tuple[int, float]] = field(
+        default_factory=dict,
+        repr=False,
+        compare=False,
+    )
     # Drain-only diagnostics.  They are carried by the immutable plan rather
     # than inferred by the executor so a production result can prove that the
     # remaining-service policy reached both sides of the dual-batch pipeline.
@@ -593,6 +627,9 @@ class SpecRhythmExecutionPlan:
     remaining_service_normal_candidates: int = 0
     remaining_service_normal_selected: int = 0
     remaining_service_normal_cross_home_selected: int = 0
+    residual_remaining_service_target_ranked: bool = False
+    residual_remaining_service_target_candidates: int = 0
+    residual_remaining_service_target_selected: int = 0
 
     def __post_init__(self) -> None:
         if self.target_candidate_budgets:
@@ -612,6 +649,8 @@ class SpecRhythmExecutionPlan:
             self.remaining_service_normal_candidates,
             self.remaining_service_normal_selected,
             self.remaining_service_normal_cross_home_selected,
+            self.residual_remaining_service_target_candidates,
+            self.residual_remaining_service_target_selected,
         )
         if any(value < 0 for value in remaining_service_counts):
             raise ValueError("SpecRhythm remaining-service diagnostics must be non-negative.")
@@ -619,6 +658,8 @@ class SpecRhythmExecutionPlan:
             raise ValueError("SpecRhythm cannot select more repair rows than it ranked.")
         if self.remaining_service_normal_cross_home_selected > self.remaining_service_normal_selected:
             raise ValueError("SpecRhythm cross-home repair rows must be selected rows.")
+        if self.residual_remaining_service_target_selected > self.residual_remaining_service_target_candidates:
+            raise ValueError("SpecRhythm cannot select more residual target rows than it ranked.")
 
 
 @dataclass
@@ -644,27 +685,53 @@ class SpecRhythmPipelineController:
         self,
         active_request_indices: Sequence[int],
         *,
+        active_indices_registered_unique: bool = False,
         priority: bool = False,
         projected_wait_ms: float = 0.0,
         priority_burst: int = 2,
         goodput_edf: bool = False,
         target_slo_first: bool = False,
         remaining_service_first: bool = False,
+        remaining_service_target_first: bool = False,
+        residual_remaining_service_target_first: bool = False,
         defer_loose: bool = False,
         merge_ready_homes: bool = False,
         max_target_requests: int | None = None,
         verification_budget: int | None = None,
         ready_candidate_counts: Mapping[int, int] | None = None,
+        reserved_target_request_indices: Sequence[int] | None = None,
+        reserved_target_home_batch_id: int | None = None,
     ) -> SpecRhythmExecutionPlan:
-        active = tuple(dict.fromkeys(int(index) for index in active_request_indices))
-        if any(index not in self.request_states for index in active):
-            raise ValueError("SpecRhythm cannot schedule an unregistered request.")
+        if active_indices_registered_unique:
+            # The native model-runner owns this list and maintains the stronger
+            # invariant that it contains unique, registered integer indices.
+            # Avoid repeating conversion, de-duplication and a registry scan in
+            # every decode cycle.  Generic callers keep the checked path below.
+            active = tuple(active_request_indices)
+        else:
+            active = tuple(dict.fromkeys(int(index) for index in active_request_indices))
+            if any(index not in self.request_states for index in active):
+                raise ValueError("SpecRhythm cannot schedule an unregistered request.")
         if priority_burst <= 0:
             raise ValueError("SpecRhythm priority burst must be positive.")
         if max_target_requests is not None and max_target_requests <= 0:
             raise ValueError("SpecRhythm target request limit must be positive.")
         if verification_budget is not None and verification_budget <= 0:
             raise ValueError("SpecRhythm verification candidate budget must be positive.")
+        if (reserved_target_request_indices is None) != (reserved_target_home_batch_id is None):
+            raise ValueError("SpecRhythm target replay reservation needs both rows and a home.")
+        reserved_target = (
+            tuple(int(index) for index in reserved_target_request_indices)
+            if reserved_target_request_indices is not None
+            else None
+        )
+        if reserved_target is not None:
+            if (
+                not reserved_target
+                or len(set(reserved_target)) != len(reserved_target)
+                or reserved_target_home_batch_id not in (0, 1)
+            ):
+                raise ValueError("SpecRhythm target replay reservation is invalid.")
         active_set = set(active)
         self._discard_inactive_payloads(active_set)
         # Use one estimator for ready verification tickets and for requests
@@ -674,22 +741,30 @@ class SpecRhythmPipelineController:
         # Keep the default-off path free of request-history scans: the
         # experiment must preserve both the scheduling decision and its host
         # overhead when the environment switch is zero.
-        if remaining_service_first:
-            observed_service_tokens = sum(
-                max(0, self.request_states[index].delivered_tokens - 1)
-                for index in active
-            )
-            observed_service_rounds = sum(
-                self.request_states[index].verification_rounds
-                for index in active
-            )
-            global_tokens_per_round = (
-                observed_service_tokens / observed_service_rounds
-                if observed_service_rounds
-                else 1.0
-            )
-        else:
-            global_tokens_per_round = 1.0
+        rank_target_by_remaining_service = bool(remaining_service_first or remaining_service_target_first)
+        needs_remaining_service_estimator = bool(
+            rank_target_by_remaining_service or residual_remaining_service_target_first
+        )
+        global_tokens_per_round: float | None = None
+
+        def service_tokens_per_round() -> float:
+            nonlocal global_tokens_per_round
+            if global_tokens_per_round is None:
+                if not needs_remaining_service_estimator:
+                    global_tokens_per_round = 1.0
+                else:
+                    observed_service_tokens = sum(
+                        max(0, self.request_states[index].delivered_tokens - 1) for index in active
+                    )
+                    observed_service_rounds = sum(
+                        self.request_states[index].verification_rounds for index in active
+                    )
+                    global_tokens_per_round = (
+                        observed_service_tokens / observed_service_rounds
+                        if observed_service_rounds
+                        else 1.0
+                    )
+            return global_tokens_per_round
 
         def estimated_remaining_service(
             index: int,
@@ -706,8 +781,7 @@ class SpecRhythmPipelineController:
                 )
                 observed_tokens = max(0, int(state.delivered_tokens) - 1)
                 smoothed_rate = (
-                    observed_tokens
-                    + DRAIN_SERVICE_PRIOR_ROUNDS * global_tokens_per_round
+                    observed_tokens + DRAIN_SERVICE_PRIOR_ROUNDS * service_tokens_per_round()
                 ) / (int(state.verification_rounds) + DRAIN_SERVICE_PRIOR_ROUNDS)
                 remaining_rounds = remaining_tokens / max(smoothed_rate, 1e-6)
             # A non-ready request cannot be verified until one normal repair
@@ -730,17 +804,24 @@ class SpecRhythmPipelineController:
                 self.request_states[index].home_batch_id == self.next_target_home_batch_id,
                 -index,
             )
-        ready_homes = {self.request_states[index].home_batch_id for index in active if index in self.ready}
+
+        ready_indices = tuple(index for index in active if index in self.ready)
+        ready_homes = {self.request_states[index].home_batch_id for index in ready_indices}
         # A promoted rolling-eager ticket belongs to the home that was just
         # verified, but paper section 4.3 requires it to join the *next*
         # cycle's opposite-home verification.  It must not take ownership of
         # that cycle or pull every old ready row from its home along with it.
+        normal_ready_indices = tuple(index for index in ready_indices if not self.ready[index].eager)
         normal_ready_homes = {
             self.request_states[index].home_batch_id
-            for index in active
-            if index in self.ready and not self.ready[index].eager
+            for index in normal_ready_indices
         }
         base_ready_homes = normal_ready_homes or ready_homes
+        scheduling_metrics_by_index = (
+            {index: self.request_states[index].scheduling_metrics(projected_wait_ms) for index in ready_indices}
+            if priority
+            else {}
+        )
         target_home: int | None
         if self.next_target_home_batch_id in base_ready_homes:
             target_home = self.next_target_home_batch_id
@@ -751,10 +832,9 @@ class SpecRhythmPipelineController:
         if priority and len(base_ready_homes) > 1:
             urgency_by_home = {
                 home: max(
-                    self.request_states[index].urgency(projected_wait_ms)
-                    for index in active
+                    scheduling_metrics_by_index[index][1]
+                    for index in ready_indices
                     if self.request_states[index].home_batch_id == home
-                    and index in self.ready
                     and (not normal_ready_homes or not self.ready[index].eager)
                 )
                 for home in base_ready_homes
@@ -781,25 +861,36 @@ class SpecRhythmPipelineController:
         # ready proposal.  In that state, verifying both homes together avoids
         # charging each request for an otherwise idle alternating round.  The
         # legacy PEARL rotation remains the default for unconstrained traffic.
-        target_homes = (
-            frozenset(ready_homes)
-            if merge_ready_homes and len(ready_homes) > 1
-            else frozenset((target_home,))
-            if target_home is not None
-            else frozenset()
-        )
+        if reserved_target is not None:
+            target_home = int(reserved_target_home_batch_id)
+            target_homes = frozenset((target_home,))
+        else:
+            target_homes = (
+                frozenset(ready_homes)
+                if merge_ready_homes and len(ready_homes) > 1
+                else frozenset((target_home,))
+                if target_home is not None
+                else frozenset()
+            )
         draft_home = 1 - target_home if target_home is not None else self.next_target_home_batch_id
         if target_home is None and not any(self.request_states[index].home_batch_id == draft_home for index in active):
             draft_home = 1 - draft_home
-        target_candidates = tuple(
-            index
-            for index in active
-            if index in self.ready
-            and (
-                self.request_states[index].home_batch_id in target_homes
-                or (not merge_ready_homes and target_home is not None and self.ready[index].eager)
+        if reserved_target is not None:
+            # A target graph submitted in the previous cycle is irreversible.
+            # Keep every ready row in the candidate set so wait ages and
+            # deferral accounting remain truthful, but select exactly the
+            # normal, single-home rows covered by its immutable signature.
+            target_candidates = tuple(index for index in active if index in self.ready)
+        else:
+            target_candidates = tuple(
+                index
+                for index in active
+                if index in self.ready
+                and (
+                    self.request_states[index].home_batch_id in target_homes
+                    or (not merge_ready_homes and target_home is not None and self.ready[index].eager)
+                )
             )
-        )
         candidate_counts = {
             index: int(self.ready[index].gamma if ready_candidate_counts is None else ready_candidate_counts[index])
             for index in target_candidates
@@ -813,16 +904,39 @@ class SpecRhythmPipelineController:
                 "A ready SpecRhythm proposal exceeds the verification budget; "
                 "rebuild or ancestor-safely prune it before scheduling."
             )
+        if reserved_target is not None:
+            reserved_target_set = set(reserved_target)
+            if tuple(index for index in active if index in reserved_target_set) != reserved_target:
+                raise ValueError("SpecRhythm target replay reservation changed active-row order.")
+            if any(
+                index not in self.ready or self.ready[index].home_batch_id != self.request_states[index].home_batch_id
+                for index in reserved_target
+            ):
+                raise ValueError("SpecRhythm target replay reservation is stale or misrouted.")
+            if max_target_requests is not None and len(reserved_target) > max_target_requests:
+                raise ValueError("SpecRhythm target replay reservation exceeds the row limit.")
+            if (
+                verification_budget is not None
+                and sum(candidate_counts[index] for index in reserved_target) > verification_budget
+            ):
+                raise ValueError("SpecRhythm target replay reservation exceeds the token budget.")
+            target = reserved_target
+        else:
+            target = None
         constrained = (
-            defer_loose
-            and any(
-                (self.request_states[index].slo_class or "").strip().lower() == "loose"
-                for index in target_candidates
+            (
+                defer_loose
+                and any(
+                    (self.request_states[index].slo_class or "").strip().lower() == "loose"
+                    for index in target_candidates
+                )
             )
-        ) or (max_target_requests is not None and len(target_candidates) > max_target_requests) or (
-            verification_budget is not None and sum(candidate_counts.values()) > verification_budget
+            or (max_target_requests is not None and len(target_candidates) > max_target_requests)
+            or (verification_budget is not None and sum(candidate_counts.values()) > verification_budget)
         )
-        if constrained:
+        if target is not None:
+            pass
+        elif constrained:
             # Pack whole proposals so deferral cannot invalidate an eager
             # continuation's exact parent path.  For unconstrained traffic,
             # age wins after deferral to prevent starvation.  Under an SLO
@@ -832,19 +946,20 @@ class SpecRhythmPipelineController:
             # still starvation-safe because their a_need grows while waiting.
             def target_priority(index: int):
                 age = self._ready_wait_cycles.get(index, 0)
-                if remaining_service_first:
+                if rank_target_by_remaining_service:
                     return remaining_service_key(
                         index,
                         needs_draft_stage=False,
                         age=age,
                     )
                 state = self.request_states[index]
-                urgency = state.urgency(projected_wait_ms)
+                metrics = scheduling_metrics_by_index.get(index)
+                if metrics is None:
+                    metrics = state.scheduling_metrics(projected_wait_ms)
+                progress_gap, urgency = metrics
                 if priority:
                     slo_priority = (
-                        -float(state.slo_tpot_ms)
-                        if target_slo_first and state.slo_tpot_ms is not None
-                        else -math.inf
+                        -float(state.slo_tpot_ms) if target_slo_first and state.slo_tpot_ms is not None else -math.inf
                     )
                     if goodput_edf:
                         terminal_slack = state.terminal_slack_ms(projected_wait_ms)
@@ -858,10 +973,47 @@ class SpecRhythmPipelineController:
                             terminal_priority = (0, -math.inf)
                     else:
                         terminal_priority = ()
+                    if residual_remaining_service_target_first:
+                        has_progress_gap = progress_gap > 0
+                        # Preserve the SLO class boundary while spending the
+                        # residual target budget.  A global LRTF order among
+                        # every zero-gap request can defer a tight request in
+                        # favour of a long loose request, erasing the tight
+                        # request's small headroom before the next cycle.  The
+                        # residual goodput stage therefore preserves every
+                        # SLO-class boundary after all positive a_need rows,
+                        # then balances remaining service within a class.
+                        # The tighter-only guard experiment allowed normal and
+                        # loose rows to compete directly; it reduced tight
+                        # attainment and did not improve the makespan.
+                        residual_class_priority = {
+                            "tight": 2,
+                            "normal": 1,
+                            "loose": 0,
+                        }.get((state.slo_class or "").strip().lower(), -1)
+                        return (
+                            slo_priority,
+                            *terminal_priority,
+                            int(has_progress_gap),
+                            progress_gap,
+                            urgency if has_progress_gap else 0.0,
+                            residual_class_priority if not has_progress_gap else 0,
+                            (
+                                0.0
+                                if has_progress_gap
+                                else estimated_remaining_service(
+                                    index,
+                                    needs_draft_stage=False,
+                                )
+                            ),
+                            age,
+                            state.home_batch_id == self.next_target_home_batch_id,
+                            -index,
+                        )
                     return (
                         slo_priority,
                         *terminal_priority,
-                        state.projected_progress_gap(projected_wait_ms),
+                        progress_gap,
                         urgency,
                         age,
                         state.home_batch_id == self.next_target_home_batch_id,
@@ -895,6 +1047,15 @@ class SpecRhythmPipelineController:
             target = target_candidates
         target_set = set(target)
         deferred = tuple(index for index in target_candidates if index not in target_set)
+        residual_target_candidates = (
+            tuple(
+                index
+                for index in target_candidates
+                if scheduling_metrics_by_index[index][0] <= 0
+            )
+            if residual_remaining_service_target_first and priority and constrained
+            else ()
+        )
         for index in active:
             if index in self.ready:
                 self._ready_wait_cycles[index] = 0 if index in target_set else self._ready_wait_cycles.get(index, 0) + 1
@@ -909,9 +1070,7 @@ class SpecRhythmPipelineController:
         normal_cross_home_selected = 0
         if remaining_service_first:
             normal_candidates = tuple(
-                index
-                for index in active
-                if index not in self.ready and index not in self.staged_eager
+                index for index in active if index not in self.ready and index not in self.staged_eager
             )
             # Preserve the established draft row count exactly.  The policy
             # may replace an alternating-home row with a more critical repair
@@ -930,15 +1089,8 @@ class SpecRhythmPipelineController:
             normal = tuple(ordered_normal[:normal_limit])
             normal_set = set(normal)
             for index in normal_candidates:
-                self._draft_wait_cycles[index] = (
-                    0
-                    if index in normal_set
-                    else self._draft_wait_cycles.get(index, 0) + 1
-                )
-            normal_cross_home_selected = sum(
-                self.request_states[index].home_batch_id != draft_home
-                for index in normal
-            )
+                self._draft_wait_cycles[index] = 0 if index in normal_set else self._draft_wait_cycles.get(index, 0) + 1
+            normal_cross_home_selected = sum(self.request_states[index].home_batch_id != draft_home for index in normal)
         else:
             normal = default_normal
             self._draft_wait_cycles.clear()
@@ -962,20 +1114,22 @@ class SpecRhythmPipelineController:
             target_candidate_budgets={index: candidate_counts[index] for index in target},
             verification_candidate_budget=verification_budget,
             deferred_target_request_indices=deferred,
+            target_scheduling_metrics={
+                index: scheduling_metrics_by_index[index]
+                for index in target
+                if index in scheduling_metrics_by_index
+            },
             remaining_service_target_ranked=bool(
-                remaining_service_first and constrained and target_candidates
+                rank_target_by_remaining_service and constrained and target_candidates
             ),
-            remaining_service_normal_ranked=bool(
-                remaining_service_first and normal_candidates
-            ),
-            remaining_service_target_candidates=(
-                len(target_candidates) if remaining_service_first else 0
-            ),
+            remaining_service_normal_ranked=bool(remaining_service_first and normal_candidates),
+            remaining_service_target_candidates=(len(target_candidates) if rank_target_by_remaining_service else 0),
             remaining_service_normal_candidates=len(normal_candidates),
-            remaining_service_normal_selected=(
-                len(normal) if remaining_service_first else 0
-            ),
+            remaining_service_normal_selected=(len(normal) if remaining_service_first else 0),
             remaining_service_normal_cross_home_selected=normal_cross_home_selected,
+            residual_remaining_service_target_ranked=bool(residual_target_candidates),
+            residual_remaining_service_target_candidates=len(residual_target_candidates),
+            residual_remaining_service_target_selected=sum(index in target_set for index in residual_target_candidates),
         )
         self.plan_id += 1
         return plan

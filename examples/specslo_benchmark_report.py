@@ -36,10 +36,12 @@ CRITICAL_ENVIRONMENT = (
     "HCCL_DETERMINISTIC",
     "OMP_NUM_THREADS",
     "OPENBLAS_NUM_THREADS",
+    "PYTORCH_NPU_ALLOC_CONF",
     "VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE",
     "VLLM_ASCEND_PEARL_DRAFT_NZ_MODE",
     "VLLM_ASCEND_PEARL_TARGET_NZ_MODE",
     "VLLM_ASCEND_PEARL_TARGET_LARGE_M_NZ_MIN_ROWS",
+    "VLLM_ASCEND_PEARL_TARGET_REPLICATE_INPUT_EMBEDDING",
     "VLLM_ASCEND_SPECSLO_ENABLE_EXPERIMENTAL_PARD_EAGER",
     "VLLM_ASCEND_PEARL_VERBOSE",
     "VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS",
@@ -47,6 +49,7 @@ CRITICAL_ENVIRONMENT = (
     "VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE",
     "VLLM_ASCEND_PEARL_DRAFT_STEP_MAJOR_PA_TASK_UPDATE",
     "VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS",
+    "VLLM_ASCEND_PEARL_DRAFT_PA_CONTIGUOUS_PARTITION",
     "VLLM_ASCEND_PEARL_DRAFT_GRAPH_UPDATE_STREAM_PRIORITY",
     "VLLM_ASCEND_PEARL_TARGET_GRAPH_UPDATE_STREAM_PRIORITY",
     "VLLM_ASCEND_SPECSLO_DRAFT_DEVICE_PAGED_ATTENTION",
@@ -72,8 +75,15 @@ CRITICAL_ENVIRONMENT = (
     "VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF",
     "VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST",
     "VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD",
+    "VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_TARGET_SUBMIT",
+    "VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT",
     "VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO",
+    "VLLM_ASCEND_SPECRHYTHM_ONLINE_TARGET_MAX_BATCH",
     "VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF",
+    "VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF_MAX_ACTIVE",
+    "VLLM_ASCEND_SPECRHYTHM_DRAIN_TARGET_LRTF",
+    "VLLM_ASCEND_SPECRHYTHM_DRAIN_PADDING_REPAIR",
+    "VLLM_ASCEND_SPECRHYTHM_TARGET_RESIDUAL_LRTF",
     "VLLM_ASCEND_SPECRHYTHM_RESIDUAL_EAGER_TIGHT_ONLY",
     "VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION",
     "VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS",
@@ -98,6 +108,7 @@ CRITICAL_ENVIRONMENT = (
     "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PROMPT_CAPACITY",
     "VLLM_ASCEND_SPECRHYTHM_PREFETCH_AHEAD",
     "VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_MAX_CAPACITY",
+    "VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_DENSE_MAX_CAPACITY",
     "VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_REQUEST_BUCKET",
     "VLLM_ASCEND_PEARL_TARGET_TOKEN_PAD_MULTIPLE",
     "VLLM_ASCEND_PEARL_TARGET_TP3_BALANCED_FFN_SHIFT",
@@ -235,33 +246,17 @@ def measure_qualified_mc2_replay_coverage(
     else:
         for raw_signature, raw_rows in raw_rows_by_shape.items():
             signature = str(raw_signature)
-            if (
-                not signature
-                or isinstance(raw_rows, (str, bytes))
-                or not isinstance(raw_rows, Sequence)
-            ):
+            if not signature or isinstance(raw_rows, (str, bytes)) or not isinstance(raw_rows, Sequence):
                 errors.append(f"MC2 profile shape {signature!r} has invalid qualified rows")
                 continue
             rows = {
-                int(value)
-                for value in raw_rows
-                if not isinstance(value, bool) and isinstance(value, int) and value > 0
+                int(value) for value in raw_rows if not isinstance(value, bool) and isinstance(value, int) and value > 0
             }
             if len(rows) != len(raw_rows):
-                errors.append(
-                    f"MC2 profile shape {signature!r} rows are not unique positive integers"
-                )
+                errors.append(f"MC2 profile shape {signature!r} rows are not unique positive integers")
             qualified_rows_by_shape[signature] = rows
-    qualified_rows = (
-        set().union(*qualified_rows_by_shape.values())
-        if qualified_rows_by_shape
-        else set()
-    )
-    full_chain_rows = (
-        set.intersection(*qualified_rows_by_shape.values())
-        if qualified_rows_by_shape
-        else set()
-    )
+    qualified_rows = set().union(*qualified_rows_by_shape.values()) if qualified_rows_by_shape else set()
+    full_chain_rows = set.intersection(*qualified_rows_by_shape.values()) if qualified_rows_by_shape else set()
     if sorted(qualified_rows) != profile_contract.get("qualified_any_projection_rows"):
         errors.append("MC2 profile any-projection row union is inconsistent")
     if sorted(full_chain_rows) != profile_contract.get("qualified_full_chain_rows"):
@@ -311,13 +306,9 @@ def measure_qualified_mc2_replay_coverage(
 
         total_count = sum(combined_counts.values())
         qualified_count = sum(count for rows, count in combined_counts.items() if rows in qualified_rows)
-        full_chain_count = sum(
-            count for rows, count in combined_counts.items() if rows in full_chain_rows
-        )
+        full_chain_count = sum(count for rows, count in combined_counts.items() if rows in full_chain_rows)
         qualified_counts_by_shape = {
-            signature: sum(
-                count for rows, count in combined_counts.items() if rows in shape_rows
-            )
+            signature: sum(count for rows, count in combined_counts.items() if rows in shape_rows)
             for signature, shape_rows in sorted(qualified_rows_by_shape.items())
         }
         unqualified_counts = {
@@ -341,9 +332,7 @@ def measure_qualified_mc2_replay_coverage(
                 rows = tuple(
                     int(value)
                     for value in values
-                    if not isinstance(value, bool)
-                    and isinstance(value, int)
-                    and value > 0
+                    if not isinstance(value, bool) and isinstance(value, int) and value > 0
                 )
                 if len(rows) != len(values) or tuple(sorted(set(rows))) != rows:
                     static_shape_evidence_valid = False
@@ -364,19 +353,22 @@ def measure_qualified_mc2_replay_coverage(
             if len(route_counts_by_shape) != len(raw_route_counts_by_shape):
                 static_shape_evidence_valid = False
         expected_static_rows_by_shape = {
-            signature: tuple(sorted(rows))
-            for signature, rows in sorted(qualified_rows_by_shape.items())
+            signature: tuple(sorted(rows)) for signature, rows in sorted(qualified_rows_by_shape.items())
         }
         expected_qualified_route_count = sum(
             route_counts_by_shape.get(signature, 0) * len(rows)
             for signature, rows in expected_static_rows_by_shape.items()
         )
-        static_projection_routes_match_profile = static_shape_evidence_valid and bool(route_counts_by_shape) and (
-            static_rows_by_shape == expected_static_rows_by_shape
-            and set(route_counts_by_shape) == set(expected_static_rows_by_shape)
-            and all(count > 0 for count in route_counts_by_shape.values())
-            and sum(route_counts_by_shape.values()) == route_count
-            and expected_qualified_route_count == qualified_route_count
+        static_projection_routes_match_profile = (
+            static_shape_evidence_valid
+            and bool(route_counts_by_shape)
+            and (
+                static_rows_by_shape == expected_static_rows_by_shape
+                and set(route_counts_by_shape) == set(expected_static_rows_by_shape)
+                and all(count > 0 for count in route_counts_by_shape.values())
+                and sum(route_counts_by_shape.values()) == route_count
+                and expected_qualified_route_count == qualified_route_count
+            )
         )
         operator_kinds_value = worker.get("mc2_static_operator_kinds", ())
         operator_kinds = (
@@ -413,9 +405,7 @@ def measure_qualified_mc2_replay_coverage(
         if not route_digest or route_count <= 0 or qualified_route_count <= 0:
             rank_errors.append("frozen MC2 static-route evidence is incomplete")
         if not static_projection_routes_match_profile:
-            rank_errors.append(
-                "frozen MC2 projection-shape routes do not match the profile contract"
-            )
+            rank_errors.append("frozen MC2 projection-shape routes do not match the profile contract")
         if not operator_kinds or (profile_operator is not None and operator_kinds != (str(profile_operator),)):
             rank_errors.append("MC2 static operator does not match the profile")
         if len(active_graph_kinds) != 1:
@@ -440,15 +430,10 @@ def measure_qualified_mc2_replay_coverage(
                 "static_operator_kinds": list(operator_kinds),
                 "static_qualified_row_routes": qualified_route_count,
                 "static_qualified_rows_by_shape": {
-                    signature: list(rows)
-                    for signature, rows in sorted(static_rows_by_shape.items())
+                    signature: list(rows) for signature, rows in sorted(static_rows_by_shape.items())
                 },
-                "static_route_counts_by_shape": dict(
-                    sorted(route_counts_by_shape.items())
-                ),
-                "static_projection_routes_match_profile": (
-                    static_projection_routes_match_profile
-                ),
+                "static_route_counts_by_shape": dict(sorted(route_counts_by_shape.items())),
+                "static_projection_routes_match_profile": (static_projection_routes_match_profile),
                 "passed": not rank_errors,
                 "errors": rank_errors,
             }
@@ -494,8 +479,8 @@ def target_fia_parallel_update_evidence(
     mistaken for work in the timed online window.
     """
 
-    if expected_workers not in (1, 2, 4):
-        raise ValueError("target FIA task-update workers must be 1, 2, or 4")
+    if expected_workers not in (1, 2, 3, 4):
+        raise ValueError("target FIA task-update workers must be 1, 2, 3, or 4")
 
     errors: list[str] = []
 
@@ -523,13 +508,9 @@ def target_fia_parallel_update_evidence(
     measured = by_rank(measured_worker_deltas, "measured worker deltas")
     expected_ranks = {0, 1, 2, 3}
     if set(workers) != expected_ranks:
-        errors.append(
-            "worker metrics rank set is not the TP1+TP3 set [0, 1, 2, 3]"
-        )
+        errors.append("worker metrics rank set is not the TP1+TP3 set [0, 1, 2, 3]")
     if set(measured) != expected_ranks:
-        errors.append(
-            "measured worker-delta rank set is not the TP1+TP3 set [0, 1, 2, 3]"
-        )
+        errors.append("measured worker-delta rank set is not the TP1+TP3 set [0, 1, 2, 3]")
 
     role_rows: dict[int, dict[str, Any]] = {}
     graph_zero_fields = (
@@ -543,9 +524,7 @@ def target_fia_parallel_update_evidence(
         "aclgraph_draft_runtime_validation_failures",
         "aclgraph_target_runtime_validation_failures",
     )
-    measured_graph_zero_fields = tuple(
-        f"{name}_delta" for name in graph_zero_fields
-    )
+    measured_graph_zero_fields = tuple(f"{name}_delta" for name in graph_zero_fields)
     target_service_graph_zero_fields = (
         "worker_spec_rhythm_mixed_target_graph_bounded_shape_fallback_batches",
         "worker_spec_rhythm_mixed_target_graph_token_capacity_fallback_batches",
@@ -564,18 +543,13 @@ def target_fia_parallel_update_evidence(
         if is_draft != expected_is_draft:
             errors.append(f"worker rank {rank} has the wrong draft/target role")
         if measured_is_draft != expected_is_draft:
-            errors.append(
-                f"measured worker rank {rank} has the wrong draft/target role"
-            )
+            errors.append(f"measured worker rank {rank} has the wrong draft/target role")
 
-        configured_workers = int(
-            worker.get("aclgraph_target_fia_task_update_workers", -1)
-        )
+        configured_workers = int(worker.get("aclgraph_target_fia_task_update_workers", -1))
         expected_rank_workers = 1 if expected_is_draft else expected_workers
         if configured_workers != expected_rank_workers:
             errors.append(
-                f"worker rank {rank} target-FIA update workers "
-                f"{configured_workers} != {expected_rank_workers}"
+                f"worker rank {rank} target-FIA update workers {configured_workers} != {expected_rank_workers}"
             )
 
         for field in graph_zero_fields:
@@ -583,9 +557,7 @@ def target_fia_parallel_update_evidence(
                 errors.append(f"worker rank {rank} {field} is nonzero or missing")
         for field in measured_graph_zero_fields:
             if field not in measured_worker or int(measured_worker.get(field, -1)) != 0:
-                errors.append(
-                    f"measured worker rank {rank} {field} is nonzero or missing"
-                )
+                errors.append(f"measured worker rank {rank} {field} is nonzero or missing")
 
         parallel_replays = int(
             measured_worker.get(
@@ -601,33 +573,17 @@ def target_fia_parallel_update_evidence(
         )
         if expected_is_draft:
             if parallel_replays != 0 or parallel_tasks != 0:
-                errors.append(
-                    "draft rank 0 unexpectedly reports target-FIA parallel updates"
-                )
+                errors.append("draft rank 0 unexpectedly reports target-FIA parallel updates")
         else:
             for field in target_service_graph_zero_fields:
-                if (
-                    field not in measured_worker
-                    or int(measured_worker.get(field, -1)) != 0
-                ):
-                    errors.append(
-                        f"measured target rank {rank} {field} is nonzero or missing"
-                    )
+                if field not in measured_worker or int(measured_worker.get(field, -1)) != 0:
+                    errors.append(f"measured target rank {rank} {field} is nonzero or missing")
             if expected_workers > 1 and parallel_replays <= 0:
-                errors.append(
-                    f"measured target rank {rank} has no parallel FIA update replay"
-                )
+                errors.append(f"measured target rank {rank} has no parallel FIA update replay")
             if expected_workers > 1 and parallel_tasks <= 0:
-                errors.append(
-                    f"measured target rank {rank} has no parallel FIA update task"
-                )
-            if expected_workers == 1 and (
-                parallel_replays != 0 or parallel_tasks != 0
-            ):
-                errors.append(
-                    f"measured target rank {rank} used the parallel FIA path "
-                    "with one configured worker"
-                )
+                errors.append(f"measured target rank {rank} has no parallel FIA update task")
+            if expected_workers == 1 and (parallel_replays != 0 or parallel_tasks != 0):
+                errors.append(f"measured target rank {rank} used the parallel FIA path with one configured worker")
 
         role_rows[rank] = {
             "role": "draft" if expected_is_draft else "target",
@@ -689,13 +645,9 @@ def draft_pa_parallel_update_evidence(
     measured = by_rank(measured_worker_deltas, "measured worker deltas")
     expected_ranks = {0, 1, 2, 3}
     if set(workers) != expected_ranks:
-        errors.append(
-            "worker metrics rank set is not the TP1+TP3 set [0, 1, 2, 3]"
-        )
+        errors.append("worker metrics rank set is not the TP1+TP3 set [0, 1, 2, 3]")
     if set(measured) != expected_ranks:
-        errors.append(
-            "measured worker-delta rank set is not the TP1+TP3 set [0, 1, 2, 3]"
-        )
+        errors.append("measured worker-delta rank set is not the TP1+TP3 set [0, 1, 2, 3]")
 
     graph_zero_fields = (
         "aclgraph_failed_captures",
@@ -708,9 +660,7 @@ def draft_pa_parallel_update_evidence(
         "aclgraph_draft_runtime_validation_failures",
         "aclgraph_target_runtime_validation_failures",
     )
-    measured_graph_zero_fields = tuple(
-        f"{name}_delta" for name in graph_zero_fields
-    )
+    measured_graph_zero_fields = tuple(f"{name}_delta" for name in graph_zero_fields)
     role_rows: dict[int, dict[str, Any]] = {}
     for rank in sorted(expected_ranks & set(workers)):
         worker = workers[rank]
@@ -721,28 +671,19 @@ def draft_pa_parallel_update_evidence(
         if is_draft != expected_is_draft:
             errors.append(f"worker rank {rank} has the wrong draft/target role")
         if measured_is_draft != expected_is_draft:
-            errors.append(
-                f"measured worker rank {rank} has the wrong draft/target role"
-            )
+            errors.append(f"measured worker rank {rank} has the wrong draft/target role")
 
-        configured_workers = int(
-            worker.get("aclgraph_draft_pa_task_update_workers", -1)
-        )
+        configured_workers = int(worker.get("aclgraph_draft_pa_task_update_workers", -1))
         expected_rank_workers = expected_workers if expected_is_draft else 1
         if configured_workers != expected_rank_workers:
-            errors.append(
-                f"worker rank {rank} draft-PA update workers "
-                f"{configured_workers} != {expected_rank_workers}"
-            )
+            errors.append(f"worker rank {rank} draft-PA update workers {configured_workers} != {expected_rank_workers}")
 
         for field in graph_zero_fields:
             if field not in worker or int(worker.get(field, -1)) != 0:
                 errors.append(f"worker rank {rank} {field} is nonzero or missing")
         for field in measured_graph_zero_fields:
             if field not in measured_worker or int(measured_worker.get(field, -1)) != 0:
-                errors.append(
-                    f"measured worker rank {rank} {field} is nonzero or missing"
-                )
+                errors.append(f"measured worker rank {rank} {field} is nonzero or missing")
 
         parallel_replays = int(
             measured_worker.get(
@@ -762,15 +703,10 @@ def draft_pa_parallel_update_evidence(
                 -1,
             )
         )
-        raw_rejections = measured_worker.get(
-            "aclgraph_draft_pa_parallel_update_rejections_delta"
-        )
+        raw_rejections = measured_worker.get("aclgraph_draft_pa_parallel_update_rejections_delta")
         if not isinstance(raw_rejections, Mapping):
             parallel_rejections: dict[str, int] = {}
-            errors.append(
-                f"measured worker rank {rank} lacks draft-PA parallel "
-                "rejection deltas"
-            )
+            errors.append(f"measured worker rank {rank} lacks draft-PA parallel rejection deltas")
         else:
             parallel_rejections = {}
             for reason, count in raw_rejections.items():
@@ -778,42 +714,29 @@ def draft_pa_parallel_update_evidence(
                     normalized_count = int(count)
                 except (TypeError, ValueError):
                     errors.append(
-                        f"measured worker rank {rank} draft-PA rejection "
-                        f"count for {reason!r} is not an integer"
+                        f"measured worker rank {rank} draft-PA rejection count for {reason!r} is not an integer"
                     )
                     continue
                 if normalized_count != 0:
                     parallel_rejections[str(reason)] = normalized_count
             if parallel_rejections:
                 errors.append(
-                    f"measured worker rank {rank} draft-PA parallel "
-                    f"rejections={parallel_rejections}, expected empty"
+                    f"measured worker rank {rank} draft-PA parallel rejections={parallel_rejections}, expected empty"
                 )
         if parallel_fallbacks != 0:
             errors.append(
-                f"measured worker rank {rank} draft-PA parallel fallback "
-                f"replays={parallel_fallbacks}, expected 0"
+                f"measured worker rank {rank} draft-PA parallel fallback replays={parallel_fallbacks}, expected 0"
             )
         if expected_is_draft and expected_workers > 1:
             if parallel_replays <= 0:
-                errors.append(
-                    "measured draft rank 0 has no parallel PA update replay"
-                )
+                errors.append("measured draft rank 0 has no parallel PA update replay")
             if parallel_tasks <= 0:
-                errors.append(
-                    "measured draft rank 0 has no parallel PA update task"
-                )
+                errors.append("measured draft rank 0 has no parallel PA update task")
         elif parallel_replays != 0 or parallel_tasks != 0:
             if expected_is_draft:
-                errors.append(
-                    "measured draft rank 0 used the parallel PA path with one "
-                    "configured worker"
-                )
+                errors.append("measured draft rank 0 used the parallel PA path with one configured worker")
             else:
-                errors.append(
-                    f"target rank {rank} unexpectedly reports draft-PA "
-                    "parallel updates"
-                )
+                errors.append(f"target rank {rank} unexpectedly reports draft-PA parallel updates")
 
         role_rows[rank] = {
             "role": "draft" if expected_is_draft else "target",

@@ -237,7 +237,7 @@ def test_target_fia_task_prefix_event_group_must_be_shorter_than_steady_group():
         NativeACLGraphRunner(MagicMock(), enabled=False)
 
 
-@pytest.mark.parametrize("workers", [1, 2, 4])
+@pytest.mark.parametrize("workers", [1, 2, 3, 4])
 def test_target_fia_task_update_worker_count_is_validated_at_runner_init(
     workers,
 ):
@@ -269,6 +269,19 @@ def test_target_fia_task_update_worker_count_is_validated_at_runner_init(
         assert runner._target_fia_update_executor is not None
         assert runner._target_fia_update_executor._max_workers == workers - 1
         runner._target_fia_update_executor.shutdown()
+
+
+def test_target_fia_task_update_worker_count_rejects_unknown_value():
+    envs = __import__("vllm_ascend.spec_decode.pearl.native_graph", fromlist=["envs"]).envs
+    with (
+        patch.object(
+            envs,
+            "VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS",
+            5,
+        ),
+        pytest.raises(ValueError, match="must be 1, 2, 3, or 4"),
+    ):
+        NativeACLGraphRunner(MagicMock(), enabled=False)
 
 
 @pytest.mark.parametrize("group_size", [2, 4])
@@ -997,7 +1010,7 @@ def _fia_task():
     )
 
 
-def _parallel_draft_pa_entry(*, step_count=4, tasks_per_step=2):
+def _parallel_draft_pa_entry(*, step_count=4, tasks_per_step=2, final_kv_only=False):
     tasks = []
     actual_seq_lengths_q = []
     sequence_lens = []
@@ -1009,7 +1022,10 @@ def _parallel_draft_pa_entry(*, step_count=4, tasks_per_step=2):
     return SimpleNamespace(
         input_ids=torch.zeros(3, dtype=torch.long),
         positions=tuple(torch.zeros(3, dtype=torch.long) for _ in range(step_count)),
-        output=torch.zeros((3, step_count), dtype=torch.long),
+        output=torch.zeros(
+            (3, step_count - int(final_kv_only)),
+            dtype=torch.long,
+        ),
         tasks=tasks,
         tasks_per_step=tasks_per_step,
         actual_seq_lengths_q=tuple(actual_seq_lengths_q),
@@ -1017,6 +1033,7 @@ def _parallel_draft_pa_entry(*, step_count=4, tasks_per_step=2):
         tree_attention_modes=(False,) * step_count,
         stable_task_barrier=False,
         taskless_device_attention=False,
+        final_kv_only=final_kv_only,
     )
 
 
@@ -2285,8 +2302,14 @@ def test_paged_attention_task_update_shares_workspace_only_for_equal_lengths():
     assert metrics["pa_workspace_cache_hits"] == 1
 
 
-@pytest.mark.parametrize("workers", [2, 4])
-def test_parallel_draft_pa_updates_complete_gamma4_entry_on_independent_streams(workers):
+@pytest.mark.parametrize(
+    ("workers", "contiguous_partition"),
+    [(2, False), (4, False), (2, True), (4, True)],
+)
+def test_parallel_draft_pa_updates_complete_gamma4_entry_on_independent_streams(
+    workers,
+    contiguous_partition,
+):
     envs = __import__("vllm_ascend.spec_decode.pearl.native_graph", fromlist=["envs"]).envs
     streams = tuple(MagicMock(name=f"update_stream_{worker}") for worker in range(workers))
     primary_stream = streams[0]
@@ -2295,6 +2318,11 @@ def test_parallel_draft_pa_updates_complete_gamma4_entry_on_independent_streams(
             envs,
             "VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS",
             workers,
+        ),
+        patch.object(
+            envs,
+            "VLLM_ASCEND_PEARL_DRAFT_PA_CONTIGUOUS_PARTITION",
+            contiguous_partition,
         ),
         patch(
             "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream",
@@ -2354,17 +2382,71 @@ def test_parallel_draft_pa_updates_complete_gamma4_entry_on_independent_streams(
         primary_stream.wait_stream.assert_any_call(secondary_stream)
     assert primary_stream.wait_stream.call_count == workers - 1
     for task_index, task in enumerate(entry.tasks):
-        expected_stream = streams[task_index % workers]
+        expected_worker = (
+            task_index * workers // len(entry.tasks)
+            if contiguous_partition
+            else task_index % workers
+        )
+        expected_stream = streams[expected_worker]
         task.event.record.assert_called_once_with(expected_stream)
         assert task.workspace is workspaces[task_index // entry.tasks_per_step]
     metrics = runner.graph_execution_metrics()
     assert metrics["draft_pa_task_update_workers"] == workers
     assert metrics["draft_pa_parallel_update_replays"] == 1
     assert metrics["draft_pa_parallel_update_tasks"] == len(entry.tasks)
+    assert metrics["draft_pa_contiguous_partition_replays"] == int(
+        contiguous_partition
+    )
     assert metrics["draft_pa_parallel_update_fallback_replays"] == 0
     assert metrics["draft_pa_parallel_update_rejections"] == {}
     assert metrics["pa_workspace_get_calls"] == 4
     assert metrics["pa_workspace_cache_hits"] == 4
+
+
+def test_parallel_draft_pa_updates_gamma4_final_kv_entry():
+    envs = __import__("vllm_ascend.spec_decode.pearl.native_graph", fromlist=["envs"]).envs
+    streams = (MagicMock(name="primary"), MagicMock(name="secondary"))
+    with (
+        patch.object(
+            envs,
+            "VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS",
+            2,
+        ),
+        patch(
+            "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.Stream",
+            side_effect=streams,
+        ),
+    ):
+        runner = NativeACLGraphRunner(MagicMock(), enabled=True)
+    entry = _parallel_draft_pa_entry(step_count=5, final_kv_only=True)
+    workspaces = [MagicMock(name=f"workspace_step_{step}") for step in range(5)]
+    try:
+        with (
+            patch(
+                "vllm_ascend.spec_decode.pearl.native_graph.torch.npu.stream",
+                return_value=MagicMock(),
+            ),
+            patch(
+                "vllm_ascend.spec_decode.pearl.native_graph.torch_npu._npu_paged_attention_get_workspace",
+                side_effect=workspaces,
+            ) as get_workspace,
+            patch.object(runner, "_update_paged_attention_task_chunk"),
+        ):
+            assert runner._try_parallel_draft_paged_attention_task_update(
+                entry,
+                stream=streams[0],
+                record_events=True,
+            )
+    finally:
+        assert runner._draft_pa_update_executor is not None
+        runner._draft_pa_update_executor.shutdown()
+
+    assert get_workspace.call_count == 5
+    metrics = runner.graph_execution_metrics()
+    assert metrics["draft_pa_parallel_update_replays"] == 1
+    assert metrics["draft_pa_parallel_update_tasks"] == len(entry.tasks)
+    assert metrics["draft_pa_parallel_update_fallback_replays"] == 0
+    assert metrics["draft_pa_parallel_update_rejections"] == {}
 
 
 @pytest.mark.parametrize(
@@ -2781,8 +2863,14 @@ def test_parallel_target_fia_primary_runs_on_caller_and_secondary_in_pool(
     assert chunk_threads[id(primary_stream)][0] == caller_thread
     assert chunk_threads[id(primary_stream)][1] is False
     groups = runner._task_event_group_ranges(task_count, group_size)
+    base_groups, extra_groups = divmod(len(groups), workers)
+    group_offsets = [0]
+    for worker in range(workers):
+        group_offsets.append(
+            group_offsets[-1] + base_groups + int(worker < extra_groups)
+        )
     assert chunk_threads[id(primary_stream)][2] == tuple(
-        index for group in groups[0::workers] for index in group
+        index for group in groups[group_offsets[0] : group_offsets[1]] for index in group
     )
     background_threads = set()
     for worker, secondary_stream in enumerate(streams[1:], start=1):
@@ -2790,7 +2878,9 @@ def test_parallel_target_fia_primary_runs_on_caller_and_secondary_in_pool(
         assert thread_id != caller_thread
         assert set_device_for_thread is True
         assert indices == tuple(
-            index for group in groups[worker::workers] for index in group
+            index
+            for group in groups[group_offsets[worker] : group_offsets[worker + 1]]
+            for index in group
         )
         background_threads.add(thread_id)
         secondary_stream.wait_stream.assert_called_once_with(primary_stream)
@@ -2800,8 +2890,9 @@ def test_parallel_target_fia_primary_runs_on_caller_and_secondary_in_pool(
     assert primary_stream.wait_stream.call_args_list == [
         call(secondary_stream) for secondary_stream in streams[1:]
     ]
-    for group_index, event in enumerate(group_events):
-        event.record.assert_called_once_with(streams[group_index % workers])
+    for worker in range(workers):
+        for event in group_events[group_offsets[worker] : group_offsets[worker + 1]]:
+            event.record.assert_called_once_with(streams[worker])
     metrics = runner.graph_execution_metrics()
     assert metrics["target_fia_parallel_update_replays"] == 1
     assert metrics["target_fia_parallel_update_tasks"] == task_count

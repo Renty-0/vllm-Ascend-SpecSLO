@@ -39,7 +39,10 @@ constexpr uint32_t kBaselineSingleNRoundTrip = 1U << 0;
 // The TP3 mailbox protocol performs two remote polls per launched AIV.  A
 // smaller cohort can reduce HCCS control-traffic contention while retaining
 // enough row-level parallelism for the qualified M<=645 verification window.
-constexpr uint32_t kMaxAivBlocks = 24;
+constexpr uint32_t kDefaultMaxAivBlocks = 24;
+constexpr uint32_t kLowContentionAivBlocks = 16;
+constexpr int64_t kLowContentionSmallMMax = 128;
+constexpr int64_t kLowContentionLargeMMin = 229;
 constexpr float kRequiredEpsilon = 1.0e-6F;
 constexpr float kEpsilonTolerance = 1.0e-12F;
 constexpr int32_t kUbMoveElements = 20480;
@@ -162,8 +165,11 @@ ge::graphStatus FillTiling(gert::TilingContext *context, AllreduceAddRmsnormTili
     if (launchedAiv > static_cast<uint32_t>(m)) {
         launchedAiv = static_cast<uint32_t>(m);
     }
-    if (launchedAiv > kMaxAivBlocks) {
-        launchedAiv = kMaxAivBlocks;
+    const uint32_t maxAivBlocks =
+        (m <= kLowContentionSmallMMax || m >= kLowContentionLargeMMin) ?
+        kLowContentionAivBlocks : kDefaultMaxAivBlocks;
+    if (launchedAiv > maxAivBlocks) {
+        launchedAiv = maxAivBlocks;
     }
 
     auto &info = tiling.allreduceAddRmsnormInfo;

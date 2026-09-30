@@ -31,9 +31,7 @@ import torch.distributed as dist
 
 def _device_matches(actual: torch.device, expected: torch.device) -> bool:
     """Treat an unindexed logical device as the current device of that type."""
-    return actual.type == expected.type and (
-        expected.index is None or actual.index == expected.index
-    )
+    return actual.type == expected.type and (expected.index is None or actual.index == expected.index)
 
 
 @dataclass(frozen=True)
@@ -65,12 +63,8 @@ class CompactFixedGreedyEnvelopeLayout:
             for size in verification_sizes
         ):
             raise ValueError("Compact verification sizes must be integers in [1, gamma].")
-        if self.share_full_window_tokens and any(
-            size != self.gamma for size in verification_sizes
-        ):
-            raise ValueError(
-                "A shared full-window envelope requires every verification row to use gamma tokens."
-            )
+        if self.share_full_window_tokens and any(size != self.gamma for size in verification_sizes):
+            raise ValueError("A shared full-window envelope requires every verification row to use gamma tokens.")
 
     @classmethod
     def full_window(
@@ -111,11 +105,7 @@ class CompactFixedGreedyEnvelopeLayout:
             if self.share_full_window_tokens
             else self.verification_token_count + self.continuation_token_count
         )
-        return (
-            proposal_tokens
-            + self.row_count * int(self.include_draft_confidence)
-            + int(self.include_draft_timing)
-        )
+        return proposal_tokens + self.row_count * int(self.include_draft_confidence) + int(self.include_draft_timing)
 
     @property
     def legacy_message_numel(self) -> int:
@@ -163,6 +153,10 @@ class CompactFixedGreedyCPUBroadcastTiming:
     # with the guarded proposal and avoid a later NPU->CPU round trip during
     # correction/state update.
     host_continuation_tokens: torch.Tensor | None = None
+    # The same CPU envelope already carries quantized draft confidence.  Keep
+    # a normalized host view so the replicated scheduler does not issue a
+    # second device-to-host read for values Gloo has already published.
+    host_draft_confidences: tuple[float, ...] | None = None
 
 
 def _validate_message_buffer(
@@ -230,13 +224,8 @@ def pack_compact_fixed_greedy_envelope(
             or tuple(draft_confidences.shape) != (layout.row_count,)
             or draft_confidences.device != device
         ):
-            raise ValueError(
-                "draft_confidences must be one floating-point value per row "
-                f"on {device}."
-            )
-        quantized_confidences = torch.round(
-            draft_confidences.float().clamp(0.0, 1.0) * 1_000_000
-        ).to(torch.long)
+            raise ValueError(f"draft_confidences must be one floating-point value per row on {device}.")
+        quantized_confidences = torch.round(draft_confidences.float().clamp(0.0, 1.0) * 1_000_000).to(torch.long)
     elif draft_confidences is not None:
         raise ValueError("draft_confidences were provided for a layout without confidence.")
 
@@ -259,11 +248,7 @@ def pack_compact_fixed_greedy_envelope(
 
     flat_continuations = continuation_tokens.reshape(-1)
     if out is None:
-        parts = (
-            [flat_continuations]
-            if layout.share_full_window_tokens
-            else [verification_tokens, flat_continuations]
-        )
+        parts = [flat_continuations] if layout.share_full_window_tokens else [verification_tokens, flat_continuations]
         if quantized_confidences is not None:
             parts.append(quantized_confidences)
         if timing is not None:
@@ -469,10 +454,7 @@ def broadcast_compact_fixed_greedy_via_cpu(
                 name="source_device_buffer",
             )
             if not _device_matches(source_device_buffer.device, actual_device):
-                raise ValueError(
-                    "source_device_buffer must be on "
-                    f"{actual_device}, got {source_device_buffer.device}."
-                )
+                raise ValueError(f"source_device_buffer must be on {actual_device}, got {source_device_buffer.device}.")
         if source_cpu_buffer is not None:
             _validate_message_buffer(
                 source_cpu_buffer,
@@ -490,16 +472,12 @@ def broadcast_compact_fixed_greedy_via_cpu(
             out=source_device_buffer,
         )
         if not _device_matches(device_message.device, actual_device):
-            raise ValueError(
-                f"Source payload must be on {actual_device}, got {device_message.device}."
-            )
+            raise ValueError(f"Source payload must be on {actual_device}, got {device_message.device}.")
         if source_cpu_buffer is None:
             cpu_message = device_message.detach().cpu()
         else:
             cpu_message = source_cpu_buffer
-            async_device_to_host = bool(
-                actual_device.type == "npu" and cpu_message.is_pinned()
-            )
+            async_device_to_host = bool(actual_device.type == "npu" and cpu_message.is_pinned())
             cpu_message.copy_(
                 device_message,
                 non_blocking=async_device_to_host,
@@ -544,24 +522,20 @@ def broadcast_compact_fixed_greedy_via_cpu(
             non_blocking=cpu_message.is_pinned(),
         )
     host_to_device_ended = time.perf_counter()
-    host_continuation_tokens = (
-        unpack_compact_fixed_greedy_envelope(
-            layout,
-            cpu_message,
-        ).continuation_tokens
-        if expose_host_continuation
+    host_views = unpack_compact_fixed_greedy_envelope(layout, cpu_message)
+    host_continuation_tokens = host_views.continuation_tokens if expose_host_continuation else None
+    host_draft_confidences = (
+        tuple(float(value) / 1_000_000.0 for value in host_views.draft_confidences.tolist())
+        if expose_host_continuation and host_views.draft_confidences is not None
         else None
     )
     return (
         unpack_compact_fixed_greedy_envelope(layout, device_message),
         CompactFixedGreedyCPUBroadcastTiming(
-            device_to_host_seconds=(
-                device_to_host_ended - device_to_host_started if is_source else 0.0
-            ),
+            device_to_host_seconds=(device_to_host_ended - device_to_host_started if is_source else 0.0),
             broadcast_seconds=broadcast_ended - broadcast_started,
-            host_to_device_submit_seconds=(
-                host_to_device_ended - host_to_device_started if not is_source else 0.0
-            ),
+            host_to_device_submit_seconds=(host_to_device_ended - host_to_device_started if not is_source else 0.0),
             host_continuation_tokens=host_continuation_tokens,
+            host_draft_confidences=host_draft_confidences,
         ),
     )

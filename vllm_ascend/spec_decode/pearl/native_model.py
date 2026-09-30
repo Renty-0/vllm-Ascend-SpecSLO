@@ -910,6 +910,8 @@ class NativeColumnLinear(nn.Module):
         self.weight = nn.Parameter(torch.empty(self.output_size_per_rank, input_size))
         self.bias = nn.Parameter(torch.empty(self.output_size_per_rank)) if bias else None
         self.token_pad_multiple = 1
+        self.register_buffer("large_m_nz_weight", None, persistent=False)
+        self.large_m_nz_min_rows = 0
 
     def load_weight(self, loaded_weight: torch.Tensor) -> None:
         _copy_padded_shard(self.weight.data, loaded_weight, dim=0, start=self.output_start)
@@ -920,7 +922,14 @@ class NativeColumnLinear(nn.Module):
 
     def forward(self, hidden_states: torch.Tensor) -> torch.Tensor:
         padded_states, real_rows = _pad_token_rows(hidden_states, self.token_pad_multiple)
-        output = F.linear(padded_states, self.weight, self.bias)
+        projection_weight = self.weight
+        if (
+            self.large_m_nz_weight is not None
+            and self.large_m_nz_min_rows > 0
+            and real_rows >= self.large_m_nz_min_rows
+        ):
+            projection_weight = self.large_m_nz_weight
+        output = F.linear(padded_states, projection_weight, self.bias)
         return output[:real_rows]
 
 
@@ -2103,7 +2112,7 @@ class NativeQwen2ForCausalLM(nn.Module):
         for module in self.modules():
             if isinstance(module, (NativeColumnLinear, NativeRowLinear, NativeLMHead)):
                 module.token_pad_multiple = token_pad_multiple
-            if isinstance(module, NativeRowLinear):
+            if isinstance(module, (NativeColumnLinear, NativeRowLinear)):
                 module.large_m_nz_min_rows = int(
                     getattr(config, "pearl_large_m_nz_min_rows", 0)
                 )
@@ -2803,22 +2812,28 @@ def _maybe_convert_linear_weights_to_nz(model: NativeQwen2ForCausalLM) -> None:
     Mode 10 is the TP3 small-M candidate: QKV plus ``down_proj`` in NZ while
     leaving the less reliable attention-output and vocabulary projections ND.
     Mode 11 retains ``down_proj`` in ND and stores a second NZ copy for matrix
-    row counts at or above ``pearl_large_m_nz_min_rows``.
+    row counts at or above ``pearl_large_m_nz_min_rows``. Modes 12/13 apply
+    that dual-layout policy only to even/odd decoder layers, respectively, so
+    TP3 can qualify the mixed-prefill route without duplicating every FFN
+    down-projection weight in HBM. Mode 14 stores alternate NZ copies of both
+    FFN projections only in every eighth decoder layer.  It targets the real
+    mixed-prefill large-M shapes without the HBM cost of duplicating all 64
+    Qwen3-32B FFN layers or regressing the dominant small-M graph family.
     """
     configured_mode = getattr(model.config, "pearl_weight_nz_mode", None)
     if not isinstance(configured_mode, int):
         configured_mode = int(ascend_envs.VLLM_ASCEND_ENABLE_NZ)
-    if configured_mode not in (2, 3, 4, 5, 6, 7, 8, 9, 10, 11):
+    if configured_mode not in (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14):
         return
     tied_embeddings = model.lm_head.weight is model.embed_tokens.weight
     linear_types = (NativeColumnLinear, NativeRowLinear, NativeLMHead)
     named_modules = (
         model.named_modules()
-        if configured_mode in (3, 4, 5, 6, 7, 8, 9, 10, 11)
+        if configured_mode in (3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14)
         else (("", module) for module in model.modules())
     )
     for module_name, module in named_modules:
-        if configured_mode in (3, 4, 5, 6, 7, 8, 9, 10, 11):
+        if configured_mode in (3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14):
             suffixes = {
                 3: (".mlp.gate_up_proj", ".mlp.down_proj"),
                 4: (".mlp.down_proj",),
@@ -2834,16 +2849,32 @@ def _maybe_convert_linear_weights_to_nz(model: NativeQwen2ForCausalLM) -> None:
                 9: ("lm_head",),
                 10: (".self_attn.qkv_proj", ".mlp.down_proj"),
                 11: (".mlp.down_proj",),
+                12: (".mlp.down_proj",),
+                13: (".mlp.down_proj",),
+                14: (".mlp.gate_up_proj", ".mlp.down_proj"),
             }[configured_mode]
             if not module_name.endswith(suffixes):
                 continue
-            if configured_mode in (6, 7):
+            if configured_mode in (6, 7, 12, 13):
                 components = module_name.split(".")
                 try:
                     layer_index = int(components[components.index("layers") + 1])
                 except (ValueError, IndexError):
                     continue
-                if layer_index % 2 != configured_mode - 6:
+                selected_parity = (
+                    configured_mode - 6
+                    if configured_mode in (6, 7)
+                    else configured_mode - 12
+                )
+                if layer_index % 2 != selected_parity:
+                    continue
+            if configured_mode == 14:
+                components = module_name.split(".")
+                try:
+                    layer_index = int(components[components.index("layers") + 1])
+                except (ValueError, IndexError):
+                    continue
+                if layer_index % 8 != 0:
                     continue
         if tied_embeddings and isinstance(module, NativeLMHead):
             # GatherV2 requires the tied embedding table to stay in ND format.
@@ -2857,7 +2888,7 @@ def _maybe_convert_linear_weights_to_nz(model: NativeQwen2ForCausalLM) -> None:
                 module.weight.data,
                 ACL_FORMAT_FRACTAL_NZ,
             )
-            if configured_mode == 11:
+            if configured_mode in (11, 12, 13, 14):
                 module.large_m_nz_weight = converted
             else:
                 module.weight.data = converted

@@ -83,19 +83,29 @@ def test_capture_runtime_environment_records_host_continuation_ab_switch():
 
 
 def test_capture_runtime_environment_records_target_fia_update_workers():
-    environment = capture_runtime_environment(
-        {"VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS": "2"}
-    )
+    environment = capture_runtime_environment({"VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS": "2"})
 
     assert environment["VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS"] == "2"
 
 
 def test_capture_runtime_environment_records_draft_pa_update_workers():
-    environment = capture_runtime_environment(
-        {"VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS": "4"}
-    )
+    environment = capture_runtime_environment({"VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS": "4"})
 
     assert environment["VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS"] == "4"
+
+
+def test_capture_runtime_environment_records_new_drain_and_mixed_submit_switches():
+    environment = capture_runtime_environment(
+        {
+            "VLLM_ASCEND_SPECRHYTHM_DRAIN_TARGET_LRTF": "1",
+            "VLLM_ASCEND_SPECRHYTHM_TARGET_RESIDUAL_LRTF": "1",
+            "VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT": "0",
+        }
+    )
+
+    assert environment["VLLM_ASCEND_SPECRHYTHM_DRAIN_TARGET_LRTF"] == "1"
+    assert environment["VLLM_ASCEND_SPECRHYTHM_TARGET_RESIDUAL_LRTF"] == "1"
+    assert environment["VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT"] == "0"
 
 
 def _target_replay_ahead_rows(*, enabled: bool) -> list[dict]:
@@ -111,10 +121,7 @@ def _target_replay_ahead_rows(*, enabled: bool) -> list[dict]:
         {
             "rank": rank,
             "worker_spec_rhythm_target_replay_ahead_enabled": int(enabled),
-            **{
-                f"worker_spec_rhythm_target_replay_ahead_{name}": value
-                for name, value in zip(fields, counters)
-            },
+            **{f"worker_spec_rhythm_target_replay_ahead_{name}": value for name, value in zip(fields, counters)},
             **{
                 f"worker_spec_rhythm_target_replay_ahead_reject_{reason}": (
                     4 if enabled and reason == "mutable_frontier" else 0
@@ -138,9 +145,7 @@ def _target_replay_ahead_rows(*, enabled: bool) -> list[dict]:
 
 @pytest.mark.parametrize("enabled", [False, True])
 def test_target_replay_ahead_evidence_accepts_consistent_ranks(enabled):
-    result = target_replay_ahead_evidence(
-        _target_replay_ahead_rows(enabled=enabled), enabled=enabled
-    )
+    result = target_replay_ahead_evidence(_target_replay_ahead_rows(enabled=enabled), enabled=enabled)
     assert result["passed"] is True
     assert result["errors"] == []
 
@@ -195,9 +200,7 @@ def _target_fia_evidence_rows(
             {
                 "rank": rank,
                 "is_draft_rank": is_draft,
-                "aclgraph_target_fia_task_update_workers": (
-                    1 if is_draft else workers
-                ),
+                "aclgraph_target_fia_task_update_workers": (1 if is_draft else workers),
                 **{name: 0 for name in graph_zero_fields},
             }
         )
@@ -205,24 +208,16 @@ def _target_fia_evidence_rows(
             {
                 "rank": rank,
                 "is_draft_rank": is_draft,
-                "aclgraph_target_fia_parallel_update_replays_delta": (
-                    0 if is_draft or workers == 1 else 7
-                ),
-                "aclgraph_target_fia_parallel_update_tasks_delta": (
-                    0 if is_draft or workers == 1 else 448
-                ),
+                "aclgraph_target_fia_parallel_update_replays_delta": (0 if is_draft or workers == 1 else 7),
+                "aclgraph_target_fia_parallel_update_tasks_delta": (0 if is_draft or workers == 1 else 448),
                 **{f"{name}_delta": 0 for name in graph_zero_fields},
-                **(
-                    {}
-                    if is_draft
-                    else {name: 0 for name in target_service_zero_fields}
-                ),
+                **({} if is_draft else {name: 0 for name in target_service_zero_fields}),
             }
         )
     return absolute, measured
 
 
-@pytest.mark.parametrize("workers", (1, 2, 4))
+@pytest.mark.parametrize("workers", (1, 2, 3, 4))
 def test_target_fia_parallel_update_evidence_accepts_strict_tp1_tp3_contract(
     workers: int,
 ):
@@ -295,9 +290,7 @@ def _draft_pa_evidence_rows(
             {
                 "rank": rank,
                 "is_draft_rank": is_draft,
-                "aclgraph_draft_pa_task_update_workers": (
-                    workers if is_draft else 1
-                ),
+                "aclgraph_draft_pa_task_update_workers": (workers if is_draft else 1),
                 **{name: 0 for name in graph_zero_fields},
             }
         )
@@ -305,12 +298,8 @@ def _draft_pa_evidence_rows(
             {
                 "rank": rank,
                 "is_draft_rank": is_draft,
-                "aclgraph_draft_pa_parallel_update_replays_delta": (
-                    7 if is_draft and workers > 1 else 0
-                ),
-                "aclgraph_draft_pa_parallel_update_tasks_delta": (
-                    1792 if is_draft and workers > 1 else 0
-                ),
+                "aclgraph_draft_pa_parallel_update_replays_delta": (7 if is_draft and workers > 1 else 0),
+                "aclgraph_draft_pa_parallel_update_tasks_delta": (1792 if is_draft and workers > 1 else 0),
                 "aclgraph_draft_pa_parallel_update_fallback_replays_delta": 0,
                 "aclgraph_draft_pa_parallel_update_rejections_delta": {},
                 **{f"{name}_delta": 0 for name in graph_zero_fields},
@@ -641,24 +630,14 @@ def test_mc2_measured_replay_coverage_fails_closed_on_rank_divergence():
 
 def test_mc2_measured_replay_coverage_requires_exact_projection_route_map():
     contract = qualified_mc2_profile_replay_contract(_mc2_profile())
-    workers = [
-        _mc2_target_delta(rank, histogram={"56": 3})
-        for rank in (1, 2, 3)
-    ]
-    workers[1]["mc2_static_qualified_rows_by_shape"][
-        "(3072, 5120, 'bfloat16', 'ND', True)"
-    ] = [52]
+    workers = [_mc2_target_delta(rank, histogram={"56": 3}) for rank in (1, 2, 3)]
+    workers[1]["mc2_static_qualified_rows_by_shape"]["(3072, 5120, 'bfloat16', 'ND', True)"] = [52]
 
     evidence = measure_qualified_mc2_replay_coverage(workers, contract)
 
     assert evidence["passed"] is False
-    assert evidence["target_ranks"][1][
-        "static_projection_routes_match_profile"
-    ] is False
-    assert any(
-        "projection-shape routes do not match" in error
-        for error in evidence["errors"]
-    )
+    assert evidence["target_ranks"][1]["static_projection_routes_match_profile"] is False
+    assert any("projection-shape routes do not match" in error for error in evidence["errors"])
 
 
 def test_under_capacity_continuous_profile_selects_actual_worker_chunk():
