@@ -4,7 +4,7 @@
 > 环境和模型、重跑同一实验，并判断是否复现了旧容器当前最优检查点。不要在读完“结果
 > 口径”和“不可自动恢复边界”之前宣称复现成功。
 
-本手册的实际空目录演练记录、清机前 P0 外部备份和 OCI 镜像缺口见
+本手册的实际空目录演练记录、可选离线灾备和 OCI 镜像线索见
 [`ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md`](ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md)。
 
 ## 1. 先回答：私人 Git 仓库能不能下载后直接运行
@@ -33,7 +33,7 @@ workload 与设计来源，不是最终二进制的运行时依赖。精确 work
 
 | 用途 | 地址/分支/提交 | 是否运行必需 |
 | --- | --- | --- |
-| 冻结的复现源码、补丁、结果和文档 | `git@github.com:Renty-0/vllm-Ascend-SpecSLO.git`，标签 `specslo-reproduction-20260930-v2` | 是，复现必须用它 |
+| 冻结的复现源码、补丁、结果和文档 | `git@github.com:Renty-0/vllm-Ascend-SpecSLO.git`，标签 `specslo-reproduction-20260930-v3` | 是，复现必须用它 |
 | 后续开发分支 | 同一私库分支 `SpecSLO-Chain` | 继续调优时使用，不替代冻结标签 |
 | 性能源码检查点 | 私库提交 `31b3cde3296c00867e8d9e23558598debed276a6`；其后到冻结标签只有文档、补丁和迁移资产变化 | 是，冻结标签已包含 |
 | vLLM 核心 | `git@github.com:vLLM-HUST/vllm-hust.git`，基线 `933842ab0fdd53ee47dee8148bca1671d7d6da61` | 是 |
@@ -48,7 +48,7 @@ workload 与设计来源，不是最终二进制的运行时依赖。精确 work
 源代码浏览入口：
 
 - `https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/SpecSLO-Chain`
-- `https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/specslo-reproduction-20260930-v2`
+- `https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/specslo-reproduction-20260930-v3`
 - `https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/codex-conversations-backup-20260924`
 - `https://github.com/vLLM-HUST/vllm-hust/commit/933842ab0fdd53ee47dee8148bca1671d7d6da61`
 
@@ -59,7 +59,7 @@ token、GitHub token 或代理凭据。
 
 ```text
 vLLM-HUST commit:       933842ab0fdd53ee47dee8148bca1671d7d6da61
-SpecSLO frozen tag:     specslo-reproduction-20260930-v2
+SpecSLO frozen tag:     specslo-reproduction-20260930-v3
 conversation branch:    59906b004691776bc590a09b094914e3c94689b8
 ```
 
@@ -87,8 +87,8 @@ conversation branch:    59906b004691776bc590a09b094914e3c94689b8
 - 能访问 vLLM-HUST 和模型镜像；外网不稳定时优先 ModelScope；
 - 安装 `git`、`zstd`、`rsync`、`sha256sum`、aarch64 Miniconda、CMake、Ninja，且
   GCC/G++ > 8、支持 C++17；
-- 若要求模型 bit-exact，先从异机备份复制旧权重。单靠当前上游模型 ID不能保证未来下载的
-  revision 永远不变。
+- 模型正常从 ModelScope 重新下载并用逐文件 SHA 校验；只有担心未来下载源失效时才需要
+  可选的异机权重副本。
 
 ### 3.3 给新容器 Codex 的停止条件
 
@@ -118,7 +118,7 @@ vLLM-HUST HTTPS:   https://github.com/vLLM-HUST/vllm-hust.git
 ssh -T git@github.com || true
 
 git ls-remote git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
-  refs/tags/specslo-reproduction-20260930-v2
+  refs/tags/specslo-reproduction-20260930-v3
 git ls-remote git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
   refs/heads/codex-conversations-backup-20260924
 ```
@@ -128,7 +128,7 @@ git ls-remote git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
 ```bash
 mkdir -p /root/data
 
-git clone --branch specslo-reproduction-20260930-v2 --single-branch \
+git clone --branch specslo-reproduction-20260930-v3 --single-branch \
   git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
   /root/data/vllm-ascend-hust
 
@@ -335,8 +335,9 @@ rg -n "drain padding repair|v149|930.005|560.578|MC2|dual batch" \
 - vLLM-Ascend-HUST editable `/root/data/vllm-ascend-hust`。
 
 Conda explicit、environment.yml、pip freeze、系统包、CANN 和驱动快照全部在
-`docs/migration/20260930/`。pip freeze 含旧 CANN 临时 `file://` 路径，不能原样盲装；这些
-wheel 应由新 CANN 镜像提供。
+`docs/migration/20260930/`。Conda 与 CANN 本身没有私有二进制修改；pip freeze 含旧 CANN
+临时 `file://` 路径，不能原样盲装，这些 wheel 应由相同版本的新 CANN 镜像提供。项目定制
+的 vLLM 补丁、插件源码和 MC2 vendor 源码已经进入 GitHub。
 
 模型可从 ModelScope 镜像下载：
 
@@ -358,8 +359,9 @@ sha256sum -c /root/data/vllm-ascend-hust/docs/migration/20260930/\
 CORE_MODEL_SHA256SUMS
 ```
 
-全部通过表示与旧容器核心模型 bit-exact。若下载 revision 已变化，功能测试仍可继续，但不能
-宣称“完美复现”；应从异机备份获取旧权重或明确报告哈希差异。
+全部通过表示下载所得模型与旧容器核心模型 bit-exact。若下载 revision 已变化，应明确报告
+哈希差异并重新完成数值门；只有要求恢复旧权重原件时才需要异机备份。模型目录没有任何
+项目私有转换或修改。
 
 ## 8. 当前核心实验结果：复现目标
 
@@ -548,8 +550,8 @@ vendor；依赖默认值运行不算复现。
 
 ## 11. GitHub 无法替代的内容
 
-普通 GitHub 已保存代码、补丁、聊天、结构化结果、精确 workload、环境清单和编译回滚包，
-但不包含：
+普通 GitHub 已保存代码、补丁、聊天、结构化结果、精确 workload、环境清单和编译回滚包。
+下列内容没有进入 GitHub，但对重新构建最终实验均不是必需备份：
 
 - 约 182.57 GB 模型权重；
 - 约 114.64 GB raw profiler、trace 和 tensor capture 原件；
@@ -557,9 +559,9 @@ vendor；依赖默认值运行不算复现。
 - 宿主驱动/固件、完整 CANN 和 588 GB 共享数据集挂载；
 - SSH、Codex、GitHub 等认证凭据。
 
-这些内容中，模型、环境、vendor、profile 可以按文档重新下载或生成；历史 trace/capture
-原件只能从外部备份恢复。重新生成得到的是新证据，不是旧文件。完整边界和实际空目录恢复
-演练见 `ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md`。
+模型、环境、vendor、profile 可以按文档重新下载或生成；模型、Conda 和 CANN 没有项目私有
+修改。历史 trace/capture 原件只能从可选外部备份恢复，新生成的是新证据而不是旧文件。
+完整边界和实际空目录恢复演练见 `ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md`。
 
 ## 12. 可直接交给新 Codex 的指令
 
@@ -569,7 +571,7 @@ vendor；依赖默认值运行不算复现。
 SPECSLO_FINAL_EXPERIMENT_HANDOFF_zh.md
 
 然后严格按 REPRODUCTION_RUNBOOK_zh.md 执行。复现源码必须来自私人仓库标签
-specslo-reproduction-20260930-v2；继续开发才使用 SpecSLO-Chain。vLLM-HUST 必须固定到
+specslo-reproduction-20260930-v3；继续开发才使用 SpecSLO-Chain。vLLM-HUST 必须固定到
 933842ab 并应用 specslo-core.patch。
 先运行 tools/specslo_migration/bootstrap_from_github.sh，并确认五项源码审计全部通过。
 恢复 GitHub evidence archive 和固定 workload，验证 workload 与核心模型 SHA256。

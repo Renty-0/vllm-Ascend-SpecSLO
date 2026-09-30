@@ -16,9 +16,10 @@
 | 可比较的 TP1+TP3 对 TP4 性能结果 | 否 | 同型号机器、重新编译/资格化 MC2、相同 workload 和运行合同 | 可重测，不能复制旧数字冒充新机器结果 |
 | 逐文件、逐二进制恢复旧容器 | 否 | 异机保存的模型、raw profile、tensor capture、Conda/LLVM 等大包 | 只有外部大包才能做到 |
 
-因此“让新容器自己复现”是可行的，但它指**从源码和固定 workload 重新生成运行环境与
-实验结果**，不等于从 GitHub 重新生成历史 profiler 原件、真实张量捕获或完全相同的模型
-字节。后者如果没有在服务器清空前复制到外部存储，就永久无法恢复。
+因此“让新容器自己复现”是可行的：从源码和固定 workload 重新生成运行环境与实验结果，
+不要求备份旧模型、Conda 或 CANN 目录。模型没有私有转换，可从 ModelScope 重下并以 SHA
+验证；Conda/CANN 没有私有二进制修改，可按固定版本重装。只有历史 profiler 原件、真实
+张量捕获或旧容器逐字节快照在没有外部副本时无法恢复。
 
 ## 2. 不可由容器自行解决的管理员前置条件
 
@@ -56,7 +57,7 @@ GitHub 中的已编译 `.so` 和 CANN vendor 只能用于取证，不能直接�
 
 ```bash
 mkdir -p /root/data
-git clone --branch specslo-reproduction-20260930-v2 --single-branch \
+git clone --branch specslo-reproduction-20260930-v3 --single-branch \
   git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
   /root/data/vllm-ascend-hust
 
@@ -246,8 +247,8 @@ PY
 ```
 
 旧容器没有保存这两个目录的下载 revision，但现在已经保存两套核心模型逐文件 SHA256。
-ModelScope 下载后只有 `CORE_MODEL_SHA256SUMS` 全部通过，才可以宣称权重 bit-exact；若上游
-revision 已变化，则只能算功能级重下载，必须从外部大包复制旧权重才能完美复现。不能臆造
+ModelScope 下载后用 `CORE_MODEL_SHA256SUMS` 判断是否与旧模型逐文件一致；若上游 revision
+已变化，应记录差异并重新跑数值门，只有恢复旧权重原件时才需要可选外部副本。不能臆造
 revision。四个派生 Qwen2.5 draft/vocab 模型也没有足够的转换配方从基础模型自动恢复，历史
 Qwen2.5 回归需要从外部包恢复它们。
 
@@ -460,7 +461,7 @@ bash tools/specslo_experiments/run_online_coalesce1_formal_ab.sh \
 
 只有全部勾选后，才可以声称新容器完成 SpecSLO 功能级复现：
 
-- [ ] 冻结标签 `specslo-reproduction-20260930-v2` 的来源和提交已记录；
+- [ ] 冻结标签 `specslo-reproduction-20260930-v3` 的来源和提交已记录；
 - [ ] `bootstrap_from_github.sh` 输出 `Source bootstrap passed.`；
 - [ ] `preflight_zero_container.sh --full-model-hash` 输出 `FAIL=0`；
 - [ ] vLLM-HUST 固定基线、核心补丁和 Catlass 提交均已校验；
@@ -480,8 +481,8 @@ bash tools/specslo_experiments/run_online_coalesce1_formal_ab.sh \
 
 1. 宿主驱动、固件、CANN 和共享挂载需要管理员提供；
 2. 私人 GitHub/SSH/ModelScope 登录需要用户重新授权；
-3. 模型旧 revision 未记录；当前 SHA 清单可以判定是否 bit-exact，但若上游已更换文件，仍需
-   外部旧权重副本才能恢复；
+3. 模型旧 revision 未记录；当前 SHA 清单可以判定下载文件是否与旧容器相同。上游若更换
+   文件仍可做功能/性能重新验证，但只有恢复旧权重原件时才需要可选外部副本；
 4. 原始 100+ GB profiler/tensor capture 若没有外部副本，只能重新生成，不能恢复历史内容；
 5. 物理 NPU 拓扑、HCCL 状态和系统噪声变化会改变性能，旧 MC2 profile 不能跨机器直接晋升；
 6. 当前最优候选尚未同时稳定满足 Raw 超 TP4 和 Goodput 三轮均 >=1.3x，因此恢复完成与最终

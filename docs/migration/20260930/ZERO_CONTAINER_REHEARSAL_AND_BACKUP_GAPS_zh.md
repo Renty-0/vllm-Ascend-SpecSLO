@@ -2,21 +2,18 @@
 
 ## 1. 结论先行
 
-截至 2026-09-30，**代码与小型实验资产已经可以仅凭 GitHub 从空目录恢复**，但若旧容器
-现在被清除，仍不能仅靠 GitHub 保证 bit-exact、ABI-exact 的“完美复现”。清机前至少还要
-把以下三项保存到异机磁盘或对象存储：
+截至 2026-09-30，**从 GitHub 取得代码和证据、从镜像重新安装固定版本环境、从
+ModelScope 下载模型，已经足以从空容器重新构建并复现最终实验**。模型权重、Conda 目录和
+CANN 目录都不是必备外部备份：模型没有做私有转换；Conda 包没有二进制魔改；CANN toolkit
+本身也没有被修改。
 
-1. `/data/shared-models/Qwen3-0.6B` 和 `/data/shared-models/Qwen3-32B` 的精确副本，共
-   `67,059,520,461` 字节；
-2. 当前容器的**不可变 OCI image digest 和镜像导出包**，或至少完整 Conda 环境与
-   CANN 9.0.0 安装介质/目录；
-3. 管理员侧的宿主驱动、固件、910B2 拓扑和容器启动参数记录。驱动本身应由新宿主正确
-   安装，不应把旧宿主动态库直接覆盖到新宿主。
+项目定制内容是 vLLM-HUST 补丁、vLLM-Ascend/SpecSLO 源码以及自定义 MC2 CANN vendor。
+这些内容均已进入私人 GitHub；新容器应从源码重编 MC2 并在新机器重新资格化 profile。
 
-如果只追求“源码与功能可重新构建”，第 1 项可以从 ModelScope 重下，第 2 项可以按版本
-重装；但只有逐文件哈希完全匹配时才能称为 bit-exact。若要保留旧 profiler/tensor capture
-原件，还需额外备份约 115 GB 历史资产；它们不是重跑最终结果的必要输入，却是完整历史
-取证所需内容。
+外部复制模型、OCI image、Conda、CANN 和约 115 GB 历史 profiler/tensor capture 仅属于
+**离线灾备或历史逐字节取证**：它能防止下载源失效、同版本构建包变化或旧 trace 丢失，但
+不是重跑最终结果的必要前置条件。新宿主仍需管理员提供同类 910B2、匹配版本的驱动/固件、
+设备映射和容器资源；这些基础设施条件无法由 GitHub 代码代替。
 
 ## 2. 本次真正做过的空目录演练
 
@@ -49,7 +46,7 @@ warning 是卡上进程占用必须在正式测试前人工审核，预检不会
 
 ```text
 git@github.com:Renty-0/vllm-Ascend-SpecSLO.git
-冻结标签：specslo-reproduction-20260930-v2
+冻结标签：specslo-reproduction-20260930-v3
 开发分支：SpecSLO-Chain
 对话分支：codex-conversations-backup-20260924
 ```
@@ -70,24 +67,24 @@ git@github.com:Renty-0/vllm-Ascend-SpecSLO.git
 `bootstrap_from_github.sh` 从公开固定提交重建。也不需要为了最终 463-request 实验备份
 588 GB `/data/shared_datasets`，因为精确 workload 与必要小型数据已经进入证据包。
 
-## 4. 仍须外部备份的内容与优先级
+## 4. 可选外部灾备内容与优先级
 
-### P0：缺失后无法保证完美复现
+### A：建议记录，但不要求导出大目录
 
 | 内容 | 当前规模/身份 | 为什么 GitHub 不能替代 |
 | --- | ---: | --- |
-| 两个 Qwen3 模型目录 | 约 67.06 GB | 上游 revision 未记录；未来同名模型文件可能变化，SHA 只能发现不同，不能恢复旧字节 |
-| 当前 OCI 镜像 digest/导出包 | 容器内无法获知 | 镜像 tag 可变；CANN、系统库、编译器和 Python ABI 会影响图与算子 |
-| 宿主/启动合同 | 910B2、Driver 26.0.rc1、ascendhal 7.35.23 | 容器不能自行恢复驱动、固件、设备映射、共享内存和 NUMA/HCCL 配置 |
+| 两个 Qwen3 模型 ID 与 SHA | 约 67.06 GB | 正常路径是 ModelScope 重下并用 Git 中的逐文件 SHA 验证；仅在下载源变化时才需要旧副本 |
+| 当前 OCI 镜像 recipe/tag/digest | 容器内无法获知实际 digest | 相同官方镜像或按固定版本重建即可；记录 digest 可减少构建差异，但镜像导出不是必需 |
+| 宿主/启动合同 | 910B2、Driver 26.0.rc1、ascendhal 7.35.23 | 新平台必须重新提供；建议记录设备、共享内存和 NUMA/HCCL 配置 |
 
 当前容器里最接近的构建线索是
 `quay.io/ascend/cann:9.0.0-910b-openeuler24.03-py3.12`，来自
 `vllm-ascend@80610e4438dba05011b05f89fc45d91e96992671` 的
 `Dockerfile.openEuler`；但容器内没有 Docker/Podman，也没有注入 OCI digest，故这只是
-重建线索，不是当前镜像身份的证明。详情见 `BASE_CONTAINER_PROVENANCE.txt`。必须让管理员
-在宿主侧查询运行容器对应的 image ID/RepoDigest。
+重建线索，不是当前镜像身份的证明。详情见 `BASE_CONTAINER_PROVENANCE.txt`。若管理员方便，
+可以在宿主侧补充 image ID/RepoDigest；缺少它不会阻止按固定软件版本重新构建。
 
-### P1：强烈建议保存，显著降低恢复风险
+### B：可选离线缓存
 
 | 内容 | 当前规模 | 说明 |
 | --- | ---: | --- |
@@ -100,7 +97,11 @@ git@github.com:Renty-0/vllm-Ascend-SpecSLO.git
 triton-ascend 3.2.1、transformers 5.14.1、ModelScope 1.40.1。注意
 `vllm-hust-dev.conda-explicit.txt` 不是完整环境锁；仅执行它不会安装上述全部 pip/CANN 包。
 
-### P2：只在需要历史取证时保存
+上表所有目录都可以不备份。`vllm-hust-dev.conda-explicit.txt` 单独只覆盖 29 个 Conda 基础
+包，但手册同时保存了完整 pip 版本、CANN 内部版本和 editable 源码来源；新容器应组合这些
+信息重建，而不是把 explicit 文件误当成唯一安装输入。
+
+### C：只在需要历史取证时保存
 
 - 约 114.64 GB raw benchmark/profile/tensor capture；
 - `/root/ascend` 中约 2.7 GB 历史 Ascend 日志；
@@ -110,12 +111,12 @@ triton-ascend 3.2.1、transformers 5.14.1、ModelScope 1.40.1。注意
 这些内容可以帮助审核旧优化过程，但不参与当前 Qwen3 最终工作负载的最小闭环。新机上的
 MC2 真实输入 capture 和 profile 必须重新生成；复制旧 profile 不能替代新机器资格化。
 
-## 5. 清机前外部备份命令
+## 5. 可选的清机前外部备份命令
 
 以下命令中的 `/mnt/external/specslo-20260930` 必须是真正不会随容器清除的异机盘、NAS 或
 对象存储挂载。**不要把备份写回本容器的 `/root/data` 或 `/data` 后误以为已经离机。**
 
-### 5.1 模型：最低必做
+### 5.1 模型：下载源不稳定时才做
 
 首选可续传的逐文件复制：
 
@@ -194,13 +195,14 @@ git bundle verify /mnt/external/specslo-20260930/vllm-hust.bundle
 
 ## 6. 新容器的完整恢复次序
 
-1. 管理员提供相同硬件、驱动、CANN、OCI 镜像和启动参数；
+1. 管理员提供同类硬件以及匹配版本的驱动、固件和 CANN；优先使用记录的镜像 recipe/tag，
+   不要求必须拿到旧 OCI 导出包；
 2. 重新配置 GitHub SSH，不从仓库恢复密钥；
-3. 克隆私人仓库冻结标签 `specslo-reproduction-20260930-v2`；
+3. 克隆私人仓库冻结标签 `specslo-reproduction-20260930-v3`；
 4. 运行 `tools/specslo_migration/bootstrap_from_github.sh`；
 5. 校验并解压 `migration_artifacts/20260930`；
-6. 从外部备份恢复两个模型，或从 ModelScope 重下后做完整 SHA；
-7. 重建/恢复 Conda 环境，安装两个 editable 源码树；
+6. 从 ModelScope 下载两个原始模型并做完整 SHA；若下载源失效才使用可选外部副本；
+7. 按记录版本重建 Conda/CANN 环境，安装两个 editable 源码树；不要求恢复旧目录 tar；
 8. 运行：
 
    ```bash
@@ -218,12 +220,13 @@ git bundle verify /mnt/external/specslo-20260930/vllm-hust.bundle
 
 ## 7. 怎样才叫“完美复现”
 
-“完美”需要分层定义，不能要求两次硬件计时逐 bit 相同：
+本项目默认所说的“完美复现”是功能与实验合同完整、结果落入容差窗口，不要求把旧容器文件
+系统逐字节复制。归档级 exact 是更严格的可选层，不能要求两次硬件计时逐 bit 相同：
 
 | 层级 | 验收 |
 | --- | --- |
-| 源码/数据 bit-exact | Git commit、补丁、submodule、workload、模型、历史 result SHA 全匹配 |
-| 软件栈 ABI-exact | OCI digest 或 CANN/driver/Python/torch-npu/编译器身份一致，扩展重新通过数值门 |
+| 可选归档级 bit-exact | Git commit、补丁、submodule、workload、模型、历史 result SHA 全匹配 |
+| 可选镜像级 ABI-exact | OCI digest 完全相同；若按版本重建，则以扩展重新通过数值门代替旧镜像字节一致 |
 | 功能 exact | 输出 token hash/接受、回滚、graph/MC2 fallback、跨 rank 一致性门通过 |
 | 性能复刻 | 同卡同合同下 baseline/candidate 各指标在目标 ±3%，Goodput ratio 至少 1.40x |
 | 项目最终门 | 三轮交错 A/B 每轮同时 Raw(candidate)>Raw(baseline) 且 Goodput>=1.3x |
@@ -233,17 +236,24 @@ TP1+TP3 candidate Raw `926.955552`、Goodput `560.577871`；Goodput `1.453552x`�
 `0.996721x`。它是**单轮最佳检查点**，不是已经完成三轮 Raw 双门。新容器先复刻这个检查点，
 再继续优化 Raw 与三轮稳定性。
 
-## 8. 当前还必须由用户/管理员补充的信息
+## 8. 新平台必须提供与可选补充的信息
 
-在清机前，仍需拿到并离机保存：
+新平台真正必须提供的是：
+
+- 至少四张同节点可用的 Ascend 910B2；
+- 匹配的 Driver 26.0.rc1、ascendhal 7.35.23 和 CANN 9.0.0
+  `V100R001C10SPC001B250`，或经过完整数值/性能重新验证的兼容栈；
+- 私人 GitHub 与 ModelScope/模型镜像访问；
+- 能重新安装文档记录的软件版本并编译自定义 CANN 算子的权限。
+
+以下内容只是可选灾备增强：
 
 - 当前运行容器的实际 OCI image ID、RepoDigest、导出包 SHA；
 - 容器创建命令或平台任务 YAML，尤其是 device、IPC、共享内存、volume、NUMA、ulimit；
-- 新服务器将提供的 910B2 型号/拓扑、driver 和 firmware 版本；
 - 外部备份目标位置及至少约 100 GB 可用空间；若连历史 profile 一起保存，建议 250 GB
   以上，若保存整个 `/root/data` 和共享数据则按 400 GB 以上规划；
 - 模型外部副本最终 SHA 校验结果。
 
-若这五项没有离开即将清除的容器，文档再完整也只能做到源码级/功能级重建，不能保证原
-环境 bit-exact。反过来，只要 P0 外部资产保存成功，GitHub 冻结标签和本手册已经覆盖从
-空容器拉代码、恢复证据、验环境、重编算子、重跑最终实验的闭环。
+这些可选大包即使不离开旧容器，GitHub 冻结标签和本手册仍覆盖从空容器拉代码、下载原始
+模型、按版本重建环境、重编算子、重新资格化和重跑最终实验的闭环。缺少它们只意味着无法
+恢复旧容器每个字节或旧 profiler 原件，不等于无法复现实验。

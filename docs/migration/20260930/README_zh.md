@@ -9,7 +9,7 @@
 的机器可读目标和模型逐文件哈希分别见 `FINAL_EXPERIMENT_TARGET.json` 与
 `CORE_MODEL_SHA256SUMS`。
 
-本次从空目录实际恢复的结果、真正必须离机备份的 P0 项、OCI 镜像缺口和管理员操作见
+本次从空目录实际恢复的结果、可选离线灾备项、OCI 镜像线索和管理员操作见
 [`ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md`](ZERO_CONTAINER_REHEARSAL_AND_BACKUP_GAPS_zh.md)。
 
 从 GitHub 恢复两个源码树时优先运行
@@ -19,8 +19,9 @@
 ## 1. 本次已经保存到私人 GitHub 的内容
 
 私人仓库为 `git@github.com:Renty-0/vllm-Ascend-SpecSLO.git`。
-完美复现使用冻结标签 `specslo-reproduction-20260930-v2`；原标签
-`specslo-reproduction-20260930` 保留为首版恢复快照；`SpecSLO-Chain` 是会继续前移的开发
+完美复现使用冻结标签 `specslo-reproduction-20260930-v3`；旧标签
+`specslo-reproduction-20260930` 和 `specslo-reproduction-20260930-v2` 保留为早期恢复快照；
+`SpecSLO-Chain` 是会继续前移的开发
 分支，不应作为未来 bit-identical 源码身份。
 
 | 内容 | 分支/目录 | 状态 |
@@ -130,7 +131,7 @@ bash tools/specslo_migration/verify_portable_archives.sh \
 ## 5. 新容器恢复顺序
 
 1. 要求管理员提供匹配的 910B2 驱动/固件和 CANN 9.0.0 镜像，先核对 ABI。
-2. 克隆私人仓库冻结标签 `specslo-reproduction-20260930-v2` 并校验；只有继续优化时才切换
+2. 克隆私人仓库冻结标签 `specslo-reproduction-20260930-v3` 并校验；只有继续优化时才切换
    `SpecSLO-Chain`，不要从 public `origin` 猜测项目状态。
 3. 克隆 vLLM-HUST 到基线 `933842ab`，应用
    `patches/vllm-hust/specslo-core.patch`；按需对 dev-hub 基线 `a61b3183` 应用 quickstart
@@ -153,8 +154,9 @@ bash tools/specslo_migration/verify_portable_archives.sh \
   GitHub 内容足以重建并重新测试 SpecSLO。
 - **逐文件复原当前容器：尚未完成。** 仍缺约 300+ GB 的模型、tensor capture、raw profile、
   Conda/LLVM/log 等异机副本，以及由管理员保证的宿主驱动/固件和共享数据集挂载。
-- **最终实验的 bit-exact 输入复原：仍需离机保存两个核心模型和 OCI 镜像身份。** raw
-  profiler/tensor capture 不属于重跑最终吞吐的输入，可在新机重新生成，但旧原件无法凭文档恢复。
+- **最终实验重新构建：不要求离机保存模型、Conda 或 CANN。** 模型可重新下载并以 SHA
+  验证，环境按固定版本重装；raw profiler/tensor capture 可在新机重新生成。外部副本只用于
+  下载源失效时的灾备或恢复旧原件。
 - 当前服务器上的任何 `/root`、`/data`、`/tmp` 归档都不算灾备；只有复制离开该宿主机并在
   目标端再次验证 SHA256，才算完成完整备份。
 
@@ -163,6 +165,6 @@ bash tools/specslo_migration/verify_portable_archives.sh \
 模型、Conda、Triton LLVM、CANN profiler 和 MC2 张量捕获可以在手册中记录来源、重建步骤
 和验收门，使新容器重新生成**功能等价的新资产**。但文档本身不会包含这些大文件，也不能
 从无到有恢复某个历史时点的 profiler、失败 trace、真实层输入或未记录 revision 的模型
-字节。需要审计历史原件或 bit-exact 恢复时，仍必须在旧服务器清空前完成第 4 节的异机
-归档。新容器自动重建的完整步骤和明确的停止条件见
+字节。只有需要审计历史原件或恢复旧容器每个字节时，才需要在旧服务器清空前完成第 4 节
+的可选异机归档。新容器自动重建的完整步骤和明确的停止条件见
 [`REPRODUCTION_RUNBOOK_zh.md`](REPRODUCTION_RUNBOOK_zh.md)。

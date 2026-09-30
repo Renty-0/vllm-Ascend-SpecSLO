@@ -18,6 +18,7 @@ Important limitation:
   The active container exposes neither its OCI image name nor immutable image
   digest, and Docker/Podman are not available inside it.  The recipe and tag
   above are a reconstruction lead, not proof of the actual image digest.
-  Before the host is cleared, an administrator must record the running
-  container's image ID/digest and preferably export the exact OCI image to
-  external storage.  A mutable image tag is not a bit-exact backup.
+  An administrator may record the running container's image ID/digest and
+  export the exact OCI image as an optional disaster-recovery aid.  It is not
+  required for rebuilding the experiment from the fixed software versions;
+  a mutable image tag alone is simply not proof of an archive-exact snapshot.
