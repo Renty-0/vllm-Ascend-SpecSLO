@@ -45,9 +45,22 @@ workload 与设计来源，不是最终二进制的运行时依赖。精确 work
 
 - `https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/SpecSLO-Chain`
 - `https://github.com/Renty-0/vllm-Ascend-SpecSLO/tree/codex-conversations-backup-20260924`
+- `https://github.com/vLLM-HUST/vllm-hust/commit/933842ab0fdd53ee47dee8148bca1671d7d6da61`
 
 这是私人仓库。新容器必须由用户重新配置 GitHub SSH 权限；仓库不保存 SSH key、Codex
 token、GitHub token 或代理凭据。
+
+截至 2026-09-30，已从一个空临时 Git 仓库实际执行并确认下面三个远端对象可下载：
+
+```text
+vLLM-HUST commit:       933842ab0fdd53ee47dee8148bca1671d7d6da61
+SpecSLO-Chain branch:   d769413b9059272198da40ee5d570810ebac60f5（本文更新前的远端头）
+conversation branch:    ca06fca23d7b935139d28d2eff04f0868de168d6
+```
+
+以后分支头会因文档或代码提交继续前移，所以下载时以分支名取得最新交接内容，以
+`31b3cde3296c00867e8d9e23558598debed276a6` 识别已经归档的运行时代码检查点；不要要求
+`SpecSLO-Chain` 永远停在上面记录的旧分支头。
 
 ## 3. 下载代码前必须完成的准备
 
@@ -85,6 +98,28 @@ token、GitHub token 或代理凭据。
 
 ## 4. 从零下载源码
 
+下面所有输入都来自 GitHub，不依赖旧容器 `/root/data/vllm-hust` 的本地 Git 对象。私人仓库
+用 SSH 下载；公开的 vLLM-HUST 同时给出 SSH 和 HTTPS 地址：
+
+```text
+SpecSLO 私库 SSH:  git@github.com:Renty-0/vllm-Ascend-SpecSLO.git
+vLLM-HUST SSH:     git@github.com:vLLM-HUST/vllm-hust.git
+vLLM-HUST HTTPS:   https://github.com/vLLM-HUST/vllm-hust.git
+```
+
+先验证权限和远端对象：
+
+```bash
+ssh -T git@github.com || true
+
+git ls-remote git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
+  refs/heads/SpecSLO-Chain
+git ls-remote git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
+  refs/heads/codex-conversations-backup-20260924
+```
+
+然后下载私库最新交接分支，并确认运行时代码检查点在其历史中：
+
 ```bash
 mkdir -p /root/data
 
@@ -92,10 +127,37 @@ git clone --branch SpecSLO-Chain --single-branch \
   git@github.com:Renty-0/vllm-Ascend-SpecSLO.git \
   /root/data/vllm-ascend-hust
 
-git clone git@github.com:vLLM-HUST/vllm-hust.git \
-  /root/data/vllm-hust
-git -C /root/data/vllm-hust checkout \
+git -C /root/data/vllm-ascend-hust cat-file -e \
+  31b3cde3296c00867e8d9e23558598debed276a6^{commit}
+git -C /root/data/vllm-ascend-hust merge-base --is-ancestor \
+  31b3cde3296c00867e8d9e23558598debed276a6 HEAD
+```
+
+不要依赖 vLLM-HUST 当前默认分支的位置。直接从 GitHub 按完整提交 SHA 拉取并 detached
+checkout，这样即使默认分支以后前移也不会改变实验基线：
+
+```bash
+mkdir -p /root/data/vllm-hust
+git -C /root/data/vllm-hust init
+git -C /root/data/vllm-hust remote add origin \
+  git@github.com:vLLM-HUST/vllm-hust.git
+git -C /root/data/vllm-hust fetch --depth=1 origin \
   933842ab0fdd53ee47dee8148bca1671d7d6da61
+git -C /root/data/vllm-hust checkout --detach FETCH_HEAD
+
+test "$(git -C /root/data/vllm-hust rev-parse HEAD)" = \
+  "933842ab0fdd53ee47dee8148bca1671d7d6da61"
+```
+
+若公开仓库的 SSH 不可用，只把上面 `remote add origin` 的地址换成：
+
+```bash
+https://github.com/vLLM-HUST/vllm-hust.git
+```
+
+最后应用由私人仓库下载下来的 SpecSLO 核心补丁：
+
+```bash
 
 git -C /root/data/vllm-hust apply --check \
   /root/data/vllm-ascend-hust/patches/vllm-hust/specslo-core.patch
@@ -105,6 +167,22 @@ git -C /root/data/vllm-hust apply --3way \
 git -C /root/data/vllm-ascend-hust submodule update --init --recursive
 git -C /root/data/vllm-ascend-hust rev-parse HEAD
 git -C /root/data/vllm-hust rev-parse HEAD
+```
+
+补丁应用成功后的正常状态是：vLLM-HUST 的 `HEAD` 仍然显示 `933842ab...`，同时
+`git status --short` 显示 SpecSLO 修改和新增文件。补丁本身的 SHA256 应为：
+
+```text
+133d96d1645225a6c9c40db445bf660a1f576787bd59265e5d0cc239f0c6db63
+```
+
+可用下面的命令确认补丁文件没有在下载过程中损坏：
+
+```bash
+printf '%s  %s\n' \
+  133d96d1645225a6c9c40db445bf660a1f576787bd59265e5d0cc239f0c6db63 \
+  /root/data/vllm-ascend-hust/patches/vllm-hust/specslo-core.patch | \
+  sha256sum -c -
 ```
 
 不要从私人仓库的 `main` 获取代码；当前项目分支是 `SpecSLO-Chain`。运行源码位于私库，
@@ -349,4 +427,3 @@ TP1+TP3 candidate。以 FINAL_EXPERIMENT_TARGET.json 为旧检查点目标，先
 Goodput 1.453552x、Raw 0.996721x，再继续完成三轮 Raw>1 和 Goodput>=1.3x 的最终门。
 任何不匹配都保留证据并报告，不得通过降低门槛或删除失败样本宣称成功。
 ```
-
