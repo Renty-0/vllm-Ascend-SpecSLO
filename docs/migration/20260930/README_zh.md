@@ -7,7 +7,7 @@
 | 内容 | 分支/目录 | 状态 |
 | --- | --- | --- |
 | SpecSLO/PEARL、TP3 MC2、测试、启动器和技术文档 | `SpecSLO-Chain` | 已推送；本审计提交完成后以远端分支头为准 |
-| Codex 对话全量快照 | `codex-conversations-backup-20260924` | 2026-09-24 全量包 + 2026-09-30 增量包；增量远端提交 `13e238cf` |
+| Codex 对话全量快照 | `codex-conversations-backup-20260924` | 2026-09-24 全量包 + 2026-09-30 增量包 + 03:12 UTC 活跃会话尾包；远端分支头 `ca06fca2` |
 | vLLM-HUST 未提交的核心层修改 | `patches/vllm-hust/specslo-core.patch` | 包含 10 个修改文件和 4 个原未跟踪文件，基线 `933842ab` |
 | dev-hub quickstart 修改 | `patches/vllm-hust-dev-hub-quickstart.patch` | 基线 `a61b3183` |
 | 可移植实验结果和数据集 | `migration_artifacts/20260930/` | 21,937 个文件；压缩前 1,704,355,840 B，含所有 `result.json`、小型 JSON、报告、CSV/TSV、脚本、论文 workload 和 `/data/datasets` |
