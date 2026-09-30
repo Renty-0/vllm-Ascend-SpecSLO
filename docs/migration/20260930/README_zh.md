@@ -4,6 +4,11 @@
 [`REPRODUCTION_RUNBOOK_zh.md`](REPRODUCTION_RUNBOOK_zh.md)。本文保留资产边界和灾备审计，
 不再用高层“恢复顺序”代替可执行手册。
 
+需要下载到本地、并作为新容器/Codex 唯一总入口的交接文档见
+[`SPECSLO_FINAL_EXPERIMENT_HANDOFF_zh.md`](SPECSLO_FINAL_EXPERIMENT_HANDOFF_zh.md)；核心结果
+的机器可读目标和模型逐文件哈希分别见 `FINAL_EXPERIMENT_TARGET.json` 与
+`CORE_MODEL_SHA256SUMS`。
+
 ## 1. 本次已经保存到私人 GitHub 的内容
 
 私人仓库为 `git@github.com:Renty-0/vllm-Ascend-SpecSLO.git`。

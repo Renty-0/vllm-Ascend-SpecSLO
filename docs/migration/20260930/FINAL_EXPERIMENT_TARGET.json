@@ -1,0 +1,106 @@
+{
+  "schema": "specslo-final-experiment-reproduction-target-v1",
+  "status": "best_single_run_checkpoint_not_formal_three_round_dual_gate",
+  "runtime_code_checkpoint": "31b3cde3296c00867e8d9e23558598debed276a6",
+  "runtime_recorded_git_head_before_dirty_patch": "c3bd269fa43891b25edc98e01b41960670b05d21",
+  "vllm_hust_base": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
+  "workload": {
+    "relative_restore_path": "root/data/specslo-workloads/eurosys27-rps4-seed0-author-slo40-50-150/rps4.0_mix0.6_0.2_0.2_seed0.jsonl",
+    "sha256": "dc58dc5af1c5b28c6944f8f3faadeaae2dae34298c07b3ac84745d367c67d662",
+    "requests": 463,
+    "class_counts": {
+      "tight_40ms": 271,
+      "normal_50ms": 96,
+      "loose_150ms": 96
+    },
+    "poisson_rps": 4.0,
+    "arrival_seed": 0,
+    "category_seed": 1,
+    "max_output_tokens": 256,
+    "requested_output_tokens": 118528
+  },
+  "hardware": {
+    "accelerator": "Ascend 910B2",
+    "physical_npus": [3, 4, 5, 7],
+    "candidate_mapping": {
+      "draft_tp1": [3],
+      "target_tp3": [4, 5, 7]
+    },
+    "baseline_mapping": {
+      "target_tp4": [3, 4, 5, 7]
+    }
+  },
+  "baseline": {
+    "name": "Qwen3-32B target-only TP4",
+    "model": "/data/shared-models/Qwen3-32B",
+    "batch_size": 64,
+    "e2e_seconds": 127.44880248699337,
+    "raw_tokens_per_second": 930.0048151656523,
+    "paper_goodput_tokens_per_second": 385.66074408597245,
+    "paper_attained_requests": 192,
+    "paper_attainment": 0.4146868250539957,
+    "output_tokens": 118528,
+    "output_token_ids_sha256": "872f39a9c5081d45f58ce33c8765731528c73fb44bf85191412c03c5dbed8f08",
+    "result_file_sha256": "2b957c1e59b1443e9d9cddd0bc2481a248d94db24808cbe06d590eb1bee198cd",
+    "measured_graph_capture": 0,
+    "measured_decode_graph_fallback": 0,
+    "class_results": {
+      "tight": {"attained": 57, "total": 271, "mean_paper_tpot_ms": 49.510134216266174},
+      "normal": {"attained": 39, "total": 96, "mean_paper_tpot_ms": 49.12977057963985},
+      "loose": {"attained": 96, "total": 96, "mean_paper_tpot_ms": 49.66311112556809}
+    },
+    "legacy_local_evidence_path": "/root/data/nano-pearl-benchmark-results/20260928-specslo-paired-baseline-target3457-precheck/runs/baseline-target-only-tp4-cards3-4-5-7-target-only-tp4-cards3-4-5-7-current-source-r1/result.json.tmp",
+    "note": "The full legacy result remained .tmp after post-run promotion; the compact metrics in this file are the Git-persisted target. Re-run the baseline to create new full evidence."
+  },
+  "candidate": {
+    "name": "SpecSLO fixed-gamma4 serial-chain TP1+TP3",
+    "draft_model": "/data/shared-models/Qwen3-0.6B",
+    "target_model": "/data/shared-models/Qwen3-32B",
+    "gamma": 4,
+    "batch_size": 64,
+    "e2e_seconds": 127.86805127095431,
+    "raw_tokens_per_second": 926.9555516165441,
+    "paper_goodput_tokens_per_second": 560.5778713879748,
+    "paper_attained_requests": 280,
+    "paper_attainment": 0.6047516198704104,
+    "output_tokens": 118528,
+    "acceptance_rate": 0.526017941805336,
+    "mean_accept_tokens": 4.610568224892023,
+    "output_token_ids_sha256": "1b08a458f9776ba984585628dc342fd8048a6dd07ed0f9d6f00f3c94ec03333c",
+    "result_file_sha256": "943cba8031561a23aef795541d1f07aebb9769886817871596317a6b4289095b",
+    "aclgraph_shape_fallbacks": 0,
+    "aclgraph_capacity_fallbacks": 0,
+    "mc2_fallbacks": 0,
+    "mc2_exceptions": 0,
+    "mc2_profile_sha256": "88d70b00fdbc8cc3c2ca8de24ca3d4c4109a8e3be7f43722883a82c2304b0830",
+    "class_results": {
+      "tight": {"attained": 88, "total": 271, "mean_paper_tpot_ms": 43.73621314050147},
+      "normal": {"attained": 96, "total": 96, "mean_paper_tpot_ms": 35.6620240612718},
+      "loose": {"attained": 96, "total": 96, "mean_paper_tpot_ms": 55.42757500196179}
+    },
+    "portable_evidence_relative_path": "root/data/nano-pearl-benchmark-results/20260929-specslo-v149-drain-padding-repair-precheck/runs/candidate-on-v149-drain-padding-repair-target457-r1/result.json"
+  },
+  "ratios": {
+    "candidate_raw_over_baseline": 0.996721238966311,
+    "candidate_paper_goodput_over_baseline": 1.4535518068258704,
+    "candidate_attainment_over_baseline": 1.4583333333333333,
+    "attainment_percentage_point_gain": 19.00647948164147
+  },
+  "separate_device_overlap_evidence": {
+    "target_window_coverage_percent": [77.51, 77.30, 77.08],
+    "source_document": "docs/specslo_optimization_resume_20260928_zh.md",
+    "note": "This profiling evidence is a separate v149 run, not the profiler-disabled best candidate run."
+  },
+  "reproduction_acceptance": {
+    "exact_contract": [
+      "same workload SHA256",
+      "same models or exact CORE_MODEL_SHA256SUMS",
+      "463 requests and 118528 requested/output tokens",
+      "zero graph shape/capacity fallback",
+      "zero MC2 fallback/exception",
+      "candidate draft TP1 plus target TP3 and baseline target TP4 on the same four physical NPUs"
+    ],
+    "checkpoint_performance_tolerance": "Each Raw/Goodput value within +/-3%; Goodput ratio should remain at least 1.40x for a close checkpoint reproduction.",
+    "project_formal_gate_not_yet_met_by_this_checkpoint": "Every one of three interleaved rounds must have candidate Raw > baseline Raw and candidate paper Goodput >= 1.3x baseline."
+  }
+}
