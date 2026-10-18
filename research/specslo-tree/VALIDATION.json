@@ -1,0 +1,12 @@
+{
+  "schema": "SpecSLO-Tree-source-save-checks-v1",
+  "source_files_sha256_verified": 2040,
+  "python_sources_syntax_passed": 1670,
+  "bash_scripts_syntax_passed": 151,
+  "credential_pattern_hits": 0,
+  "NPU_used_for_snapshot_checks": false,
+  "whole_repository_format_check": "Unavailable: pre-commit not installed; environment unchanged",
+  "git_diff_check": "Historical frozen source has whitespace findings; source bytes deliberately preserved",
+  "full_workload_qualification_inherited_by_new_prototypes": false,
+  "performance_goal_achieved": false
+}

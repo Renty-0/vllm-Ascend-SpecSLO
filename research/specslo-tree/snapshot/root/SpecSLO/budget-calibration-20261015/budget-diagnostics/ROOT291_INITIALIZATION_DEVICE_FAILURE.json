@@ -1,0 +1,13 @@
+{
+  "UTC": "2026-10-18T22:47:28.486743+00:00",
+  "status": "terminal_failed_initialization_no_math_or_cost",
+  "tag": "span-prefix-dual-cache-root-v291-B1to8-408-math-paired-cost-v1",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-span-prefix-dual-cache-root-v291-B1to8-408-math-paired-cost-v1.json",
+  "source_unchanged": true,
+  "owned_remaining": [],
+  "error": "Unindexed engine npu device compares unequal to indexed actual cache tensors in strict PrefixCopies constructor",
+  "HOST_regression": "actual torch.device mismatch reproduced;8valid and5invalid concrete-device controls pass in new296",
+  "original_frozen291_untouched": true,
+  "Goodput": null,
+  "adopted": false
+}

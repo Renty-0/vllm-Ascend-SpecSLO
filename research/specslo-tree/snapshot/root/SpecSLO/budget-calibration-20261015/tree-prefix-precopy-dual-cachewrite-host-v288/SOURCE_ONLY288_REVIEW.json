@@ -1,0 +1,18 @@
+{
+  "UTC": "2026-10-18T21:13:37.318014+00:00",
+  "status": "HOST_actual_metadata70cases_and560payload_comparisons_passed_Triton_source_only",
+  "runtime_installed": false,
+  "NPU_used": false,
+  "kernel_compiled": false,
+  "model_math_qualified": false,
+  "Goodput": null,
+  "next": [
+    "isolated raw-bit and strided dual-write operator probe after current full ends",
+    "actual all64 layer graph integration with unchanged Q5/masks/cache geometry",
+    "fresh408 target math against independent own-prefix references",
+    "complete463 independent ownAR and original publication metrics"
+  ],
+  "concrete_HOST_proof": "split288.py preserves exact final cache words for70 actual Native padded batches, allpage-boundaries andB5..8; current rows and committed history separated",
+  "mathematical_changes": false,
+  "precision_changes": false
+}

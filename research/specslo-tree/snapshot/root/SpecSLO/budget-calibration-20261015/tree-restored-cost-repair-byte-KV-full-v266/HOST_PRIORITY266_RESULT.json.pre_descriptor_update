@@ -1,0 +1,45 @@
+{
+  "status": "HOST_actual_controller_SLO_first_and_truthful_live_counter_passed",
+  "original_gap_first_selected": [
+    4,
+    5
+  ],
+  "new_SLO_first_selected": [
+    0,
+    1
+  ],
+  "whole_ready_tickets_preserved": true,
+  "verification_budget8_preserved": true,
+  "real_original_controller_executed": true,
+  "live_projection": {
+    "original_source_sha256": "89303eadf7753d9a0482a24d6fa0613c482b5a50a8c979a3bc1aec5ef3e4095c",
+    "projected_source_sha256": "34ec2daba8ecd2306513484a78f53557182c67bad2d8a818597eae420eb8e2b1",
+    "effective_target_requests": 24,
+    "effective_verification_candidates": 96,
+    "original_target_query_limit": 128,
+    "original_global_selected_draft_limit": 192,
+    "active_cap": 48,
+    "KV_pages": 544,
+    "reserved_private_pages": 64,
+    "request_order_and_priority_preserved": true,
+    "pending_requests_never_dropped": true,
+    "Native_flags_assigned": false,
+    "original_environment_target_SLO_first": false,
+    "actual_LIVE_target_SLO_first": true,
+    "truthful_actual_policy_counter": 1,
+    "only_LIVE_policy_and_counter_changed": false,
+    "whole_ticket_budget_and_native_maths_unchanged": false,
+    "ROOT266_LIVE_source_sha256": "34ec2daba8ecd2306513484a78f53557182c67bad2d8a818597eae420eb8e2b1",
+    "original_typed_allocator_gain_need_priority_and_charges_retained": true,
+    "primary_plus_side_groups_limit": 24,
+    "spare_B5_owners_selected_by_priority_and_positive_gain": true,
+    "target_whole_ticket_group_budget": true,
+    "original_physical_M120_S24_KV2560_unchanged": true,
+    "previous257_policy_projection_source_sha256": "51dca154ef61800e83e286d882744a6314ff5f92f87ea494b917c975a94ba995",
+    "native_model_maths_unchanged": true,
+    "whole_ticket_integrity_and_C96_global192_preserved": true,
+    "LIVE_per_owner_caps_and_target_group_selection_changed": true
+  },
+  "NPU_used": false,
+  "original_controller_source_sha256": "8bedd1cc21452b190e8bb95f0cad03c3ab0487b32f28011fe8412f45375f175f"
+}

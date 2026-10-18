@@ -1,0 +1,23 @@
+{
+  "status": "HOST_original_Native_verdicts_request_conditional_censoring_and_phase_adaptation_passed",
+  "legal_path_cases": 44,
+  "original_verifier_executed": true,
+  "easy_g4": 4.76738745889821,
+  "easy_g8": 4.969438249504543,
+  "hard_g4": 1.2326125411017888,
+  "hard_g8": 4.718824633964307,
+  "same_class_requests_separated": true,
+  "class_prior_excludes_own_raw_counts": true,
+  "unobserved_continuations_not_failed": true,
+  "within_request_phase_change_g4": [
+    4.876852184122582,
+    1.2884505420044388
+  ],
+  "original_actual_budget_observe_once": true,
+  "terminal_excluded": true,
+  "fresh_reset_and_stale_generation_checked": true,
+  "synthetic_fixture_not_machine_measurement": true,
+  "NPU_used": false,
+  "runtime_installed": false,
+  "Goodput": null
+}

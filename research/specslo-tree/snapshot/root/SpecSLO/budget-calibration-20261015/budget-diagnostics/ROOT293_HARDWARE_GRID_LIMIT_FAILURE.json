@@ -1,0 +1,16 @@
+{
+  "UTC": "2026-10-18T22:28:01.380139+00:00",
+  "status": "rejected_unlaunchable_row_prefix_grid_not_a_numeric_or_speed_result",
+  "tag": "all64-prefix-row-versus-span-native-cache-v293-v1",
+  "operator": "_prefix_all_layers288",
+  "requested_coreDim": 114688,
+  "hardware_max_coreDim": 65535,
+  "actual_error": "EE1003 Invalid_Argument coreDim114688 exceeds65535",
+  "owned_cleanup_complete": true,
+  "all4_idle_at_terminal": true,
+  "sources_unchanged": true,
+  "NPU_numeric_qualification": false,
+  "timing_result": false,
+  "Goodput": null,
+  "next": "295 compares original Native cache write/copy against fixed12x64 span copy +dualwrite; every launch<=65535"
+}

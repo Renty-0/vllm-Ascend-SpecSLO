@@ -1,0 +1,13 @@
+{
+  "UTC": "2026-10-18T21:19:39.137082+00:00",
+  "status": "HOST_actual_allocator32cases_passed_source_only",
+  "delta": "per-owner branch eligibility count limited by spare C96 candidate space and24 target groups after reserving4 nodes for every prospective normal owner",
+  "original_bound_repair_state_cells_preserved": true,
+  "original_priority_and_global192_limits_preserved": true,
+  "reason": "oldpositive-gain-only cap8 allocation can grant12 B8 and defer12 owners when24 B4 owners fit; new cap preserves all24 in this HOST fixture",
+  "HOST_fixture_not_machine_result": true,
+  "ROI_gate_not_implemented": true,
+  "runtime_installed": false,
+  "NPU_used": false,
+  "Goodput": null
+}

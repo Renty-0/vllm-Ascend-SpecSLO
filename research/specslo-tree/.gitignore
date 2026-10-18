@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+*.tar.gz
+*.safetensors
+*.pt
+*.pth
+*.bin
+actual/
+triton-cache/
+ROOT_private_plot_tool_v1/

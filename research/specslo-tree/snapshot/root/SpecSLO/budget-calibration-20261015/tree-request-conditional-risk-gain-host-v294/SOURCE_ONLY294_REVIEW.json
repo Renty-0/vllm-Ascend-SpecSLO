@@ -1,0 +1,22 @@
+{
+  "UTC": "2026-10-18T21:40:50.433482+00:00",
+  "status": "HOST44_original_Native_paths_and_request_specific_model_controls_passed_unfrozen",
+  "change": "all8 conditional hazards, per-request recentcounts with other-request class prior; false censored failures excluded",
+  "hyperparameters": {
+    "class_prior_samples": 12,
+    "request_prior_samples": 2,
+    "recent_decay": 0.96875
+  },
+  "hyperparameters_empirically_validated": false,
+  "phase_adaptation_test_synthetic_only": true,
+  "original_actual_budget_observe_once": true,
+  "original_global_candidate_accounting_unchanged": true,
+  "NPU_used": false,
+  "runtime_installed": false,
+  "actual_machine_g_measured": false,
+  "Goodput": null,
+  "pending": [
+    "causal LIVE integration after kernel291 math gates",
+    "class-only versus request-aware real full463 and independent ownAR"
+  ]
+}

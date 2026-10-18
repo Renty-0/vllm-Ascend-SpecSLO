@@ -1,0 +1,1096 @@
+{
+  "status": "HOST_actual_Native_physical120_split_copy_and_cache_write_equivalence_passed",
+  "cases": [
+    {
+      "prefix": 0,
+      "budgets": [
+        5
+      ],
+      "prefix_copies": 0,
+      "current_aliases": 2,
+      "original_copies": 2
+    },
+    {
+      "prefix": 0,
+      "budgets": [
+        6
+      ],
+      "prefix_copies": 0,
+      "current_aliases": 3,
+      "original_copies": 3
+    },
+    {
+      "prefix": 0,
+      "budgets": [
+        7
+      ],
+      "prefix_copies": 0,
+      "current_aliases": 4,
+      "original_copies": 4
+    },
+    {
+      "prefix": 0,
+      "budgets": [
+        8
+      ],
+      "prefix_copies": 0,
+      "current_aliases": 5,
+      "original_copies": 5
+    },
+    {
+      "prefix": 0,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "prefix_copies": 1397,
+      "current_aliases": 60,
+      "original_copies": 1457
+    },
+    {
+      "prefix": 0,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 889,
+      "current_aliases": 40,
+      "original_copies": 929
+    },
+    {
+      "prefix": 0,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 381,
+      "current_aliases": 8,
+      "original_copies": 389
+    },
+    {
+      "prefix": 1,
+      "budgets": [
+        5
+      ],
+      "prefix_copies": 1,
+      "current_aliases": 2,
+      "original_copies": 3
+    },
+    {
+      "prefix": 1,
+      "budgets": [
+        6
+      ],
+      "prefix_copies": 1,
+      "current_aliases": 3,
+      "original_copies": 4
+    },
+    {
+      "prefix": 1,
+      "budgets": [
+        7
+      ],
+      "prefix_copies": 1,
+      "current_aliases": 4,
+      "original_copies": 5
+    },
+    {
+      "prefix": 1,
+      "budgets": [
+        8
+      ],
+      "prefix_copies": 1,
+      "current_aliases": 5,
+      "original_copies": 6
+    },
+    {
+      "prefix": 1,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "prefix_copies": 1398,
+      "current_aliases": 60,
+      "original_copies": 1458
+    },
+    {
+      "prefix": 1,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 890,
+      "current_aliases": 40,
+      "original_copies": 930
+    },
+    {
+      "prefix": 1,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 382,
+      "current_aliases": 8,
+      "original_copies": 390
+    },
+    {
+      "prefix": 123,
+      "budgets": [
+        5
+      ],
+      "prefix_copies": 123,
+      "current_aliases": 2,
+      "original_copies": 125
+    },
+    {
+      "prefix": 123,
+      "budgets": [
+        6
+      ],
+      "prefix_copies": 123,
+      "current_aliases": 3,
+      "original_copies": 126
+    },
+    {
+      "prefix": 123,
+      "budgets": [
+        7
+      ],
+      "prefix_copies": 123,
+      "current_aliases": 4,
+      "original_copies": 127
+    },
+    {
+      "prefix": 123,
+      "budgets": [
+        8
+      ],
+      "prefix_copies": 123,
+      "current_aliases": 5,
+      "original_copies": 128
+    },
+    {
+      "prefix": 123,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "prefix_copies": 1520,
+      "current_aliases": 60,
+      "original_copies": 1580
+    },
+    {
+      "prefix": 123,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 1012,
+      "current_aliases": 40,
+      "original_copies": 1052
+    },
+    {
+      "prefix": 123,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 504,
+      "current_aliases": 8,
+      "original_copies": 512
+    },
+    {
+      "prefix": 124,
+      "budgets": [
+        5
+      ],
+      "prefix_copies": 124,
+      "current_aliases": 2,
+      "original_copies": 126
+    },
+    {
+      "prefix": 124,
+      "budgets": [
+        6
+      ],
+      "prefix_copies": 124,
+      "current_aliases": 3,
+      "original_copies": 127
+    },
+    {
+      "prefix": 124,
+      "budgets": [
+        7
+      ],
+      "prefix_copies": 124,
+      "current_aliases": 4,
+      "original_copies": 128
+    },
+    {
+      "prefix": 124,
+      "budgets": [
+        8
+      ],
+      "prefix_copies": 124,
+      "current_aliases": 5,
+      "original_copies": 129
+    },
+    {
+      "prefix": 124,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "prefix_copies": 1521,
+      "current_aliases": 60,
+      "original_copies": 1581
+    },
+    {
+      "prefix": 124,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 1013,
+      "current_aliases": 40,
+      "original_copies": 1053
+    },
+    {
+      "prefix": 124,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 505,
+      "current_aliases": 8,
+      "original_copies": 513
+    },
+    {
+      "prefix": 125,
+      "budgets": [
+        5
+      ],
+      "prefix_copies": 125,
+      "current_aliases": 2,
+      "original_copies": 127
+    },
+    {
+      "prefix": 125,
+      "budgets": [
+        6
+      ],
+      "prefix_copies": 125,
+      "current_aliases": 3,
+      "original_copies": 128
+    },
+    {
+      "prefix": 125,
+      "budgets": [
+        7
+      ],
+      "prefix_copies": 125,
+      "current_aliases": 4,
+      "original_copies": 129
+    },
+    {
+      "prefix": 125,
+      "budgets": [
+        8
+      ],
+      "prefix_copies": 125,
+      "current_aliases": 5,
+      "original_copies": 130
+    },
+    {
+      "prefix": 125,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "prefix_copies": 1522,
+      "current_aliases": 60,
+      "original_copies": 1582
+    },
+    {
+      "prefix": 125,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 1014,
+      "current_aliases": 40,
+      "original_copies": 1054
+    },
+    {
+      "prefix": 125,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 506,
+      "current_aliases": 8,
+      "original_copies": 514
+    },
+    {
+      "prefix": 126,
+      "budgets": [
+        5
+      ],
+      "prefix_copies": 126,
+      "current_aliases": 2,
+      "original_copies": 128
+    },
+    {
+      "prefix": 126,
+      "budgets": [
+        6
+      ],
+      "prefix_copies": 126,
+      "current_aliases": 3,
+      "original_copies": 129
+    },
+    {
+      "prefix": 126,
+      "budgets": [
+        7
+      ],
+      "prefix_copies": 126,
+      "current_aliases": 4,
+      "original_copies": 130
+    },
+    {
+      "prefix": 126,
+      "budgets": [
+        8
+      ],
+      "prefix_copies": 126,
+      "current_aliases": 5,
+      "original_copies": 131
+    },
+    {
+      "prefix": 126,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "prefix_copies": 1523,
+      "current_aliases": 60,
+      "original_copies": 1583
+    },
+    {
+      "prefix": 126,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 1015,
+      "current_aliases": 40,
+      "original_copies": 1055
+    },
+    {
+      "prefix": 126,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 507,
+      "current_aliases": 8,
+      "original_copies": 515
+    },
+    {
+      "prefix": 127,
+      "budgets": [
+        5
+      ],
+      "prefix_copies": 127,
+      "current_aliases": 2,
+      "original_copies": 129
+    },
+    {
+      "prefix": 127,
+      "budgets": [
+        6
+      ],
+      "prefix_copies": 127,
+      "current_aliases": 3,
+      "original_copies": 130
+    },
+    {
+      "prefix": 127,
+      "budgets": [
+        7
+      ],
+      "prefix_copies": 127,
+      "current_aliases": 4,
+      "original_copies": 131
+    },
+    {
+      "prefix": 127,
+      "budgets": [
+        8
+      ],
+      "prefix_copies": 127,
+      "current_aliases": 5,
+      "original_copies": 132
+    },
+    {
+      "prefix": 127,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "prefix_copies": 1524,
+      "current_aliases": 60,
+      "original_copies": 1584
+    },
+    {
+      "prefix": 127,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 1016,
+      "current_aliases": 40,
+      "original_copies": 1056
+    },
+    {
+      "prefix": 127,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 508,
+      "current_aliases": 8,
+      "original_copies": 516
+    },
+    {
+      "prefix": 128,
+      "budgets": [
+        5
+      ],
+      "prefix_copies": 0,
+      "current_aliases": 2,
+      "original_copies": 2
+    },
+    {
+      "prefix": 128,
+      "budgets": [
+        6
+      ],
+      "prefix_copies": 0,
+      "current_aliases": 3,
+      "original_copies": 3
+    },
+    {
+      "prefix": 128,
+      "budgets": [
+        7
+      ],
+      "prefix_copies": 0,
+      "current_aliases": 4,
+      "original_copies": 4
+    },
+    {
+      "prefix": 128,
+      "budgets": [
+        8
+      ],
+      "prefix_copies": 0,
+      "current_aliases": 5,
+      "original_copies": 5
+    },
+    {
+      "prefix": 128,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "prefix_copies": 1397,
+      "current_aliases": 60,
+      "original_copies": 1457
+    },
+    {
+      "prefix": 128,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 889,
+      "current_aliases": 40,
+      "original_copies": 929
+    },
+    {
+      "prefix": 128,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 381,
+      "current_aliases": 8,
+      "original_copies": 389
+    },
+    {
+      "prefix": 1505,
+      "budgets": [
+        5
+      ],
+      "prefix_copies": 97,
+      "current_aliases": 2,
+      "original_copies": 99
+    },
+    {
+      "prefix": 1505,
+      "budgets": [
+        6
+      ],
+      "prefix_copies": 97,
+      "current_aliases": 3,
+      "original_copies": 100
+    },
+    {
+      "prefix": 1505,
+      "budgets": [
+        7
+      ],
+      "prefix_copies": 97,
+      "current_aliases": 4,
+      "original_copies": 101
+    },
+    {
+      "prefix": 1505,
+      "budgets": [
+        8
+      ],
+      "prefix_copies": 97,
+      "current_aliases": 5,
+      "original_copies": 102
+    },
+    {
+      "prefix": 1505,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "prefix_copies": 1494,
+      "current_aliases": 60,
+      "original_copies": 1554
+    },
+    {
+      "prefix": 1505,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 986,
+      "current_aliases": 40,
+      "original_copies": 1026
+    },
+    {
+      "prefix": 1505,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 478,
+      "current_aliases": 8,
+      "original_copies": 486
+    },
+    {
+      "prefix": 2555,
+      "budgets": [
+        5
+      ],
+      "prefix_copies": 123,
+      "current_aliases": 2,
+      "original_copies": 125
+    },
+    {
+      "prefix": 2555,
+      "budgets": [
+        6
+      ],
+      "prefix_copies": 123,
+      "current_aliases": 3,
+      "original_copies": 126
+    },
+    {
+      "prefix": 2555,
+      "budgets": [
+        7
+      ],
+      "prefix_copies": 123,
+      "current_aliases": 4,
+      "original_copies": 127
+    },
+    {
+      "prefix": 2555,
+      "budgets": [
+        8
+      ],
+      "prefix_copies": 123,
+      "current_aliases": 5,
+      "original_copies": 128
+    },
+    {
+      "prefix": 2555,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8
+      ],
+      "prefix_copies": 1520,
+      "current_aliases": 60,
+      "original_copies": 1580
+    },
+    {
+      "prefix": 2555,
+      "budgets": [
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        8,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 1012,
+      "current_aliases": 40,
+      "original_copies": 1052
+    },
+    {
+      "prefix": 2555,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "prefix_copies": 504,
+      "current_aliases": 8,
+      "original_copies": 512
+    }
+  ],
+  "case_count": 70,
+  "independent_layer_KV_payload_comparisons": 560,
+  "page_crossings_checked": true,
+  "all_touched_cache_words_equal": true,
+  "old_query_order_and_slots_preserved": true,
+  "hypothesis": "one all-layer committed-prefix copy before model; per-layer current cache dual write replaces original cache writer",
+  "Triton_operator_implemented": false,
+  "NPU_used": false,
+  "model_math_qualified": false,
+  "runtime_installed": false,
+  "Goodput": null
+}

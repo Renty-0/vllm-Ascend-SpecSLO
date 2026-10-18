@@ -1,0 +1,70 @@
+{
+  "UTC": "2026-10-18T05:10:33.810766+00:00",
+  "status": "predeclared_plan_only_supervisor_not_implemented",
+  "physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "blocks": [
+    [
+      "fixed_gamma4",
+      "qualified_dynamic_tree",
+      "official_MC2_ON"
+    ],
+    [
+      "official_MC2_ON",
+      "qualified_dynamic_tree",
+      "fixed_gamma4"
+    ],
+    [
+      "fixed_gamma4",
+      "qualified_dynamic_tree",
+      "official_MC2_ON"
+    ]
+  ],
+  "fresh_process_each_cell": true,
+  "requests": 463,
+  "tokens_per_request": 256,
+  "arrival_trace": "original Poisson4 seed0 120s manifest",
+  "SLO_ms": {
+    "tight": 40,
+    "normal": 50,
+    "loose": 150
+  },
+  "paper_TPOT_denominator": 256,
+  "observed_TPOT_denominator": 255,
+  "clock": "actual worker/engine publication first-to-last; include original full generate wall in throughput denominator",
+  "primary_summaries": "all cells and method medians; no fastest-cell selection",
+  "historical_fixed_Goodput": 501.63560407964184,
+  "historical_strong_actual_MC2_Goodput": 429.8442987424407,
+  "historical_strong_1p5_threshold": 644.766448113661,
+  "precondition": "current candidate must first complete all original and new math, warm/twozero/seal/full463, own-AR equality, and independent arithmetic audit; no final run authorized by a HOST-only proof",
+  "selected_candidate": null,
+  "baselines": {
+    "fixed_entry": "/root/SpecSLO/budget-calibration-20261015/final-fixed-gamma4-stream-witness-v1/run.sh",
+    "official_MC2_mapping_entry": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/final-official-tp4-publication-rebind-v2/run.sh",
+    "official_publication_witness": "/root/SpecSLO/budget-calibration-20261015/final-official-publication-witness-v1/run_publication_benchmark.py",
+    "official_instrumented_wrapper_HOST_prepared": {
+      "status": "source_and_HOST15_prepared_device_unrun",
+      "directory": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/final-official-tp4-publication-rebind-v2",
+      "manifest_sha256": "3c03fc5f3ca4348fb94dc31d0701c0a892fefe54ece53f78fa9df28979528936",
+      "archive_sha256": "e0ad778bfc7ea66b144c720b83fe966697a7a3b9b0cee03997cc65c33f759632",
+      "source_members": 13,
+      "real_mapping_and_model_pending": true,
+      "common9_supervisor_pending": true
+    }
+  },
+  "models_and_datasets_public_only": true,
+  "all_new_source_and_results_private": true,
+  "NPU_used": false,
+  "performance_result": false,
+  "preparation_revisions": [
+    {
+      "UTC": "2026-10-18T05:24:43.746020+00:00",
+      "prior_plan_sha256": "8219b3682df8010945c347aaa98cade8e4e217ab2d81b09f91a4ea6ae01805b9",
+      "change": "official baseline entry now combines the prepared actual-card rebind and original raw engine-publication witness; order/thresholds/flags unchanged; no baseline model run yet"
+    }
+  ]
+}
