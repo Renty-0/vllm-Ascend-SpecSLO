@@ -50,6 +50,7 @@ def main():
         'tree-capacity-request-risk-span-full-v299',
         'tree-single-validated-prefix-descriptors-host-v304',
         'tree-single-validated-prefix-prepare-host-v305',
+        'tree-capacity-risk-single-prepare-full-v307',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -78,6 +79,13 @@ def main():
         'ROOT296_INDEPENDENT_TARGET_MATH_AND_COST_AUDIT.json',
         'ROOT296_VS280_HISTORICAL_TARGET_COST.json',
         'build_ROOT305_single_validated_prepare_HOST.py',
+        'build_ROOT307_fast_prepare_full_HOST.py',
+        'freeze_ROOT307_fast_prepare_full_HOST.py',
+        'monitor_ROOT299_readonly_HOST.py',
+        'audit_ROOT299_terminal_full_HOST.py',
+        'ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json',
+        'ROOT299_TERMINAL_GEOMETRY_HOST_REGRESSION.json',
+        'ROOT_NEXT_PERFORMANCE_LEVERS_20261018.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

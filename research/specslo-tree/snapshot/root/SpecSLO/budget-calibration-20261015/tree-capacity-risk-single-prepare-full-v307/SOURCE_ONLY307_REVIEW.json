@@ -1,0 +1,13 @@
+{
+  "status": "SOURCE_ONLY307_fast_prepare_not_frozen_not_NPU_run",
+  "only_serving_delta": "Same capacity/risk policy and raw operators; original map validation once, direct span/alias descriptors and no unused prefix staging",
+  "kernels_and_attention_from_frozen296": true,
+  "models_and_sampler_unchanged": true,
+  "active299_sources_edited": false,
+  "new_model_qualification_inherited": false,
+  "original_startup_408target45draft20followup463ownAR_required": true,
+  "prerequisite": "Finish299 andinspectactualfailures orperformance before scheduling307",
+  "NPU_used": false,
+  "Goodput": null,
+  "adopted": false
+}

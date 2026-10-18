@@ -8,6 +8,14 @@ def sha(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 def need(ok,message):
     if ok is not True:raise ValueError(message)
 
+def require_actual_branching(trace):
+    budgets=[b for call in trace['normal_target_calls'] for b in call['budgets']]
+    need(bool(budgets)and all(type(b)is int and 1<=b<=8 for b in budgets),
+         'actual normal budgets remain inside declared B1..8 domain')
+    need(any(b>4 for b in budgets),
+         'actual real branching was executed, not merely a tree method label')
+    return True
+
 def qualified(receipt,audit,metrics):
     need(receipt['status']=='complete'and receipt['sources_unchanged']is True
          and receipt['devices_after']['all_idle']is True and not receipt['owned_remaining'],
@@ -55,8 +63,7 @@ def select(directory,receipt_path,audit_path,terminal_auditor,output):
     need(audit['source_freeze_sha256']==sha(freeze)and audit['source_archive_sha256']==sha(archive),
          'same complete candidate source as independently audited')
     trace=json.loads(__import__('gzip').decompress(raw.read_bytes()))
-    need(any(5 in c['budgets']for c in trace['normal_target_calls']),
-         'actual real branching was executed, not merely a tree method label')
+    require_actual_branching(trace)
     need(trace['decode_counters']['spec_rhythm_kv_compaction_rows']>0,
          'actual noncontiguous accepted path KV work retained')
     bindings={str(p):sha(p)for p in [freeze,archive,guard,terminal_auditor,receipt_path,audit_path,raw]}

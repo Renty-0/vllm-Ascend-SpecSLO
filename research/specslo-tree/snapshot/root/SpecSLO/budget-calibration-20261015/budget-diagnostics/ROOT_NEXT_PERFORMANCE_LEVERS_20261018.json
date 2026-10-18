@@ -1,0 +1,64 @@
+{
+  "UTC": "2026-10-18T23:27:51.885203+00:00",
+  "status": "future_hypotheses_not_installed_not_NPU_qualified",
+  "active_run": "capacity-risk-span-root-v299-B1to8-full463-ownAR-v1",
+  "levers": [
+    {
+      "priority": 1,
+      "name": "single validated descriptor/prepare",
+      "implementation": "HOST304/305 pass, full307 source-only",
+      "evidence": "Full immutable1792 antiAliasboundscheck retained once; exact aliases/spans equal oldNN296 inputs on417 NativeHOST maps;408 actualpreparecallbacks pass",
+      "HOST_descriptor_ms": {
+        "old": [
+          4.85,
+          6.29
+        ],
+        "new": [
+          1.26,
+          2.18
+        ]
+      },
+      "next": "Finish299; ifbelowgoal runfreshfull307 originalallgates and463ownAR"
+    },
+    {
+      "priority": 2,
+      "name": "cost-aware spare-branch selection",
+      "evidence": "NN296 actual target B8/B4 ratios roughly1.18\u20131.3; positive token gain alone is insufficient. Use per-request risk and measured N/fork costs.",
+      "not_implemented": true,
+      "requirements": [
+        "preserve originalSLO priority andallhardbudgets",
+        "account fortrue alternate3-stepdraft cost andoverlap",
+        "handle cold priors/exploration withoutfuture verdicts",
+        "freshHOST andNNqualification"
+      ]
+    },
+    {
+      "priority": 3,
+      "name": "avoid dominated B6/B7 when costs equivalent",
+      "evidence": "Current live287/299 producer runs3extra draft NN steps for every B>=6; target physicalM120/S24 remainsfixed.",
+      "not_implemented": true,
+      "requirements": [
+        "mustprove completejump choice doesnot violate C96/future96/global192 orrepair/terminalcaps",
+        "checkactualcostdifferences andsameprefixg",
+        "do not confuse selectedcandidate charges withrawNNqueries"
+      ]
+    },
+    {
+      "priority": 4,
+      "name": "KV extent orcausal path specialization",
+      "evidence": "Current tree path usesFULL masks withall24KV lengths2560 andQ5. Native causal FIA supports sparse_mode3 next_tokens0, but current tree usesdifferentmetadata.",
+      "not_implemented": true,
+      "requirements": [
+        "do not truncate context orswitchmaskflags blindly",
+        "examine prompt+output lengthdistribution beforedesigningbuckets",
+        "preserve per-request numerical geometry acrosscandidate andindependentownAR",
+        "explicitnewsource NNcasecoverage andall463ownAR mandatory",
+        "batchutilization andlong-request handling mustbe measured"
+      ]
+    }
+  ],
+  "Goodput_claim": null,
+  "best_clean_tree_GP": 554.7604454409803,
+  "goal_GP_gt": 644.766448113661,
+  "goal_achieved": false
+}

@@ -1,8 +1,8 @@
 {
   "schema": "SpecSLO-Tree-source-save-checks-v1",
-  "source_files_sha256_verified": 2144,
-  "python_sources_syntax_passed": 1750,
-  "bash_scripts_syntax_passed": 153,
+  "source_files_sha256_verified": 2210,
+  "python_sources_syntax_passed": 1797,
+  "bash_scripts_syntax_passed": 155,
   "credential_pattern_hits": 0,
   "NPU_used_for_snapshot_checks": false,
   "whole_repository_format_check": "Unavailable: pre-commit not installed; environment unchanged",
@@ -16,5 +16,8 @@
   "v299_full_workload_validation": "running; no performance qualification inherited",
   "HOST304_mapping_cases": 417,
   "HOST305_actual_prepare_cases": 408,
-  "HOST304_305_NPU_qualification": false
+  "HOST304_305_NPU_qualification": false,
+  "HOST307_integration_suites": 13,
+  "HOST307_NPU_qualification": false,
+  "final_actual_branch_gate": "B5..8 accepted; illegal domain rejected; other eligibility requirements unchanged"
 }

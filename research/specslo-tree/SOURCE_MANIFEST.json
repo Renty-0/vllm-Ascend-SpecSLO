@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-18T23:22:26.738448+00:00",
-  "upstream_branch_base": "3451519587e1cd5192e36199fa59c5f467a126c2",
+  "saved_UTC": "2026-10-18T23:38:04.777881+00:00",
+  "upstream_branch_base": "3243c76285906529f66980ae3acf4fb45597b0df",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -146,10 +146,28 @@
       "bytes": 16336
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT299_TERMINAL_GEOMETRY_HOST_REGRESSION.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT299_TERMINAL_GEOMETRY_HOST_REGRESSION.json",
+      "sha256": "a9fb158cf70c3f40299ce60e9502a7e41af7c2287faef553394221eb26a59448",
+      "bytes": 575
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
+      "sha256": "c61622b98714b6f10d4442fbd088e894566a3543b8949235a35093eeb13fafe9",
+      "bytes": 312
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_THREE_BLOCK_COMPARISON_PREDECLARATION_20261018.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_THREE_BLOCK_COMPARISON_PREDECLARATION_20261018.json",
       "sha256": "5c264b3d47ec6187b6faee48cd2e22f42ffdc295737c2b6d7d2fdc88ab5d1e0a",
       "bytes": 2840
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_NEXT_PERFORMANCE_LEVERS_20261018.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_NEXT_PERFORMANCE_LEVERS_20261018.json",
+      "sha256": "f6f0b04a12c9ac0ee714f5cd934c83d1e698704da49853184b630671a292b502",
+      "bytes": 2639
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ablation229_SOURCE.py",
@@ -198,6 +216,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT296_target_math_and_cost_HOST.py",
       "sha256": "41889d9bd9a53923612c96806006cf20f45d83e9de63113488bc91f5dfa119c4",
       "bytes": 4234
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT299_terminal_full_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT299_terminal_full_HOST.py",
+      "sha256": "a55795b1c3e076657c95476c193fe878bb7155950ed02d6acd5a9bac37acca48",
+      "bytes": 8645
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/baseline233_SOURCE.py",
@@ -278,6 +302,12 @@
       "bytes": 3074
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_ROOT307_fast_prepare_full_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_ROOT307_fast_prepare_full_HOST.py",
+      "sha256": "7d541515e02f8e91fa2d5e8efd7b1c269b79893297561061ba928d6ca9efcdd1",
+      "bytes": 2865
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_v209_role_audit_source.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_v209_role_audit_source.py",
       "sha256": "8b676db14b8a112ba966698a5b35124d04d0e6522f8efafaea6efa2a5adad2bf",
@@ -334,8 +364,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/final_candidate_eligibility.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/final_candidate_eligibility.py",
-      "sha256": "cb4e2baea16ca0debcbbd2e92194bc5c2607a3b11e1dfe2385f1ede4b903b189",
-      "bytes": 4999
+      "sha256": "d4d027b6267c0414780dad9aaf35a1368a6c42a655d69426584ad4782346360f",
+      "bytes": 5282
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/final_common_comparison.py",
@@ -566,6 +596,12 @@
       "bytes": 5762
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT307_fast_prepare_full_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT307_fast_prepare_full_HOST.py",
+      "sha256": "587feb9b9ba95f7b5b432cd1c31c2dfb80e90ee9b4b3575c255f346303afee25",
+      "bytes": 6719
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_deferred259_metadata_probe_HOST.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_deferred259_metadata_probe_HOST.py",
       "sha256": "21900e7a47456a6fb7670fed339ea527c751fbe1661e426dcf3ab23498e845b7",
@@ -582,6 +618,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/install232_SOURCE.py",
       "sha256": "5f640e95b1f4ff3d805425c283b0226155d718d648c604852d2f9e50865bdab8",
       "bytes": 966
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/monitor_ROOT299_readonly_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/monitor_ROOT299_readonly_HOST.py",
+      "sha256": "e101cd4b7d814b8fd214825b561615a613ae1f90d4ef0365bf166d2e601bd029",
+      "bytes": 3004
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/plot_ROOT287_same_prefix_gains_HOST.py",
@@ -694,8 +736,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "2630570d00f1af23a48e9d092b61659cd0c3da5f1f064d09bad8c14aa08509ea",
-      "bytes": 7027
+      "sha256": "d4e4ef91ad3b282c5c94afe0491c6ac005ef44029f9acb7e9b6a2ec2861d97bd",
+      "bytes": 7448
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution/common_guard.py",
@@ -2134,6 +2176,360 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/window299.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/window299.py",
+      "sha256": "10ac72788eb821b20b95d00253fee9f948e4e4a7c42a73bd0a76e354cd6c1d09",
+      "bytes": 949
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_ADMISSION307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_ADMISSION307_RESULT.json",
+      "sha256": "275400ce4f2d91dbccfbbe7ba89d815c3ff2642d6f243fe0f2e05e82a8d44910",
+      "bytes": 4542
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_AUDIT307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_AUDIT307_RESULT.json",
+      "sha256": "c87de6e86f0568e785c495a687d548558e6f968217b4484d4c36664c5f7704b7",
+      "bytes": 393
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_BUDGET307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_BUDGET307_RESULT.json",
+      "sha256": "6fb464938644e88677f942719970f0e88dd497d540c0839b5e66f24d67518b58",
+      "bytes": 6764
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_COST307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_COST307_RESULT.json",
+      "sha256": "1777c6d6a69474f768981dfeedd20dbe0052522db683618c8c9b79a189d7336b",
+      "bytes": 74745
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_EAGER307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_EAGER307_RESULT.json",
+      "sha256": "da086604049fa39aced86de9bbba42e03ee2571b19d955bdc1404d9fb1a01813",
+      "bytes": 1870
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_FAULT307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_FAULT307_RESULT.json",
+      "sha256": "c0e4ab6de9598957214a68c18cff6b509617611a5297748cf97920b34787f869",
+      "bytes": 216
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_FULL307_PROTOCOL_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_FULL307_PROTOCOL_RESULT.json",
+      "sha256": "cf6d5f97be163927779bcb238d4f5312b48256760b45522a2bf3eabf3a128d24",
+      "bytes": 414134
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_LAUNCH307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_LAUNCH307_RESULT.json",
+      "sha256": "ab58517b5631101973c3dcb9b363627653669f4538792f9d3a277a1f56453360",
+      "bytes": 332
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_LIVE307_POST_SNAPSHOT_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_LIVE307_POST_SNAPSHOT_RESULT.json",
+      "sha256": "6e7b4a0cb66df91f36c31acafeb3a83e91e981a73710b428402c19fd464d5943",
+      "bytes": 774
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_PLANS307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_PLANS307_RESULT.json",
+      "sha256": "caae317d04db56c130f5ed94af4e12cf44d692dac0794744ce48ee5e6be23a4e",
+      "bytes": 5337
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_PRIORITY307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_PRIORITY307_RESULT.json",
+      "sha256": "033248ca02b2691b863ed85852a1a454c63b18fef7ffe0aec375fdb767941288",
+      "bytes": 2539
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_RISK_ALLOCATION307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_RISK_ALLOCATION307_RESULT.json",
+      "sha256": "0744e9360f7f84723218e523146ab084184ead724f07a2ed1707700d197c553b",
+      "bytes": 1596
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_SNAPSHOT307_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/HOST_SNAPSHOT307_RESULT.json",
+      "sha256": "07dfd1a54a8f25b6fc005b2015678c7397b28f9e9228f2939d5f3cd369a5b75d",
+      "bytes": 201
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/SOURCE_ONLY307_REVIEW.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/SOURCE_ONLY307_REVIEW.json",
+      "sha256": "ffbfcbcff4458f3d5b1439e7b7463a04d1e1bff4b49acbfed8901ebb06e51690",
+      "bytes": 624
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/audit307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/audit307.py",
+      "sha256": "22c5aa5f65fccef554531d2eac856ef6e0b95bdfc54ec0159398def10bcd06ef",
+      "bytes": 10137
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/audit_domain307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/audit_domain307.py",
+      "sha256": "d398f87f80b6c310987a34d976fa68d931a7bfbd617e3d3252f4250fe4ae47fb",
+      "bytes": 1659
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/audit_reference307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/audit_reference307.py",
+      "sha256": "d2f4858118dc5ce0be1aefb271a2ceed8d8b0b8b8fbd0e90e6c8e254132753e7",
+      "bytes": 11856
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/audit_static_calls307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/audit_static_calls307.py",
+      "sha256": "2c7816733006735c886857c8747ee02e8b70becd7b6406680005054974147266",
+      "bytes": 103
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/bank307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/bank307.py",
+      "sha256": "aaaaedf499fc4fa0e3cab4d9d46c6d58d12974c55084cc82efdb75821ac933b7",
+      "bytes": 103
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/baseline307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/baseline307.py",
+      "sha256": "81e98a5adcbbe18fa3f64fde38bc4aabd15415385d4770c5683cb3d745b417ed",
+      "bytes": 100
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/budget307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/budget307.py",
+      "sha256": "44935433a545b6f1992711f84a98ccaef9facf56b8e3e4e11e104783b0e05588",
+      "bytes": 97
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check307.py",
+      "sha256": "72245c876c9e895e35ea4325c74b2b7c6d50dd4e74778c532f529783bc7d452e",
+      "bytes": 2872
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_admission307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_admission307_HOST.py",
+      "sha256": "712bd61a0c68333b4eaf35cd4f3d4021c991b2703e95052621ffcb217c2e6718",
+      "bytes": 4718
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_audit307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_audit307_HOST.py",
+      "sha256": "78a4df455404645ef55637433a4dfa40d7bb33991100769a093430872883479e",
+      "bytes": 1919
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_budget307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_budget307_HOST.py",
+      "sha256": "c0580b4d1591ec9f8fa8bf3d07df1afdf5509d42b74b07591c0ca352c919c8c7",
+      "bytes": 5908
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_cost307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_cost307_HOST.py",
+      "sha256": "7299d90c7b7f7658840d453e58074e440fb00044dc6c37b524f26104505ae056",
+      "bytes": 6149
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_eager307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_eager307_HOST.py",
+      "sha256": "02ab36c38e25b29688fae397dedc54c0fb1137109a86918438cef655a9e4dcbc",
+      "bytes": 4593
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_fault307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_fault307_HOST.py",
+      "sha256": "87cdac7fe8843bcf1f891bf24cec17a55638a7dec2ab27ed5018ceda120b9994",
+      "bytes": 1467
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_full307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_full307_HOST.py",
+      "sha256": "eea1a723907c51f4b630d795ff6827b26525079c7c9e970084259535180d41c8",
+      "bytes": 3971
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_launch307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_launch307_HOST.py",
+      "sha256": "1f9388488d987bdcf3bd2ce1640d2a174de88b8b19cc6c7a3c7571753c83dc0c",
+      "bytes": 1745
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_live307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_live307_HOST.py",
+      "sha256": "921080a96dc7c5127187562c559c614509b8d859ce3895a3bb2428cc691e1092",
+      "bytes": 4902
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_plans307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_plans307_HOST.py",
+      "sha256": "738eb2cf67d8b4470775c2e6afd89adbb7a3a01e340c721a3a5d4e29b34ba739",
+      "bytes": 2493
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_prepare307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_prepare307_HOST.py",
+      "sha256": "fa61cfd0204a7d55291fc90140ab52bff60ddf275b399b4263ac569904b49d17",
+      "bytes": 147
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_priority307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_priority307_HOST.py",
+      "sha256": "972d0dcaf9006017abdfc11e27469544264ae3207695e56a5d14575fbd8c574a",
+      "bytes": 3329
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_risk_allocation307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_risk_allocation307_HOST.py",
+      "sha256": "fa77dd70764feb71da24c7429c055c29fce9eab126e09ff3c91857c3ad4d986b",
+      "bytes": 3511
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_snapshot307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/check_snapshot307_HOST.py",
+      "sha256": "9a1a065c4f4ffb9700d6488829e02ea3d6cbd8234264714175434eb92eeb6270",
+      "bytes": 2291
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/debug_snapshot307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/debug_snapshot307.py",
+      "sha256": "a2dce8db63d30ca34e52cba2379a4ab318dca42549d6e213a674978517a296f4",
+      "bytes": 1208
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/empty307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/empty307.py",
+      "sha256": "3eeead19c299945fd00030369c987662f41b11bfb2eb221ca98b7a3ee65cffd9",
+      "bytes": 2889
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/extension307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/extension307.py",
+      "sha256": "2376aa5a104a7f011977521700596a7845dcece31acdef01454270d08a367c9b",
+      "bytes": 8895
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/fault_handler307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/fault_handler307.py",
+      "sha256": "0f3f60a0b091727dc245a3e8ac53a13cae5e9159f153228f5dae383f5e2a16ac",
+      "bytes": 1077
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/frames307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/frames307.py",
+      "sha256": "0caba8fd984f1a0e0cf22e85eedd3605c359972ab0e03a279c1e5d68665261d7",
+      "bytes": 98
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/generation307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/generation307.py",
+      "sha256": "e1fcc01161d35c0b7c0c315cda953101b648391e024aadbb4dd565381398ce97",
+      "bytes": 6995
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/guard307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/guard307.py",
+      "sha256": "a9ed3f71c0622bd934ab85701cf61a7a6934f1b2a949bd43fef8f71e49a19fa7",
+      "bytes": 8244
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/launch307.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/launch307.sh",
+      "sha256": "701de27da67c2d1c3e1b16d3c28ea5defee335637575962950e54fa2e89177a3",
+      "bytes": 1260
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/live307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/live307.py",
+      "sha256": "6085e70adc0c27adffc3929ff0adb3a399def3982d57d2dcae2e5ba5037af794",
+      "bytes": 5722
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/mapper307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/mapper307.py",
+      "sha256": "20aa0a98ca0883ae336bb3ced43f5f41ffedd63ee8e2962e60b741c3dbe2999e",
+      "bytes": 101
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/metadata307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/metadata307.py",
+      "sha256": "e4ba41253d437f2c60c878e139b4e054db589360c3e304e2babce512cc383560",
+      "bytes": 100
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/oracle307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/oracle307.py",
+      "sha256": "a242a812f0ff82705c342771855b5997a5c6b7845ff8685ef271f5db1368ad45",
+      "bytes": 89
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/plans307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/plans307.py",
+      "sha256": "bccbb71602beab4d755509b4c65d97d95cbbbf5c311fe17d264c4a2cc951b1ff",
+      "bytes": 2141
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/reference307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/reference307.py",
+      "sha256": "fece2e3ff99f660fa83628851e33903c0970b09394c61a2bf4c672a075bbcf49",
+      "bytes": 4352
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/reference_schedule307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/reference_schedule307.py",
+      "sha256": "36715f99e4f393a8663c16f5439c8d2b236e00d19283193fc25ab22a0233e8a9",
+      "bytes": 110
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/risk307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/risk307.py",
+      "sha256": "b7169ec0424d38d2414f8f51a21475279ba0bd567efa918343fb72473dafc24f",
+      "bytes": 3721
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/runtime307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/runtime307.py",
+      "sha256": "b4985a8bc7405dc1a38ab28568f6f84d88c6c449eec7a01f7b25afef4293465c",
+      "bytes": 7059
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/scope307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/scope307.py",
+      "sha256": "d950114baac942ef6d892ab47a68389113a33a0579813fc766b6bcba6d8356e9",
+      "bytes": 7590
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/source307_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/source307_HOST.py",
+      "sha256": "623b5243b1803dd9a9d5856cf8e736c844774488bed0d9461b98963b5fe59088",
+      "bytes": 664
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/startup307.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/startup307.sh",
+      "sha256": "5ec578f9b879c041d42ca8685817c1c1161826249a99fcd16a90bdf4cc612b26",
+      "bytes": 7559
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/static_state307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/static_state307.py",
+      "sha256": "6ac567db2c53d5f8f648b6c4314080991d1713962389a9339b443fb53ff65a69",
+      "bytes": 170
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/trace307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/trace307.py",
+      "sha256": "de0d3b7dff6933f452c4ac4aad1c8985aad9c5c252483958fadb0a4707636690",
+      "bytes": 2553
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/window307.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-risk-single-prepare-full-v307/window307.py",
       "sha256": "10ac72788eb821b20b95d00253fee9f948e4e4a7c42a73bd0a76e354cd6c1d09",
       "bytes": 949
     },

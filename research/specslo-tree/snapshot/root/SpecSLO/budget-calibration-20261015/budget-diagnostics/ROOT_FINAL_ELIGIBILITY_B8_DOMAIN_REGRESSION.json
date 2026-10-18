@@ -1,0 +1,9 @@
+{
+  "status": "HOST_final_eligibility_actual_branch_B5to8_and_invalid_domain_controls_passed",
+  "positive_cases": 5,
+  "negative_cases": 4,
+  "exactB5_no_longer_required": true,
+  "all463_ownAR_GP_floors_and_compaction_gates_unchanged": true,
+  "active299_source_closure_unchanged": true,
+  "NPU_used": false
+}

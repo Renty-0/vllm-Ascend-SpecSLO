@@ -1,0 +1,14 @@
+{
+  "status": "HOST_terminal299_declared_B8_geometry_matches_prior_real_raw_calls",
+  "real_calls_checked": 2795,
+  "rejected_invalid_cases": [
+    "B9",
+    "wrongQ",
+    "too_many_groups",
+    "bool_budget"
+  ],
+  "prior_raw_source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/dynamic-root-alternate-root-v287-eager3-compatible-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+  "current299_full_result_inferred": false,
+  "old_receipt_or_data_edited": false,
+  "NPU_used": false
+}
