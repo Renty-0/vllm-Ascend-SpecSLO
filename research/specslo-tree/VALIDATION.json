@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-save-checks-v1",
-  "source_files_sha256_verified": 2130,
-  "python_sources_syntax_passed": 1744,
+  "source_files_sha256_verified": 2137,
+  "python_sources_syntax_passed": 1745,
   "bash_scripts_syntax_passed": 153,
   "credential_pattern_hits": 0,
   "NPU_used_for_snapshot_checks": false,
@@ -10,5 +10,8 @@
   "full_workload_qualification_inherited_by_new_prototypes": false,
   "performance_goal_achieved": false,
   "companion_core_modified_files": 14,
-  "core_modified_sources_equal_frozen_runtime": true
+  "core_modified_sources_equal_frozen_runtime": true,
+  "v296_target_numeric_408_per3targets": true,
+  "v296_paired_cost_11config20rotations": true,
+  "v299_full_workload_validation": "running; no performance qualification inherited"
 }

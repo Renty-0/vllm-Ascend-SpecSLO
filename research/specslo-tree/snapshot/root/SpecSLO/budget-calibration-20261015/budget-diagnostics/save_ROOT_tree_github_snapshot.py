@@ -15,6 +15,7 @@ SOURCES = (
     ('tree-all-layer-prefix-dual-cache-target-cost-v291', 291),
     ('tree-safe-grid-span-dual-cache-probe-v295', 295),
     ('tree-concrete-device-span-dual-cache-target-cost-v296', 296),
+    ('tree-capacity-request-risk-span-full-v299', 299),
 )
 
 
@@ -72,6 +73,8 @@ def main():
         'build_ROOT299_capacity_risk_span_full_HOST.py',
         'freeze_ROOT299_capacity_risk_span_full_HOST.py',
         'save_ROOT_tree_github_snapshot.py',
+        'ROOT296_INDEPENDENT_TARGET_MATH_AND_COST_AUDIT.json',
+        'ROOT296_VS280_HISTORICAL_TARGET_COST.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

@@ -15,4 +15,4 @@ exec /usr/bin/env -i HOME=/root USER=root LOGNAME=root SHELL=/bin/bash LANG=C.UT
   SPECSLO_V299_ROOT_FREEZE_SHA="${SPECSLO_V299_ROOT_FREEZE_SHA:?explicit ROOT299 freeze required}" \
   SPECSLO_V218_ROOT_FREEZE_SHA=fa58f2866e8fed383e2d1ed1103b2fcb72a731aab3d65060e3a7c3e350a4d260 \
   /bin/bash /root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh \
-  /bin/bash "/root/SpecSLO/budget-calibration-20261015/tree-dynamic-root-alternate-paired-prefix-grid-full-v299/startup299.sh" "$@"
+  /bin/bash "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/startup299.sh" "$@"

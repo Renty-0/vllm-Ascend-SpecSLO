@@ -22,7 +22,9 @@ def main():
         if source.suffix == '.json':
             target.write_bytes(source.read_bytes())
         else:
-            target.write_text(source.read_text().replace(OLD.name, P.name).replace('287', '299'))
+            target.write_text(source.read_text()
+                              .replace('tree-dynamic-root-alternate-paired-prefix-grid-full-v287', P.name)
+                              .replace(OLD.name, P.name).replace('287', '299'))
     paths = [B / name for name in (
         'tree-concrete-device-span-dual-cache-target-cost-v296',
         'tree-spare-capacity-budget-host-v290',

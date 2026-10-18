@@ -30,7 +30,8 @@ def main():
                 'HOST_PRIORITY299_RESULT.json', 'HOST_ADMISSION299_RESULT.json',
                 'HOST_LIVE299_POST_SNAPSHOT_RESULT.json', 'HOST_FAULT299_RESULT.json',
                 'HOST_SNAPSHOT299_RESULT.json', 'HOST_EAGER299_RESULT.json',
-                'HOST_AUDIT299_RESULT.json', 'HOST_RISK_ALLOCATION299_RESULT.json')
+                'HOST_AUDIT299_RESULT.json', 'HOST_RISK_ALLOCATION299_RESULT.json',
+                'HOST_LAUNCH299_RESULT.json')
     for name in required:
         assert read(P / name)['status'].startswith('HOST_'), name
     assert read(P / 'HOST_FULL299_PROTOCOL_RESULT.json')['actual_observer_cases'] == 408

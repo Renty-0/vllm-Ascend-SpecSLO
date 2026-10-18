@@ -1,0 +1,8 @@
+{
+  "status": "HOST_actual_guard_shell_runtime_and_import_paths_passed",
+  "actual_candidate_directory": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299",
+  "old_alias_not_required": true,
+  "all_literal_import_directories_exist": true,
+  "NPU_used": false,
+  "model_launch_executed": false
+}

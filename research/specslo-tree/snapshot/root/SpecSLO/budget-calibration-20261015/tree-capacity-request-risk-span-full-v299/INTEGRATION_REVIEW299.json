@@ -1,0 +1,34 @@
+{
+  "schema": "ROOT299.capacity-request-conditional-risk-span-full.v1",
+  "UTC": "2026-10-18T23:13:26.229413+00:00",
+  "changes": [
+    "Reserve prospective B4 normal capacity before branch upgrades",
+    "Per-request conditional hazards with leave-own-out class prior and censoring",
+    "All64 contiguous prefix memcpy and raw K/V dual cache writes"
+  ],
+  "gain_hyperparameters": {
+    "class_prior_strength": 12,
+    "request_prior_strength": 2,
+    "decay": 0.96875
+  },
+  "backend": "exact frozen296 original-attention M120/S24/Q5/KV2560",
+  "global_selected_candidates": 192,
+  "normal_candidates": 96,
+  "future_candidates": 96,
+  "actual_target_primary_plus_side_groups": 24,
+  "active_admission_cap": 48,
+  "LIVE_normal_budget_domain": [
+    1,
+    8
+  ],
+  "eager_parent_and_child_support": "unchanged original B3 only",
+  "original_source_auditor_changes": "Only two legacy B<=5 bounds become declared8; nonempty dict normalized bool",
+  "all_original_startup_component_gates_required": true,
+  "fresh408target_45draft_20postbranch_required": true,
+  "fresh_warm_twozero_seal_full463_ownAR_required": true,
+  "models_BF16_original_sampler_arrivals_SLO_unchanged": true,
+  "device_qualification_inherited": false,
+  "performance_qualified": false,
+  "Goodput": null,
+  "adopted": false
+}
