@@ -42,6 +42,8 @@ TP4 基线 1.5 倍。当前参考阈值为 644.7664 token/s，尚未达到。
 运行时依赖还保存在 `snapshot/root/data/vllm-ascend-hust/`；
 历史冻结的 `native_engine.py` 等依赖位于 `snapshot/root/data/specslo-baselines/`。
 这些路径与 manifest 一一对应。仓库顶层插件没有自动切换到这些实验原型。
+配套 vLLM 核心的 14 个本地修改文件也已保存，包含调度、投机元数据、验证和对应测试；
+它们与冻结运行时中的对应文件逐字节一致，映射记录在 `companion_core_sources`。
 
 ## 复现约束
 

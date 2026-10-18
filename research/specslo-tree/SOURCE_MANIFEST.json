@@ -1,9 +1,95 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-18T23:01:40.386911+00:00",
-  "upstream_branch_base": "5ea94228a8bc498419c4fcbd8e21e99674d35b63",
+  "saved_UTC": "2026-10-18T23:04:44.348495+00:00",
+  "upstream_branch_base": "a27307f978b9793ce074102ea5fe99e00b1c2d3f",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
+  "companion_core_sources": [
+    {
+      "path": "tests/v1/spec_decode/test_spec_rhythm.py",
+      "working_source": "/root/data/vllm-hust/tests/v1/spec_decode/test_spec_rhythm.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/tests/v1/spec_decode/test_spec_rhythm.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "tests/v1/spec_decode/test_tree_verification.py",
+      "working_source": "/root/data/vllm-hust/tests/v1/spec_decode/test_tree_verification.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/tests/v1/spec_decode/test_tree_verification.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/config/speculative.py",
+      "working_source": "/root/data/vllm-hust/vllm/config/speculative.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/config/speculative.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/attention/backend.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/attention/backend.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/attention/backend.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/core/sched/async_scheduler.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/core/sched/async_scheduler.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/core/sched/async_scheduler.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/core/sched/output.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/core/sched/output.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/core/sched/output.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/core/sched/scheduler.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/core/sched/scheduler.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/core/sched/scheduler.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/outputs.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/outputs.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/outputs.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/request.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/request.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/request.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/sample/rejection_sampler.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/sample/rejection_sampler.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/sample/rejection_sampler.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/spec_decode/metadata.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/spec_decode/metadata.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/metadata.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/spec_decode/spec_rhythm.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/spec_decode/spec_rhythm.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/spec_rhythm.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/spec_decode/tree.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/spec_decode/tree.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/tree.py",
+      "bytes_equal": true
+    },
+    {
+      "path": "vllm/v1/spec_decode/vocab_mapping.py",
+      "working_source": "/root/data/vllm-hust/vllm/v1/spec_decode/vocab_mapping.py",
+      "frozen_runtime_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/vocab_mapping.py",
+      "bytes_equal": true
+    }
+  ],
   "files": [
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_GENERATION_TEMPLATE.py",
@@ -96,6 +182,12 @@
       "bytes": 4472
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT296_target_math_and_cost_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT296_target_math_and_cost_HOST.py",
+      "sha256": "41889d9bd9a53923612c96806006cf20f45d83e9de63113488bc91f5dfa119c4",
+      "bytes": 4234
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/baseline233_SOURCE.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/baseline233_SOURCE.py",
       "sha256": "f25c000f7d7926ac4cb6fc178b57afbd7d0ffab1edd8701cd2d97e6f3b1c4609",
@@ -160,6 +252,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_ROOT296_concrete_cache_device_HOST.py",
       "sha256": "a2f5fbc780a19d3a9218335ec247bb220dc7e5f6641f41a43086cbcb8709f6ab",
       "bytes": 2162
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_ROOT299_capacity_risk_span_full_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_ROOT299_capacity_risk_span_full_HOST.py",
+      "sha256": "3820d9168ec90c475df8b0e8edfb8e9e68f9aa9d6981ffd1adb3eeea503d1dd3",
+      "bytes": 4130
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_v209_role_audit_source.py",
@@ -444,6 +542,12 @@
       "bytes": 4398
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT299_capacity_risk_span_full_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT299_capacity_risk_span_full_HOST.py",
+      "sha256": "96567bd5bd4967257b862ca25d99f80d81f2935cf9bbeb5f4eefc87db13c15bb",
+      "bytes": 5716
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_deferred259_metadata_probe_HOST.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_deferred259_metadata_probe_HOST.py",
       "sha256": "21900e7a47456a6fb7670fed339ea527c751fbe1661e426dcf3ab23498e845b7",
@@ -568,6 +672,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT218_HOST.py",
       "sha256": "69743719323c58f9fc865c80b8a9866c36f1e40e856216eca8c8daa74fb5277f",
       "bytes": 2470
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
+      "sha256": "11c1f46ffbf0309737c4e3bb75f7f225c1fd2b4f5be674ef4e2955489092e0ca",
+      "bytes": 6677
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution/common_guard.py",
@@ -10800,6 +10910,90 @@
       "bytes": 1050902
     },
     {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/tests/v1/spec_decode/test_spec_rhythm.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/tests/v1/spec_decode/test_spec_rhythm.py",
+      "sha256": "236fdad315c89444576278be98df0448499048ecf1f690200c524648da41d16f",
+      "bytes": 3355
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/tests/v1/spec_decode/test_tree_verification.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/tests/v1/spec_decode/test_tree_verification.py",
+      "sha256": "780acfcab56f0762b6a1979c1a69dd711d9d5d0caf0360b4adf7a12d1ec0977b",
+      "bytes": 1535
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/config/speculative.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/config/speculative.py",
+      "sha256": "e6c0094328064fbb821c7e2eb0120d758ebda1eb95a58f6a0486c2c214ea6916",
+      "bytes": 58300
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/attention/backend.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/attention/backend.py",
+      "sha256": "1a95927fc11eb29ae57cdab27da4870e4f6b0305462dbae3143c114cbe82c315",
+      "bytes": 39341
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/core/sched/async_scheduler.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/core/sched/async_scheduler.py",
+      "sha256": "d42a9b6d7aef01b493ed48c7da7492bcd562a3a3a0126c3ac1c28d165e02cecd",
+      "bytes": 3461
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/core/sched/output.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/core/sched/output.py",
+      "sha256": "57c75588c1347d570c0b1709b3a4d3dad565ad5cfa4b8646478fbef76c694af2",
+      "bytes": 11004
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/core/sched/scheduler.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/core/sched/scheduler.py",
+      "sha256": "bc5a237a7302adf308b48f0f2ac1ce3f9902a148329ce352e3324772dc91526a",
+      "bytes": 131603
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/outputs.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/outputs.py",
+      "sha256": "96180bb4cdb65b0e4938504e6ee563809fc5a26990b62014f61ee6719d8c8418",
+      "bytes": 13236
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/request.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/request.py",
+      "sha256": "b62393c60eb68d6ba544d1d098bffe7bc29f638a37623e7a28a9fa2d10104504",
+      "bytes": 15913
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/sample/rejection_sampler.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/sample/rejection_sampler.py",
+      "sha256": "25ca58998a0724c47227e662e0f631acd19bf47305b5a0e6569f579e78726cd7",
+      "bytes": 37260
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/metadata.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/metadata.py",
+      "sha256": "2e00c4713373c33379d8115b943081351de132f94b5860e99bd498fc2829a116",
+      "bytes": 3126
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/spec_rhythm.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/spec_rhythm.py",
+      "sha256": "68f1e361644a21d6a39d050022292ed700dd43abc0b432059f29330325edc9ef",
+      "bytes": 14610
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/tree.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/tree.py",
+      "sha256": "ea9968a529d5e2db981c9f46ece7e76e508c3ba76ba4e11c2f65eecc30e92f2d",
+      "bytes": 5596
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/vocab_mapping.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust/vllm/v1/spec_decode/vocab_mapping.py",
+      "sha256": "160f0a7f9db8833abb88fcf98d01e44b84b74d58c468e3be5f8a1079f46abad6",
+      "bytes": 6173
+    },
+    {
       "source": "/root/data/vllm-ascend-hust/csrc/mc2/CMakeLists.txt",
       "saved": "research/specslo-tree/snapshot/root/data/vllm-ascend-hust/csrc/mc2/CMakeLists.txt",
       "sha256": "3e8d4b4654be3df2a768cf4197d94c2fa898f2adb7844b96745746bb31dd74ce",
@@ -12592,6 +12786,90 @@
       "saved": "research/specslo-tree/snapshot/root/data/vllm-ascend-hust/vllm_ascend/spec_decode/utils.py",
       "sha256": "011e5ad7adeca4838adc62b9cf69a1842f055e138d98bdef5da7a69834f8138e",
       "bytes": 3200
+    },
+    {
+      "source": "/root/data/vllm-hust/tests/v1/spec_decode/test_spec_rhythm.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/tests/v1/spec_decode/test_spec_rhythm.py",
+      "sha256": "236fdad315c89444576278be98df0448499048ecf1f690200c524648da41d16f",
+      "bytes": 3355
+    },
+    {
+      "source": "/root/data/vllm-hust/tests/v1/spec_decode/test_tree_verification.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/tests/v1/spec_decode/test_tree_verification.py",
+      "sha256": "780acfcab56f0762b6a1979c1a69dd711d9d5d0caf0360b4adf7a12d1ec0977b",
+      "bytes": 1535
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/config/speculative.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/config/speculative.py",
+      "sha256": "e6c0094328064fbb821c7e2eb0120d758ebda1eb95a58f6a0486c2c214ea6916",
+      "bytes": 58300
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/attention/backend.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/attention/backend.py",
+      "sha256": "1a95927fc11eb29ae57cdab27da4870e4f6b0305462dbae3143c114cbe82c315",
+      "bytes": 39341
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/core/sched/async_scheduler.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/core/sched/async_scheduler.py",
+      "sha256": "d42a9b6d7aef01b493ed48c7da7492bcd562a3a3a0126c3ac1c28d165e02cecd",
+      "bytes": 3461
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/core/sched/output.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/core/sched/output.py",
+      "sha256": "57c75588c1347d570c0b1709b3a4d3dad565ad5cfa4b8646478fbef76c694af2",
+      "bytes": 11004
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/core/sched/scheduler.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/core/sched/scheduler.py",
+      "sha256": "bc5a237a7302adf308b48f0f2ac1ce3f9902a148329ce352e3324772dc91526a",
+      "bytes": 131603
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/outputs.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/outputs.py",
+      "sha256": "96180bb4cdb65b0e4938504e6ee563809fc5a26990b62014f61ee6719d8c8418",
+      "bytes": 13236
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/request.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/request.py",
+      "sha256": "b62393c60eb68d6ba544d1d098bffe7bc29f638a37623e7a28a9fa2d10104504",
+      "bytes": 15913
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/sample/rejection_sampler.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/sample/rejection_sampler.py",
+      "sha256": "25ca58998a0724c47227e662e0f631acd19bf47305b5a0e6569f579e78726cd7",
+      "bytes": 37260
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/spec_decode/metadata.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/spec_decode/metadata.py",
+      "sha256": "2e00c4713373c33379d8115b943081351de132f94b5860e99bd498fc2829a116",
+      "bytes": 3126
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/spec_decode/spec_rhythm.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/spec_decode/spec_rhythm.py",
+      "sha256": "68f1e361644a21d6a39d050022292ed700dd43abc0b432059f29330325edc9ef",
+      "bytes": 14610
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/spec_decode/tree.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/spec_decode/tree.py",
+      "sha256": "ea9968a529d5e2db981c9f46ece7e76e508c3ba76ba4e11c2f65eecc30e92f2d",
+      "bytes": 5596
+    },
+    {
+      "source": "/root/data/vllm-hust/vllm/v1/spec_decode/vocab_mapping.py",
+      "saved": "research/specslo-tree/snapshot/root/data/vllm-hust/vllm/v1/spec_decode/vocab_mapping.py",
+      "sha256": "160f0a7f9db8833abb88fcf98d01e44b84b74d58c468e3be5f8a1079f46abad6",
+      "bytes": 6173
     }
   ],
   "frozen_entries": [

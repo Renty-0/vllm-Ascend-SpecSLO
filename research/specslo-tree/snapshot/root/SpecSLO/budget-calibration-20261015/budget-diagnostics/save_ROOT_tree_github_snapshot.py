@@ -1,0 +1,134 @@
+"""Save exact research sources without datasets, caches, or runtime mutation."""
+import datetime
+import hashlib
+import json
+import shutil
+import subprocess
+from pathlib import Path
+
+BASE = Path('/root/SpecSLO/budget-calibration-20261015')
+REPO = Path('/root/SpecSLO/checkpoints/github-SpecSLO-Tree')
+DEST = REPO / 'research/specslo-tree'
+SOURCES = (
+    ('tree-static-q5-M120-SLO-first-full463-own-AR-v257', 257),
+    ('tree-dynamic-root-alternate-eager-compat-full-v287', 287),
+    ('tree-all-layer-prefix-dual-cache-target-cost-v291', 291),
+    ('tree-safe-grid-span-dual-cache-probe-v295', 295),
+    ('tree-concrete-device-span-dual-cache-target-cost-v296', 296),
+)
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def main():
+    selected = set()
+    omitted = {}
+    freezes = []
+    for directory, version in SOURCES:
+        path = BASE / directory / f'FREEZE{version}.json'
+        freeze = json.loads(path.read_text())
+        freezes.append(dict(source=str(path), sha256=digest(path)))
+        selected.add(path)
+        for filename, expected in freeze['files'].items():
+            source = Path(filename)
+            if any(part in {'HOST-attempts', 'HOST-loop-attempts'} for part in source.parts):
+                omitted[filename] = dict(sha256=expected, reason='Historical HOST attempt artifact')
+            elif source.suffix in {'.py', '.sh', '.pre_descriptor_update'}:
+                if digest(source) != expected:
+                    raise RuntimeError(f'Frozen source changed: {source}')
+                selected.add(source)
+            else:
+                omitted[filename] = dict(sha256=expected, reason='Historical evidence or fixture; not source')
+    for directory in (
+        'tree-prefix-precopy-dual-cachewrite-host-v288',
+        'tree-spare-capacity-budget-host-v290',
+        'tree-contiguous-prefix-span-copy-host-v292',
+        'tree-request-conditional-risk-gain-host-v294',
+        'tree-capacity-request-risk-span-full-v299',
+    ):
+        selected.update(p for p in (BASE / directory).iterdir()
+                        if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
+    for filename in (
+        'audit_ROOT287_declared_B1to8_HOST.py',
+        'audit_ROOT295_operator_evidence_HOST.py',
+        'calibrate_ROOT287_same_prefix_gains_HOST.py',
+        'plot_ROOT287_same_prefix_gains_HOST.py',
+        'read_common_publication_metrics.py',
+        'common_publication_metrics.py',
+        'final_candidate_eligibility.py',
+        'prepare_final_comparison_plan.py',
+        'final_common_comparison.py',
+        'final_owned_processes.py',
+        'final_baseline_cell.py',
+        'ROOT287_INDEPENDENT_FULL_DOMAIN8_AUDIT.json',
+        'ROOT295_INDEPENDENT_OPERATOR_AUDIT.json',
+        'ROOT287_B8_COHORT_SAME_PREFIX_GAINS_AR_QUALIFIED.json',
+        'ROOT_FINAL_THREE_BLOCK_COMPARISON_PREDECLARATION_20261018.json',
+        'ROOT293_HARDWARE_GRID_LIMIT_FAILURE.json',
+        'ROOT291_INITIALIZATION_DEVICE_FAILURE.json',
+        'audit_ROOT296_target_math_and_cost_HOST.py',
+        'build_ROOT299_capacity_risk_span_full_HOST.py',
+        'freeze_ROOT299_capacity_risk_span_full_HOST.py',
+        'save_ROOT_tree_github_snapshot.py',
+    ):
+        path = BASE / 'budget-diagnostics' / filename
+        if path.exists():
+            selected.add(path)
+    plugin = Path('/root/data/vllm-ascend-hust')
+    for directory in ('vllm_ascend/spec_decode', 'vllm_ascend/ops/triton', 'csrc/mc2'):
+        selected.update(p for p in (plugin / directory).rglob('*')
+                        if p.is_file() and not p.is_symlink()
+                        and '__pycache__' not in p.parts
+                        and (p.suffix in {'.py', '.sh', '.cpp', '.h', '.hpp', '.cmake'}
+                             or p.name == 'CMakeLists.txt'))
+    core = Path('/root/data/vllm-hust')
+    frozen_core = Path('/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust')
+    companion_core = []
+    changed_core = subprocess.check_output(['git', 'diff', 'HEAD', '--name-only'], cwd=core, text=True).splitlines()
+    for filename in changed_core:
+        source, actual = core / filename, frozen_core / filename
+        if source.suffix != '.py' or not source.is_file():
+            continue
+        selected.add(source)
+        matches = actual.is_file() and digest(source) == digest(actual)
+        if actual.is_file():
+            selected.add(actual)
+        companion_core.append(dict(path=filename, working_source=str(source),
+                                   frozen_runtime_source=str(actual), bytes_equal=matches))
+    previous = DEST / 'SOURCE_MANIFEST.json'
+    if previous.exists():
+        for entry in json.loads(previous.read_text())['files']:
+            if Path(entry['source']) not in selected:
+                old = REPO / entry['saved']
+                if old.exists():
+                    if digest(old) != entry['sha256']:
+                        raise RuntimeError(f'Previous saved file changed: {old}')
+                    old.unlink()
+    entries = []
+    for source in sorted(selected):
+        if source.is_symlink() or source.stat().st_size > 3 * 1024**2:
+            raise RuntimeError(f'Unexpected source entry: {source}')
+        target = DEST / 'snapshot' / source.relative_to('/')
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(source, target)
+        entries.append(dict(source=str(source), saved=str(target.relative_to(REPO)),
+                            sha256=digest(source), bytes=source.stat().st_size))
+    manifest = dict(schema='SpecSLO-Tree-source-snapshot-v1',
+        saved_UTC=datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        upstream_branch_base=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=REPO, text=True).strip(),
+        local_plugin_base=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=plugin, text=True).strip(),
+        core_commit=subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd='/root/data/vllm-hust', text=True).strip(),
+        companion_core_sources=companion_core,
+        files=entries, frozen_entries=freezes, omitted_evidence=omitted,
+        models_included=False, datasets_included=False, binary_caches_included=False,
+        byte_exact_original_experiment_backup=False,
+        original_absolute_paths_preserved=True)
+    (DEST / 'SOURCE_MANIFEST.json').write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + '\n')
+    print(json.dumps(dict(files=len(entries), source_bytes=sum(v['bytes'] for v in entries),
+                         omitted_evidence=len(omitted)), ensure_ascii=False))
+
+
+if __name__ == '__main__':
+    main()
