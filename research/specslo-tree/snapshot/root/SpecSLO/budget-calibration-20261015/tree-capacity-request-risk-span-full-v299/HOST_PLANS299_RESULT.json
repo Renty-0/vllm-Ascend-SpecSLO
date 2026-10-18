@@ -1,0 +1,434 @@
+{
+  "status": "HOST_original_candidate_DTO_and_selected_packer_B1to8_passed",
+  "cases": [
+    {
+      "B": 1,
+      "prefix": 0,
+      "selected": [
+        0
+      ]
+    },
+    {
+      "B": 2,
+      "prefix": 0,
+      "selected": [
+        0,
+        1
+      ]
+    },
+    {
+      "B": 3,
+      "prefix": 0,
+      "selected": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "B": 4,
+      "prefix": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "B": 5,
+      "prefix": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "B": 6,
+      "prefix": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "B": 7,
+      "prefix": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "B": 8,
+      "prefix": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "B": 1,
+      "prefix": 127,
+      "selected": [
+        0
+      ]
+    },
+    {
+      "B": 2,
+      "prefix": 127,
+      "selected": [
+        0,
+        1
+      ]
+    },
+    {
+      "B": 3,
+      "prefix": 127,
+      "selected": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "B": 4,
+      "prefix": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "B": 5,
+      "prefix": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "B": 6,
+      "prefix": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "B": 7,
+      "prefix": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "B": 8,
+      "prefix": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "B": 1,
+      "prefix": 128,
+      "selected": [
+        0
+      ]
+    },
+    {
+      "B": 2,
+      "prefix": 128,
+      "selected": [
+        0,
+        1
+      ]
+    },
+    {
+      "B": 3,
+      "prefix": 128,
+      "selected": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "B": 4,
+      "prefix": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "B": 5,
+      "prefix": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "B": 6,
+      "prefix": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "B": 7,
+      "prefix": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "B": 8,
+      "prefix": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "B": 1,
+      "prefix": 1505,
+      "selected": [
+        0
+      ]
+    },
+    {
+      "B": 2,
+      "prefix": 1505,
+      "selected": [
+        0,
+        1
+      ]
+    },
+    {
+      "B": 3,
+      "prefix": 1505,
+      "selected": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "B": 4,
+      "prefix": 1505,
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "B": 5,
+      "prefix": 1505,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "B": 6,
+      "prefix": 1505,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "B": 7,
+      "prefix": 1505,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "B": 8,
+      "prefix": 1505,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    },
+    {
+      "B": 1,
+      "prefix": 2555,
+      "selected": [
+        0
+      ]
+    },
+    {
+      "B": 2,
+      "prefix": 2555,
+      "selected": [
+        0,
+        1
+      ]
+    },
+    {
+      "B": 3,
+      "prefix": 2555,
+      "selected": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "B": 4,
+      "prefix": 2555,
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "B": 5,
+      "prefix": 2555,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "B": 6,
+      "prefix": 2555,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "B": 7,
+      "prefix": 2555,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "B": 8,
+      "prefix": 2555,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ]
+    }
+  ],
+  "case_count": 40,
+  "exact_declared269_target_plans": true,
+  "ancestor_closed": true,
+  "all_admitted_grants_preserved": true,
+  "unit_candidate_charges_preserved": true,
+  "NPU_used": false,
+  "model_executed": false,
+  "Goodput": null,
+  "adopted": false
+}

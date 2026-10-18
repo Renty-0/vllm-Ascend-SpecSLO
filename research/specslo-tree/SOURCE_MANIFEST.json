@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-18T22:50:13.876242+00:00",
-  "upstream_branch_base": "e5f8817ee2a0cf48fc80c80418cde02ba7603161",
+  "saved_UTC": "2026-10-18T23:01:40.386911+00:00",
+  "upstream_branch_base": "5ea94228a8bc498419c4fcbd8e21e99674d35b63",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "files": [
@@ -1630,6 +1630,354 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-canonical-contiguous-full463-own-AR-v235/trace235.py",
       "sha256": "dca21eff6714381e3d319aaeac3b1ede89f4092df0c929b0e06d8d35ec529eaf",
       "bytes": 1736
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_ADMISSION299_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_ADMISSION299_RESULT.json",
+      "sha256": "255441ebb59c67549d8b742a95fb7c69c094c48b7439aa38e028648c4c7fde89",
+      "bytes": 4542
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_AUDIT299_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_AUDIT299_RESULT.json",
+      "sha256": "c87de6e86f0568e785c495a687d548558e6f968217b4484d4c36664c5f7704b7",
+      "bytes": 393
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_BUDGET299_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_BUDGET299_RESULT.json",
+      "sha256": "6fb464938644e88677f942719970f0e88dd497d540c0839b5e66f24d67518b58",
+      "bytes": 6764
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_COST299_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_COST299_RESULT.json",
+      "sha256": "1777c6d6a69474f768981dfeedd20dbe0052522db683618c8c9b79a189d7336b",
+      "bytes": 74745
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_EAGER299_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_EAGER299_RESULT.json",
+      "sha256": "da086604049fa39aced86de9bbba42e03ee2571b19d955bdc1404d9fb1a01813",
+      "bytes": 1870
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_FAULT299_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_FAULT299_RESULT.json",
+      "sha256": "c0e4ab6de9598957214a68c18cff6b509617611a5297748cf97920b34787f869",
+      "bytes": 216
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_FULL299_PROTOCOL_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_FULL299_PROTOCOL_RESULT.json",
+      "sha256": "cf6d5f97be163927779bcb238d4f5312b48256760b45522a2bf3eabf3a128d24",
+      "bytes": 414134
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_LIVE299_BEFORE_ADDITIONAL_RISK_AUDIT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_LIVE299_BEFORE_ADDITIONAL_RISK_AUDIT.json",
+      "sha256": "6e7b4a0cb66df91f36c31acafeb3a83e91e981a73710b428402c19fd464d5943",
+      "bytes": 774
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_LIVE299_POST_SNAPSHOT_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_LIVE299_POST_SNAPSHOT_RESULT.json",
+      "sha256": "6e7b4a0cb66df91f36c31acafeb3a83e91e981a73710b428402c19fd464d5943",
+      "bytes": 774
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_PLANS299_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_PLANS299_RESULT.json",
+      "sha256": "caae317d04db56c130f5ed94af4e12cf44d692dac0794744ce48ee5e6be23a4e",
+      "bytes": 5337
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_PRIORITY299_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_PRIORITY299_RESULT.json",
+      "sha256": "35aee40ab1c9c099a491849c7aec3369ea32d33f43b7cb560eac6c13df0383e8",
+      "bytes": 2539
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_RISK_ALLOCATION299_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_RISK_ALLOCATION299_RESULT.json",
+      "sha256": "0744e9360f7f84723218e523146ab084184ead724f07a2ed1707700d197c553b",
+      "bytes": 1596
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_SNAPSHOT299_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/HOST_SNAPSHOT299_RESULT.json",
+      "sha256": "07dfd1a54a8f25b6fc005b2015678c7397b28f9e9228f2939d5f3cd369a5b75d",
+      "bytes": 201
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/SOURCE_ONLY299_REVIEW.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/SOURCE_ONLY299_REVIEW.json",
+      "sha256": "c75ec7306614296bb724aa0d9a6ec8f7e66d82154fdae47bc4d7a24f7f3879b1",
+      "bytes": 430
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/audit299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/audit299.py",
+      "sha256": "478569138c333ca030325dab27d87f51c9b2c27cbd091735d8095c430ee3361c",
+      "bytes": 10137
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/audit_domain299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/audit_domain299.py",
+      "sha256": "439bbf040584234bcb6decbbb7ba4abcc7f188c89096ff7145ca78c0815330c5",
+      "bytes": 1659
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/audit_reference299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/audit_reference299.py",
+      "sha256": "18bc6564958807d41b572cf418921a36f92882564bffc9eb9ccf17801d156834",
+      "bytes": 11856
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/audit_static_calls299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/audit_static_calls299.py",
+      "sha256": "2c7816733006735c886857c8747ee02e8b70becd7b6406680005054974147266",
+      "bytes": 103
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/bank299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/bank299.py",
+      "sha256": "aaaaedf499fc4fa0e3cab4d9d46c6d58d12974c55084cc82efdb75821ac933b7",
+      "bytes": 103
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/baseline299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/baseline299.py",
+      "sha256": "81e98a5adcbbe18fa3f64fde38bc4aabd15415385d4770c5683cb3d745b417ed",
+      "bytes": 100
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/budget299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/budget299.py",
+      "sha256": "44935433a545b6f1992711f84a98ccaef9facf56b8e3e4e11e104783b0e05588",
+      "bytes": 97
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check299.py",
+      "sha256": "eaf29c04587b95bcfc511330091629d3df3bf1bcc48fb8ea4e7800e234b114e6",
+      "bytes": 2666
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_admission299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_admission299_HOST.py",
+      "sha256": "867b095e42edf12406a3af4c020bbd1e29ce7a56e829778bc556311eaec4fbd4",
+      "bytes": 4718
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_audit299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_audit299_HOST.py",
+      "sha256": "2c42e6a25adf62d26dc51360072ee5766d6c559aabde41052c43dd92ef14d814",
+      "bytes": 1919
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_budget299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_budget299_HOST.py",
+      "sha256": "32ed89fb6c49847303ece1bb243b94056716ac273c7a91e109a3fb254ef21c93",
+      "bytes": 5908
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_cost299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_cost299_HOST.py",
+      "sha256": "439cb7ea776c288c326c347457380b68258afe2e76d630c7ea6f6d755be2f800",
+      "bytes": 6149
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_eager299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_eager299_HOST.py",
+      "sha256": "557f58c0a8553f480b2d732ee2eb07683d03008491e3296939bb2e5bac46efdd",
+      "bytes": 4593
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_fault299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_fault299_HOST.py",
+      "sha256": "69697f58345ec0e48b86fcdaef2d62448058a2f263b1a9893f4f3adc59b987d7",
+      "bytes": 1467
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_full299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_full299_HOST.py",
+      "sha256": "4137060973fe96a57018d36ed98292d703e8a75d5753c8e96c1da8f335ca748c",
+      "bytes": 3971
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_live299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_live299_HOST.py",
+      "sha256": "6e7ee5ea1bdf023c5136766816646cf1b6c26c40f099d0c9cb45e42156beae06",
+      "bytes": 4902
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_plans299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_plans299_HOST.py",
+      "sha256": "e4e920fdfbd8fcbc56ccfce1ab0521b3ca584defefcaa97782c97904976baa75",
+      "bytes": 2493
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_prepare299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_prepare299_HOST.py",
+      "sha256": "8984fcdd0a3dcf2862cee235a4493f233d738fa8b031982c9cf3d2d0ca977932",
+      "bytes": 147
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_priority299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_priority299_HOST.py",
+      "sha256": "9a628ee10472aaca24f445550f20c025c208748e2e3d78f28380f5e5a061b590",
+      "bytes": 3329
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_risk_allocation299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_risk_allocation299_HOST.py",
+      "sha256": "21d5b9ce65fb9291b54413835bc55b9cc4dfbbba494201cfeb723a38438e7009",
+      "bytes": 3511
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_snapshot299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/check_snapshot299_HOST.py",
+      "sha256": "dcaf7e2ae9cd5718dd448a08ad8c986ccbc36b64bef7bd2f4bcea43361d1471f",
+      "bytes": 2291
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/debug_snapshot299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/debug_snapshot299.py",
+      "sha256": "f0390ad1878e2c33be08b92c93633ceac470078e0583150bc03f5118b63ee05c",
+      "bytes": 1208
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/empty299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/empty299.py",
+      "sha256": "3eeead19c299945fd00030369c987662f41b11bfb2eb221ca98b7a3ee65cffd9",
+      "bytes": 2889
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/extension299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/extension299.py",
+      "sha256": "1621ca52b4c57da70e7e615254a298ed5417acfdc7795bfb2c300f974c8afde3",
+      "bytes": 8895
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/fault_handler299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/fault_handler299.py",
+      "sha256": "842d044acd9ae6a5bbb72ba659ded37ab0a487d1192c5bf718e086883ca170d3",
+      "bytes": 1077
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/frames299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/frames299.py",
+      "sha256": "0caba8fd984f1a0e0cf22e85eedd3605c359972ab0e03a279c1e5d68665261d7",
+      "bytes": 98
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/generation299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/generation299.py",
+      "sha256": "81b71aaa5ba6a5c3628748e8b04332b6fbcb98bd008823a185490bf2146d620b",
+      "bytes": 6995
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/guard299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/guard299.py",
+      "sha256": "94b499a1fd65d6baaff0fb8769cc20bc49dbb78d93fec806917d7ec962abf91d",
+      "bytes": 8244
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/launch299.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/launch299.sh",
+      "sha256": "3ed819b68912a1b69d47ff69142ee80f69dd4d3ce6d6be262b9219d532f09917",
+      "bytes": 1273
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/live299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/live299.py",
+      "sha256": "7f5ff1960a32a5d1bc9dc7e96f1493b189d48b6773c97fd8aad1665ccfd143eb",
+      "bytes": 5722
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/mapper299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/mapper299.py",
+      "sha256": "20aa0a98ca0883ae336bb3ced43f5f41ffedd63ee8e2962e60b741c3dbe2999e",
+      "bytes": 101
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/metadata299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/metadata299.py",
+      "sha256": "e4ba41253d437f2c60c878e139b4e054db589360c3e304e2babce512cc383560",
+      "bytes": 100
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/oracle299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/oracle299.py",
+      "sha256": "a242a812f0ff82705c342771855b5997a5c6b7845ff8685ef271f5db1368ad45",
+      "bytes": 89
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/plans299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/plans299.py",
+      "sha256": "d746034ba7b6d4410dd59bbe592af3e8fc1dd7224cf9f8e12de83d886aecda2e",
+      "bytes": 2141
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/reference299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/reference299.py",
+      "sha256": "8815298e81999291aef65216483b4ca2eae63a2be6511427b6ee4bfbd91925a8",
+      "bytes": 4352
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/reference_schedule299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/reference_schedule299.py",
+      "sha256": "36715f99e4f393a8663c16f5439c8d2b236e00d19283193fc25ab22a0233e8a9",
+      "bytes": 110
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/risk299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/risk299.py",
+      "sha256": "792c17ac26cd0aa5332eac0803854989f5568816b41cc9909977df28bf50d2a0",
+      "bytes": 3721
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/runtime299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/runtime299.py",
+      "sha256": "34e526d03ea1f49deecdbdd8155fbbfb1720a9ac89a35438c4ad0ed16125cc1a",
+      "bytes": 6853
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/scope299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/scope299.py",
+      "sha256": "8438e43151e15b980977cd7b7f94153c426b79d900f04cf11294195c9e19a0c3",
+      "bytes": 7590
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/source299_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/source299_HOST.py",
+      "sha256": "02c755ff23dc87c2e800a7166aa76dc3ff21b71e25d3bfdaea524f0413ecf8dc",
+      "bytes": 664
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/startup299.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/startup299.sh",
+      "sha256": "2b1faf6c65fba49eaf4f1259e30b32fe2a43ef932bd0c05722e2222f3f52d7d6",
+      "bytes": 7442
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/static_state299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/static_state299.py",
+      "sha256": "aa020a5d99ef849bfbe1ea0d0c5b8fb421f36ac4e0e5e2b3fb0307e8aa120252",
+      "bytes": 167
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/trace299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/trace299.py",
+      "sha256": "d13504a3e34d3ab3c4d4af067bf0da9559c8dbf17b1cb7e021c90aa9bf0ec603",
+      "bytes": 2553
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/window299.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-capacity-request-risk-span-full-v299/window299.py",
+      "sha256": "10ac72788eb821b20b95d00253fee9f948e4e4a7c42a73bd0a76e354cd6c1d09",
+      "bytes": 949
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/actor167.py",

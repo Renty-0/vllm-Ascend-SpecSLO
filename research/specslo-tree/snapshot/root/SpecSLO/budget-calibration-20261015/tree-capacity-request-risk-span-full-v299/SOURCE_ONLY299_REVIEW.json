@@ -1,0 +1,10 @@
+{
+  "status": "SOURCE_ONLY_new299_not_frozen_not_NPU_run",
+  "mechanism": "Capacity290 primary reservation + causal request risk294 + frozen span/dual-cache296",
+  "actual_models_sampler_and_arrivals_unchanged": true,
+  "original_startup_components_and_408target45draft20postbranch_required": true,
+  "all463_independent_own_AR_required": true,
+  "previous_qualification_inherited": false,
+  "Goodput": null,
+  "adopted": false
+}

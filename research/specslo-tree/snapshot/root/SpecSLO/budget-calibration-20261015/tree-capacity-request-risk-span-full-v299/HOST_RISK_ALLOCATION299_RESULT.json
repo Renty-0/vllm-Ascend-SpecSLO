@@ -1,0 +1,98 @@
+{
+  "status": "HOST_actual_typed_allocator_request_conditional_spare_branch_owners_and_phase_change_passed",
+  "phases": [
+    {
+      "phase": 0,
+      "hard_owners": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "actual_branch_eligible": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "budgets": {
+        "0": 4,
+        "1": 4,
+        "2": 4,
+        "3": 4,
+        "4": 4,
+        "5": 4,
+        "6": 4,
+        "7": 4,
+        "8": 8,
+        "9": 8,
+        "10": 8,
+        "11": 8,
+        "12": 8,
+        "13": 8,
+        "14": 8,
+        "15": 8
+      }
+    },
+    {
+      "phase": 1,
+      "hard_owners": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "actual_branch_eligible": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "budgets": {
+        "0": 8,
+        "1": 8,
+        "2": 8,
+        "3": 8,
+        "4": 8,
+        "5": 8,
+        "6": 8,
+        "7": 8,
+        "8": 4,
+        "9": 4,
+        "10": 4,
+        "11": 4,
+        "12": 4,
+        "13": 4,
+        "14": 4,
+        "15": 4
+      }
+    }
+  ],
+  "causal_risk_audit": {
+    "generations": 1,
+    "request_records": 16,
+    "observed_verdicts": 3072,
+    "exact_class_own_data_conservation": true
+  },
+  "same_class_priority_unchanged": true,
+  "C96_and24_groups_preserved": true,
+  "synthetic_not_machine_measurement": true,
+  "NPU_used": false,
+  "Goodput": null
+}

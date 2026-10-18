@@ -1,8 +1,8 @@
 {
   "schema": "SpecSLO-Tree-source-save-checks-v1",
-  "source_files_sha256_verified": 2040,
-  "python_sources_syntax_passed": 1670,
-  "bash_scripts_syntax_passed": 151,
+  "source_files_sha256_verified": 2098,
+  "python_sources_syntax_passed": 1712,
+  "bash_scripts_syntax_passed": 153,
   "credential_pattern_hits": 0,
   "NPU_used_for_snapshot_checks": false,
   "whole_repository_format_check": "Unavailable: pre-commit not installed; environment unchanged",
