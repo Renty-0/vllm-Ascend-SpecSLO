@@ -48,6 +48,8 @@ def main():
         'tree-contiguous-prefix-span-copy-host-v292',
         'tree-request-conditional-risk-gain-host-v294',
         'tree-capacity-request-risk-span-full-v299',
+        'tree-single-validated-prefix-descriptors-host-v304',
+        'tree-single-validated-prefix-prepare-host-v305',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -75,6 +77,7 @@ def main():
         'save_ROOT_tree_github_snapshot.py',
         'ROOT296_INDEPENDENT_TARGET_MATH_AND_COST_AUDIT.json',
         'ROOT296_VS280_HISTORICAL_TARGET_COST.json',
+        'build_ROOT305_single_validated_prepare_HOST.py',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

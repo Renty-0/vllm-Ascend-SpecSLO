@@ -17,6 +17,7 @@
 | v291 | 将 v295 路径接入真实 target 模型 | 初始化时缓存检查失败，尚无模型数值或时延结果，不能采用。 |
 | v296 | 按实际缓存张量解析具体 NPU 编号，再执行原有严格缓存检查 | 三个 target rank 各 408 组数值检查及成对 target 时延验证通过；尚无完整负载 Goodput。 |
 | v299 | 组合主链容量保留、按请求估计收益、连续前缀复制与 K/V 双写 | 13 项 HOST 检查通过，源码已冻结，正在启动全套模型与完整负载验证。 |
+| v304/v305 | 保留一次完整映射校验，直接生成复制区间与当前 K/V 别名，省去无用缓冲 | 417 个映射场景及 408 组真实 HOST prepare 回调检查通过；尚未冻结、未接入模型。HOST 描述准备约从 5–6 ms 降到 1–2 ms，不能作为模型提速结果。 |
 
 最终目标仍是动态预算树形方案超过固定 gamma4，并超过打开 MC2 的官方
 TP4 基线 1.5 倍。当前参考阈值为 644.7664 token/s，尚未达到。
@@ -37,6 +38,8 @@ TP4 基线 1.5 倍。当前参考阈值为 644.7664 token/s，尚未达到。
 | `tree-all-layer-prefix-dual-cache-target-cost-v291/` | 尚待修复的模型集成诊断。 |
 | `tree-concrete-device-span-dual-cache-target-cost-v296/` | 修复设备比较后的独立模型诊断，不继承前驱的数值验证资格。 |
 | `tree-capacity-request-risk-span-full-v299/` | 当前冻结的完整实验，需重新通过所有模型与独立 AR 校验。 |
+| `tree-single-validated-prefix-descriptors-host-v304/` | 不可变映射校验与直接区间描述，HOST 原型。 |
+| `tree-single-validated-prefix-prepare-host-v305/` | 精简 HOST prepare 回调，尚未执行 NPU 模型验证。 |
 | `budget-diagnostics/` | 独立审计、逐类收益校准与最终比较脚本。 |
 
 运行时依赖还保存在 `snapshot/root/data/vllm-ascend-hust/`；

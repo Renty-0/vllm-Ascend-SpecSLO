@@ -1,0 +1,83 @@
+{
+  "status": "HOST_actual_Native_maps_single_full_contract_span_alias_inverse_passed",
+  "original_declared_cases": 408,
+  "branch_map_cases": 417,
+  "extra_page_boundaries": [
+    0,
+    1,
+    2,
+    126,
+    128,
+    129,
+    1505,
+    2555
+  ],
+  "rejected_controls": [
+    "out_of_bounds",
+    "duplicate_destination",
+    "source_destination_alias",
+    "writer_rows119",
+    "invalid_writer",
+    "ambiguous_current_writer",
+    "alias_destination_is_writer",
+    "unvalidated_map"
+  ],
+  "immutable_input_snapshot": true,
+  "every_original_prefix_and_alias_row_preserved": true,
+  "original_full_1792_anti_alias_bounds_contract_still_executed": true,
+  "no_unused_1792_prefix_staging_tensor_required": true,
+  "HOST_descriptor_timings": [
+    {
+      "original_median_ms": 5.026738857850432,
+      "proposed_median_ms": 1.352836610749364
+    },
+    {
+      "original_median_ms": 5.935243098065257,
+      "proposed_median_ms": 1.9234849605709314
+    },
+    {
+      "original_median_ms": 5.231251940131187,
+      "proposed_median_ms": 1.4636178966611624
+    },
+    {
+      "original_median_ms": 5.317122908309102,
+      "proposed_median_ms": 1.5343690756708384
+    },
+    {
+      "original_median_ms": 5.386569537222385,
+      "proposed_median_ms": 1.6081701032817364
+    },
+    {
+      "original_median_ms": 5.005832994356751,
+      "proposed_median_ms": 1.3476214371621609
+    },
+    {
+      "original_median_ms": 5.769531009718776,
+      "proposed_median_ms": 1.8275831826031208
+    },
+    {
+      "original_median_ms": 6.294448859989643,
+      "proposed_median_ms": 2.1766838617622852
+    },
+    {
+      "original_median_ms": 6.248548394069076,
+      "proposed_median_ms": 2.1218284964561462
+    },
+    {
+      "original_median_ms": 5.36030437797308,
+      "proposed_median_ms": 1.6088599804788828
+    },
+    {
+      "original_median_ms": 5.0143536645919085,
+      "proposed_median_ms": 1.355576328933239
+    },
+    {
+      "original_median_ms": 4.848666954785585,
+      "proposed_median_ms": 1.2613346334546804
+    }
+  ],
+  "timing_is_not_NPU_model_performance": true,
+  "NPU_used": false,
+  "runtime_installed": false,
+  "Goodput": null
+}
