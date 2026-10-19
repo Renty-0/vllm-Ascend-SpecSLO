@@ -1,0 +1,22 @@
+{
+  "UTC": "2026-10-19T14:10:57.785166+00:00",
+  "scope": "Full M120/S24/FULL2560 B1to8 + original305 prepare + measured311 target ROI gate + live refill minimum4.",
+  "numeric_small_component": 351,
+  "small_checks": "Four warmups plus12 current singleton exact graph / eager3/4/8; original full initialization includes tail_hidden_observer before graph capture. All independent hidden/KV/root/nextdraft and two zero sweeps required before issuing scope.",
+  "new_helpers": "Nextdraft finite1/2/4/16; incumbent plus all nonselected prefix protection. No numerical comparison relaxed.",
+  "model_BF16_unquantized": true,
+  "actual463_manifest_arrivals_SLO_unchanged": true,
+  "all_teacher_prefixes_exact_from311": true,
+  "independent_target_cases": 408,
+  "actual_genuine_draft_cases": 45,
+  "postbranch_recovery_cases": 20,
+  "warm_twozero_seal_full463_and_ownAR_required": true,
+  "actual_branching_at_any_N_required": true,
+  "no_artificial_minimum_branch_N": true,
+  "rationale_for_any_N": "Prospective HOST gate screen shows whole-batch ROI can legitimately reject larger N. All408 independent large-N math cases retained, actual genuine B6to8 generation still required.",
+  "source_of_Raw_hypothesis": "Actual257 average target N16.60/24 and empty-active-only admission. All incumbent refill duration remains in request accounting.",
+  "performance_qualification_inherited": false,
+  "standalone352_result": "Failed observation buffers: minimal loader omitted original full initialization. Full348 retains that original after_install and same16 checks.",
+  "full463_Goodput": null,
+  "adopted": false
+}

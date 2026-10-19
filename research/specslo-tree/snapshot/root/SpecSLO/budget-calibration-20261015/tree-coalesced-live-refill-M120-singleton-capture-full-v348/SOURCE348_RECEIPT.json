@@ -1,0 +1,9 @@
+{
+  "freeze_sha256": "09119c918ad6d28d137a731cf041e69f7a0135dc302169455fa944df6caab5c8",
+  "archive_sha256": "921dec97a13a4f82466162b96ae50c342c24b3d79ac4ee5c50328f46d4210d60",
+  "members": 3704,
+  "archive_bytes": 29685291,
+  "HOST_only": true,
+  "NPU_qualified": false,
+  "Goodput": null
+}

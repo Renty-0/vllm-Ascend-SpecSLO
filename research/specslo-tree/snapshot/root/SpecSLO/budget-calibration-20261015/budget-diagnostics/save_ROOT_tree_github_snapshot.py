@@ -48,6 +48,7 @@ SOURCES = (
     ('tree-small-refill-full-next-subset-domain-v350', 350),
     ('tree-small-refill-incumbent-prefix-protection-v351', 351),
     ('tree-small-refill-original-launch-pin-v352', 352),
+    ('tree-coalesced-live-refill-M120-singleton-capture-full-v348', 348),
 )
 
 
@@ -259,6 +260,11 @@ def main():
         'ROOT346_HOST_INITIAL_PRIOR_COST_GATE_SCREEN.json',
         'ROOT350_EMPTY_NONSELECTED_PREFIX_GUARD_FAILURE.json',
         'ROOT351_LAUNCH_PIN_SUBSTRING_RENAME_FAILURE.json',
+        'ROOT352_MISSING_ORIGINAL_TAIL_OBSERVER_FAILURE.json',
+        'audit_ROOT348_terminal_full_HOST.py',
+        'check_ROOT348_terminal_source_HOST.py',
+        'HOST_ROOT348_TERMINAL_SOURCE_RESULT.json',
+        'read_ROOT348_common_result_HOST.py',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

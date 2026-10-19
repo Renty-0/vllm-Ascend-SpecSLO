@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-19T14:05:50.141105+00:00",
-  "upstream_branch_base": "5629b112c9b18ca45c1a63dd1a0311a2d2502c05",
+  "saved_UTC": "2026-10-19T14:18:19.585218+00:00",
+  "upstream_branch_base": "8286168092ce2360238cfe84ac863bac09f58230",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -118,6 +118,12 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/HOST_ROOT346_TERMINAL_SOURCE_RESULT.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/HOST_ROOT346_TERMINAL_SOURCE_RESULT.json",
+      "sha256": "4f109fdd59f10e02fc0fd79308659435e2fd0ad6ebbcbce306276729a4fa7220",
+      "bytes": 624
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/HOST_ROOT348_TERMINAL_SOURCE_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/HOST_ROOT348_TERMINAL_SOURCE_RESULT.json",
       "sha256": "4f109fdd59f10e02fc0fd79308659435e2fd0ad6ebbcbce306276729a4fa7220",
       "bytes": 624
     },
@@ -482,10 +488,16 @@
       "bytes": 728
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT352_MISSING_ORIGINAL_TAIL_OBSERVER_FAILURE.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT352_MISSING_ORIGINAL_TAIL_OBSERVER_FAILURE.json",
+      "sha256": "42b74bd713d664adfc0d344f6a934a89060941de2a22cae1359dd45fb3edf438",
+      "bytes": 761
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
-      "sha256": "7519359599589dd09130b39f19d857855d2cdc56fd2041cba6ba1c3d989fc459",
-      "bytes": 32204
+      "sha256": "0cfc38817ee512d0a1c4e4ebdaf109426044d2d8ba07aef9e5e4a35a47ff8673",
+      "bytes": 33253
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
@@ -668,6 +680,12 @@
       "bytes": 9477
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT348_terminal_full_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT348_terminal_full_HOST.py",
+      "sha256": "6bc5488b3efe4e6f6a7865f39a3913b9ffed4c74522e26cb040f93650cf0fd61",
+      "bytes": 9477
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT_M160_math_cost_HOST.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT_M160_math_cost_HOST.py",
       "sha256": "688a8b068b8a6f67dc18f5b517c37f5ba36401318760de61060c8fc500e29e3c",
@@ -822,6 +840,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/check_ROOT346_terminal_source_HOST.py",
       "sha256": "ea2282859a3238bd7f5508545c6fbd9438411266431ab1b8ae3e487be165f163",
       "bytes": 4292
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/check_ROOT348_terminal_source_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/check_ROOT348_terminal_source_HOST.py",
+      "sha256": "47044c1431186be0fee1e493d89e4b936c029f9c9421f6705d6a68fa50acf47f",
+      "bytes": 4307
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/check_original_B5_vs_B4_paired_verdict_HOST.py",
@@ -1292,6 +1316,12 @@
       "bytes": 3696
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_ROOT348_common_result_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_ROOT348_common_result_HOST.py",
+      "sha256": "7dddfc762dc8f5804a7d4494830ba26993d24312f98eba8d384786b390ceb9f2",
+      "bytes": 3704
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_common_publication_metrics.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_common_publication_metrics.py",
       "sha256": "bac15282709b4c0f802aff696d50916e14e1395e29bbd7e38ec15615f4e074ed",
@@ -1306,8 +1336,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "431acb742368c5dd336e861ca75ef5404d51a007289d19fd62d6c2628eb414c6",
-      "bytes": 18175
+      "sha256": "c7fd2468b9373ca7d5766c3be47dd42173da2026ed5a89912599adc3195ea1d4",
+      "bytes": 18506
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/startup_ROOT331_runtime_import_HOST.sh",
@@ -10448,6 +10478,12 @@
       "bytes": 949
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/FREEZE348.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/FREEZE348.json",
+      "sha256": "09119c918ad6d28d137a731cf041e69f7a0135dc302169455fa944df6caab5c8",
+      "bytes": 769461
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_ADMISSION348_RESULT.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_ADMISSION348_RESULT.json",
       "sha256": "bbd40af4923eb25de8b561949badbfd39e14ee034046c56d686c3b76fffc897a",
@@ -10536,6 +10572,18 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_SNAPSHOT348_RESULT.json",
       "sha256": "07dfd1a54a8f25b6fc005b2015678c7397b28f9e9228f2939d5f3cd369a5b75d",
       "bytes": 201
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/PLAN348.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/PLAN348.json",
+      "sha256": "6a1be0c7d0b79a71e8e7dc3048e1da23544e39f34b47a5aed26b61ba653655c0",
+      "bytes": 1610
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/SOURCE348_RECEIPT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/SOURCE348_RECEIPT.json",
+      "sha256": "70ef1c559dec549774de63fb3e75d8042c829b7f1bd8de9dd7f0596847610b77",
+      "bytes": 292
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/audit348.py",
@@ -16882,8 +16930,8 @@
     {
       "source": "/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
-      "sha256": "99bdcc3e58ce67982dbec76548e0e23526ecf53a1bc0049fb9f353c45a42245b",
-      "bytes": 316513
+      "sha256": "aa7f2d1872dd7d27fe350bb340caa4f41a7c584308dcd553d024363811693b16",
+      "bytes": 317102
     },
     {
       "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/ops/triton/batch_memcpy.py",
@@ -19018,6 +19066,10 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-original-launch-pin-v352/FREEZE352.json",
       "sha256": "a8b594ddcfe1559f45fbb98a55e870fa38376cab63c643185d3e68537ffb809f"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/FREEZE348.json",
+      "sha256": "09119c918ad6d28d137a731cf041e69f7a0135dc302169455fa944df6caab5c8"
     }
   ],
   "omitted_evidence": {
@@ -25111,6 +25163,94 @@
     },
     "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-original-launch-pin-v352/PLAN352.json": {
       "sha256": "bb8adf76bde7d5a9c070f4d315edfd3d9f9d389c1abbd41a674247b65654e702",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/FREEZE347.json": {
+      "sha256": "800cc56da053b31459ffb19d88ebe4c07d61acb585b2f9dbd799b9f43c61dc60",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/FREEZE349.json": {
+      "sha256": "c794dc2c3e782905f08db3b28a74d2fb87babae9ff10cd09327f4342362b7ee2",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-full-next-subset-domain-v350/FREEZE350.json": {
+      "sha256": "ed598707ecbc194a515fe8765cbb537852d1ce1916e6144125cd61c53f3f11fa",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-incumbent-prefix-protection-v351/FREEZE351.json": {
+      "sha256": "3d37ddcc17ca8702a2035a1e52f9048bdc34145d41520b9b78c74e5c962a0008",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-original-launch-pin-v352/FREEZE352.json": {
+      "sha256": "a8b594ddcfe1559f45fbb98a55e870fa38376cab63c643185d3e68537ffb809f",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/FIXTURE348.json": {
+      "sha256": "e5c977302c904f1ca5dbf66894db260a8bbaa926a29f2e765b78ce07aca11fbe",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_ADMISSION348_RESULT.json": {
+      "sha256": "bbd40af4923eb25de8b561949badbfd39e14ee034046c56d686c3b76fffc897a",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_AUDIT348_RESULT.json": {
+      "sha256": "c87de6e86f0568e785c495a687d548558e6f968217b4484d4c36664c5f7704b7",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_BUDGET348_RESULT.json": {
+      "sha256": "6fb464938644e88677f942719970f0e88dd497d540c0839b5e66f24d67518b58",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_COST348_RESULT.json": {
+      "sha256": "1777c6d6a69474f768981dfeedd20dbe0052522db683618c8c9b79a189d7336b",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_EAGER348_RESULT.json": {
+      "sha256": "da086604049fa39aced86de9bbba42e03ee2571b19d955bdc1404d9fb1a01813",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_FAULT348_RESULT.json": {
+      "sha256": "c0e4ab6de9598957214a68c18cff6b509617611a5297748cf97920b34787f869",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_FULL348_PROTOCOL_RESULT.json": {
+      "sha256": "cf6d5f97be163927779bcb238d4f5312b48256760b45522a2bf3eabf3a128d24",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_LAUNCH348_RESULT.json": {
+      "sha256": "9581008cb1b33988e907460540548d42203f37612b9502e83c1473d4353aa159",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_LIVE348_POST_SNAPSHOT_RESULT.json": {
+      "sha256": "6e7b4a0cb66df91f36c31acafeb3a83e91e981a73710b428402c19fd464d5943",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_PLANS348_RESULT.json": {
+      "sha256": "caae317d04db56c130f5ed94af4e12cf44d692dac0794744ce48ee5e6be23a4e",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_PRIORITY348_RESULT.json": {
+      "sha256": "73e789e7f15a1a3c3331840e3db93f3033cc304f8c7471b973ec71b8b7694b35",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_READINESS348_RESULT.json": {
+      "sha256": "ffaf04e3452916058210cd103e59f96dce1f362d4a64f4044c7e49764a8562ac",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_REFILL_AUDIT348_RESULT.json": {
+      "sha256": "cc71c98bc76226888143cbada143de62110a9e024173a71f7d4896269860ec0e",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_RISK_ALLOCATION348_RESULT.json": {
+      "sha256": "0744e9360f7f84723218e523146ab084184ead724f07a2ed1707700d197c553b",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/HOST_SNAPSHOT348_RESULT.json": {
+      "sha256": "07dfd1a54a8f25b6fc005b2015678c7397b28f9e9228f2939d5f3cd369a5b75d",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-singleton-capture-full-v348/PLAN348.json": {
+      "sha256": "6a1be0c7d0b79a71e8e7dc3048e1da23544e39f34b47a5aed26b61ba653655c0",
       "reason": "Historical evidence or fixture; not source"
     }
   },

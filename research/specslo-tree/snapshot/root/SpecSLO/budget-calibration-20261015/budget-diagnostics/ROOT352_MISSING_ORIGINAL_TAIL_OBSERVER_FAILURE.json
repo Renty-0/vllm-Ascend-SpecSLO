@@ -1,0 +1,14 @@
+{
+  "UTC": "2026-10-19T14:12:54.685725+00:00",
+  "status": "failed_missing_original_tail_hidden_capture_initialization",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-small-refill-original-pin-root-v352-numeric351-16-cases-v1.json",
+  "receipt_sha256": "81077f2e3034a34f98e12348e49b74a7797c83cfee5b908f14e646f291a598cc",
+  "sources_unchanged": true,
+  "owned_remaining": [],
+  "all_four_idle": true,
+  "numerical_comparison_not_reached": true,
+  "fix": "Full348 retains original complete after_install, which installs tail_hidden_observer before original captures; same16 additional checks remain mandatory before performance.",
+  "full463": false,
+  "Goodput": null,
+  "adopted": false
+}
