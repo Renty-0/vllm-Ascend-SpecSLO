@@ -2051,3 +2051,27 @@ v331 在诊断总量达到预设 2.25 GiB 上限后被监控器以 SIGTERM 终�
 源条件：`budget-calibration-20261015/tree-M160-C128-F64-global192-full-v333/SOURCE333_RECEIPT.json`；失败记录复核：`budget-calibration-20261015/budget-diagnostics/ROOT331_REJECTED_RUN_RETAINED_COMPONENT_OBSERVATIONS.json`；清理重建清单：`ROOT329_331_REDUNDANT_CHECKPOINT_AND_OLD_CACHE_REGENERATION_20261019.json`。
 
 <!-- END_ROOT331_REJECTED_AND333_CURRENT_20261019 -->
+
+<!-- ROOT348_355_356_357_CURRENT_20261019 -->
+
+### 2026-10-19：完整负结果、优先级保护与 Raw 候选的当前状态
+
+官方 v0.21 的复测已完成，未重测 HUST TP4 基线。三轮 Goodput 为 **274.32、372.91、287.63**，中位数 **287.63**，极差／中位数 **34.28%**；历史 v0.23 对应值为 **39.30%**。这三轮观察的波动稍小，但仍未满足预先声明的稳定条件。两组环境与卡组不同，不能把差异全部归于版本，也不据此降低最终门槛 **644.77**。
+
+| 树形版本 | Raw token/s | Goodput token/s | 达标请求 | 当前结论 |
+| --- | ---: | ---: | ---: | --- |
+| v257，当前保留的最佳完整正确版本 | 686.78 | 554.76 | 374/463 | 已通过三个 target 的逐请求完整 token AR 对照 |
+| v333，FIA160／投影165／32组 | 504.21 | 127.41 | 117/463 | 完整 AR 一致；性能下降，未采用；原监控回执与独立复核结论分别保留 |
+| v348，M120／动态B1～8／运行中补入请求 | 692.29 | 216.81 | 145/463 | 完整数值、463请求及三个 target 的 AR 对照通过；性能下降，未采用 |
+| v355，相同核心配置、batch 活跃期间关闭补入 | 待完成 | 待完成 | 待完成 | 正在进行完整模型与负载检查 |
+| v356，tight／normal 活跃期间禁止补入 | 未测试 | 未测试 | 未测试 | 源码封存、主机检查完成；等待 v355 结果后决定运行 |
+
+v348 比 v257 的有效批次更大、target 调用更少，但 Raw 只增加约 **0.8%**，Goodput 大幅下降。实际记录显示 119 组补入发生时仍有旧请求活跃，全部 tight 和 normal 请求都曾暴露在这种补入中；prefill 次数由12增至120。它支持检查补入引起的停顿，但这些版本还包含其他差异，不能据此认定唯一根因。v355 仅关闭 v348 的运行中补入，用于做更直接的对照；v356 则只允许旧请求全部为 loose 时补入，并保留原始到达时间、页容量约束和真实 prefill 时间记账。
+
+提高树形自身 Raw 的后续原型采用 **Q4／32组／128行，主干3＋根分支3，保留预算B1～6**。原始 draft 四步与 raw8 候选池仍保留，不把保留6个候选写成只生成6个节点。v357 的原验证器路径和预算检查、v358 的398组布局检查已在主机通过，覆盖24,507个真实查询及分支 KV 地址、mask、位置和写入槽重排；**尚未安装到服务，也未完成新模型、提前草稿晋升或完整负载检查**。
+
+保留的组件测量表明，Q4／32组在有效 N24 时约 **59.40 ms**，原 Q5／24组约 **53.84 ms**；Q4 在 N32 时约 **59.25 ms**。因此缩小每组宽度本身不能保证提速，必须实际提高有效并发。历史同前缀观测经精确裁剪后，主干3的每轮 token 产出也低于主干4，尤其是 normal 类。当前三类 B1～6 曲线仅用于筛选方案，仍受旧自适应B8样本选择影响，不是新 Q4 部署曲线或性能结论。
+
+复核文件：`budget-diagnostics/ROOT348_TERMINAL_INDEPENDENT_FULL_AUDIT.json`、`ROOT348_FINAL_FULL_RESULT.json`、`ROOT348_VS257_REFILL_RAW_DESCRIPTIVE.json`、`ROOT348_LIVE_REFILL_INCUMBENT_EXPOSURES.json`、`ROOT_Q4S32_LIVE_POOL_FOLLOWUP_SCREEN_20261019.json`、`ROOT357_CONDITIONAL_DEPTH3_GAIN_SCREEN.json`。目标仍为完整正确的树形 Goodput 同时超过固定串行γ4的 **501.64** 和强 MC2 ON 基线的1.5倍 **644.77**；达到后仍需预先声明的三组匹配复测。
+
+<!-- END_ROOT348_355_356_357_CURRENT_20261019 -->

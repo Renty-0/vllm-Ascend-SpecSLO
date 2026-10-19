@@ -134,6 +134,7 @@ def main():
         'tree-admission-closed-control-full-v355',
         'tree-priority-protected-refill-full-v356',
         'tree-depth3-branch6-protocol-host-v357',
+        'tree-Q4S32-branch-projection-host-v358',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -305,6 +306,8 @@ def main():
         'HOST_ROOT356_TERMINAL_SOURCE_RESULT.json',
         'ROOT356_PROTECTED_REFILL_PREDECLARATION.json',
         'ROOT_Q4S32_LIVE_POOL_FOLLOWUP_SCREEN_20261019.json',
+        'calibrate_ROOT357_same_prefix_short_tree_HOST.py',
+        'ROOT357_CONDITIONAL_DEPTH3_GAIN_SCREEN.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

@@ -1,0 +1,25 @@
+{
+  "status": "PASS_HOST_Q4S32_primary3_alternate3_address_and_physical_projection",
+  "counts": {
+    "frames": 398,
+    "branches": 1631,
+    "real_queries": 24507,
+    "independently_checked_visibility_rows": 21324,
+    "negative_controls": 8,
+    "identity_projection_frames": 89
+  },
+  "every_original_physical_writer_preserved": true,
+  "all_real_tree_visibility_and_private_alias_addresses_independently_checked": true,
+  "NPU_used": false,
+  "serving_installed": false,
+  "neural_math_qualified": false,
+  "eager_promotion_qualified": false,
+  "full463_qualified": false,
+  "Goodput": null,
+  "source_hashes": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4S32-branch-projection-host-v358/layout358.py": "e46942cdea4c015f9449b352d423f3c1437325609ec5e465a5a6e10544f2dd5b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4S32-branch-projection-host-v358/projection358.py": "2cc94d586dba52b7267ef2f1a9087930d3e51f44fa7f21c626503e5b5f60784d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-depth3-branch6-protocol-host-v357/plan357.py": "444874a3318cdcd734b4fea70f6d91fb28b7bd4b2640345b49a96d7b8d53cb19",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/tree.py": "692b2d225d1fedffb84eee7afca7030609a3b4f29d1796cddde448780b5b911a"
+  }
+}
