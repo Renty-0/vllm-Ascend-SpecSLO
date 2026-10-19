@@ -1,0 +1,93 @@
+{
+  "UTC": "2026-10-19T22:23:52.771245+00:00",
+  "status": "rejected_first_real_greedy_hidden_KV_case",
+  "tag": "adaptive-M80-M120-Q5-root-v378-target-math-cost-v1",
+  "receipt_sha256": "a4950dbde05e2a8b9fcfee8e45559fc961cbe69a41df99e8b97651efc0626a98",
+  "case": "N16-all4-anchor0",
+  "candidate_M": 80,
+  "independent_reference_M": 120,
+  "completed_positive_cases": 0,
+  "real_model_failure_rows": [
+    {
+      "rank": 1,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-M80-M120-Q5-root-v378-target-math-cost-v1/mixed/rank1-FAILED-N16-all4-anchor0.json",
+      "sha256": "f8a97ed66b3fe5d385156d5b62a54459efea52118bf3cf3d48f3ca891dbed2a4",
+      "different_greedy_rows": [
+        {
+          "row": 16,
+          "candidate": 222,
+          "reference": 236
+        },
+        {
+          "row": 59,
+          "candidate": 76,
+          "reference": 73
+        }
+      ],
+      "hidden_abs_min_med_max": [
+        0.375,
+        1.46875,
+        8.9375
+      ],
+      "first_KV_layer_failing_original_matcher": 0
+    },
+    {
+      "rank": 2,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-M80-M120-Q5-root-v378-target-math-cost-v1/mixed/rank2-FAILED-N16-all4-anchor0.json",
+      "sha256": "6a6129b949f1307c8ff2fa9cf1063c0d7c367488629648241c36c1854fb5743c",
+      "different_greedy_rows": [
+        {
+          "row": 16,
+          "candidate": 222,
+          "reference": 236
+        },
+        {
+          "row": 59,
+          "candidate": 76,
+          "reference": 73
+        }
+      ],
+      "hidden_abs_min_med_max": [
+        0.375,
+        1.46875,
+        8.9375
+      ],
+      "first_KV_layer_failing_original_matcher": 0
+    },
+    {
+      "rank": 3,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-M80-M120-Q5-root-v378-target-math-cost-v1/mixed/rank3-FAILED-N16-all4-anchor0.json",
+      "sha256": "c3b254c520afa703d2982dc1c994adfb0a7ce4da2e56188aa2a79a2588ebf9bf",
+      "different_greedy_rows": [
+        {
+          "row": 16,
+          "candidate": 222,
+          "reference": 236
+        },
+        {
+          "row": 59,
+          "candidate": 76,
+          "reference": 73
+        }
+      ],
+      "hidden_abs_min_med_max": [
+        0.375,
+        1.46875,
+        8.9375
+      ],
+      "first_KV_layer_failing_original_matcher": 1
+    }
+  ],
+  "greedy_equal": false,
+  "source_unchanged": true,
+  "owned_remaining": [],
+  "all4idle": true,
+  "timing_completed": false,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "goal_achieved": false,
+  "source_gate_weakening": false,
+  "additional_guardian_import_path_issue": "Default guardian audit callback lacks CORE377 path; not the model failure cause; fix in additive next supervisor before further tests",
+  "next": "Trace first-layer eager intermediates at80 and120 on independent same-prefix banks; no performance/equivalence qualification"
+}

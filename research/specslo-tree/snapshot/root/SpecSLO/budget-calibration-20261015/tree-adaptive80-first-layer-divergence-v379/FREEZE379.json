@@ -1,0 +1,35 @@
+{
+  "schema": "ROOT379.additive-synchronized-eager-observations.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-first-layer-divergence-v379/check379_HOST.py": "4f7ad3100e7ddf7dce6c94e5d049d360b7349da6368adbe21535d7134a3d6eea",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-first-layer-divergence-v379/audit379.py": "80ce60242def92b2523639304cdd8cb8b50255ded0b11b7d7f4d2196f1fc539e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-first-layer-divergence-v379/runtime379.py": "b180f0a7837d71f8cca41ecd0fc01b8d74d77c6c8a245ac1b0bfe79745d8ab97",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-first-layer-divergence-v379/HOST379_CONSTRUCTION_RESULT.json": "640bd784d61406f801b351723e558e3af525c5c01be3f8dc473fc44b1b096465",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-first-layer-divergence-v379/guard379.py": "a3a1ff4fc58f74b9ac020912fd60098625c9a987cacfabcbb0bac72fa47b327d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-first-layer-divergence-v379/trace379.py": "da5292e221ea8b3874ab75a4201a358125a039ed14fed937e87923fdb4b5547c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-first-layer-divergence-v379/check379.py": "4ee30b4ae2d00978299016f3127595951a8db0981b84cba329a860a34accb2c3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-first-layer-divergence-v379/startup379.sh": "aab587960243d6588ba6459a4aa733e5b61c74c5d260f585b092bbb823310201",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-first-layer-divergence-v379/probe379.py": "7217de950aea39555a5109130943c9506a7aca41765f8515e7a71ca645e9ed3f",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT379_layer_observations_HOST.py": "38af267cac09ca4a45ac0f2e23d0d42a7fdaea7253738429a138a840a96b0312"
+  },
+  "parent_freeze_sha256": "e7beb04cadd68479440ec26a1e8b3a39949d395e7f6485af658bc219c5853bc3",
+  "parent_archive_sha256": "d6541a3a95327a495345ed50a9008753ae26d09f715b13969643b10a13603451",
+  "actual_diagnostic_pairs_each_target": 1,
+  "independent_prefills_each_target": 144,
+  "original_case": "N16-all4-anchor0",
+  "physical_families": [
+    80,
+    120
+  ],
+  "Q": 5,
+  "S": [
+    16,
+    24
+  ],
+  "preserves_original_mc2_function": true,
+  "synchronizes_before_observation": true,
+  "diagnostic_does_not_grant_neural_or_performance_qualification": true,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST378_ACTUAL_FROZEN_GUARD_AND_LIFECYCLE_CONSTRUCTION",
+  "source_files": 3605,
+  "freeze_sha256": "e7beb04cadd68479440ec26a1e8b3a39949d395e7f6485af658bc219c5853bc3",
+  "archive_sha256": "d6541a3a95327a495345ed50a9008753ae26d09f715b13969643b10a13603451",
+  "cases_each_target": 693,
+  "independent_prefills_each_target": 216,
+  "NPU_used": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -6,7 +6,22 @@ from geometry377 import adjust
 
 
 def cases():
-    return [adjust(case, enabled=True) for case in original.cases()]
+    from mapper255 import envelope
+    full = list(original.cases())
+    budgets = [5] + [4] * 14
+    m,s,padding = envelope(15,76,'full9')
+    for anchor in range(4):
+        full.append(dict(name=f'N15-onefork-max80-anchor{anchor}',N=15,budgets=list(budgets),
+            anchor=anchor,M=m,S=s,padding=list(padding),plan_family='full9',query_count=76,
+            fixture_budget_reduction=None))
+    selected = [adjust(case, enabled=True) for case in full]
+    # Naturally qualify each entry at its largest real-row count before reusing
+    # it for smaller cases. No validation state is assigned or inherited.
+    family = lambda c:(c['M'], 11 if 5 in c['budgets'] else 10)
+    first = [max((c for c in selected if family(c)==key), key=lambda c:c['query_count'])
+             for key in ((80,10),(80,11),(120,10),(120,11))]
+    names = {c['name'] for c in first}
+    return first + [c for c in selected if c['name'] not in names]
 
 
 def candidate_function():

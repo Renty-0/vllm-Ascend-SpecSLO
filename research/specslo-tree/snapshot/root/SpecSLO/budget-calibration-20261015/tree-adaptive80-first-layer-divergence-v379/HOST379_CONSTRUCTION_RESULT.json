@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST379_ALIGN_HOOK_LIFECYCLE_WORKER_AND_ACTUAL_GUARD_IMPORTS",
+  "NPU_used": false,
+  "alignment_cases": 7,
+  "actual_mc2_impl_forwarded_once": true,
+  "class_method_and_hooks_restored": true,
+  "actual_audit_import_path_tested_without_extra_CORE_injection": true,
+  "original_owned_lifecycle_preserved": true,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

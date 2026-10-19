@@ -1,0 +1,10 @@
+{
+  "status": "PASS_HOST378_ACTUAL_ORIGINAL_WORKER_AND_OWNED_GUARD_CONSTRUCTION",
+  "NPU_used": false,
+  "models_loaded": false,
+  "neural_qualified": false,
+  "cases_each_target": 693,
+  "independent_prefills_each_target": 216,
+  "deadline_seconds": 3600,
+  "actual_original_lifecycle_and_verifier_cleanup_preserved": true
+}

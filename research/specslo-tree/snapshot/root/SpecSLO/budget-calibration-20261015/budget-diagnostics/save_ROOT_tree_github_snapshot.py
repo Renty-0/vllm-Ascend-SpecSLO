@@ -63,6 +63,8 @@ SOURCES = (
     ('tree-fastv5-eager-frontier-chain-device-v374', 374),
     ('tree-fastv5-frontier-boolean-guard-v375', 375),
     ('tree-best257-uniform-KV-buckets-full-v376', 376),
+    ('tree-adaptive-M80-M120-target-math-cost-v378', 378),
+    ('tree-adaptive80-first-layer-divergence-v379', 379),
 )
 
 
@@ -166,6 +168,8 @@ def main():
         'tree-fastv5-frontier-boolean-guard-v375',
         'tree-best257-uniform-KV-buckets-full-v376',
         'tree-adaptive-M80-M120-target-host-v377',
+        'tree-adaptive-M80-M120-target-math-cost-v378',
+        'tree-adaptive80-first-layer-divergence-v379',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -371,6 +375,12 @@ def main():
         'ROOT376_PRELIMINARY_FULL_COMMON_METRICS.json',
         'ROOT376_ACTUAL_SMALL_BATCH_PADDING_SCREEN.json',
         'ROOT_FUTURE_ADAPTIVE_M80_M120_TAIL_RAW_PLAN_20261019.json',
+        'HOST_ROOT378_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'ROOT378_INHERITED_SCOPE_LABEL_CONTEXT.json',
+        'ROOT378_NEGATIVE_FIRST_MODEL_CASE.json',
+        'HOST_ROOT379_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'freeze_ROOT379_layer_observations_HOST.py',
+        'freeze_ROOT378_adaptive_physical_target_HOST.py',
         'HOST_ROOT376_ACTUAL_FROZEN_CONSTRUCTION.json',
         'ROOT376_GITHUB_VALIDATION_CONTEXT.json',
         'freeze_ROOT376_best257_KV_buckets_HOST.py',

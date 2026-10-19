@@ -1,0 +1,38 @@
+{
+  "status": "PASS_HOST378_ACTUAL_SIX_ARM_ORDER_AND_AUDIT_CORRUPTIONS",
+  "NPU_used": false,
+  "actual_original_timing_loop_exercised_on_draft_HOST_double": true,
+  "each_arm_mode_first_counts": {
+    "N1-B4": {
+      "fixed120": 10,
+      "adaptive80_120": 10
+    },
+    "N8-B5": {
+      "fixed120": 10,
+      "adaptive80_120": 10
+    },
+    "N12-B4": {
+      "fixed120": 10,
+      "adaptive80_120": 10
+    },
+    "N16-B4": {
+      "fixed120": 10,
+      "adaptive80_120": 10
+    },
+    "N12-B5": {
+      "fixed120": 10,
+      "adaptive80_120": 10
+    },
+    "N24-B4": {
+      "fixed120": 10,
+      "adaptive80_120": 10
+    }
+  },
+  "target_auditor_fixture_is_synthetic": true,
+  "synthetic_timings_saved_as_results": false,
+  "target_calls_each_bank": 252,
+  "corruption_controls": 6,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

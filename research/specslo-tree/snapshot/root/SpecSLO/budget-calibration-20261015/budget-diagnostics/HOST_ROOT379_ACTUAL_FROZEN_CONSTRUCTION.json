@@ -1,0 +1,19 @@
+{
+  "status": "PASS_HOST379_ACTUAL_FROZEN_GUARD_WORKER_AND_AUDIT",
+  "source_members": 3616,
+  "pins": {
+    "freeze_sha256": "318f60b9d142a4c67c6c6f50e0b91e5f38aec40b365a0d4dea2a32bc1e28449c",
+    "archive_sha256": "b97ec0fe654ee372318878ee975b3d8fc69cd7460432bce50b0663716e25b2e7",
+    "own_archive_members": 11,
+    "own_archive_bytes": 13290,
+    "parent_source_members": 3605,
+    "NPU_used": false,
+    "model_or_performance_qualification_inherited": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "NPU_used": false,
+  "models_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

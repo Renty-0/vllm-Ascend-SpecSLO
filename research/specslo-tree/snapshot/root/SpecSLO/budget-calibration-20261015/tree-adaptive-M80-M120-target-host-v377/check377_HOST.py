@@ -78,6 +78,17 @@ def main():
          'side groups, rather than owner count alone, control boundary')
     need(choose([4]*16, enabled=True) == 80 and choose([4]*17, enabled=True) == 120,
          'complete physical query capacity boundary')
+    from oracle377 import cases as neural_cases, candidate_function, specialized_run
+    import dis
+    actual = neural_cases()
+    need(len(actual)==231, 'all original227 plus4 max80 branch cases')
+    maximum={(c['M'],11 if 5 in c['budgets'] else 10):c['query_count']for c in actual[:4]}
+    need(maximum=={(80,10):80,(80,11):76,(120,10):120,(120,11):116},
+         'largest actual real-row count first in every family')
+    need(sum(i.opname=='LOAD_CONST'and i.argval=='M'for i in dis.get_instructions(candidate_function()))==3,
+         'all three actual candidate physical dimension gates')
+    need(specialized_run().__globals__['reference'].__module__=='oracle255',
+         'independent reference stays original FULL120')
 
     # Exercise actual installer callback construction while replacing only the
     # allocation/attention-binding entry with a HOST double. No model executes.

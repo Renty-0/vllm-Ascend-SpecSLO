@@ -1,0 +1,30 @@
+{
+  "UTC": "2026-10-19T22:14:19.147015+00:00",
+  "status": "inherited_supervisor_description_context_only",
+  "inherited_description": "fresh target Q4/Q5 node math, two masked-future canaries, paired target costs; no real draft or service workload",
+  "description_origin": "unchanged original336 supervisor body reused through361",
+  "actual_frozen378_scope": {
+    "Q": 5,
+    "M": [
+      80,
+      120
+    ],
+    "S": [
+      16,
+      24
+    ],
+    "case_count_each_target": 693,
+    "independent_prefills_each_target": 216,
+    "full_FIXED120_reference": true,
+    "paired_modes": [
+      "fixed120",
+      "adaptive80_120"
+    ],
+    "canary_tests_run_or_counted": false,
+    "Q4_test_run_or_counted": false
+  },
+  "authoritative_scope": "frozen378 source and actual per-bank model records audited by audit378.py",
+  "frozen_supervisor_not_edited": true,
+  "qualification_flags_not_relaxed": true,
+  "scope_grants_no_LIVE_permission": true
+}

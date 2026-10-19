@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST377_ALL231_DISPATCH_COLD_REUSE_AND_CORRUPTIONS",
+  "NPU_used": false,
+  "synthetic_protocol_only": true,
+  "neural_qualified": false,
+  "cases": 231,
+  "first_cold_calls": 239,
+  "warm_reuse_calls": 231,
+  "corruptions": 5,
+  "Raw": null,
+  "Goodput": null
+}

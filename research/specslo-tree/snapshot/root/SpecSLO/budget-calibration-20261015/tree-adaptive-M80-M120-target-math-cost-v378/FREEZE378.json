@@ -1,0 +1,59 @@
+{
+  "schema": "ROOT378.additive-adaptive-physical-target-source.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378/audit378.py": "48469f69b22429a5004f180dfb69413fad4da4d74d510081d978e10fcd02f643",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378/check378.py": "c178fa0c3286af7c910caea80cbc1fb07a420a29263b04a93b6fdc9662dc6f23",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378/guard378.py": "3a6bf5e45efad54619ae5b40c888bbe9fb82714e21a9b819624fa6b8b6a6904b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378/check_cost378_HOST.py": "8da9791a95b21588bc6945706c779a33bb95598c1349ed5b257afb4753df07bd",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378/HOST378_CONSTRUCTION_RESULT.json": "740a5ddd8d7a1b1c3faf15a9c364b4de2e6a034aa9b0e2627da4f61b882761de",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378/HOST378_COST_AND_AUDIT_RESULT.json": "0cd8abaa3cef03ad229f7cad4922c4164269e4059f71cb443bbaf396fc058efd",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378/runtime378.py": "6fc6ef46e856ae6afcdaa8302c7b0271b82e48e5607f0c299865c508ccdfc507",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378/benchmark378.py": "ffab6158f71089da7ac16f84ff8e12c36b131cc2736e62f4e3b4709f4522d107",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378/probe378.py": "29171efe7774f625edbfda711860b01f32d82fcbc3f24cb203565375a06fc801",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378/startup378.sh": "f70764624f5e6abeab31c93de9a2b8fb980acaffb0f16ab4b2423ae0d13dfd31",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/oracle377.py": "1e19818f5b8242eb865aed628ef69021ba90515b86a9f80f5070dc121d6e2692",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/install377.py": "9c7d5b2fde205bf71c818c8954af04a8be5b38253bfcbb41834aaae90e5fddc9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/dispatch377.py": "377f944fc302c44069642b4091cc50048b4b66bcc2e8bf6e637f7fec414f5d89",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/check377_HOST.py": "808b9ee49ec4eae628e00af8f95432cd611a4c883da2cc8cbf7a0797cfe32ac4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/bucket377.py": "0cefe3dd606edaf72078991f5c7addb8a6c1831cf1b8fd589fc0aa990c7a2477",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/geometry377.py": "8c1c958f95552e054dc62337a4c561c6b39a77109fb8671c7593202a2001c68a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/HOST377_DISPATCH_RESULT.json": "b66f74471546b7cf65650dd00921c7884b79ec0b65b13cf5bd6218d4965525c0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/physical377.py": "5f577ff88c1bb5fe466230e6af722a2bdf338e2b66a9037ee0148ef55cc7afd0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/HOST377_RESULT.json": "e768170d8fd622687d4494970d6d8dd9bad191545f2a47ac7c1777afa445bbc9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/check_dispatch377_HOST.py": "18dd2548993cd0faa2d4cabb084d3649e155aeedc39b5776cb9e7b573abaed8b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377/source377.py": "3c4a8189502a6b149bc5ea9322aaa3a998f588cc03fed6dba9210fa7c113ddd6",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT378_adaptive_physical_target_HOST.py": "c9365e175f20b06e16825a53aafef35cef3aefabdb37065abdf50ab5d4cf72c4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/prefixes376.py": "e809cf70cd2ddd780428b82f6193651264b7d713df40c05de5eaf950b8ffa998"
+  },
+  "parent_freeze_sha256": "a1dbe700b6fa857631be31878df58fd7b129de38491ae027a8823799ce81bf3f",
+  "parent_archive_sha256": "3e96cc84744c376ef5855bc57cda8627323c4ba841bc3843420c906d0618c20a",
+  "actual_target_cases_each": 693,
+  "independent_prefills_each_target": 216,
+  "original_real_budget_domain": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "original_target_KV_bucket_policy_retained": true,
+  "independent_FULL120_reference_required": true,
+  "physical_families": [
+    80,
+    120
+  ],
+  "Q": 5,
+  "S": [
+    16,
+    24
+  ],
+  "paired_modes": [
+    "fixed120",
+    "adaptive80_120"
+  ],
+  "six_arms20_pairs": true,
+  "model_or_performance_qualification_inherited": false,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

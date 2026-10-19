@@ -1,6 +1,6 @@
 {
   "UTC": "2026-10-19T20:09:01.138356+00:00",
-  "status": "launched_full463_pending_fresh_same_instance_gates",
+  "status": "complete_full463_and_all3_ownAR_independently_audited",
   "candidate": "best257 original draft/allocator/admission plus uniform target KV extent",
   "pending_component361": false,
   "preserve": [
@@ -30,5 +30,6 @@
   "component361_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT361_FINAL_TARGET_KV_BUCKET_AND_COST_RESULT.json",
   "guardian_session": 11754,
   "tag": "static-M120-uniform-KV-root-v376-full463-ownAR-v1",
-  "launched_UTC": "2026-10-19T20:38:03.817666+00:00"
+  "launched_UTC": "2026-10-19T20:38:03.817666+00:00",
+  "final_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT376_FINAL_FULL_RESULT.json"
 }
