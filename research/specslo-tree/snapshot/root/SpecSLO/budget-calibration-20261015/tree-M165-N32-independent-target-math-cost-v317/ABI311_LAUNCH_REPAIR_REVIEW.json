@@ -1,0 +1,12 @@
+{
+  "change": "startup filename Python ABI317 corrected to actual ABI311; only additive entry/guard source binding",
+  "original_startup_preserved": true,
+  "original_numeric_source_freeze_sha256": "36cbac2bca38b3b69b2ab4ed04f984bb48782fd51d5bb682d04f3d98ba76405f",
+  "actual_extension": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/vllm_ascend_C.cpython-311-aarch64-linux-gnu.so",
+  "actual_extension_exists": true,
+  "bash_syntax_passed": true,
+  "original_startup_inverse_exact": true,
+  "numeric_conditions_relaxed": false,
+  "new_source_entry": "guard317_abi311.py",
+  "NPU_qualification_inherited": false
+}

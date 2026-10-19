@@ -1,0 +1,5 @@
+{
+  "passed": false,
+  "models_loaded": false,
+  "reason": "Smoke imported late helpers before actual runtime317 bootstrap set its dependent module directories; corrected smoke now imports the actual bootstrap first"
+}

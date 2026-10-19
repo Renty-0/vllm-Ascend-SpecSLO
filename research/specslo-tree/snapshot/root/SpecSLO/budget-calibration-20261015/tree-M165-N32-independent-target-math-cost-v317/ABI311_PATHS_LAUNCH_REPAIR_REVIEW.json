@@ -1,0 +1,10 @@
+{
+  "change": "Additive startup dependency path restores actual original M120-node-math-v255 directory; mathematical317 bodies remain immutable",
+  "startup_inverse_exact": true,
+  "actual_startup_imports": 20,
+  "actual_CASE_COUNT": 546,
+  "actual_extension_ABI311": true,
+  "numeric_conditions_relaxed": false,
+  "models_loaded_in_smoke": false,
+  "NPU_qualification_inherited": false
+}

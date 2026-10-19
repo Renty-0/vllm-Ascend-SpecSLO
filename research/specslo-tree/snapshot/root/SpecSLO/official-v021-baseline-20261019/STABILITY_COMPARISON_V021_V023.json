@@ -1,0 +1,326 @@
+{
+  "schema": "official021-vs023-observed-stability.v1",
+  "Asia_Shanghai": "2026-10-19T12:49:54.764233+08:00",
+  "official021": {
+    "Goodput_all": [
+      274.3205053479455,
+      372.91212795006754,
+      287.6271515695234
+    ],
+    "Goodput_median": 287.6271515695234,
+    "Goodput_min": 274.3205053479455,
+    "Goodput_max": 372.91212795006754,
+    "Goodput_range_over_median": 0.34277578477597614,
+    "Goodput_sample_CV": 0.17167051392364266,
+    "Raw_all": [
+      920.3651737398462,
+      923.3064986143384,
+      918.4232494944092
+    ],
+    "Raw_median": 920.3651737398462,
+    "Raw_range_over_median": 0.005305773468248865,
+    "TPOT_median_range_over_median": {
+      "tight": 0.17189359554671055,
+      "normal": 0.15734894599166546,
+      "loose": 0.17044950620709573
+    },
+    "representative_round": {
+      "tag": "official021-MC2ON-20261019-v2-r3",
+      "Goodput": 287.6271515695234,
+      "Raw": 918.4232494944092,
+      "attained": 145,
+      "groups": {
+        "loose": {
+          "requests": 96,
+          "attained": 96,
+          "median": 57.51718008559692,
+          "P90": 62.360396513213345
+        },
+        "normal": {
+          "requests": 96,
+          "attained": 28,
+          "median": 57.04394246004085,
+          "P90": 61.10257907585037
+        },
+        "tight": {
+          "requests": 271,
+          "attained": 21,
+          "median": 57.46951903165609,
+          "P90": 61.746920484438306
+        }
+      },
+      "result": "/root/SpecSLO/official-v021-baseline-20261019/runs/official021-MC2ON-20261019-v2-r3/result.json",
+      "result_sha256": "b8d88d79bff77e60f99a9393cd120b976494d87bbe9237ff4867ccffe03dff0c",
+      "audit_sha256": "32cc76f2020c0ea3047e32decb363304c2ba7f527e8bfbd821e39e44f25bb3a0"
+    },
+    "rounds": [
+      {
+        "tag": "official021-MC2ON-20261019-v2-r1",
+        "Goodput": 274.3205053479455,
+        "Raw": 920.3651737398462,
+        "attained": 138,
+        "groups": {
+          "loose": {
+            "requests": 96,
+            "attained": 96,
+            "median": 57.214705762817175,
+            "P90": 61.60114333124511
+          },
+          "normal": {
+            "requests": 96,
+            "attained": 29,
+            "median": 56.18631499055482,
+            "P90": 61.348139187430206
+          },
+          "tight": {
+            "requests": 271,
+            "attained": 13,
+            "median": 57.108559980406426,
+            "P90": 61.38943964833743
+          }
+        },
+        "result": "/root/SpecSLO/official-v021-baseline-20261019/runs/official021-MC2ON-20261019-v2-r1/result.json",
+        "result_sha256": "5323d42d723f20ce794c574d52ce140731bca35b94ef4185b7faa783c81c8efb",
+        "audit_sha256": "df85d953edf29600442648d7eb71f69f0dc74a509b148a0b44e6aeed1821b866"
+      },
+      {
+        "tag": "official021-MC2ON-20261019-v2-r2",
+        "Goodput": 372.91212795006754,
+        "Raw": 923.3064986143384,
+        "attained": 187,
+        "groups": {
+          "loose": {
+            "requests": 96,
+            "attained": 96,
+            "median": 47.76496174054046,
+            "P90": 51.5801331757757
+          },
+          "normal": {
+            "requests": 96,
+            "attained": 68,
+            "median": 48.20308501712134,
+            "P90": 51.95329321668396
+          },
+          "tight": {
+            "requests": 271,
+            "attained": 23,
+            "median": 47.65292332012905,
+            "P90": 51.90506650797033
+          }
+        },
+        "result": "/root/SpecSLO/official-v021-baseline-20261019/runs/official021-MC2ON-20261019-v2-r2/result.json",
+        "result_sha256": "81f6fa2d1e1a4721da8bb40f455e0532d7f328ac047a0cd75bfc72f7ccb0b101",
+        "audit_sha256": "2dd7397548af4f0e3f4ca6550209771791a7b2ead14e7cf49c58265d0de8e003"
+      },
+      {
+        "tag": "official021-MC2ON-20261019-v2-r3",
+        "Goodput": 287.6271515695234,
+        "Raw": 918.4232494944092,
+        "attained": 145,
+        "groups": {
+          "loose": {
+            "requests": 96,
+            "attained": 96,
+            "median": 57.51718008559692,
+            "P90": 62.360396513213345
+          },
+          "normal": {
+            "requests": 96,
+            "attained": 28,
+            "median": 57.04394246004085,
+            "P90": 61.10257907585037
+          },
+          "tight": {
+            "requests": 271,
+            "attained": 21,
+            "median": 57.46951903165609,
+            "P90": 61.746920484438306
+          }
+        },
+        "result": "/root/SpecSLO/official-v021-baseline-20261019/runs/official021-MC2ON-20261019-v2-r3/result.json",
+        "result_sha256": "b8d88d79bff77e60f99a9393cd120b976494d87bbe9237ff4867ccffe03dff0c",
+        "audit_sha256": "32cc76f2020c0ea3047e32decb363304c2ba7f527e8bfbd821e39e44f25bb3a0"
+      }
+    ]
+  },
+  "official023": {
+    "Goodput_all": [
+      409.1977918973598,
+      325.25961340459247,
+      281.37747870781476
+    ],
+    "Goodput_median": 325.25961340459247,
+    "Goodput_min": 281.37747870781476,
+    "Goodput_max": 409.1977918973598,
+    "Goodput_range_over_median": 0.39297935532668965,
+    "Goodput_sample_CV": 0.19180613995365256,
+    "Raw_all": [
+      924.1881836511102,
+      923.8969386891184,
+      923.9558343384272
+    ],
+    "Raw_median": 923.9558343384272,
+    "Raw_range_over_median": 0.0003152152420795124,
+    "TPOT_median_range_over_median": {
+      "tight": 0.14992786712389608,
+      "normal": 0.14330587777338058,
+      "loose": 0.15354319103810748
+    },
+    "representative_round": {
+      "tag": "mc2-on-confirm3-20261015-r2",
+      "Goodput": 325.25961340459247,
+      "Raw": 923.8969386891184,
+      "attained": 163,
+      "groups": {
+        "tight": {
+          "requests": 271,
+          "attained": 34,
+          "median": 53.051898780722695,
+          "P90": 58.10664734690363
+        },
+        "normal": {
+          "requests": 96,
+          "attained": 33,
+          "median": 52.59548259709845,
+          "P90": 57.73733545493087
+        },
+        "loose": {
+          "requests": 96,
+          "attained": 96,
+          "median": 53.49255409601028,
+          "P90": 57.60691644718463
+        }
+      },
+      "result": "/root/SpecSLO/upstream-baseline-20261014/runs/mc2-on-confirm3-20261015-r2/result.json",
+      "result_sha256": "7cf4fa810cd70ac93f5f911bd00fe3a052eae1acd0b7a91563033f9473adc94b"
+    },
+    "rounds": [
+      {
+        "tag": "mc2-on-confirm3-20261015-r1",
+        "Goodput": 409.1977918973598,
+        "Raw": 924.1881836511102,
+        "attained": 205,
+        "groups": {
+          "tight": {
+            "requests": 271,
+            "attained": 27,
+            "median": 47.405279988197435,
+            "P90": 50.42985930140276
+          },
+          "normal": {
+            "requests": 96,
+            "attained": 82,
+            "median": 47.768005859779805,
+            "P90": 50.60088884420111
+          },
+          "loose": {
+            "requests": 96,
+            "attained": 96,
+            "median": 47.32854328767644,
+            "P90": 50.3941040628888
+          }
+        },
+        "result": "/root/SpecSLO/upstream-baseline-20261014/runs/mc2-on-confirm3-20261015-r1/result.json",
+        "result_sha256": "c8b76f4bbe82a57e990985cffe0f75c0d01d6296d4df7fb9ed2efcf48e451873"
+      },
+      {
+        "tag": "mc2-on-confirm3-20261015-r2",
+        "Goodput": 325.25961340459247,
+        "Raw": 923.8969386891184,
+        "attained": 163,
+        "groups": {
+          "tight": {
+            "requests": 271,
+            "attained": 34,
+            "median": 53.051898780722695,
+            "P90": 58.10664734690363
+          },
+          "normal": {
+            "requests": 96,
+            "attained": 33,
+            "median": 52.59548259709845,
+            "P90": 57.73733545493087
+          },
+          "loose": {
+            "requests": 96,
+            "attained": 96,
+            "median": 53.49255409601028,
+            "P90": 57.60691644718463
+          }
+        },
+        "result": "/root/SpecSLO/upstream-baseline-20261014/runs/mc2-on-confirm3-20261015-r2/result.json",
+        "result_sha256": "7cf4fa810cd70ac93f5f911bd00fe3a052eae1acd0b7a91563033f9473adc94b"
+      },
+      {
+        "tag": "mc2-on-confirm3-20261015-r3",
+        "Goodput": 281.37747870781476,
+        "Raw": 923.9558343384272,
+        "attained": 141,
+        "groups": {
+          "tight": {
+            "requests": 271,
+            "attained": 13,
+            "median": 55.35923801926401,
+            "P90": 60.06775566856959
+          },
+          "normal": {
+            "requests": 96,
+            "attained": 32,
+            "median": 55.30524766027156,
+            "P90": 59.546093228163954
+          },
+          "loose": {
+            "requests": 96,
+            "attained": 96,
+            "median": 55.541960740356444,
+            "P90": 59.958977985843376
+          }
+        },
+        "result": "/root/SpecSLO/upstream-baseline-20261014/runs/mc2-on-confirm3-20261015-r3/result.json",
+        "result_sha256": "350a1d119f8d9796e1f08e9ca9e6557af26be26b56f5f729a4fded715fa813e9"
+      }
+    ]
+  },
+  "official021_passes_predeclared_stability": false,
+  "official021_observed_Goodput_variation_smaller": true,
+  "old021_source": {
+    "plugin_tag": "v0.21.0rc1",
+    "plugin_commit": "80610e4438dba05011b05f89fc45d91e96992671",
+    "core_tag": "v0.21.0",
+    "core_commit": "ad7125a431e176d4161099480a66f0169609a690",
+    "Python": "3.11",
+    "CANN": "9.0",
+    "physical_cards": [
+      2,
+      5,
+      6,
+      7
+    ],
+    "source_manifest_sha256": "1d2904420270f750bf43e8d7ccb28a94a3e3d2635755af1a488fa2b03de13eec"
+  },
+  "old023_source": {
+    "plugin_version": "0.23.0.post1",
+    "plugin_commit": "1cdb8c4",
+    "core_version": "0.23.0",
+    "core_commit": "0fc695f",
+    "Python": "3.12",
+    "CANN": "9.1",
+    "physical_cards": [
+      1,
+      2,
+      3,
+      5
+    ]
+  },
+  "predeclared_criteria": {
+    "raw_full_range_over_median_max": 0.03,
+    "Goodput_full_range_over_median_max": 0.1,
+    "per_class_TPOT_median_full_range_over_median_max": 0.05
+  },
+  "receipt_sha256": "af80c34fbb9b002f1268f43c5c2c7a50c9ce45f599735559510ab87d44b97124",
+  "archived023_summary_sha256": "b295ef2b0980e7eaa249a8f150f47c603d91fb06b790b4fba18e6d21b14bfdff",
+  "selected_legacy_baseline_if_stable": null,
+  "HUST_baseline_run": false,
+  "tree_Raw_above_baseline_required": false,
+  "scope": "Three observations per configuration; Python/CANN and visible physical card identifiers differ, so this is not a version-only causal experiment. Final method comparison must rerun on identical current hardware/configuration clocks."
+}

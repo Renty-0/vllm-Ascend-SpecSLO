@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "modules": {
+    "runtime317": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/runtime317.py",
+    "probes317": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/probes317.py",
+    "oracle317": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/oracle317.py",
+    "oracle311": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/oracle311.py",
+    "oracle255": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/oracle255.py",
+    "reference_schedule317": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/reference_schedule317.py",
+    "bank317": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/bank317.py",
+    "baseline317": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/baseline317.py",
+    "static_state317": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/static_state317.py",
+    "raw_controls317": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/raw_controls317.py",
+    "benchmark317": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/benchmark317.py",
+    "audit_static_calls317": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/audit_static_calls317.py",
+    "metadata285": "/root/SpecSLO/budget-calibration-20261015/tree-uniform-q5-M165-S33-C128-host-v285/metadata285.py",
+    "plan285": "/root/SpecSLO/budget-calibration-20261015/tree-uniform-q5-M165-S33-C128-host-v285/plan285.py",
+    "write313": "/root/SpecSLO/budget-calibration-20261015/tree-M165-single-prepare-host-v313/write313.py",
+    "kernels292": "/root/SpecSLO/budget-calibration-20261015/tree-contiguous-prefix-span-copy-host-v292/kernels292.py",
+    "neural_oracle231": "/root/SpecSLO/budget-calibration-20261015/tree-contiguous-branch-tail-final-metadata-math-v234/neural_oracle231.py",
+    "dual_bank_v146": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/dual_bank_v146.py",
+    "capture_key296": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/capture_key296.py",
+    "device296": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/device296.py"
+  },
+  "actual_startup_environment": true,
+  "cases": 546,
+  "model_constructed": false,
+  "kernels_launched": false
+}

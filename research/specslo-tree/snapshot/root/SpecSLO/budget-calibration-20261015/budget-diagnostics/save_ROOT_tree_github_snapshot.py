@@ -120,13 +120,18 @@ def main():
         'ROOT316_PRELIMINARY_FULL_COMMON_METRICS.json',
         'ROOT316_TERMINAL_INDEPENDENT_FULL_AUDIT.json',
         'freeze_ROOT317_M165_target_cost_HOST.py',
+        'freeze_ROOT317_ABI311_launch_HOST.py',
+        'freeze_ROOT317_ABI311_paths_HOST.py',
+        'summarize_ROOT_official021_stability_HOST.py',
+        'ROOT316_ACTUAL_ALL_GAMMA4_CALL_COUNTS.json',
+        'ROOT_TREE_RAW_FOLLOWUP_WITH_ORIGINAL_PLAN_20261019.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():
             selected.add(path)
     official = Path('/root/SpecSLO/official-v021-baseline-20261019')
     selected.update(p for p in official.iterdir() if p.is_file()
-                    and p.suffix in {'.py', '.sh', '.json'}
+                    and p.suffix in {'.py', '.sh', '.json', '.md'}
                     and not p.name.startswith('SOURCE_MANIFEST')
                     and not p.name.startswith(('HOST', 'SCOPED_BUILD_ATTEMPT')))
     for directory in ('harness', 'publication-witness'):

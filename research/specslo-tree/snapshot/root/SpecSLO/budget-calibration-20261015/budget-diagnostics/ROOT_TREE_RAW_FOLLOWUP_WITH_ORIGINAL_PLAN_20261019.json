@@ -1,0 +1,40 @@
+{
+  "UTC": "2026-10-19T04:49:10.764122+00:00",
+  "user_request": "Keep original tree/dynamic-budget optimization plan; add improving current tree Raw as an extra direction; do not compare tree Raw against baseline Raw as a requirement",
+  "main_order": [
+    "fresh317 M165/N32 target numeric and paired cost qualification",
+    "only after qualification integrate C128 normal/F64 future/global192 plus measured costs",
+    "fresh full463 including original startup, genuine draft, zero/sealing and independent ownAR gates",
+    "measure complete-workload Goodput; select qualified candidate for fair final repeats"
+  ],
+  "additional_Raw_directions": [
+    {
+      "name": "actual effective batch utilization",
+      "observation": "v316 mean16.994 real requests/call,1109of2279 calls at existing N24 cap; target phase139.184s of193.768s host wall",
+      "next": "Test165-row/N32 backend costs before changing admitted concurrency; examine actual N and tail padding in full workload",
+      "implemented": false
+    },
+    {
+      "name": "complete gamma4 hot path",
+      "source_evidence": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT316_ACTUAL_ALL_GAMMA4_CALL_COUNTS.json",
+      "observed_measured_calls": 2279,
+      "observed_all_gamma4_calls": 1809,
+      "observed_fraction": 0.7937691970162352,
+      "next": "After current plan, consider original causal attention for eligible complete-chain calls; inspect exact candidate and independent reference numerical geometry first",
+      "requirements": [
+        "No blind mask/flag changes or context truncation",
+        "Fresh true model greedy/hidden/all128KV proof",
+        "Fresh full463 ownAR before any performance adoption"
+      ],
+      "implemented": false
+    },
+    {
+      "name": "draft/target critical path",
+      "next": "If full Raw remains low relative to target-only cost, measure actual draft and target latency/overlap; host phase walls alone cannot prove device overlap",
+      "implemented": false
+    }
+  ],
+  "tree_Raw_must_exceed_baseline_Raw": false,
+  "performance_improvement_proven": false,
+  "Goodput": null
+}
