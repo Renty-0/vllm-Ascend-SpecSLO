@@ -1,0 +1,35 @@
+{
+  "status": "passed_actual_retained_frontend_CPU",
+  "old337_bypass_reproduced": true,
+  "model_callback_never_called_in_actual_fast_frontend": true,
+  "actual_frontend_code_unchanged": true,
+  "actual_HOST_builder_rebound": true,
+  "physical_rows": [
+    96,
+    128,
+    120
+  ],
+  "activation": {
+    "target_only": true,
+    "physical_rows": [
+      96,
+      120,
+      128
+    ],
+    "original_model_forward_unchanged": true,
+    "original_capture_validation_replay_unchanged": true,
+    "Native_flags_assigned": false,
+    "actual_qualified_MC2_rows": true,
+    "deferred_read_done": false,
+    "actual_Native_HOST_builder_bound": true,
+    "target_frontend_code_identical": true,
+    "target_defaults_preserved": true,
+    "original_inference_decorators_preserved": true,
+    "only_target_global_rebound": "_dynamic_tree_make_host_metadata",
+    "model_callback_not_required": true
+  },
+  "fake_graph_is_not_NPU_evidence": true,
+  "real_model_constructed": false,
+  "NPU_used": false,
+  "model_math_qualified": false
+}

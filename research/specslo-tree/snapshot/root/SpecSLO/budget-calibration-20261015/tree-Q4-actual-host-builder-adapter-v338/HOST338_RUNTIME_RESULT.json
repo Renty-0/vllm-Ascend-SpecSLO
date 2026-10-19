@@ -1,0 +1,13 @@
+{
+  "status": "passed_HOST_only",
+  "entire_original_main_code_identical": true,
+  "only_main_worker_delegate_changed": true,
+  "original_worker_signature_preserved": true,
+  "only_numeric_worker_probe_import_changed": true,
+  "candidate_reference_cost_functions_identical": true,
+  "original209_output_preserved": true,
+  "original_owned_guard_compiled": true,
+  "Torch_imported": false,
+  "NPU_used": false,
+  "model_constructed": false
+}

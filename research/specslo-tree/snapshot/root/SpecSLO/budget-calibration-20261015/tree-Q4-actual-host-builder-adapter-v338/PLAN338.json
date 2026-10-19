@@ -1,0 +1,30 @@
+{
+  "schema": "ROOT338.actual-retained-HOST-builder-adapter.v1",
+  "prepared_UTC": "2026-10-19T10:57:46.299582+00:00",
+  "change": "Bind the actual retained Native _dynamic_tree_make_host_metadata delegate, privately, through original inference decorators. Keep all frontend code/defaults and all336 candidate/reference/cost functions.",
+  "old337_failure_reproduced_on_actual_frontend_CPU": true,
+  "physical_rows": [
+    96,
+    128,
+    120
+  ],
+  "cases_per_target": 36,
+  "canaries": [
+    0,
+    17
+  ],
+  "bank_checkpoint_before_math": true,
+  "full_local_exception_trace_retained": true,
+  "models_requested": true,
+  "actual_model_qualification_inherited": false,
+  "full463": false,
+  "dynamic_B_or_branch_qualified": false,
+  "Goodput": null,
+  "original209_output_root_preserved": true,
+  "original_capture_validation_and_MC2_model_unchanged": true,
+  "HOST_setup_history": [
+    "CPU fixture must be installed before fake tree helper imports; first attempt reached container plugin and failed circular import without a model.",
+    "Actual Native frontend compilation requires typing names in the fake namespace.",
+    "Original inference decorators hide the HOST delegate in the wrapped function; retain the decorator and rebind exactly its function cell."
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "schema": "ROOT337.original-output-root-launch-adapter.v1",
+  "prepared_UTC": "2026-10-19T10:33:40.290275+00:00",
+  "change": "Restore original209 private output root in retained parent main globals; preserve all original path checks and all frozen336 math/cost code.",
+  "numeric_source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336",
+  "numeric_cases": 36,
+  "future_canaries": [
+    0,
+    17
+  ],
+  "models_requested": true,
+  "actual_models_loaded_before_launch": false,
+  "model_math_qualified": false,
+  "full463": false,
+  "Goodput": null,
+  "original_failed336_receipt_retained": true,
+  "source_and_original_guard_prepost_required": true
+}

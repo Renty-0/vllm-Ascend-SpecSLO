@@ -1,0 +1,44 @@
+{
+  "schema": "ROOT336.finite-linear-target-diagnostic-plan.v1",
+  "prepared_UTC": "2026-10-19T10:23:01.164863+00:00",
+  "cases_per_target": 36,
+  "canaries": [
+    0,
+    17
+  ],
+  "independent_neural_prefixes": 96,
+  "layouts": {
+    "Q4-S24": {
+      "rows": 96,
+      "primary_nodes": 3
+    },
+    "Q4-S32": {
+      "rows": 128,
+      "primary_nodes": 3
+    },
+    "Q5-S24-control": {
+      "rows": 120,
+      "primary_nodes": 4
+    }
+  },
+  "rotated_target_cost_rounds": 20,
+  "actual_models_loaded": true,
+  "real_draft_generation": false,
+  "dynamic_B_qualified": false,
+  "tree_branch_qualified": false,
+  "full463": false,
+  "Goodput": null,
+  "required_HOST_results": [
+    "HOST336_METADATA_RESULT.json",
+    "HOST336_CALLBACK_RESULT.json",
+    "HOST336_GUARD_RESULT.json",
+    "HOST336_RUNTIME_PROJECTION_RESULT.json"
+  ],
+  "conditions": [
+    "No real node/query/KV budget is silently removed: each linear3 orlinear4 plan contributes root+all selected nodes.",
+    "Reference has independently prefilled owners; both masked-future values must preserve all real hidden/128KV/greedy comparisons.",
+    "All actual matrix shapes96/120/128 must use original qualified flushed MC2; no admission to deferred-read-done.",
+    "No new capture/validation/fallback work during paired cost rounds.",
+    "Original source/environment prepost checks, single execution lock and owned cleanup remain mandatory."
+  ]
+}

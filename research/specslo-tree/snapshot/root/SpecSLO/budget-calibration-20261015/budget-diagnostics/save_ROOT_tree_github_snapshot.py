@@ -32,6 +32,9 @@ SOURCES = (
     ('tree-M160-C128-F64-global192-full-v333', 333),
     ('tree-FIA160-projection165-chained-flush-host-v334', 334),
     ('tree-FIA-Q4-group-and-query-isolation-v335', 335),
+    ('tree-Q4-linear-target-math-cost-v336', 336),
+    ('tree-Q4-original-output-root-adapter-v337', 337),
+    ('tree-Q4-actual-host-builder-adapter-v338', 338),
 )
 
 
@@ -94,6 +97,9 @@ def main():
         'tree-M160-C128-F64-global192-full-v333',
         'tree-FIA160-projection165-chained-flush-host-v334',
         'tree-FIA-Q4-group-and-query-isolation-v335',
+        'tree-Q4-linear-target-math-cost-v336',
+        'tree-Q4-original-output-root-adapter-v337',
+        'tree-Q4-actual-host-builder-adapter-v338',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -200,6 +206,8 @@ def main():
         'ROOT333_FINAL_FULL_RESULT.json',
         'ROOT_FUTURE_Q4_DEPTH3_EXISTING_EAGER_RAW_ALTERNATIVE_20261019.json',
         'ROOT_FUTURE_RISK_CPU_PROFILE_RAW_PLAN_20261019.json',
+        'ROOT336_OUTPUT_ROOT_STARTUP_FAILURE.json',
+        'ROOT337_ACTUAL_FRONTEND_BYPASS_FAILURE.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

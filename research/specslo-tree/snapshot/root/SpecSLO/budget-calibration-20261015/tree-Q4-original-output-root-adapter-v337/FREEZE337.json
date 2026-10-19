@@ -1,0 +1,15 @@
+{
+  "schema": "ROOT337.additive-original-output-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-original-output-root-adapter-v337/HOST337_OUTPUT_ROOT_AND_LIFECYCLE_RESULT.json": "493dbb2f7ee2dcd1090df08f71a618000bcdae4e3a7eebba03c0e839c24cf896",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-original-output-root-adapter-v337/PLAN337.json": "98b8c17ffec577002102b603343321016cb2ee0ac09375a0db079c4105d51e43",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-original-output-root-adapter-v337/check337.py": "09833d4cef4c1a6bdb9c48cfe97f15e04f7c8ad3e37ffe330e7cf6bed71434e4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-original-output-root-adapter-v337/check337_HOST.py": "79c8a68aa87d727b0763f2589b81cc5c112385cd0bf8fdc37117427e7ce931fe",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-original-output-root-adapter-v337/guard337.py": "bb1cf6f7fb222fe25a56bd922da3d3ade7babe405764ba28d2e6bb433ae5247d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-original-output-root-adapter-v337/runtime337.py": "44f6ff35415b9977fc6a64949f39c3f84ac5c936aa40c94d78b94ae6402cedfd",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-original-output-root-adapter-v337/startup337.sh": "b7cddf316c1e9c8607982acd720cb71efe123d3eb3e3c1d987b9b8c6f0fbcb9b"
+  },
+  "parent_freeze_sha256": "1733a53d408a345b15f442a97595db92c2e23388aa19796f26eb9184e9e7f6ae",
+  "parent_archive_sha256": "c7d3dfdee31e60b8cfa9e77941639ed6ba18a9538491851f20075c1308b3d445",
+  "device_qualification_inherited": false
+}

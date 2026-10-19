@@ -1,0 +1,29 @@
+{
+  "schema": "ROOT336.additive-target-component-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/HOST336_CALLBACK_RESULT.json": "80cb41c3b1f638c63f9f0122c731bd33570ecb5fa924a60fd8c4f8218e66af18",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/HOST336_GUARD_PARENT_LOOKUP_FAILURE.json": "93cb3ccaea9c5fca30164604eb52c5bb957dc9f177467698ccb51bc2d23c973b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/HOST336_GUARD_RESULT.json": "15981af2f4da5e7cbd269d82d15b0a1187ff15dc73535543ff9212e5367d8278",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/HOST336_METADATA_RESULT.json": "8707f571f1ef6b684a1275023b2698e974df1beb773337c03e1f325d03c69d02",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/HOST336_METADATA_RESULT_BEFORE_TRUNCATION_REJECTION.json": "8707f571f1ef6b684a1275023b2698e974df1beb773337c03e1f325d03c69d02",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/HOST336_RUNTIME_PROJECTION_BEFORE_EXPLICIT_DEFAULTS.json": "e6b6e127e310297e9752978b0eaf31f8808fb0cc286ab912ed667c4578fc499b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/HOST336_RUNTIME_PROJECTION_RESULT.json": "0bf033385199abab5be78834ff341e390f7ca9f2e9e75b4411cc044ad1a79461",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/PLAN336.json": "5c2e68b1b6af152f8226cde760d78605a0cf549634b419e10c5aeb02f25bf38a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/check336.py": "8fe334cb9c4650284010234f216a507f7e07e1851f5890e695b1f8d57916f399",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/check336_HOST.py": "538b513343935e1ef1b265ac69b265271b91dc3b909f80bed3b15c71c3a67143",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/check_callback336_HOST.py": "6b25a357950ffd3a647be7859ca1c345659c1fcb7d379bd7967618b148c0289f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/check_guard336_HOST.py": "4d55932e5f60412dd74377bb1bc32135e72e2699bfaf1a8720f3a9a8127c5966",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/check_runtime336_HOST.py": "dcb646137201f1d951efdf2e911f1eb2cd0da3b10fab1530da074e5789e2e82a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/geometry336.py": "8049a855cde6ee477fc82a7cd1f889ff3aeb560926d2c1c5a9859a364b3f26ed",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/guard336.py": "12f790c882546c054674003835cadc546d8e0a77932b834256999e725bdfcd58",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/metadata336.py": "d43110d28e0b4ff8c868d063c22984f78f8d87452dae6a60a3a2bb686877e20d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/probe336.py": "c54d8174f35bdab353061de483f3c06575b9a92e2729c241d2e82408abdeb042",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/runtime336.py": "22136f2597c9e9ba357a1b2b2c70dce1fc029c8879a540e810e0d91f3b313d78",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/startup336.sh": "90b3d79b80c8a40c280a8266ccab77d4a7319b139bba574620614555384be817"
+  },
+  "parent_freeze_sha256": "7e6eb8fa4a28db1e78ed4de514c47289e63749130d7cf300faa0cc64af795eba",
+  "parent_archive_sha256": "e2be79a2a164b7318ad7edb16eb65d65b81cb3cb9ae5be4bd6f9c8aa638b3929",
+  "parent_source_verified_separately_in_place": true,
+  "model_math_or_performance_qualification_inherited": false,
+  "source_prepared_before_NPU": true
+}

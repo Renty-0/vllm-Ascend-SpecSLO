@@ -1,0 +1,15 @@
+{
+  "status": "passed_original_loader_projection_HOST",
+  "exact_source_replacement_counts": {
+    "from check326 import ready": 2,
+    "alternate-chain-B1to8-M160-N32-node-component": 2,
+    "from probes326 import run": 1,
+    "numeric_cases=532": 2,
+    "ROOT326 bounded numeric diagnostics": 1
+  },
+  "worker_and_main_compiled": true,
+  "original_worker_defaults_preserved": true,
+  "Torch_imported": false,
+  "NPU_used": false,
+  "model_constructed": false
+}

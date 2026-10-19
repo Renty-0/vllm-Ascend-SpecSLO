@@ -1,0 +1,20 @@
+{
+  "status": "passed_HOST_only",
+  "original_configure_guard_prefix_executed": true,
+  "original336_output_rejected": true,
+  "original209_output_accepted": true,
+  "entire_parent_main_code_identical": true,
+  "changed_main_globals": [
+    "DONOR",
+    "worker"
+  ],
+  "defaults_and_signature_exact": true,
+  "original_fixture_directory_preserved": true,
+  "declared_models_requested_not_loaded": true,
+  "original_owned_guard_compiled": true,
+  "parent_numeric_source_unchanged": true,
+  "model_constructed": false,
+  "NPU_used": false,
+  "Torch_imported": false,
+  "no_model_qualification_claimed": true
+}

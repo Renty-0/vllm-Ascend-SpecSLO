@@ -1,0 +1,496 @@
+{
+  "status": "passed_CPU_metadata_only",
+  "finite_cases": 36,
+  "boundary_cases": 60,
+  "reference_metadata_variants": 120,
+  "all_masks_independently_rebuilt": true,
+  "all_input_positions_and_KV_slots_exact": true,
+  "all32_prefix_origins_covered": true,
+  "real_model_constructed": false,
+  "NPU_used": false,
+  "Torch_NPU_imported": false,
+  "real_model_math_qualified": false,
+  "Goodput": null,
+  "cases": [
+    {
+      "layout": "Q4-S24",
+      "real": 1,
+      "prefix": 97,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 1,
+      "prefix": 97,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 1,
+      "prefix": 127,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 1,
+      "prefix": 127,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 1,
+      "prefix": 128,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 1,
+      "prefix": 128,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 1,
+      "prefix": 1505,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 1,
+      "prefix": 1505,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 1,
+      "prefix": 2555,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 1,
+      "prefix": 2555,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 24,
+      "prefix": 97,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 24,
+      "prefix": 97,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 24,
+      "prefix": 127,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 24,
+      "prefix": 127,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 24,
+      "prefix": 128,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 24,
+      "prefix": 128,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 24,
+      "prefix": 1505,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 24,
+      "prefix": 1505,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 24,
+      "prefix": 2555,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S24",
+      "real": 24,
+      "prefix": 2555,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 1,
+      "prefix": 97,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 1,
+      "prefix": 97,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 1,
+      "prefix": 127,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 1,
+      "prefix": 127,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 1,
+      "prefix": 128,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 1,
+      "prefix": 128,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 1,
+      "prefix": 1505,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 1,
+      "prefix": 1505,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 1,
+      "prefix": 2555,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 1,
+      "prefix": 2555,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 32,
+      "prefix": 97,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 32,
+      "prefix": 97,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 32,
+      "prefix": 127,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 32,
+      "prefix": 127,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 32,
+      "prefix": 128,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 32,
+      "prefix": 128,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 32,
+      "prefix": 1505,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 32,
+      "prefix": 1505,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 32,
+      "prefix": 2555,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q4-S32",
+      "real": 32,
+      "prefix": 2555,
+      "depth": 3,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 1,
+      "prefix": 97,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 1,
+      "prefix": 97,
+      "depth": 4,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 1,
+      "prefix": 127,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 1,
+      "prefix": 127,
+      "depth": 4,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 1,
+      "prefix": 128,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 1,
+      "prefix": 128,
+      "depth": 4,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 1,
+      "prefix": 1505,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 1,
+      "prefix": 1505,
+      "depth": 4,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 1,
+      "prefix": 2555,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 1,
+      "prefix": 2555,
+      "depth": 4,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 24,
+      "prefix": 97,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 24,
+      "prefix": 97,
+      "depth": 4,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 24,
+      "prefix": 127,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 24,
+      "prefix": 127,
+      "depth": 4,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 24,
+      "prefix": 128,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 24,
+      "prefix": 128,
+      "depth": 4,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 24,
+      "prefix": 1505,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 24,
+      "prefix": 1505,
+      "depth": 4,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 24,
+      "prefix": 2555,
+      "depth": 0,
+      "future_mask_independent": true,
+      "exact_slots": true
+    },
+    {
+      "layout": "Q5-S24-control",
+      "real": 24,
+      "prefix": 2555,
+      "depth": 4,
+      "future_mask_independent": true,
+      "exact_slots": true
+    }
+  ]
+}

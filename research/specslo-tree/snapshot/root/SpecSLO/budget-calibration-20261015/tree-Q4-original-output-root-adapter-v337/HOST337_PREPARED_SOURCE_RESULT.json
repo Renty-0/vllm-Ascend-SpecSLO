@@ -1,0 +1,9 @@
+{
+  "status": "passed_source_frozen_NOT_LAUNCHED",
+  "source_members": 3458,
+  "own_archive_members": 8,
+  "current_main_uses_original209_output": true,
+  "parent336_numerics_verified_unchanged": true,
+  "Torch_imported": false,
+  "NPU_used": false
+}

@@ -1,0 +1,17 @@
+{
+  "status": "failed_first_target_frontend_after_independent_prefix_bank",
+  "UTC": "2026-10-19T10:56:09.131720+00:00",
+  "receipt": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-linear-Q4-Q5-original-output-root-v337-36-math-paired-cost-v1.json",
+    "sha256": "06da7214d262f659999d42290b4ad80e15ffba3a2ab8899ac2ca0da0d08c1eae"
+  },
+  "actual_models_loaded": true,
+  "numeric_cases": 0,
+  "new_Q4_numeric_qualification": false,
+  "target_operator_cost_measured": false,
+  "all4_idle": true,
+  "owned_cleanup": true,
+  "sources_unchanged": true,
+  "diagnosis": "The retained HOST optimization directly invokes _dynamic_tree_make_host_metadata. The336 model.make callback was bypassed; linear metadata remained causal with tree_attention_mask=None.338 CPU execution of the actual decorated Native frontend reproduces old failure and validates the new private HOST delegate binding.",
+  "next": "fresh338 models, original209 output root, original math gates; no failed result inherited"
+}

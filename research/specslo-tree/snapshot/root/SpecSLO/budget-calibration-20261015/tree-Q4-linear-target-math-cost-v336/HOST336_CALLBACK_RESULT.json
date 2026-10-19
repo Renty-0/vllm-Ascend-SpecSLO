@@ -1,0 +1,10 @@
+{
+  "status": "passed_CPU_callback_protocol",
+  "actual_CPU_metadata_layouts": 3,
+  "force_FULL_argument_checked": true,
+  "actual_input_identity_preserved": true,
+  "observer_fixture_is_not_graph_evidence": true,
+  "real_model_constructed": false,
+  "NPU_used": false,
+  "real_model_math_qualified": false
+}

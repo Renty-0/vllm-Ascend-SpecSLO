@@ -1,0 +1,8 @@
+{
+  "status": "HOST_setup_failure_before_fixture_no_model",
+  "UTC": "2026-10-19T10:48:06.665598+00:00",
+  "source_sha256": "e9ee7176bd089340543fadf0d2cda9d82da8458a4340126f1c0c6bf20e665eb1",
+  "cause": "Imported tree package before the retained CPU fixture installed its fake package modules; reached container official plugin and circular DeviceOperator import.",
+  "real_model_constructed": false,
+  "correction": "Build the retained CPU fixture before importing the tree helper."
+}

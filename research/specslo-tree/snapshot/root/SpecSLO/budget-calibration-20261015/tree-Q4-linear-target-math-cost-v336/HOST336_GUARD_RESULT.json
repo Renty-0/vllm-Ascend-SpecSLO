@@ -1,0 +1,9 @@
+{
+  "status": "passed_HOST_auditor",
+  "corrupt_records_rejected": 8,
+  "fixture_is_not_model_evidence": true,
+  "original_owned_guard_compiled": true,
+  "Torch_imported": false,
+  "NPU_used": false,
+  "launcher_executed": false
+}

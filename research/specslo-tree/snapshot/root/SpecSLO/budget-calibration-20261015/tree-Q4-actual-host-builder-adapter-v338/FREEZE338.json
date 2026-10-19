@@ -1,0 +1,21 @@
+{
+  "schema": "ROOT338.additive-actual-HOST-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/HOST338_ACTUAL_FRONTEND_RESULT.json": "300bf96d29bacc2286d72ff15eb8c7377bef2d66c6e17a105c7efe9421241e9a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/HOST338_FRONTEND_BEFORE_FUNCTION_METADATA_PRESERVATION.json": "300bf96d29bacc2286d72ff15eb8c7377bef2d66c6e17a105c7efe9421241e9a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/HOST338_IMPORT_ORDER_FAILURE.json": "f91ff1425475de7510e40c96333f0afaf80180ebcfa3f473f28e2ba5f4c7288a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/HOST338_RUNTIME_RESULT.json": "29d950377202eb7c8e06bf3128286c9e4390eb7780a2ce191dbcd24a06c8784c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/PLAN338.json": "374844a32333d7408f698e487dcb3d31b8f99b88261bb6dc6758ac7fd7190b37",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/check338.py": "c86c200eddd831f1604f3c756521c5bb62bac78b4359dc7f5d6fccea01d8c849",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/check338_HOST.py": "ba6b32a8591fe040f96d522b29394221c6e4fff332ae44081e73f138a3df7c02",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/check_runtime338_HOST.py": "485e66683617b5ccf0c950387137a44e2a2bc7b8670c11cee32f00809059a7d5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/guard338.py": "19c1540c44f8319ce52e95d70a07c4c8c5adb68445f2e90c68d7984f3373c5a9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/metadata338.py": "e01396887e44025cab4e8d44e0680487a30bc9031b7b4a2263989cc650e174eb",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/probe338.py": "33e1e898f4c2ada8ca09f4287e17ba2bdde58f70d0ccd815dd871152fb24a54b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/runtime338.py": "51417877b2ffd44793d480c1e32d5c9709ee47076cc0e24858d8770583adea32",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/startup338.sh": "223e017bc2f36484d10d3925b704be89ca4af41e7ddcfd8b32a964ee1b6c1542"
+  },
+  "parent_freeze_sha256": "c883f0dcc3e48286c92bbb915ccb9d924d0c22c67069796997a046354932218a",
+  "parent_archive_sha256": "6bd1d8bc101f80ac4d66684b597ad2a09a72a16a1e827327136f16a2bf577d4e",
+  "device_qualification_inherited": false
+}

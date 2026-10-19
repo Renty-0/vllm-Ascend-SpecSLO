@@ -1,0 +1,16 @@
+{
+  "status": "failed_before_model_constructor_no_numeric_cases",
+  "UTC": "2026-10-19T10:28:37.348696+00:00",
+  "receipt": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/receipt-linear-Q4-Q5-fixed-shape-root-v336-36-math-paired-cost-v1.json",
+    "sha256": "65b7264af65ee46f83af84a4c66d00fbd6ee7b30078d46601a4d3f767e7f1766"
+  },
+  "actual_models_loaded": false,
+  "planned_models_loaded_field_in_original_scope_is_not_evidence": true,
+  "all_four_errors_same_original_output_root_contract": true,
+  "original_source_and_environment_prepost_unchanged": true,
+  "owned_cleanup": true,
+  "all4_idle": true,
+  "numeric_cases": 0,
+  "next": "Additive337 launcher preserves original209 output root; frozen336 numerical source remains unchanged."
+}

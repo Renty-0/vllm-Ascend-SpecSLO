@@ -1,0 +1,7 @@
+{
+  "UTC": "2026-10-19T10:19:34.703080+00:00",
+  "status": "HOST_failure_before_freeze_no_NPU",
+  "source_sha256": "029935b5393dd52d3b02fdc37f1b8008598a7a34f8db9e686da81fc6ee5b279e",
+  "error": "AttributeError: module 'guard335' has no attribute 'donor_guard'",
+  "correction": "Use guard335.parent (original guard333) to obtain the original donor helper; no frozen parent mutation."
+}
