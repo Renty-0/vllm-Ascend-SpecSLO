@@ -1,8 +1,8 @@
 {
   "schema": "SpecSLO-Tree-source-save-checks-v1",
-  "source_files_sha256_verified": 2216,
-  "python_sources_syntax_passed": 1800,
-  "bash_scripts_syntax_passed": 155,
+  "source_files_sha256_verified": 2254,
+  "python_sources_syntax_passed": 1822,
+  "bash_scripts_syntax_passed": 157,
   "credential_pattern_hits": 0,
   "NPU_used_for_snapshot_checks": false,
   "whole_repository_format_check": "Unavailable: pre-commit not installed; environment unchanged",
@@ -13,7 +13,7 @@
   "core_modified_sources_equal_frozen_runtime": true,
   "v296_target_numeric_408_per3targets": true,
   "v296_paired_cost_11config20rotations": true,
-  "v299_full_workload_validation": "running genuine draft checks; no performance result",
+  "v299_full_workload_validation": "complete;all463 ownAR equal on3targets;negative performance result retained",
   "HOST304_mapping_cases": 417,
   "HOST305_actual_prepare_cases": 408,
   "HOST304_305_NPU_qualification": false,
@@ -23,5 +23,12 @@
   "HOST308_exact_layout_cases": 472,
   "HOST308_negative_controls": 6,
   "HOST308_NPU_qualification": false,
-  "v299_target_cases_per_rank": 408
+  "v299_target_cases_per_rank": 408,
+  "v299_Goodput": 254.04284004595166,
+  "v299_adopted": false,
+  "HOST309_typed_cases": 16,
+  "HOST309_causal_observations": 3072,
+  "HOST309_NPU_qualification": false,
+  "v311_HOST_suites": 5,
+  "v311_model_validation": "running;fresh qualification required"
 }

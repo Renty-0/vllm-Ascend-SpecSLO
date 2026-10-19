@@ -16,6 +16,7 @@ SOURCES = (
     ('tree-safe-grid-span-dual-cache-probe-v295', 295),
     ('tree-concrete-device-span-dual-cache-target-cost-v296', 296),
     ('tree-capacity-request-risk-span-full-v299', 299),
+    ('tree-single-prepare-target-math-cost-v311', 311),
 )
 
 
@@ -52,6 +53,8 @@ def main():
         'tree-single-validated-prefix-prepare-host-v305',
         'tree-capacity-risk-single-prepare-full-v307',
         'tree-range-packed-branch-layout-host-v308',
+        'tree-measured-branch-cost-eligibility-host-v309',
+        'tree-single-prepare-target-math-cost-v311',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -90,6 +93,12 @@ def main():
         'profile_ROOT305_prepare_HOST.py',
         'ROOT305_CPU_PREPARE_PROFILE.json',
         'ROOT257_287_ACTUAL_DELIVERY_MARGIN_AND_PHASES.json',
+        'ROOT299_PRELIMINARY_FULL_COMMON_METRICS.json',
+        'ROOT299_FINAL_FULL_RESULT.json',
+        'ROOT299_TERMINAL_INDEPENDENT_FULL_AUDIT.json',
+        'build_ROOT311_single_prepare_target_cost_HOST.py',
+        'freeze_ROOT311_single_prepare_target_cost_HOST.py',
+        'audit_ROOT311_target_math_and_cost_HOST.py',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

@@ -1,0 +1,113 @@
+{
+  "status": "SOURCE_ONLY311_fresh_NN_and_cost_not_frozen_not_executed",
+  "only_serving_delta_from296": "HOST305 single immutable row validation, direct span/alias preparation and no unused prefix staging",
+  "raw_kernels_and_capture_keys_and_attention_identical_to296": true,
+  "fresh_target_cases_per_rank": 408,
+  "target_ranks": [
+    1,
+    2,
+    3
+  ],
+  "fresh_independent_committed_prefixes": 72,
+  "paired_cost_configurations": 11,
+  "rotated_cost_rounds": 20,
+  "measured_scope": "Synchronous target pad/metadata/model/sync; no real draft or whole workload performance",
+  "prerequisite": "Finish299 and its independent full463 AR audit before NPU launch",
+  "parent_source_files": [
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/check_device296_HOST.py",
+      "sha256": "8218f19ba19e1ce429758a451787eb613f2f41ed487b62d63cf597f04cf7eeba",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/check_device311_HOST.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/probes296.py",
+      "sha256": "fd0a190e1f78e498a4af78506132c8a1ef4a80c33d6e690a7b6e0d0fe048f017",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/probes311.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/capture_key296.py",
+      "sha256": "e02ff1fef623d7c012d98bf59c2587916f0702cdb9e7ed548baf762133329bb5",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/capture_key311.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/DECLARED296_CASES.json",
+      "sha256": "b652970db1db33bcbe631ce80ad9a6df9009c5bf8fdd9e4d2a47a89dba26a083",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/DECLARED311_CASES.json"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/benchmark296.py",
+      "sha256": "4703abd3e4e02232ad4737ec60cf176069807d625057f75d0d12452e5a755f29",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/benchmark311.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/runtime296.py",
+      "sha256": "d1fd8f7ca136051cb2bc8322c83a315efbd37b02cbaf18920c5ccca4532c196c",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/runtime311.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/audit_static_calls296.py",
+      "sha256": "7b00cae77128839d85eb9056602d9e7ecb33d9e32099ff6276a6ce713daf84c7",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/audit_static_calls311.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/static_state296.py",
+      "sha256": "626b269247630842e121a6972d1724a355b2fadfff4128109130739a92291ab6",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/static_state311.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/check_grid296_HOST.py",
+      "sha256": "e07bef0ed2c67e835c44180bcf73c108d018d8d47ae40bd3b54afa73b6bdee97",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/check_grid311_HOST.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/startup296.sh",
+      "sha256": "2a367a4edf5d568c3880ee747f02db7c557d98a0880c750d51ee94c39343b780",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/startup311.sh"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/guard296.py",
+      "sha256": "54e863edbf54b6ccc118914d664aed5ae6d337115b32bd37c35b45c6dda75afd",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/guard311.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/FIXTURE296.json",
+      "sha256": "e5c977302c904f1ca5dbf66894db260a8bbaa926a29f2e765b78ce07aca11fbe",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/FIXTURE311.json"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/device296.py",
+      "sha256": "20e9b7e0a18919449b8327a7c7c0b3f77ffa8f30e55c4cd0012736b9a027950b",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/device311.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/oracle296.py",
+      "sha256": "627f76dd7201338502191e66045f629df8e6b592c09c473333a0673ec3143ab7",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/oracle311.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/launch296.sh",
+      "sha256": "d307d97228aec494cebd5cef6f2168a8699b8aa621a030f1d680f0cc4ccf2b29",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/launch311.sh"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/check296.py",
+      "sha256": "836e85788fc2f227c00f5a315fb3459145ab338e50b57f6db46b02cf68f73ad9",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/check311.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/check296_HOST.py",
+      "sha256": "506fa00956f1d420d270aa4152b0876bd02ed5dd61970f4ddf68b4892a3351d8",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/check311_HOST.py"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/check_split296_HOST.py",
+      "sha256": "acfafee84e9c43163317dfc5794f4f7399d49da41714efcca8b3478da72fe38f",
+      "saved": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311/check_split311_HOST.py"
+    }
+  ],
+  "active299_changed": false,
+  "NPU_qualification_inherited": false,
+  "whole463_AR_qualified": false,
+  "Goodput": null,
+  "adopted": false
+}

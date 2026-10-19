@@ -1,0 +1,113 @@
+{
+  "status": "HOST_actual_typed_cost_gate_weak_strong_and_priority_cases_passed",
+  "cases": [
+    {
+      "N": 1,
+      "gain_kind": "weak",
+      "branches": 0,
+      "actual_normal_candidates": 4
+    },
+    {
+      "N": 1,
+      "gain_kind": "strong",
+      "branches": 1,
+      "actual_normal_candidates": 8
+    },
+    {
+      "N": 4,
+      "gain_kind": "weak",
+      "branches": 0,
+      "actual_normal_candidates": 16
+    },
+    {
+      "N": 4,
+      "gain_kind": "strong",
+      "branches": 4,
+      "actual_normal_candidates": 32
+    },
+    {
+      "N": 8,
+      "gain_kind": "weak",
+      "branches": 0,
+      "actual_normal_candidates": 32
+    },
+    {
+      "N": 8,
+      "gain_kind": "strong",
+      "branches": 8,
+      "actual_normal_candidates": 64
+    },
+    {
+      "N": 12,
+      "gain_kind": "weak",
+      "branches": 0,
+      "actual_normal_candidates": 48
+    },
+    {
+      "N": 12,
+      "gain_kind": "strong",
+      "branches": 12,
+      "actual_normal_candidates": 96
+    },
+    {
+      "N": 16,
+      "gain_kind": "weak",
+      "branches": 0,
+      "actual_normal_candidates": 64
+    },
+    {
+      "N": 16,
+      "gain_kind": "strong",
+      "branches": 8,
+      "actual_normal_candidates": 96
+    },
+    {
+      "N": 20,
+      "gain_kind": "weak",
+      "branches": 0,
+      "actual_normal_candidates": 80
+    },
+    {
+      "N": 20,
+      "gain_kind": "strong",
+      "branches": 4,
+      "actual_normal_candidates": 96
+    },
+    {
+      "N": 23,
+      "gain_kind": "weak",
+      "branches": 0,
+      "actual_normal_candidates": 92
+    },
+    {
+      "N": 23,
+      "gain_kind": "strong",
+      "branches": 0,
+      "actual_normal_candidates": 92
+    },
+    {
+      "N": 24,
+      "gain_kind": "weak",
+      "branches": 0,
+      "actual_normal_candidates": 96
+    },
+    {
+      "N": 24,
+      "gain_kind": "strong",
+      "branches": 0,
+      "actual_normal_candidates": 96
+    }
+  ],
+  "measured_ratio_envelope": [
+    0.2045142890542393,
+    0.015337951862048152
+  ],
+  "original_allocator_not_mutated": true,
+  "original_priority_order_preserved": true,
+  "C96_future96_global192_and24_groups_preserved": true,
+  "synthetic_gains_not_new_machine_observations": true,
+  "real_draft_cost_included_in_proxy": false,
+  "NPU_used": false,
+  "runtime_installed": false,
+  "Goodput": null
+}

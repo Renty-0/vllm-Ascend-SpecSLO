@@ -1,0 +1,80 @@
+{
+  "UTC": "2026-10-19T00:10:58.870407+00:00",
+  "status": "preliminary_common_clock_metrics_whole463_AR_still_pending",
+  "all": {
+    "requests": 463,
+    "attained": 203,
+    "output_tokens": 118528,
+    "good_tokens": 51968,
+    "Raw": 579.4179061146582,
+    "Goodput": 254.04284004595166,
+    "TPOT_paper_median_ms": 47.459746227104915,
+    "TPOT_paper_P90_ms": 65.6106036669371,
+    "TPOT_observed_median_ms": 47.64586287897591,
+    "TPOT_observed_P90_ms": 65.86790015190547
+  },
+  "by_class": {
+    "loose": {
+      "requests": 96,
+      "attained": 96,
+      "output_tokens": 24576,
+      "good_tokens": 24576,
+      "Raw": 120.13848593306088,
+      "Goodput": 120.13848593306088,
+      "TPOT_paper_median_ms": 65.37165719237237,
+      "TPOT_paper_P90_ms": 77.80047128653678,
+      "TPOT_observed_median_ms": 65.62801663234245,
+      "TPOT_observed_P90_ms": 78.10557117393496
+    },
+    "normal": {
+      "requests": 96,
+      "attained": 94,
+      "output_tokens": 24576,
+      "good_tokens": 24064,
+      "Raw": 120.13848593306088,
+      "Goodput": 117.63560080945544,
+      "TPOT_paper_median_ms": 39.831825239161844,
+      "TPOT_paper_P90_ms": 46.137425169945345,
+      "TPOT_observed_median_ms": 39.98802847539385,
+      "TPOT_observed_P90_ms": 46.31835624904317
+    },
+    "tight": {
+      "requests": 271,
+      "attained": 13,
+      "output_tokens": 69376,
+      "good_tokens": 3328,
+      "Raw": 339.14093424853644,
+      "Goodput": 16.26875330343533,
+      "TPOT_paper_median_ms": 47.337077628981206,
+      "TPOT_paper_P90_ms": 52.999726964117144,
+      "TPOT_observed_median_ms": 47.52271322752623,
+      "TPOT_observed_P90_ms": 53.20756903064309
+    }
+  },
+  "elapsed_seconds": 204.563923118636,
+  "target_calls": 2217,
+  "mean_N": 17.19124943617501,
+  "median_N": 24,
+  "N24_calls": 1114,
+  "budget_histogram": {
+    "8": 4654,
+    "1": 150,
+    "4": 33092,
+    "3": 28,
+    "5": 19,
+    "2": 150,
+    "6": 13,
+    "7": 7
+  },
+  "branch_calls": 1087,
+  "phase_seconds": {
+    "draft": 0.0,
+    "target": 146.93579821055755,
+    "exchange": 12.155649425461888,
+    "verify": 0.0,
+    "broadcast": 1.0027313102036715,
+    "state_update": 8.551685620564967
+  },
+  "formal_adopted": false,
+  "whole463_AR_verified": false
+}
