@@ -49,6 +49,7 @@ SOURCES = (
     ('tree-small-refill-incumbent-prefix-protection-v351', 351),
     ('tree-small-refill-original-launch-pin-v352', 352),
     ('tree-coalesced-live-refill-M120-singleton-capture-full-v348', 348),
+    ('tree-admission-closed-control-full-v355', 355),
 )
 
 
@@ -128,6 +129,8 @@ def main():
         'tree-small-refill-incumbent-prefix-protection-v351',
         'tree-small-refill-original-launch-pin-v352',
         'tree-coalesced-live-refill-M120-singleton-capture-full-v348',
+        'tree-priority-protected-live-refill-host-v354',
+        'tree-admission-closed-control-full-v355',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -276,6 +279,17 @@ def main():
         'audit_ROOT348_small_refill_component_HOST.py',
         'ROOT348_INDEPENDENT_SMALL_REFILL_COMPONENT_AUDIT.json',
         'ROOT348_RETAINED_408_TARGET_COMPONENT_CHECKPOINT.json',
+        'ROOT348_PRELIMINARY_FULL_COMMON_METRICS.json',
+        'ROOT348_VS257_REFILL_RAW_DESCRIPTIVE.json',
+        'ROOT348_LIVE_REFILL_INCUMBENT_EXPOSURES.json',
+        'build_ROOT355_closed_control_HOST.py',
+        'freeze_ROOT355_closed_control_HOST.py',
+        'HOST_ROOT355_FROZEN_RUNTIME_CONSTRUCTION.json',
+        'audit_ROOT355_terminal_full_HOST.py',
+        'read_ROOT355_common_result_HOST.py',
+        'check_ROOT355_terminal_source_HOST.py',
+        'HOST_ROOT355_TERMINAL_SOURCE_RESULT.json',
+        'ROOT355_CLOSED_ADMISSION_CONTROL_PREDECLARATION.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

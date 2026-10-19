@@ -1,0 +1,12 @@
+{
+  "status": "HOST_additive_launch_and_guard_sources_prepared",
+  "original348_freeze_sha256": "09119c918ad6d28d137a731cf041e69f7a0135dc302169455fa944df6caab5c8",
+  "original218_launch_pin_preserved": true,
+  "launch_shell_environment_preserved_except_own_source_pin_and_lookup_paths": true,
+  "old_model_and_kernel_configuration_unchanged": true,
+  "original_full_NN_and_owned_cleanup_gates_retained": true,
+  "mode": "closed",
+  "NPU_used": false,
+  "frozen": false,
+  "Goodput": null
+}

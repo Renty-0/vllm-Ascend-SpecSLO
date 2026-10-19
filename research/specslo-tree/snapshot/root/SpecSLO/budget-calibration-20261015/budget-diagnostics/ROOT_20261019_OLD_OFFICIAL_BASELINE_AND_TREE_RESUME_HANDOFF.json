@@ -1,6 +1,6 @@
 {
-  "UTC": "2026-10-19T15:01:15.976333+00:00",
-  "status": "active_ROOT348_complete_initialized_live_refill_full463_ownAR",
+  "UTC": "2026-10-19T15:32:07.874563+00:00",
+  "status": "active_ROOT348_full_performance_negative_ownAR_pending_355_closed_control_ready",
   "user_resume_request": true,
   "prior_pause_revoked": true,
   "user_correction": "old official vllm-ascend, explicitly not HUST",
@@ -31,7 +31,7 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "755e92d",
+  "github_checkpoint": "6a06002",
   "goal_achieved": false,
   "next": [
     "fresh real-model Q4/S24 and Q4/S32 target-only diagnostic, retain hidden/all128KV/greedy/graph-eager proofs; choose by measured cost rather than nominal capacity",
@@ -341,7 +341,7 @@
   "tree339_archive_sha256": "2f486aff3ff807a1fcf398e068575ec8103b127a704456bce8eb122b7f248643",
   "tree339_actual_installer_and_complete_frontend_HOST_passed": true,
   "tree339_guard_session": null,
-  "github_commit": "755e92d",
+  "github_commit": "6a06002",
   "tree339_result": "complete_numeric_cost_independently_audited_original_supervisor_count_failed_42_vs36",
   "tree339_original_receipt_failed": true,
   "tree339_owned_cleanup": true,
@@ -510,5 +510,25 @@
   "tree348_target408_retained_fields_checkpoint": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_RETAINED_408_TARGET_COMPONENT_CHECKPOINT.json",
   "tree348_draft45_complete": true,
   "tree348_postbranch20_complete": true,
-  "tree348_stage": "warm65 generation1; twozero and seal pending; full463 and ownAR pending"
+  "tree348_stage": "postfull ownAR120 groups, last observed92; not adopted; goal unmet",
+  "tree348_no_current_full_performance_result": true,
+  "tree348_full_measured": true,
+  "tree348_measured_GP": 216.80713949072063,
+  "tree348_measured_Raw": 692.2876247186458,
+  "tree348_attained": {
+    "all": 145,
+    "tight": 0,
+    "normal": 49,
+    "loose": 96
+  },
+  "tree348_full_AR_pending": true,
+  "tree355_source": "/root/SpecSLO/budget-calibration-20261015/tree-admission-closed-control-full-v355",
+  "tree355_freeze_sha256": "1f6bd48a2a1972e5f4e1efbba692302ea7dc2c43ce6a94f9aaec2b9d3628149a",
+  "tree355_archive_sha256": "3436e72ff47446889f901a78878e4634eabc35bbdeedde4fe56c04ffbe235877",
+  "tree355_mode": "closed",
+  "tree355_frozen": true,
+  "tree355_HOST_actual_runtime_and_archive_passed": true,
+  "tree355_NPU_launched": false,
+  "tree354_protected_HOST_random_cases": 720,
+  "tree355_predeclaration": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT355_CLOSED_ADMISSION_CONTROL_PREDECLARATION.json"
 }

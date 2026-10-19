@@ -1,0 +1,15 @@
+{
+  "status": "passed_terminal_source_projection_and_scope_HOST",
+  "NPU_used": false,
+  "backend_import_attempts": [],
+  "actual_original_arithmetic_loader_executed": true,
+  "changes": 13,
+  "actual_live_refill_and_incumbent_page_fields_required": true,
+  "actual_projected_wrapper_executed": true,
+  "fake_clock_fixture_only": true,
+  "original_constructor_and_scheduling_counters_checked": true,
+  "incumbent_prefill_pause_reported_truthfully": true,
+  "unsafe_page_inventory_rejected": true,
+  "original_complete_metrics_and_own_AR_bodies_retained": true,
+  "no_complete_model_run_or_performance_qualification": true
+}

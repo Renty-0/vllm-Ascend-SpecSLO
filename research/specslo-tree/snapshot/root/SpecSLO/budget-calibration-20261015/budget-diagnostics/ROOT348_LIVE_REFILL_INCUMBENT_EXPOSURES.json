@@ -1,0 +1,35 @@
+{
+  "UTC": "2026-10-19T15:10:27.269954+00:00",
+  "source": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M120-B8-refill4-singleton-aware-root-v348-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+    "bytes": 1317453,
+    "sha256": "6f3bc759d148d0e4b78020aa7bd1c7b5523e28464f9c70a9336644ebccc01614"
+  },
+  "actual_prefill_groups": 120,
+  "actual_inflight_refill_groups": 119,
+  "by_class": {
+    "tight": {
+      "requests": 271,
+      "refill_exposures_median": 11,
+      "refill_exposures_max": 15,
+      "owners_exposed": 271
+    },
+    "normal": {
+      "requests": 96,
+      "refill_exposures_median": 9.0,
+      "refill_exposures_max": 12,
+      "owners_exposed": 96
+    },
+    "loose": {
+      "requests": 96,
+      "refill_exposures_median": 13.0,
+      "refill_exposures_max": 23,
+      "owners_exposed": 95
+    }
+  },
+  "each_exposure_counted_from_actual_root_and_finish_events": true,
+  "individual_prefill_durations_inferred": false,
+  "sole_cause_of_GP_decline_proven": false,
+  "whole_workload_AR_qualified": false,
+  "NPU_used": false
+}

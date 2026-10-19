@@ -1,0 +1,13 @@
+{
+  "status": "PASS_HOST_frozen_archive_and_actual_worker_construction",
+  "UTC": "2026-10-19T15:28:29.372152+00:00",
+  "source_members": 3722,
+  "own_freeze": "1f6bd48a2a1972e5f4e1efbba692302ea7dc2c43ce6a94f9aaec2b9d3628149a",
+  "own_archive": "3436e72ff47446889f901a78878e4634eabc35bbdeedde4fe56c04ffbe235877",
+  "worker_projection_changes": 7,
+  "original_parent_source_pins_preserved": true,
+  "NPU_used": false,
+  "framework_imported": false,
+  "model_processes_launched": 0,
+  "mode": "closed"
+}
