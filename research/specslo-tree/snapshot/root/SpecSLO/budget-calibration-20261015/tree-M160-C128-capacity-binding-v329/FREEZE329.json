@@ -1,0 +1,22 @@
+{
+  "schema": "ROOT329.actual-C128-Q160-policy-and-constructor-binding.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/check329.py": "de19b379abdd462d0e0f3470edeb0a406578ba5fda18d07fc168bee29db2c4f6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/startup329_HOST.sh": "b8f102fe2a511337df569d3428dc60897697a470f5b7e54312256a0b3e44ad96",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/actual-install-HOST-v3.log": "0c011d53fa8c394561c015bc66068a3066f0d9932d924196fa624dbd0ce19eac",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/capacity329.py": "3bfe1e2729b6e711deaf3125d7e7617870e898ac817261a3870108839866eeed",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/launch329.sh": "2dcde2a5b1488eac05eebef427a2763df30f07727256e5ec442eab113aa73850",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/HOST329_ACTUAL_INSTALL_CAPACITY_RESULT.json": "05faf3823e7ec4f1693af44ef226c0ce5bf6d9ffc60d503e46fb915dce0c02db",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/runtime329.py": "064e439b6ee26d9de13d30aed3e2582b59160c56a839cbe5885de05b17174a1f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/check_install329_HOST.py": "520a8d4f131993f4a30ab0760bb7915562f41793cd3e68377728a926ca285995",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/actual-install-HOST.log": "d83e1eda7f030cc6693d7aaf8716c991a3e76e1cde9ac2d531fe895c8ed42564",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/guard329.py": "023a736d3e851193a2bfd2d9bcbafbcdc1f512ccf3d1163d27bcd1195b834a1d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/startup329.sh": "36b0c4a55f9f0cf03668ce765be352fa794a1930077200f9487b7ca8b2e732a9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329/actual-install-HOST-v2.log": "ca7512dddee9e57b25b48607047f39f65f6f777f83fe90d7959f1ebd30f0d557",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT326_PARTIAL_MODEL_CAPACITY_FAILURE_AUDIT.json": "7d2f47156b8f931a05ccbf343df60f214a01ad19a74e5d34757e89c56abc4756"
+  },
+  "original326_sources_unchanged": true,
+  "partial410_qualification_not_inherited": true,
+  "all532_new_model_checks_required": true,
+  "Goodput": null
+}

@@ -1,0 +1,43 @@
+{
+  "passed": true,
+  "actual_frozen_installer_executed": true,
+  "actual_accounting_callback_all532_cases_passed": true,
+  "old_capacity_failure_reproduced": true,
+  "old": {
+    "C": 96,
+    "Q": 128,
+    "N": 32
+  },
+  "capacity_binding": {
+    "old": {
+      "C": 96,
+      "Q": 128,
+      "N": 32
+    },
+    "new": {
+      "C": 128,
+      "Q": 160,
+      "N": 32,
+      "groups": 32,
+      "branches": 12
+    },
+    "same_actual_accounting_policy_instance": true,
+    "original_check_target_code_retained": true,
+    "positive_per_request_B1to8_and_whole_group_bound_checked": true,
+    "original_policy_class_unmodified": true,
+    "model_loaded": false
+  },
+  "invalid_limits_rejected": [
+    "C129",
+    "N33",
+    "groups33",
+    "branches13",
+    "B9",
+    "empty"
+  ],
+  "original_policy_class_defaults_unchanged": true,
+  "constructor_candidates128_verified": true,
+  "model_weights_loaded": false,
+  "NPU_model_executed": false,
+  "Goodput": null
+}

@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "entries": 6,
+  "actual_CPU_tensor_storage_checks": true,
+  "activation_and_residual_cloned": true,
+  "model_weight_and_gamma_storage_shared_readonly": true,
+  "duplicate_and_wrong_case_and_changed_weight_binding_rejected": true,
+  "extra_cloned_bytes": 21012480,
+  "production_capture_installed": false,
+  "real_model_weights_loaded": false,
+  "NPU_used": false,
+  "Goodput": null,
+  "original_model_weight_sentinels_and_gamma_unchanged": true
+}

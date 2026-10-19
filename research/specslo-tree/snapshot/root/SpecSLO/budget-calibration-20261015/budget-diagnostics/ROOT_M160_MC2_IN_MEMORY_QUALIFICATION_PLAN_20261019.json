@@ -1,0 +1,53 @@
+{
+  "UTC": "2026-10-19T06:12:36.389212+00:00",
+  "status": "design_only_waiting_for326_whole_model_math",
+  "not_installed": true,
+  "purpose": "Qualify exactM160 MC2 shape without dumpingGB of duplicated model weights",
+  "payload": {
+    "capture_case": "N32-all4, all160 target queries real",
+    "layers": [
+      0,
+      31,
+      63
+    ],
+    "kinds": [
+      "attention",
+      "down"
+    ],
+    "capture_only_candidate_eager": true,
+    "activation_and_residual_cloned_in_GPU": true,
+    "weight_and_gamma_readonly_model_references": true,
+    "model_weights_dumped": false,
+    "estimated_extra_GPU_payload_MiB_per_rank": 25
+  },
+  "qualification": {
+    "tp_group": "existing target subgroup, original logical devices1,2,3",
+    "baseline": "same nativeF.linear then subgroupall_reduce then npu_add_rms_norm",
+    "candidate": "same F.linear then original allreduce_add_rmsnorm_chained, fully flushed",
+    "changed_input_replays": 1024,
+    "samples": 31,
+    "percentile": 95,
+    "minimum_speedup": 1.02,
+    "all_three_target_ranks_required": true,
+    "qualify_both_exactK_shapes": [
+      3072,
+      8576
+    ],
+    "hold_all_captures_alive": true
+  },
+  "profile_safety": [
+    "no interpolation fromM128or165",
+    "same source/adapter/vendor/runtimebinding as oldprofile;mergeonlyfresh measured160 entries",
+    "explicitly validate chained flush at160 before profile flag could auto-admit it",
+    "deferredwhole64-layer chain requires separate exactrow evidence and changedinput checks",
+    "coldcapturechangedinputrestore andwhole532modelmath again after any new profile before full463serving"
+  ],
+  "still_required_before_adoption": [
+    "original startup inventory",
+    "genuine draft45 andpostbranch20",
+    "fixedpoint twozero sealed full463",
+    "all3 own AR463 and current Raw/Goodput",
+    "final matched9 cells"
+  ],
+  "Goodput": null
+}

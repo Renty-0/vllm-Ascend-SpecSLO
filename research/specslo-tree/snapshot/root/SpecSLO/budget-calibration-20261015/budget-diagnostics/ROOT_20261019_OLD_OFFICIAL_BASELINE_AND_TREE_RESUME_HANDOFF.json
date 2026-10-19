@@ -1,6 +1,6 @@
 {
-  "UTC": "2026-10-19T06:05:25.612638+00:00",
-  "status": "active_tree326_M160_S32_all532_model_and_cost_qualification",
+  "UTC": "2026-10-19T06:43:06.850120+00:00",
+  "status": "active_tree329_fresh532_model_and_cost_after_actual_capacity_HOST_preflight",
   "user_resume_request": true,
   "prior_pause_revoked": true,
   "user_correction": "old official vllm-ascend, explicitly not HUST",
@@ -31,15 +31,15 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "c9ac63f",
+  "github_checkpoint": "dc5912d",
   "goal_achieved": false,
   "next": [
-    "finish326 fresh532 whole-target model comparisons and16 paired component costs",
-    "independent read of all3 target numerical reports; never inherit M165 qualification",
-    "ifM160 math passes, capture actualM160 native MC2 inputs and qualify exactshape before fused claim; prefer in-memory weights/projections over duplicateGB dumps",
-    "integrate C128/F64/global192 with32 primary/side groups andN32 max",
-    "fresh original startup, genuine draft, postbranch, fixedpoint, twozero, sealed463 ownAR; assess Raw/Goodput",
-    "final matched9 cells only after eligible candidate; floor644.766 unchanged"
+    "finish329 actual installer/account callback all532 HOST regression and constructorC128 binding",
+    "freeze329 additive controls and fresh all532 NN cases (no inheritance of410) +16 paired costs",
+    "ifordinaryM160 cost too high, prototype explicit padding of onlyMC2 matrix/epilogue toqualifiedM165 whileFIA stays160/S32; no fakeM160 profile entry; new full gates mandatory",
+    "alternative: newM160 in-memoryMC2 realinput qualification; modelweights remainGPU references",
+    "integrate328 C128/F64/global192 roles/groups32 onlyafter modelqualification",
+    "full463 ownAR andalloriginalgates; Raw/GP thenfinal9 matched comparisons"
   ],
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
   "user_Raw_clarification": {
@@ -180,5 +180,25 @@
   "tree326_actual_compiled_reference_binding_HOST_passed": true,
   "tree326_original408_budget_anchor_cases_preserved": true,
   "tree326_future_MC2_profile_needed": true,
-  "tree326_current_profile_M160_qualified": false
+  "tree326_current_profile_M160_qualified": false,
+  "tree326_result": "failed atN25-fork5: actual installed policy target_queries128; all410 completed target cases exact onall3 ranks",
+  "tree326_completed_model_cases_each_rank": 410,
+  "tree326_all_completed_cases_bitwise": true,
+  "tree326_costs_not_measured": true,
+  "tree326_owned_cleanup": true,
+  "tree329_source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-capacity-binding-v329",
+  "tree329_pending": "fresh model532 and paired target cost; all4actualcapacityC128/Q160 installed",
+  "tree328_budget_HOST_all_passed": true,
+  "tree327_memory_recorder_HOST_passed": true,
+  "tree329_freeze_sha256": "8ad8a253fbf54cb026b2a8498efc8d3b1a7b7a28e4d08f671d94f64b4e3fd949",
+  "tree329_HOST_actual_installer_accounting532_passed": true,
+  "tree329_constructor_C128_HOST_verified": true,
+  "tree329_all6_invalid_limit_cases_rejected": true,
+  "tree329_model_qualification": false,
+  "tree329_tag": "M160-S32-C128-root-v329-B1to8-532-math-cost-v1",
+  "updated_UTC": "2026-10-19T06:49:01.715543+00:00",
+  "tree329_guard_pid": 292972,
+  "tree329_all_four_capacity_before_model_passed": true,
+  "tree330_source_only": true,
+  "tree330_plan": "physicalFIA160/S32, actual165projectionMC2, trim160; HOST under development; no neural claim"
 }

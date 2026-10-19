@@ -1,0 +1,18 @@
+{
+  "UTC": "2026-10-19T06:21:40.784337+00:00",
+  "status": "future_hypothesis_only_after_M160_and_MC2",
+  "installed": false,
+  "motivation": "FULL tree FIA fixes all32 KV lengths2560, even short code/math requests; causal mode has different per-query numerical geometry and must not be blindly enabled",
+  "candidate": "input-bound fixed KV buckets, homogeneous selected target batches, all32 physical groups use same bucket; root/side paths keep identical visibility",
+  "bound": "per-request bucket from known full prompt length+max output length+max speculative reserve; never shrink/truncate current or future valid keys",
+  "reference": "independent own-AR uses same input-derived assigned bucket and homogeneous32-group frames; no candidate tokens or KV seeded",
+  "caveats": [
+    "different maxKV among batches can change FIA reduction tiling; uniform exactbucket andgroup32 required",
+    "whole cohort bucket likely remains2560 when any long summary is present; measure prompt distribution before adding policy",
+    "bucket grouping changes target selection and may reduce batch utilization; retain original SLOpriority and whole tickets",
+    "all old408 cases remain in correct largestbucket; add explicit short-prefix N32/branch fixtures for each new key",
+    "new capture/update/seal inventory, all32group ancestry, all128hidden/KV, strict full463 ownAR and measured Raw/GP required"
+  ],
+  "source_alternative": "do not use sparse_mode3 with fixedKV2560 unless causal alignment semantics proven; actual length changes can alter BF16 rounding",
+  "Goodput": null
+}

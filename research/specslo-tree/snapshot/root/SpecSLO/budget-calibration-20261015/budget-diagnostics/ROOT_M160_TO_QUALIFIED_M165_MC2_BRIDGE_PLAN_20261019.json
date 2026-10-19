@@ -1,0 +1,36 @@
+{
+  "UTC": "2026-10-19T06:24:25.989624+00:00",
+  "status": "future_source_hypothesis_only_not_installed",
+  "purpose": "Reuse an actually qualified165-row MC2 route while keeping FIA at numerically stable32groups/160rows",
+  "actual_shapes": {
+    "FIA_rows": 160,
+    "FIA_groups": 32,
+    "gate_up_rows": 160,
+    "QKV_rows": 160,
+    "attention_o_projection_MC2_rows": 165,
+    "down_projection_MC2_rows": 165
+  },
+  "mechanism": [
+    "pad attention activation and residual with five zero rows before bind_mc2_static_route and existing forward_mc2; trim both returned tensors to160",
+    "pad down activation and residual likewise; bind actual165 shape, keep original ND weight/gamma objects",
+    "do not fabricate a qualified160 profile entry; record actual operator165 padding explicitly",
+    "initially no deferred crosslayer chain for physical160; use already qualified nonchained165 epilogue and fresh model proof"
+  ],
+  "potential": "avoid qualification of a new C++ shape and retain real fused epilogue/nextnorm behavior; around3.125percent extra projection rows plus captured padding kernels; no speedup assumed",
+  "requirements": [
+    "first326 complete math/cost",
+    "HOST exact zero-pad/trim and binding shape checks; original all160 real row order unchanged",
+    "fresh model all532 hidden/KV/greedy and prefix checks; all raw160 controls retained",
+    "actual perlayer route witnesses show165 approved profile entry, same source/runtimebinding, no fake160 route",
+    "paired fulltarget costs versus ordinary160 before deciding bridge versus new160 in-memory qualification",
+    "full463 ownAR and all production gates after integration"
+  ],
+  "risks": [
+    "extra captured allocations and kernels may erase fusion gain",
+    "matmul165 can change BF16 rounding versus160; only fresh samebackend ownAR claim allowed",
+    "no changes toFIA groups orvisible context; no silent live weight/NZ policy change",
+    "private adapter must preserve actual route/weight/gamma identity checks and normalized-state semantics"
+  ],
+  "alternative": "new160 exactshape in-memory qualification plan remains valid if bridge unprofitable or fails gates",
+  "Goodput": null
+}

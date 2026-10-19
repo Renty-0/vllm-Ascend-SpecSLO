@@ -1,0 +1,59 @@
+{
+  "status": "HOST_pass",
+  "original_source_sha256": "e0d9efe4572c7e87ad860b014ef146394ca44f53ac8d87d12edfed2b572422a1",
+  "original_binder_source_sha256": "5072f7de5e922c4f0bee477995741e7ece4439e1dfb4b1630b51016fd51fe75a",
+  "original_decoder_MLP_norm_binder_code_executed_with_CPU_operator_double": true,
+  "physical_attention_queries": 160,
+  "real_MC2_mock_received165": true,
+  "both_attention_and_down_covered": true,
+  "all160_rows_and_both_outputs_exact": true,
+  "actual_padding_suffix_zero": true,
+  "unchanged_profile160_refuses": true,
+  "changed_weight_original_identity_check_rejects": true,
+  "original_class_code_unmodified": true,
+  "no_models_loaded": true,
+  "no_NPU_run": true,
+  "model_qualified": false,
+  "Goodput": null,
+  "bridge": {
+    "FIA_rows": 160,
+    "FIA_groups": 32,
+    "actual_projection_MC2_rows": 165,
+    "candidate_queries_added": 0,
+    "projection_padding_rows": 5,
+    "profile160_claimed": false,
+    "deferred_chain_enabled": false,
+    "counts_are_Python_graph_construction_or_eager_not_device_replays": true,
+    "construction_witnesses": [
+      {
+        "layer": 0,
+        "K": 3072,
+        "calls": 1
+      },
+      {
+        "layer": 0,
+        "K": 8576,
+        "calls": 1
+      }
+    ],
+    "pending_tickets": 0,
+    "model_qualified": false,
+    "Goodput": null
+  },
+  "operator_calls": [
+    {
+      "M": 165,
+      "K": 3072,
+      "weight": 281466392807136,
+      "gamma": 281465057310784,
+      "flush": true
+    },
+    {
+      "M": 165,
+      "K": 8576,
+      "weight": 281465057307744,
+      "gamma": 281465057308544,
+      "flush": true
+    }
+  ]
+}

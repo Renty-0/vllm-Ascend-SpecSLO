@@ -1,0 +1,34 @@
+{
+  "UTC": "2026-10-19T06:37:48.102349+00:00",
+  "status": "partial_math_not_qualified_capacity_accounting_failure",
+  "actual_model_cases_by_rank": [
+    {
+      "rank": 1,
+      "completed_cases": 410,
+      "all_completed_cases_bitwise": true,
+      "last": "N25-all4-anchor0"
+    },
+    {
+      "rank": 2,
+      "completed_cases": 410,
+      "all_completed_cases_bitwise": true,
+      "last": "N25-all4-anchor0"
+    },
+    {
+      "rank": 3,
+      "completed_cases": 410,
+      "all_completed_cases_bitwise": true,
+      "last": "N25-all4-anchor0"
+    }
+  ],
+  "failed_next_case": "N25-fork5-anchor0",
+  "cause": "actual installed TreeBudgetPolicy.target_queries128, not tensor numerical disagreement",
+  "all532_qualified": false,
+  "costs_measured": false,
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M160-S32-N32-root-v326-B1to8-532-math-cost-v1.json",
+  "receipt_sha256": "51ed31a1a3636b8a1630c5330109b8ddce6866a3c8bcbac615138fdf4bebfd94",
+  "owned_cleanup": true,
+  "source_and_environment_unchanged": true,
+  "next": "329 bind actual policy+account closureC128/Q160/F12/groups32 and ctorC128; HOST before new models; redo all532",
+  "Goodput": null
+}

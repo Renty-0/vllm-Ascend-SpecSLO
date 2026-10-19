@@ -25,6 +25,7 @@ SOURCES = (
     ('tree-M165-first-divergence-v322', 322),
     ('tree-M165-common-mask11-target-math-cost-v323', 323),
     ('tree-M160-S32-N32-target-math-cost-v326', 326),
+    ('tree-M160-C128-capacity-binding-v329', 329),
 )
 
 
@@ -78,6 +79,10 @@ def main():
         'tree-FIA-group-root-isolation-v324',
         'tree-M165-common-mask11-reference-fix-v325',
         'tree-M160-S32-N32-target-math-cost-v326',
+        'tree-M160-MC2-memory-qualification-host-v327',
+        'tree-C128-F64-global192-groups32-host-v328',
+        'tree-M160-C128-capacity-binding-v329',
+        'tree-M160-actual165-MC2-bridge-host-v330',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -146,6 +151,10 @@ def main():
         'build_ROOT323_common_mask_HOST.py',
         'ROOT316_EAGER_B4_EXCLUSIONS_RAW_FOLLOWUP_20261019.json',
         'build_ROOT326_M160_HOST.py',
+        'ROOT326_PARTIAL_MODEL_CAPACITY_FAILURE_AUDIT.json',
+        'ROOT_M160_MC2_IN_MEMORY_QUALIFICATION_PLAN_20261019.json',
+        'ROOT_M160_TO_QUALIFIED_M165_MC2_BRIDGE_PLAN_20261019.json',
+        'ROOT_FUTURE_RAW_STATIC_KV_BUCKET_PLAN_20261019.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():
