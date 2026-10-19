@@ -1,0 +1,11 @@
+{
+  "status": "passed_actual408_Native_prepare_CPU",
+  "NPU_used": false,
+  "model_executed": false,
+  "actual_layouts": 408,
+  "actual_forwards": 816,
+  "physical_mapping_slots_and_checked_copy_splits_identical": true,
+  "all_original_contexts_fit512": true,
+  "only_toy_receiver_expected_extent_varied": true,
+  "invalid_inputs_rejected": 5
+}

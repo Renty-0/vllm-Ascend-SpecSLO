@@ -1,0 +1,32 @@
+{
+  "UTC": "2026-10-19T12:19:27.613825+00:00",
+  "status": "source_only",
+  "scope": "M120/Q5/S24 original311 tree B1to8 with homogeneous KV buckets; original fixed FULL2560 independent reference.",
+  "model_cases_per_target": 594,
+  "maximum_extent_prelude": 6,
+  "mixed_cases": 408,
+  "mid_cases": 90,
+  "short_cases": 90,
+  "independent_prefills_per_target": 216,
+  "all_qualified_extents": [
+    512,
+    1024,
+    1536,
+    2048,
+    2560
+  ],
+  "shortened_teacher_prefixes_are_diagnostic_only": true,
+  "formal463_workload_unchanged": true,
+  "all_prefix_page_residues_preserved": true,
+  "maximum_workspace_and_original_changed_input_qualification_before_bucketing": true,
+  "costs": "three banks,12 N/fork panels,20balanced five-budget rotations; original pad/metadata/model/sync scope.",
+  "repeated_cost_maps": "Retain compact actual call fields and SHA256 of every full map; full maps reproducible from frozen conditions, not dumped repeatedly.",
+  "source_basis": "Original311 runtime,305 checked copy/alias/span implementation, original full node matchers plus strict bitwise; only physical metadata execution sequence lengths change.",
+  "HOST_setup_history": [
+    "Old CPU receiver expects fixed2560; test-only arithmetic receiver literal adapted per tested extent, retaining its exact assertion. Python constant folding required updating its tuple constant. No real Native or frozen source changed."
+  ],
+  "real_draft_generation": false,
+  "whole_workload_AR_qualified": false,
+  "Goodput": null,
+  "NPU_qualification_inherited": false
+}

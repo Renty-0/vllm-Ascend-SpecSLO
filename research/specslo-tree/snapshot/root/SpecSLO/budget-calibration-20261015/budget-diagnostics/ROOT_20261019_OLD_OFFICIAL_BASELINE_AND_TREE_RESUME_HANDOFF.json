@@ -194,7 +194,7 @@
   "tree329_all6_invalid_limit_cases_rejected": true,
   "tree329_model_qualification": true,
   "tree329_tag": "M160-S32-C128-root-v329-B1to8-532-math-cost-v1",
-  "updated_UTC": "2026-10-19T11:53:26.647524+00:00",
+  "updated_UTC": "2026-10-19T12:20:25.214286+00:00",
   "tree329_guard_pid": 292336,
   "tree329_all_four_capacity_before_model_passed": true,
   "tree330_source_only": true,
@@ -341,7 +341,7 @@
   "tree339_archive_sha256": "2f486aff3ff807a1fcf398e068575ec8103b127a704456bce8eb122b7f248643",
   "tree339_actual_installer_and_complete_frontend_HOST_passed": true,
   "tree339_guard_session": null,
-  "github_commit": "62f56ba",
+  "github_commit": "1e86425",
   "tree339_result": "complete_numeric_cost_independently_audited_original_supervisor_count_failed_42_vs36",
   "tree339_original_receipt_failed": true,
   "tree339_owned_cleanup": true,
@@ -398,5 +398,13 @@
   },
   "tree342_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT342_INDEPENDENT_FULL_BUCKET_MODEL_COST_AUDIT.json",
   "next_optimization": "real branch integration of homogeneous FULL KV buckets, preserve M120 gamma4 and FULL2560 ownAR reference; inspect whole-batch cost eligibility and qualify bounded rolling whole-prompt admission",
-  "future_rolling_raw_followup": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_EMPTY_ACTIVE_ADMISSION_RAW_FOLLOWUP_20261019.json"
+  "future_rolling_raw_followup": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_EMPTY_ACTIVE_ADMISSION_RAW_FOLLOWUP_20261019.json",
+  "tree343_source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v343",
+  "tree343_source_frozen": true,
+  "tree343_tag": "M120-uniform-KV-bucket-root-v343-594-branch-math-current-cost-v1",
+  "tree343_freeze_sha256": "f13e3e28482fac59088014f391c5dd0526cdd773228ebb1855747abb98aa488b",
+  "tree343_archive_sha256": "4efb97046a8062e9440e7ffd32d27c92694636ee500a5f01a6b7b028b196e59e",
+  "tree343_pending": "fresh594 M120 B1..8 target cases:6maxextent families,408originalmixed,90mid,90short;216 independent prefills pertarget, fixedFULL2560 reference and strict allhidden/128KV/greedy;threebanks12panels20rotated costs, no realdraft/full463.",
+  "tree343_REQUIRED_HOST_all3_passed": true,
+  "tree343_guard_session": 17939
 }
