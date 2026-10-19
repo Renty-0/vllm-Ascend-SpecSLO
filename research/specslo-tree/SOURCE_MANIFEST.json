@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-19T04:35:43.242202+00:00",
-  "upstream_branch_base": "ddba1f7a68767f66ba3074289cf86d363180cf8c",
+  "saved_UTC": "2026-10-19T04:36:52.077795+00:00",
+  "upstream_branch_base": "08871948c73b9f244d848bc36be082eed7eaf4ff",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -874,8 +874,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "f778f3c49896c667fa1278179c9d83cfa00c7ca8487a4491ccfc49dd7c88ebe2",
-      "bytes": 10189
+      "sha256": "6dead2c79dcd16608180e6c4c51c9ce4c9dbb32bee682639e91cf68ad988e208",
+      "bytes": 10217
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution/common_guard.py",
@@ -12552,6 +12552,30 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/official-v021-baseline-20261019/harness/admission.py",
       "sha256": "ce8769239f7fc482c798ae4bcee6e55f7cee07b4d13966a6f0324b42fdd30e7e",
       "bytes": 3930
+    },
+    {
+      "source": "/root/SpecSLO/official-v021-baseline-20261019/harness/examples/__init__.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/official-v021-baseline-20261019/harness/examples/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "source": "/root/SpecSLO/official-v021-baseline-20261019/harness/examples/benchmark_nano_pearl_target_only.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/official-v021-baseline-20261019/harness/examples/benchmark_nano_pearl_target_only.py",
+      "sha256": "70b06cbfcd746e9dc5fc5aa99deb26735aa7f13f5d27566fbb93df30d7f0bb29",
+      "bytes": 35452
+    },
+    {
+      "source": "/root/SpecSLO/official-v021-baseline-20261019/harness/examples/specslo_benchmark_report.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/official-v021-baseline-20261019/harness/examples/specslo_benchmark_report.py",
+      "sha256": "01a5f920669f330d6f38a871d7dc9f70c2d7d5d022a4ee5f2ab51439b92f4b30",
+      "bytes": 67473
+    },
+    {
+      "source": "/root/SpecSLO/official-v021-baseline-20261019/harness/examples/specslo_slo_metrics.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/official-v021-baseline-20261019/harness/examples/specslo_slo_metrics.py",
+      "sha256": "560d8622f62f22d498a869e01cf5174c1fdeb58bbe0acfc5d96c71bc51bbf53b",
+      "bytes": 2378
     },
     {
       "source": "/root/SpecSLO/official-v021-baseline-20261019/harness/run_baseline.py",

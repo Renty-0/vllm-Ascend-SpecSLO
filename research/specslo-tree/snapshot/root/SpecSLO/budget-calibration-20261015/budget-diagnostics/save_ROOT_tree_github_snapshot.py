@@ -133,7 +133,7 @@ def main():
         selected.update(p for p in (official / directory).rglob('*') if p.is_file()
                         and '__pycache__' not in p.parts and 'actual' not in p.parts
                         and p.suffix in {'.py', '.json'}
-                        and p.parent == official / directory)
+                        and (directory == 'harness' or p.parent == official / directory))
     selected.add(BASE / 'budget-diagnostics' / 'ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json')
     selected.add(Path('/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md'))
     plugin = Path('/root/data/vllm-ascend-hust')
