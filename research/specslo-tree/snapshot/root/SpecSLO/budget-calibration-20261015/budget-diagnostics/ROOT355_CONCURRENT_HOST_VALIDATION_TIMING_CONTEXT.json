@@ -1,0 +1,20 @@
+{
+  "status": "measured_run_context_not_a_counterfactual_or_performance_correction",
+  "tag": "M120-B8-closed-control-root-v355-full463-ownAR-v1",
+  "formal_trace": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT355_FINAL_FULL_RESULT.json",
+  "HOST_process": "check360_HOST.py, Torch CPU only, torch.set_num_threads(1), TORCH_DEVICE_BACKEND_AUTOLOAD=0",
+  "HOST_log": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT360_HOST_argument_binding_retry.log",
+  "HOST_interval_UTC": {
+    "log_created": "2026-10-19T16:35:53.781573602+00:00",
+    "log_last_write": "2026-10-19T16:36:01.049694870+00:00"
+  },
+  "interval_seconds": 7.268121268,
+  "overlaps_formal_generation5": true,
+  "HOST_NPU_used": false,
+  "active_NPU_job_source_or_flags_mutated": false,
+  "performance_impact_measured": false,
+  "no_elapsed_time_adjustment_applied": true,
+  "no_clean_idle_HOST_load_claim": true,
+  "interpretation": "Retain355 as one complete correct but inferior diagnostic observation. Its negative result does not select a production candidate; final matched comparison must avoid concurrent HOST stress and use all predeclared repetitions.",
+  "goal_achieved": false
+}

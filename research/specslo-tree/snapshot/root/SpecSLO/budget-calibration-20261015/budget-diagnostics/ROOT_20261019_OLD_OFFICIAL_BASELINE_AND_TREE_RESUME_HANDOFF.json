@@ -31,9 +31,9 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "a9d57e1",
+  "github_checkpoint": "f819a57",
   "goal_achieved": false,
-  "next": "Launch370 first/catch-up+tail3 exact99 then320 balanced timings with no concurrent HOST load; after qualification integrate into original dynamic budget/tree and full463+ownAR; no final success claim yet",
+  "next": "Wait371 math/cost + complete source/cleanup/idle audit. Then build full372 on best257 dynamicB1..5 (genuine branch B5) preserving227 target+alloriginalcomponents, fresh same-instance all-N/eager tail3 draft tests before original warm/twozero/seal, full463 clocks+all3ownAR. Never inherit standalone0.6B component flags.",
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
   "user_Raw_clarification": {
     "UTC": "2026-10-19T02:55:43.056404+00:00",
@@ -189,7 +189,7 @@
   "tree329_all6_invalid_limit_cases_rejected": true,
   "tree329_model_qualification": true,
   "tree329_tag": "M160-S32-C128-root-v329-B1to8-532-math-cost-v1",
-  "updated_UTC": "2026-10-19T18:28:09.995619+00:00",
+  "updated_UTC": "2026-10-19T18:37:40.320703+00:00",
   "tree329_guard_pid": 292336,
   "tree329_all_four_capacity_before_model_passed": true,
   "tree330_source_only": true,
@@ -623,8 +623,72 @@
   "tree368_serving_qualified": false,
   "tree369_HOST_20_cases_pass": true,
   "tree370_frozen": true,
-  "tree370_guard_session": null,
+  "tree370_guard_session": 9428,
   "tree370_model_qualified": false,
   "tree370_planned_math_rows": 99,
-  "tree370_planned_cost_calls": 320
+  "tree370_planned_cost_calls": 320,
+  "tree370_tag": "primary4-first-catchup-tail3-root-v370-draft-only-v1",
+  "tree370_complete": true,
+  "tree370_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT370_INDEPENDENT_REAL_DRAFT_TAIL3_RESULT.json",
+  "tree370_all99_exact": true,
+  "tree370_medians_ms": {
+    "N4_none": {
+      "original_ms": 52.094738464802504,
+      "tail3_ms": 36.27385920844972,
+      "time_reduction": 0.3036943791750114,
+      "component_speedup": 1.4361509803916157
+    },
+    "N4_staggered": {
+      "original_ms": 51.985798636451364,
+      "tail3_ms": 37.77010040357709,
+      "time_reduction": 0.27345349317970313,
+      "component_speedup": 1.3763743829372492
+    },
+    "N12_none": {
+      "original_ms": 61.50216073729098,
+      "tail3_ms": 48.22074854746461,
+      "time_reduction": 0.21595033459976265,
+      "component_speedup": 1.27542940725512
+    },
+    "N12_staggered": {
+      "original_ms": 61.50672258809209,
+      "tail3_ms": 47.53578663803637,
+      "time_reduction": 0.22714486095476882,
+      "component_speedup": 1.2939035395887757
+    },
+    "N24_none": {
+      "original_ms": 82.04754558391869,
+      "tail3_ms": 68.69872636161745,
+      "time_reduction": 0.16269614316065062,
+      "component_speedup": 1.1943095589870985
+    },
+    "N24_staggered": {
+      "original_ms": 82.86661165766418,
+      "tail3_ms": 68.73244349844754,
+      "time_reduction": 0.17056529616062077,
+      "component_speedup": 1.2056404143341113
+    },
+    "N32_none": {
+      "original_ms": 119.84799872152507,
+      "tail3_ms": 106.87181237153709,
+      "time_reduction": 0.10827203197726343,
+      "component_speedup": 1.1214182305141098
+    },
+    "N32_staggered": {
+      "original_ms": 120.4952821135521,
+      "tail3_ms": 108.91454946249723,
+      "time_reduction": 0.09610942808649914,
+      "component_speedup": 1.1063286099810061
+    }
+  },
+  "tree370_whole463_qualified": false,
+  "tree371_tag": "primary4-tail3-allN-mixed-eager-root-v371-draft-only-v1",
+  "tree371_guard_session": 94585,
+  "tree371_freeze_sha256": "448148e2d4116abb0b01bc0f05aba9cee9e1e661d828b888fae28c1f01929ab1",
+  "tree371_archive_sha256": "6ce292566207124d277358e3e3af034604c268af691724cb70f5c00c19bbdbaf",
+  "tree371_source": "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-eager-allN-device-v371",
+  "tree371_planned_math306": true,
+  "tree371_allN1to32_and_eager_promotion_checked": false,
+  "tree371_planned_cost320": true,
+  "tree371_model_qualified": false
 }

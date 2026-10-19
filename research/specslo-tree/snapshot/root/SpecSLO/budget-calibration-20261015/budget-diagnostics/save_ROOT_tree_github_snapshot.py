@@ -58,6 +58,7 @@ SOURCES = (
     ('tree-primary4-top2-chain-runtime-init-v367', 367),
     ('tree-primary4-top2-chain-compiler-cache-v368', 368),
     ('tree-primary4-tail3-top2-chain-device-v370', 370),
+    ('tree-primary4-tail3-eager-allN-device-v371', 371),
 )
 
 
@@ -154,6 +155,7 @@ def main():
         'tree-primary4-top2-chain-compiler-cache-v368',
         'tree-primary4-tail3-top2-chain-host-v369',
         'tree-primary4-tail3-top2-chain-device-v370',
+        'tree-primary4-tail3-eager-allN-device-v371',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -335,6 +337,14 @@ def main():
         'freeze_ROOT361_bucket_completion_HOST.py',
         'check_ROOT361_actual_frozen_construction_HOST.py',
         'HOST_ROOT361_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'ROOT356_PRELIMINARY_FULL_COMMON_METRICS.json',
+        'ROOT356_FINAL_FULL_RESULT.json',
+        'ROOT356_TERMINAL_INDEPENDENT_FULL_AUDIT.json',
+        'ROOT363_NEGATIVE_SYNTHETIC_RESULT.json',
+        'ROOT365_367_LAUNCH_FAILURES_RETAINED.json',
+        'ROOT368_INDEPENDENT_REAL_DRAFT_COMPONENT_RESULT.json',
+        'ROOT370_INDEPENDENT_REAL_DRAFT_TAIL3_RESULT.json',
+        'ROOT355_CONCURRENT_HOST_VALIDATION_TIMING_CONTEXT.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

@@ -1,0 +1,57 @@
+{
+  "status": "independently_audited_real_draft_component_original_supervisor_failed_on_audit_return_ABI",
+  "UTC": "2026-10-19T18:28:09.995619+00:00",
+  "tag": "primary4-top2-chain4-chain5-root-v368-draft-only-v3",
+  "terminal_receipt_sha256": "c109cd5a06c10102ae10ae6944e09bfbedec512b034598c7757dec7295ca936c",
+  "original_supervisor_status": "failed",
+  "original_supervisor_error_retained": [
+    "Traceback (most recent call last):\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-device-v365/guard365.py::original-owned-supervision\", line 130, in execute_locked\n    if '--prepare-only' in sys.argv:prepare_only()\nValueError: too many values to unpack (expected 3)\n"
+  ],
+  "child_exit_code": 0,
+  "original_supervisor_marked_complete": false,
+  "sources_unchanged": true,
+  "owned_remaining": [],
+  "all_four_devices_idle": true,
+  "pre_post_frozen_baseline_verifiers_pass": true,
+  "independent_math_and_timing_inventory_audit": {
+    "status": "complete_real_draft_component_audited",
+    "result_sha256": "09a5c42b74ecab6eb6bd6f3176dd7430a472d1ddbf81d34362356b7fe5beb842",
+    "math_rows": 33,
+    "timing_calls": 240,
+    "median_seconds": {
+      "N4": {
+        "generic4": 0.05671511963009834,
+        "chain4": 0.03275895421393216,
+        "chain5": 0.04008254292421043
+      },
+      "N12": {
+        "generic4": 0.06714600301347673,
+        "chain4": 0.043787278002128005,
+        "chain5": 0.053531082114204764
+      },
+      "N24": {
+        "generic4": 0.08897213614545763,
+        "chain4": 0.06503355735912919,
+        "chain5": 0.07911651977337897
+      },
+      "N32": {
+        "generic4": 0.12663391837850213,
+        "chain4": 0.1033633342012763,
+        "chain5": 0.12544835591688752
+      }
+    },
+    "Raw": null,
+    "Goodput": null,
+    "adopted": false
+  },
+  "math_cases": 33,
+  "candidate_modes": 2,
+  "all66_candidate_token_FP32_and_56KV_comparisons_passed": true,
+  "component_costs_preliminary": true,
+  "concurrent_HOST_context": "HOST369 CPU source/model protocol test ran near the end of this component; no timestamp adjustment or zero-impact claim. Re-measure370 with no concurrent HOST tests or exporter during costs.",
+  "serving_installed": false,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "goal_achieved": false
+}

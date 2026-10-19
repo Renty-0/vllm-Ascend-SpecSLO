@@ -1,0 +1,30 @@
+{
+  "status": "startup_failures_no_performance_or_math_qualification",
+  "UTC": "2026-10-19T18:17:36.161863+00:00",
+  "runs": [
+    {
+      "tag": "primary4-top2-chain4-chain5-root-v365-draft-only-v1",
+      "status": "failed",
+      "receipt_sha256": "2d152224290ebc1aacd01011f745e146ca314bbc47a9812854a39e64bee975a3",
+      "owned_remaining": [],
+      "devices_idle": true,
+      "child_exit": 1,
+      "model_math_cases_completed": 0
+    },
+    {
+      "tag": "primary4-top2-chain4-chain5-root-v367-draft-only-v2",
+      "status": "failed",
+      "receipt_sha256": "cd058a33d89014740783df438585bef0a2a640e5c983b56a97b4abb994c2ae7e",
+      "owned_remaining": [],
+      "devices_idle": true,
+      "child_exit": 1,
+      "model_math_cases_completed": 0
+    }
+  ],
+  "first_root_cause": "Missing original init_device_properties_triton call in independent TP1 factory setup",
+  "second_error": "Clang PCH compile failed on write while inherited file size limit is64MiB; disable optional host PCH and retain original NPU kernels/checks",
+  "second_cause_confirmed": false,
+  "NPU_performance_result": false,
+  "Raw": null,
+  "Goodput": null
+}

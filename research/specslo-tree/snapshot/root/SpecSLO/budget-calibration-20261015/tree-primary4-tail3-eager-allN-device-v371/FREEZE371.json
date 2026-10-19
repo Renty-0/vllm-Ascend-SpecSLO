@@ -1,0 +1,22 @@
+{
+  "schema": "ROOT371.real-draft-mixed-eager-allN-source.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-eager-allN-device-v371/audit371.py": "6108bda43394a87c8093b854e023582be0b581d18881e8a5f4aa0db05e92a3cf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-eager-allN-device-v371/guard371.py": "fba7f233338cc1e73b3a4e7ba2a215b51a39099558eb9e4bed2486f86e3d8567",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-eager-allN-device-v371/probe371.py": "e9f4bb1826c47572a3368a2e21ffe25627adaeae2e4f65baa0e7e6180c007f37",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-eager-allN-device-v371/check371_HOST.py": "5a177169c5731ff9848e5178ca3ff9bb16b2635c7807307e2f4132d538a9b491",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-eager-allN-device-v371/startup371.sh": "ff710932e4d48e264fa5ea39e9f1ca2f4aa167244396b00444c02d4d78f91a32",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-eager-allN-device-v371/HOST371_RESULT.json": "f884a0c7676f29daf8055586db198b423a27e57112d15223426e456ae6b90733",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-device-v370/SOURCE370_RECEIPT.json": "237385d513a761004945df9575601f74e7e63e5b8641eec37a5198db7d4d18d0"
+  },
+  "math_rows": 306,
+  "timing_calls": 320,
+  "models_planned": [
+    "Qwen3-0.6B"
+  ],
+  "target_model_loaded": false,
+  "NPU_used": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

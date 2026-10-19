@@ -1,0 +1,24 @@
+{
+  "status": "PASS_HOST_allN_eager_inventory_and_actual_guard_ABI",
+  "math_rows": 306,
+  "timing_calls": 320,
+  "rejected_corruptions": [
+    "missing_N",
+    "frontier_count",
+    "frontier_roots",
+    "promotion_map",
+    "probability_bits",
+    "KV",
+    "query_charge",
+    "ABA",
+    "timing_order",
+    "unvalidated",
+    "prefix",
+    "invented_Raw"
+  ],
+  "probe_sha256": "e9f4bb1826c47572a3368a2e21ffe25627adaeae2e4f65baa0e7e6180c007f37",
+  "NPU_used": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

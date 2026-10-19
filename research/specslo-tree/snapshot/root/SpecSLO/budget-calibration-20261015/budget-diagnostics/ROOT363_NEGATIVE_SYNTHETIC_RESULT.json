@@ -1,0 +1,101 @@
+{
+  "status": "complete_negative_synthetic_component",
+  "tag": "Q5-S24-multi-owner-page-offset-root-v363-synthetic-v1",
+  "source_freeze_sha256": "292e7a4a0c4a945879e298b73204c898f3ebc9c86f2b746fba7ba60a03e2083e",
+  "receipt_sha256": "a81b0c99ec7a0aed5b30b4c584fa782d9977bd0658ca25a3292caf9b91584bf6",
+  "supervisor_status": "complete",
+  "errors": [],
+  "owned_remaining": [],
+  "devices_idle": true,
+  "cases": 640,
+  "rows": 1920,
+  "exact_rows": 1536,
+  "same_extent_page_offset_exact_rows": 1536,
+  "all_A_restored": true,
+  "by_group": {
+    "heads2_mask10_precise1_extent2560": {
+      "rows": 84,
+      "exact": 69,
+      "page_offset_exact": 69
+    },
+    "heads2_mask10_precise2_extent2560": {
+      "rows": 84,
+      "exact": 69,
+      "page_offset_exact": 69
+    },
+    "heads2_mask11_precise1_extent2560": {
+      "rows": 84,
+      "exact": 69,
+      "page_offset_exact": 69
+    },
+    "heads2_mask11_precise2_extent2560": {
+      "rows": 84,
+      "exact": 69,
+      "page_offset_exact": 69
+    },
+    "heads3_mask10_precise1_extent2560": {
+      "rows": 84,
+      "exact": 69,
+      "page_offset_exact": 69
+    },
+    "heads3_mask10_precise2_extent2560": {
+      "rows": 84,
+      "exact": 69,
+      "page_offset_exact": 69
+    },
+    "heads3_mask11_precise1_extent2560": {
+      "rows": 84,
+      "exact": 69,
+      "page_offset_exact": 69
+    },
+    "heads3_mask11_precise2_extent2560": {
+      "rows": 84,
+      "exact": 69,
+      "page_offset_exact": 69
+    },
+    "heads2_mask10_precise1_extent4096": {
+      "rows": 156,
+      "exact": 123,
+      "page_offset_exact": 123
+    },
+    "heads2_mask10_precise2_extent4096": {
+      "rows": 156,
+      "exact": 123,
+      "page_offset_exact": 123
+    },
+    "heads2_mask11_precise1_extent4096": {
+      "rows": 156,
+      "exact": 123,
+      "page_offset_exact": 123
+    },
+    "heads2_mask11_precise2_extent4096": {
+      "rows": 156,
+      "exact": 123,
+      "page_offset_exact": 123
+    },
+    "heads3_mask10_precise1_extent4096": {
+      "rows": 156,
+      "exact": 123,
+      "page_offset_exact": 123
+    },
+    "heads3_mask10_precise2_extent4096": {
+      "rows": 156,
+      "exact": 123,
+      "page_offset_exact": 123
+    },
+    "heads3_mask11_precise1_extent4096": {
+      "rows": 156,
+      "exact": 123,
+      "page_offset_exact": 123
+    },
+    "heads3_mask11_precise2_extent4096": {
+      "rows": 156,
+      "exact": 123,
+      "page_offset_exact": 123
+    }
+  },
+  "models_loaded": false,
+  "adopted": false,
+  "Raw": null,
+  "Goodput": null
+}
