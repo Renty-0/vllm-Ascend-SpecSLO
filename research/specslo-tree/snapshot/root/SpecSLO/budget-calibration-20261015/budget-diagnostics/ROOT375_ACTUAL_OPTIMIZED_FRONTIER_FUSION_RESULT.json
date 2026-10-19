@@ -1,0 +1,107 @@
+{
+  "status": "complete_independently_audited_actual_optimized_stack_component",
+  "UTC": "2026-10-19T20:02:45.894498+00:00",
+  "tag": "FastV5-all-eager-frontier-fused-root-v375-draft-only-v2",
+  "receipt_sha256": "3a77b1f01ee5e381d525fff832a4e0943607d32c28278f4002186e38a12f22bf",
+  "audit": {
+    "status": "completed_actual_FastV5_frontier_fusion_component",
+    "math_rows": 510,
+    "timing_calls": 320,
+    "median_seconds": {
+      "N4_B4": {
+        "optimized_existing": 0.02548089809715748,
+        "fused_frontier_chain": 0.025015930645167828
+      },
+      "N4_B5": {
+        "optimized_existing": 0.02576667140237987,
+        "fused_frontier_chain": 0.025013580918312073
+      },
+      "N12_B4": {
+        "optimized_existing": 0.03246629307977855,
+        "fused_frontier_chain": 0.031781093683093786
+      },
+      "N12_B5": {
+        "optimized_existing": 0.03255054424516857,
+        "fused_frontier_chain": 0.03182589402422309
+      },
+      "N24_B4": {
+        "optimized_existing": 0.04518102644942701,
+        "fused_frontier_chain": 0.04453025199472904
+      },
+      "N24_B5": {
+        "optimized_existing": 0.04503252520225942,
+        "fused_frontier_chain": 0.04430167912505567
+      },
+      "N32_B4": {
+        "optimized_existing": 0.03745449450798333,
+        "fused_frontier_chain": 0.03707882948219776
+      },
+      "N32_B5": {
+        "optimized_existing": 0.03752445592544973,
+        "fused_frontier_chain": 0.03709519491530955
+      }
+    },
+    "result_sha256": "8625a5d78e6c71b1a46d2db491dee1153da33c5d2abfcbcee5db7022bbbf7b4e",
+    "full463_qualified": false,
+    "Raw": null,
+    "Goodput": null,
+    "adopted": false
+  },
+  "ratios": {
+    "N4_B4": {
+      "existing_ms": 25.48089809715748,
+      "fused_ms": 25.015930645167828,
+      "reduction": 0.018247686962082454
+    },
+    "N4_B5": {
+      "existing_ms": 25.76667140237987,
+      "fused_ms": 25.013580918312073,
+      "reduction": 0.02922730966322018
+    },
+    "N12_B4": {
+      "existing_ms": 32.46629307977855,
+      "fused_ms": 31.781093683093786,
+      "reduction": 0.021104947060049173
+    },
+    "N12_B5": {
+      "existing_ms": 32.55054424516857,
+      "fused_ms": 31.82589402422309,
+      "reduction": 0.0222623073668895
+    },
+    "N24_B4": {
+      "existing_ms": 45.18102644942701,
+      "fused_ms": 44.53025199472904,
+      "reduction": 0.014403711155752674
+    },
+    "N24_B5": {
+      "existing_ms": 45.03252520225942,
+      "fused_ms": 44.30167912505567,
+      "reduction": 0.016229293692086366
+    },
+    "N32_B4": {
+      "existing_ms": 37.45449450798333,
+      "fused_ms": 37.07882948219776,
+      "reduction": 0.010029905108063675
+    },
+    "N32_B5": {
+      "existing_ms": 37.52445592544973,
+      "fused_ms": 37.09519491530955,
+      "reduction": 0.011439499908886042
+    }
+  },
+  "all510_math_exact": true,
+  "model_weights_or_precision_changed": false,
+  "all56_KV_and_ledger_and_confidence_exact": true,
+  "all96_committed_prefixes_protected": true,
+  "Native_qualification_flags_unchanged": true,
+  "extra_HOST_tests_or_exporter_during_costs": false,
+  "original_supervisor_complete": true,
+  "owned_remaining": [],
+  "all4idle": true,
+  "benefit_scope": "only qualified all-eager frontier; other optimized paths retained",
+  "production_increment_not_measured": true,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "goal_achieved": false
+}

@@ -31,9 +31,9 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "e391226",
+  "github_checkpoint": "256b6dc",
   "goal_achieved": false,
-  "next": "Monitor375 running immutable374 with Boolean-only375 repair; component510 true optimized-baseline checks and320timings. If qualified gain useful, fresh production full. Also preserve original target KV bucket361 direction; standalone target-only594+same-instance costs frozen ready. No gain370/371 is production incremental.",
+  "next": "Run frozen361 target-only complete594+sameinstance cost andpaired FULL/bucket controls; preserve all old594 math and qualification. Combine only if whole math passes andactualtime benefit, then full best257+qualified additions. No final GPgoal;0/9.",
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
   "user_Raw_clarification": {
     "UTC": "2026-10-19T02:55:43.056404+00:00",
@@ -189,7 +189,7 @@
   "tree329_all6_invalid_limit_cases_rejected": true,
   "tree329_model_qualification": true,
   "tree329_tag": "M160-S32-C128-root-v329-B1to8-532-math-cost-v1",
-  "updated_UTC": "2026-10-19T19:58:29.414947+00:00",
+  "updated_UTC": "2026-10-19T20:02:45.894498+00:00",
   "tree329_guard_pid": 292336,
   "tree329_all_four_capacity_before_model_passed": true,
   "tree330_source_only": true,
@@ -780,5 +780,17 @@
   "tree375_source": "/root/SpecSLO/budget-calibration-20261015/tree-fastv5-frontier-boolean-guard-v375",
   "tree375_freeze_sha256": "f79ec8e9d6f39116528341cd9716ae3f36e4eb529c0f282c2a4be337452b6398",
   "tree375_archive_sha256": "1e6017f6cfa51d4c7f70e169551092c906c58f3f8a9df13f479128d0beb12779",
-  "tree375_NPU_started": true
+  "tree375_NPU_started": true,
+  "tree375_complete": true,
+  "tree375_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT375_ACTUAL_OPTIMIZED_FRONTIER_FUSION_RESULT.json",
+  "tree375_all510_exact": true,
+  "tree375_component_gain_small": true,
+  "current_execution": {
+    "version": 361,
+    "tag": "Q5-KV-bucket-all594-and-paired-FULL-root-v361-target-component-v1",
+    "guardian_pid": 1733957,
+    "status": "running_target_component",
+    "UTC": "2026-10-19T20:05:00+00:00",
+    "full463_result": false
+  }
 }

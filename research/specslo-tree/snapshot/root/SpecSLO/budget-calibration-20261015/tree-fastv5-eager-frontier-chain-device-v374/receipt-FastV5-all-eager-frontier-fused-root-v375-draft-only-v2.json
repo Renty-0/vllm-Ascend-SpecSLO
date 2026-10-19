@@ -1,6 +1,6 @@
 {
   "schema": "ROOT.V365.real-draft-chain-component-supervisor.v1",
-  "status": "running",
+  "status": "complete",
   "started_UTC": "2026-10-19T19:58:08.449186+00:00",
   "tag": "FastV5-all-eager-frontier-fused-root-v375-draft-only-v2",
   "action": "real-draft-primary4-top2-chain-component",
@@ -54,7 +54,8 @@
       "FastV5-all-eager-frontier-fused-root-v375-draft-only-v2"
     ],
     "log": "/root/SpecSLO/budget-calibration-20261015/tree-fastv5-eager-frontier-chain-device-v374/local-FastV5-all-eager-frontier-fused-root-v375-draft-only-v2.log",
-    "pid": 1725344
+    "pid": 1725344,
+    "exit_code": 0
   },
   "physical_cards": [
     2,
@@ -223,9 +224,206 @@
       "errors": []
     }
   },
-  "elapsed_seconds": 18.14599445927888,
+  "elapsed_seconds": 221.66662803525105,
   "private_storage": {
-    "actual_tag_bytes": 0,
-    "aggregate_private_bytes": 1439454
-  }
+    "actual_tag_bytes": 684886,
+    "aggregate_private_bytes": 2163373
+  },
+  "actual_component_audit": {
+    "status": "completed_actual_FastV5_frontier_fusion_component",
+    "math_rows": 510,
+    "timing_calls": 320,
+    "median_seconds": {
+      "N4_B4": {
+        "optimized_existing": 0.02548089809715748,
+        "fused_frontier_chain": 0.025015930645167828
+      },
+      "N4_B5": {
+        "optimized_existing": 0.02576667140237987,
+        "fused_frontier_chain": 0.025013580918312073
+      },
+      "N12_B4": {
+        "optimized_existing": 0.03246629307977855,
+        "fused_frontier_chain": 0.031781093683093786
+      },
+      "N12_B5": {
+        "optimized_existing": 0.03255054424516857,
+        "fused_frontier_chain": 0.03182589402422309
+      },
+      "N24_B4": {
+        "optimized_existing": 0.04518102644942701,
+        "fused_frontier_chain": 0.04453025199472904
+      },
+      "N24_B5": {
+        "optimized_existing": 0.04503252520225942,
+        "fused_frontier_chain": 0.04430167912505567
+      },
+      "N32_B4": {
+        "optimized_existing": 0.03745449450798333,
+        "fused_frontier_chain": 0.03707882948219776
+      },
+      "N32_B5": {
+        "optimized_existing": 0.03752445592544973,
+        "fused_frontier_chain": 0.03709519491530955
+      }
+    },
+    "result_sha256": "8625a5d78e6c71b1a46d2db491dee1153da33c5d2abfcbcee5db7022bbbf7b4e",
+    "full463_qualified": false,
+    "Raw": null,
+    "Goodput": null,
+    "adopted": false
+  },
+  "actual_local_coverage_status": "completed_optimized_draft_component",
+  "independent_draft_component_arithmetic": {
+    "actual_optimized_baseline_used": true,
+    "all510_root_confidence_ledger_KV_checks_recounted": true,
+    "all320_balanced_pairs_recounted": true
+  },
+  "actual_execution_complete": true,
+  "owned_remaining": [],
+  "sources_unchanged": true,
+  "post_verifier": {
+    "argv": [
+      "bash",
+      "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh",
+      "python",
+      "-B",
+      "/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/verify_lock.py",
+      "/root/data/specslo-baselines/nano-pearl-ascend-v1/lock.json"
+    ],
+    "exit_code": 0,
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/FastV5-all-eager-frontier-fused-root-v375-draft-only-v2-post-verifier.log",
+    "sha256": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "actual_result": {
+      "baseline_id": "nano-pearl-ascend-v1",
+      "status": "pass",
+      "checked_frozen_files": 10496,
+      "checked_external_files": 15,
+      "checked_packages": 212,
+      "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+      "errors": []
+    }
+  },
+  "devices_after": {
+    "hardware": {
+      "argv": [
+        "npu-smi",
+        "info"
+      ],
+      "started_UTC": "2026-10-19T20:02:04.706526+00:00",
+      "timeout_seconds": 30,
+      "pid": 1732626,
+      "exit_code": 0,
+      "output": "+------------------------------------------------------------------------------------------------------------------+\n| npu-smi 26.0.rc1                            Version: 26.0.rc1                                                    |\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU   Name                | Health        | Power(W)             Temp(C)                 Hugepages-Usage(page)   |\n| Chip                      | Bus-Id        | AICore(%)            Memory-Usage(MB)        HBM-Usage(MB)           |\n+===========================+===============+======================================================================+\n| 2     910B2               | OK            | 95.4                 41                      0    / 0                |\n| 0                         | 0000:C2:00.0  | 0                    0    / 0                3422 / 65536            |\n+===========================+===============+======================================================================+\n| 5     910B2               | OK            | 98.4                 43                      0    / 0                |\n| 0                         | 0000:41:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n| 6     910B2               | OK            | 93.0                 40                      0    / 0                |\n| 0                         | 0000:82:00.0  | 0                    0    / 0                3423 / 65536            |\n+===========================+===============+======================================================================+\n| 7     910B2               | OK            | 99.0                 41                      0    / 0                |\n| 0                         | 0000:42:00.0  | 0                    0    / 0                3423 / 65536            |\n+===========================+===============+======================================================================+\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU     Chip              | Process id    | Process name       | Process memory(MB)    | Process id in container |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 2                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 5                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 6                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 7                                                                              |\n+===========================+===============+======================================================================+\n",
+      "timed_out": false,
+      "elapsed_seconds": 0.7785961860790849
+    },
+    "parsed_hardware": [
+      [
+        2,
+        "910B2"
+      ],
+      [
+        5,
+        "910B2"
+      ],
+      [
+        6,
+        "910B2"
+      ],
+      [
+        7,
+        "910B2"
+      ]
+    ],
+    "four_910B2": true,
+    "processes": {
+      "2": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "2",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T20:02:05.485278+00:00",
+        "timeout_seconds": 30,
+        "pid": 1732891,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.4547587772831321,
+        "idle": true
+      },
+      "5": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "5",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T20:02:05.940083+00:00",
+        "timeout_seconds": 30,
+        "pid": 1732903,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.4537675529718399,
+        "idle": true
+      },
+      "6": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "6",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T20:02:06.393888+00:00",
+        "timeout_seconds": 30,
+        "pid": 1732915,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.46024440601468086,
+        "idle": true
+      },
+      "7": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "7",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T20:02:06.854170+00:00",
+        "timeout_seconds": 30,
+        "pid": 1732928,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.4621278732083738,
+        "idle": true
+      }
+    },
+    "all_idle": true
+  },
+  "private_storage_final": {
+    "actual_tag_bytes": 684886,
+    "aggregate_private_bytes": 2163373
+  },
+  "finished_UTC": "2026-10-19T20:02:07.323111+00:00"
 }
