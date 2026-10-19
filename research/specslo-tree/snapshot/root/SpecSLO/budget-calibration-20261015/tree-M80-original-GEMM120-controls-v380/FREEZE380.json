@@ -1,0 +1,36 @@
+{
+  "schema": "ROOT380.additive-original-GEMM120-eager-controls.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380/trace380.py": "a955d773222ad7ef4aa96fc337028b188f7921e54419dffd931b274a8dfae6e3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380/audit380.py": "0498e0892df52fe0ce13246a95e7234b1d014e9153de51eacef05af2a7355308",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380/startup380.sh": "51c2872de5c9a7a9e298a8cbcb0fe187506e9a0e2f1ef613cf93f230364fdde0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380/control380.py": "80787edf46783b6ad99b330b42342186d5a7798a2e3f0a63fe56a88817a47281",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380/check380.py": "1fa808689bbdd7e6003da2482ae5b64f044c1fb784f0a9aa8513e43059deef6d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380/probe380.py": "1a76c2b50f11a49a08ef17c151fd15da65332db73cf6636286695b8111771f3f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380/guard380.py": "6146d9b80e641a5db710d343104fe49da70a2a923492842f9bb8ffff13c4535f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380/check380_HOST.py": "0e4fef34bdf6dec342947a3789ee91dfbf92d8b5235cff6a13ab12ac59a13f49",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380/runtime380.py": "446755c3c58a5a5dad63538f2f5913f115002ef4bbd5f39668b57631661b6acb",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380/HOST380_CONSTRUCTION_RESULT.json": "ce74fe12958e4c1bc35de915f8ced4e1d91af7212a97a0e5b22236355452e0eb",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT380_GEMM120_controls_HOST.py": "fa49c39ec60ac86b38184c1fa14c985f8d10ec7294d286366d8310bad4c0d8b1"
+  },
+  "parent_freeze_sha256": "318f60b9d142a4c67c6c6f50e0b91e5f38aec40b365a0d4dea2a32bc1e28449c",
+  "parent_archive_sha256": "b97ec0fe654ee372318878ee975b3d8fc69cd7460432bce50b0663716e25b2e7",
+  "actual_diagnostic_controls_each_target": 3,
+  "independent_prefills_each_target": 288,
+  "original_case": "N16-all4-anchor0",
+  "physical_families": [
+    80,
+    120
+  ],
+  "Q": 5,
+  "S": [
+    16,
+    24
+  ],
+  "preserves_original_mc2_function": true,
+  "synchronizes_before_observation": true,
+  "diagnostic_does_not_grant_neural_or_performance_qualification": true,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

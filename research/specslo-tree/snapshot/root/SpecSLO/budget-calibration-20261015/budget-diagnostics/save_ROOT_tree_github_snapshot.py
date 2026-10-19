@@ -65,6 +65,8 @@ SOURCES = (
     ('tree-best257-uniform-KV-buckets-full-v376', 376),
     ('tree-adaptive-M80-M120-target-math-cost-v378', 378),
     ('tree-adaptive80-first-layer-divergence-v379', 379),
+    ('tree-M80-original-GEMM120-controls-v380', 380),
+    ('tree-GEMM120-original-annotation-flags-v381', 381),
 )
 
 
@@ -170,6 +172,8 @@ def main():
         'tree-adaptive-M80-M120-target-host-v377',
         'tree-adaptive-M80-M120-target-math-cost-v378',
         'tree-adaptive80-first-layer-divergence-v379',
+        'tree-M80-original-GEMM120-controls-v380',
+        'tree-GEMM120-original-annotation-flags-v381',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -379,6 +383,13 @@ def main():
         'ROOT378_INHERITED_SCOPE_LABEL_CONTEXT.json',
         'ROOT378_NEGATIVE_FIRST_MODEL_CASE.json',
         'HOST_ROOT379_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'ROOT379_REAL_FIRST_QKV_DIVERGENCE_RESULT.json',
+        'ROOT376_ACTUAL_ROLLING_COUNTER_SCREEN.json',
+        'HOST_ROOT380_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'ROOT380_DIAGNOSTIC_PROTOCOL_FAILURE.json',
+        'HOST_ROOT381_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'freeze_ROOT381_GEMM120_compiler_and_stage_repair_HOST.py',
+        'freeze_ROOT380_GEMM120_controls_HOST.py',
         'freeze_ROOT379_layer_observations_HOST.py',
         'freeze_ROOT378_adaptive_physical_target_HOST.py',
         'HOST_ROOT376_ACTUAL_FROZEN_CONSTRUCTION.json',

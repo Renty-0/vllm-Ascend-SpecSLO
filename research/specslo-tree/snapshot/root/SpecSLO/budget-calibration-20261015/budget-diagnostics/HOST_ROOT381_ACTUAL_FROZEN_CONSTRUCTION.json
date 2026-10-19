@@ -1,0 +1,20 @@
+{
+  "status": "PASS_HOST381_ACTUAL_FROZEN_SOURCE_WORKER_AND_AUDIT",
+  "source_members": 3637,
+  "NPU_used": false,
+  "model_qualified": false,
+  "pins": {
+    "freeze_sha256": "9ae5f9c8a807be352c0afd59dcce84a2b67eaa3ac48c644ffa9cb19f6039ebe5",
+    "archive_sha256": "713ddce61fcdf7104859e566b5f1f7ef1f9c1e0ce9e0d618855a04c1f2cc5aca",
+    "own_archive_members": 9,
+    "own_archive_bytes": 9909,
+    "parent_source_members": 3628,
+    "NPU_used": false,
+    "model_or_performance_qualification_inherited": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "previous380_source_clean_all4idle": true,
+  "Raw": null,
+  "Goodput": null
+}

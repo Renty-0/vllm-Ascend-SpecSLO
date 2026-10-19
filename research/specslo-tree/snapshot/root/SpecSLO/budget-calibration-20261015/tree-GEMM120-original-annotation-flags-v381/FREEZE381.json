@@ -1,0 +1,33 @@
+{
+  "schema": "ROOT381.additive-GEMM120-annotation-and-role-stage-repair.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-GEMM120-original-annotation-flags-v381/startup381.sh": "8088e13671c1d001841e02d0c448eb73764c914e2e9a36b17836bcb4bff926dd",
+    "/root/SpecSLO/budget-calibration-20261015/tree-GEMM120-original-annotation-flags-v381/HOST381_CONSTRUCTION_RESULT.json": "122a84f062043e88f5ddb9e7825cf96f63edd7fe227daf21586bbd7020cd6938",
+    "/root/SpecSLO/budget-calibration-20261015/tree-GEMM120-original-annotation-flags-v381/check381_HOST.py": "1f299412a93a24b4c945c3bf7eac43c2712a1dd27ddd547e77873eda0602d34e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-GEMM120-original-annotation-flags-v381/repair381.py": "ad0128c9ad38ab1dac40a8480435eeea37a6597bb4aacd9ae41f02ad8cd03a3a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-GEMM120-original-annotation-flags-v381/check381.py": "c343533942ff9638c586d12c7b3c1ca480de6f22fd83caab049a333dc5cbb510",
+    "/root/SpecSLO/budget-calibration-20261015/tree-GEMM120-original-annotation-flags-v381/guard381.py": "18977351a92132dc852a232f1e0193f7471fec0cbfcf7fe406ddd4b72a26ebb0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-GEMM120-original-annotation-flags-v381/runtime381.py": "c5c7854a75ef82a50844fe18b71d80578da33f31ff3939612e47a4a05f55e8cf",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT381_GEMM120_compiler_and_stage_repair_HOST.py": "05fee3c09cf90b4ca73b4519f9a43a58780da9c43916e8ae4fc9fff5aa501c1d"
+  },
+  "parent_freeze_sha256": "a1a52c1d2b34e5ded30ad1a2a5e52baea39369ffdf26e6f6ffc0dd4e2920934e",
+  "parent_archive_sha256": "2564364f6a8503b6ad77ae68dabab1734daa392e04a4349c287862b6f50225b5",
+  "actual_diagnostic_controls_each_target": 3,
+  "independent_prefills_each_target": 288,
+  "original_case": "N16-all4-anchor0",
+  "physical_families": [
+    80,
+    120
+  ],
+  "Q": 5,
+  "S": [
+    16,
+    24
+  ],
+  "preserves_original_mc2_function": true,
+  "synchronizes_before_observation": true,
+  "diagnostic_does_not_grant_neural_or_performance_qualification": true,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

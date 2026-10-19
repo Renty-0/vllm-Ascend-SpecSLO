@@ -1,0 +1,36 @@
+{
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/static-M120-uniform-KV-root-v376-full463-ownAR-v1/windows/window48/full463/rank0-full463-actual-trace.json.gz",
+  "sha256": "36481bee3fc408f311be2144dc81420b2fdb3b0e2d6f9f999301640f65f7066a",
+  "formal_source_generation": 5,
+  "Raw": 699.6987403391912,
+  "Goodput": 609.0250374874602,
+  "counters": {
+    "spec_rhythm_tree_eager_promoted": 0,
+    "spec_rhythm_tree_eager_invalidated": 0,
+    "spec_rhythm_tree_eager_dependency_rejections": 0,
+    "spec_rhythm_tree_eager_promotion_kv_move_rounds": 0,
+    "spec_rhythm_tree_eager_promotion_kv_move_rows": 0,
+    "spec_rhythm_tree_eager_promotion_kv_move_slots": 0,
+    "spec_rhythm_draft_model_calls": 4295,
+    "spec_rhythm_draft_graph_calls": 4295,
+    "spec_rhythm_eager_parent_B1_seen": 60,
+    "spec_rhythm_eager_parent_B1_excluded_unqualified": 60,
+    "spec_rhythm_eager_parent_B2_seen": 58,
+    "spec_rhythm_eager_parent_B2_excluded_unqualified": 58,
+    "spec_rhythm_eager_parent_B3_seen": 22,
+    "spec_rhythm_eager_parent_B3_excluded_unqualified": 0,
+    "spec_rhythm_eager_parent_B4_seen": 18923,
+    "spec_rhythm_eager_parent_B4_excluded_unqualified": 18923,
+    "spec_rhythm_eager_parent_B5_seen": 7,
+    "spec_rhythm_eager_parent_B5_excluded_unqualified": 7,
+    "spec_rhythm_eager_parent_filter_calls": 2458,
+    "spec_rhythm_eager_parent_B5_deferred_first_candidate": 7
+  },
+  "claims": {
+    "rolling_eager_not_actual_GP_source": true,
+    "parent_B4_currently_excluded": true,
+    "enabling_B4_requires_new_fresh_parent_verdict_KV_promotion_invalidation_rollback_and_own_next_proof": true,
+    "current_priority": "finish real M80/120 first-divergence diagnostic",
+    "performance_effect_of_changing_eager_gate_unmeasured": true
+  }
+}

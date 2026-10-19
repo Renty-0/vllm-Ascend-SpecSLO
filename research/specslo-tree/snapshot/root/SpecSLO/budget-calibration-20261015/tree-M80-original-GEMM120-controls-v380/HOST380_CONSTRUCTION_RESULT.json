@@ -1,0 +1,10 @@
+{
+  "status": "PASS_HOST380_GEMM_CONTROL_RESTORATION_AST_INVERSE_AND_ACTUAL_LIFECYCLE",
+  "NPU_used": false,
+  "original_qualification_branch_retained": true,
+  "exception_cleanup_passed": true,
+  "actual_guard_audit_imports_checked": true,
+  "models_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

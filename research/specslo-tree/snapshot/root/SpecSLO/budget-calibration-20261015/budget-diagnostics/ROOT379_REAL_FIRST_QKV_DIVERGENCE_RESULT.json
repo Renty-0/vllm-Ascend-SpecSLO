@@ -1,0 +1,335 @@
+{
+  "status": "completed_real_diagnostic_NOT_neural_qualification",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-adaptive80-first-layer-root-v379-diagnostic-v1.json",
+  "receipt_sha256": "d8d3c59615fb7728e78f1db8e9fa2805f8fd0bbd0359aca43fc69d4f0a764f47",
+  "actual_observation_audit": {
+    "status": "retained_real_stage_observations379_NOT_model_qualification",
+    "observations": [
+      {
+        "rank": 1,
+        "inputs_equal": true,
+        "graph_difference_rows": [
+          16,
+          59
+        ],
+        "eager_difference_rows": [
+          16,
+          59
+        ],
+        "first_difference": {
+          "name": "layers.0.self_attn.qkv_proj/output",
+          "baseline_full_shape": [
+            120,
+            3840
+          ],
+          "candidate_shape": [
+            80,
+            3840
+          ],
+          "aligned_shape": [
+            80,
+            3840
+          ],
+          "cropped_batch_axis": 0,
+          "dtype": "torch.bfloat16",
+          "bitwise_equal": false,
+          "different_elements": 57,
+          "elements": 307200,
+          "max_abs": 0.00048828125,
+          "first_difference_index": [
+            1,
+            2965
+          ]
+        },
+        "transient_trace_bytes": 303057600
+      },
+      {
+        "rank": 2,
+        "inputs_equal": true,
+        "graph_difference_rows": [
+          16,
+          59
+        ],
+        "eager_difference_rows": [
+          16,
+          59
+        ],
+        "first_difference": {
+          "name": "layers.0.self_attn.qkv_proj/output",
+          "baseline_full_shape": [
+            120,
+            3840
+          ],
+          "candidate_shape": [
+            80,
+            3840
+          ],
+          "aligned_shape": [
+            80,
+            3840
+          ],
+          "cropped_batch_axis": 0,
+          "dtype": "torch.bfloat16",
+          "bitwise_equal": false,
+          "different_elements": 63,
+          "elements": 307200,
+          "max_abs": 0.0009765625,
+          "first_difference_index": [
+            0,
+            919
+          ]
+        },
+        "transient_trace_bytes": 303057600
+      },
+      {
+        "rank": 3,
+        "inputs_equal": true,
+        "graph_difference_rows": [
+          16,
+          59
+        ],
+        "eager_difference_rows": [
+          16,
+          59
+        ],
+        "first_difference": {
+          "name": "layers.0.self_attn.qkv_proj/output",
+          "baseline_full_shape": [
+            120,
+            3840
+          ],
+          "candidate_shape": [
+            80,
+            3840
+          ],
+          "aligned_shape": [
+            80,
+            3840
+          ],
+          "cropped_batch_axis": 0,
+          "dtype": "torch.bfloat16",
+          "bitwise_equal": false,
+          "different_elements": 43,
+          "elements": 307200,
+          "max_abs": 0.00048828125,
+          "first_difference_index": [
+            0,
+            493
+          ]
+        },
+        "transient_trace_bytes": 303057600
+      }
+    ],
+    "model_qualified": false,
+    "performance": false,
+    "Raw": null,
+    "Goodput": null,
+    "adopted": false
+  },
+  "reason": "observations_retained_no_equivalence_or_performance_claim",
+  "reports": [
+    {
+      "rank": 1,
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive80-first-layer-root-v379-diagnostic-v1/rank1-observation379.json",
+      "sha256": "3054c6edbaa018c649b1c84d76bb044fc4914372a1bc3fac94851f73147ff8ff",
+      "first": {
+        "name": "layers.0.self_attn.qkv_proj/output",
+        "baseline_full_shape": [
+          120,
+          3840
+        ],
+        "candidate_shape": [
+          80,
+          3840
+        ],
+        "aligned_shape": [
+          80,
+          3840
+        ],
+        "cropped_batch_axis": 0,
+        "dtype": "torch.bfloat16",
+        "bitwise_equal": false,
+        "different_elements": 57,
+        "elements": 307200,
+        "max_abs": 0.00048828125,
+        "first_difference_index": [
+          1,
+          2965
+        ]
+      },
+      "prior_observed_tensors_all_bitwise_equal": true,
+      "first_decoder_output": {
+        "name": "layers.0/output/0",
+        "baseline_full_shape": [
+          120,
+          5120
+        ],
+        "candidate_shape": [
+          80,
+          5120
+        ],
+        "aligned_shape": [
+          80,
+          5120
+        ],
+        "cropped_batch_axis": 0,
+        "dtype": "torch.bfloat16",
+        "bitwise_equal": false,
+        "different_elements": 24963,
+        "elements": 409600,
+        "max_abs": 0.00390625,
+        "first_difference_index": [
+          0,
+          5
+        ]
+      },
+      "graph_eager_equal_each": [
+        true,
+        true
+      ],
+      "greedy_difference_rows": [
+        16,
+        59
+      ]
+    },
+    {
+      "rank": 2,
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive80-first-layer-root-v379-diagnostic-v1/rank2-observation379.json",
+      "sha256": "301f22c032dd63a88c6e8a4f7058231605793c03a28c09f91b630a45d95c1bf4",
+      "first": {
+        "name": "layers.0.self_attn.qkv_proj/output",
+        "baseline_full_shape": [
+          120,
+          3840
+        ],
+        "candidate_shape": [
+          80,
+          3840
+        ],
+        "aligned_shape": [
+          80,
+          3840
+        ],
+        "cropped_batch_axis": 0,
+        "dtype": "torch.bfloat16",
+        "bitwise_equal": false,
+        "different_elements": 63,
+        "elements": 307200,
+        "max_abs": 0.0009765625,
+        "first_difference_index": [
+          0,
+          919
+        ]
+      },
+      "prior_observed_tensors_all_bitwise_equal": true,
+      "first_decoder_output": {
+        "name": "layers.0/output/0",
+        "baseline_full_shape": [
+          120,
+          5120
+        ],
+        "candidate_shape": [
+          80,
+          5120
+        ],
+        "aligned_shape": [
+          80,
+          5120
+        ],
+        "cropped_batch_axis": 0,
+        "dtype": "torch.bfloat16",
+        "bitwise_equal": false,
+        "different_elements": 24963,
+        "elements": 409600,
+        "max_abs": 0.00390625,
+        "first_difference_index": [
+          0,
+          5
+        ]
+      },
+      "graph_eager_equal_each": [
+        true,
+        true
+      ],
+      "greedy_difference_rows": [
+        16,
+        59
+      ]
+    },
+    {
+      "rank": 3,
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive80-first-layer-root-v379-diagnostic-v1/rank3-observation379.json",
+      "sha256": "0d75449025bac6e16c85b7446ac9b7b3db123929a8d884ddc7ccde418e9540c9",
+      "first": {
+        "name": "layers.0.self_attn.qkv_proj/output",
+        "baseline_full_shape": [
+          120,
+          3840
+        ],
+        "candidate_shape": [
+          80,
+          3840
+        ],
+        "aligned_shape": [
+          80,
+          3840
+        ],
+        "cropped_batch_axis": 0,
+        "dtype": "torch.bfloat16",
+        "bitwise_equal": false,
+        "different_elements": 43,
+        "elements": 307200,
+        "max_abs": 0.00048828125,
+        "first_difference_index": [
+          0,
+          493
+        ]
+      },
+      "prior_observed_tensors_all_bitwise_equal": true,
+      "first_decoder_output": {
+        "name": "layers.0/output/0",
+        "baseline_full_shape": [
+          120,
+          5120
+        ],
+        "candidate_shape": [
+          80,
+          5120
+        ],
+        "aligned_shape": [
+          80,
+          5120
+        ],
+        "cropped_batch_axis": 0,
+        "dtype": "torch.bfloat16",
+        "bitwise_equal": false,
+        "different_elements": 24963,
+        "elements": 409600,
+        "max_abs": 0.00390625,
+        "first_difference_index": [
+          0,
+          5
+        ]
+      },
+      "graph_eager_equal_each": [
+        true,
+        true
+      ],
+      "greedy_difference_rows": [
+        16,
+        59
+      ]
+    }
+  ],
+  "sources_unchanged": true,
+  "owned_remaining": [],
+  "all4idle": true,
+  "diagnostic_explicitly_synchronized": true,
+  "earliest_observed_boundary": "first decoder QKV F.linear: equal inputs, shape120 vs80 produces different BF16 outputs",
+  "unique_low_level_root_cause_proven": false,
+  "no_quantization": true,
+  "no_performance_measured": true,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false
+}

@@ -1,0 +1,17 @@
+{
+  "status": "failed_after_reference_due_collective_retention_stage_mismatch",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M80-GEMM120-controls-root-v380-eager-diagnostic-v1.json",
+  "receipt_sha256": "8342a9292834698e7583d832dd47de7fc494af854b587ab54185795ed41592ec",
+  "candidate_controls_completed": 0,
+  "reference_fixed120_retained_each_target": true,
+  "source_clean": true,
+  "owned_remaining": [],
+  "all4idle": true,
+  "additional_HOST_reproduced_latent_issue": "MC2 control compiler omitted original postponed-annotation flag; actual native signature not preserved",
+  "repair_source": "/root/SpecSLO/budget-calibration-20261015/tree-GEMM120-original-annotation-flags-v381",
+  "both_issues_reproduced_and_repaired_on_HOST": true,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false
+}

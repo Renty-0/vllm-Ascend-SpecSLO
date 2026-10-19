@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST381_EXACT_NATIVE_POSTPONED_ANNOTATIONS_AND_WORKER",
+  "NPU_used": false,
+  "original_failure_reproduced": true,
+  "exact_native_signature_preserved": true,
+  "exact_native_annotation_compiler_flag_preserved": true,
+  "original_collective_stage_mismatch_reproduced": true,
+  "all_role_stage_order_repair_checked": true,
+  "models_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}
