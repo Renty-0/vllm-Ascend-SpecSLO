@@ -1,0 +1,21 @@
+{
+  "UTC": "2026-10-19T05:15:37.820015+00:00",
+  "fix": "Native ATB reference supports int32 slots; use existing exact int32 slots512..676 for both reference loops. Candidate keeps original int32/int64 inputs.",
+  "candidate_unchanged": true,
+  "neural_fixtures_and_matchers_unchanged": true,
+  "numeric_case_count": 546,
+  "models_loaded_in_probe": false,
+  "model_free_checks": 144,
+  "all_BF16_bit_patterns_each_width": 65536,
+  "private_space": {
+    "df_used_GiB": 82,
+    "df_available_GiB": 115,
+    "per_tag_cap_MiB": 256,
+    "prior_aggregate_cap_MiB": 2048,
+    "new_aggregate_cap_MiB": 2304,
+    "reason": "Retain all prior pinned evidence; remaining old cap around140MiB versus forecast150MiB for larger546-case fresh neural diagnostic",
+    "public_artifacts_moved": false
+  },
+  "performance_qualified": false,
+  "Goodput": null
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "ROOT318.additive-supported-native-raw-reference.v1",
+  "original_freeze_sha256": "d9dda427f94bd3ecbb507fe0787f867f6e23437ae82fee0455476434eda1f775",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/raw_controls318.py": "893d86360304d036c2f7dc34f9707a1461f63e50427312063b9ca708b70f4ea5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/REPAIR318_REVIEW.json": "f332ede9efedcfb333495c872496d8fbc6aa454c254be810a97dcb5174f113b0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/raw318-model-free.log": "db732a9cc027f2d5c67c9d53169cc9a37eadc535effc88c42fb42073ca862b9f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/probe_raw318.py": "143e2ff5b5090ff79422bd067b7503c8fa3a1f0cde323bbdcdbf30d1f5468e16",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/REFERENCE_API_DIAGNOSTIC.json": "b5813c5379fe2a350273c5f423c87afcac2ed2269e4e36a6c95e3c7e25f4e12f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/reference-int32.log": "c94dc2b31007cc76341ba076174e04aa8e1eaeb5d0292f32fff692d6e432d912",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/RAW318_MODEL_FREE_RESULT.json": "a032e2b5730796a576941b411250964192bd253c001334f69b409ce339956985",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/guard318.py": "457e7ac8d68dbcfbd5eb6ec6c08f123324b227d629a2148acc28cce63972d85b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/launch318.sh": "cb8e158dff06d672d9539cadb27bd43ffda827152f24f53322c238ab4fbf3398",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/runtime318.py": "b27bf26752a6f2e2ac9d6d8c726ba2480ac7d763bdcf747c09a10f0cfff72ad1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/probe_reference318.py": "d27327935356c1d785afc3c3c7e26edc379d7020c72645348e31d0ef43706171",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/probe_reference318.sh": "f8d0893210881713c1d8a33a87a56ebe047e1b181422672f798e4e6553168ea4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/reference-int64.log": "f85a995903ac4d13578039e87b3a729f8b6d61c73784306a8668fe7be51b2947",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/startup318.sh": "6bdffc3ea3e7e399cc0f248e46a3ab38c5a681e227c5abbeddca009d2eeedbdf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/supervise_reference318.py": "55118a7e62b5ab9654288e6342d8550856cc831238b0b5c244195f6c2fde6249",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/probe_raw318.sh": "2cce3d01ef72bb164f5f6ad54c9e048e0a08fad572e0f9c0447a0fc70213da73",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M165-N32-root-v317-B1to8-546-math-cost-v3.json": "c0694b4bf9b9915ec60a32497ee2faf0f530cf0b902b19ec69efdf94005d559a"
+  },
+  "model_qualification_inherited": false
+}

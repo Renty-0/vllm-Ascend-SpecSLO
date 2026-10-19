@@ -19,6 +19,7 @@ SOURCES = (
     ('tree-single-prepare-target-math-cost-v311', 311),
     ('tree-measured-cost-risk-single-prepare-full-v316', 316),
     ('tree-M165-N32-independent-target-math-cost-v317', 317),
+    ('tree-M165-raw-reference-api-v318', 318),
 )
 
 
@@ -63,6 +64,7 @@ def main():
         'tree-current-prepare-cost-eligibility-host-v312',
         'tree-measured-cost-risk-single-prepare-full-v316',
         'tree-M165-N32-independent-target-math-cost-v317',
+        'tree-M165-raw-reference-api-v318',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))

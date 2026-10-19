@@ -1,6 +1,6 @@
 {
-  "UTC": "2026-10-19T05:04:33.092799+00:00",
-  "status": "active_tree317_M165_N32_device_qualification_after_official021_unstable",
+  "UTC": "2026-10-19T05:15:13.093214+00:00",
+  "status": "active_tree318_supported_native_raw_reference_fix_after_model_free_dtype_isolation",
   "user_resume_request": true,
   "prior_pause_revoked": true,
   "user_correction": "old official vllm-ascend, explicitly not HUST",
@@ -12,7 +12,7 @@
   "selected_baseline_pending_stability": false,
   "stability_plan": "/root/SpecSLO/official-v021-baseline-20261019/RECOVERY_PLAN.json",
   "build_session": 8191,
-  "NPU_measurement_started": true,
+  "NPU_measurement_started": false,
   "physical_cards": [
     2,
     5,
@@ -31,13 +31,13 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "b43cbf986ac77747386dffd426ea57c9f6aff8a6",
+  "github_checkpoint": "d85241eef212baca82bcc2a7fb2ed50fb4b38782",
   "goal_achieved": false,
   "next": [
-    "finish official-only source/dependency/operator build",
-    "source-bound3 fresh full463 MC2_ON measurements and audit stability",
-    "select legacy official if stable and freeze comparison policy",
-    "continue Raw and TPOT optimization from current plan;fresh numerical/fullAR gates mandatory"
+    "finish independent144 raw16 operator checks with supported int32 native reference and both candidate slot dtypes",
+    "fresh original546 M165/N32 target math cases and paired costs",
+    "C128/F64/global192 integration if correctness/cost permits",
+    "fresh full463 own-AR gates, then Raw/Goodput assessment and final matched repeats"
   ],
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
   "user_Raw_clarification": {
@@ -57,7 +57,7 @@
   "source_manifest_sha256": "1d2904420270f750bf43e8d7ccb28a94a3e3d2635755af1a488fa2b03de13eec",
   "baseline_guard_receipt": "/root/SpecSLO/official-v021-baseline-20261019/controls-v2/receipt.json",
   "NPU_model_launch_started": true,
-  "baseline_no_performance_result_yet": true,
+  "baseline_no_performance_result_yet": false,
   "tree317_source_only_HOST_cases": 546,
   "tree317_source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317",
   "tree317_NPU_qualified": false,
@@ -69,7 +69,7 @@
   "tree317_declared_HOST_cases": 546,
   "tree317_all_KV_ancestry_and_split_HOST_passed": true,
   "tree317_NPU_started": true,
-  "baseline_valid_complete_rounds": 1,
+  "baseline_valid_complete_rounds": 3,
   "baseline_round1_GP": 274.3205053479455,
   "baseline_round1_Raw": 920.3651737398462,
   "baseline_round1_attained": 138,
@@ -95,7 +95,7 @@
   "previous_official_reference_and_goal_unchanged": true,
   "current_goal_GP_gt": 644.766448113661,
   "stability_comparison": "/root/SpecSLO/official-v021-baseline-20261019/STABILITY_COMPARISON_V021_V023.json",
-  "tree317_guard_session": 4314,
+  "tree317_guard_session": null,
   "tree317_tag": "M165-N32-root-v317-B1to8-546-math-cost-v3",
   "additional_Raw_plan": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_TREE_RAW_FOLLOWUP_WITH_ORIGINAL_PLAN_20261019.json",
   "tree317_launch_only_repair": "Separate additive ABI311 startup; original numeric sources unchanged",
@@ -104,5 +104,13 @@
   "tree317_attempt1": "failed before model load: incorrect cpython317 filename; preserved receipt and source",
   "tree317_actual_neural_qualification_complete": false,
   "tree317_actual_startup_imports_passed": 20,
-  "tree317_attempt2": "models loaded, but no numeric cases executed: missing old255 path in generated startup; preserved failed record; additive path correction passes actual-startup imports"
+  "tree317_attempt2": "models loaded, but no numeric cases executed: missing old255 path in generated startup; preserved failed record; additive path correction passes actual-startup imports",
+  "tree317_attempt3": "all models loaded; native raw reference rejected int64 slot indices; zero neural cases; all owned processes cleaned, no OOM, sources unchanged",
+  "tree317_guard_complete": true,
+  "tree318_source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318",
+  "tree318_operator_dtype_probe": {
+    "int32_exit": 0,
+    "int64_exit": -6,
+    "models_loaded": false
+  }
 }

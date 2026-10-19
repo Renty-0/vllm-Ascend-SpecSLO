@@ -1,0 +1,19 @@
+{
+  "schema": "ROOT318.native-api-slot-dtype-isolation.v1",
+  "rows": [
+    {
+      "dtype": "int32",
+      "exit_code": 0,
+      "seconds": 13.435035585891455,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/reference-int32.log"
+    },
+    {
+      "dtype": "int64",
+      "exit_code": -6,
+      "seconds": 13.135079716332257,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318/reference-int64.log"
+    }
+  ],
+  "models_loaded": false,
+  "performance": false
+}
