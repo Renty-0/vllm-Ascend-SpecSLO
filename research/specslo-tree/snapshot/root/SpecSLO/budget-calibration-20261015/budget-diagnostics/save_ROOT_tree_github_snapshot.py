@@ -67,6 +67,8 @@ SOURCES = (
     ('tree-adaptive80-first-layer-divergence-v379', 379),
     ('tree-M80-original-GEMM120-controls-v380', 380),
     ('tree-GEMM120-original-annotation-flags-v381', 381),
+    ('tree-M80-attention-GEMM120-target-v382', 382),
+    ('tree-hybrid-native-method-dedent-v384', 384),
 )
 
 
@@ -174,6 +176,9 @@ def main():
         'tree-adaptive80-first-layer-divergence-v379',
         'tree-M80-original-GEMM120-controls-v380',
         'tree-GEMM120-original-annotation-flags-v381',
+        'tree-M80-attention-GEMM120-target-v382',
+        'tree-hybrid-native-method-dedent-v384',
+        'tree-adaptive80-GEMM120-best376-full-v383',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -388,6 +393,13 @@ def main():
         'HOST_ROOT380_ACTUAL_FROZEN_CONSTRUCTION.json',
         'ROOT380_DIAGNOSTIC_PROTOCOL_FAILURE.json',
         'HOST_ROOT381_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'ROOT381_THREE_REAL_GEMM_CONTROLS_RESULT.json',
+        'ROOT_NEXT_RAW_AND_BUDGET_TREE_PRIORITIES_20261019.json',
+        'HOST_ROOT382_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'ROOT382_NATIVE_METHOD_SOURCE_INDENTATION_FAILURE.json',
+        'HOST_ROOT384_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'freeze_ROOT384_native_method_dedent_HOST.py',
+        'freeze_ROOT382_hybrid_GEMM120_693_HOST.py',
         'freeze_ROOT381_GEMM120_compiler_and_stage_repair_HOST.py',
         'freeze_ROOT380_GEMM120_controls_HOST.py',
         'freeze_ROOT379_layer_observations_HOST.py',

@@ -1,0 +1,33 @@
+{
+  "schema": "ROOT384.additive-native-method-source-dedent.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-hybrid-native-method-dedent-v384/check384.py": "84d1a146f6ecdbbe2fbedb7b3f2217c4e7dcff19ce70aa19e29e5d581bd50f2e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-hybrid-native-method-dedent-v384/repair384.py": "b22a76cabf0881253ae439ed820e536c82c68bad8fe53698298af628d5c20a3b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-hybrid-native-method-dedent-v384/check384_HOST.py": "483ec1fc4052cf95eb1c08ed3ae706fbcecaa8705b91ad387094c75302ddb779",
+    "/root/SpecSLO/budget-calibration-20261015/tree-hybrid-native-method-dedent-v384/startup384.sh": "79e7889a49527670eba4421e5dc733f2bb27e872a299f28d121a2c4e181f03c1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-hybrid-native-method-dedent-v384/guard384.py": "fc7ebf107ffa023de95cb30c014fdb7099698903e1f97444bcb9e011c2b0a005",
+    "/root/SpecSLO/budget-calibration-20261015/tree-hybrid-native-method-dedent-v384/HOST384_CONSTRUCTION_RESULT.json": "c773d1d7c436c5d40b914af674b85d796729c332be3e341296f5e815abfa715e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-hybrid-native-method-dedent-v384/runtime384.py": "ed3dcdcd58aa543a21d0d06b8515625065b38ce72764573812c0df61b2c270ab",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT384_native_method_dedent_HOST.py": "27520883c7370aa69020c60088fc2a17fb2f15a9facb91a4998403875c21d6a9"
+  },
+  "parent_freeze_sha256": "f8b65aa81b78b9f33d3e0e97e30f62841f310160e52c321fd0b8a0243023d6c4",
+  "parent_archive_sha256": "872dde76b7c77e884b304205b27f0fc55706c9b75d3160378a25d62342ff7cea",
+  "actual_target_cases_each_target": 693,
+  "independent_prefills_each_target": 216,
+  "fresh_cases": "231 each mixed/mid/short banks, original227 plus4 max80 branch cases",
+  "physical_families": [
+    80,
+    120
+  ],
+  "Q": 5,
+  "S": [
+    16,
+    24
+  ],
+  "preserves_original_mc2_function": true,
+  "original_untimed_numerical_stage_fences_retained": true,
+  "diagnostic_does_not_grant_neural_or_performance_qualification": true,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

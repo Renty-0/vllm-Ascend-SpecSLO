@@ -1,0 +1,9 @@
+{
+  "status": "PASS_HOST384_ACTUAL_INDENTED_NATIVE_METHODS_AND_LIFECYCLE",
+  "NPU_used": false,
+  "raw_method_source_indentation_failure_reproduced": true,
+  "actual_native_method_signatures_preserved_after_dedent": true,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

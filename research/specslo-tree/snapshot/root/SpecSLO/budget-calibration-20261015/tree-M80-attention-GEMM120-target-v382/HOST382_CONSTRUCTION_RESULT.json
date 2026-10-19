@@ -1,0 +1,13 @@
+{
+  "status": "PASS_HOST382_NATIVE_PLAIN_SIGNATURES_GEOMETRY_AND_ACTUAL_LIFECYCLE",
+  "exact_native_functions": [
+    "NativeColumnLinear.forward",
+    "NativeLMHead._project_local"
+  ],
+  "eligibility_cases": 9,
+  "NPU_used": false,
+  "actual_guard_audit_imports_checked": true,
+  "models_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

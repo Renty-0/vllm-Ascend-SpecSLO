@@ -1,0 +1,35 @@
+{
+  "schema": "ROOT382.additive-physical80-attention-original120-GEMM693-and-cost.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-attention-GEMM120-target-v382/HOST382_CONSTRUCTION_RESULT.json": "cf87664c7a3ca209cbd5805f9759eb94722a8699d5e12316becbe1b85c0cc77a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-attention-GEMM120-target-v382/guard382.py": "525b09e92407988f65feb3c0ac526742209c2a7e8331965c6b01b57fe91f60a3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-attention-GEMM120-target-v382/hybrid382.py": "17e5b18323f5582b7dd2ec29daf4a9c6dba7e01680866e146231813f827e2922",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-attention-GEMM120-target-v382/runtime382.py": "6467b590d9ae5b1208e8ba2cd26b4a5b5b35500c4f304e2100db2960eca15240",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-attention-GEMM120-target-v382/audit382.py": "ef77e5d909fd364629a8e62ef29e4bb99e8083821467a50f23d969740cf02800",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-attention-GEMM120-target-v382/startup382.sh": "83da13b12d4ad0789daa87776a42a04d790d17a3d36e3f1afed5a782cd1d44ec",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-attention-GEMM120-target-v382/check382.py": "c9598dd3c240a3492877f7abbe44f994ae3e0cfa7938a195ddd582609a56829c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-attention-GEMM120-target-v382/probe382.py": "f38047e182506469984557d55c8696c7f5c7d00cee03f785d7c553922754e9b8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-attention-GEMM120-target-v382/check382_HOST.py": "60f32e11dea664e3f3c5e4cc2a5aeaa40b9dcfd6e2537c9e285f49ce06e3e1d7",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT382_hybrid_GEMM120_693_HOST.py": "192ae9a9335969799e06a82b81250e08b278cfb9cbc82aa475ddcb5afc9fcc7e"
+  },
+  "parent_freeze_sha256": "9ae5f9c8a807be352c0afd59dcce84a2b67eaa3ac48c644ffa9cb19f6039ebe5",
+  "parent_archive_sha256": "713ddce61fcdf7104859e566b5f1f7ef1f9c1e0ce9e0d618855a04c1f2cc5aca",
+  "actual_target_cases_each_target": 693,
+  "independent_prefills_each_target": 216,
+  "fresh_cases": "231 each mixed/mid/short banks, original227 plus4 max80 branch cases",
+  "physical_families": [
+    80,
+    120
+  ],
+  "Q": 5,
+  "S": [
+    16,
+    24
+  ],
+  "preserves_original_mc2_function": true,
+  "original_untimed_numerical_stage_fences_retained": true,
+  "diagnostic_does_not_grant_neural_or_performance_qualification": true,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

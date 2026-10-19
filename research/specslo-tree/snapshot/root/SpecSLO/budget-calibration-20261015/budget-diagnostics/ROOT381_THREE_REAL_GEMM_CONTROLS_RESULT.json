@@ -1,0 +1,331 @@
+{
+  "status": "completed_three_real_controls_only_full_model_qualification_pending",
+  "receipt_sha256": "b0c0a83ec60e34546eb89bc1b4607b957a706791130876fd38b1c04f3b0a8e29",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M80-GEMM120-controls-root-v381-eager-diagnostic-v2.json",
+  "audit_status": "retained_three_GEMM_controls380_NOT_model_qualification",
+  "reports": [
+    {
+      "rank": 1,
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-GEMM120-controls-root-v381-eager-diagnostic-v2/rank1-observation380.json",
+      "sha256": "2c3d4acd83db0c0ff68cc7f76c39cc2072bbccf8b9f875ff47c4b10873eb58a8",
+      "controls": [
+        {
+          "mode": "fixed120",
+          "greedy_equal": true,
+          "greedy_difference_rows": [],
+          "hidden_match": true,
+          "hidden_max_abs": 0.0,
+          "KV_match": true,
+          "KV_all128_bitwise_equal": true,
+          "first_floating_value_difference": null
+        },
+        {
+          "mode": "qkv120",
+          "greedy_equal": false,
+          "greedy_difference_rows": [
+            16,
+            56,
+            59
+          ],
+          "hidden_match": false,
+          "hidden_max_abs": 28.9375,
+          "KV_match": false,
+          "KV_all128_bitwise_equal": false,
+          "first_floating_value_difference": {
+            "name": "MC2.layer0/attention/output/0",
+            "baseline_full_shape": [
+              120,
+              5120
+            ],
+            "candidate_shape": [
+              80,
+              5120
+            ],
+            "aligned_shape": [
+              80,
+              5120
+            ],
+            "cropped_batch_axis": 0,
+            "dtype": "torch.bfloat16",
+            "bitwise_equal": false,
+            "different_elements": 17,
+            "elements": 409600,
+            "max_abs": 0.000732421875,
+            "first_difference_index": [
+              7,
+              2418
+            ]
+          }
+        },
+        {
+          "mode": "columns120",
+          "greedy_equal": false,
+          "greedy_difference_rows": [
+            2,
+            58,
+            59,
+            67
+          ],
+          "hidden_match": false,
+          "hidden_max_abs": 14.0,
+          "KV_match": false,
+          "KV_all128_bitwise_equal": false,
+          "first_floating_value_difference": {
+            "name": "MC2.layer0/attention/output/0",
+            "baseline_full_shape": [
+              120,
+              5120
+            ],
+            "candidate_shape": [
+              80,
+              5120
+            ],
+            "aligned_shape": [
+              80,
+              5120
+            ],
+            "cropped_batch_axis": 0,
+            "dtype": "torch.bfloat16",
+            "bitwise_equal": false,
+            "different_elements": 17,
+            "elements": 409600,
+            "max_abs": 0.000732421875,
+            "first_difference_index": [
+              7,
+              2418
+            ]
+          }
+        },
+        {
+          "mode": "columns_and_mc2_120",
+          "greedy_equal": true,
+          "greedy_difference_rows": [],
+          "hidden_match": true,
+          "hidden_max_abs": 0.0,
+          "KV_match": true,
+          "KV_all128_bitwise_equal": true,
+          "first_floating_value_difference": null
+        }
+      ]
+    },
+    {
+      "rank": 2,
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-GEMM120-controls-root-v381-eager-diagnostic-v2/rank2-observation380.json",
+      "sha256": "5a28fd303137f662d0b239b65a36af4425c3edd30f010ebfee8273b9913ec745",
+      "controls": [
+        {
+          "mode": "fixed120",
+          "greedy_equal": true,
+          "greedy_difference_rows": [],
+          "hidden_match": true,
+          "hidden_max_abs": 0.0,
+          "KV_match": true,
+          "KV_all128_bitwise_equal": true,
+          "first_floating_value_difference": null
+        },
+        {
+          "mode": "qkv120",
+          "greedy_equal": false,
+          "greedy_difference_rows": [
+            16,
+            56,
+            59
+          ],
+          "hidden_match": false,
+          "hidden_max_abs": 28.9375,
+          "KV_match": false,
+          "KV_all128_bitwise_equal": false,
+          "first_floating_value_difference": {
+            "name": "MC2.layer0/attention/output/0",
+            "baseline_full_shape": [
+              120,
+              5120
+            ],
+            "candidate_shape": [
+              80,
+              5120
+            ],
+            "aligned_shape": [
+              80,
+              5120
+            ],
+            "cropped_batch_axis": 0,
+            "dtype": "torch.bfloat16",
+            "bitwise_equal": false,
+            "different_elements": 17,
+            "elements": 409600,
+            "max_abs": 0.000732421875,
+            "first_difference_index": [
+              7,
+              2418
+            ]
+          }
+        },
+        {
+          "mode": "columns120",
+          "greedy_equal": false,
+          "greedy_difference_rows": [
+            2,
+            58,
+            59,
+            67
+          ],
+          "hidden_match": false,
+          "hidden_max_abs": 14.0,
+          "KV_match": false,
+          "KV_all128_bitwise_equal": false,
+          "first_floating_value_difference": {
+            "name": "MC2.layer0/attention/output/0",
+            "baseline_full_shape": [
+              120,
+              5120
+            ],
+            "candidate_shape": [
+              80,
+              5120
+            ],
+            "aligned_shape": [
+              80,
+              5120
+            ],
+            "cropped_batch_axis": 0,
+            "dtype": "torch.bfloat16",
+            "bitwise_equal": false,
+            "different_elements": 17,
+            "elements": 409600,
+            "max_abs": 0.000732421875,
+            "first_difference_index": [
+              7,
+              2418
+            ]
+          }
+        },
+        {
+          "mode": "columns_and_mc2_120",
+          "greedy_equal": true,
+          "greedy_difference_rows": [],
+          "hidden_match": true,
+          "hidden_max_abs": 0.0,
+          "KV_match": true,
+          "KV_all128_bitwise_equal": true,
+          "first_floating_value_difference": null
+        }
+      ]
+    },
+    {
+      "rank": 3,
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-GEMM120-controls-root-v381-eager-diagnostic-v2/rank3-observation380.json",
+      "sha256": "4160367200a455e4adb3b9ea753126a90b7b9faa2c14bd57a0e13ea61b5fc4a5",
+      "controls": [
+        {
+          "mode": "fixed120",
+          "greedy_equal": true,
+          "greedy_difference_rows": [],
+          "hidden_match": true,
+          "hidden_max_abs": 0.0,
+          "KV_match": true,
+          "KV_all128_bitwise_equal": true,
+          "first_floating_value_difference": null
+        },
+        {
+          "mode": "qkv120",
+          "greedy_equal": false,
+          "greedy_difference_rows": [
+            16,
+            56,
+            59
+          ],
+          "hidden_match": false,
+          "hidden_max_abs": 28.9375,
+          "KV_match": false,
+          "KV_all128_bitwise_equal": false,
+          "first_floating_value_difference": {
+            "name": "MC2.layer0/attention/output/0",
+            "baseline_full_shape": [
+              120,
+              5120
+            ],
+            "candidate_shape": [
+              80,
+              5120
+            ],
+            "aligned_shape": [
+              80,
+              5120
+            ],
+            "cropped_batch_axis": 0,
+            "dtype": "torch.bfloat16",
+            "bitwise_equal": false,
+            "different_elements": 17,
+            "elements": 409600,
+            "max_abs": 0.000732421875,
+            "first_difference_index": [
+              7,
+              2418
+            ]
+          }
+        },
+        {
+          "mode": "columns120",
+          "greedy_equal": false,
+          "greedy_difference_rows": [
+            2,
+            58,
+            59,
+            67
+          ],
+          "hidden_match": false,
+          "hidden_max_abs": 14.0,
+          "KV_match": false,
+          "KV_all128_bitwise_equal": false,
+          "first_floating_value_difference": {
+            "name": "MC2.layer0/attention/output/0",
+            "baseline_full_shape": [
+              120,
+              5120
+            ],
+            "candidate_shape": [
+              80,
+              5120
+            ],
+            "aligned_shape": [
+              80,
+              5120
+            ],
+            "cropped_batch_axis": 0,
+            "dtype": "torch.bfloat16",
+            "bitwise_equal": false,
+            "different_elements": 17,
+            "elements": 409600,
+            "max_abs": 0.000732421875,
+            "first_difference_index": [
+              7,
+              2418
+            ]
+          }
+        },
+        {
+          "mode": "columns_and_mc2_120",
+          "greedy_equal": true,
+          "greedy_difference_rows": [],
+          "hidden_match": true,
+          "hidden_max_abs": 0.0,
+          "KV_match": true,
+          "KV_all128_bitwise_equal": true,
+          "first_floating_value_difference": null
+        }
+      ]
+    }
+  ],
+  "sources_unchanged": true,
+  "owned_remaining": [],
+  "all4idle": true,
+  "independent_prefills_each_target": 288,
+  "scope": "one N16-all4-anchor0 fixture with synchronized eager observers; no paired performance",
+  "correct_control": "columns_and_mc2_120",
+  "physical_cache_addresses_differ_between_independent_banks": true,
+  "address_differences_are_not_hidden_or_KV_value_failures": true,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false
+}

@@ -1,0 +1,63 @@
+{
+  "schema": "ROOT.next-Raw-and-original-budget-tree-priorities.v1",
+  "UTC": "2026-10-19T22:51:12.633428+00:00",
+  "best_full": {
+    "version": 376,
+    "Raw": 699.6987403391912,
+    "Goodput": 609.0250374874602,
+    "attained": 403,
+    "all3_AR463_equal": true
+  },
+  "goal_floor": 644.766448113661,
+  "goal_achieved": false,
+  "primary_current": "finish independent GEMM120/attention80 three-control diagnostic381; full correct tree optimization remains primary",
+  "conditional_steps": [
+    {
+      "if_condition": "a controlled eager geometry recovers original hidden/KV matcher and all80 exact greedy",
+      "next": "create production-scoped adapter, fresh same-instance 693 mixed/mid/short target cases with independent FULL120 reference and original qualification untouched; balanced component costs, then only if worthwhile full463 plus all3 independent ownAR"
+    },
+    {
+      "if_condition": "shape control cannot recover correctness or saves insufficient measured time",
+      "next": "return to fixedM120 best376; qualify parentB4 continuation and shared4 eligibility rather than removing existing guards",
+      "required_new_proof": [
+        "same-instance original optimized RootSeed/FastV5 draft, actual parentB4/childB4 calls",
+        "independent real prefills, roots/confidence/ledger/allKV and committed-prefix protection",
+        "natural parent target verdict, exact promotion root, stale/wrong-root invalidation and rollback",
+        "promoted child consumption and independent next-step AR",
+        "fresh full463 original arrivals/publication clocks and all3 ownAR; no drops or timing holds"
+      ]
+    },
+    {
+      "if_condition": "device paths qualified but final goodput remains below target",
+      "next": "use actual role phase and publication trace to locate remaining waits before choosing transport/host/prefill changes; avoid blind admission refills already negative"
+    }
+  ],
+  "current_actual_counters": {
+    "rolling_promoted": 0,
+    "parent_B4_seen": 18923,
+    "parent_B4_excluded": 18923,
+    "draft_graph_calls": 4295,
+    "target_calls": 2320
+  },
+  "measured_role_phase_seconds": {
+    "draft_rank0": {
+      "draft": 94.43455701926723,
+      "exchange": 17.61782095953822,
+      "broadcast": 10.404395014513284,
+      "state_update": 5.365648242179304
+    },
+    "target_rank1": {
+      "target": 119.7925436757505,
+      "exchange": 5.708669386338443,
+      "broadcast": 1.0588332959450781,
+      "state_update": 6.304525030311197
+    }
+  },
+  "caveats": [
+    "phase measurements overlap across roles and include waits; summing them is not an attribution or speedup prediction",
+    "all proposed controls and successor scopes remain unmeasured until real device evidence",
+    "official0.21 stability task complete; no HUST TP4 baseline requested or scheduled",
+    "no quantization, tolerance relaxation, Native qualification flag overrides, arrival changes or public migration of code/logs"
+  ],
+  "Raw_gain_claim": null
+}

@@ -1,0 +1,9 @@
+{
+  "status": "PASS_HOST383_SCOPE_PROVENANCE_FOUR_ENTRIES_AND_CALLBACK_CORRUPTIONS",
+  "NPU_used": false,
+  "uses_HOST_doubles": true,
+  "actual_Native_flags_assigned": false,
+  "original_scope_failure_retained": true,
+  "neural_qualification_inherited": false,
+  "production_qualified": false
+}

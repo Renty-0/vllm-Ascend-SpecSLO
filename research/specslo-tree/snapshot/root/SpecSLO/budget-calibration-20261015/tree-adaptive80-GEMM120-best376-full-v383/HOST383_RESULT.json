@@ -1,0 +1,13 @@
+{
+  "status": "PASS_HOST383_GEOMETRY_BIJECTIONS_SOURCE_INVERSES_AND_LOGICAL_SUPERSET",
+  "NPU_used": false,
+  "cases": 231,
+  "old227_logical_subset_retained": true,
+  "physical_families": {
+    "80": 112,
+    "120": 119
+  },
+  "actual_reversible_worker_changes": 13,
+  "neural_qualification_inherited": false,
+  "production_qualified": false
+}

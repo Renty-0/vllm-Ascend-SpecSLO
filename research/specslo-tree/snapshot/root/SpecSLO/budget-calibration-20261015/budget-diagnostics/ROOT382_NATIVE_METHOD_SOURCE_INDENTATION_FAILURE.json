@@ -1,0 +1,14 @@
+{
+  "status": "failed_before_model_cases_due_indented_method_source_parser",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-hybrid-M80-GEMM120-root-v382-target693-and-cost-v1.json",
+  "target_cases_completed": 0,
+  "performance_started": false,
+  "source_clean": true,
+  "all4idle": true,
+  "owned_remaining": [],
+  "repaired_in": 384,
+  "HOST_reproduces_raw_original_method_indentation": true,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false
+}
