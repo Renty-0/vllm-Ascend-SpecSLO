@@ -1,0 +1,27 @@
+{
+  "status": "PASS_HOST_Q4S32_original_split128_snapshot_equivalence",
+  "counts": {
+    "frames": 72,
+    "all_original_cache_row_comparisons": 5013504,
+    "moved_current_aliases": 1224,
+    "committed_prefix_copies": 24276,
+    "rejected_controls": 5
+  },
+  "original_anti_alias_and_twelve_span_checks_preserved": true,
+  "original_split_full_AST_inverse": true,
+  "full_original_copy_after_writes_equals_prefix_before_writes_plus_aliases": true,
+  "simulation_scope": "integer address labels for one cache array; not neural or BF16 device validation",
+  "NPU_used": false,
+  "serving_installed": false,
+  "neural_math_qualified": false,
+  "full463_qualified": false,
+  "Raw": null,
+  "Goodput": null,
+  "source_hashes": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4S32-prefix-alias-split-host-v359/descriptors359.py": "25b3ed606f966d04df3a759e2aed8be11eb073d9f5bfd9f286a2a3ba718a93cc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py": "b1ef40cbfeca8f6a6248401707485516fecc37bddd86f5646e937358b24699d8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304/descriptors304.py": "37863bce1162e68c4549f47b1f55680ceac574cf3a5ac39f807268b54ded7801",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4S32-branch-projection-host-v358/layout358.py": "e46942cdea4c015f9449b352d423f3c1437325609ec5e465a5a6e10544f2dd5b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4S32-branch-projection-host-v358/projection358.py": "2cc94d586dba52b7267ef2f1a9087930d3e51f44fa7f21c626503e5b5f60784d"
+  }
+}

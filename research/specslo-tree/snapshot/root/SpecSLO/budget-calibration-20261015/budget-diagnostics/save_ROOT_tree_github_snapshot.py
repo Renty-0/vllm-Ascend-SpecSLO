@@ -135,6 +135,8 @@ def main():
         'tree-priority-protected-refill-full-v356',
         'tree-depth3-branch6-protocol-host-v357',
         'tree-Q4S32-branch-projection-host-v358',
+        'tree-Q4S32-prefix-alias-split-host-v359',
+        'tree-Q4S32-depth3-target-adapter-host-v360',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -308,6 +310,7 @@ def main():
         'ROOT_Q4S32_LIVE_POOL_FOLLOWUP_SCREEN_20261019.json',
         'calibrate_ROOT357_same_prefix_short_tree_HOST.py',
         'ROOT357_CONDITIONAL_DEPTH3_GAIN_SCREEN.json',
+        'ROOT355_PRELIMINARY_FULL_COMMON_METRICS.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

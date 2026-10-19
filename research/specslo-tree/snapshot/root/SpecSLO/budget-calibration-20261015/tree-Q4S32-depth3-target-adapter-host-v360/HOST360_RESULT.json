@@ -1,0 +1,234 @@
+{
+  "status": "PASS_HOST_actual_Native_protocol_Q4S32_depth3_projection_and_split128",
+  "frames": 314,
+  "alternate_owner_occurrences": 1295,
+  "frames_with_typed_root_padding": 83,
+  "identity_projection_frames": 75,
+  "original_Native_forward_and_allocator_executed": true,
+  "all_real_tokens_budgets_and_KV_coordinates_preserved": true,
+  "physical_metadata_is_actual_model_input": true,
+  "reserved_zero_not_branch_scratch": true,
+  "complete_original_module_AST_inverses": {
+    "branch_tail": {
+      "changes": [
+        [
+          "ImportFrom",
+          "module",
+          "padding326",
+          "padding360"
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ]
+      ],
+      "sha256": "9dde885c68584c94eb300bfbcfa7425367a1cf057a0e2289daea59704e793bbc"
+    },
+    "static_base": {
+      "changes": [
+        [
+          "alias",
+          "name",
+          "branch_tail326",
+          "branch360"
+        ],
+        [
+          "ImportFrom",
+          "module",
+          "projection326",
+          "projection358"
+        ],
+        [
+          "keyword",
+          "arg",
+          "fixed_q5_groups",
+          "fixed_q4_groups"
+        ],
+        [
+          "Name",
+          "id",
+          "branch_tail326",
+          "branch360"
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ]
+      ],
+      "sha256": "abae53fe6c17fc34f4ba0a45769009569c156a6a28d60013674f5975bc28f09e"
+    },
+    "static_state": {
+      "changes": [
+        [
+          "ImportFrom",
+          "module",
+          "static_base326",
+          "static_base360"
+        ],
+        [
+          "ImportFrom",
+          "module",
+          "layout326",
+          "layout360"
+        ],
+        [
+          "ImportFrom",
+          "module",
+          "descriptors326",
+          "descriptors359"
+        ],
+        [
+          "alias",
+          "name",
+          "branch_tail326",
+          "branch360"
+        ],
+        [
+          "alias",
+          "name",
+          "static_base326",
+          "static_base360"
+        ],
+        [
+          "ImportFrom",
+          "module",
+          "padding326",
+          "padding360"
+        ],
+        [
+          "ImportFrom",
+          "module",
+          "write326",
+          "write360"
+        ],
+        [
+          "arg",
+          "arg",
+          "branch_tail326",
+          "branch360"
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "Name",
+          "id",
+          "branch_tail326",
+          "branch360"
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "keyword",
+          "arg",
+          "ROOT305_original_attention_and_Q5_geometry_preserved",
+          "ROOT360_original_attention_body_preserved"
+        ],
+        [
+          "Name",
+          "id",
+          "static_base326",
+          "static_base360"
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "Name",
+          "id",
+          "branch_tail326",
+          "branch360"
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ]
+      ],
+      "sha256": "553d7f9631b59c0b8479b1dd00307b60c3a54576fbe41b5997b8348693c40755"
+    },
+    "write": {
+      "changes": [
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ],
+        [
+          "Constant",
+          "value",
+          160,
+          128
+        ]
+      ],
+      "sha256": "aa43f8e2eda3381320fb8b3504f9dbd11e602636aacc1be02ff5f823981a1c95"
+    }
+  },
+  "model_double": "CPU input/position identity; no attention, neural arithmetic or ACLGraph execution",
+  "actual_device_copy_kernel_executed": false,
+  "NPU_used": false,
+  "serving_installed": false,
+  "neural_math_qualified": false,
+  "eager_promotion_qualified": false,
+  "full463_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}
