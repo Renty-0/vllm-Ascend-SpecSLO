@@ -280,6 +280,8 @@ def main():
         'ROOT348_INDEPENDENT_SMALL_REFILL_COMPONENT_AUDIT.json',
         'ROOT348_RETAINED_408_TARGET_COMPONENT_CHECKPOINT.json',
         'ROOT348_PRELIMINARY_FULL_COMMON_METRICS.json',
+        'ROOT348_TERMINAL_INDEPENDENT_FULL_AUDIT.json',
+        'ROOT348_FINAL_FULL_RESULT.json',
         'ROOT348_VS257_REFILL_RAW_DESCRIPTIVE.json',
         'ROOT348_LIVE_REFILL_INCUMBENT_EXPOSURES.json',
         'build_ROOT355_closed_control_HOST.py',
@@ -290,6 +292,7 @@ def main():
         'check_ROOT355_terminal_source_HOST.py',
         'HOST_ROOT355_TERMINAL_SOURCE_RESULT.json',
         'ROOT355_CLOSED_ADMISSION_CONTROL_PREDECLARATION.json',
+        'monitor_ROOT355_readonly_HOST.py',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

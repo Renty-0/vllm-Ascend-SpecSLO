@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-19T15:32:13.097700+00:00",
-  "upstream_branch_base": "6a060028a50bfe93439d4796abc5d5d271a41cad",
+  "saved_UTC": "2026-10-19T15:47:55.108699+00:00",
+  "upstream_branch_base": "bd7b4ba842343eac933b5bfc7d5d2c1fcd423c52",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -488,6 +488,12 @@
       "bytes": 1116
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_FINAL_FULL_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_FINAL_FULL_RESULT.json",
+      "sha256": "5cb5f1ddcac22291861c9d4ccc864194cb7e5cfe4a0bcfba436c3d437c20b080",
+      "bytes": 106503
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_INDEPENDENT_SMALL_REFILL_COMPONENT_AUDIT.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_INDEPENDENT_SMALL_REFILL_COMPONENT_AUDIT.json",
       "sha256": "9da7e3772e4ee2f5547d6dbf8be1c953a27dab8d733a44f7fd187f36867152a8",
@@ -516,6 +522,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_RETAINED_408_TARGET_COMPONENT_CHECKPOINT.json",
       "sha256": "0b6dd7d4c7d9f80b3f7677ceabe715720b27563a7674549ec25a87a16fc0dd2f",
       "bytes": 134312
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+      "sha256": "23937e28093c5c6b8c0c9c258e49e27d6ed7e609a353f1c7d7fd0e294c4d7e6a",
+      "bytes": 2806626
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_VS257_REFILL_RAW_DESCRIPTIVE.json",
@@ -556,8 +568,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
-      "sha256": "6bfa9154fd4ec87d91bfd179e9a34207b8b753252ae289b1afd91b603d3b4205",
-      "bytes": 36505
+      "sha256": "3408a21cc21c397feb34bece1084cc6828063d78d02265cabfbf914bab9dc9cf",
+      "bytes": 37208
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
@@ -1328,6 +1340,12 @@
       "bytes": 3616
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/monitor_ROOT355_readonly_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/monitor_ROOT355_readonly_HOST.py",
+      "sha256": "833a2e84b3a51242e7b334e94f90c9dfd4ee0fe3d27f034c892524f4a9179464",
+      "bytes": 3609
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/plot_ROOT287_same_prefix_gains_HOST.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/plot_ROOT287_same_prefix_gains_HOST.py",
       "sha256": "81557430797ab280f95fc25a17e689de389e49ff73eb19ec21e8a0a08b04eb7f",
@@ -1468,8 +1486,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "3cb71ea1a799f403db9128afea44b50884211a336551b5dae1f1ab60c5a7584d",
-      "bytes": 19905
+      "sha256": "1a08796dc3610b272ab79e987f9fa4974b643f111aeb65f720fd9b1844058ccb",
+      "bytes": 20047
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/startup_ROOT331_runtime_import_HOST.sh",
@@ -17158,8 +17176,8 @@
     {
       "source": "/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
-      "sha256": "c8a8f4f9b1b771f46f706807cccf2c3d63836451acaed943db2b2135827a8837",
-      "bytes": 320075
+      "sha256": "d48ffc436f692d01f9ef9f36fb676b2bd1def3728f2a1d60157ec84d66a83567",
+      "bytes": 320540
     },
     {
       "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/ops/triton/batch_memcpy.py",
