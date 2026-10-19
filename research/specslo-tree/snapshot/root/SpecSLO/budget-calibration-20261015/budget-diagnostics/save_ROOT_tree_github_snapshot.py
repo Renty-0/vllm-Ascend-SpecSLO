@@ -55,6 +55,9 @@ def main():
         'tree-range-packed-branch-layout-host-v308',
         'tree-measured-branch-cost-eligibility-host-v309',
         'tree-single-prepare-target-math-cost-v311',
+        'tree-uniform-q5-M165-S33-C128-host-v285',
+        'tree-M165-single-prepare-host-v313',
+        'tree-C128-F64-global192-budget-host-v314',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -99,6 +102,7 @@ def main():
         'build_ROOT311_single_prepare_target_cost_HOST.py',
         'freeze_ROOT311_single_prepare_target_cost_HOST.py',
         'audit_ROOT311_target_math_and_cost_HOST.py',
+        'build_ROOT313_M165_prepare_HOST.py',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

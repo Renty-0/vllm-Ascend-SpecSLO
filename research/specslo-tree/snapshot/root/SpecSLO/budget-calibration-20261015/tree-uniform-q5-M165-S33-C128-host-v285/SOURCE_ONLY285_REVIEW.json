@@ -1,0 +1,77 @@
+{
+  "UTC": "2026-10-18T20:14:58.857849+00:00",
+  "status": "HOST_only_passed_NPU_unrun",
+  "physical_M": 165,
+  "physical_S": 33,
+  "uniform_q": 5,
+  "KV_extent": 2560,
+  "proposed_max_real_requests": 32,
+  "proposed_candidate_cap": 128,
+  "explicit_branch_cap": 12,
+  "unchanged_copy_buffer_slots": 1792,
+  "unchanged_model_precision": "BF16",
+  "original_global_selected_budget192_preserved_as_future_requirement": true,
+  "intended_question": "whether larger real batches and the existing NZ14 threshold161 can improve useful throughput; actual cost and all own-AR math must first be measured",
+  "pending": [
+    "CPU full Native protocol and independent metadata/copy ancestry",
+    "complete checked raw-copy binding for new physical shape",
+    "actual same-prefix neural/greedy/KV and paired whole-model cost",
+    "LIVE capacity DTO/controller/shaper changes if worthwhile",
+    "fresh full463 ownAR and benchmark"
+  ],
+  "current284_source_or_policy_modified": false,
+  "NPU_used": false,
+  "neural_qualified": false,
+  "runtime_installed": false,
+  "Goodput": null,
+  "adopted": false,
+  "source_specialization_proofs": [
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+      "source_sha256": "5cb14a81d4c0bfe99becd15237b733fb454fcc21e6d55b17f6ab31c0042e47fa",
+      "output": "projection285.py",
+      "edits": 22,
+      "full_AST_inverse": true
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+      "source_sha256": "b11e35aeb13bbe39f0d34b6dbe9019380e3cba79c1baaf08ec2a35fa687bb98a",
+      "output": "branch_tail285.py",
+      "edits": 7,
+      "full_AST_inverse": true
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+      "source_sha256": "eaf5fcd1638ec91d4621068584d84404d98927618aacb3e7e92558ff8462f378",
+      "output": "static_base285.py",
+      "edits": 7,
+      "full_AST_inverse": true
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/frames255.py",
+      "source_sha256": "7192d763c7c26e84d7693c4a1786ab3f33592e304ecce244b39d80f4896775f0",
+      "output": "frames285.py",
+      "edits": 6,
+      "full_AST_inverse": true
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/metadata255.py",
+      "source_sha256": "fdba7be89e5a211cfba8f539d7b424ef68115506e9517afda0bc8ca341be8b10",
+      "output": "metadata285.py",
+      "edits": 12,
+      "full_AST_inverse": true
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/padding255.py",
+      "source_sha256": "57fdec779bb22a6776c6f1e4a0ff93357abcaaf66f6c38f7e6b4fa2113796333",
+      "output": "padding285.py",
+      "edits": 5,
+      "full_AST_inverse": true
+    }
+  ],
+  "CPU_protocol_cases": 1020,
+  "complete_allocated_prefix_required_for_CPU_fixture": true,
+  "CPU_independent_visible_KV_ancestry_passed": true,
+  "CPU_complete_reference_masks_passed": true,
+  "source_frozen": false
+}

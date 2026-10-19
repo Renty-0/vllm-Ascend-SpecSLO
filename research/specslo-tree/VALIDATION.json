@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-save-checks-v1",
-  "source_files_sha256_verified": 2254,
-  "python_sources_syntax_passed": 1822,
+  "source_files_sha256_verified": 2280,
+  "python_sources_syntax_passed": 1841,
   "bash_scripts_syntax_passed": 157,
   "credential_pattern_hits": 0,
   "NPU_used_for_snapshot_checks": false,
@@ -30,5 +30,12 @@
   "HOST309_causal_observations": 3072,
   "HOST309_NPU_qualification": false,
   "v311_HOST_suites": 5,
-  "v311_model_validation": "running;fresh qualification required"
+  "v311_model_validation": "running;fresh qualification required",
+  "HOST313_real_Native_cases": 1020,
+  "HOST313_model_or_device_qualification": false,
+  "HOST314_allocator_cases": 128,
+  "HOST314_controller_cases": 36,
+  "HOST314_negative_limit_controls": 7,
+  "HOST314_actual218_bound_repair_qualified": false,
+  "HOST314_model_or_device_qualification": false
 }

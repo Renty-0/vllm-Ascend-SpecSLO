@@ -1,0 +1,15 @@
+{
+  "status": "HOST_complete_own_reference165_masks_and_boundaries_passed",
+  "boundaries": [
+    0,
+    127,
+    128,
+    1505,
+    2555,
+    2559
+  ],
+  "full_mask_bytes_checked": true,
+  "NPU_used": false,
+  "neural_qualified": false,
+  "Goodput": null
+}

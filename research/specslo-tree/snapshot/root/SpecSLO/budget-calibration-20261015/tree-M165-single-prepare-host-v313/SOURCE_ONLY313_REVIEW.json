@@ -1,0 +1,24 @@
+{
+  "status": "SOURCE_ONLY_M165_prepare_not_frozen_not_NPU_executed",
+  "original_geometry": "M120/S24/C96",
+  "proposed_geometry": "M165/S33/C128/N32/F12",
+  "descriptor_full1792_contract_preserved": true,
+  "all64_prefix_span_device_body_unchanged": true,
+  "raw_dual_write_device_body_unchanged_only_grid165": true,
+  "actual_NPU_launch_or_model_math_not_qualified": true,
+  "unchanged_BF16_no_quantization": true,
+  "future_global_budget192_preservation_required": true,
+  "inherited_model_qualification": false,
+  "source_projections": [
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+      "sha256": "b2f833e5d54eb346bc0d3a10bb07a733b1b067bcf85a0a0a7c9246d5ac7c4545",
+      "output": "static_state313.py",
+      "edits": 67,
+      "complete_AST_inverse": true
+    }
+  ],
+  "NPU_used": false,
+  "Goodput": null,
+  "adopted": false
+}
