@@ -275,6 +275,7 @@ def main():
         'ROOT_PREPARED_FINAL_REFERENCE_SOURCE_READINESS_20261019.json',
         'audit_ROOT348_small_refill_component_HOST.py',
         'ROOT348_INDEPENDENT_SMALL_REFILL_COMPONENT_AUDIT.json',
+        'ROOT348_RETAINED_408_TARGET_COMPONENT_CHECKPOINT.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():
