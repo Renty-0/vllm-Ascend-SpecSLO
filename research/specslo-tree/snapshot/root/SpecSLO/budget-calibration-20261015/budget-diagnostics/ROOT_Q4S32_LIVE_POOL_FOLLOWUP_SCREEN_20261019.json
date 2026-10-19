@@ -1,0 +1,49 @@
+{
+  "UTC": "2026-10-19T16:11:47.220148+00:00",
+  "status": "retained_component_and_historical_clip_arithmetic_only",
+  "sources": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT339_INDEPENDENT_LINEAR_MATH_AND_COST_AUDIT.json": "d20445c7ad6a309d16ca5ca3f4e178c10de25000b9b1c97f0401f17b0029f213",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_Q4_FUTURE_RAW_HISTORICAL_BONUS_COST_SCREEN_20261019.json": "bd22083053e40be81bb2d74763deb6310f15574ee4236ea0fb98d106745dbe44"
+  },
+  "original339_supervisor_failed_count_but_independent_math_cost_reader_passed": true,
+  "Q5_S24_N24_ms": 53.843491012230515,
+  "Q4_S32_N24_ms": 59.3950399197638,
+  "Q4_S32_N32_ms": 59.24502853304148,
+  "historical_visible_output_retained_fraction": 0.8886291449625207,
+  "target_capacity_ratio_if_actual_N24": 0.8055705568113345,
+  "target_capacity_ratio_if_actual_N32": 1.0768137358745846,
+  "minimum_equivalent_mean_N_if_comparing_to_full_N24": 30,
+  "not_full_workload_prediction": true,
+  "no_new_NPU_run": true,
+  "new_serving_implementation": false,
+  "Goodput": null,
+  "activation": "Only after current355 and protected356 results if further gain needed",
+  "candidate": {
+    "physical": "Q4/S32/M128, FULL2560, original qualified flushed MC2 rows128",
+    "active_limit": 48,
+    "global_retained_budget": 192,
+    "normal_candidates": 96,
+    "future_candidates": 96,
+    "primary_retained_depth": 3,
+    "max_candidates": 6,
+    "raw_draft_pool8_retained_for_bridge": true,
+    "raw_pool_indices_for_full6": [
+      0,
+      1,
+      2,
+      4,
+      5,
+      6
+    ],
+    "existing_B3_eager_mechanism_to_qualify_in_new_geometry": true,
+    "force_N32_or_dummy_arrivals": false
+  },
+  "gates": [
+    "New branch3+3 node math, prefix/KV/copy and actual32-owner generation",
+    "Complete B3 eager promotion/rollback/dependency proof in Q4/S32; no filter flip alone",
+    "New six-candidate causal gain curves and true generated-query charges",
+    "All original warm/twozero/seal, complete463 ownAR and measured GP",
+    "Actual N/ready-home merge and eager promotion evidence required; no nominal32 throughput claim"
+  ],
+  "goal_achieved": false
+}

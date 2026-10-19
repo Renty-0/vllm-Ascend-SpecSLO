@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-19T16:01:21.448080+00:00",
-  "upstream_branch_base": "6698470efe6320f9f7e332ec1baaed1981486107",
+  "saved_UTC": "2026-10-19T16:21:35.022660+00:00",
+  "upstream_branch_base": "7a894df3b88d3f2412eec5b7fba41ac46088d41c",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -654,6 +654,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_PREPARED_FINAL_REFERENCE_SOURCE_READINESS_20261019.json",
       "sha256": "1bf32fa6f74ef6ef96c24cbe126129d57820310f5a3be072d2215e0b1bd97302",
       "bytes": 1398
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_Q4S32_LIVE_POOL_FOLLOWUP_SCREEN_20261019.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_Q4S32_LIVE_POOL_FOLLOWUP_SCREEN_20261019.json",
+      "sha256": "d7f7e50cae947c200b76e029d0ec7ac4901069283e71cb9b61be61c64cffaa3e",
+      "bytes": 2185
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_Q4_FUTURE_RAW_HISTORICAL_BONUS_COST_SCREEN_20261019.json",
@@ -1534,8 +1540,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "8fa6017e792b5c45c3c2fda14e366a55e37b1a09230c21895cefd48e69df8b8e",
-      "bytes": 20562
+      "sha256": "2106bffc2313ec0c6c334e2f743f7a7e747cdbde021a88469b71a40c28008629",
+      "bytes": 20674
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/startup_ROOT331_runtime_import_HOST.sh",
@@ -11796,6 +11802,24 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-deferred-FULL-mask-host-projection-v259/probe259.py",
       "sha256": "b301a7c65cf6fa1a491a366adcc7027a659838876cbaeb1bac9bbf721ddee98e",
       "bytes": 5368
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-depth3-branch6-protocol-host-v357/HOST357_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-depth3-branch6-protocol-host-v357/HOST357_RESULT.json",
+      "sha256": "b8dc0fade3cbd9edc7068566b97fe5fb12b0dbd00d4e1d1efe68458d624a72fe",
+      "bytes": 1008
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-depth3-branch6-protocol-host-v357/check357_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-depth3-branch6-protocol-host-v357/check357_HOST.py",
+      "sha256": "92ba4ab2bbdc74c7c150ecdd12a68ccbbd10df1f979b126ad3c7a4bfcd3a2e81",
+      "bytes": 6562
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-depth3-branch6-protocol-host-v357/plan357.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-depth3-branch6-protocol-host-v357/plan357.py",
+      "sha256": "444874a3318cdcd734b4fea70f6d91fb28b7bd4b2640345b49a96d7b8d53cb19",
+      "bytes": 2210
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-dynamic-root-alternate-eager-compat-full-v287/FREEZE287.json",

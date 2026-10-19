@@ -1,0 +1,20 @@
+{
+  "status": "PASS_HOST_original_tree_packing_and_verifier_for_primary3_alternate3",
+  "exact_mask_and_position_cases": 36,
+  "actual_original_verdict_cases": 162,
+  "budget_vectors": 272,
+  "short_primary_plans_match_old_B3_semantics": true,
+  "raw4_step_primary_bridge_retained": true,
+  "raw8_pool_not_relabelled_as6_generated_nodes": true,
+  "old_P4_family_classifier_rejected_for_new_branch": true,
+  "NPU_used": false,
+  "serving_installed": false,
+  "new_target_branch_projection_implemented": false,
+  "new_eager_geometry_qualified": false,
+  "full463_qualified": false,
+  "Goodput": null,
+  "source_hashes": {
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/tree.py": "692b2d225d1fedffb84eee7afca7030609a3b4f29d1796cddde448780b5b911a",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py": "05d47ed6dc48e368010ca145a0b859aaffe596f246e0b28eb7b07d2d51a50cc9"
+  }
+}

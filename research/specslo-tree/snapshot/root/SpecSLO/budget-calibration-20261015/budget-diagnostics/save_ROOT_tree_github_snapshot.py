@@ -133,6 +133,7 @@ def main():
         'tree-priority-protected-live-refill-host-v354',
         'tree-admission-closed-control-full-v355',
         'tree-priority-protected-refill-full-v356',
+        'tree-depth3-branch6-protocol-host-v357',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -303,6 +304,7 @@ def main():
         'check_ROOT356_terminal_source_HOST.py',
         'HOST_ROOT356_TERMINAL_SOURCE_RESULT.json',
         'ROOT356_PROTECTED_REFILL_PREDECLARATION.json',
+        'ROOT_Q4S32_LIVE_POOL_FOLLOWUP_SCREEN_20261019.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():
