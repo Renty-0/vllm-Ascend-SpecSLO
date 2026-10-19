@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "tests": 4,
+  "errors": 0,
+  "failures": 0,
+  "details": {
+    "actual_complete": {
+      "original_methods": true,
+      "actual_driver": true,
+      "FINAL_ONLY_nonfinal_none_preserved": true,
+      "all_raw_tokens_and_first_last_equal": true,
+      "postlude_after_original_elapsed": true
+    },
+    "identity": {
+      "inactive_and_active_original_called_once": true,
+      "original_arguments_return_and_exception_identity": true,
+      "observer_error_deferred": true
+    },
+    "failure": {
+      "original_all_requests_drained": true,
+      "failed_raw_exclusive": true,
+      "mode_unchanged": true
+    },
+    "negative": {
+      "original_error_preserved": true,
+      "raw_vs_original_metrics_mismatch_rejected": true,
+      "failed_not_reclassified": true
+    }
+  },
+  "HOST_only": true,
+  "carrier_adapted_to_actual_v021_prompt_routed_experts_argument": true,
+  "observer_and_original_processor_unchanged": true
+}

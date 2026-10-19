@@ -1,0 +1,16 @@
+{
+  "official_supported_build_ops": [
+    "scatter_nd_update_v2",
+    "matmul_allreduce_add_rmsnorm",
+    "add_rms_norm_bias",
+    "apply_top_k_top_p_custom",
+    "transpose_kv_cache_by_block",
+    "reshape_and_cache_bnsd",
+    "store_kv_block",
+    "inplace_partial_rotary_mul"
+  ],
+  "ordinary_MC2_from_torch_npu": true,
+  "full_original_Cpp_extension_to_compile": true,
+  "all_original_Python_inference_source_retained": true,
+  "missing_operator_causes_failure_not_silent_fallback": true
+}

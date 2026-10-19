@@ -1,0 +1,6 @@
+{
+  "passed": false,
+  "reason": "torch automatically imported torch_npu backend; explicit HOST no-backend precondition failed after geometry checks",
+  "models_loaded": false,
+  "UTC": "2026-10-19T03:05:02.772012+00:00"
+}

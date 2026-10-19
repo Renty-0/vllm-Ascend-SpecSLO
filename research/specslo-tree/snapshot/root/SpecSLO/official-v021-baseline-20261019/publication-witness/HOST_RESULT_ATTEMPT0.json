@@ -1,0 +1,14 @@
+{
+  "passed": false,
+  "tests": 4,
+  "errors": 3,
+  "failures": 0,
+  "details": {
+    "identity": {
+      "inactive_and_active_original_called_once": true,
+      "original_arguments_return_and_exception_identity": true,
+      "observer_error_deferred": true
+    }
+  },
+  "HOST_only": true
+}

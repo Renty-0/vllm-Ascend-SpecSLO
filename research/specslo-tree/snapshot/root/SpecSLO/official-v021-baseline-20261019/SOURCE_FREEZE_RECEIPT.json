@@ -1,0 +1,9 @@
+{
+  "source_manifest_sha256": "66a8b1f1328afbaa56affbbb9247adcd0d5c2bb350b089e6d909927190f928d2",
+  "files": 10413,
+  "private_manifest": "/root/SpecSLO/official-v021-baseline-20261019/SOURCE_MANIFEST.json",
+  "official_plugin_commit": "80610e4438dba05011b05f89fc45d91e96992671",
+  "official_core_commit": "ad7125a431e176d4161099480a66f0169609a690",
+  "models_or_binaries_included": false,
+  "actual_performance_result_available": false
+}

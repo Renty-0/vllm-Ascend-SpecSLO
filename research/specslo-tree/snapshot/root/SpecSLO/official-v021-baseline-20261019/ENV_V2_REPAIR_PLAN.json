@@ -1,0 +1,20 @@
+{
+  "UTC": "2026-10-19T03:13:46.926647+00:00",
+  "failure": "worker import cannot find acl because isolated official PYTHONPATH omitted retained CANN Python directory",
+  "repair": "Append the existing retained CANN9.0 python/site-packages path; no pip installation or inference source change",
+  "original_v1_freeze_retained": true,
+  "new_entry": "run-v2.sh",
+  "new_controls": "controls-v2",
+  "new_tags": "official021-MC2ON-20261019-v2-r1..3",
+  "measurement_parameters_unchanged": true,
+  "previous_attempt_produced_performance_result": false,
+  "private_torchvision_overlay": "python-v2: torchvision0.25.0+cpu from official PyTorch CPU wheel index; wheel requires torch2.10.0",
+  "worker_import_HOST_result": {
+    "acl_module": "/root/data/specslo-cann-runtime/cann-9.0.0/python/site-packages/acl.so",
+    "torchvision_version": "0.25.0+cpu",
+    "old_official_worker_import": true,
+    "model_loaded": false,
+    "worker_module": "/root/SpecSLO/official-v021-baseline-20261019/vllm-ascend/vllm_ascend/worker/worker.py"
+  },
+  "global_packages_modified": false
+}

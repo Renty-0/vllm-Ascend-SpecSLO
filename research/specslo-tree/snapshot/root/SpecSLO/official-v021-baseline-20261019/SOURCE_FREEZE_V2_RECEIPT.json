@@ -1,0 +1,8 @@
+{
+  "source_manifest_sha256": "1d2904420270f750bf43e8d7ccb28a94a3e3d2635755af1a488fa2b03de13eec",
+  "frozen_files": 10631,
+  "private_manifest": "/root/SpecSLO/official-v021-baseline-20261019/SOURCE_MANIFEST-v2.json",
+  "official_plugin_tag": "v0.21.0rc1",
+  "official_core_tag": "v0.21.0",
+  "original_inference_source_modified": false
+}

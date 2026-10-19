@@ -1,0 +1,10 @@
+{
+  "UTC": "2026-10-19T03:08:44.872107+00:00",
+  "original_full_Cpp_extension": true,
+  "dense_ACLNN_ops": 8,
+  "original_official_inference_source_modified": false,
+  "build_session": 8191,
+  "build_exit_code": 0,
+  "MC2_benchmark_uses": "ordinary torch_npu.npu_mm_all_reduce_base; fused_MC2 disabled",
+  "NPU_model_started": false
+}

@@ -1,0 +1,29 @@
+[
+  [
+    "cmake",
+    "-S",
+    "/root/SpecSLO/official-v021-baseline-20261019/vllm-ascend",
+    "-B",
+    "/root/SpecSLO/official-v021-baseline-20261019/cpp-build",
+    "-DCMAKE_BUILD_TYPE=Release",
+    "-DCMAKE_INSTALL_PREFIX=/root/SpecSLO/official-v021-baseline-20261019/vllm-ascend/vllm_ascend",
+    "-DASCEND_HOME_PATH=/root/data/specslo-cann-runtime/cann-9.0.0",
+    "-DPYTHON_EXECUTABLE=/root/miniconda3/envs/vllm-hust-dev/bin/python",
+    "-DPYTHON_INCLUDE_PATH=/root/miniconda3/envs/vllm-hust-dev/include/python3.11",
+    "-Dpybind11_DIR=/root/miniconda3/envs/vllm-hust-dev/lib/python3.11/site-packages/pybind11/share/cmake/pybind11",
+    "-DTORCH_NPU_PATH=/root/miniconda3/envs/vllm-hust-dev/lib/python3.11/site-packages/torch_npu",
+    "-DSOC_VERSION=ascend910b1"
+  ],
+  [
+    "cmake",
+    "--build",
+    "/root/SpecSLO/official-v021-baseline-20261019/cpp-build",
+    "--parallel",
+    "4"
+  ],
+  [
+    "cmake",
+    "--install",
+    "/root/SpecSLO/official-v021-baseline-20261019/cpp-build"
+  ]
+]

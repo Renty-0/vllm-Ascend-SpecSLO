@@ -1,0 +1,31 @@
+{
+  "ascend_commit": "80610e4438dba05011b05f89fc45d91e96992671",
+  "core_tag": "v0.21.0",
+  "source_evidence": "/root/data/vllm-ascend-hust/docs/migration/20260930/BASE_CONTAINER_PROVENANCE.txt",
+  "scope": "Old container bundled official source checkout; historical TP4 result identity is not established by provenance alone; this experiment measures the recovered official checkout anew.",
+  "user_correction": "old official vllm-ascend, not HUST",
+  "physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "MC2_ON": true,
+  "requests": 463,
+  "output_tokens_each": 256,
+  "repeat_runs": 3,
+  "stability_predeclared": {
+    "raw_full_range_over_median_max": 0.03,
+    "Goodput_full_range_over_median_max": 0.1,
+    "per_class_TPOT_median_full_range_over_median_max": 0.05
+  },
+  "candidate_only_if_all_actual_runs_and_MC2_selection_audited": true,
+  "models_datasets_public_only": true,
+  "other_artifacts_private_only": true,
+  "UTC": "2026-10-19T02:34:44.280702+00:00",
+  "core_commit": "ad7125a431e176d4161099480a66f0169609a690",
+  "old_extra_reference_commit_not_selected": "d6e8f1ad4bd67cc48a349cd7cf8efab98eecad13",
+  "baseline_Raw_vs_tree_Raw_comparison_required": false,
+  "select_if_stable": "One actual representative round with median Goodput; use the same round for Raw, TPOT and per-class attainment.",
+  "actual_runtime": "retained Python3.11 + CANN9.0 + torch-npu2.10.0; isolated source and Python dependency overlay, no global installation"
+}

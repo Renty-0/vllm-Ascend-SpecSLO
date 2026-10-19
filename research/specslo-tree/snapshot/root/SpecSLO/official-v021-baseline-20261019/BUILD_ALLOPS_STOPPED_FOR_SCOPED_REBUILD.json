@@ -1,0 +1,233 @@
+{
+  "reason": "Replace full37ACLNN operator build by supported operator-scoped official build for dense Qwen3; no NPU experiment began",
+  "root_pid": 46723,
+  "start_ticks": 377371748,
+  "cleanup": {
+    "before": [
+      {
+        "pid": 46723,
+        "ppid": 46515,
+        "state": "S",
+        "start_ticks": 377371748
+      },
+      {
+        "pid": 46724,
+        "ppid": 46723,
+        "state": "S",
+        "start_ticks": 377371748
+      },
+      {
+        "pid": 46805,
+        "ppid": 46724,
+        "state": "S",
+        "start_ticks": 377371864
+      },
+      {
+        "pid": 47062,
+        "ppid": 46805,
+        "state": "S",
+        "start_ticks": 377371890
+      },
+      {
+        "pid": 47066,
+        "ppid": 47062,
+        "state": "S",
+        "start_ticks": 377371890
+      },
+      {
+        "pid": 47074,
+        "ppid": 47066,
+        "state": "S",
+        "start_ticks": 377371892
+      },
+      {
+        "pid": 47075,
+        "ppid": 47066,
+        "state": "S",
+        "start_ticks": 377371892
+      },
+      {
+        "pid": 48472,
+        "ppid": 47074,
+        "state": "S",
+        "start_ticks": 377373581
+      },
+      {
+        "pid": 48473,
+        "ppid": 48472,
+        "state": "S",
+        "start_ticks": 377373596
+      },
+      {
+        "pid": 49392,
+        "ppid": 48473,
+        "state": "S",
+        "start_ticks": 377376130
+      },
+      {
+        "pid": 49393,
+        "ppid": 49392,
+        "state": "S",
+        "start_ticks": 377376130
+      },
+      {
+        "pid": 49394,
+        "ppid": 49393,
+        "state": "S",
+        "start_ticks": 377376131
+      },
+      {
+        "pid": 49397,
+        "ppid": 49394,
+        "state": "S",
+        "start_ticks": 377376134
+      },
+      {
+        "pid": 58088,
+        "ppid": 49397,
+        "state": "S",
+        "start_ticks": 377398709
+      },
+      {
+        "pid": 64022,
+        "ppid": 48473,
+        "state": "S",
+        "start_ticks": 377415812
+      },
+      {
+        "pid": 64023,
+        "ppid": 64022,
+        "state": "S",
+        "start_ticks": 377415812
+      },
+      {
+        "pid": 64024,
+        "ppid": 64023,
+        "state": "S",
+        "start_ticks": 377415812
+      },
+      {
+        "pid": 64029,
+        "ppid": 64024,
+        "state": "S",
+        "start_ticks": 377415813
+      },
+      {
+        "pid": 64151,
+        "ppid": 48473,
+        "state": "S",
+        "start_ticks": 377416134
+      },
+      {
+        "pid": 64152,
+        "ppid": 64151,
+        "state": "S",
+        "start_ticks": 377416134
+      },
+      {
+        "pid": 64153,
+        "ppid": 64152,
+        "state": "S",
+        "start_ticks": 377416134
+      },
+      {
+        "pid": 64158,
+        "ppid": 64153,
+        "state": "S",
+        "start_ticks": 377416135
+      },
+      {
+        "pid": 64417,
+        "ppid": 48473,
+        "state": "S",
+        "start_ticks": 377416217
+      },
+      {
+        "pid": 64418,
+        "ppid": 64417,
+        "state": "S",
+        "start_ticks": 377416217
+      },
+      {
+        "pid": 64419,
+        "ppid": 64418,
+        "state": "S",
+        "start_ticks": 377416217
+      },
+      {
+        "pid": 64424,
+        "ppid": 64419,
+        "state": "S",
+        "start_ticks": 377416218
+      },
+      {
+        "pid": 64430,
+        "ppid": 64029,
+        "state": "S",
+        "start_ticks": 377416535
+      },
+      {
+        "pid": 64431,
+        "ppid": 64430,
+        "state": "S",
+        "start_ticks": 377416535
+      },
+      {
+        "pid": 64432,
+        "ppid": 64431,
+        "state": "R",
+        "start_ticks": 377416536
+      },
+      {
+        "pid": 64435,
+        "ppid": 58088,
+        "state": "S",
+        "start_ticks": 377416545
+      },
+      {
+        "pid": 64436,
+        "ppid": 64435,
+        "state": "R",
+        "start_ticks": 377416546
+      },
+      {
+        "pid": 64440,
+        "ppid": 64158,
+        "state": "S",
+        "start_ticks": 377416847
+      },
+      {
+        "pid": 64441,
+        "ppid": 64440,
+        "state": "S",
+        "start_ticks": 377416847
+      },
+      {
+        "pid": 64442,
+        "ppid": 64441,
+        "state": "R",
+        "start_ticks": 377416848
+      },
+      {
+        "pid": 64445,
+        "ppid": 64424,
+        "state": "S",
+        "start_ticks": 377416946
+      },
+      {
+        "pid": 64446,
+        "ppid": 64445,
+        "state": "S",
+        "start_ticks": 377416947
+      },
+      {
+        "pid": 64447,
+        "ppid": 64446,
+        "state": "R",
+        "start_ticks": 377416947
+      }
+    ],
+    "after": [],
+    "scope": "fresh child descendants only; PID plus immutable start tick; no global pkill"
+  }
+}

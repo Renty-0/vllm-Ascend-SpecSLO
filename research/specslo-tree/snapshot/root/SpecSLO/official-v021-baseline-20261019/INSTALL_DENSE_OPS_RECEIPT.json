@@ -1,0 +1,27 @@
+{
+  "UTC": "2026-10-19T03:08:12.771605+00:00",
+  "argv": [
+    "bash",
+    "/root/SpecSLO/official-v021-baseline-20261019/vllm-ascend/csrc/build/cann-ops-transformer-custom_linux-aarch64.run",
+    "--install-path=/root/SpecSLO/official-v021-baseline-20261019/vllm-ascend/vllm_ascend/_cann_ops_custom"
+  ],
+  "installer_sha256": "aa6d916dd4c01d2f8efcf056bae343564b8e78b376a9e4852e66136d10e41192",
+  "exit_code": 0,
+  "official_inference_source_modified": false,
+  "scope": {
+    "official_supported_build_ops": [
+      "scatter_nd_update_v2",
+      "matmul_allreduce_add_rmsnorm",
+      "add_rms_norm_bias",
+      "apply_top_k_top_p_custom",
+      "transpose_kv_cache_by_block",
+      "reshape_and_cache_bnsd",
+      "store_kv_block",
+      "inplace_partial_rotary_mul"
+    ],
+    "ordinary_MC2_from_torch_npu": true,
+    "full_original_Cpp_extension_to_compile": true,
+    "all_original_Python_inference_source_retained": true,
+    "missing_operator_causes_failure_not_silent_fallback": true
+  }
+}

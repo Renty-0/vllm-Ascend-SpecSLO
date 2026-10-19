@@ -1,0 +1,5 @@
+{
+  "reason": "CMake operator scope changed; remove stale all37 operator configure/cache from scoped8 build",
+  "retained_original_build": "/root/SpecSLO/official-v021-baseline-20261019/obsolete-allops-build",
+  "original_source_modified": false
+}

@@ -1,0 +1,13 @@
+{
+  "files": {
+    "/root/SpecSLO/official-v021-baseline-20261019/publication-witness/publication_witness.py": "c782beefc814e18dc95694ca6d9dc597a7e60d68b86ce4e69c8122a1c9cb928f",
+    "/root/SpecSLO/official-v021-baseline-20261019/publication-witness/run_publication_benchmark.py": "4d1ec9ecb9925dc8d55e6e0d631ce915b9f30d328aa7f9cb755eade41cae60b8",
+    "/root/SpecSLO/official-v021-baseline-20261019/harness/run_baseline.py": "f624cd80fa9bca873a28c036543ed5b393fe5cf20460cc2381bea058367e0e45",
+    "/root/SpecSLO/official-v021-baseline-20261019/harness/tp4_model_evidence.py": "bae9e7d91dc215f47af88cca15c9c4669eab12bc58a3a86cf1e1ce037dd4fc42",
+    "/root/SpecSLO/official-v021-baseline-20261019/harness/examples/benchmark_nano_pearl_target_only.py": "70b06cbfcd746e9dc5fc5aa99deb26735aa7f13f5d27566fbb93df30d7f0bb29",
+    "/root/SpecSLO/official-v021-baseline-20261019/vllm/vllm/v1/engine/output_processor.py": "b0b1949992bafaef6c40bddb4b6b12c8085a46910e2e6764efb7c270d33fb6bf"
+  },
+  "harness_path": "/root/SpecSLO/official-v021-baseline-20261019/harness/run_baseline.py",
+  "benchmark_path": "/root/SpecSLO/official-v021-baseline-20261019/harness/examples/benchmark_nano_pearl_target_only.py",
+  "output_processor_path": "/root/SpecSLO/official-v021-baseline-20261019/vllm/vllm/v1/engine/output_processor.py"
+}

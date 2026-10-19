@@ -1,0 +1,7 @@
+{
+  "acl_module": "/root/data/specslo-cann-runtime/cann-9.0.0/python/site-packages/acl.so",
+  "torchvision_version": "0.25.0+cpu",
+  "old_official_worker_import": true,
+  "model_loaded": false,
+  "worker_module": "/root/SpecSLO/official-v021-baseline-20261019/vllm-ascend/vllm_ascend/worker/worker.py"
+}

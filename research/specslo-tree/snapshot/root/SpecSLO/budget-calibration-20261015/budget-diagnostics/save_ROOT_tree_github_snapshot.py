@@ -18,6 +18,7 @@ SOURCES = (
     ('tree-capacity-request-risk-span-full-v299', 299),
     ('tree-single-prepare-target-math-cost-v311', 311),
     ('tree-measured-cost-risk-single-prepare-full-v316', 316),
+    ('tree-M165-N32-independent-target-math-cost-v317', 317),
 )
 
 
@@ -61,6 +62,7 @@ def main():
         'tree-C128-F64-global192-budget-host-v314',
         'tree-current-prepare-cost-eligibility-host-v312',
         'tree-measured-cost-risk-single-prepare-full-v316',
+        'tree-M165-N32-independent-target-math-cost-v317',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -117,10 +119,22 @@ def main():
         'ROOT316_FINAL_FULL_RESULT.json',
         'ROOT316_PRELIMINARY_FULL_COMMON_METRICS.json',
         'ROOT316_TERMINAL_INDEPENDENT_FULL_AUDIT.json',
+        'freeze_ROOT317_M165_target_cost_HOST.py',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():
             selected.add(path)
+    official = Path('/root/SpecSLO/official-v021-baseline-20261019')
+    selected.update(p for p in official.iterdir() if p.is_file()
+                    and p.suffix in {'.py', '.sh', '.json'}
+                    and not p.name.startswith('SOURCE_MANIFEST')
+                    and not p.name.startswith(('HOST', 'SCOPED_BUILD_ATTEMPT')))
+    for directory in ('harness', 'publication-witness'):
+        selected.update(p for p in (official / directory).rglob('*') if p.is_file()
+                        and '__pycache__' not in p.parts and 'actual' not in p.parts
+                        and p.suffix in {'.py', '.json'}
+                        and p.parent == official / directory)
+    selected.add(BASE / 'budget-diagnostics' / 'ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json')
     selected.add(Path('/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md'))
     plugin = Path('/root/data/vllm-ascend-hust')
     for directory in ('vllm_ascend/spec_decode', 'vllm_ascend/ops/triton', 'csrc/mc2'):

@@ -1,0 +1,78 @@
+{
+  "UTC": "2026-10-19T03:10:26.215170+00:00",
+  "reason": "Original frozen verifier expected two missing old runtime path aliases; all13 retained target files match exact original SHA256",
+  "aliases": {
+    "/usr/local/Ascend/cann-9.0.0": "/root/data/specslo-cann-runtime/cann-9.0.0",
+    "/opt/specslo-cann/nnal": "/root/data/specslo-cann-runtime/nnal"
+  },
+  "verified_files": [
+    {
+      "original": "/usr/local/Ascend/cann-9.0.0/set_env.sh",
+      "retained": "/root/data/specslo-cann-runtime/cann-9.0.0/set_env.sh",
+      "sha256": "f9c99ed3e6465e1dfa80caa24b759e6e993760f607ca0777bbe24f9e05f52ded"
+    },
+    {
+      "original": "/usr/local/Ascend/cann-9.0.0/aarch64-linux/ascend_toolkit_install.info",
+      "retained": "/root/data/specslo-cann-runtime/cann-9.0.0/aarch64-linux/ascend_toolkit_install.info",
+      "sha256": "52e4a3939d96bac7c9effb36f182c794b82624e185b9abb6fbbe37b22ac7f0e5"
+    },
+    {
+      "original": "/usr/local/Ascend/cann-9.0.0/lib64/libascendcl.so",
+      "retained": "/root/data/specslo-cann-runtime/cann-9.0.0/lib64/libascendcl.so",
+      "sha256": "94edd165d95210c2a46c52f77f0215cb64e78c42176a451f8e118daccfa912fe"
+    },
+    {
+      "original": "/usr/local/Ascend/cann-9.0.0/lib64/libhccl.so",
+      "retained": "/root/data/specslo-cann-runtime/cann-9.0.0/lib64/libhccl.so",
+      "sha256": "1188f6acb2df4de12b887ab3d0a270c59d0b745e11f692929a6a6635c8cf3e4c"
+    },
+    {
+      "original": "/opt/specslo-cann/nnal/atb/9.0.0/atb/set_env.sh",
+      "retained": "/root/data/specslo-cann-runtime/nnal/atb/9.0.0/atb/set_env.sh",
+      "sha256": "8219b354c51441bca8f5ab3127522cd92161f97de0ffd95eee2a85812d689886"
+    },
+    {
+      "original": "/opt/specslo-cann/nnal/atb/9.0.0/version.info",
+      "retained": "/root/data/specslo-cann-runtime/nnal/atb/9.0.0/version.info",
+      "sha256": "24c84e721eb2bd3b41a0c271cddd88a43d772449962d14bbfc9952568737f2cb"
+    },
+    {
+      "original": "/opt/specslo-cann/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libasdops.so",
+      "retained": "/root/data/specslo-cann-runtime/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libasdops.so",
+      "sha256": "8774006735eb22bef3de0efecf8c335b348fadbd1663e114ea71000996452c53"
+    },
+    {
+      "original": "/opt/specslo-cann/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libatb.so",
+      "retained": "/root/data/specslo-cann-runtime/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libatb.so",
+      "sha256": "39764f7cf0d0faf128bd28a2302aaf4edbad07aebbd50cd0b3f12aaa2fb41694"
+    },
+    {
+      "original": "/opt/specslo-cann/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libatb_mixops.so",
+      "retained": "/root/data/specslo-cann-runtime/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libatb_mixops.so",
+      "sha256": "5f375fa139ba94d343bfa06e0b8b8104ff446671d35879cc18e52c841e631413"
+    },
+    {
+      "original": "/opt/specslo-cann/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libatb_train.so",
+      "retained": "/root/data/specslo-cann-runtime/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libatb_train.so",
+      "sha256": "264be2ab293ffdf222f64e85f55afb93570c33e419f1f8270026ed4483270691"
+    },
+    {
+      "original": "/opt/specslo-cann/nnal/atb/9.0.0/atb/cxx_abi_1/lib/liblcal.so",
+      "retained": "/root/data/specslo-cann-runtime/nnal/atb/9.0.0/atb/cxx_abi_1/lib/liblcal.so",
+      "sha256": "0721a4387676ee3fc117b68fe8ba8efbdec391c44a2fd401b8c0c0ee4271abc8"
+    },
+    {
+      "original": "/opt/specslo-cann/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libmki.so",
+      "retained": "/root/data/specslo-cann-runtime/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libmki.so",
+      "sha256": "1128beb80f321fb6107ef4106021c13dd85a02c1ab9ed15fc850b58cb73b0ee0"
+    },
+    {
+      "original": "/opt/specslo-cann/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libtbe_adapter.so",
+      "retained": "/root/data/specslo-cann-runtime/nnal/atb/9.0.0/atb/cxx_abi_1/lib/libtbe_adapter.so",
+      "sha256": "4f87684dd48266df8a9248b3f863d54236ec7ae25349bae33f10bcedfd6120c1"
+    }
+  ],
+  "reinstalled_packages": false,
+  "modified_runtime_files": false,
+  "baseline_model_started_before_repair": false
+}

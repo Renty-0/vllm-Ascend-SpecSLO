@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "cases": 546,
+  "unchanged_legacy408_cases": true,
+  "real_nodes": 45756,
+  "independent_reference_frames": 2628,
+  "independent_owner_offsets": [
+    32,
+    64
+  ],
+  "physical_reference_groups": 33,
+  "physical_reference_rows": 165,
+  "prefixes": 32,
+  "independently_prefilled_owners_planned": 96,
+  "paired_target_cost_configurations": 16,
+  "NPU_used": false,
+  "neural_qualified": false,
+  "Goodput": null
+}

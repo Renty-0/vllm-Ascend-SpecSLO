@@ -1,0 +1,11 @@
+{
+  "UTC": "2026-10-19T04:25:38.012542+00:00",
+  "reason": "Core worktree Git pointer referenced ephemeral /vllm-workspace metadata lost after container restart",
+  "recovery": "Independent Git metadata under private retained checkout; fetch official tag bloblessly and reset index only; no working source reset",
+  "commit": "ad7125a431e176d4161099480a66f0169609a690",
+  "checked_original_frozen_core_files": 4878,
+  "original_core_file_hashes_unchanged": true,
+  "git_metadata_persistent": true,
+  "plugin_official_tag": "v0.21.0rc1",
+  "plugin_official_commit": "80610e4438dba05011b05f89fc45d91e96992671"
+}
