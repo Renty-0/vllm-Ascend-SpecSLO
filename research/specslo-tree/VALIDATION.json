@@ -1,6 +1,6 @@
 {
   "schema": "SpecSLO-Tree-source-save-checks-v1",
-  "source_files_sha256_verified": 2356,
+  "source_files_sha256_verified": 2360,
   "python_sources_syntax_passed": 1892,
   "bash_scripts_syntax_passed": 159,
   "credential_pattern_hits": 0,
@@ -41,6 +41,21 @@
   "v312_measured_current_cost_causal_observations": 3072,
   "v316_HOST_integration_suites": 13,
   "v316_actual_bound_repair_cases": 160,
-  "v316_model_validation": "running;freshqualification not inherited",
-  "pause_requested_after_current316": true
+  "v316_model_validation": "complete;all original components;408cases per3targets;45genuineDraft;20postbranch;all463ownAR equal3targets;independentterminalaudit pass",
+  "pause_requested_after_current316": true,
+  "v316_Goodput": 288.0143414026082,
+  "v316_Raw": 611.7001838046219,
+  "v316_adopted": false,
+  "v316_AR_equal_requests_each_target": [
+    463,
+    463,
+    463
+  ],
+  "v316_AR_different_requests_each_target": [
+    0,
+    0,
+    0
+  ],
+  "paused_after_current316": true,
+  "additional_NPU_experiment_started_after316": false
 }

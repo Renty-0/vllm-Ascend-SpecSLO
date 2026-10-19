@@ -114,10 +114,14 @@ def main():
         'audit_ROOT316_terminal_full_HOST.py',
         'ROOT316_GENERATED_SOURCE_NUMERIC_INTEGRITY.json',
         'monitor_ROOT316_readonly_HOST.py',
+        'ROOT316_FINAL_FULL_RESULT.json',
+        'ROOT316_PRELIMINARY_FULL_COMMON_METRICS.json',
+        'ROOT316_TERMINAL_INDEPENDENT_FULL_AUDIT.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():
             selected.add(path)
+    selected.add(Path('/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md'))
     plugin = Path('/root/data/vllm-ascend-hust')
     for directory in ('vllm_ascend/spec_decode', 'vllm_ascend/ops/triton', 'csrc/mc2'):
         selected.update(p for p in (plugin / directory).rglob('*')

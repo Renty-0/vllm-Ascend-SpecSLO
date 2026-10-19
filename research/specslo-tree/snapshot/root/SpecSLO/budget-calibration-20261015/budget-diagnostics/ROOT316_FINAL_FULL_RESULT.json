@@ -1,0 +1,125 @@
+{
+  "UTC": "2026-10-19T02:03:15.761986+00:00",
+  "status": "complete_independently_audited_correct_outputs_performance_rejected",
+  "scheme": "single prepare + causal request risk gain + measured311 target cost eligibility",
+  "tag": "measured-target-cost-risk-root-v316-B1to8-full463-ownAR-v1",
+  "all": {
+    "requests": 463,
+    "attained": 218,
+    "output_tokens": 118528,
+    "good_tokens": 55808,
+    "Raw": 611.7001838046219,
+    "Goodput": 288.0143414026082,
+    "TPOT_paper_median_ms": 45.705614324106136,
+    "TPOT_paper_P90_ms": 58.80251470589428,
+    "TPOT_observed_median_ms": 45.88485202733793,
+    "TPOT_observed_P90_ms": 59.03311280278014
+  },
+  "by_class": {
+    "loose": {
+      "requests": 96,
+      "attained": 96,
+      "output_tokens": 24576,
+      "good_tokens": 24576,
+      "Raw": 126.83200355344214,
+      "Goodput": 126.83200355344214,
+      "TPOT_paper_median_ms": 58.80012887519115,
+      "TPOT_paper_P90_ms": 63.697163488541264,
+      "TPOT_observed_median_ms": 59.030717615878174,
+      "TPOT_observed_P90_ms": 63.946956286535546
+    },
+    "normal": {
+      "requests": 96,
+      "attained": 95,
+      "output_tokens": 24576,
+      "good_tokens": 24320,
+      "Raw": 126.83200355344214,
+      "Goodput": 125.51083684976045,
+      "TPOT_paper_median_ms": 39.1006121171813,
+      "TPOT_paper_P90_ms": 44.910083828654024,
+      "TPOT_observed_median_ms": 39.253947850974164,
+      "TPOT_observed_P90_ms": 45.08620180445267
+    },
+    "tight": {
+      "requests": 271,
+      "attained": 27,
+      "output_tokens": 69376,
+      "good_tokens": 6912,
+      "Raw": 358.0361766977377,
+      "Goodput": 35.6715009994056,
+      "TPOT_paper_median_ms": 45.50011987157632,
+      "TPOT_paper_P90_ms": 51.423541093754466,
+      "TPOT_observed_median_ms": 45.67855171420995,
+      "TPOT_observed_P90_ms": 51.62520203922017
+    }
+  },
+  "elapsed_seconds": 193.76812879601493,
+  "target_calls": 2279,
+  "mean_N": 16.99429574374726,
+  "median_N": 23,
+  "N24_calls": 1109,
+  "budget_histogram": {
+    "4": 38002,
+    "8": 397,
+    "1": 146,
+    "2": 157,
+    "5": 1,
+    "3": 22,
+    "6": 4,
+    "7": 1
+  },
+  "branch_calls": 229,
+  "phase_seconds": {
+    "draft": 0.0,
+    "target": 139.18416904099286,
+    "exchange": 8.57217672932893,
+    "verify": 0.0,
+    "broadcast": 1.0037805056199431,
+    "state_update": 9.057393103372306
+  },
+  "phase_time_scope": "host phase walls; not isolated device timings",
+  "eager_promoted": 0,
+  "formal_adopted": false,
+  "whole463_AR_verified": true,
+  "AR_equal_requests_each_target": [
+    463,
+    463,
+    463
+  ],
+  "AR_different_requests_each_target": [
+    0,
+    0,
+    0
+  ],
+  "source_and_environment_and_owned_cleanup_verified": true,
+  "terminal_receipt": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-measured-target-cost-risk-root-v316-B1to8-full463-ownAR-v1.json",
+    "sha256": "b33283b67720ea4850c5be82becc5fe347b017c91212be0e883bf4b727e4d2e5"
+  },
+  "independent_audit": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT316_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+    "sha256": "9dc06c20148b27abd94402f3079b0ab1e966394cb7048f4c796ac526e196e647"
+  },
+  "common_metrics": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT316_PRELIMINARY_FULL_COMMON_METRICS.json",
+    "sha256": "08d3bc1b939e09228555ab056e3446ce73f8bcfe457bfe78e3bec8767bd88c19"
+  },
+  "best_clean_tree_GP_unchanged": 554.7604454409803,
+  "fixed_reference_GP": 501.63560407964184,
+  "required_GP_gt": 644.766448113661,
+  "tree_to_fixed_reference_ratio": 0.5741505169495141,
+  "tree_to_best_clean_tree_ratio": 0.5191688480487554,
+  "previous299_GP": 254.04284004595166,
+  "tree_to_previous299_ratio": 1.133723514311648,
+  "goal_achieved": false,
+  "final_comparison_cells_completed": 0,
+  "user_requested_pause_after_current316": true,
+  "additional_NPU_experiment_started": false,
+  "interpretation": "tight TPOT median45.50ms exceeds40ms; only27/271 tight attain. Branch calls lower than299, but separate fresh processes and multiple changes do not establish isolated causality.",
+  "pending_on_resume": [
+    "review negative316 before selecting next experiment",
+    "M165/N32 device qualification plan exists but unrun",
+    "measure actual new draft and target costs before larger-budget controller adoption",
+    "only after eligible full-AR candidate run predeclared nine comparison cells"
+  ]
+}

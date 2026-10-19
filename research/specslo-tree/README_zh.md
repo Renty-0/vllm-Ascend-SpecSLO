@@ -1,6 +1,6 @@
 # SpecSLO-Tree 优化代码快照
 
-本分支保存正在这台 Ascend 机器上开发的动态预算与树状投机解码源码。
+本分支保存这台 Ascend 机器上的动态预算与树状投机解码源码。v316 已完成，按用户要求暂停。
 `SOURCE_MANIFEST.json` 记录每个文件的原始位置、SHA256 和字节数；
 `snapshot/root/` 保持原实验目录结构。源码保留原样，未改动正在使用的运行环境。
 
@@ -11,8 +11,8 @@
 | 固定串行 gamma4 | 双 batch、rolling-eager 和已有算子、计算图优化 | 对照 Goodput 501.6356 token/s。 |
 | v257 | Q5/M120 树形验证；463 请求均与独立自回归参考一致 | 当前最好树形结果：Raw 686.7756，Goodput 554.7604 token/s。 |
 | v287 | 根节点分叉，动态 B=1…8；完整 463 请求和三个 target rank 的独立自回归校验通过 | Raw 510.2503，Goodput 206.0838；性能退化，未采用。原 guard 的预算上限审计过期，保留原失败记录和独立修正审计。 |
-| v290 | 先为正常请求保留主链容量，再分配分叉预算 | HOST 测试通过，已集成 v299，完整负载收益待测。 |
-| v294 | 按请求估计条件接受概率，处理未展开分支的观测截断 | HOST 测试通过，模型超参数和实际性能尚未验证。 |
+| v290 | 先为正常请求保留主链容量，再分配分叉预算 | HOST 测试通过，已集成 v299/v316；完整负载结果见对应行。 |
+| v294 | 按请求估计条件接受概率，处理未展开分支的观测截断 | HOST 测试通过，已参与 v299/v316 完整实验；没有独立收益消融。 |
 | v295 | 所有层的连续前缀合并复制，当前 K/V 双写 | 独立 NPU 算子测试通过；不能据此宣称端到端提升。 |
 | v291 | 将 v295 路径接入真实 target 模型 | 初始化时缓存检查失败，尚无模型数值或时延结果，不能采用。 |
 | v296 | 按实际缓存张量解析具体 NPU 编号，再执行原有严格缓存检查 | 三个 target rank 各 408 组数值检查及成对 target 时延验证通过；尚无完整负载 Goodput。 |
@@ -25,10 +25,15 @@
 | v312 | 采用 v311 新成本数据的分支预算判断 | 实际类型分配与 3,072 次合成因果观测通过；对有限的非单调经验收益，拒绝不划算的分支，保持原分配器的容错。成本代理仍未计入真实 draft 开销。 |
 | v313 | 较大物理批次 M165/S33，沿用单次映射检查与连续前缀复制 | 1,020 个真实 Native HOST 场景通过 token 顺序、KV 可见性、复制区间和别名逆向检查；新行数尚未通过设备端算子或模型验证。 |
 | v314 | 正常候选上限 128、后续候选上限 64，全局仍为 192 | 128 个实际类型分配场景、36 个控制器场景及 7 项坏上限检查通过；尚未验证实际 218 repair 绑定、真实 draft 或 target 路径。 |
-| v316 | 组合单次准备、逐请求收益预测与 v311 实测分支成本判断 | 13 项 HOST 集成检查通过，已冻结并启动完整实验；全局仍为 192，尚无新 Goodput。工作负载要求实际使用分支，允许成本规则跳过大批次分叉；大批次数值能力仍须通过完整 408 案例检查。 |
+| v316 | 组合单次准备、逐请求收益预测与 v311 实测分支成本判断 | 全部原组件、三个 target 各 408 数值案例及完整 463 请求独立 AR 通过。Raw 611.7002、Goodput 288.0143；tight 27/271、normal 95/96、loose 96/96 达标。实际 229 次分枝调用，性能未采用；按用户要求暂停。 |
 
 最终目标仍是动态预算树形方案超过固定 gamma4，并超过打开 MC2 的官方
 TP4 基线 1.5 倍。当前参考阈值为 644.7664 token/s，尚未达到。
+v316 仅为固定 gamma4 对照的 0.574 倍，当前最好树形仍为 v257。
+最终三块九轮比较为 0/9；暂停后没有启动新的 NPU 实验。
+完整结果和校验摘要保存在 `budget-diagnostics/ROOT316_FINAL_FULL_RESULT.json`
+及 `ROOT316_TERMINAL_INDEPENDENT_FULL_AUDIT.json`。
+后续 M165/N32 只有 HOST 原型和设备验证计划，尚未获得真实模型资格。
 
 ## 主要代码入口
 
@@ -47,7 +52,7 @@ TP4 基线 1.5 倍。当前参考阈值为 644.7664 token/s，尚未达到。
 | `tree-concrete-device-span-dual-cache-target-cost-v296/` | 修复设备比较后的独立模型诊断，不继承前驱的数值验证资格。 |
 | `tree-capacity-request-risk-span-full-v299/` | 当前冻结的完整实验，需重新通过所有模型与独立 AR 校验。 |
 | `tree-single-validated-prefix-descriptors-host-v304/` | 不可变映射校验与直接区间描述，HOST 原型。 |
-| `tree-single-validated-prefix-prepare-host-v305/` | 精简 HOST prepare 回调，尚未执行 NPU 模型验证。 |
+| `tree-single-validated-prefix-prepare-host-v305/` | 精简 HOST prepare 回调；已通过集成 v311/v316 的实际模型检查。 |
 | `tree-capacity-risk-single-prepare-full-v307/` | 后续完整实验候选，尚未启动 NPU。 |
 | `tree-range-packed-branch-layout-host-v308/` | 连续区间索引构造的 HOST 原型与完整差分检查，尚未接入运行版本。 |
 | `tree-measured-branch-cost-eligibility-host-v309/` | 成本约束的分支选择原型，旧成本代理不能替代新路径实测。 |
@@ -56,7 +61,7 @@ TP4 基线 1.5 倍。当前参考阈值为 644.7664 token/s，尚未达到。
 | `tree-M165-single-prepare-host-v313/` | 较大批次的单次准备与 165 行别名缓冲；尚未执行 NPU。 |
 | `tree-C128-F64-global192-budget-host-v314/` | 固定全局 192 下的角色预算调整与调度控制器 HOST 原型。 |
 | `tree-current-prepare-cost-eligibility-host-v312/` | 使用 v311 当前准备路径成本的分支选择。 |
-| `tree-measured-cost-risk-single-prepare-full-v316/` | 当前冻结的完整负载候选，保留全部数值、真实 draft、独立 AR 与性能门槛。 |
+| `tree-measured-cost-risk-single-prepare-full-v316/` | 已完成完整负载及独立 AR，正确性通过，性能未达标。 |
 | `budget-diagnostics/` | 独立审计、逐类收益校准与最终比较脚本。 |
 
 运行时依赖还保存在 `snapshot/root/data/vllm-ascend-hust/`；
