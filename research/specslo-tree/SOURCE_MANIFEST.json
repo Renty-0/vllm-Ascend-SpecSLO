@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-19T23:13:45.329798+00:00",
-  "upstream_branch_base": "22a52f15e825dffe7d715d4cf963aa9d4f3d7de8",
+  "saved_UTC": "2026-10-19T23:44:48.915226+00:00",
+  "upstream_branch_base": "cc25b1e6924efa42b7856ca9e1ba8f643c2fef2a",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -198,6 +198,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/HOST_ROOT384_ACTUAL_FROZEN_CONSTRUCTION.json",
       "sha256": "2f6a969b13bd362242c6bf648a67ee5a078ef1edd3205eeee11c7b281ecd0ace",
       "bytes": 634
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/HOST_ROOT385_ACTUAL_FROZEN_CONSTRUCTION.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/HOST_ROOT385_ACTUAL_FROZEN_CONSTRUCTION.json",
+      "sha256": "ed717283c9371ad6c2b60b4f9b64973a2e51740b61fd949ac5e95f230fc3e6e7",
+      "bytes": 670
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_287_ACTUAL_DELIVERY_MARGIN_AND_PHASES.json",
@@ -830,10 +836,16 @@
       "bytes": 521
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT384_FINAL_HYBRID_TARGET_MATH_AND_COST_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT384_FINAL_HYBRID_TARGET_MATH_AND_COST_RESULT.json",
+      "sha256": "fb5bd28f00a8ac98e132f518e43fa1c7d99d75b95dad34a11c41f6204a21c090",
+      "bytes": 17552
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
-      "sha256": "5f71d21238a36624303c4b0696e7b10a4927a8f51f3c1ccae7ccce7a1308fd79",
-      "bytes": 55385
+      "sha256": "2d9e0ecc1cf1d55ea6c68e477640f495d737bf85531d5ee5856e32dea23f7a1b",
+      "bytes": 57142
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
@@ -1688,6 +1700,12 @@
       "bytes": 3367
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT385_real_M120_chain_qualifier_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT385_real_M120_chain_qualifier_HOST.py",
+      "sha256": "526991002fc80e874dcc9cab48f0f09e4579b9dc70ad109ae2872661b5a9f159",
+      "bytes": 3766
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_deferred259_metadata_probe_HOST.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_deferred259_metadata_probe_HOST.py",
       "sha256": "21900e7a47456a6fb7670fed339ea527c751fbe1661e426dcf3ab23498e845b7",
@@ -1912,8 +1930,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "81f2494f5c3aa612259142dd5222331eefc8f480b7e7870ca9083a87c62356b9",
-      "bytes": 26448
+      "sha256": "612a2ee12619549631f694f908e228a0569aaf72ff45767afea98a623638d9e0",
+      "bytes": 26740
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/startup_ROOT331_runtime_import_HOST.sh",
@@ -5660,6 +5678,12 @@
       "bytes": 7292
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-GEMM120-best376-full-v383/HOST383_CONSTRUCTION_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-GEMM120-best376-full-v383/HOST383_CONSTRUCTION_RESULT.json",
+      "sha256": "eb8897db598325723242765252d4c3d7bacc49212d94e82b064c55f38eefc08f",
+      "bytes": 406
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-GEMM120-best376-full-v383/HOST383_INITIAL_PROJECTION_RESULT.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-GEMM120-best376-full-v383/HOST383_INITIAL_PROJECTION_RESULT.json",
       "sha256": "4fd408bf7f4f71f445f6dc48ed2158f99e41fad7c420d58419af9fce64038ccf",
@@ -5694,6 +5718,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-GEMM120-best376-full-v383/check383_HOST.py",
       "sha256": "f2f521f078d18808c80bb0fc46c3e9f80d8e3a72f3c9ed430ed5543919e36a9c",
       "bytes": 3044
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-GEMM120-best376-full-v383/check_construction383_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-GEMM120-best376-full-v383/check_construction383_HOST.py",
+      "sha256": "19e675f5ad9bbf9985685a12baff0980f03dc0500630c878747bba98735e4c49",
+      "bytes": 2299
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-GEMM120-best376-full-v383/check_scope383_HOST.py",
@@ -16592,6 +16622,72 @@
       "bytes": 3619
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/FREEZE385.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/FREEZE385.json",
+      "sha256": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+      "bytes": 3008
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/HOST385_CONSTRUCTION_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/HOST385_CONSTRUCTION_RESULT.json",
+      "sha256": "8671e080664087729ab3dd14395e9c78889488f209708e0460ff167d70f2b496",
+      "bytes": 517
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/SOURCE385_RECEIPT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/SOURCE385_RECEIPT.json",
+      "sha256": "2ca2f96e6b1a8e785e242a870db9b19809415dd347524e8f5cb80cf60a5232ee",
+      "bytes": 382
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/audit385.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/audit385.py",
+      "sha256": "d2b5e2f38ac23254a27f1a1a168a7228f0a45309b9fb8a029dbf40e72b6d775d",
+      "bytes": 3760
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/check385.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/check385.py",
+      "sha256": "cf75241d012ad3a58d001733c49f8d1c545fb83ad4fa1c4e7047a7dfd6ad0034",
+      "bytes": 1628
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/check385_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/check385_HOST.py",
+      "sha256": "d28743de53d650a4a1fc9bd5018430aa402b36c77148b7a187c05b3f9389246a",
+      "bytes": 2833
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/guard385.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/guard385.py",
+      "sha256": "fce4123f25b8b298c20374cd2f7ab2df24a6569f08c2a0c6b720e715e5e7cd93",
+      "bytes": 7199
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/original385.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/original385.py",
+      "sha256": "1a0a2376a9bad060e7ed36200c23aef2ffaa475b7a5d808f820ce80753dc7510",
+      "bytes": 4180
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/probe385.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/probe385.py",
+      "sha256": "9ead1fe16d01c1c6e7595db8de8c6f0ba60ba45951b2caf69d98bf89c5de3300",
+      "bytes": 3249
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/runtime385.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/runtime385.py",
+      "sha256": "b3d9030965ae43f0e8e9e10b614fd4dc2ebe782b03b3ef0e99075528e27ebd65",
+      "bytes": 2297
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/startup385.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/startup385.sh",
+      "sha256": "6721c692dc1b8798df30f323b3d4baf98d1ade7cedfefcb18e8c67ded2b3d983",
+      "bytes": 7789
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-original-AR-partition-attention-origin-v239/check239.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-real-original-AR-partition-attention-origin-v239/check239.py",
       "sha256": "7bd6ae02c708ca913afe521a0fad3fed76397d09c486ff0fe6550d11a4fc349c",
@@ -19384,8 +19480,20 @@
     {
       "source": "/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
-      "sha256": "b1fa5dccd31c8645a2a37837df7c66c783c330c9756ee6bee5de81b2e4011da1",
-      "bytes": 340598
+      "sha256": "643dfd478c218fc433581d26153cf86805b91b8181deacc30b9fe98fe7e4c40a",
+      "bytes": 341777
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/examples/check_specslo_mc2_deferred_chain.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/examples/check_specslo_mc2_deferred_chain.py",
+      "sha256": "e0d59f45a293dc1348b448ec5a8d7b848229f610cf2cf3c5bcae0c7975f9afb9",
+      "bytes": 17946
+    },
+    {
+      "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/examples/specslo_mc2_deferred_chain_evidence.py",
+      "saved": "research/specslo-tree/snapshot/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/examples/specslo_mc2_deferred_chain_evidence.py",
+      "sha256": "5f8e64ff42ffad197242198a6cc533f6f0b781f2cdbfb09709d1acbee1b464f3",
+      "bytes": 12282
     },
     {
       "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/ops/triton/batch_memcpy.py",
@@ -21604,6 +21712,10 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-hybrid-native-method-dedent-v384/FREEZE384.json",
       "sha256": "a647343b81fac81459d6829644a59ab12425955647b11a78c15a4978871a1e5b"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/FREEZE385.json",
+      "sha256": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f"
     }
   ],
   "omitted_evidence": {
@@ -28025,6 +28137,10 @@
     },
     "/root/SpecSLO/budget-calibration-20261015/tree-hybrid-native-method-dedent-v384/HOST384_CONSTRUCTION_RESULT.json": {
       "sha256": "c773d1d7c436c5d40b914af674b85d796729c332be3e341296f5e815abfa715e",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/HOST385_CONSTRUCTION_RESULT.json": {
+      "sha256": "8671e080664087729ab3dd14395e9c78889488f209708e0460ff167d70f2b496",
       "reason": "Historical evidence or fixture; not source"
     }
   },

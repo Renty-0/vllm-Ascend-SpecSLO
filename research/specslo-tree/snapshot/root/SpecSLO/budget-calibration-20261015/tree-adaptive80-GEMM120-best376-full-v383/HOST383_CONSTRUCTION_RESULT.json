@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST383_ACTUAL_WORKER_TRACE_AUDITOR_CONSTRUCTION",
+  "NPU_used": false,
+  "source_gate_mocked_for_unfrozen_construction_only": true,
+  "actual_frozen_gate_required_before_launch": true,
+  "original_worker_main_and_trace_bodies_retained": true,
+  "actual_audit_imports_checked": true,
+  "model_environment_unchanged": true,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

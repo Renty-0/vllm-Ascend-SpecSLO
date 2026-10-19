@@ -1,0 +1,38 @@
+{
+  "schema": "ROOT385.additive-real120-deferred-chain-original-qualifier.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/original385.py": "1a0a2376a9bad060e7ed36200c23aef2ffaa475b7a5d808f820ce80753dc7510",
+    "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/check385_HOST.py": "d28743de53d650a4a1fc9bd5018430aa402b36c77148b7a187c05b3f9389246a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/guard385.py": "fce4123f25b8b298c20374cd2f7ab2df24a6569f08c2a0c6b720e715e5e7cd93",
+    "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/HOST385_CONSTRUCTION_RESULT.json": "8671e080664087729ab3dd14395e9c78889488f209708e0460ff167d70f2b496",
+    "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/runtime385.py": "b3d9030965ae43f0e8e9e10b614fd4dc2ebe782b03b3ef0e99075528e27ebd65",
+    "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/check385.py": "cf75241d012ad3a58d001733c49f8d1c545fb83ad4fa1c4e7047a7dfd6ad0034",
+    "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/startup385.sh": "6721c692dc1b8798df30f323b3d4baf98d1ade7cedfefcb18e8c67ded2b3d983",
+    "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/probe385.py": "9ead1fe16d01c1c6e7595db8de8c6f0ba60ba45951b2caf69d98bf89c5de3300",
+    "/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385/audit385.py": "d2b5e2f38ac23254a27f1a1a168a7228f0a45309b9fb8a029dbf40e72b6d775d",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT385_real_M120_chain_qualifier_HOST.py": "526991002fc80e874dcc9cab48f0f09e4579b9dc70ad109ae2872661b5a9f159",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/examples/check_specslo_mc2_deferred_chain.py": "e0d59f45a293dc1348b448ec5a8d7b848229f610cf2cf3c5bcae0c7975f9afb9",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/examples/specslo_mc2_deferred_chain_evidence.py": "5f8e64ff42ffad197242198a6cc533f6f0b781f2cdbfb09709d1acbee1b464f3"
+  },
+  "parent_freeze_sha256": "a647343b81fac81459d6829644a59ab12425955647b11a78c15a4978871a1e5b",
+  "parent_archive_sha256": "2309d02384a0f76202cfc3c9de26e8d041990fc224d03e5a192cb53e2126767f",
+  "actual_operator_cases_each_target": 1,
+  "independent_prefills_each_target": 72,
+  "current_real_payload_case": "N24-all4-anchor0",
+  "physical_families": [
+    120
+  ],
+  "Q": 5,
+  "S": [
+    24
+  ],
+  "epilogues_per_chain": 128,
+  "original_measurement_and_numerical_functions_unchanged": true,
+  "new_profile_installed": false,
+  "preserves_original_mc2_function": true,
+  "original_untimed_numerical_stage_fences_retained": true,
+  "diagnostic_does_not_grant_neural_or_performance_qualification": true,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

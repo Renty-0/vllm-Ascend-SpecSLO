@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST385_TP_GROUP_FORWARDING_AND_ACTUAL_LIFECYCLE",
+  "NPU_used": false,
+  "original_example": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/examples/check_specslo_mc2_deferred_chain.py",
+  "original_example_sha256": "e0d59f45a293dc1348b448ec5a8d7b848229f610cf2cf3c5bcae0c7975f9afb9",
+  "borrowed_group_not_destroyed": true,
+  "original_measurement_functions_used": true,
+  "model_qualified": false,
+  "new_profile_installed": false,
+  "Raw": null,
+  "Goodput": null
+}
