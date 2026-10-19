@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST_frozen_protected_runtime_and_archive",
+  "UTC": "2026-10-19T15:58:21.966252+00:00",
+  "source_members": 3725,
+  "worker_projection_changes": 7,
+  "mode": "protect_tight_normal",
+  "own_freeze": "a36db776e7ad93c6e3215a147abef1a24558c40114fc7505939114a6c78c35f5",
+  "own_archive": "37041e1acdb44e2ef0cc4bb863aad958263fd51098cd74bd337748dab3065b48",
+  "NPU_used": false,
+  "framework_imported": false,
+  "model_processes_launched": 0
+}

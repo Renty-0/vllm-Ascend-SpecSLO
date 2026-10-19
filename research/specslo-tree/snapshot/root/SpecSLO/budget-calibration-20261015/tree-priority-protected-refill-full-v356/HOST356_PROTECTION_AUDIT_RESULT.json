@@ -1,0 +1,27 @@
+{
+  "status": "PASS_HOST_actual_protected_audit_rejects_retained_bad_and_closed_traces",
+  "negative_controls": [
+    {
+      "source": {
+        "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M120-B8-refill4-singleton-aware-root-v348-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+        "sha256": "6f3bc759d148d0e4b78020aa7bd1c7b5523e28464f9c70a9336644ebccc01614"
+      },
+      "rejected": true,
+      "reason": "prefill interrupted a protected tight/normal owner"
+    },
+    {
+      "source": {
+        "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/static-M120-root-v257-LIVE-target-SLO-first-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+        "sha256": "bbca2ce66af0418170ef4a4a04532bdc358c0ab887b5878d6cda7ecaece445e1"
+      },
+      "rejected": true,
+      "reason": "protected refill must actually run with incumbents"
+    }
+  ],
+  "synthetic_loose_only_memberships": 1160,
+  "synthetic_positive_fixture_not_full_machine_proof": true,
+  "original_class_labels_and_retained_raw_files_unchanged": true,
+  "NPU_used": false,
+  "full356_run_complete": false,
+  "Goodput": null
+}

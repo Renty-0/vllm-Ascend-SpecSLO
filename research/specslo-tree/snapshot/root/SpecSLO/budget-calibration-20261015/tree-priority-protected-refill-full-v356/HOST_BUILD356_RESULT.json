@@ -1,0 +1,11 @@
+{
+  "status": "HOST_additive_protected_refill_sources_prepared",
+  "mode": "protect_tight_normal",
+  "template355_source_bytes_retained": true,
+  "all_original64hex_source_pins_preserved": true,
+  "original348_model_and_actual_budget_code_unchanged": true,
+  "fresh_all_original_numerical_and_ownAR_gates_required": true,
+  "NPU_used": false,
+  "frozen": false,
+  "Goodput": null
+}

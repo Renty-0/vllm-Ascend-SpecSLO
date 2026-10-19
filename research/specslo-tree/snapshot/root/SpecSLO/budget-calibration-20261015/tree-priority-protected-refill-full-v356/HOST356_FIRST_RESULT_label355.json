@@ -1,0 +1,35 @@
+{
+  "status": "PASS_HOST_additive_protected_refill_delegates_and_source_inverses",
+  "actual_worker_projection_changes": 7,
+  "whole_worker_and_audit_source_inverse": true,
+  "frozen348_modules_and_function_globals_not_modified": true,
+  "actual_trace_code_objects_identical_with_private_globals": true,
+  "fresh_numerical_qualification_delegates_identical": true,
+  "model_kernel_and_VLLM_environment_lines_identical": true,
+  "separate355_and_original348_source_pins": true,
+  "actual_original218_launch_pin_preserved": true,
+  "actual_live_source_sha256": "c4a725e182f47399d68279d480c5db9449ece9174557f63d82a9184e76f598fe",
+  "fixtures": [
+    {
+      "incumbent_class": "tight",
+      "refill_blocked": true,
+      "no_prefill_clock_or_root_publication": true
+    },
+    {
+      "incumbent_class": "normal",
+      "refill_blocked": true,
+      "no_prefill_clock_or_root_publication": true
+    },
+    {
+      "incumbent_class": "loose",
+      "refill_blocked": false,
+      "original_root_publication_and50ms_charge": true
+    }
+  ],
+  "NPU_used": false,
+  "model_constructed": false,
+  "frozen": false,
+  "whole463_AR_qualified": false,
+  "Goodput": null,
+  "goal_achieved": false
+}
