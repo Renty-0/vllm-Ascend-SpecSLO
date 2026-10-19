@@ -1,0 +1,86 @@
+{
+  "status": "PASS_retained_complete_math_checkpoints_ONLY",
+  "original_receipt_status": "failed_deadline_preserved",
+  "original_receipt_sha256": "3d268e4a063be8052302c65a3d1582895742b1e643f8b942a3c8ead87880fd85",
+  "cases_per_target": 498,
+  "real_target_roles": 3,
+  "rows": [
+    {
+      "bank": "mixed",
+      "rank": 1,
+      "cases": 408,
+      "independent_prefills": 72,
+      "complete_checkpoint_sha256": "5a39fb4273e16220f35de3c1885872b8320004e2e4b9a628aff2dec97124fe87",
+      "all_original_and_strict_node_matchers": true,
+      "all_prefixes_unchanged_at_end_of_math": true,
+      "actual_dispatch_reconstructed": true
+    },
+    {
+      "bank": "mixed",
+      "rank": 2,
+      "cases": 408,
+      "independent_prefills": 72,
+      "complete_checkpoint_sha256": "0d0833606a19110f4ee0d3146f06f14bd6368ed3d58fe2df967425db050b8cd0",
+      "all_original_and_strict_node_matchers": true,
+      "all_prefixes_unchanged_at_end_of_math": true,
+      "actual_dispatch_reconstructed": true
+    },
+    {
+      "bank": "mixed",
+      "rank": 3,
+      "cases": 408,
+      "independent_prefills": 72,
+      "complete_checkpoint_sha256": "19940c6bac52028cf4d748ff3c5a8e9cc73f25563c6e041ac5b7e9ac8dcd9bde",
+      "all_original_and_strict_node_matchers": true,
+      "all_prefixes_unchanged_at_end_of_math": true,
+      "actual_dispatch_reconstructed": true
+    },
+    {
+      "bank": "mid-residue-preserved",
+      "rank": 1,
+      "cases": 90,
+      "independent_prefills": 72,
+      "complete_checkpoint_sha256": "5776b1b013ad174a44c39163305fee35671c6ff031d8454cd70c3287448eb5d9",
+      "all_original_and_strict_node_matchers": true,
+      "all_prefixes_unchanged_at_end_of_math": true,
+      "actual_dispatch_reconstructed": true
+    },
+    {
+      "bank": "mid-residue-preserved",
+      "rank": 2,
+      "cases": 90,
+      "independent_prefills": 72,
+      "complete_checkpoint_sha256": "1d09d9a41a8983212845f2263af07dfff5ed480ec625b4c82dddbee9090342ad",
+      "all_original_and_strict_node_matchers": true,
+      "all_prefixes_unchanged_at_end_of_math": true,
+      "actual_dispatch_reconstructed": true
+    },
+    {
+      "bank": "mid-residue-preserved",
+      "rank": 3,
+      "cases": 90,
+      "independent_prefills": 72,
+      "complete_checkpoint_sha256": "ee4e0bad1bfc2f200ca2da14be18ec0abc57f8e11710b67eeb6290cdb1f80cf6",
+      "all_original_and_strict_node_matchers": true,
+      "all_prefixes_unchanged_at_end_of_math": true,
+      "actual_dispatch_reconstructed": true
+    }
+  ],
+  "short_bank_case_files_per_target": [
+    71,
+    71,
+    71
+  ],
+  "short_bank_not_qualified": true,
+  "complete_current_cost_report_available": false,
+  "no_after_cost_prefix_or_normal_exit_qualification": true,
+  "model_qualification_inherited": false,
+  "full594_scope_qualified": false,
+  "real_draft_generation": false,
+  "empirical_g": false,
+  "whole463_qualified": false,
+  "Goodput": null,
+  "adopted": false,
+  "original_receipt_unchanged": true,
+  "NPU_used_by_this_reader": false
+}

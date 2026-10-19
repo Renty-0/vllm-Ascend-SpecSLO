@@ -234,6 +234,9 @@ def main():
         'ROOT342_INDEPENDENT_FULL_BUCKET_MODEL_COST_AUDIT.json',
         'ROOT343_NEGATIVE_CONTROL_OBSERVER_FAILURE.json',
         'ROOT346_ARCHIVAL_FORMAT_CHECK_EXCEPTION.json',
+        'ROOT344_PREDECLARED_DEADLINE_PARTIAL_MATH.json',
+        'audit_ROOT344_partial_retained_math_HOST.py',
+        'ROOT344_INDEPENDENT_PARTIAL_RETAINED_MATH_AUDIT.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

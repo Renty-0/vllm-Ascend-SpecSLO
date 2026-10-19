@@ -1,0 +1,47 @@
+{
+  "UTC": "2026-10-19T13:00:22.834224+00:00",
+  "status": "failed_predeclared1800second_deadline",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M120-uniform-KV-bucket-root-v344-594-branch-math-current-cost-v1.json",
+  "receipt_sha256": "3d268e4a063be8052302c65a3d1582895742b1e643f8b942a3c8ead87880fd85",
+  "actual_elapsed": 1803.6053013568744,
+  "owned_remaining": [],
+  "all_four_idle": true,
+  "sources_unchanged": true,
+  "post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "retained_case_files": {
+    "mixed": [
+      408,
+      408,
+      408
+    ],
+    "mid-residue-preserved": [
+      90,
+      90,
+      90
+    ],
+    "short-residue-preserved": [
+      71,
+      71,
+      71
+    ]
+  },
+  "math_checkpoints": {
+    "mixed": 4,
+    "mid-residue-preserved": 4,
+    "short-residue-preserved": 0
+  },
+  "local_math_failure_files": [],
+  "no_complete_three_bank_cost_report": true,
+  "no_current_bucket_branch_qualification": true,
+  "no_Goodput_or_g": true,
+  "adopted": false,
+  "next": "Run346 separate FULL2560 occupancy experiment. No qualification inherited from this incomplete component."
+}
