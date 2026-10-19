@@ -1,0 +1,13 @@
+{
+  "freeze_sha256": "a1dbe700b6fa857631be31878df58fd7b129de38491ae027a8823799ce81bf3f",
+  "archive_sha256": "3e96cc84744c376ef5855bc57cda8627323c4ba841bc3843420c906d0618c20a",
+  "own_archive_members": 17,
+  "own_archive_bytes": 17199,
+  "parent344_source_only_pins": {
+    "freeze_sha256": "f4aa9b02429020c9a1bdbaaa4d168253588b681897dce1796713aac72196b6c4",
+    "archive_sha256": "2db775f30864fa4b1372ab066e48dea7f28feeba15db9e52a045b9ed0f130807"
+  },
+  "NPU_used": false,
+  "model_or_performance_qualification_inherited": false,
+  "Goodput": null
+}

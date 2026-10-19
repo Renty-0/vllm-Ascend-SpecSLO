@@ -1,0 +1,10 @@
+{
+  "status": "PASS_HOST_original344_full_worker_and_ENV_source_identity",
+  "entire_worker_inverse": true,
+  "original_signatures_and_594_cases_preserved": true,
+  "all_VLLM_ENV_lines_identical": true,
+  "actual_fixture_directory": "/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311",
+  "new_numeric_result_inherited": false,
+  "NPU_used": false,
+  "Goodput": null
+}

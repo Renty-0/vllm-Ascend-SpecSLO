@@ -51,6 +51,7 @@ SOURCES = (
     ('tree-coalesced-live-refill-M120-singleton-capture-full-v348', 348),
     ('tree-admission-closed-control-full-v355', 355),
     ('tree-priority-protected-refill-full-v356', 356),
+    ('tree-Q5-bucket-completion-and-paired-mode-cost-v361', 361),
 )
 
 
@@ -137,6 +138,7 @@ def main():
         'tree-Q4S32-branch-projection-host-v358',
         'tree-Q4S32-prefix-alias-split-host-v359',
         'tree-Q4S32-depth3-target-adapter-host-v360',
+        'tree-Q5-bucket-completion-and-paired-mode-cost-v361',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -311,6 +313,13 @@ def main():
         'calibrate_ROOT357_same_prefix_short_tree_HOST.py',
         'ROOT357_CONDITIONAL_DEPTH3_GAIN_SCREEN.json',
         'ROOT355_PRELIMINARY_FULL_COMMON_METRICS.json',
+        'ROOT355_FINAL_FULL_RESULT.json',
+        'ROOT355_TERMINAL_INDEPENDENT_FULL_AUDIT.json',
+        'monitor_ROOT356_readonly_HOST.py',
+        'build_ROOT361_bucket_completion_guard_HOST.py',
+        'freeze_ROOT361_bucket_completion_HOST.py',
+        'check_ROOT361_actual_frozen_construction_HOST.py',
+        'HOST_ROOT361_ACTUAL_FROZEN_CONSTRUCTION.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

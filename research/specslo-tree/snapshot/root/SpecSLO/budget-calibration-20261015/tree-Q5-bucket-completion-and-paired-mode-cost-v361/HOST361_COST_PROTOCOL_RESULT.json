@@ -1,0 +1,25 @@
+{
+  "status": "PASS_HOST_paired_mode_cost_protocol_and_original344_probe_inverse",
+  "arms": 5,
+  "rounds": 20,
+  "warm_calls": 10,
+  "timed_calls": 200,
+  "each_arm_full_first": 10,
+  "each_arm_bucket_first": 10,
+  "rejected_controls": [
+    "heads",
+    "fallback",
+    "capture_after_warm"
+  ],
+  "mode_restored_after_success_and_failures": true,
+  "draft_role_never_executes_target": true,
+  "original594_math_body_preserved": true,
+  "fake_Torch_and_model_only": true,
+  "actual_Torch_imported": false,
+  "NPU_used": false,
+  "device_math_qualified": false,
+  "full594_qualified": false,
+  "performance_measured": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,18 @@
+{
+  "status": "PASS_HOST_mode_auditor_positive_and_six_corruption_controls",
+  "synthetic_calls": 210,
+  "synthetic_summaries": 5,
+  "rejected_controls": [
+    "wrong_full_extent",
+    "wrong_mode",
+    "wrong_copy_key",
+    "missing_call",
+    "invalid_elapsed",
+    "unprotected_prefix"
+  ],
+  "real_model_or_timing_evidence": false,
+  "fake_Torch_only": true,
+  "NPU_used": false,
+  "full594_qualified": false,
+  "Goodput": null
+}

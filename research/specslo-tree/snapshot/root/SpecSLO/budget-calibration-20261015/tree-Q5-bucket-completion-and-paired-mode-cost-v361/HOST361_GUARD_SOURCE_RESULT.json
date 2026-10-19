@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST_guard361_source_limits_parent_pins_and_owned_lifecycle",
+  "seconds": 3600,
+  "tag_private_limit_MiB": 192,
+  "aggregate_private_limit_MiB": 3584,
+  "original218_literal_pin_identical": true,
+  "original344_parent_verified": true,
+  "original_owned_guard_factory_and_cleanup_unchanged": true,
+  "actual_prepared_execution_pending_freeze": true,
+  "NPU_used": false,
+  "Goodput": null
+}
