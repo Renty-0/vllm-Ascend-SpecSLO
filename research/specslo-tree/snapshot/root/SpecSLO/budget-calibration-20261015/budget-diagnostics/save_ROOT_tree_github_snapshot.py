@@ -59,6 +59,7 @@ SOURCES = (
     ('tree-primary4-top2-chain-compiler-cache-v368', 368),
     ('tree-primary4-tail3-top2-chain-device-v370', 370),
     ('tree-primary4-tail3-eager-allN-device-v371', 371),
+    ('tree-primary4-tail3-best257-full-v372', 372),
 )
 
 
@@ -156,6 +157,7 @@ def main():
         'tree-primary4-tail3-top2-chain-host-v369',
         'tree-primary4-tail3-top2-chain-device-v370',
         'tree-primary4-tail3-eager-allN-device-v371',
+        'tree-primary4-tail3-best257-full-v372',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -344,6 +346,9 @@ def main():
         'ROOT365_367_LAUNCH_FAILURES_RETAINED.json',
         'ROOT368_INDEPENDENT_REAL_DRAFT_COMPONENT_RESULT.json',
         'ROOT370_INDEPENDENT_REAL_DRAFT_TAIL3_RESULT.json',
+        'ROOT371_INDEPENDENT_REAL_DRAFT_EAGER_RESULT.json',
+        'ROOT372_FULL_TAIL3_PLAN_20261019.json',
+        'monitor_ROOT372_readonly_HOST.py',
         'ROOT355_CONCURRENT_HOST_VALIDATION_TIMING_CONTEXT.json',
     ):
         path = BASE / 'budget-diagnostics' / filename

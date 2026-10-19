@@ -31,9 +31,9 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "f819a57",
+  "github_checkpoint": "3d65a9c",
   "goal_achieved": false,
-  "next": "Wait371 math/cost + complete source/cleanup/idle audit. Then build full372 on best257 dynamicB1..5 (genuine branch B5) preserving227 target+alloriginalcomponents, fresh same-instance all-N/eager tail3 draft tests before original warm/twozero/seal, full463 clocks+all3ownAR. Never inherit standalone0.6B component flags.",
+  "next": "Monitor372 originalstartup/components +227target +fresh306draft qualification; then original warm/twozero/seal/full463/all3ownAR. No formal timing HOST load. Goal644.77 and final0/9 remain.",
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
   "user_Raw_clarification": {
     "UTC": "2026-10-19T02:55:43.056404+00:00",
@@ -189,7 +189,7 @@
   "tree329_all6_invalid_limit_cases_rejected": true,
   "tree329_model_qualification": true,
   "tree329_tag": "M160-S32-C128-root-v329-B1to8-532-math-cost-v1",
-  "updated_UTC": "2026-10-19T18:37:40.320703+00:00",
+  "updated_UTC": "2026-10-19T19:03:01.742037+00:00",
   "tree329_guard_pid": 292336,
   "tree329_all_four_capacity_before_model_passed": true,
   "tree330_source_only": true,
@@ -690,5 +690,67 @@
   "tree371_planned_math306": true,
   "tree371_allN1to32_and_eager_promotion_checked": false,
   "tree371_planned_cost320": true,
-  "tree371_model_qualified": false
+  "tree371_model_qualified": false,
+  "tree371_complete": true,
+  "tree371_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT371_INDEPENDENT_REAL_DRAFT_EAGER_RESULT.json",
+  "tree371_all306_exact": true,
+  "tree371_all64_private_graphs_naturally_qualified": true,
+  "tree371_medians": {
+    "N4_mixed_eager": {
+      "original_ms": 77.52177305519581,
+      "tail3_ms": 50.51433481276035,
+      "reduction": 0.34838519783604605
+    },
+    "N4_all_eager": {
+      "original_ms": 78.56816169805825,
+      "tail3_ms": 53.3038314897567,
+      "reduction": 0.32155939075415496
+    },
+    "N12_mixed_eager": {
+      "original_ms": 103.16681396216154,
+      "tail3_ms": 70.21240284666419,
+      "reduction": 0.3194284077395666
+    },
+    "N12_all_eager": {
+      "original_ms": 110.22884701378644,
+      "tail3_ms": 77.02736789360642,
+      "reduction": 0.30120499324489414
+    },
+    "N24_mixed_eager": {
+      "original_ms": 149.6185336727649,
+      "tail3_ms": 102.89627243764699,
+      "reduction": 0.31227589315442394
+    },
+    "N24_all_eager": {
+      "original_ms": 166.1734830122441,
+      "tail3_ms": 116.7197145987302,
+      "reduction": 0.2976032488280336
+    },
+    "N32_mixed_eager": {
+      "original_ms": 235.2617511060089,
+      "tail3_ms": 161.91169945523143,
+      "reduction": 0.3117806073700691
+    },
+    "N32_all_eager": {
+      "original_ms": 252.19493778422475,
+      "tail3_ms": 177.85306717269123,
+      "reduction": 0.29477939273761167
+    }
+  },
+  "tree372_source": "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-best257-full-v372",
+  "tree372_only_qualifier_source_created": false,
+  "tree372_qualification_projection_HOST_pass": true,
+  "tree372_plan": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT372_FULL_TAIL3_PLAN_20261019.json",
+  "tree372_all_full_sources_created": true,
+  "tree372_frozen": true,
+  "tree372_freeze_sha256": "7c01a5e495efaac0ed9f94ab3a4f11d746e75df8e4f1b0017343fdd374090eb3",
+  "tree372_archive_sha256": "6c8cd84f710294e571a4e9ea9f969214c83895aaf24eb7e2697aac40016cd5dc",
+  "tree372_source_members": 3495,
+  "tree372_guard_session": 29532,
+  "tree372_tag": "static-M120-B5-tail3-root-v372-full463-ownAR-v1",
+  "tree372_NPU_started": true,
+  "tree372_status": "running_model_initialization",
+  "tree372_monitor": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/monitor_ROOT372_readonly_HOST.py",
+  "tree372_new_path_logical_N_limit32": true,
+  "tree372_larger_batches_use_original": true
 }

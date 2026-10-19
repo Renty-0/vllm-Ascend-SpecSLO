@@ -1,0 +1,20 @@
+{
+  "status": "PASS_HOST_actual_scope_callback_identity_and_bounded_adoption",
+  "larger_than32_uses_original": true,
+  "other_instances_use_original": true,
+  "original_scope_delegate_exercised": true,
+  "rejected_mutations": [
+    "original_scope",
+    "draft_callback",
+    "resident_entry_identity",
+    "natural_qualification_required",
+    "disabled_entry",
+    "missing_neural_cases"
+  ],
+  "purely_fictional_scope_objects": true,
+  "Native_graph_or_model_created": false,
+  "NPU_used": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

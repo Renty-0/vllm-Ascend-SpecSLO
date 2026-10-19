@@ -1,0 +1,53 @@
+{
+  "UTC": "2026-10-19T18:42:44.635519+00:00",
+  "status": "design_only_no_full372_source_or_NPU_launch_yet",
+  "base257": {
+    "freeze": "b352ac6bb9f3ae182d33d2f11dc278f7e49c2b8dff9d9d514c0b32d7a14a01f2",
+    "archive": "f268e73e73b334f29dba4da8413a9a9efc6f4bbcabdbd975554c801f6e34e8b0",
+    "old_tag": "static-M120-root-v257-LIVE-target-SLO-first-full463-ownAR-v1",
+    "GP": 554.7604454409803,
+    "Raw": 686.7756316555451,
+    "budget_counts": {
+      "1": 153,
+      "2": 187,
+      "3": 71,
+      "4": 37764,
+      "5": 347
+    },
+    "requests24": true,
+    "candidates96": true,
+    "staticM120": true,
+    "Q5S24": true,
+    "FULL2560": true,
+    "old_startup_and_all_components_and227target_required": true,
+    "pool_blocks544": true,
+    "storage_rows527": true
+  },
+  "draft_source": "tree-primary4-tail3-top2-chain-host-v369/forward369.py",
+  "normal370_passed99": true,
+  "eager371_pending306": true,
+  "qualification_plan": [
+    "Call original extension257.qualify_component unchanged, with original component identity.",
+    "On actual draft Engine rank0 only, allocate bank326 three independent32-owner prefix banks plus64 original scratch leases. Existing257 pool544/storage527 verified from old full raw artifacts.",
+    "Build forward369 projected function and private NativeGraph tail3 state on actual runner, but do not yet replace class forward.",
+    "Extract unchanged torch.inference_mode body from frozen371 main into private372 qualifier on engine/model/original/proposed/state and source-module globals; all306 original math cases/promotion map/probabilities/56KV/ABA remain.",
+    "Fresh qualification only: wrap original371 cost loop in if measure_costs=False; summary conditional={} when false; preserve inverse AST. These are not timed or cost-profile qualification.",
+    "Require all64 NEW private ROOT369 draft entries naturally runtime_validated with real physical rows, not disabled; preserve original warm/twozero/seal checks for ALL pre-existing entries. Do not assign any Native flags.",
+    "After all306 exact and prefix protection/release, install owner-checked class forward wrapper preserving original on other instances/roles. New extended Scope delegates original scope257.issue/require and checks private callback/object identities + own fresh result.",
+    "Project original runtime257 worker to extension372 and scope372; preserve227 target cases plus original startup and entire original target backend/arrivals/SLO/Poisson/clocks/cohorts/root publication/MC2/NZ/replay/bonus policy.",
+    "Original warm-to-fixedpoint, two complete zero rounds and sealing after all new logicalN1..32 normal/full keys prepared on this SAME model. No inherited standalone flags.",
+    "Full463 then original independent ownAR all3targets463 exact; original guard257 lifecycle+pre/post locks, additive sources/pins, source immutability/owned cleanup/four idle.",
+    "Add read-only own snapshot counts: actual per-generation tail submissions2+frontier, unchanged four model steps+frontier and all query charges. No per-token debug dumps.",
+    "Only eligible full correct GP>501.6356 and>644.7664 moves to predeclared3blocks*3methods=9 paired final comparisons."
+  ],
+  "implementation_notes": [
+    "Native draft_tree_forward is torch.inference_mode decorated: inspect.unwrap for exact source filename/globals (fixed369).",
+    "Native _tree_eager_scratch_plan is staticmethod(plan,parent); actual NativeEngine already exposes correctly. SimpleNamespace factory must assign function without MethodType.",
+    "TORCH_DEVICE_BACKEND_AUTOLOAD=0 (not PYTORCH_) for HOST CPU tests.",
+    "Use original runtime Triton init and disable optional host PCH for new isolated caches to avoid RLIMIT_FSIZE64MiB compiler failure. No NPU kernel change.",
+    "All new actual_audit functions must return exactly tuple(result,status,arithmetic); actual370 HOST test covers malformed dict rejection.",
+    "Shared private compiler cache365 is allowed; no model/dataset downloads; all experiment data private.",
+    "Keep user updated every60seconds, short analysis, no final until goal. No subagents."
+  ],
+  "goal_achieved": false
+}

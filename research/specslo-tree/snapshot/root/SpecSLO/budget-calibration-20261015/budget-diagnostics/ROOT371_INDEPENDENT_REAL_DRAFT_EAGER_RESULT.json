@@ -1,0 +1,104 @@
+{
+  "status": "complete_independently_audited_real_draft_eager_allN_component",
+  "UTC": "2026-10-19T18:46:55.345162+00:00",
+  "tag": "primary4-tail3-allN-mixed-eager-root-v371-draft-only-v1",
+  "receipt_sha256": "9617f7cd0b72d77840e20af9262f736a4128531a809d0a2a8453abcbe79e14d3",
+  "audit": {
+    "status": "completed_real_draft_allN_mixed_eager_tail3_component",
+    "math_rows": 306,
+    "timing_calls": 320,
+    "median_seconds": {
+      "N4_mixed_eager": {
+        "generic": 0.07752177305519581,
+        "first_plus_tail3": 0.05051433481276035
+      },
+      "N4_all_eager": {
+        "generic": 0.07856816169805825,
+        "first_plus_tail3": 0.0533038314897567
+      },
+      "N12_mixed_eager": {
+        "generic": 0.10316681396216154,
+        "first_plus_tail3": 0.07021240284666419
+      },
+      "N12_all_eager": {
+        "generic": 0.11022884701378644,
+        "first_plus_tail3": 0.07702736789360642
+      },
+      "N24_mixed_eager": {
+        "generic": 0.1496185336727649,
+        "first_plus_tail3": 0.10289627243764699
+      },
+      "N24_all_eager": {
+        "generic": 0.1661734830122441,
+        "first_plus_tail3": 0.1167197145987302
+      },
+      "N32_mixed_eager": {
+        "generic": 0.2352617511060089,
+        "first_plus_tail3": 0.16191169945523143
+      },
+      "N32_all_eager": {
+        "generic": 0.25219493778422475,
+        "first_plus_tail3": 0.17785306717269123
+      }
+    },
+    "result_sha256": "c3fbbd3e723d3f1e778c9089d7c2cdf767914cae194d87d6533dc86fca9c6e32",
+    "full463_qualified": false,
+    "Raw": null,
+    "Goodput": null,
+    "adopted": false
+  },
+  "ratios": {
+    "N4_mixed_eager": {
+      "original_ms": 77.52177305519581,
+      "tail3_ms": 50.51433481276035,
+      "reduction": 0.34838519783604605
+    },
+    "N4_all_eager": {
+      "original_ms": 78.56816169805825,
+      "tail3_ms": 53.3038314897567,
+      "reduction": 0.32155939075415496
+    },
+    "N12_mixed_eager": {
+      "original_ms": 103.16681396216154,
+      "tail3_ms": 70.21240284666419,
+      "reduction": 0.3194284077395666
+    },
+    "N12_all_eager": {
+      "original_ms": 110.22884701378644,
+      "tail3_ms": 77.02736789360642,
+      "reduction": 0.30120499324489414
+    },
+    "N24_mixed_eager": {
+      "original_ms": 149.6185336727649,
+      "tail3_ms": 102.89627243764699,
+      "reduction": 0.31227589315442394
+    },
+    "N24_all_eager": {
+      "original_ms": 166.1734830122441,
+      "tail3_ms": 116.7197145987302,
+      "reduction": 0.2976032488280336
+    },
+    "N32_mixed_eager": {
+      "original_ms": 235.2617511060089,
+      "tail3_ms": 161.91169945523143,
+      "reduction": 0.3117806073700691
+    },
+    "N32_all_eager": {
+      "original_ms": 252.19493778422475,
+      "tail3_ms": 177.85306717269123,
+      "reduction": 0.29477939273761167
+    }
+  },
+  "sources_unchanged": true,
+  "owned_remaining": [],
+  "all4idle": true,
+  "all306_exact": true,
+  "all64_new_draft_entries_naturally_qualified": true,
+  "costs320_balanced": true,
+  "extra_HOST_tests_or_exporter_during_costs": false,
+  "Raw": null,
+  "Goodput": null,
+  "whole463_qualified": false,
+  "adopted": false,
+  "goal_achieved": false
+}

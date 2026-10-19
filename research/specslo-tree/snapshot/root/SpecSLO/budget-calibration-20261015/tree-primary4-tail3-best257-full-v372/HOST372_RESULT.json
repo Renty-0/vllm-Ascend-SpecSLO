@@ -1,0 +1,21 @@
+{
+  "status": "PASS_HOST_full372_runtime_ENV_delta_and_fresh_neural_auditor_controls",
+  "original_worker_AST_bytes_preserved_outside_declared_extensions": true,
+  "original_VLLM_ENV_lines_equal": true,
+  "original_target227_and_all_original_components_required": true,
+  "fresh_draft306_required": true,
+  "rejected_corruptions": [
+    "probability",
+    "promotion",
+    "missing_N",
+    "invented_cost",
+    "stale_body_hash",
+    "unqualified_graphs"
+  ],
+  "fictional_auditor_data_only": true,
+  "model_loaded": false,
+  "NPU_used": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}
