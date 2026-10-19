@@ -1,0 +1,40 @@
+{
+  "UTC": "2026-10-19T12:41:52.443914+00:00",
+  "scope": "Full M120 S24 FULL2560 dynamic B1to8 + original305 checked prepare + original312 whole-batch target-cost eligibility + coalesced live wholeprompt refill minimum4.",
+  "variable_of_interest": "Tree Raw via occupancy and avoiding empty-active-only refill. No shortened KV bucket in this candidate.",
+  "all463_original_arrivals": true,
+  "priorities_unchanged": true,
+  "models_BF16_unquantized": true,
+  "original_MC2_and_all_original_components_required": true,
+  "new_same_instance_refill_component_sizes": [
+    1,
+    3,
+    4,
+    8
+  ],
+  "fresh_independent_target_cases": 408,
+  "actual_draft_cases": 45,
+  "actual_postbranch_recovery_cases": 20,
+  "warm_twozero_seal_full463_and_own_AR_required": true,
+  "formal_Goodput": false,
+  "adopted": false,
+  "all_HOST_tests": [
+    "HOST_ADMISSION346_RESULT.json",
+    "HOST_AUDIT346_RESULT.json",
+    "HOST_FAULT346_RESULT.json",
+    "HOST_BUDGET346_RESULT.json",
+    "HOST_PRIORITY346_RESULT.json",
+    "HOST_COST346_RESULT.json",
+    "HOST_RISK_ALLOCATION346_RESULT.json",
+    "HOST_PLANS346_RESULT.json",
+    "HOST_LIVE346_POST_SNAPSHOT_RESULT.json",
+    "HOST_FULL346_PROTOCOL_RESULT.json",
+    "HOST_READINESS346_RESULT.json",
+    "HOST_LAUNCH346_RESULT.json",
+    "HOST_REFILL_AUDIT346_RESULT.json",
+    "HOST_EAGER346_RESULT.json",
+    "HOST_SNAPSHOT346_RESULT.json"
+  ],
+  "HOST_alias_attempt": "check_prepare346_HOST.py aliases check_full346_HOST.py; after successful full test, redundant alias reached FileExistsError only when preserving an already written report. No result overwritten.",
+  "target_cost_proxy": "Measured311 target costs, excludes actual draft overhead; no guaranteed whole-service gain."
+}

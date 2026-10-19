@@ -14,5 +14,6 @@
   "original_component_proof_identity_preserved_on_success_and_failure": true,
   "B1to8_LIVE_admission_projection_passed": true,
   "model_constructed": false,
+  "actual_composed_LIVE_function_and_original_admission_hooks_executed": true,
   "no_actual_model_or_performance_qualification": true
 }

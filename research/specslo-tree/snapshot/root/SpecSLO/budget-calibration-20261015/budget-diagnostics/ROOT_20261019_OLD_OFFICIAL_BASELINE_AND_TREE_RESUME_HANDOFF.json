@@ -397,7 +397,7 @@
     "short/FULLbucket": 49.65373477898538
   },
   "tree342_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT342_INDEPENDENT_FULL_BUCKET_MODEL_COST_AUDIT.json",
-  "next_optimization": "real branch integration of homogeneous FULL KV buckets, preserve M120 gamma4 and FULL2560 ownAR reference; inspect whole-batch cost eligibility and qualify bounded rolling whole-prompt admission",
+  "next_optimization": "Finish344 target bucket qualification; once original guardian ends and four cards idle, run346 full B1to8/current311-cost eligibility/coalesced refill with FULL2560. Fresh small cohort NN1/3/4/8, target408,draft45,recovery20,warm/twozero/seal/full463/ownAR required. Keep bucket separate for first Raw occupancy ablation.",
   "future_rolling_raw_followup": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_EMPTY_ACTIVE_ADMISSION_RAW_FOLLOWUP_20261019.json",
   "tree343_source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v343",
   "tree343_source_frozen": true,
@@ -416,6 +416,14 @@
   "tree344_guard_session": 78840,
   "tree345_HOST_source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345",
   "tree345_HOST_only": true,
-  "latest_saved_Git_commit": "2649ec8",
-  "current_UTC": "2026-10-19T12:34:36.985320+00:00"
+  "latest_saved_Git_commit": "b65587e",
+  "current_UTC": "2026-10-19T12:44:00.050450+00:00",
+  "tree345_frozen": true,
+  "tree345_freeze_sha256": "5de32ee205cbbe49e48dc3d527fbfaead2583329e6b428616d8cac831f4dd534",
+  "tree345_archive_sha256": "2f7d54480d31d01ef88d7fd7b8ea4e0553848fdda9bf25592ce5a42e4ecc2102",
+  "tree346_source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-B8-full-v346",
+  "tree346_freeze_sha256": "c4f5013ba25822efd69970f34951d7a275d4d505d1f6e9ded39dcfecd438e99a",
+  "tree346_archive_sha256": "0ff2651850d0672d0d5665a3dfd77f6834151b7d991139b6ae770ff821fbe762",
+  "tree346_HOST_ready": true,
+  "tree346_launched": false
 }

@@ -1,0 +1,15 @@
+{
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/HOST345_ADMISSION_RESULT.json": "afec2608d8a3c246f4717c35614d6a6991d44f90075703f161fa961b1eb1bd76",
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/HOST345_COMPONENT_RESULT.json": "7816e335bed1a7a2e48857a185ec1419bf262f8ea08810b5aa7430ee8baba27a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/PLAN345.json": "1765af5feb1ea6b8db7eb105529b66ce2999bf10d813b340a3da90dc6f66a412",
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/admission345.py": "011bb591cc5290d95ce96e8fcce0ba3f47cd339ea0c14c46f0c7383f5b2762a2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/check_admission345_HOST.py": "822ab539415a625a5779c16eec8c058585ff531ad141c259e775c496486e7dcd",
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/check_component345_HOST.py": "9f00e1c2302392a7372f8e15175cb9d735144d1eb83cde1361c621ce662b44c9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/prefill345.py": "260e996d9ad49bded0653981e36dd901c3620852c8c3121900ca1043b7013343",
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/subset345.py": "2d0e5f0886a351cd63177c82cae1047ac5a8b997f2144d9539d23a755128663f"
+  },
+  "parent_freeze_sha256": "f4aa9b02429020c9a1bdbaaa4d168253588b681897dce1796713aac72196b6c4",
+  "parent_archive_sha256": "2db775f30864fa4b1372ab066e48dea7f28feeba15db9e52a045b9ed0f130807",
+  "NPU_qualification_inherited": false
+}

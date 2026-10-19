@@ -23,6 +23,26 @@ def main():
     new = patch(old)
     assert 'if active:\n        return closed' not in new
     assert '_root307_build_plan' in new and '_root307_observe' in new
+    ns, effects = admission_test.namespace([128]*48, list(range(44)), list(range(44,48)))
+    hooks = dict(reset=0, reserve=0)
+    def reset(**kwargs):
+        assert kwargs['active'] == list(range(44))
+        hooks['reset'] += 1
+    def reserve(**kwargs):
+        assert kwargs['admitted'] == kwargs['needs_prefill'] == list(range(44,48))
+        assert kwargs['active'] == list(range(44))
+        hooks['reserve'] += 1
+        return False
+    ns.update(cache_activated=set(), cache_released=set(),
+              _v75_hooks=SimpleNamespace(reset_for_original_admission_fallback=reset,
+                  reserved_slots=lambda: 0, filter_pending_candidates=lambda candidates: candidates,
+                  reserve_at_original_admission=reserve))
+    exec(admission_test.function(new, False), ns)
+    assert ns['admit_available']() is False
+    assert hooks == dict(reset=1, reserve=1)
+    assert ns['active'] == list(range(48)) and ns['pending_admission'] == []
+    assert effects['prefills'] == [list(range(44,48))]
+    assert all(abs(s.decode_elapsed_ms-50.0) < 1e-8 for s in ns['states'][:44])
     assert prefill345.project().count('for n in (1,3,4,8)') == 3
     real = prefill345.namespace()
     assert inspect.signature(real['run_case']) == inspect.signature(prefill345.original.run_case)
@@ -55,6 +75,7 @@ def main():
         original_numerical_bodies_and_matchers_retained=True, original_worker_signatures=True,
         original_component_proof_identity_preserved_on_success_and_failure=True,
         B1to8_LIVE_admission_projection_passed=True, model_constructed=False,
+        actual_composed_LIVE_function_and_original_admission_hooks_executed=True,
         no_actual_model_or_performance_qualification=True)
     (P/'HOST345_COMPONENT_RESULT.json').write_text(json.dumps(result, indent=2)+'\n')
     print(json.dumps(result))

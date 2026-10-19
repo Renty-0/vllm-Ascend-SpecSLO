@@ -1,0 +1,14 @@
+{
+  "UTC": "2026-10-19T12:36:47.179241+00:00",
+  "status": "HOST_only",
+  "minimum_live_refill": 4,
+  "active48": true,
+  "actual_pages": 544,
+  "private_pages": 64,
+  "future_tail": 8,
+  "source": "Original actual composed LIVE admission body; remove empty-active guard only, include incumbent and cached-pending page reserves, group small in-flight refills.",
+  "model_component": "Original independent all-query hidden/KV/root/nextdraft with sizes1,3,4,8 and two zero sweeps; no real-model result yet.",
+  "original_components_proof_identity_preserved": true,
+  "full463_qualified": false,
+  "Goodput": null
+}

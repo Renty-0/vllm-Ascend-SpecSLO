@@ -41,6 +41,8 @@ SOURCES = (
     ('tree-Q5-uniform-KV-bucket-only-target-math-cost-v342', 342),
     ('tree-Q5-uniform-KV-bucket-branch-math-cost-v343', 343),
     ('tree-Q5-uniform-KV-bucket-branch-math-cost-v344', 344),
+    ('tree-coalesced-live-refill-host-v345', 345),
+    ('tree-coalesced-live-refill-M120-B8-full-v346', 346),
 )
 
 
@@ -113,6 +115,7 @@ def main():
         'tree-Q5-uniform-KV-bucket-branch-math-cost-v343',
         'tree-Q5-uniform-KV-bucket-branch-math-cost-v344',
         'tree-coalesced-live-refill-host-v345',
+        'tree-coalesced-live-refill-M120-B8-full-v346',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
