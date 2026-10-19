@@ -1,0 +1,9 @@
+{
+  "parent320_freeze_sha256": "1c809976a59f2158d99d24e3cc978b582fdbcdcb263821967a0a0f603e5712b1",
+  "purpose": "Locate first neural divergence, first four layers; read-only clone/index_select hooks only during eager candidate/reference. No model output edits.",
+  "all_original546_fixtures_and_matchers_retained": true,
+  "diagnostic_only": true,
+  "NZ_threshold": 166,
+  "raw144_retained": true,
+  "Goodput": null
+}

@@ -1,0 +1,14 @@
+{
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v321/runtime321.py": "5ff3b673fe24b5706513e38a6b168fca3c139e072f04f0d5c9eaa2318deb57d4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v321/TRACE321_REVIEW.json": "e4733cb01c1f2367da7c8200e1b89fb772fb8c053c2df662182657fbdc84ee49",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v321/startup321.sh": "41f0db7bebfe196a11ed3f7e5f27793cde753de1a624e082cb933ddfd32807ad",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v321/trace321.py": "bbea1066a31e2e870d89f4ce96247f9b6cb46ab1bf8fe8c58485b43b77a58439",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v321/launch321.sh": "732f4b09a729ac5a55bdc805d9516a38260824544712b75334720dadf21627d8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v321/guard321.py": "a13d15538fd19e919ddfb3fb179af20da545c12824fe358d31298d526bd524ae",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1.json": "eab7bf40cfd74c69d0ebbf1b39c10712721943d642a6ad0f9ea2ead83f8296b4"
+  },
+  "source_and_checks_unchanged_from320": true,
+  "observing_hook_outputs_only": true,
+  "Goodput": null
+}

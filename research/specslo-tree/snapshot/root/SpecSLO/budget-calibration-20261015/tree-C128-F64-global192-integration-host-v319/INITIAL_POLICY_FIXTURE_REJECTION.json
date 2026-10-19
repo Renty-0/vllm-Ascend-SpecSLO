@@ -1,0 +1,6 @@
+{
+  "status": "expected_capacity_guard_rejection",
+  "fixture_mistake": "new128-candidate DTO was passed old policy target_queries128; requires160 for128+32",
+  "production_attempted": false,
+  "NPU_used": false
+}

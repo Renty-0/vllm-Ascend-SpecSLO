@@ -1,0 +1,140 @@
+{
+  "UTC": "2026-10-19T05:35:11.846683+00:00",
+  "status": "strict_gate_failed_not_adopted",
+  "cases": [
+    {
+      "version": 318,
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M165-N32-root-v318-B1to8-546-math-cost-v1.json",
+      "receipt_sha256": "1b731f3706c43307d582394da30a973eb2307cd226ed5484ead1ebe75a77e144",
+      "actual_completed_positive_cases": 0,
+      "target_first_case": [
+        {
+          "rank": 1,
+          "measurement": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M165-N32-root-v318-B1to8-546-math-cost-v1/independent-node-math/rank1-FAILED-N1-fork5-anchor0.json",
+          "sha256": "0546df904af2575c330276429403a59acc41d9fb0af84fa28937cdb7de6f41ba",
+          "tokens_equal": true,
+          "hidden_bad_rows": [
+            5
+          ],
+          "hidden_max_abs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            2.5
+          ],
+          "first_bad_KV_layer": 2
+        },
+        {
+          "rank": 2,
+          "measurement": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M165-N32-root-v318-B1to8-546-math-cost-v1/independent-node-math/rank2-FAILED-N1-fork5-anchor0.json",
+          "sha256": "6de9bcfa71fa6d4cd9ba7101b7fdd23ecbb02852da9c92fa89d3842906c111a6",
+          "tokens_equal": true,
+          "hidden_bad_rows": [
+            5
+          ],
+          "hidden_max_abs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            2.5
+          ],
+          "first_bad_KV_layer": 2
+        },
+        {
+          "rank": 3,
+          "measurement": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M165-N32-root-v318-B1to8-546-math-cost-v1/independent-node-math/rank3-FAILED-N1-fork5-anchor0.json",
+          "sha256": "5e86ab11ada2aac3aa0a7dbd7987f8903b8bbe8b97805c24df16de1063a53a8f",
+          "tokens_equal": true,
+          "hidden_bad_rows": [
+            5
+          ],
+          "hidden_max_abs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            2.5
+          ],
+          "first_bad_KV_layer": 2
+        }
+      ],
+      "sources_unchanged": true,
+      "owned_cleanup_and_idle": true
+    },
+    {
+      "version": 320,
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1.json",
+      "receipt_sha256": "eab7bf40cfd74c69d0ebbf1b39c10712721943d642a6ad0f9ea2ead83f8296b4",
+      "actual_completed_positive_cases": 0,
+      "target_first_case": [
+        {
+          "rank": 1,
+          "measurement": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/independent-node-math/rank1-FAILED-N1-fork5-anchor0.json",
+          "sha256": "0546df904af2575c330276429403a59acc41d9fb0af84fa28937cdb7de6f41ba",
+          "tokens_equal": true,
+          "hidden_bad_rows": [
+            5
+          ],
+          "hidden_max_abs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            2.5
+          ],
+          "first_bad_KV_layer": 2
+        },
+        {
+          "rank": 2,
+          "measurement": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/independent-node-math/rank2-FAILED-N1-fork5-anchor0.json",
+          "sha256": "6de9bcfa71fa6d4cd9ba7101b7fdd23ecbb02852da9c92fa89d3842906c111a6",
+          "tokens_equal": true,
+          "hidden_bad_rows": [
+            5
+          ],
+          "hidden_max_abs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            2.5
+          ],
+          "first_bad_KV_layer": 2
+        },
+        {
+          "rank": 3,
+          "measurement": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/independent-node-math/rank3-FAILED-N1-fork5-anchor0.json",
+          "sha256": "5e86ab11ada2aac3aa0a7dbd7987f8903b8bbe8b97805c24df16de1063a53a8f",
+          "tokens_equal": true,
+          "hidden_bad_rows": [
+            5
+          ],
+          "hidden_max_abs": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            2.5
+          ],
+          "first_bad_KV_layer": 2
+        }
+      ],
+      "sources_unchanged": true,
+      "owned_cleanup_and_idle": true
+    }
+  ],
+  "NZ166_control_did_not_resolve_failure": true,
+  "baseline021_already_complete_unstable": true,
+  "next": "321 first-four-layers eager read-only intermediates and direct all128 prefix/alias raw16 comparison; all original matchers retained",
+  "new_Goodput": null,
+  "best_clean_tree_GP_unchanged": 554.7604454409803,
+  "goal_achieved": false
+}
