@@ -1,0 +1,39 @@
+{
+  "UTC": "2026-10-19T08:48:37.009466+00:00",
+  "status": "historical_exact_count_HYPOTHESIS_SCREEN_ONLY",
+  "scope": "Q4 no depth4 bonus future alternative; current full333 unchanged",
+  "rows": [
+    {
+      "version": 257,
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+      "source_sha256": "f7bd56b50167f5027072d33163d6713dbe0e586aa827376b305babc59869d409",
+      "exact_event_alignment": true,
+      "delivered_decode_tokens": 118065,
+      "visible_primary_bonus": 13149,
+      "visible_bonus_fraction": 0.11137085503747936,
+      "necessary_same_round_cycle_cost_ratio_lt": 0.8886291449625207,
+      "illustrative_target_only_gain_if_cycle_cost_exactly_scales_128over160": 1.1107864312031508
+    },
+    {
+      "version": 316,
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT316_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+      "source_sha256": "9dc06c20148b27abd94402f3079b0ab1e966394cb7048f4c796ac526e196e647",
+      "exact_event_alignment": true,
+      "delivered_decode_tokens": 118065,
+      "visible_primary_bonus": 13010,
+      "visible_bonus_fraction": 0.11019353745817982,
+      "necessary_same_round_cycle_cost_ratio_lt": 0.8898064625418202,
+      "illustrative_target_only_gain_if_cycle_cost_exactly_scales_128over160": 1.112258078177275
+    }
+  ],
+  "interpretation": "Historical visible bonuses are about11% of output. Simply removing them at unchanged cost cannot improve Raw. A pruned Q4 design needs enough measured cycle-cost reduction to offset lost output; fewer nominal query rows alone do not prove a speedup.",
+  "limitations": [
+    "This is not a rerun or an end-to-end counterfactual: future prefixes, B decisions and tails would change.",
+    "128/160 linear cost is an illustrative assumption, not measured performance.",
+    "Original all-query tree ABI cannot represent missing leaf heads; a new typed query map, verifier and KV frontier contract would be needed.",
+    "Fresh numeric and complete own-AR gates remain mandatory."
+  ],
+  "implemented": false,
+  "NPU_used": false,
+  "performance_improvement_proven": false
+}

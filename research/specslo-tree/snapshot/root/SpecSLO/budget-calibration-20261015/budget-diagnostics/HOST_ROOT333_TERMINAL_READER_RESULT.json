@@ -1,0 +1,9 @@
+{
+  "status": "passed",
+  "valid_geometry_cases": 4,
+  "invalid_geometry_cases": 6,
+  "script_sha256": "e8b9588cd8b29eed80399f23a07b20938df9f5085f7785811387655707517017",
+  "NPU_used": false,
+  "Torch_imported": false,
+  "no_actual_performance_or_terminal_receipt_read": true
+}

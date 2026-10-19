@@ -178,6 +178,14 @@ def main():
         'ROOT331_334_ABI_SOURCE_REVIEW_20261019.json',
         'ROOT329_331_REDUNDANT_CHECKPOINT_AND_OLD_CACHE_REGENERATION_20261019.json',
         'ROOT316_NONTERMINAL_LOW_B_RAW_CHECK_20261019.json',
+        'audit_ROOT333_terminal_full_HOST.py',
+        'ROOT333_TERMINAL_READER_SOURCE_PREPARED.json',
+        'HOST_ROOT333_TERMINAL_READER_RESULT.json',
+        'monitor_ROOT333_readonly_HOST.py',
+        'analyze_ROOT_tree_terminal_gain_HOST.py',
+        'ROOT316_TERMINAL_GAIN_DESCRIPTIVE_20261019.json',
+        'ROOT_FUTURE_Q4_NO_BONUS_RAW_HYPOTHESIS_20261019.json',
+        'ROOT_Q4_FUTURE_RAW_HISTORICAL_BONUS_COST_SCREEN_20261019.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

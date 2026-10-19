@@ -1,0 +1,12 @@
+{
+  "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT316_terminal_full_HOST.py",
+  "source_sha256": "17e0797affd074e76126a04a64c068fb7677e13badd6766a26c914ecec741b3a",
+  "output": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT333_terminal_full_HOST.py",
+  "output_sha256": "e8b9588cd8b29eed80399f23a07b20938df9f5085f7785811387655707517017",
+  "status": "HOST_source_only_terminal_reader_prepared",
+  "NPU_used": false,
+  "Torch_imported": false,
+  "terminal_result_read": false,
+  "geometry": "independent N32/B1..8/C128/root160/side12/groups32; fixedQ5*32",
+  "normal_AR_and_original_clock_checks_preserved": true
+}

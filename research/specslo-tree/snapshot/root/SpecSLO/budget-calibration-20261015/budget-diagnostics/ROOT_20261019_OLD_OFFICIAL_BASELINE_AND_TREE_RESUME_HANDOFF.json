@@ -31,15 +31,14 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "3592208",
+  "github_checkpoint": "a8c86485aa02e4a209b8775fef7527f6933c7331",
   "goal_achieved": false,
   "next": [
-    "finish329 actual installer/account callback all532 HOST regression and constructorC128 binding",
-    "freeze329 additive controls and fresh all532 NN cases (no inheritance of410) +16 paired costs",
-    "ifordinaryM160 cost too high, prototype explicit padding of onlyMC2 matrix/epilogue toqualifiedM165 whileFIA stays160/S32; no fakeM160 profile entry; new full gates mandatory",
-    "alternative: newM160 in-memoryMC2 realinput qualification; modelweights remainGPU references",
-    "integrate328 C128/F64/global192 roles/groups32 onlyafter modelqualification",
-    "full463 ownAR andalloriginalgates; Raw/GP thenfinal9 matched comparisons"
+    "monitor333 original controls and fresh532 strict math",
+    "evaluate own-model current16cost panels with original chained-flush ABI",
+    "finish draft45/follow20 and warm/fixedpoint/twozero/sealed full463/independent ownAR",
+    "independent terminal metrics/audits; decide next Raw/GP optimization from measured data",
+    "final matched baseline/fixedgamma4/tree only after strong full result; no HUST baseline"
   ],
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
   "user_Raw_clarification": {
@@ -80,9 +79,9 @@
   "tree317_archive_sha256": "2182c4e257ecb8f4c8e5c6031aeb165bb9f46155559948fc18ef0ed5017e9a71",
   "github_user_author": "Renty-0",
   "github_remote_push_verified": true,
-  "github_snapshot_files": 2426,
-  "github_snapshot_python_syntax_files": 1926,
-  "github_format_check": "not run: pre-commit unavailable; snapshot syntax/SHA and staged whitespace checks passed",
+  "github_snapshot_files": 2709,
+  "github_snapshot_python_syntax_files": 2078,
+  "github_format_check": "format.sh ci blocked by missing pre-commit; staged whitespace check records two formatting issues retained in immutable frozen sources",
   "official021_repeat3_complete": true,
   "official021_GP_all": [
     274.3205053479455,
@@ -196,7 +195,7 @@
   "tree329_all6_invalid_limit_cases_rejected": true,
   "tree329_model_qualification": true,
   "tree329_tag": "M160-S32-C128-root-v329-B1to8-532-math-cost-v1",
-  "updated_UTC": "2026-10-19T08:28:37.278914+00:00",
+  "updated_UTC": "2026-10-19T08:43:29.997617+00:00",
   "tree329_guard_pid": 292336,
   "tree329_all_four_capacity_before_model_passed": true,
   "tree330_source_only": true,
@@ -261,5 +260,7 @@
   "tree333_guard_session": 52360,
   "tree333_child_pid": 477060,
   "tree333_tag": "M160-actual165-chainedflush-C128-F64-currentcost-root-v333-full463-ownAR-v1",
-  "tree333_guard_prepared_passed": true
+  "tree333_guard_prepared_passed": true,
+  "tree333_terminal_reader_source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT333_terminal_full_HOST.py",
+  "tree333_terminal_reader_HOST_geometry_4valid6invalid_passed": true
 }

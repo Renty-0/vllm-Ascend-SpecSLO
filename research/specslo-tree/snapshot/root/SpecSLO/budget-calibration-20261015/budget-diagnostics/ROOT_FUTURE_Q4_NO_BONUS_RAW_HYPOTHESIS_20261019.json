@@ -1,0 +1,24 @@
+{
+  "UTC": "2026-10-19T08:38:54.097790+00:00",
+  "status": "future_hypothesis_only_not_implemented",
+  "purpose": "If full333 remains Raw-limited, test four query rows per group while retaining exact greedy outputs",
+  "priority": "After current333 full result; does not replace current C128/tree/cost plan",
+  "idea": [
+    "A maximum-four-output verifier can predict draft4 from the query for draft3; the depth4 leaf query is used only for a fifth bonus token",
+    "Keep shorter side-leaf queries when their correction token is still needed within the four-output cap",
+    "Prototype uniform Q4/S32/M128, using the actually qualified128-row MC2 path; no fabricated160 qualification",
+    "Never fabricate a missing leaf head: introduce explicit typed absence and ensure no consumer reads it"
+  ],
+  "unresolved": [
+    "Native cache commit must exclude the last delivered root when its KV has not been computed",
+    "Separate delivered tokens, matched draft nodes, committed KV nodes and acceptance statistics; do not reuse old g1plusaccepted algebra blindly",
+    "Recalibrate same-prefix per-class g for the changed output cap; old B4/B8 gains are not interchangeable",
+    "Fresh FIA Q4 group-position controls, all actual-node hidden/KV/ancestor controls and full463 own-history AR are mandatory",
+    "Only after that, evaluate whether existing fixed-gamma4 rolling continuation can qualify B4 eager within the original raw-eight-step window"
+  ],
+  "measured_gain": null,
+  "tradeoff": "Fewer model queries and access to existing128 MC2 versus losing a fifth bonus when a depth4 path fully matches; no speedup assumed",
+  "no_current_source_or_measurement_changed": true,
+  "NPU_used": false,
+  "Goodput": null
+}

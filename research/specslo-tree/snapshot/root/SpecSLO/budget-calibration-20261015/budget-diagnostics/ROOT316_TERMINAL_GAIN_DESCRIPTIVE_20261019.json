@@ -1,0 +1,96 @@
+{
+  "schema": "ROOT.tree-terminal-gain-descriptive.v1",
+  "version": 316,
+  "terminal_audit": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT316_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+    "sha256": "9dc06c20148b27abd94402f3079b0ab1e966394cb7048f4c796ac526e196e647"
+  },
+  "actual_report": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/measured-target-cost-risk-root-v316-B1to8-full463-ownAR-v1/rank0-local-diagnostic.json",
+    "sha256": "dfeae723b8ad2b30034c507c94afbf760f912e77b1d2d93bcad3b642994512b1"
+  },
+  "generation": 5,
+  "classes": {
+    "loose": {
+      "requests": 96,
+      "median_final_cached_g": [
+        0.0,
+        1.6534649351958088,
+        2.078611834897875,
+        2.361725241041828,
+        2.5471720576985355,
+        2.7780871901047313,
+        2.9011747756741224,
+        2.977363613709467,
+        3.029611959619662
+      ],
+      "median_final_cached_B8_to_B4": 1.1783069649937148,
+      "median_verdict_observations": 96.0,
+      "requests_without_any_alternate_trials": 66
+    },
+    "normal": {
+      "requests": 96,
+      "median_final_cached_g": [
+        0.0,
+        1.8322652723528061,
+        2.5489996899251226,
+        3.175924270837018,
+        3.7013645442319447,
+        3.8712114041852868,
+        3.948707550535363,
+        3.9880262841385985,
+        4.00984179225537
+      ],
+      "median_final_cached_B8_to_B4": 1.0846220663385742,
+      "median_verdict_observations": 69.0,
+      "requests_without_any_alternate_trials": 96
+    },
+    "tight": {
+      "requests": 271,
+      "median_final_cached_g": [
+        0.0,
+        1.7348946506668845,
+        2.271778110780778,
+        2.6755865707982673,
+        2.9747999595871346,
+        3.1468627508376006,
+        3.249625024507863,
+        3.314836067539059,
+        3.350526272416954
+      ],
+      "median_final_cached_B8_to_B4": 1.1211740202011717,
+      "median_verdict_observations": 82,
+      "requests_without_any_alternate_trials": 256
+    }
+  },
+  "actual_budget_owner_rounds": {
+    "1": 146,
+    "2": 157,
+    "3": 22,
+    "4": 38002,
+    "5": 1,
+    "6": 4,
+    "7": 1,
+    "8": 397
+  },
+  "actual_target_calls": 2279,
+  "actual_mean_N": 16.99429574374726,
+  "actual_bonus_accounting": {
+    "owner_rounds": 38730,
+    "accepted_nodes": 79674,
+    "Native_full_primary_accepts": 13305,
+    "delivered_decode_tokens": 118065,
+    "verified_event_alignment_exact": true,
+    "alignment_limitation": null,
+    "accepted_nodes_per_owner": 2.0571649883811,
+    "delivered_decode_per_owner": 3.0484120836560806,
+    "visible_primary_bonus": 13010,
+    "discarded_primary_bonus": 295,
+    "total_output_limit_discarded": 339,
+    "subtraction_is_not_a_rerun_without_bonus": true
+  },
+  "limitation": "Final cached request predictions describe the predictor; they are neither held-out accuracy nor counterfactual gains from different budgets.",
+  "independent_AR_qualified": true,
+  "NPU_used": false,
+  "performance_change_inferred": false
+}
