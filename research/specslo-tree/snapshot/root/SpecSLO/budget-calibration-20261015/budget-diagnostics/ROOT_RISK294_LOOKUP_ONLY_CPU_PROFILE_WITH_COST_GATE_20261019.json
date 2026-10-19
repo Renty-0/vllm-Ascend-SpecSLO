@@ -1,0 +1,81 @@
+{
+  "status": "HOST_only_lookup_allocation_equivalence_and_microcost",
+  "original_source": "/root/SpecSLO/budget-calibration-20261015/tree-request-conditional-risk-gain-host-v294/risk294.py",
+  "original_source_sha256": "ef5c6c04b626d4fe5b04d973895d13fef60abb7b43d810ab704671952ed33ec4",
+  "profile_script_sha256": "89947f92dcbed3e9c8103a51e25192a6726c7f22c10d78f1a5a1fa3953da588f",
+  "checks": {
+    "observations": 2160,
+    "exact_gain_comparisons": 19440,
+    "complete_state_and_history_equal": true,
+    "identity_and_stale_generation_rejected": true,
+    "actual_original_budget312_eligible_cases": 576,
+    "identical_selected_owner_sets": true,
+    "cases_selecting_branches": 159,
+    "identical_policy_counters": true
+  },
+  "timings": [
+    {
+      "cache_revision_changes_each_request": false,
+      "requests_per_sample": 12000,
+      "gain_calls_per_sample": 24000,
+      "original_seconds": [
+        0.117572286,
+        0.117869948,
+        0.117582185,
+        0.117751349,
+        0.117702638,
+        0.117672868,
+        0.117157514,
+        0.117862419
+      ],
+      "lookup_only_seconds": [
+        0.063086671,
+        0.062383696,
+        0.062679859,
+        0.062379187,
+        0.063257122,
+        0.06290111,
+        0.06280384,
+        0.062981861
+      ],
+      "original_median": 0.117687753,
+      "lookup_only_median": 0.06285247499999999,
+      "isolated_speedup": 1.8724442116241249
+    },
+    {
+      "cache_revision_changes_each_request": true,
+      "requests_per_sample": 12000,
+      "gain_calls_per_sample": 24000,
+      "original_seconds": [
+        0.312837365,
+        0.312846177,
+        0.313480733,
+        0.312836822,
+        0.313267606,
+        0.312916338,
+        0.31336551,
+        0.313733317
+      ],
+      "lookup_only_seconds": [
+        0.256218965,
+        0.256251445,
+        0.256633101,
+        0.257358996,
+        0.256849496,
+        0.257299959,
+        0.257133891,
+        0.256731
+      ],
+      "original_median": 0.313091972,
+      "lookup_only_median": 0.256790248,
+      "isolated_speedup": 1.2192517996244157
+    }
+  ],
+  "NPU_used": false,
+  "production_source_changed": false,
+  "active348_changed": false,
+  "synthetic_legal_verdicts": true,
+  "measured_end_to_end_Raw": null,
+  "measured_Goodput": null,
+  "implementation_selected": false
+}

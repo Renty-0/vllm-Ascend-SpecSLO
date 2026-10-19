@@ -265,6 +265,9 @@ def main():
         'check_ROOT348_terminal_source_HOST.py',
         'HOST_ROOT348_TERMINAL_SOURCE_RESULT.json',
         'read_ROOT348_common_result_HOST.py',
+        'profile_ROOT_risk294_owner_HOST.py',
+        'ROOT_RISK294_LOOKUP_ONLY_CPU_PROFILE_20261019.json',
+        'ROOT_RISK294_LOOKUP_ONLY_CPU_PROFILE_WITH_COST_GATE_20261019.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

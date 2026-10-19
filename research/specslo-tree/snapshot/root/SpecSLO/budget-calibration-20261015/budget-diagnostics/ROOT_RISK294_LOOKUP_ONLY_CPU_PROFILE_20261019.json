@@ -1,0 +1,76 @@
+{
+  "status": "HOST_only_lookup_allocation_equivalence_and_microcost",
+  "original_source": "/root/SpecSLO/budget-calibration-20261015/tree-request-conditional-risk-gain-host-v294/risk294.py",
+  "original_source_sha256": "ef5c6c04b626d4fe5b04d973895d13fef60abb7b43d810ab704671952ed33ec4",
+  "checks": {
+    "observations": 2160,
+    "exact_gain_comparisons": 19440,
+    "complete_state_and_history_equal": true,
+    "identity_and_stale_generation_rejected": true
+  },
+  "timings": [
+    {
+      "cache_revision_changes_each_request": false,
+      "requests_per_sample": 12000,
+      "gain_calls_per_sample": 24000,
+      "original_seconds": [
+        0.117694127,
+        0.116789274,
+        0.115606087,
+        0.116669542,
+        0.116276526,
+        0.116806824,
+        0.115981813,
+        0.116278117
+      ],
+      "lookup_only_seconds": [
+        0.062281702,
+        0.061330759,
+        0.061449001,
+        0.061123206,
+        0.061299949,
+        0.061909848,
+        0.061963878,
+        0.061636503
+      ],
+      "original_median": 0.1164738295,
+      "lookup_only_median": 0.061542752000000006,
+      "isolated_speedup": 1.8925677795494096
+    },
+    {
+      "cache_revision_changes_each_request": true,
+      "requests_per_sample": 12000,
+      "gain_calls_per_sample": 24000,
+      "original_seconds": [
+        0.312917595,
+        0.312692052,
+        0.312149734,
+        0.312830754,
+        0.312548631,
+        0.312351588,
+        0.312299777,
+        0.311966922
+      ],
+      "lookup_only_seconds": [
+        0.25672421,
+        0.256542468,
+        0.256075751,
+        0.256488797,
+        0.256210953,
+        0.256678249,
+        0.25674722,
+        0.256393526
+      ],
+      "original_median": 0.3124501095,
+      "lookup_only_median": 0.2565156325,
+      "isolated_speedup": 1.2180548470082035
+    }
+  ],
+  "NPU_used": false,
+  "production_source_changed": false,
+  "active348_changed": false,
+  "synthetic_legal_verdicts": true,
+  "measured_end_to_end_Raw": null,
+  "measured_Goodput": null,
+  "implementation_selected": false
+}

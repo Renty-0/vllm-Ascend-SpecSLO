@@ -1,6 +1,6 @@
 {
-  "UTC": "2026-10-19T06:43:06.850120+00:00",
-  "status": "active_ROOT337_original_output_fresh_Q4_model_math_cost",
+  "UTC": "2026-10-19T14:25:03.668947+00:00",
+  "status": "active_ROOT348_complete_initialized_live_refill_full463_ownAR",
   "user_resume_request": true,
   "prior_pause_revoked": true,
   "user_correction": "old official vllm-ascend, explicitly not HUST",
@@ -31,7 +31,7 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "4b5276ffd41f13690943dd7e2cd802e73846ef70",
+  "github_checkpoint": "7b3b9d0808c4bb05e36f952a585506103e551f54",
   "goal_achieved": false,
   "next": [
     "fresh real-model Q4/S24 and Q4/S32 target-only diagnostic, retain hidden/all128KV/greedy/graph-eager proofs; choose by measured cost rather than nominal capacity",
@@ -341,7 +341,7 @@
   "tree339_archive_sha256": "2f486aff3ff807a1fcf398e068575ec8103b127a704456bce8eb122b7f248643",
   "tree339_actual_installer_and_complete_frontend_HOST_passed": true,
   "tree339_guard_session": null,
-  "github_commit": "1e86425",
+  "github_commit": "7b3b9d0808c4bb05e36f952a585506103e551f54",
   "tree339_result": "complete_numeric_cost_independently_audited_original_supervisor_count_failed_42_vs36",
   "tree339_original_receipt_failed": true,
   "tree339_owned_cleanup": true,
@@ -460,7 +460,7 @@
   "tree348_frozen": true,
   "tree348_HOST15_passed_before_component_rebind": true,
   "tree350_guard_session": 24319,
-  "tree348_pending350_neural_qualification": true,
+  "tree348_pending350_neural_qualification": false,
   "tree350_result": "Failed before nextdraft: N1 has no nonselected owners; old prefix_evidence concatenated empty list. All4 exited/idle, source unchanged. No completed case or Goodput.",
   "tree351_source": "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-incumbent-prefix-protection-v351",
   "tree351_freeze_sha256": "3d37ddcc17ca8702a2035a1e52f9048bdc34145d41520b9b78c74e5c962a0008",
@@ -488,5 +488,11 @@
   "tree348_teacher_fixture": "Exact original311 prefix token values restored before freeze; production463 manifest always unchanged.",
   "tree348_terminal_reader": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT348_terminal_full_HOST.py",
   "tree348_common_result_reader": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_ROOT348_common_result_HOST.py",
-  "tree348_terminal_reader_HOST_passed": true
+  "tree348_terminal_reader_HOST_passed": true,
+  "historical_top_status_before348": "active_ROOT337_original_output_fresh_Q4_model_math_cost",
+  "tree348_component_qualification_note": "350/351 standalone failures preserved. Full348 now performs all16 small checks inside original complete after_install, with original tail observer before capture.",
+  "risk_CPU_lookup_profile": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_RISK294_LOOKUP_ONLY_CPU_PROFILE_20261019.json",
+  "risk_CPU_profile_scope": "HOST isolated query microbenchmarks only; 19440 exact gain comparisons and complete state/history equal, no serving integration and no Raw/Goodput claim",
+  "risk_CPU_lookup_cost_gate_profile": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_RISK294_LOOKUP_ONLY_CPU_PROFILE_WITH_COST_GATE_20261019.json",
+  "risk_CPU_original_cost_gate_identical_cases": 576
 }
