@@ -1,0 +1,39 @@
+{
+  "schema": "ROOT316.capacity-request-conditional-risk-span-full.v1",
+  "UTC": "2026-10-19T00:53:02.425620+00:00",
+  "changes": [
+    "Reserve prospective B4 normal capacity before branch upgrades",
+    "Per-request conditional hazards with leave-own-out class prior and censoring",
+    "All64 raw operators unchanged; single full immutable descriptor validation and no unused1792-row prefix staging"
+  ],
+  "gain_hyperparameters": {
+    "class_prior_strength": 12,
+    "request_prior_strength": 2,
+    "decay": 0.96875
+  },
+  "backend": "305 HOSTprepare with exact frozen296 raw operators and original-attention M120/S24/Q5/KV2560",
+  "global_selected_candidates": 192,
+  "normal_candidates": 96,
+  "future_candidates": 96,
+  "actual_target_primary_plus_side_groups": 24,
+  "active_admission_cap": 48,
+  "LIVE_normal_budget_domain": [
+    1,
+    8
+  ],
+  "eager_parent_and_child_support": "unchanged original B3 only",
+  "original_source_auditor_changes": "Only two legacy B<=5 bounds become declared8; nonempty dict normalized bool",
+  "all_original_startup_component_gates_required": true,
+  "fresh408target_45draft_20postbranch_required": true,
+  "fresh_warm_twozero_seal_full463_ownAR_required": true,
+  "models_BF16_original_sampler_arrivals_SLO_unchanged": true,
+  "device_qualification_inherited": false,
+  "performance_qualified": false,
+  "Goodput": null,
+  "adopted": false,
+  "measured_target_cost_source": "ROOT311 independent11x20 pairedtarget costs",
+  "cost_aware_branch_eligibility": true,
+  "finite_noisy_gain_declines_are_not_profitable_branches": true,
+  "workload_branch_scope": "actual branch at anyN; no forced largeN branch. Fresh408 stillproves wholeN24/C96 domain",
+  "whole463_AR_and_actual_branch_compaction_still_required": true
+}

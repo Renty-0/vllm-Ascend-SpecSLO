@@ -1,0 +1,11 @@
+{
+  "status": "HOST_actual_raw_auditor_two_declared_B8_bounds_and_whole_AST_inverse_passed",
+  "functions": [
+    "audit_transactions",
+    "audit_trace_set"
+  ],
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/audit_production_v101.py",
+  "numerical_matchers_changed": false,
+  "N32_C96_root128_limits_unchanged": true,
+  "NPU_used": false
+}

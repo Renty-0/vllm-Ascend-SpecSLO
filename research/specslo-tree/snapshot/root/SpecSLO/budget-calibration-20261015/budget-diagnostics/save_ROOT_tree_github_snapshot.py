@@ -17,6 +17,7 @@ SOURCES = (
     ('tree-concrete-device-span-dual-cache-target-cost-v296', 296),
     ('tree-capacity-request-risk-span-full-v299', 299),
     ('tree-single-prepare-target-math-cost-v311', 311),
+    ('tree-measured-cost-risk-single-prepare-full-v316', 316),
 )
 
 
@@ -58,6 +59,8 @@ def main():
         'tree-uniform-q5-M165-S33-C128-host-v285',
         'tree-M165-single-prepare-host-v313',
         'tree-C128-F64-global192-budget-host-v314',
+        'tree-current-prepare-cost-eligibility-host-v312',
+        'tree-measured-cost-risk-single-prepare-full-v316',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -103,6 +106,14 @@ def main():
         'freeze_ROOT311_single_prepare_target_cost_HOST.py',
         'audit_ROOT311_target_math_and_cost_HOST.py',
         'build_ROOT313_M165_prepare_HOST.py',
+        'ROOT311_INDEPENDENT_TARGET_MATH_AND_COST_AUDIT.json',
+        'ROOT311_VS296_TARGET_PREPARE_COST_COMPARISON.json',
+        'ROOT_M165_N32_NEXT_DEVICE_PLAN_20261019.json',
+        'build_ROOT316_measured_cost_full_HOST.py',
+        'freeze_ROOT316_measured_cost_full_HOST.py',
+        'audit_ROOT316_terminal_full_HOST.py',
+        'ROOT316_GENERATED_SOURCE_NUMERIC_INTEGRITY.json',
+        'monitor_ROOT316_readonly_HOST.py',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

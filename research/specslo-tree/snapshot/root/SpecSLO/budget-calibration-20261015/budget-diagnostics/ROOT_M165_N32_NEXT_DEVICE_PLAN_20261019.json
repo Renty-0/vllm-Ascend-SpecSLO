@@ -1,0 +1,53 @@
+{
+  "UTC": "2026-10-19T00:41:55.430829+00:00",
+  "status": "future_device_plan_only_no_qualification",
+  "implemented_HOST": {
+    "prepare313": "1020 actual Native165 protocol and visible-KV ancestry cases; exact prefixspan+alias inverse; rawperrowdevicebody288 unchanged butgrid165 unqualified",
+    "budget314": "128typedallocator+36controller+7badlimits;normal128future64global192,N32,groups33; actual218binding andrealproducer unqualified"
+  },
+  "proposed_geometry": {
+    "M": 165,
+    "S": 33,
+    "Q_per_group": 5,
+    "KV_extent": 2560,
+    "normal_candidates": 128,
+    "future_candidates": 64,
+    "global_selected_candidates": 192,
+    "max_real_requests": 32,
+    "max_branches": 12,
+    "active_admission_cap": 48
+  },
+  "reason": "Increase real requests per target call and examine the already existing NZ14 threshold161; no predicted Goodput claim",
+  "device_prerequisites": [
+    "finish311 and independent exact current cost audit",
+    "first evaluate cost-aware C96+305 full candidate with new311 costs",
+    "if needed, freshly qualify raw165 launch and a separate M165 target math/cost diagnostic",
+    "all128 modelKV/hidden/greedy and independent prefixes strict; no inherited device qualification",
+    "only then integrate realproducer,targetadmission,actual218repair andnewglobalrole caps",
+    "fresh originalstartup,draft,postbranch,warm,twozero,sealed463 andownAR gates"
+  ],
+  "prospective_neural_fixture": {
+    "prefixes32_rule": "old24 prefixes byte-identical followed by oldfirst8 inputs; keep candidate/reference owners independently prefilled",
+    "bank_owners": 96,
+    "candidate_owners": "0..31",
+    "spine_owners": "32..63",
+    "side_owners": "64..95",
+    "reference_frame_groups": 33,
+    "reference_frame_rows": 165,
+    "zero_owner": 526,
+    "scratch_owners": "463..526",
+    "cache_pool_pages": 544,
+    "must_measure_actual_disjoint_allocation": true
+  },
+  "prospective_neural_cases": "Preserve all old408 budget/anchor cases with explicitly rebuilt165 padding; add N25..32 and measured-cost geometries within C128,F12,groups33; freeze full exact declaration before any launch",
+  "prospective_costs": "B4..8 rotated20 sameprefix costs at N4/8/12/16/20/24/28/31 with1andmaximumforks; N32B4 single-arm baseline20; verify captured inventory unchanged. All declarations pending implementation.",
+  "correctness_risks": [
+    "Do not replace all constants24 with32 inreference schedules:bankoffsets32/64 butframegroups33 androws165",
+    "Preserve masked future-query canaries andfull committedprefix bounds",
+    "Raw perrow kernel isunchanged; launch165 andaliases165 require actual controls andnew modelproof",
+    "Never shrink visible KV extent orchange BF16 sampler to gainperformance"
+  ],
+  "actual_GOODPUT": null,
+  "NPU_used": false,
+  "goal_achieved": false
+}

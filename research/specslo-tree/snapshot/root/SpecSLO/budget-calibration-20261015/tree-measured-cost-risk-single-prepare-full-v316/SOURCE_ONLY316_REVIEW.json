@@ -1,0 +1,23 @@
+{
+  "status": "SOURCE_ONLY_measured_cost316_not_frozen_or_NPU_executed",
+  "target_cost_evidence": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT311_INDEPENDENT_TARGET_MATH_AND_COST_AUDIT.json",
+    "sha256": "2591887d1d7a3f941ca790a2c6223accac38b2cb833ee672fa7c503858924ed7"
+  },
+  "only_serving_deltas_from299": [
+    "305 HOST validation/staging",
+    "priority-weighted branch progress must beat measured311 relative target cost"
+  ],
+  "all_original_precision_sampler_arrivals_SLO_and_budget_limits_unchanged": true,
+  "physical_geometry": "M120/S24/uniformQ5/KV2560;C96/future96/global192",
+  "workload_branch_scope_predeclared": "Require genuine actual branch at any N; ROI may correctly skip large-N branches. Fresh408 math still proves the entire larger-N capability.",
+  "full463_ownAR_all3targets_and_actual_branch_compaction_still_required": true,
+  "all_startup_draft_followup_warm_twozero_seal_gates_still_required": true,
+  "real_draft_cost_missing_from_proxy": true,
+  "no_Goodput_guarantee": true,
+  "new_model_qualification_inherited": false,
+  "NPU_used": false,
+  "Goodput": null,
+  "adopted": false,
+  "finite_noisy_negative_marginal_gains_rejected_as_unprofitable": true
+}
