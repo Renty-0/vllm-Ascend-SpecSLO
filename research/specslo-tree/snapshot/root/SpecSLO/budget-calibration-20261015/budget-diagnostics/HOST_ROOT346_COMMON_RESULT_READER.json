@@ -1,0 +1,9 @@
+{
+  "status": "passed_common_result_reader_HOST",
+  "NPU_used": false,
+  "fixture_version": 257,
+  "original_GP_and_Raw_reproduced": true,
+  "original_request_and_class_counts_reproduced": true,
+  "AR_qualification_never_inferred_from_speed": true,
+  "new346_performance_measured": false
+}

@@ -416,8 +416,8 @@
   "tree344_guard_session": null,
   "tree345_HOST_source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345",
   "tree345_HOST_only": true,
-  "latest_saved_Git_commit": "b077a29",
-  "current_UTC": "2026-10-19T13:00:53.112967+00:00",
+  "latest_saved_Git_commit": "1bc2573",
+  "current_UTC": "2026-10-19T13:30:36.235355+00:00",
   "tree345_frozen": true,
   "tree345_freeze_sha256": "5de32ee205cbbe49e48dc3d527fbfaead2583329e6b428616d8cac831f4dd534",
   "tree345_archive_sha256": "2f7d54480d31d01ef88d7fd7b8ea4e0553848fdda9bf25592ce5a42e4ecc2102",
@@ -433,5 +433,10 @@
   "tree344_result": "predeclared1800s timeout; 408mixed+90mid completed,71short case files, no math failures; incomplete scope, not adopted",
   "tree346_pending": true,
   "tree346_guard_session": 21457,
-  "tree346_tag": "M120-B8-coalesced-refill4-root-v346-current-cost-full463-ownAR-v1"
+  "tree346_tag": "M120-B8-coalesced-refill4-root-v346-current-cost-full463-ownAR-v1",
+  "tree346_terminal_reader": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT346_terminal_full_HOST.py",
+  "tree346_terminal_reader_HOST_passed": true,
+  "tree346_common_result_reader": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_ROOT346_common_result_HOST.py",
+  "tree346_original_fixed_timing_and_ALL463_and_ownAR_required": true,
+  "tree346_terminal_reader_scope": "Declared live refills; incumbent pages and root arrival checks replace old empty-only assertion; constructor coalescer remains disabled; pause-membership flag reports actual incumbents."
 }

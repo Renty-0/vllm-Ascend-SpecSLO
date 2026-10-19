@@ -237,6 +237,11 @@ def main():
         'ROOT344_PREDECLARED_DEADLINE_PARTIAL_MATH.json',
         'audit_ROOT344_partial_retained_math_HOST.py',
         'ROOT344_INDEPENDENT_PARTIAL_RETAINED_MATH_AUDIT.json',
+        'audit_ROOT346_terminal_full_HOST.py',
+        'check_ROOT346_terminal_source_HOST.py',
+        'HOST_ROOT346_TERMINAL_SOURCE_RESULT.json',
+        'read_ROOT346_common_result_HOST.py',
+        'HOST_ROOT346_COMMON_RESULT_READER.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():
