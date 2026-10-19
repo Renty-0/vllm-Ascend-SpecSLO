@@ -1,0 +1,7 @@
+{
+  "status": "HOST_new_risk_predictor_bounded_snapshot_passed",
+  "no_mutation_of_policy_counts": true,
+  "original_gain_not_serialized": true,
+  "only_every256_verdicts": true,
+  "NPU_used": false
+}

@@ -1,0 +1,266 @@
+{
+  "status": "HOST_own_history_M160_S32_frame_and_independent_mask_audit_passed",
+  "history_cases": 36,
+  "metadata_cases": 72,
+  "all160_input_positions_and_tokens_exact": true,
+  "all32_full_tables_independently_recomputed": true,
+  "all_complete_masks_independently_recomputed": true,
+  "full463_own_AR_qualified": false,
+  "NPU_used": false,
+  "model_constructed": false,
+  "Goodput": null,
+  "cases": [
+    {
+      "real_owners": 1,
+      "prompt_length": 127,
+      "own_output_length": 1,
+      "max_root_position": 127,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 127,
+      "own_output_length": 128,
+      "max_root_position": 254,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 127,
+      "own_output_length": 255,
+      "max_root_position": 381,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 128,
+      "own_output_length": 1,
+      "max_root_position": 128,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 128,
+      "own_output_length": 128,
+      "max_root_position": 255,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 128,
+      "own_output_length": 255,
+      "max_root_position": 382,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 1505,
+      "own_output_length": 1,
+      "max_root_position": 1505,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 1505,
+      "own_output_length": 128,
+      "max_root_position": 1632,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 1505,
+      "own_output_length": 255,
+      "max_root_position": 1759,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 2301,
+      "own_output_length": 1,
+      "max_root_position": 2301,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 2301,
+      "own_output_length": 128,
+      "max_root_position": 2428,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 1,
+      "prompt_length": 2301,
+      "own_output_length": 255,
+      "max_root_position": 2555,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 127,
+      "own_output_length": 1,
+      "max_root_position": 127,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 127,
+      "own_output_length": 128,
+      "max_root_position": 254,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 127,
+      "own_output_length": 255,
+      "max_root_position": 381,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 128,
+      "own_output_length": 1,
+      "max_root_position": 128,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 128,
+      "own_output_length": 128,
+      "max_root_position": 255,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 128,
+      "own_output_length": 255,
+      "max_root_position": 382,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 1505,
+      "own_output_length": 1,
+      "max_root_position": 1505,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 1505,
+      "own_output_length": 128,
+      "max_root_position": 1632,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 1505,
+      "own_output_length": 255,
+      "max_root_position": 1759,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 2301,
+      "own_output_length": 1,
+      "max_root_position": 2301,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 2301,
+      "own_output_length": 128,
+      "max_root_position": 2428,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 8,
+      "prompt_length": 2301,
+      "own_output_length": 255,
+      "max_root_position": 2555,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 127,
+      "own_output_length": 1,
+      "max_root_position": 127,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 127,
+      "own_output_length": 128,
+      "max_root_position": 254,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 127,
+      "own_output_length": 255,
+      "max_root_position": 381,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 128,
+      "own_output_length": 1,
+      "max_root_position": 128,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 128,
+      "own_output_length": 128,
+      "max_root_position": 255,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 128,
+      "own_output_length": 255,
+      "max_root_position": 382,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 1505,
+      "own_output_length": 1,
+      "max_root_position": 1505,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 1505,
+      "own_output_length": 128,
+      "max_root_position": 1632,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 1505,
+      "own_output_length": 255,
+      "max_root_position": 1759,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 2301,
+      "own_output_length": 1,
+      "max_root_position": 2301,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 2301,
+      "own_output_length": 128,
+      "max_root_position": 2428,
+      "future_inputs_do_not_change_visibility": true
+    },
+    {
+      "real_owners": 16,
+      "prompt_length": 2301,
+      "own_output_length": 255,
+      "max_root_position": 2555,
+      "future_inputs_do_not_change_visibility": true
+    }
+  ]
+}

@@ -29,6 +29,8 @@ SOURCES = (
     ('tree-M160-actual165-MC2-bridge-host-v330', 330),
     ('tree-FIA160-projection165-MC2-target-math-cost-v331', 331),
     ('tree-FIA160-projection165-MC2-audit-adapter-v332', 332),
+    ('tree-M160-C128-F64-global192-full-v333', 333),
+    ('tree-FIA160-projection165-chained-flush-host-v334', 334),
 )
 
 
@@ -88,6 +90,8 @@ def main():
         'tree-M160-actual165-MC2-bridge-host-v330',
         'tree-FIA160-projection165-MC2-target-math-cost-v331',
         'tree-FIA160-projection165-MC2-audit-adapter-v332',
+        'tree-M160-C128-F64-global192-full-v333',
+        'tree-FIA160-projection165-chained-flush-host-v334',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -163,6 +167,17 @@ def main():
         'audit_ROOT_M160_math_cost_HOST.py',
         'check_ROOT331_runtime_import_HOST.py',
         'startup_ROOT331_runtime_import_HOST.sh',
+        'build_ROOT333_M160_full_HOST.py',
+        'integrate_ROOT333_geometry_HOST.py',
+        'freeze_ROOT333_current_cost_full_HOST.py',
+        'startup_ROOT333_actual_install_HOST.sh',
+        'cleanup_ROOT331_reconstructable_private_HOST.py',
+        'audit_ROOT331_rejected_observations_HOST.py',
+        'ROOT329_INDEPENDENT_TARGET_MATH_AND_COST_AUDIT.json',
+        'ROOT331_REJECTED_RUN_RETAINED_COMPONENT_OBSERVATIONS.json',
+        'ROOT331_334_ABI_SOURCE_REVIEW_20261019.json',
+        'ROOT329_331_REDUNDANT_CHECKPOINT_AND_OLD_CACHE_REGENERATION_20261019.json',
+        'ROOT316_NONTERMINAL_LOW_B_RAW_CHECK_20261019.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

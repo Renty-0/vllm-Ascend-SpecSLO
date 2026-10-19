@@ -1,0 +1,84 @@
+{
+  "status": "HOST_pass",
+  "original_source_sha256": "e0d9efe4572c7e87ad860b014ef146394ca44f53ac8d87d12edfed2b572422a1",
+  "original_binder_source_sha256": "5072f7de5e922c4f0bee477995741e7ece4439e1dfb4b1630b51016fd51fe75a",
+  "original_decoder_MLP_norm_binder_code_executed_with_CPU_operator_double": true,
+  "physical_attention_queries": 160,
+  "real_MC2_mock_received165": true,
+  "actual_original_model_forward_and_chain_class_executed": true,
+  "original165_profile_admission_retained": true,
+  "every_projection_flushed": true,
+  "deferred_read_done_enabled": false,
+  "actual_chain_finish_two_operations": true,
+  "both_attention_and_down_covered": true,
+  "all160_rows_and_both_outputs_exact": true,
+  "actual_padding_suffix_zero": true,
+  "unchanged_profile160_refuses": true,
+  "changed_weight_original_identity_check_rejects": true,
+  "original_class_code_unmodified": true,
+  "no_models_loaded": true,
+  "no_NPU_run": true,
+  "model_qualified": false,
+  "Goodput": null,
+  "bridge": {
+    "FIA_rows": 160,
+    "FIA_groups": 32,
+    "actual_projection_MC2_rows": 165,
+    "candidate_queries_added": 0,
+    "projection_padding_rows": 5,
+    "profile160_claimed": false,
+    "deferred_chain_enabled": false,
+    "counts_are_Python_graph_construction_or_eager_not_device_replays": true,
+    "construction_witnesses": [
+      {
+        "layer": 0,
+        "K": 3072,
+        "calls": 2
+      },
+      {
+        "layer": 0,
+        "K": 8576,
+        "calls": 2
+      }
+    ],
+    "pending_tickets": 0,
+    "model_qualified": false,
+    "Goodput": null,
+    "original_165_standalone_chained_flush_ABI": true,
+    "chain_scope_closed": true
+  },
+  "operator_calls": [
+    {
+      "M": 165,
+      "K": 3072,
+      "weight": 281466413771392,
+      "gamma": 281466413765312,
+      "flush": true,
+      "actual_chain_state": true
+    },
+    {
+      "M": 165,
+      "K": 8576,
+      "weight": 281466413770032,
+      "gamma": 281466413775872,
+      "flush": true,
+      "actual_chain_state": true
+    },
+    {
+      "M": 165,
+      "K": 3072,
+      "weight": 281466413771392,
+      "gamma": 281466413765312,
+      "flush": true,
+      "actual_chain_state": true
+    },
+    {
+      "M": 165,
+      "K": 8576,
+      "weight": 281466413770032,
+      "gamma": 281466413775872,
+      "flush": true,
+      "actual_chain_state": true
+    }
+  ]
+}

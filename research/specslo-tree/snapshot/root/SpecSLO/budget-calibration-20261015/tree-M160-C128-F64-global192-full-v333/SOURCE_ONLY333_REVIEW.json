@@ -1,0 +1,63 @@
+{
+  "UTC": "2026-10-19T08:18:30.512938+00:00",
+  "status": "SOURCE_ONLY_HOST_PASSED_NOT_FROZEN_NOT_NPU_LAUNCHED",
+  "scope": "FIA160/S32, actual165 original chained-flush MC2, dynamic B1to8, normal128/future64/global192",
+  "original_constructor_budget96_and_all_original_startup_controls_retained": true,
+  "actual_policy_C128_Q160_activated_only_after_original_component": true,
+  "actual_compiled_LIVE_target32_and_policy_roof128": true,
+  "original_need_priority_charges_repair_and_generation_cells_retained": true,
+  "target_costs": "Fresh same-instance16x20 rotated panels after all532 bitwise math; bind conservative target-only branch ratio before LIVE; no external331 data",
+  "caller_draft_budget256_clamped192_HOST_verified": true,
+  "deferred_read_done_enabled": false,
+  "matmul_precision": "BF16; original ND parameters, no quantization",
+  "required_HOST": [
+    "HOST_FULL333_PROTOCOL_RESULT.json",
+    "HOST333_ACTUAL_INSTALL_CAPACITY_RESULT.json",
+    "HOST_REFERENCE333_METADATA_RESULT.json",
+    "HOST_BOUND333_CURRENT_COST_RESULT.json",
+    "HOST_REQUESTED256333_CURRENT_COST_RESULT.json",
+    "HOST_CURRENT_COST333_RESULT.json",
+    "HOST_AUDIT333_RESULT.json",
+    "HOST_PLANS333_RESULT.json",
+    "HOST_LIVE333_POST_SNAPSHOT_RESULT.json",
+    "HOST_EAGER333_RESULT.json",
+    "HOST_ADMISSION333_RESULT.json",
+    "HOST_PRIORITY333_RESULT.json",
+    "HOST_FAULT333_RESULT.json",
+    "HOST_SNAPSHOT333_RESULT.json",
+    "HOST_LAUNCH333_RESULT.json"
+  ],
+  "current_component_NPU_qualification_inherited": false,
+  "fresh_required": [
+    "original201/44/114 and own components",
+    "all532 strict target hidden/128KV/greedy/graph-eager",
+    "raw160 both widths144 controls",
+    "same-instance16 target-cost panels20 rotations",
+    "genuine draft45 and postbranch20",
+    "fixedpoint warm and two complete zeros",
+    "sealed full463 original Poisson4rps seed0 requests and SLO",
+    "independent own-history AR for463x256 onall3target ranks",
+    "prepost10496/15/212 and owned cleanup"
+  ],
+  "diagnostics": {
+    "private_per_tag_bytes": 268435456,
+    "private_aggregate_scope_bytes": 2684354560,
+    "aggregate_scope": "donor diagnostic directory plus own333 source/archive/results; shared private326 compiler cache reused",
+    "tensor_dumps": false,
+    "models_or_datasets_copied": false
+  },
+  "earlier331": {
+    "status": "guard_rejected_private_limit",
+    "child_exit": -15,
+    "adopted": false,
+    "negative_target_N32_B4_ms": 81.18445216678083
+  },
+  "best_adopted_reference": {
+    "version": 257,
+    "Goodput": 554.7604454409803,
+    "Raw": 686.7756316555451
+  },
+  "threshold_Goodput": 644.766448113661,
+  "formal_Goodput": null,
+  "adopted": false
+}

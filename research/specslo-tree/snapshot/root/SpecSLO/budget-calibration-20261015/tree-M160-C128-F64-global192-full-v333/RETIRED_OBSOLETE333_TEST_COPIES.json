@@ -1,0 +1,30 @@
+{
+  "retired": [
+    {
+      "path": "check_cost333_HOST.py",
+      "sha256": "8d6641d436a02c323298fd7f508f2664f191238a891d291740f3b0cb56058b89",
+      "reason": "unexecuted copied316 test superseded by current cost/role-bound/full532 checks; original316 immutable source retained"
+    },
+    {
+      "path": "check_budget333_HOST.py",
+      "sha256": "3e94205dd2ef3493f2182c6a8a21ee753b410c65eb7eb988b4db514cc92cf955",
+      "reason": "unexecuted copied316 test superseded by current cost/role-bound/full532 checks; original316 immutable source retained"
+    },
+    {
+      "path": "check_risk_allocation333_HOST.py",
+      "sha256": "672c44f575c853c29bafd2e63ae7d1f5c911a05d61f4a88fab18599648e77a1f",
+      "reason": "unexecuted copied316 test superseded by current cost/role-bound/full532 checks; original316 immutable source retained"
+    },
+    {
+      "path": "check_prepare333_HOST.py",
+      "sha256": "345026bc74d734d776ee2040a1945287ed9d3e980c03d2211e1d92d182f7717a",
+      "reason": "unexecuted copied316 test superseded by current cost/role-bound/full532 checks; original316 immutable source retained"
+    }
+  ],
+  "replacements": [
+    "check_current_cost333_HOST.py",
+    "check_bound333_HOST.py",
+    "check_requested256333_HOST.py",
+    "check_full333_HOST.py"
+  ]
+}

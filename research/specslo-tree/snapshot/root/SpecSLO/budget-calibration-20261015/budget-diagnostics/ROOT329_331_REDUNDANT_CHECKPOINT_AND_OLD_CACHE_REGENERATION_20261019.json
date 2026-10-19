@@ -1,0 +1,744 @@
+{
+  "UTC": "2026-10-19T07:56:51.976139+00:00",
+  "status": "complete_exact_reconstruction_verified",
+  "cache_root": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache",
+  "cache_files": [
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/9cQFPjDYvBrs0uRySyXHiVZXZqtoZ1IW9iNbHcfSvWo/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "c23f209498cec0525a0d95183c0a9450cabda0e3febd32a446978bf1be36ae8b"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/9cQFPjDYvBrs0uRySyXHiVZXZqtoZ1IW9iNbHcfSvWo/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "0f4a96f18a3256a422c5dbfc363fc9d482b5a030358f9fa96bf70f77c9d28188"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/9cQFPjDYvBrs0uRySyXHiVZXZqtoZ1IW9iNbHcfSvWo/_dual_cache_write288.npubin",
+      "bytes": 2968,
+      "sha256": "caaf968f19981db10f3466e23c339fb4e479d0232798933afadf7243a23fa479"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/9cQFPjDYvBrs0uRySyXHiVZXZqtoZ1IW9iNbHcfSvWo/_dual_cache_write288.ttadapter",
+      "bytes": 14173,
+      "sha256": "808bce479ef657defae898e89a22f37cdbb15f41b4b57873ca04caf945f22c62"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/9cQFPjDYvBrs0uRySyXHiVZXZqtoZ1IW9iNbHcfSvWo/_dual_cache_write288.ttir",
+      "bytes": 9161,
+      "sha256": "543c8f1fe524a8c5bcc6a62df7bf2d44f7360de1e1de7f26468326499f318deb"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/AidCh03c9_A39CxOBPWGMs7B0o621yDe9XAvfZKiCRE/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "f573903a0a024ecb12aeaeb60215d3f68285bd22794e3f881fb028646e23a2ac"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/AidCh03c9_A39CxOBPWGMs7B0o621yDe9XAvfZKiCRE/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "7bde0bce5c97d47e9c5229f3d5223d37eaf99e3bc8555f49908f6a81efd204ae"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/AidCh03c9_A39CxOBPWGMs7B0o621yDe9XAvfZKiCRE/_dual_cache_write288.npubin",
+      "bytes": 2864,
+      "sha256": "48d3e7284fc7d0eab2596a4076758fe772613cc96506d131bc556c24fdec26f7"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/AidCh03c9_A39CxOBPWGMs7B0o621yDe9XAvfZKiCRE/_dual_cache_write288.ttadapter",
+      "bytes": 12739,
+      "sha256": "e8a4c14cdae8a4341c5d449efedf607268c9aee6200435d5df60a0d6c615f533"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/AidCh03c9_A39CxOBPWGMs7B0o621yDe9XAvfZKiCRE/_dual_cache_write288.ttir",
+      "bytes": 9130,
+      "sha256": "2ef4921db7a0e638f9bc7bda070deb10cdec9ff50e6de72ec26bc7f61e3f2291"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/ENpRb09D8hv02uzQK30fESJjKYcuCNa85jQ98ofBLwo/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "abc14514c3f4dda18f745a74c97384082b50bdaa59786313a5177ead194fa2cc"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/ENpRb09D8hv02uzQK30fESJjKYcuCNa85jQ98ofBLwo/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "e40ad1843bb197f24f6b12ce27d4419c6331e177d6283ef65f7a80da40ce49e8"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/ENpRb09D8hv02uzQK30fESJjKYcuCNa85jQ98ofBLwo/_dual_cache_write288.npubin",
+      "bytes": 2952,
+      "sha256": "9eac65253571eaaf7956201c72d164b4fb4d5b323c5a4d3a2bf7683de25e21d6"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/ENpRb09D8hv02uzQK30fESJjKYcuCNa85jQ98ofBLwo/_dual_cache_write288.ttadapter",
+      "bytes": 13996,
+      "sha256": "ff0ea26674587e5001ed40f0181ce869fc2ccb64b114b92b6991f11b5232a8d9"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/ENpRb09D8hv02uzQK30fESJjKYcuCNa85jQ98ofBLwo/_dual_cache_write288.ttir",
+      "bytes": 8984,
+      "sha256": "44f4aa73d6e66737802f831b7b5906bd233d617b136ae777dbac1de07f94561e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/GKWtUMU693WkjrkiflAQTK1rA8Ro5fhT-7mU1Z_-9V0/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "3f8aecbf9cfa94eb8be2058c119ca9b222db17205b8fec776498715dd53221f6"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/GKWtUMU693WkjrkiflAQTK1rA8Ro5fhT-7mU1Z_-9V0/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "aa9d1ed329e12cd173373343dafb106950f636e722714bc6ce5c1f4f8dce9869"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/GKWtUMU693WkjrkiflAQTK1rA8Ro5fhT-7mU1Z_-9V0/_dual_cache_write288.npubin",
+      "bytes": 2872,
+      "sha256": "f4bd9f13de89c1901c244d44229b47ad7488da53d218725be11b9a62a70fe754"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/GKWtUMU693WkjrkiflAQTK1rA8Ro5fhT-7mU1Z_-9V0/_dual_cache_write288.ttadapter",
+      "bytes": 12802,
+      "sha256": "f3cb2c0f9b4329c431d30f741bf0e5d7958a325ca8e60b09d353e9539268a5d8"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/GKWtUMU693WkjrkiflAQTK1rA8Ro5fhT-7mU1Z_-9V0/_dual_cache_write288.ttir",
+      "bytes": 9130,
+      "sha256": "b8d8aae0356e006ca60485b21e729e111d18b13bd16c5de99eef13f4b767dbff"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Ibs0Lo3AE2HIYpNZ97nKHUGq9RVjol-RNKE6aSMlm_s/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "c2f1e5cb89813512a736b192db8629005ad2082875700ea74dccfb387d48bb40"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Ibs0Lo3AE2HIYpNZ97nKHUGq9RVjol-RNKE6aSMlm_s/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "2526e05de44eee954eeb55194dd49e61590e5749b035b916c7077bc0eb9ab1cd"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Ibs0Lo3AE2HIYpNZ97nKHUGq9RVjol-RNKE6aSMlm_s/_dual_cache_write288.npubin",
+      "bytes": 2960,
+      "sha256": "cc32cdaf4a9ddae7d4c808f896aa93da5c28586b1b88496c496c50dc8317e5fb"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Ibs0Lo3AE2HIYpNZ97nKHUGq9RVjol-RNKE6aSMlm_s/_dual_cache_write288.ttadapter",
+      "bytes": 14236,
+      "sha256": "e7cef1ac0e82188af53a834e477f582e12a3c6c22a72be6a229b1d4638c4f73d"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Ibs0Lo3AE2HIYpNZ97nKHUGq9RVjol-RNKE6aSMlm_s/_dual_cache_write288.ttir",
+      "bytes": 9161,
+      "sha256": "5137f0b43221d03c480eac4028a19b94e38eba66c1946483c90daa2a84323cbd"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Jr-fRVPbnJeycKGZYckGcTMrRmwGA119cXDPv9GPnSE/launcher_cxx11abi1.cpython-311-aarch64-linux-gnu.so",
+      "bytes": 181360,
+      "sha256": "84e052741b12bb5be487b06b8e63485e86b873f38ba99dc02d85c2d522809578"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/OxxBRcIq2ap8cCDwvJ_tvUYHSKXoemHjfnO9P8TSYK8/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "90f26c8d573185feee8dedd918ae3739a144feba6e1584a69c8c7fd272036e51"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/OxxBRcIq2ap8cCDwvJ_tvUYHSKXoemHjfnO9P8TSYK8/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "c28d20cfa9a0c356dac8acf3face9aaecacadf56191c56bbb32de59e2821cb43"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/OxxBRcIq2ap8cCDwvJ_tvUYHSKXoemHjfnO9P8TSYK8/_dual_cache_write288.npubin",
+      "bytes": 2960,
+      "sha256": "b0039eff7b0d159e9eb8ed3619aa3730a60d0f458ab1e6eaa3e88d21bda0b223"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/OxxBRcIq2ap8cCDwvJ_tvUYHSKXoemHjfnO9P8TSYK8/_dual_cache_write288.ttadapter",
+      "bytes": 14119,
+      "sha256": "b20c0a12af6936409deaf59c9641764b2ea3fd7f812b83963378e107f28c9e5d"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/OxxBRcIq2ap8cCDwvJ_tvUYHSKXoemHjfnO9P8TSYK8/_dual_cache_write288.ttir",
+      "bytes": 9106,
+      "sha256": "5657cdb8a1273ba4f596776004bd4f9e628fec823f2265a4673704afd2596d10"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/RjHtcGLlZtvZPgeGOp7BEd9Oh9wyGPuwFuiPQiEoxRE/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "0e5ccc7bac73860d3b63f4807a8183e8fd28f1455debd4d03c23107d5835b17a"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/RjHtcGLlZtvZPgeGOp7BEd9Oh9wyGPuwFuiPQiEoxRE/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "511023a7dc92b41b97ff2313b5d6a5e18431fc486799bc6a0e65ff69639842b2"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/RjHtcGLlZtvZPgeGOp7BEd9Oh9wyGPuwFuiPQiEoxRE/_dual_cache_write288.npubin",
+      "bytes": 2944,
+      "sha256": "82a4d639b2861c514aca9e4ef74f88b27b42370fdfa54b2442985ba2764406bf"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/RjHtcGLlZtvZPgeGOp7BEd9Oh9wyGPuwFuiPQiEoxRE/_dual_cache_write288.ttadapter",
+      "bytes": 13942,
+      "sha256": "9c4d3d42a9ec360750fb8ccd8f71ffe698f43c46072d26c97a76c207470ddaaa"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/RjHtcGLlZtvZPgeGOp7BEd9Oh9wyGPuwFuiPQiEoxRE/_dual_cache_write288.ttir",
+      "bytes": 8929,
+      "sha256": "74e849bec46f4d0e197c60cef49b09388c868e6f13dd21c0fd2943eef8c848dc"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Ux5hjqs4Ze32Xaon7o0WzrXNJ91m9Zf8iL8e_JqdIwE/__grp__split_qkv_rmsnorm_rope_kernel.json",
+      "bytes": 1115,
+      "sha256": "37a103fd158262fbc96146527e602dcb97343e727c98d7da0d98f2edf75acfb2"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Ux5hjqs4Ze32Xaon7o0WzrXNJ91m9Zf8iL8e_JqdIwE/split_qkv_rmsnorm_rope_kernel.json",
+      "bytes": 2709,
+      "sha256": "a78673c163fe6e093744b277efcae50f664164efa6c22844994d757198f4dfca"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Ux5hjqs4Ze32Xaon7o0WzrXNJ91m9Zf8iL8e_JqdIwE/split_qkv_rmsnorm_rope_kernel.npubin",
+      "bytes": 7536,
+      "sha256": "3c29b2aa72fa691fa9b3ab2b4514741f2c69ab25c95be74cee18344af85a5964"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Ux5hjqs4Ze32Xaon7o0WzrXNJ91m9Zf8iL8e_JqdIwE/split_qkv_rmsnorm_rope_kernel.ttadapter",
+      "bytes": 34995,
+      "sha256": "9be9865b98009f8895bbd133b998cd4a08f6aba45d1c9a1ef78a9f758f8f196c"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/Ux5hjqs4Ze32Xaon7o0WzrXNJ91m9Zf8iL8e_JqdIwE/split_qkv_rmsnorm_rope_kernel.ttir",
+      "bytes": 39354,
+      "sha256": "ade738199504a46edaf9a70dce29c9d4ede4a0ad477031212c6c567994c5be9e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/ce2cdf734ae056e29945a229e46f7f4c47ac21a1d0b242fdc2aee142b258524d.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/gF3DjRQOHgFmGnAaqUW-tSnugap4SUU0uxkhMVa-5Tk/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "e37e3d5fbe8f7d2760660f8ac3d772fdc82d8f81c306fde28a2f7b28beb554fa"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/gF3DjRQOHgFmGnAaqUW-tSnugap4SUU0uxkhMVa-5Tk/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "6e2183a22b33cc27507e520a98fbd530088bad095dabd4aa047f51f1d4b89f13"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/gF3DjRQOHgFmGnAaqUW-tSnugap4SUU0uxkhMVa-5Tk/_dual_cache_write288.npubin",
+      "bytes": 2960,
+      "sha256": "7dd53cd6ab24a8910299bb17e87036c72165ddd91209f5e7d44ed5e178b368a2"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/gF3DjRQOHgFmGnAaqUW-tSnugap4SUU0uxkhMVa-5Tk/_dual_cache_write288.ttadapter",
+      "bytes": 14236,
+      "sha256": "ae32851bc5fa99748bee9d59e0583623646418b8ab6d3f1c0406e805e3efeb95"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/gF3DjRQOHgFmGnAaqUW-tSnugap4SUU0uxkhMVa-5Tk/_dual_cache_write288.ttir",
+      "bytes": 9161,
+      "sha256": "844c26e64d2e9f17ae9ebd39e382bfdbf4ac45d0efc226ccc3bd723c47c42a45"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/jzHx-YJTLfo4Yt7nhbaDjQ/npu_utils.so",
+      "bytes": 212120,
+      "sha256": "8c1962635b5b374b06bf679ba8fdea99d5c2214947168ae75a95f32eae52088e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/lIWu8_MN_OcFEMfvNQhJYm7i_zskEzQlUD4RGjYk6ck/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "52e43ef9cbf9cc00639bbbd09660812bd7cd9cda65a00e0d1d7df4040df0c040"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/lIWu8_MN_OcFEMfvNQhJYm7i_zskEzQlUD4RGjYk6ck/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "6de639281ccc965ec0420e9f4e09f5168dda504dacced9afbf650c1c9e23b0e9"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/lIWu8_MN_OcFEMfvNQhJYm7i_zskEzQlUD4RGjYk6ck/_dual_cache_write288.npubin",
+      "bytes": 2880,
+      "sha256": "18d8163807c403d5e622661eb279e6acbe9add05ffe3b0f7a9c16b7ada448264"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/lIWu8_MN_OcFEMfvNQhJYm7i_zskEzQlUD4RGjYk6ck/_dual_cache_write288.ttadapter",
+      "bytes": 12979,
+      "sha256": "cd965afcc9f02d9ee4517966aebc6d63720a23b08bc01af35e62166aa2713bad"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/lIWu8_MN_OcFEMfvNQhJYm7i_zskEzQlUD4RGjYk6ck/_dual_cache_write288.ttir",
+      "bytes": 9307,
+      "sha256": "38009b6616d5cd265493fa227a0f3a5adbd33a7afadc113991e657f947717388"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/n2KJzqhsdv_30cqZRrMV26kPphu3Cg2Ko_aMzK6DKe4/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "9db666298049f565dd4870003ebf4ee014865dadea6bb3cc9c26699d83371d07"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/n2KJzqhsdv_30cqZRrMV26kPphu3Cg2Ko_aMzK6DKe4/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "985e233a8cce7bcf107326bc656d7a79a1211dc586438a8ef80e53dcb28ad46e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/n2KJzqhsdv_30cqZRrMV26kPphu3Cg2Ko_aMzK6DKe4/_dual_cache_write288.npubin",
+      "bytes": 2864,
+      "sha256": "43ae74aa78e1089ab328f68324a1bc2f709206a26b730cdc937e8ef3335200a3"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/n2KJzqhsdv_30cqZRrMV26kPphu3Cg2Ko_aMzK6DKe4/_dual_cache_write288.ttadapter",
+      "bytes": 12685,
+      "sha256": "ffa8c2ee860c2e4f8049fa1088ccbd496ac22a89f662383008d067baf9519dbb"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/n2KJzqhsdv_30cqZRrMV26kPphu3Cg2Ko_aMzK6DKe4/_dual_cache_write288.ttir",
+      "bytes": 9075,
+      "sha256": "cfb360c04f09805ac9280c34d13b33b8d35dc97f1954b17c2b9111f74d84051e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/q7db-iU1qu7TY59C7cvqUbkVzWmMcKsgeMEywIl-IIo/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "d282a7e6e04f24ca877a4e237e582d50ff61bd0310045f7e11c8d5c7b98ea22a"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/q7db-iU1qu7TY59C7cvqUbkVzWmMcKsgeMEywIl-IIo/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "51edf7627b933939f5f9991dcd0862a3ce85e67efcdd3dd0a197b764be889599"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/q7db-iU1qu7TY59C7cvqUbkVzWmMcKsgeMEywIl-IIo/_dual_cache_write288.npubin",
+      "bytes": 2856,
+      "sha256": "e9cca9a77d14cfe842793747ed598d501c015bcbff202e7ac4b5132b562cdd19"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/q7db-iU1qu7TY59C7cvqUbkVzWmMcKsgeMEywIl-IIo/_dual_cache_write288.ttadapter",
+      "bytes": 12508,
+      "sha256": "b2fe9e2b22185444693a210219974f51572b57b197200cc2528bdfbc64ddcb99"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/q7db-iU1qu7TY59C7cvqUbkVzWmMcKsgeMEywIl-IIo/_dual_cache_write288.ttir",
+      "bytes": 8898,
+      "sha256": "59a25288e71fcd95c1d68b8cdaa59d8d2ee6dd0fbac582731f9ee313dc0bb536"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/rpHyuH1AjsZ2xIjA8RDJ2pQL3ljhnsRirg8Gxa-GM5Q/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "be0caf13b89134f9964c1b138bad7b78db36b527db3887b8fe8551172c44767b"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/rpHyuH1AjsZ2xIjA8RDJ2pQL3ljhnsRirg8Gxa-GM5Q/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "f2ed86d28f1712c894c94bc0c87a87483e9688946426b9a6c8137660f887eba6"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/rpHyuH1AjsZ2xIjA8RDJ2pQL3ljhnsRirg8Gxa-GM5Q/_dual_cache_write288.npubin",
+      "bytes": 2864,
+      "sha256": "1a1486d0c178622bb834f33f79828c37d90ce305b8fbcada5a455292b49c762f"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/rpHyuH1AjsZ2xIjA8RDJ2pQL3ljhnsRirg8Gxa-GM5Q/_dual_cache_write288.ttadapter",
+      "bytes": 12562,
+      "sha256": "ae29f7bbb87d43f66d3b81f1d9dd8ceb6a81cdb92ea0c89ff7bbd82f1288cd75"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/rpHyuH1AjsZ2xIjA8RDJ2pQL3ljhnsRirg8Gxa-GM5Q/_dual_cache_write288.ttir",
+      "bytes": 8953,
+      "sha256": "37641ad884d4dc4796e31f95e17bc9e18f02e3fc03b59e5eac79e5df9375c990"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/svadNdlWIMPWTnQtrvxWGj6JKS4nqsD7uAtMCE6zOKk/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "3b650e8cabcf6cf072a61011b0325b31d2caacb984a8ec777cf586fb3af8fcbd"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/svadNdlWIMPWTnQtrvxWGj6JKS4nqsD7uAtMCE6zOKk/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "74e71568ebba6736803decfda2cc9302a7cdb03f14eeead4ee18c79315e18930"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/svadNdlWIMPWTnQtrvxWGj6JKS4nqsD7uAtMCE6zOKk/_dual_cache_write288.npubin",
+      "bytes": 2872,
+      "sha256": "d96dcf1fce81f7f1d6ca17293f1c1458a262866f9db0cd9e95065b82e2b4af72"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/svadNdlWIMPWTnQtrvxWGj6JKS4nqsD7uAtMCE6zOKk/_dual_cache_write288.ttadapter",
+      "bytes": 12802,
+      "sha256": "33c12d1aeb403bb6c2e1fe396e01ca96b4f3dfffeef511a8a3d20de411332409"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/svadNdlWIMPWTnQtrvxWGj6JKS4nqsD7uAtMCE6zOKk/_dual_cache_write288.ttir",
+      "bytes": 9130,
+      "sha256": "53f81d40ef9dd59e32c9ce47155673016a0b7474efdf23604ab9f6fadc0a15a9"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/t6XsJD9beVz7pCmd8mPEM5NUwuVvQNNmPajKNdKRbdU/launcher_cxx11abi1.cpython-311-aarch64-linux-gnu.so",
+      "bytes": 181840,
+      "sha256": "fab8643c98815f292324fcec55c53a98c2ffd5102828b1bc77a5985683d30775"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/txrKf7zYylyi6JDOVP28ur9X3c77nXx0afFN5SGaDk4/launcher_cxx11abi1.cpython-311-aarch64-linux-gnu.so",
+      "bytes": 181384,
+      "sha256": "7e1656916e585ca99aee42052e672f64cb6ba0167d0b925648c024bea91a2b1e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/uz-VwjzreilTlb3tKmNVmUFxzf1Yp1Lrzrzz6DVIAPg/__grp___all_layer_spans292.json",
+      "bytes": 1035,
+      "sha256": "70bad1b4c0d2e638f167fc45c06b6cf72168007fcf6b366146cf48924f82731d"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/uz-VwjzreilTlb3tKmNVmUFxzf1Yp1Lrzrzz6DVIAPg/_all_layer_spans292.json",
+      "bytes": 2674,
+      "sha256": "d3c047edfd0a3a44893e8d443229841f0f6877c3fc974c2efe6ec3d4e1500c4a"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/uz-VwjzreilTlb3tKmNVmUFxzf1Yp1Lrzrzz6DVIAPg/_all_layer_spans292.npubin",
+      "bytes": 3264,
+      "sha256": "7eabbebd32f122c0b0648d851e043369079ebcd0d3164ba573f078859f1f065b"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/uz-VwjzreilTlb3tKmNVmUFxzf1Yp1Lrzrzz6DVIAPg/_all_layer_spans292.ttadapter",
+      "bytes": 13470,
+      "sha256": "b6a728ca860b029a4da9efd11094722400b87e4ac329acb8e552cba90a460063"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/uz-VwjzreilTlb3tKmNVmUFxzf1Yp1Lrzrzz6DVIAPg/_all_layer_spans292.ttir",
+      "bytes": 9231,
+      "sha256": "b010e1a673b8cf36c07188add0dc7f40498a72a8a054186be5a4e86f1a1ccf32"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/vKTAAuUPVBEFp-VAmztgTKPng9LrrzeGNPxjTAn9H9o/launcher_cxx11abi1.cpython-311-aarch64-linux-gnu.so",
+      "bytes": 181384,
+      "sha256": "bae811d38cd7da6e973a04a917a244dd4539c688f3af47a01899cace9ffee29e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/vPprVncserNrSemOB3zoWqtgP2l6II6O77KnQGto0P8/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "03baad8d8705fc551e9070d2d85beb00d450407c5dd89bd0eeb117dae26d28ad"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/vPprVncserNrSemOB3zoWqtgP2l6II6O77KnQGto0P8/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "9e5e121e4654e932cdb2653a250eaf2d2fbf43ab0bc81f76c8b52d6f68e1cba1"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/vPprVncserNrSemOB3zoWqtgP2l6II6O77KnQGto0P8/_dual_cache_write288.npubin",
+      "bytes": 2976,
+      "sha256": "15b0079cee6611b3341c925f95bdb23a1766fc81011021940524218a069576f9"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/vPprVncserNrSemOB3zoWqtgP2l6II6O77KnQGto0P8/_dual_cache_write288.ttadapter",
+      "bytes": 14413,
+      "sha256": "5a6705613229d13af989347c42d26f1076785ceb614b1538f4db4b48eb659ef0"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/vPprVncserNrSemOB3zoWqtgP2l6II6O77KnQGto0P8/_dual_cache_write288.ttir",
+      "bytes": 9338,
+      "sha256": "e3b4ec0a9fdb17321c4e5aea02f3369131c9977ea4fb6756ef334ce911593873"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/xFirHK3akeq_BDc5er4r5HSoizl4x-jjWauIdGKOFlw/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "5ba16a384771e847f488400f7688d3ea6abae8ed19879815b16db2c350cf42ba"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/xFirHK3akeq_BDc5er4r5HSoizl4x-jjWauIdGKOFlw/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "588873d399523cd1290e6009e5b945a99ac17b8d9d3fa9080100022ccb86aef9"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/xFirHK3akeq_BDc5er4r5HSoizl4x-jjWauIdGKOFlw/_dual_cache_write288.npubin",
+      "bytes": 2976,
+      "sha256": "d0904847977a5a8b761be1348a3b6826b32c81fe0a2ee931fe946635dfac06ae"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/xFirHK3akeq_BDc5er4r5HSoizl4x-jjWauIdGKOFlw/_dual_cache_write288.ttadapter",
+      "bytes": 14413,
+      "sha256": "3050d0c307568646c246b928aebcd8efea9e22fe1c345eae180b91ef0a5983e9"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/xFirHK3akeq_BDc5er4r5HSoizl4x-jjWauIdGKOFlw/_dual_cache_write288.ttir",
+      "bytes": 9338,
+      "sha256": "a2676e0f2e3e3e6c6fac060b04cb2a86561f4ff5732a6fb74f7c59e69c237d4b"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/zizfc0rgVuKZRaIp5G9_TEesIaHQskL9wq7hQrJYUk0/precompiled.h",
+      "bytes": 1594,
+      "sha256": "8495bbb0ad986c3e866e25e921eb4b6de5d5e5db8949ae3a22a7fb4085eb30d2"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/zizfc0rgVuKZRaIp5G9_TEesIaHQskL9wq7hQrJYUk0/precompiled.h.gch",
+      "bytes": 76131644,
+      "sha256": "b69ab66489eff3a02a76d38ebe55e4c90d4392d380f770c0a2159779b54d3919"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/zjbZ6nbKnT1DwnpJ3BCWHn-ykpZbd--gAFHS7pSJOfY/__grp___dual_cache_write288.json",
+      "bytes": 1043,
+      "sha256": "861b9fc85b7d086f212ae83b6adad09fc495e1c58b438f09d97deaa9bc88b68e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/zjbZ6nbKnT1DwnpJ3BCWHn-ykpZbd--gAFHS7pSJOfY/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "586635cf3f185f950b7efa5e31aa9ba6835132e55546aa1a2b44bbd333dec693"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/zjbZ6nbKnT1DwnpJ3BCWHn-ykpZbd--gAFHS7pSJOfY/_dual_cache_write288.npubin",
+      "bytes": 2872,
+      "sha256": "bd940761bd3d38a377aec641ad298b6db532bedc5027cb2495ae68fb2eac4006"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/zjbZ6nbKnT1DwnpJ3BCWHn-ykpZbd--gAFHS7pSJOfY/_dual_cache_write288.ttadapter",
+      "bytes": 12979,
+      "sha256": "d2e3052ee5c5d552a2034127f18afc8ac75dd302514ff0b0ee48cf0ec86a10aa"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1/zjbZ6nbKnT1DwnpJ3BCWHn-ykpZbd--gAFHS7pSJOfY/_dual_cache_write288.ttir",
+      "bytes": 9307,
+      "sha256": "33500b479d85d56238a4551e3091d3eafd4631148f46567df95c27da1b880f91"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v2/jzHx-YJTLfo4Yt7nhbaDjQ/npu_utils.so",
+      "bytes": 212120,
+      "sha256": "8c1962635b5b374b06bf679ba8fdea99d5c2214947168ae75a95f32eae52088e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/ce2cdf734ae056e29945a229e46f7f4c47ac21a1d0b242fdc2aee142b258524d.lock",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/jzHx-YJTLfo4Yt7nhbaDjQ/npu_utils.so",
+      "bytes": 212120,
+      "sha256": "8c1962635b5b374b06bf679ba8fdea99d5c2214947168ae75a95f32eae52088e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/n2KJzqhsdv_30cqZRrMV26kPphu3Cg2Ko_aMzK6DKe4/__grp___dual_cache_write288.json",
+      "bytes": 1019,
+      "sha256": "b5ed6326f0dfb82b3cefb98b56eb8ccfd573221491f8d9f476a0905c081d3405"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/n2KJzqhsdv_30cqZRrMV26kPphu3Cg2Ko_aMzK6DKe4/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "985e233a8cce7bcf107326bc656d7a79a1211dc586438a8ef80e53dcb28ad46e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/n2KJzqhsdv_30cqZRrMV26kPphu3Cg2Ko_aMzK6DKe4/_dual_cache_write288.npubin",
+      "bytes": 2864,
+      "sha256": "43ae74aa78e1089ab328f68324a1bc2f709206a26b730cdc937e8ef3335200a3"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/n2KJzqhsdv_30cqZRrMV26kPphu3Cg2Ko_aMzK6DKe4/_dual_cache_write288.ttadapter",
+      "bytes": 12685,
+      "sha256": "ffa8c2ee860c2e4f8049fa1088ccbd496ac22a89f662383008d067baf9519dbb"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/n2KJzqhsdv_30cqZRrMV26kPphu3Cg2Ko_aMzK6DKe4/_dual_cache_write288.ttir",
+      "bytes": 9075,
+      "sha256": "cfb360c04f09805ac9280c34d13b33b8d35dc97f1954b17c2b9111f74d84051e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/q7db-iU1qu7TY59C7cvqUbkVzWmMcKsgeMEywIl-IIo/__grp___dual_cache_write288.json",
+      "bytes": 1019,
+      "sha256": "7a9292308356c71fa43958a1b7bf42e1dbf8d0455c9bf3e54409c4bd224730a4"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/q7db-iU1qu7TY59C7cvqUbkVzWmMcKsgeMEywIl-IIo/_dual_cache_write288.json",
+      "bytes": 2673,
+      "sha256": "51edf7627b933939f5f9991dcd0862a3ce85e67efcdd3dd0a197b764be889599"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/q7db-iU1qu7TY59C7cvqUbkVzWmMcKsgeMEywIl-IIo/_dual_cache_write288.npubin",
+      "bytes": 2856,
+      "sha256": "e9cca9a77d14cfe842793747ed598d501c015bcbff202e7ac4b5132b562cdd19"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/q7db-iU1qu7TY59C7cvqUbkVzWmMcKsgeMEywIl-IIo/_dual_cache_write288.ttadapter",
+      "bytes": 12508,
+      "sha256": "b2fe9e2b22185444693a210219974f51572b57b197200cc2528bdfbc64ddcb99"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/q7db-iU1qu7TY59C7cvqUbkVzWmMcKsgeMEywIl-IIo/_dual_cache_write288.ttir",
+      "bytes": 8898,
+      "sha256": "59a25288e71fcd95c1d68b8cdaa59d8d2ee6dd0fbac582731f9ee313dc0bb536"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/txrKf7zYylyi6JDOVP28ur9X3c77nXx0afFN5SGaDk4/launcher_cxx11abi1.cpython-311-aarch64-linux-gnu.so",
+      "bytes": 181384,
+      "sha256": "7e1656916e585ca99aee42052e672f64cb6ba0167d0b925648c024bea91a2b1e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/vKTAAuUPVBEFp-VAmztgTKPng9LrrzeGNPxjTAn9H9o/launcher_cxx11abi1.cpython-311-aarch64-linux-gnu.so",
+      "bytes": 181384,
+      "sha256": "bae811d38cd7da6e973a04a917a244dd4539c688f3af47a01899cace9ffee29e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/zizfc0rgVuKZRaIp5G9_TEesIaHQskL9wq7hQrJYUk0/precompiled.h",
+      "bytes": 1594,
+      "sha256": "8495bbb0ad986c3e866e25e921eb4b6de5d5e5db8949ae3a22a7fb4085eb30d2"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/triton-cache/M165-N32-root-v317-B1to8-546-math-cost-v3/zizfc0rgVuKZRaIp5G9_TEesIaHQskL9wq7hQrJYUk0/precompiled.h.gch",
+      "bytes": 76131628,
+      "sha256": "afe06cec0c08193913a26f16840f616555c5e0967ec7fcc7a90ddc8d31bb0501"
+    }
+  ],
+  "checkpoints": [
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-S32-C128-root-v329-B1to8-532-math-cost-v1/rank0-completed-math-before-cost.json",
+      "bytes": 6847,
+      "sha256": "57dc3ae7a374eb85aeb85bdfd78c9e7b46a0479e9b3a0280231e14e9b016b37b",
+      "final_report": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-S32-C128-root-v329-B1to8-532-math-cost-v1/rank0-numeric.json",
+      "final_report_sha256": "809ba7608f6285ce1a36fa82ccdaa14e14594579a0e17f4d090a7c368c9fb580",
+      "reconstruction_fields_in_order": [
+        "rank",
+        "cases",
+        "math",
+        "bank",
+        "actual_static_graph_calls",
+        "dispatch_audit",
+        "performance"
+      ],
+      "rank": 0,
+      "cases": 532,
+      "performance": false
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-S32-C128-root-v329-B1to8-532-math-cost-v1/rank1-completed-math-before-cost.json",
+      "bytes": 14815382,
+      "sha256": "723095d7dae8db7e894e5e73891416e2643000166ef3c12de23ced16199b62f5",
+      "final_report": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-S32-C128-root-v329-B1to8-532-math-cost-v1/rank1-numeric.json",
+      "final_report_sha256": "315e3b95c5e5c06bda83f817b6b3dcaf9397f23c4aff0d7ebe27d69bc487d625",
+      "reconstruction_fields_in_order": [
+        "rank",
+        "cases",
+        "math",
+        "bank",
+        "actual_static_graph_calls",
+        "dispatch_audit",
+        "performance"
+      ],
+      "rank": 1,
+      "cases": 532,
+      "performance": false
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-S32-C128-root-v329-B1to8-532-math-cost-v1/rank2-completed-math-before-cost.json",
+      "bytes": 14815369,
+      "sha256": "a31f5404d8d4ccc7957806786896a563f6f667df678889ba54080e924ab9014c",
+      "final_report": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-S32-C128-root-v329-B1to8-532-math-cost-v1/rank2-numeric.json",
+      "final_report_sha256": "af9a91678b824c0a433c7c0de414fec053958eb517191259d2c3e37bbe4faea1",
+      "reconstruction_fields_in_order": [
+        "rank",
+        "cases",
+        "math",
+        "bank",
+        "actual_static_graph_calls",
+        "dispatch_audit",
+        "performance"
+      ],
+      "rank": 2,
+      "cases": 532,
+      "performance": false
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-S32-C128-root-v329-B1to8-532-math-cost-v1/rank3-completed-math-before-cost.json",
+      "bytes": 14815395,
+      "sha256": "35d919f230cc09bb8cc0d7e33d7679dc6dde2fc4963dc2d754cdb1dea6a03029",
+      "final_report": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-S32-C128-root-v329-B1to8-532-math-cost-v1/rank3-numeric.json",
+      "final_report_sha256": "afbfcc027bfd0b9795099e7af4240b30faab19c0468bf320c121d33654894088",
+      "reconstruction_fields_in_order": [
+        "rank",
+        "cases",
+        "math",
+        "bank",
+        "actual_static_graph_calls",
+        "dispatch_audit",
+        "performance"
+      ],
+      "rank": 3,
+      "cases": 532,
+      "performance": false
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-FIA160-MC2projection165-root-v331-B1to8-532-math-cost-v1/rank0-completed-math-before-cost.json",
+      "bytes": 6847,
+      "sha256": "57dc3ae7a374eb85aeb85bdfd78c9e7b46a0479e9b3a0280231e14e9b016b37b",
+      "final_report": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-FIA160-MC2projection165-root-v331-B1to8-532-math-cost-v1/rank0-numeric.json",
+      "final_report_sha256": "4c4775bda42acaa8afe94d782eabd215a781643df73abb78a24da5a782480133",
+      "reconstruction_fields_in_order": [
+        "rank",
+        "cases",
+        "math",
+        "bank",
+        "actual_static_graph_calls",
+        "dispatch_audit",
+        "performance"
+      ],
+      "rank": 0,
+      "cases": 532,
+      "performance": false
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-FIA160-MC2projection165-root-v331-B1to8-532-math-cost-v1/rank1-completed-math-before-cost.json",
+      "bytes": 14815294,
+      "sha256": "8b433d8b3f9d9ef7085c71c60e4dd65d35d6128c3d602606e0423c9222001944",
+      "final_report": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-FIA160-MC2projection165-root-v331-B1to8-532-math-cost-v1/rank1-numeric.json",
+      "final_report_sha256": "2b0086ee666777f1384d3f2f4411e13a469ecd02e149dca81f6f861cca416098",
+      "reconstruction_fields_in_order": [
+        "rank",
+        "cases",
+        "math",
+        "bank",
+        "actual_static_graph_calls",
+        "dispatch_audit",
+        "performance"
+      ],
+      "rank": 1,
+      "cases": 532,
+      "performance": false
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-FIA160-MC2projection165-root-v331-B1to8-532-math-cost-v1/rank2-completed-math-before-cost.json",
+      "bytes": 14815281,
+      "sha256": "971ceb7c0d32d0ae87233326625acd20805cc8d5de9ea149112dd4671d4471cc",
+      "final_report": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-FIA160-MC2projection165-root-v331-B1to8-532-math-cost-v1/rank2-numeric.json",
+      "final_report_sha256": "f899cba512cfdc873e2b49ea4a754a42481196754ff3129a125e8b08d509c801",
+      "reconstruction_fields_in_order": [
+        "rank",
+        "cases",
+        "math",
+        "bank",
+        "actual_static_graph_calls",
+        "dispatch_audit",
+        "performance"
+      ],
+      "rank": 2,
+      "cases": 532,
+      "performance": false
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-FIA160-MC2projection165-root-v331-B1to8-532-math-cost-v1/rank3-completed-math-before-cost.json",
+      "bytes": 14815307,
+      "sha256": "2ae66b4e4119bdfecc0e4b56aac3455a539fe88c06c17b7babe54051d9e743a2",
+      "final_report": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-FIA160-MC2projection165-root-v331-B1to8-532-math-cost-v1/rank3-numeric.json",
+      "final_report_sha256": "ecbdd08612759545d92c321c2b6ffe58e25237b4736b9b1d22bb35e69ac1654f",
+      "reconstruction_fields_in_order": [
+        "rank",
+        "cases",
+        "math",
+        "bank",
+        "actual_static_graph_calls",
+        "dispatch_audit",
+        "performance"
+      ],
+      "rank": 3,
+      "cases": 532,
+      "performance": false
+    }
+  ],
+  "total_bytes": 243536719,
+  "original_receipts_and_all_final_numeric_reports_retained": true,
+  "frozen_source_or_model_or_dataset_removed": false,
+  "public_storage_used": false,
+  "cache_regeneration": "Automatically compiled on first use by preserved frozen317/318/320 source and retained CANN9.0/torch-npu2.10.0/Triton environment; cache itself is not measurement evidence. Use a fresh diagnostic tag and original freeze pins. M160 continues to use its separate326 cache.",
+  "checkpoint_reconstruction": "Read final_report, select rank,cases=532,math,bank,actual_static_graph_calls,dispatch_audit,performance=False in recorded order; json.dumps(payload,indent=2).encode() with no trailing newline. Verify sha256 against this record before restoring.",
+  "deleted": true,
+  "deleted_UTC": "2026-10-19T07:56:52.059163+00:00"
+}

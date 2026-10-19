@@ -1,0 +1,11 @@
+{
+  "freeze_sha256": "27ebbaae666041785cf3dd8adc52aa9b05ec06a4198995c0cc2895305ba45014",
+  "archive_sha256": "6fb6621ed12270cb3287b43174b3d5a0ec5dfc5016b55245e5d4923689540e59",
+  "members": 3423,
+  "archive_bytes": 29265300,
+  "source_freeze": "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-F64-global192-full-v333/FREEZE333.json",
+  "archive": "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-F64-global192-full-v333/SOURCE333.tar.gz",
+  "HOST_only": true,
+  "NPU_qualified": false,
+  "Goodput": null
+}

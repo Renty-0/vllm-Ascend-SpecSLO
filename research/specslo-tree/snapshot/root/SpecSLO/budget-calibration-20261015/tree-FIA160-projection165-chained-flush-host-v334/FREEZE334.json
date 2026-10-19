@@ -1,0 +1,12 @@
+{
+  "UTC": "2026-10-19T07:44:19.136022+00:00",
+  "scope": "HOST-only actual165 fully flushed chain ABI, FIA160/S32; no deferred or160 profile entry; fresh NPU gates required",
+  "parent330": "6f92a1a0b918261281907ccaf2c716d153bd5fc8cda1b2ea13e0bcb579a09aa4",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-chained-flush-host-v334/HOST334_CHAINED_FLUSH_RESULT.json": "dcfdbe662e2bed161e2ff7e149c9ca80067f690b9e657dd3378c10cc5a02956f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-chained-flush-host-v334/HOST334_ROW_ADMISSION_RESULT.json": "d7630ce4b16c2091ca62956c649633979f7db900fd8a89ec34eaf19dc506f73a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-chained-flush-host-v334/bridge334.py": "0c8a5ae321ac1b4bab7b00966deaec42fd6af460aaaf2481825ea8000ada283e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-chained-flush-host-v334/check_bridge334_HOST.py": "0cef727019b7cbc0d24decf27168e30f074911d65c39250764123bb7cfc42da5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-chained-flush-host-v334/check_rows334_HOST.py": "cf1ba60de32753f3815a4dc6ac8177f704a28462e85c815cb89b179fec506c69"
+  }
+}

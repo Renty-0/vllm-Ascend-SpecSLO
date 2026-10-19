@@ -1,0 +1,48 @@
+{
+  "status": "HOST_pass",
+  "cases": [
+    {
+      "physical_rows": 160,
+      "tree": true,
+      "chain_admission_rows": 165
+    },
+    {
+      "physical_rows": 160,
+      "tree": true,
+      "chain_admission_rows": 160
+    },
+    {
+      "physical_rows": 160,
+      "tree": false,
+      "chain_admission_rows": 160
+    },
+    {
+      "physical_rows": 160,
+      "tree": false,
+      "chain_admission_rows": 160
+    },
+    {
+      "physical_rows": 159,
+      "tree": true,
+      "chain_admission_rows": 159
+    },
+    {
+      "physical_rows": 165,
+      "tree": true,
+      "chain_admission_rows": 165
+    },
+    {
+      "physical_rows": 128,
+      "tree": true,
+      "chain_admission_rows": 128
+    }
+  ],
+  "rejected": [
+    "unqualified",
+    "deferred"
+  ],
+  "projection_rows_not_FIA_or_input_rows_changed": true,
+  "deferred_read_done_enabled": false,
+  "no_model_or_NPU_run": true,
+  "Goodput": null
+}

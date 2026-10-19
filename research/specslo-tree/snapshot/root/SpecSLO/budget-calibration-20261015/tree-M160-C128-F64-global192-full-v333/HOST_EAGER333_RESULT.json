@@ -1,0 +1,96 @@
+{
+  "status": "HOST_actual_Native_eager3_and_normalB1to8_mixed_selection_regression_passed",
+  "cases": [
+    {
+      "prefix": 0,
+      "eager_prefix": 4,
+      "normal_grants": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "eager_grant": 3,
+      "old_failure_reproduced": true,
+      "packed_eager_exact_declared_chain": true
+    },
+    {
+      "prefix": 127,
+      "eager_prefix": 131,
+      "normal_grants": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "eager_grant": 3,
+      "old_failure_reproduced": true,
+      "packed_eager_exact_declared_chain": true
+    },
+    {
+      "prefix": 128,
+      "eager_prefix": 132,
+      "normal_grants": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "eager_grant": 3,
+      "old_failure_reproduced": true,
+      "packed_eager_exact_declared_chain": true
+    },
+    {
+      "prefix": 1505,
+      "eager_prefix": 1509,
+      "normal_grants": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "eager_grant": 3,
+      "old_failure_reproduced": true,
+      "packed_eager_exact_declared_chain": true
+    },
+    {
+      "prefix": 2555,
+      "eager_prefix": 2559,
+      "normal_grants": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "eager_grant": 3,
+      "old_failure_reproduced": true,
+      "packed_eager_exact_declared_chain": true
+    }
+  ],
+  "original_eager_method_sha256": "808a9aab4701cc1d3c732de6fe302920f9d21902cd50174c1da28facf49761b3",
+  "old_failure_reproduced_all_prefixes": true,
+  "unqualified_eager_shapes_rejected": true,
+  "original_eager_candidate_charges_and_prefix_preserved": true,
+  "NPU_used": false,
+  "Goodput": null
+}

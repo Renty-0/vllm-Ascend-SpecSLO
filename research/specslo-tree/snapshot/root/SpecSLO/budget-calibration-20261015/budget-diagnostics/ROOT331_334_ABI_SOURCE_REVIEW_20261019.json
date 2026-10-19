@@ -1,0 +1,30 @@
+{
+  "UTC": "2026-10-19T07:46:59.419931+00:00",
+  "scope": "Source and HOST-only ABI review; active331 runtime unchanged",
+  "profile_file": "/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/mc2-profile.json",
+  "profile_file_sha256": "ad9e0648810ed697679ee84b8bbc2939ea14bfb687d0215d27f403ad5526db1c",
+  "profile_standalone_chained_flush": true,
+  "source_hashes": {
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_model.py": "e0d9efe4572c7e87ad860b014ef146394ca44f53ac8d87d12edfed2b572422a1",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/mc2.py": "5072f7de5e922c4f0bee477995741e7ece4439e1dfb4b1630b51016fd51fe75a"
+  },
+  "actual331": {
+    "FIA_rows": 160,
+    "projection_rows": 165,
+    "chain_state": null,
+    "ABI": "legacy nonchained TP3 epilogue; only165 shape route accepted; fresh math/cost measured independently"
+  },
+  "source334": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-chained-flush-host-v334",
+    "freeze": "4523faba8e46353919b5a1005ac70ead2c56a4223a7fd1cfa0c342e7d579c30a",
+    "HOST_original_Model_Layer_MLP_Norm_binder_and_chain_class": true,
+    "actual_projection_rows": 165,
+    "FIA_rows": 160,
+    "FIA_groups": 32,
+    "original_chained_flush_admission165_required": true,
+    "deferred_read_done_enabled": false
+  },
+  "next_step": "Use actual331 cost to choose full experiment source;334 still requires fresh target all532, original components/draft controls, full463 ownAR and performance; no measured gain assumed",
+  "NPU334_run": false,
+  "Goodput": null
+}

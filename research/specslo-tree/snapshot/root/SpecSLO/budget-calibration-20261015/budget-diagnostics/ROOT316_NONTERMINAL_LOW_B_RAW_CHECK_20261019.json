@@ -1,0 +1,15 @@
+{
+  "UTC": "2026-10-19T07:24:46.398146+00:00",
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/measured-target-cost-risk-root-v316-B1to8-full463-ownAR-v1/rank1-local-diagnostic.json",
+  "source_sha256": "d5d9d104b88556655194d749881f3da285a56103b38ecaf493f6c6a1a2e22ca9",
+  "generation": 5,
+  "scope": "Actual LIVE observation callback records remaining_before>=5; not teacher-forced gains or latency",
+  "sample_histogram": {
+    "4": 37759,
+    "8": 366
+  },
+  "low_B_samples": 0,
+  "normal_floor4_changes_not_implemented": true,
+  "Goodput": null,
+  "reason": "Check whether increasing normal minimum could affect any genuinely nonterminal work before adding another NPU experiment"
+}

@@ -1,0 +1,23 @@
+{
+  "status": "HOST_current_cost_binding_and_generation_persistence_passed",
+  "target_panels": 48,
+  "rotations_per_panel": 20,
+  "invalid_cases_rejected": [
+    "rotation",
+    "time",
+    "graph_counter",
+    "missing_panel",
+    "unbound",
+    "source",
+    "model",
+    "ABI",
+    "rebind",
+    "foreign_policy"
+  ],
+  "actual_original_risk_generation_reset_preserves_static_calibration": true,
+  "synthetic_HOST_cost_only": true,
+  "no_actual_model_or_NPU_run": true,
+  "independent_full_auditor_recomputes_same48_rows": true,
+  "no_latency_or_Goodput_claim": true,
+  "Goodput": null
+}
