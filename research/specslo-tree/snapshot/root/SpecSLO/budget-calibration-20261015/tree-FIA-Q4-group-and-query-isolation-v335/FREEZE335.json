@@ -1,0 +1,16 @@
+{
+  "schema": "ROOT335.additive-synthetic-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q4-group-and-query-isolation-v335/HOST335_RESULT.json": "65d18b80765571a8565f06ece93fe1d1c6b707e471c166b49f281e59ffcfd7b0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q4-group-and-query-isolation-v335/PLAN335.json": "f942978e52101ad09617fd4f591bea39ed775e4958e6e488e56ac7e9634a3df7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q4-group-and-query-isolation-v335/check335_HOST.py": "ff8bde7d02e54e2d194b097ac528dce13d97a953e9d962c64760a172e62746a9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q4-group-and-query-isolation-v335/guard335.py": "7514ce9d017dbad6cdbc93f9e0f762a51322a5fbad99d2ab5fb1c54fea8b3cef",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q4-group-and-query-isolation-v335/probe335.py": "bbc045381ff0abd77d8edd7b202b05b5f740d5fc25f359dafd71137f0ba19709",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q4-group-and-query-isolation-v335/startup335.sh": "92938e26c0ff5747a25b6ed5a415f2730a54aea3ef6b453d0bc4d13aafa9486b"
+  },
+  "parent_freeze_sha256": "27ebbaae666041785cf3dd8adc52aa9b05ec06a4198995c0cc2895305ba45014",
+  "parent_archive_sha256": "6fb6621ed12270cb3287b43174b3d5a0ec5dfc5016b55245e5d4923689540e59",
+  "parent_source_verified_separately_in_place": true,
+  "models_loaded": false,
+  "NPU_qualification_inherited": false
+}

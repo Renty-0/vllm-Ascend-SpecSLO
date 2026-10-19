@@ -1,0 +1,27 @@
+{
+  "schema": "ROOT335.synthetic-only-plan.v1",
+  "models_loaded": false,
+  "full463": false,
+  "Goodput": null,
+  "requires_parent333_terminal_and_owned_cleanup_before_launch": true,
+  "groups": [
+    24,
+    32,
+    33
+  ],
+  "widths": [
+    4,
+    5
+  ],
+  "comparison_modes": [
+    "roots",
+    "all_queries"
+  ],
+  "ABA_observations": 864,
+  "parent324": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/probe324.py",
+    "sha256": "7c45c788de5e596b48787f7ca809c80148bf211c98644c6164d17690cd701c66"
+  },
+  "purpose": "Screen Q4 numeric geometry before any actual-model depth/Raw experiment; retain Q5 and33-group controls; no performance inference.",
+  "original_environment_prepost_and_owned_lock_required": true
+}

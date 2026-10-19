@@ -1,0 +1,10 @@
+{
+  "status": "passed_actual_retained_trace_HOST_regression",
+  "actual_full_calls": 2059,
+  "logical_partition_independently_rebuilt": true,
+  "actual160_scatter_and_inverse_independently_rebuilt": true,
+  "actual_device_Q5_metadata_checked": true,
+  "NPU_used": false,
+  "original_failed_receipt_unchanged": true,
+  "formal_adopted": false
+}

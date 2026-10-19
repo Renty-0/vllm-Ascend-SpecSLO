@@ -1,0 +1,13 @@
+{
+  "status": "passed",
+  "original_Host_source_SHA_verified": true,
+  "unchanged_original_functions_projected": [
+    "admission_and_full_statistics",
+    "common_full_statistics"
+  ],
+  "exact_source_anchors_checked": 9,
+  "original_constructor96_active48_and_LIVE_flags_retained": true,
+  "NPU_used": false,
+  "Torch_imported": false,
+  "no_actual_performance_or_terminal_receipt_read": true
+}

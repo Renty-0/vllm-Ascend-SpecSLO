@@ -1,0 +1,8 @@
+{
+  "status": "passed_source_frozen_NOT_LAUNCHED",
+  "source_members": 3430,
+  "own_archive_members": 7,
+  "parent333_archive_verified_in_place": true,
+  "Torch_imported": false,
+  "NPU_used": false
+}

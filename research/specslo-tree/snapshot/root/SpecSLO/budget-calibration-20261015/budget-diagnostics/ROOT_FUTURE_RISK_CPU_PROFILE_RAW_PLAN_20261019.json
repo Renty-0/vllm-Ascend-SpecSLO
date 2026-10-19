@@ -1,0 +1,19 @@
+{
+  "UTC": "2026-10-19T09:26:44.704049+00:00",
+  "status": "future_profile_plan_only",
+  "current333_untouched": true,
+  "when": "After active333 terminal and owned NPU cleanup; do not load CPU during timing",
+  "evidence": [
+    "ROOT316 rank0 host state_update23.909s versus ROOT2575.301s; different experiments, not isolated causality.",
+    "risk294.owner evaluates dict(raw=blank(),recent=blank(),...) eagerly on every setdefault call even when the request row already exists. prediction invokes owner before checking its cached revision."
+  ],
+  "question": "Measure how much actual prediction, observation, shape/priority/repair work costs before selecting a CPU optimization.",
+  "method": [
+    "Profile exact original functions on CPU-only retained state and representative actual controller fixture; no serving-state or frozen-source mutation.",
+    "Compare selective create-on-miss owner lookup with complete unchanged data/cache outputs, then report isolated micro cost rather than inferring full Raw.",
+    "Profile full actual build_plan/shape/observe boundaries; optimization priority follows total cost, not number of allocations.",
+    "Any integration must be private per-instance, preserve g curves, budgets, priority, generation resets and full independent ownAR."
+  ],
+  "implementation_started": false,
+  "performance_claim": false
+}

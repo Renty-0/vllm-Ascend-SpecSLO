@@ -1,0 +1,139 @@
+{
+  "status": "completed_compute_independently_audited_original_execution_failed_performance_rejected",
+  "UTC": "2026-10-19T09:53:10.655344+00:00",
+  "trace": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-actual165-chainedflush-C128-F64-currentcost-root-v333-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+    "sha256": "daf6163ca959cd1a3b6bd2202954f211455d967114a87f29c1a813baa1726ea8"
+  },
+  "all": {
+    "requests": 463,
+    "attained": 117,
+    "output_tokens": 118528,
+    "good_tokens": 29952,
+    "Raw": 504.2106166831511,
+    "Goodput": 127.41391393505114,
+    "TPOT_paper_median_ms": 63.1377611298376,
+    "TPOT_paper_P90_ms": 76.50142318634607,
+    "TPOT_observed_median_ms": 63.38536019309186,
+    "TPOT_observed_P90_ms": 76.801428767469
+  },
+  "by_class": {
+    "loose": {
+      "requests": 96,
+      "attained": 96,
+      "output_tokens": 24576,
+      "good_tokens": 24576,
+      "Raw": 104.54474989542658,
+      "Goodput": 104.54474989542658,
+      "TPOT_paper_median_ms": 76.29232905856043,
+      "TPOT_paper_P90_ms": 83.17919363707915,
+      "TPOT_observed_median_ms": 76.59151466271165,
+      "TPOT_observed_P90_ms": 83.505386553303
+    },
+    "normal": {
+      "requests": 96,
+      "attained": 21,
+      "output_tokens": 24576,
+      "good_tokens": 5376,
+      "Raw": 104.54474989542658,
+      "Goodput": 22.869164039624565,
+      "TPOT_paper_median_ms": 54.64987104096508,
+      "TPOT_paper_P90_ms": 61.0025607247735,
+      "TPOT_observed_median_ms": 54.86418426073357,
+      "TPOT_observed_P90_ms": 61.241786453105945
+    },
+    "tight": {
+      "requests": 271,
+      "attained": 0,
+      "output_tokens": 69376,
+      "good_tokens": 0,
+      "Raw": 295.12111689229795,
+      "Goodput": 0.0,
+      "TPOT_paper_median_ms": 62.95992497143743,
+      "TPOT_paper_P90_ms": 70.69657788633776,
+      "TPOT_observed_median_ms": 63.20682663799209,
+      "TPOT_observed_P90_ms": 70.97381936824497
+    }
+  },
+  "elapsed_seconds": 235.0763670541346,
+  "target_calls": 2059,
+  "mean_N": 18.811559009227782,
+  "max_N": 24,
+  "N_histogram": {
+    "1": 142,
+    "17": 73,
+    "18": 82,
+    "16": 30,
+    "15": 19,
+    "14": 18,
+    "13": 26,
+    "11": 20,
+    "9": 15,
+    "7": 27,
+    "8": 16,
+    "6": 24,
+    "5": 25,
+    "4": 32,
+    "2": 42,
+    "3": 29,
+    "24": 1062,
+    "23": 58,
+    "22": 135,
+    "21": 108,
+    "20": 26,
+    "19": 19,
+    "12": 14,
+    "10": 17
+  },
+  "budgets": {
+    "4": 37455,
+    "8": 960,
+    "1": 169,
+    "2": 114,
+    "6": 4,
+    "7": 5,
+    "3": 26
+  },
+  "branch_calls": 276,
+  "real_queries": 196767,
+  "physical_queries": 329440,
+  "padding_queries": 132673,
+  "padding_fraction": 0.40272280233122876,
+  "target_host_seconds": 180.44095521513373,
+  "mean_target_host_ms": 87.63523808408631,
+  "target_host_is_device_time": false,
+  "active_window": 48,
+  "prefill_cohort_sizes": {
+    "1": 1,
+    "35": 1,
+    "48": 8,
+    "43": 1
+  },
+  "original_config_max_target_batch": 32,
+  "original_config_merge_ready_homes": true,
+  "actual_N32_observed": false,
+  "current_best_unchanged": 257,
+  "goal_achieved": false,
+  "formal_adopted": false,
+  "whole463_AR_verified": true,
+  "AR_equal_requests_each_target": [
+    463,
+    463,
+    463
+  ],
+  "original_supervisor_status": "failed",
+  "original_child_exit": 1,
+  "original_receipt": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M160-actual165-chainedflush-C128-F64-currentcost-root-v333-full463-ownAR-v1.json",
+    "sha256": "56e608dcd161b21f72d24a9750140620cc390811c66e757bc2568af773614eba"
+  },
+  "independent_posthoc_audit": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT333_TERMINAL_INDEPENDENT_CORRECTED_PROJECTION_AUDIT.json",
+    "sha256": "1b29e6a35ce78a0690f3c5d41269e841ec0f11222f448b2423bd431ac8d2c8cc"
+  },
+  "posthoc_corrections": "Old120 producer projection import replaced only in HOST reader with independent160 scatter; logical trace partition audited separately from actual fixedQ5 device metadata; original sources/receipt unchanged.",
+  "source_environment_prepost_and_owned_cleanup_verified": true,
+  "normal_worker_exit_record_retained": true,
+  "final_comparison_cells_completed": 0,
+  "next": "Q4 passing S24/S32 synthetic geometry -> fresh real model hidden/KV/greedy/graph cost diagnostic before any new full production candidate"
+}

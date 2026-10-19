@@ -1,0 +1,56 @@
+{
+  "UTC": "2026-10-19T09:24:53.401723+00:00",
+  "status": "FUTURE_SOURCE_DESIGN_ONLY_NOT_IMPLEMENTED",
+  "activation": "Only consider after current333 full result; current333 and frozen sources unchanged",
+  "motivation": [
+    "Current333 same-model target N32/B4 costs77.31ms; no component gain over ordinary160 observation72.42ms.",
+    "Historical tree visible bonus tokens are about11% of decode output, so dropping them alone is not a speedup.",
+    "For a greedy straight path, four queried heads root/d1/d2/d3 emit the same four target tokens whether called a depth3 tree with its ordinary bonus or a depth4 tree with the last leaf query and fifth bonus omitted. Acceptance/KV ABI differs, so do not fabricate an uncomputed fourth-leaf head."
+  ],
+  "alternative": {
+    "name": "uniformQ4/S32, primary3+root-alternate3, retained ordinary tree verifier",
+    "physical_rows": 128,
+    "physical_groups": 32,
+    "KV_extent": 2560,
+    "primary_depth": 3,
+    "max_candidates": 6,
+    "max_emitted_tokens": 4,
+    "parents": [
+      -1,
+      0,
+      1,
+      -1,
+      3,
+      4
+    ],
+    "normal_roof_hypothesis": 96,
+    "future_roof_hypothesis": 96,
+    "global_roof": 192,
+    "max_primary_plus_side_groups": 32,
+    "max_side_groups": 12,
+    "draft_primary_full4_retained_for_existing_B3_eager_frontier": true,
+    "draft_side_steps": 2
+  },
+  "advantages_to_test": [
+    "Use actual128-row qualified MC2 instead of padding160 to165.",
+    "Keep ordinary all-query tree verifier and explicit KV semantics; avoid typed missing-leaf-head ABI.",
+    "Depth3 parent topology may reuse original qualified B3 eager path, but new target layout and full promotion still require fresh model proof."
+  ],
+  "required": [
+    "Check full source history to avoid repeating a prior negative identical Q4/S32 experiment.",
+    "Fresh synthetic FIA Q4 group-position invariance at long prefixes, both masks and ABA; then real independent node math.",
+    "New primary3/side3 model generation, exact candidate orders and B1..6 g definitions; calibrate using current data, never reuse g4/8 numerical curves.",
+    "Prove all normal/future/group/priority budgets with actual original repair and accounting closure.",
+    "Fresh target hidden/all128KV/greedy/graph-eager and independent prefixes, actual eager3 dependency/rollback/followup, then full463 ownAR.",
+    "Real current cost and complete Raw/Goodput, followed by matched final comparison if worthwhile."
+  ],
+  "limitations": [
+    "A smaller tree horizon can reduce useful tokens per round; no Raw or Goodput gain is guaranteed.",
+    "Q4/S32 changes FIA arithmetic geometry and is not numerically qualified by currentQ5/S32.",
+    "Historical count screen is descriptive, not a rerun or an end-to-end counterfactual.",
+    "Tree primary depth3 is an explicit new experiment; fixed serialgamma4 reference remains unchanged."
+  ],
+  "NPU_used": false,
+  "implemented": false,
+  "Goodput": null
+}

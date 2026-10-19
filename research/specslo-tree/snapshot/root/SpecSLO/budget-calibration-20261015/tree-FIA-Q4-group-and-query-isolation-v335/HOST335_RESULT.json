@@ -1,0 +1,11 @@
+{
+  "status": "passed_HOST_only",
+  "planned_configurations": 288,
+  "planned_ABA_observations": 864,
+  "rejected_corrupt_records": 7,
+  "original_guard_functions_compiled": true,
+  "fake_fixture_is_not_device_evidence": true,
+  "Torch_imported": false,
+  "NPU_used": false,
+  "launcher_executed": false
+}

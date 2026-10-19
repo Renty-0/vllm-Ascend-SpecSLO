@@ -31,6 +31,7 @@ SOURCES = (
     ('tree-FIA160-projection165-MC2-audit-adapter-v332', 332),
     ('tree-M160-C128-F64-global192-full-v333', 333),
     ('tree-FIA160-projection165-chained-flush-host-v334', 334),
+    ('tree-FIA-Q4-group-and-query-isolation-v335', 335),
 )
 
 
@@ -92,6 +93,7 @@ def main():
         'tree-FIA160-projection165-MC2-audit-adapter-v332',
         'tree-M160-C128-F64-global192-full-v333',
         'tree-FIA160-projection165-chained-flush-host-v334',
+        'tree-FIA-Q4-group-and-query-isolation-v335',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -186,6 +188,18 @@ def main():
         'ROOT316_TERMINAL_GAIN_DESCRIPTIVE_20261019.json',
         'ROOT_FUTURE_Q4_NO_BONUS_RAW_HYPOTHESIS_20261019.json',
         'ROOT_Q4_FUTURE_RAW_HISTORICAL_BONUS_COST_SCREEN_20261019.json',
+        'HOST_ROOT333_TERMINAL_READER_LEGACY_PROJECTION_RESULT.json',
+        'ROOT333_posthoc_projection_adapter_HOST.py',
+        'audit_ROOT333_terminal_corrected_projection_HOST.py',
+        'HOST_ROOT333_ACTUAL_LOGICAL_AND_DEVICE_PROJECTION_REGRESSION.json',
+        'ROOT333_TERMINAL_ORIGINAL_READER_AUDIT.json',
+        'ROOT333_TERMINAL_INDEPENDENT_CORRECTED_PROJECTION_AUDIT.json',
+        'ROOT333_CURRENT_COST_OBSERVATIONS_FULL_PENDING_20261019.json',
+        'ROOT333_PRELIMINARY_FULL_COMMON_METRICS.json',
+        'ROOT333_PRELIMINARY_FULL_RESULT_AND_RAW_FINDINGS.json',
+        'ROOT333_FINAL_FULL_RESULT.json',
+        'ROOT_FUTURE_Q4_DEPTH3_EXISTING_EAGER_RAW_ALTERNATIVE_20261019.json',
+        'ROOT_FUTURE_RISK_CPU_PROFILE_RAW_PLAN_20261019.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():
