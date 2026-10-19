@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-19T05:47:52.964894+00:00",
-  "upstream_branch_base": "efc430a277ca554922cc88a3b0290c206d030a22",
+  "saved_UTC": "2026-10-19T06:06:22.300751+00:00",
+  "upstream_branch_base": "c9ac63f0898ba1199d59a83759103a11ba9bac06",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -232,8 +232,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT318_320_FIRST_BRANCH_FAILURE_COMPARISON.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT318_320_FIRST_BRANCH_FAILURE_COMPARISON.json",
-      "sha256": "c9cee0791d7d10b44d5794dc9bd35b3c98988d8d5ff246cd84971c541851b8f4",
-      "bytes": 5146
+      "sha256": "9a9f7d68728e38d13823d29385b1128fa8ccb544c5f78adeae84e8265ef34629",
+      "bytes": 5272
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT318_UNUSED_COMPILER_CACHE_REGENERATION_20261019.json",
@@ -250,8 +250,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
-      "sha256": "6ee7759393994ca4e826ba7b64cffefedecafd4bf1178ef6d2bd1a9f123b9bb9",
-      "bytes": 9807
+      "sha256": "6e709027aba6d6232407a26828327446d2ebeae4f149f2a824dd8e1afeb6fa72",
+      "bytes": 11230
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
@@ -456,6 +456,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_ROOT323_common_mask_HOST.py",
       "sha256": "1a1c3801ab0dfadb7726317b222bfda0e591b802d262436514174c790f91c5e8",
       "bytes": 4271
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_ROOT326_M160_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_ROOT326_M160_HOST.py",
+      "sha256": "bde696ca447745c8f4dc43063f01efbc3e5b8cf6ae3100ba40bc62bfa1175cde",
+      "bytes": 5350
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_v209_role_audit_source.py",
@@ -928,8 +934,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "6b3df73e568ba34174c5591eadd865334820f3f0d2f957ec3fc483bc77c6e8ca",
-      "bytes": 11337
+      "sha256": "2d2bd44bae8798956452eb15558e95635d776b4cb5ffc938d3d65bde971c8ed3",
+      "bytes": 11580
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/summarize_ROOT_official021_stability_HOST.py",
@@ -1154,10 +1160,286 @@
       "bytes": 7125
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/FIA324_GROUP_INVARIANCE_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/FIA324_GROUP_INVARIANCE_RESULT.json",
+      "sha256": "e57c6ce92f735b69d07caab383ea4f7b6c7e3f7abfc71aea4e942b00749d41ba",
+      "bytes": 168432
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/PROBE324_SOURCE_PIN.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/PROBE324_SOURCE_PIN.json",
+      "sha256": "019db89bd50d6bdceae35cb5863abb2494020452ba261d2e6cf3ebb675d69cd2",
+      "bytes": 327
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/SUMMARY324.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/SUMMARY324.json",
+      "sha256": "bea5f3537b5d756799b30995d536f7447ae068a7d8d5239b8bba49f8ee187b1c",
+      "bytes": 504
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/probe324.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/probe324.py",
+      "sha256": "7c45c788de5e596b48787f7ca809c80148bf211c98644c6164d17690cd701c66",
+      "bytes": 3977
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/probe324.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/probe324.sh",
+      "sha256": "4b874c3ea1b0c3c2b0687258ae597b8f70e28e5064639f0277e7a67412d7ff35",
+      "bytes": 225
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-FP32-BF16-tie-refinement-diagnostic-v223/precision_ties223.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-FP32-BF16-tie-refinement-diagnostic-v223/precision_ties223.py",
       "sha256": "559c0adf01999fd97e109f1a0ae588c3071e64e4f42778c1ba4889204fcf6c5b",
       "bytes": 2448
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/DECLARED326_CASES.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/DECLARED326_CASES.json",
+      "sha256": "83f30f7e38594727319281ed0e0b669258d6c292854d85a838c0cb33253f6f8d",
+      "bytes": 653410
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/FREEZE326.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/FREEZE326.json",
+      "sha256": "1c8878b7490ed85684aea9686a25652b2488f30074769b0568243e5c476fbc43",
+      "bytes": 8436
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/HOST326_COMPILED_REFERENCE_BINDING.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/HOST326_COMPILED_REFERENCE_BINDING.json",
+      "sha256": "fbdabf80e3863efa06649aeb879c205589531f4a791da860be010224fdd41923",
+      "bytes": 332
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/HOST326_GEOMETRY_AND_SPLIT_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/HOST326_GEOMETRY_AND_SPLIT_RESULT.json",
+      "sha256": "cc986937415fa3b01acfbed0aafce9040f7ff66cb4b68c3e955d86c316f470c0",
+      "bytes": 166950
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/HOST326_INITIAL_CASE_COUNT_ASSUMPTION_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/HOST326_INITIAL_CASE_COUNT_ASSUMPTION_RESULT.json",
+      "sha256": "cc986937415fa3b01acfbed0aafce9040f7ff66cb4b68c3e955d86c316f470c0",
+      "bytes": 166950
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/RAW326_MODEL_FREE_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/RAW326_MODEL_FREE_RESULT.json",
+      "sha256": "22d48b15a7f4cdefe99b43cc76c588eb44f3dd25f2ea8f02fe59dd8f46aebd37",
+      "bytes": 80657
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/SOURCE326_REVIEW.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/SOURCE326_REVIEW.json",
+      "sha256": "bb95807df54cc341a0760beb4d8e5715f0902855d94582aa0dbc41ba064887d5",
+      "bytes": 880
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/actual_audit326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/actual_audit326.py",
+      "sha256": "3a9ac350095f41bf698d1600faedd4746fcac50c642be3e072eff1b872666255",
+      "bytes": 3456
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/audit_static_calls326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/audit_static_calls326.py",
+      "sha256": "5d5dcd8e5d702f805d7a61f8187b6fcb7495b175c5bfbe1305984cc4f980f538",
+      "bytes": 3228
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/bank326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/bank326.py",
+      "sha256": "e228170e5623c10f2bb00431fbced62f1ed53402531d2cb30aa2388b60ebbcae",
+      "bytes": 3316
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/baseline326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/baseline326.py",
+      "sha256": "93f92cc34e7b1be23f8fdc4e0d196478ffaeac761847185f4da39691edca1f3c",
+      "bytes": 2870
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/benchmark326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/benchmark326.py",
+      "sha256": "0ca354745ec356f2739c233e48362c916a1c39cd57fe8b2da1e00dbe35138046",
+      "bytes": 3480
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/binding326_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/binding326_HOST.py",
+      "sha256": "b186075b16b5da9340ee92fc63b0fca8300f09d2f53ddc66ea578a3b04ce634b",
+      "bytes": 722
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/branch_tail326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/branch_tail326.py",
+      "sha256": "244c2f48996e9aff28f3ffe2f506bf72a4c77bedea5e934139a806dbd05893f6",
+      "bytes": 9635
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/capture_key326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/capture_key326.py",
+      "sha256": "9ff8fcbc8761d4e71b4620e646a2b0678814a4d2bff2f4bd5d352810aebabdfa",
+      "bytes": 132
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/check326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/check326.py",
+      "sha256": "65b4a6f10e187387853bae419a63ab2b8ba654d9b715a04e82147c5a7cca3a6d",
+      "bytes": 886
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/check_base326_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/check_base326_HOST.py",
+      "sha256": "02e4b5b39bf8441a3cf7bd83fbea822ca322d73d47331a67d1a51fdb243924e7",
+      "bytes": 6701
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/check_geometry326_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/check_geometry326_HOST.py",
+      "sha256": "f511cfb537867f0ac539369b7cb27dd807ab083a2b8b8d221a5765cb0c554644",
+      "bytes": 2918
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/check_split326_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/check_split326_HOST.py",
+      "sha256": "da37b8576ada99e79611cc2ebf012123861278a85d178724f8e97d5cc5cabd77",
+      "bytes": 3590
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/descriptors326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/descriptors326.py",
+      "sha256": "a35c7fbb83792e9f3c3b2270d92fd9cb688948449c7761cd8397d125908cb62a",
+      "bytes": 1987
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/fixture326_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/fixture326_HOST.py",
+      "sha256": "697cb01edfcc0f90c1484ab4fea1b1d357d19ff3538f19d2e4f865e4bda4006d",
+      "bytes": 1074
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/fixture_base326_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/fixture_base326_HOST.py",
+      "sha256": "a3c86378b5cf4fcb3dd0285c5418d496010654a7c90e4303279d31c77f7328d5",
+      "bytes": 2115
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/frames326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/frames326.py",
+      "sha256": "21200a59c4a01d4dc2788c29c0aeb0e453dd46f522537de954fce5bc4d5e9ba8",
+      "bytes": 2554
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/guard326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/guard326.py",
+      "sha256": "2ee3aacf8ac3176c7b993d9bbbb5ceb2e1746c3499f8a0077bbd85a628ce685e",
+      "bytes": 3190
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/launch326.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/launch326.sh",
+      "sha256": "1ad7d4be00d3306011564cf076e04f0a40274ba9fe2778e2ef2fa2ad1854f51c",
+      "bytes": 1354
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/layout326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/layout326.py",
+      "sha256": "51ec35842ab11512806a3f5ae504bc32d53d91297eb25c20e467e0fae7735301",
+      "bytes": 3012
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/metadata326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/metadata326.py",
+      "sha256": "a949f29e540ff1e1d80147185d998b76c8af5012a1be58cafb565925d33342b4",
+      "bytes": 1127
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/oracle326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/oracle326.py",
+      "sha256": "cb9804001780739322122eb77743ace574dabe740b28143d895a8982f05a2ef0",
+      "bytes": 4947
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/padding326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/padding326.py",
+      "sha256": "ec59815f9fd37c0783beb4a359728f3d922cb43fb9858a24d8a1ab0d5aafe4ab",
+      "bytes": 1384
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/plan326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/plan326.py",
+      "sha256": "e272df2c52b92d221029b227ec50b59e1eb21adfceb45d297be58101c0840e07",
+      "bytes": 865
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/probe_raw326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/probe_raw326.py",
+      "sha256": "d408cbcfc717999c5d954ab1207d0b99522e32c56d388934fd94d160c15cedb5",
+      "bytes": 1419
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/probes326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/probes326.py",
+      "sha256": "26fc20ae71b9c5bda53314693889b3440e9d6afb965f827d25da9d8b359ff5fc",
+      "bytes": 3101
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/projection326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/projection326.py",
+      "sha256": "899c888e36561f8a18330661031b595f8856aa26a0bd3d733844840e435ff473",
+      "bytes": 5242
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/raw_controls326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/raw_controls326.py",
+      "sha256": "5b66226d6e66550da3b932d8349de60b43087955768c083a03847d7499363d93",
+      "bytes": 4629
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/reference_schedule326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/reference_schedule326.py",
+      "sha256": "77f9d44c5cac15933ab1f1d38445a9f182320e8392306bd519497c4f23c0370e",
+      "bytes": 2143
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/runtime326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/runtime326.py",
+      "sha256": "61614908dd57b1274acdb6add084ef1ff810dc0c88242873af4fedd07632b755",
+      "bytes": 7100
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/startup326.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/startup326.sh",
+      "sha256": "25bf16f6967455d7378c9be47c39e648a85aae505d703186226a32d59e013a89",
+      "bytes": 6342
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/startup326_binding_only.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/startup326_binding_only.sh",
+      "sha256": "5545c9c20fa7057beae90ed5d9e052103c26b5033569577a33da2397607f8db0",
+      "bytes": 5961
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/static_base326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/static_base326.py",
+      "sha256": "10ba4298d4d4b907eff147f5a564d6f2e0677bf38ef6d93be7ccadfb2c9b5dc3",
+      "bytes": 4529
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/static_state326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/static_state326.py",
+      "sha256": "beb736e13f6c7d19a11f4c3ebe16185e75a4be92cb89b81df00d33b8932e9a0e",
+      "bytes": 10219
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/write326.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/write326.py",
+      "sha256": "c0fab5a8e442bc54a75a92dda6ce270a452e6bac1610eddf1fe7e28017b104eb",
+      "bytes": 2096
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317/ABI311_LAUNCH_REPAIR_REVIEW.json",
@@ -1428,6 +1710,60 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M165-NZ166-target-math-cost-v320/startup320.sh",
       "sha256": "1e44d992998ea49ef107be2582bde72e9b80f804f480d5dd5753478c496868d8",
       "bytes": 6274
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/HOST325_ACTUAL_COMPILED_REFERENCE_BINDING.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/HOST325_ACTUAL_COMPILED_REFERENCE_BINDING.json",
+      "sha256": "a0672de55bfd154b926ab8b494f2aed78141d76425c5c6c136e525248baf126a",
+      "bytes": 413
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/baseline325.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/baseline325.py",
+      "sha256": "153f4c83d694bf4cfd3d2d5d1faa527e2a1acbcf5f612601bf7c59359a081294",
+      "bytes": 2870
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/binding325_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/binding325_HOST.py",
+      "sha256": "d3e37d1f1cfcad9d1d11693e1057f22207a7504fa5dc0dd5e9d1ae9fc8933fe8",
+      "bytes": 808
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/launch325.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/launch325.sh",
+      "sha256": "a37a15818cd036f0ea92b581c6237306ae61d2d6654b74fa90156c441861095f",
+      "bytes": 1259
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/oracle325.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/oracle325.py",
+      "sha256": "73d9c91aa6cee85ec4b7146fea2013cf11232335ae17a980d016390be573063c",
+      "bytes": 4948
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/probes325.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/probes325.py",
+      "sha256": "23708b883f97d7735db0272248c6f2ddd96c61a0a656275f07d8a7a39976f45a",
+      "bytes": 2711
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/runtime325.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/runtime325.py",
+      "sha256": "e00ae8701a29011178af7df5af872ad4aeea3d1ef999aa524dad53a501dc6a87",
+      "bytes": 427
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/startup325.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/startup325.sh",
+      "sha256": "1f4f0705c93a05bc5e50d30e154986ad8d792276d79a5b07ed68c0a143d67d72",
+      "bytes": 6500
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/startup325_binding_only.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-reference-fix-v325/startup325_binding_only.sh",
+      "sha256": "9f3f230aac20e818d2a8841b272808e599e40391a131580cdf2ef09a8aa1f217",
+      "bytes": 6266
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/FREEZE323.json",
@@ -13192,8 +13528,8 @@
     {
       "source": "/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
-      "sha256": "f5e8279ee20ecb21f8ba224a421e0cbe84ec1ba08b523993ddf1469c72a1c4a5",
-      "bytes": 302218
+      "sha256": "d801c86dbac0529aba02d758f6efeb4c8627a681aa7a60d9739434e4a91896a2",
+      "bytes": 304071
     },
     {
       "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/ops/triton/batch_memcpy.py",
@@ -15232,6 +15568,10 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/FREEZE323.json",
       "sha256": "de58e73c32160ab68f359546e31c59ecf0ceece7a3d0c3b794f33a9883c74850"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/FREEZE326.json",
+      "sha256": "1c8878b7490ed85684aea9686a25652b2488f30074769b0568243e5c476fbc43"
     }
   ],
   "omitted_evidence": {
@@ -20745,6 +21085,46 @@
     },
     "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT322_FIRST_DIVERGENCE_INDEPENDENT_READ.json": {
       "sha256": "bcecb147af3560e3dce17a374f9558dd38136a31efc0f78db74ad6a2ce01546f",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/RAW326_MODEL_FREE_RESULT.json": {
+      "sha256": "22d48b15a7f4cdefe99b43cc76c588eb44f3dd25f2ea8f02fe59dd8f46aebd37",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/HOST326_COMPILED_REFERENCE_BINDING.json": {
+      "sha256": "fbdabf80e3863efa06649aeb879c205589531f4a791da860be010224fdd41923",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/FIXTURE326.json": {
+      "sha256": "edcb1fbd258e1347d0e2f3094f69081f00f502a499c64142bdea5830df0e2232",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/HOST326_GEOMETRY_AND_SPLIT_RESULT.json": {
+      "sha256": "cc986937415fa3b01acfbed0aafce9040f7ff66cb4b68c3e955d86c316f470c0",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/DECLARED326_CASES.json": {
+      "sha256": "83f30f7e38594727319281ed0e0b669258d6c292854d85a838c0cb33253f6f8d",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/raw326-model-free.log": {
+      "sha256": "5102f289aff845200ddcc77aecd7ce5c88683701c4e510d9169d8e890062c537",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/SOURCE326_REVIEW.json": {
+      "sha256": "bb95807df54cc341a0760beb4d8e5715f0902855d94582aa0dbc41ba064887d5",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/HOST326_INITIAL_CASE_COUNT_ASSUMPTION_RESULT.json": {
+      "sha256": "cc986937415fa3b01acfbed0aafce9040f7ff66cb4b68c3e955d86c316f470c0",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/FIA324_GROUP_INVARIANCE_RESULT.json": {
+      "sha256": "e57c6ce92f735b69d07caab383ea4f7b6c7e3f7abfc71aea4e942b00749d41ba",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-group-root-isolation-v324/SUMMARY324.json": {
+      "sha256": "bea5f3537b5d756799b30995d536f7447ae068a7d8d5239b8bba49f8ee187b1c",
       "reason": "Historical evidence or fixture; not source"
     }
   },

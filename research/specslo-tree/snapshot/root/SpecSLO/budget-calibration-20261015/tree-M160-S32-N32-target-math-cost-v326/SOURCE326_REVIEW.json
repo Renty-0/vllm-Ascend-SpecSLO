@@ -1,0 +1,27 @@
+{
+  "status": "HOST532_and_synthetic_raw144_passed_model_pending",
+  "M": 160,
+  "S": 32,
+  "Q": 5,
+  "real_N_max": 32,
+  "C": 128,
+  "future": 64,
+  "global_selected": 192,
+  "tree_primary_plus_side_groups_max": 32,
+  "KV_extent": 2560,
+  "bank_owners": 96,
+  "bank_offsets": [
+    32,
+    64
+  ],
+  "original408_fixture_budgets_and_anchors_retained": true,
+  "reason": "Synthetic324 identical roots differed only for33groups at long prefixes;24/32groups all tested roots exact, both mask capacities and precision modes",
+  "actual_MC2_profile_has_M160": false,
+  "new_MC2_shape_measurements_required_before_any_M160_fused_claim": true,
+  "neural_qualified": false,
+  "Goodput": null,
+  "declared_model_cases": 532,
+  "old408_budget_anchor_preservation_independently_checked": true,
+  "actual_compiled_reference_binding_HOST_passed": true,
+  "all_BF16_words_each_width": 65536
+}

@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "reference_compiled_checked_origin": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/metadata323.py",
+  "actual_compiled_reference_checker_correct": true,
+  "model_cases": 546,
+  "original_oracle_source": "/root/SpecSLO/budget-calibration-20261015/tree-contiguous-branch-tail-final-metadata-math-v234/neural_oracle231.py",
+  "models_loaded": false
+}

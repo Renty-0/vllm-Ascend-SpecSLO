@@ -1,0 +1,7 @@
+{
+  "passed": true,
+  "cases": 532,
+  "actual_reference_checker": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/metadata326.py",
+  "original_oracle": "/root/SpecSLO/budget-calibration-20261015/tree-contiguous-branch-tail-final-metadata-math-v234/neural_oracle231.py",
+  "models_loaded": false
+}

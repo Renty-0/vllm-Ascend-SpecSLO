@@ -6,7 +6,7 @@
       "version": 318,
       "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M165-N32-root-v318-B1to8-546-math-cost-v1.json",
       "receipt_sha256": "1b731f3706c43307d582394da30a973eb2307cd226ed5484ead1ebe75a77e144",
-      "actual_completed_positive_cases": 0,
+      "actual_completed_positive_cases": 2,
       "target_first_case": [
         {
           "rank": 1,
@@ -64,13 +64,14 @@
         }
       ],
       "sources_unchanged": true,
-      "owned_cleanup_and_idle": true
+      "owned_cleanup_and_idle": true,
+      "partial_cases_are_not_whole_model_qualification": true
     },
     {
       "version": 320,
       "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M165-N32-NZ166-root-v320-B1to8-546-math-cost-v1.json",
       "receipt_sha256": "eab7bf40cfd74c69d0ebbf1b39c10712721943d642a6ad0f9ea2ead83f8296b4",
-      "actual_completed_positive_cases": 0,
+      "actual_completed_positive_cases": 2,
       "target_first_case": [
         {
           "rank": 1,
@@ -128,7 +129,8 @@
         }
       ],
       "sources_unchanged": true,
-      "owned_cleanup_and_idle": true
+      "owned_cleanup_and_idle": true,
+      "partial_cases_are_not_whole_model_qualification": true
     }
   ],
   "NZ166_control_did_not_resolve_failure": true,

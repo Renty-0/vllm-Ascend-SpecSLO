@@ -1,0 +1,28 @@
+{
+  "rows": [
+    {
+      "groups": 24,
+      "tests": 72,
+      "noninvariant": 0,
+      "different_prefixes": []
+    },
+    {
+      "groups": 32,
+      "tests": 72,
+      "noninvariant": 0,
+      "different_prefixes": []
+    },
+    {
+      "groups": 33,
+      "tests": 72,
+      "noninvariant": 24,
+      "different_prefixes": [
+        1505,
+        2555
+      ]
+    }
+  ],
+  "synthetic_only": true,
+  "model_qualification_for_32_groups_still_required": true,
+  "NZ_or_MC2_causality_claimed": false
+}
