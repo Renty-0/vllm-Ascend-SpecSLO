@@ -1,0 +1,14 @@
+{
+  "UTC": "2026-10-19T14:02:31.394993+00:00",
+  "status": "failed_wrong_original218_launch_pin_before_model_load",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-small-refill-incumbent-prefix-root-v351-16-own-model-cases-v1.json",
+  "receipt_sha256": "037a2121bfcbb3b38ccb6e70fc1da07d76a7da6554692f9c26dbfdf7e8be5ee1",
+  "all_four_idle": true,
+  "owned_remaining": [],
+  "sources_unchanged": true,
+  "models_loaded": false,
+  "original218_SHA": "fa58f2866e8fed383e2d1ed1103b2fcb72a731aab3d65060e3a7c3e350a4d260",
+  "fix": "352 additive launch adapter corrects exactly one pin; frozen351 numerical files unchanged.",
+  "Goodput": null,
+  "adopted": false
+}

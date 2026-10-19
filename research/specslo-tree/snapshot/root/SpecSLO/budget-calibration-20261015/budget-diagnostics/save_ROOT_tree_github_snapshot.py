@@ -46,6 +46,8 @@ SOURCES = (
     ('tree-small-refill-singleton-graph-capture-v347', 347),
     ('tree-small-refill-singleton-module-binding-v349', 349),
     ('tree-small-refill-full-next-subset-domain-v350', 350),
+    ('tree-small-refill-incumbent-prefix-protection-v351', 351),
+    ('tree-small-refill-original-launch-pin-v352', 352),
 )
 
 
@@ -122,6 +124,8 @@ def main():
         'tree-small-refill-singleton-graph-capture-v347',
         'tree-small-refill-singleton-module-binding-v349',
         'tree-small-refill-full-next-subset-domain-v350',
+        'tree-small-refill-incumbent-prefix-protection-v351',
+        'tree-small-refill-original-launch-pin-v352',
         'tree-coalesced-live-refill-M120-singleton-capture-full-v348',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
@@ -253,6 +257,8 @@ def main():
         'ROOT347_SUBSET_MODULE_BINDING_FAILURE.json',
         'ROOT349_OWNED_ABORT_FOR_MISSING_NEXT_DRAFT_DOMAIN.json',
         'ROOT346_HOST_INITIAL_PRIOR_COST_GATE_SCREEN.json',
+        'ROOT350_EMPTY_NONSELECTED_PREFIX_GUARD_FAILURE.json',
+        'ROOT351_LAUNCH_PIN_SUBSTRING_RENAME_FAILURE.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

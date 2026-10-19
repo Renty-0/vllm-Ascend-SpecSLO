@@ -78,7 +78,7 @@ def issue(engine, *, component_proof):
         need(all(r['original_next_primary_exacttop2_and_all56KV']and r['next_genuine_alternate_bitwise_hidden_and56KV']and r['canonical_prefix_KV_ledger_tables_protected']for r in draft['postbranch20']['cases']),
              'same-instance original deferred repair and following alternate')
         need(getattr(engine,'_ROOT281_qualified_private_copy',None)is not None,'actual qualified persistent private graph')
-    refill=getattr(engine,'_ROOT350_actual_small_refill',None)
+    refill=getattr(engine,'_ROOT351_actual_small_refill',None)
     need(refill is not None and refill['audit']['passed_current_multiowner_math'] is True
          and refill['audit']['representative_sizes']==[1,3,4,8]
          and refill['audit']['Native_zero_scalar_subtractions']==672,

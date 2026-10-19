@@ -12,5 +12,7 @@
   "actual_full_refill_coverage_required": true,
   "full463_and_own_AR_still_required": true,
   "model_qualified": false,
-  "Goodput": null
+  "Goodput": null,
+  "actual_original218_launch_SHA_verified": true,
+  "original311_teacher_prefixes_exact": true
 }

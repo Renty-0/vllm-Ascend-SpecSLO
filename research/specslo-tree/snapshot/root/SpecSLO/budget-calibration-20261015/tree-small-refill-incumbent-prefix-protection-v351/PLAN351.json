@@ -1,0 +1,26 @@
+{
+  "UTC": "2026-10-19T13:56:08.241270+00:00",
+  "scope": "Fresh four-role small prefill component: singleton target original exact201 graph plus multiowner eager3/4/8, independent fullphysical hidden/KV/roots, incumbent prefix protection, genuine nextdraft4, two zero sweeps.",
+  "warmup_cases": 4,
+  "main_cases": 12,
+  "finite_prefill_cases": 16,
+  "original_singleton201_wrapper_installed_after_model_load": true,
+  "all201_warmup_claimed": false,
+  "selected_exact_graph_warms_naturally": true,
+  "original_Native_and_numerical_gates_retained": true,
+  "graph_and_eager_capture_separated": true,
+  "source_only": true,
+  "NPU_qualified": false,
+  "full463": false,
+  "Goodput": null,
+  "fixed_local_subset_import": "Explicit frozen subset345, every local import resolved in HOST; no Native/model numerical gate changed.",
+  "actual_nextdraft_domain": [
+    1,
+    2,
+    4,
+    16
+  ],
+  "fix": "Explicit two original nextdraft finite-domain predicates expanded to actual selected home sizes; all model hidden, top2, ledger, all56draftKV, packet and typed-work checks unchanged.",
+  "guard_rest": "Actual incumbent plus all nonselected candidate/reference owners; same hash check before and after actual nextdraft. No vacuous empty history or skipped prefix check.",
+  "actual_prefix_hash_CPU_mutation_regression": true
+}

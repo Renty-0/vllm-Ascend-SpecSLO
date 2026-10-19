@@ -7,7 +7,7 @@ from pathlib import Path
 
 P = Path(__file__).resolve().parent
 B = P.parent
-sys.path.extend([str(B/'tree-small-refill-full-next-subset-domain-v350'),str(B/'tree-coalesced-live-refill-host-v345'),str(B/'tree-current-prepare-cost-eligibility-host-v312')])
+sys.path.extend([str(B/'tree-small-refill-incumbent-prefix-protection-v351'),str(B/'tree-coalesced-live-refill-host-v345'),str(B/'tree-current-prepare-cost-eligibility-host-v312')])
 sys.path.extend(['/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305', '/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304'])
 sys.path.extend(['/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296', '/root/SpecSLO/budget-calibration-20261015/tree-spare-capacity-budget-host-v290', '/root/SpecSLO/budget-calibration-20261015/tree-request-conditional-risk-gain-host-v294', '/root/SpecSLO/budget-calibration-20261015/tree-prefix-precopy-dual-cachewrite-host-v288', '/root/SpecSLO/budget-calibration-20261015/tree-contiguous-prefix-span-copy-host-v292'])
 DONOR = B/'tree-causal80-small-cohort-role-aware-audit-full-v209'

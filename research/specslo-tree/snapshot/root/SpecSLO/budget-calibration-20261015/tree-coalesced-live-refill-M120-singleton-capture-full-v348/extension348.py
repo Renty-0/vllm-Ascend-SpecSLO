@@ -41,9 +41,9 @@ def qualify_component(engine, native, stage, policy, output):
     original = extension218.qualify_component(engine, native, stage, policy, output)
     if engine.cache_allocation is not None or engine.graph_runner.graph_cache_sealed:
         raise RuntimeError('ROOT348 original component must finish and release before activation')
-    from prefill350 import run as qualify_small_refill
+    from prefill351 import run as qualify_small_refill
     extra_refill = qualify_small_refill(engine,native,stage,output)
-    if extra_refill is not getattr(engine,'_ROOT350_actual_small_refill',None):
+    if extra_refill is not getattr(engine,'_ROOT351_actual_small_refill',None):
         raise RuntimeError('ROOT348 same-instance small-refill proof required')
     from static_state348 import install
     activation = stage('ROOT348/activate-new-private-canonical-backend', lambda:install(engine, native))

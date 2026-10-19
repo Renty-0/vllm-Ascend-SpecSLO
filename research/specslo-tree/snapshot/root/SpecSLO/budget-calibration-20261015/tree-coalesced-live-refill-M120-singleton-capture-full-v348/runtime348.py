@@ -7,7 +7,7 @@ from pathlib import Path
 
 P = Path(__file__).resolve().parent
 B = P.parent
-sys.path.extend([str(B/'tree-small-refill-full-next-subset-domain-v350'),str(B/'tree-coalesced-live-refill-host-v345'),str(B/'tree-current-prepare-cost-eligibility-host-v312')])
+sys.path.extend([str(B/'tree-small-refill-incumbent-prefix-protection-v351'),str(B/'tree-coalesced-live-refill-host-v345'),str(B/'tree-current-prepare-cost-eligibility-host-v312')])
 sys.path.extend(['/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305', '/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304'])
 sys.path.extend(['/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296', '/root/SpecSLO/budget-calibration-20261015/tree-spare-capacity-budget-host-v290', '/root/SpecSLO/budget-calibration-20261015/tree-request-conditional-risk-gain-host-v294', '/root/SpecSLO/budget-calibration-20261015/tree-prefix-precopy-dual-cachewrite-host-v288', '/root/SpecSLO/budget-calibration-20261015/tree-contiguous-prefix-span-copy-host-v292'])
 OLD = B/'tree-packed-KV-preflight-rank-aware-own-AR-full-v218'
@@ -29,7 +29,7 @@ def project_source(source):
          '   policy=extension.install_entry(entry,native)'),
         ('     from scope209 import issue,report as scope_report', '     from scope348 import issue,report as scope_report'),
         ('     from trace209 import run_windows,warm_to_fixedpoint', '     from trace348 import run_windows,warm_to_fixedpoint'),
-        ("     report['Native_final']=", "     report['postfull_independent_FIA_AR']=extension.postfull_AR(engine,native,stage,report['windows'],output_directory)\n     report['ROOT218_slot_preflight']=__import__('slot_preflight218').snapshot()\n     report['ROOT218_cached_parent_dispatch']=extension.cache_snapshot()\n     report['ROOT350_small_refill_current_component']=getattr(engine,'_ROOT350_actual_small_refill')\n     report['ROOT348_current_math']=getattr(engine,'_canonical348_actual_proof')\n     report['ROOT348_actual_geometry']=extension.snapshot(engine)\n     report['Native_final']="),
+        ("     report['Native_final']=", "     report['postfull_independent_FIA_AR']=extension.postfull_AR(engine,native,stage,report['windows'],output_directory)\n     report['ROOT218_slot_preflight']=__import__('slot_preflight218').snapshot()\n     report['ROOT218_cached_parent_dispatch']=extension.cache_snapshot()\n     report['ROOT351_small_refill_current_component']=getattr(engine,'_ROOT351_actual_small_refill')\n     report['ROOT348_current_math']=getattr(engine,'_canonical348_actual_proof')\n     report['ROOT348_actual_geometry']=extension.snapshot(engine)\n     report['Native_final']="),
         ('   from audit209 import audit', '   from audit348 import audit'),
         ('   engine._v101_output_directory=output_directory',
          '   engine._v101_output_directory=output_directory\n   from fault_handler348 import install as register_fault_dump\n   register_fault_dump(engine,output_directory)'),

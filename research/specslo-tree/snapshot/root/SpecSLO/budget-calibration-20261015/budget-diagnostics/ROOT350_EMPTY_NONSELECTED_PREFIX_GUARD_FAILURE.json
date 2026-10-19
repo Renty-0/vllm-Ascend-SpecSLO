@@ -1,0 +1,24 @@
+{
+  "UTC": "2026-10-19T13:55:32.753718+00:00",
+  "status": "failed_singleton_empty_nonselected_prefix_collection",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-small-refill-full-subset-domain-root-v350-16-own-model-cases-v1.json",
+  "receipt_sha256": "4633728185dec79a5188f47c0228c1b6d883dc94d8f61d3e3ad1ba034c215e2c",
+  "all_four_idle": true,
+  "owned_remaining": [],
+  "sources_unchanged": true,
+  "post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "error": "subset guard_rest called prefix_evidence on empty nonselected histories for N1 selected all. Original torch.cat requires nonempty.",
+  "fix": "New351 always includes actual incumbent prefix plus every nonselected candidate/reference; exact same guard rebound into original finish.",
+  "finite_cases_completed": 0,
+  "full463": false,
+  "Goodput": null,
+  "adopted": false
+}

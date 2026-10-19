@@ -1,0 +1,9 @@
+{
+  "status": "passed_literal_original_launch_pin_HOST",
+  "NPU_used": false,
+  "exactly_one_environment_pin_corrected": true,
+  "numeric351_sources_unchanged": true,
+  "actual_original218_manifest_hash_verified": true,
+  "actual_owned_guard_bindings_checked": true,
+  "model_qualification": false
+}

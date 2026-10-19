@@ -139,7 +139,7 @@ def audit(directory, selected_windows):
             if step['metadata'] is not None:
                 need(step['metadata']['backend'] == 'static_FULL_q5_M120_S24_KV2560'
                      and step['metadata']['tree_mask_shape'] == [24, 1, 10, 4096], 'actual canonical own-AR metadata')
-    from prefill350 import audit as small_refill_audit
+    from prefill351 import audit as small_refill_audit
     small_refill = small_refill_audit(directory/'live-refill-small-cohort-own-current-process')
     full_refills=[row['actual_empty_cohorts'] for row in actual['empty_active_cohorts'] if row['role']=='full463']
     need(len(full_refills)==len(selected_windows) and all(row['actual_inflight_refill_groups']>0 for row in full_refills),
@@ -147,7 +147,7 @@ def audit(directory, selected_windows):
     return dict(actual, ROOT348_same_instance_independent_cases=408,
                 ROOT348_effective_requests=24, ROOT348_effective_candidates=96,
                 ROOT348_actual_FIA_metadata_audited=True,
-                ROOT350_small_refill_current_component=small_refill,
+                ROOT351_small_refill_current_component=small_refill,
                 ROOT348_actual_live_refills=full_refills,
                 ROOT348_independent_reference=reference,
                 whole_workload_AR_qualified=reference['same_backend_exact_output_qualified'])

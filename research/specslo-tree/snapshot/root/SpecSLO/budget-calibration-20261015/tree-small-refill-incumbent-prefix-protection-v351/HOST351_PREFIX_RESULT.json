@@ -1,0 +1,12 @@
+{
+  "status": "passed_actual_prefix_protection_CPU",
+  "NPU_used": false,
+  "old_empty_history_error_reproduced": true,
+  "actual_frozen_prefix_hash_function_used": true,
+  "singleton_incumbent_KV_mutation_detected": true,
+  "nonselected_candidate_reference_and_incumbent_mutations_detected": true,
+  "all_restored_prefixes_equal": true,
+  "same_finish_guard_bound": true,
+  "model_executed": false,
+  "numerical_NPU_qualification": false
+}

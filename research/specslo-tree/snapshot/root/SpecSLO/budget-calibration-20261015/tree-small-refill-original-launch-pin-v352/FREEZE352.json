@@ -1,0 +1,11 @@
+{
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-original-launch-pin-v352/HOST352_LAUNCH_RESULT.json": "ac45adba4f703b108feb724ea1bbd8247a6cc3ea17c557e37f4fc9353461e17d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-original-launch-pin-v352/PLAN352.json": "bb8adf76bde7d5a9c070f4d315edfd3d9f9d389c1abbd41a674247b65654e702",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-original-launch-pin-v352/check_launch352_HOST.py": "cdc3d5fe4f7e0f1cb2de95b4be173822d3b7ff574f5c9ce778c0e10bd3e688aa",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-original-launch-pin-v352/guard352.py": "d50d341087751f6d90c7bc30bad49913aa71d08cf0ba61ca993594386cbeb747"
+  },
+  "parent_freeze_sha256": "3d37ddcc17ca8702a2035a1e52f9048bdc34145d41520b9b78c74e5c962a0008",
+  "parent_archive_sha256": "68598a11d0013eb24f83a13b1eca133f9523cb79f0cc983ecd1e65031fbb76a1",
+  "device_qualification_inherited": false
+}
