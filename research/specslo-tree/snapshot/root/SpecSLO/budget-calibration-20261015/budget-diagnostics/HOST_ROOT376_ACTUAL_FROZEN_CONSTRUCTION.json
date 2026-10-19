@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST376_ACTUAL_FROZEN_GUARD_RUNTIME_TRACE_AND_CALLBACKS",
+  "source_files": 2470,
+  "freeze_sha256": "ae723ddfddeb6d47f04605a3842de0c3690196b0addf39fa17c5bd1ca248765c",
+  "archive_sha256": "d0102997fe19bc7c40bff8a0c91f128a553058c55f4d22488baf7be2b2fdeeea",
+  "NPU_used": false,
+  "models_loaded": false,
+  "full463_qualified": false,
+  "Raw": null,
+  "Goodput": null,
+  "all_original_startup_math_sealing_AR_ownership_gates_preserved": true
+}

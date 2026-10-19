@@ -1,0 +1,30 @@
+{
+  "UTC": "2026-10-19T20:09:01.138356+00:00",
+  "status": "source_frozen_HOST_checks_passed_pending_component361",
+  "candidate": "best257 original draft/allocator/admission plus uniform target KV extent",
+  "pending_component361": true,
+  "preserve": [
+    "original227 fixed-FULL target math",
+    "original201 and all inherited component gates",
+    "current RootSeed/FastV5 normal and rolling-eager optimized draft",
+    "best257 admission/arrival/original publication clocks",
+    "M120/Q5/S24/maxN24/C96/B1to5",
+    "original warm/twozero/seal",
+    "full463/all3 independent ownAR"
+  ],
+  "additional_neural_cases": 681,
+  "additional_neural_prefills_per_target": 216,
+  "raw": null,
+  "goodput": null,
+  "adopted": false,
+  "goal_achieved": false,
+  "final_matched_cells_complete": 0,
+  "do_not_inherit_standalone_component_flags": true,
+  "source_directory": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376",
+  "github_last_pushed": "85a75e3",
+  "source_freeze_sha256": "ae723ddfddeb6d47f04605a3842de0c3690196b0addf39fa17c5bd1ca248765c",
+  "source_archive_sha256": "d0102997fe19bc7c40bff8a0c91f128a553058c55f4d22488baf7be2b2fdeeea",
+  "source_files": 2470,
+  "guard_deadline_seconds": 10800,
+  "neural_model_or_performance_inherited": false
+}

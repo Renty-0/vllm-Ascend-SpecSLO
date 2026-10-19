@@ -62,6 +62,7 @@ SOURCES = (
     ('tree-primary4-tail3-best257-full-v372', 372),
     ('tree-fastv5-eager-frontier-chain-device-v374', 374),
     ('tree-fastv5-frontier-boolean-guard-v375', 375),
+    ('tree-best257-uniform-KV-buckets-full-v376', 376),
 )
 
 
@@ -163,6 +164,7 @@ def main():
         'tree-fastv5-eager-frontier-chain-host-v373',
         'tree-fastv5-eager-frontier-chain-device-v374',
         'tree-fastv5-frontier-boolean-guard-v375',
+        'tree-best257-uniform-KV-buckets-full-v376',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -361,6 +363,12 @@ def main():
         'ROOT372_RETAINED_TARGET227_CHECKPOINT.json',
         'ROOT374_FIRST_ATTEMPT_BOOLEAN_CONTRACT_FAILURE.json',
         'ROOT375_ACTUAL_OPTIMIZED_FRONTIER_FUSION_RESULT.json',
+        'ROOT376_BEST257_KV_BUCKET_FULL_PLAN.json',
+        'HOST_ROOT376_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'ROOT376_GITHUB_VALIDATION_CONTEXT.json',
+        'freeze_ROOT376_best257_KV_buckets_HOST.py',
+        'audit_ROOT376_terminal_full_HOST.py',
+        'read_ROOT376_common_result_HOST.py',
         'ROOT355_CONCURRENT_HOST_VALIDATION_TIMING_CONTEXT.json',
     ):
         path = BASE / 'budget-diagnostics' / filename

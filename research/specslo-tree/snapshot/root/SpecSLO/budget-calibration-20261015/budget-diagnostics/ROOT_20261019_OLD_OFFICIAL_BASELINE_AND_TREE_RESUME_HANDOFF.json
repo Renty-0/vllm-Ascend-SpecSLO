@@ -31,7 +31,7 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "256b6dc",
+  "github_checkpoint": "85a75e3",
   "goal_achieved": false,
   "next": "Run frozen361 target-only complete594+sameinstance cost andpaired FULL/bucket controls; preserve all old594 math and qualification. Combine only if whole math passes andactualtime benefit, then full best257+qualified additions. No final GPgoal;0/9.",
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
@@ -790,7 +790,8 @@
     "tag": "Q5-KV-bucket-all594-and-paired-FULL-root-v361-target-component-v1",
     "guardian_pid": 1733957,
     "status": "running_target_component",
-    "UTC": "2026-10-19T20:05:00+00:00",
+    "UTC": "2026-10-19T20:06:18.382846+00:00",
     "full463_result": false
-  }
+  },
+  "prepared_next_full376": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT376_BEST257_KV_BUCKET_FULL_PLAN.json"
 }

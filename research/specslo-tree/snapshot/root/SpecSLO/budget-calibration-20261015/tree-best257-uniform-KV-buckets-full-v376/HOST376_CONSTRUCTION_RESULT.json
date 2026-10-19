@@ -1,0 +1,10 @@
+{
+  "status": "PASS_HOST376_ACTUAL_GUARD_AND_NUMERICAL_CALLBACK_CONSTRUCTION",
+  "NPU_used": false,
+  "deadline_seconds": 10800,
+  "original_owned_verifier_and_cleanup_retained": true,
+  "original_draft_preserved": true,
+  "new_target_cases": 681,
+  "all_original227_and_full463_ownAR_gates_retained": true,
+  "neural_qualification_inherited": false
+}

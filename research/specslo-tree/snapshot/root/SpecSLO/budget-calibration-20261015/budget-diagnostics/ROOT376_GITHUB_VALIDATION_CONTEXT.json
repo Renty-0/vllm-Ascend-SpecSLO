@@ -1,0 +1,14 @@
+{
+  "UTC": "2026-10-19T20:17:10.713352+00:00",
+  "git_diff_cached_check_exit_code": 2,
+  "issue": "one inherited trailing space in frozen runtime376.py line31",
+  "byte_identical_line_present_in_frozen_best257": true,
+  "syntax_HOST_runtime_scope_boundary_and_227_dispatch_regressions_passed": true,
+  "frozen_source_bytes_preserved": true,
+  "checks_disabled": false,
+  "clean_lint_claim": false,
+  "context": "source archival checkpoint; immutable unrun source retains original Python whitespace; failed advisory whitespace result recorded",
+  "freeze_sha256": "ae723ddfddeb6d47f04605a3842de0c3690196b0addf39fa17c5bd1ca248765c",
+  "archive_sha256": "d0102997fe19bc7c40bff8a0c91f128a553058c55f4d22488baf7be2b2fdeeea",
+  "NPU_used": false
+}
