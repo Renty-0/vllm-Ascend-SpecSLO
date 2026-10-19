@@ -1,0 +1,14 @@
+{
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v322/launch322.sh": "d7c7e6c23a8417eda38fb72a83c004dc8e79c61004528efe101ecfc007482ea5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v322/startup322.sh": "5fbd89a1b3ff4e850298441f3c90067077f2e24bfddf11743b3a2bc6296fefed",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v322/HOST322_NEGATIVE_ROUTING_REGRESSION.json": "7a2e6d41d4da39646942cb59f76ff1ec9284765fe0503d822d25af8ba74c2116",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v322/runtime322.py": "8b6211f5df39450c2b039c7e95ba62d3f8ce2f904848a472418f2306f05f7e3e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v322/guard322.py": "16a985f12b7ddd824d2e454b33cdb0fc543cb2bb5d3d3e7e3564b879235ea762",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v322/trace322.py": "925bb45535c77a5eaac61cca01065a5a54895036592adb5d31874a1e7e4f5026",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M165-N32-NZ166-root-v321-first-four-layers-v1.json": "fc368174b296faa5c24f262d28c3c652f1e588bc817e5fcbc2e2a274e5263395"
+  },
+  "fix": "negative reference does not consume/write positive recorder before actual candidate trace",
+  "all_model_matchers_unchanged": true,
+  "Goodput": null
+}

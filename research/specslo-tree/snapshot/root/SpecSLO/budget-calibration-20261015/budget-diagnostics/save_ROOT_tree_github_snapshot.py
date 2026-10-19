@@ -22,6 +22,8 @@ SOURCES = (
     ('tree-M165-raw-reference-api-v318', 318),
     ('tree-M165-NZ166-target-math-cost-v320', 320),
     ('tree-M165-first-divergence-v321', 321),
+    ('tree-M165-first-divergence-v322', 322),
+    ('tree-M165-common-mask11-target-math-cost-v323', 323),
 )
 
 
@@ -70,6 +72,8 @@ def main():
         'tree-C128-F64-global192-integration-host-v319',
         'tree-M165-NZ166-target-math-cost-v320',
         'tree-M165-first-divergence-v321',
+        'tree-M165-first-divergence-v322',
+        'tree-M165-common-mask11-target-math-cost-v323',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -134,6 +138,9 @@ def main():
         'ROOT_TREE_RAW_FOLLOWUP_WITH_ORIGINAL_PLAN_20261019.json',
         'ROOT318_UNUSED_COMPILER_CACHE_REGENERATION_20261019.json',
         'ROOT318_320_FIRST_BRANCH_FAILURE_COMPARISON.json',
+        'ROOT322_FIRST_DIVERGENCE_INDEPENDENT_READ.json',
+        'build_ROOT323_common_mask_HOST.py',
+        'ROOT316_EAGER_B4_EXCLUSIONS_RAW_FOLLOWUP_20261019.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

@@ -1,6 +1,6 @@
 {
-  "UTC": "2026-10-19T05:35:11.846683+00:00",
-  "status": "active_tree321_first_layer_divergence_diagnostic_after_NZ166_negative",
+  "UTC": "2026-10-19T05:47:49.113958+00:00",
+  "status": "active_tree323_common_Q11_full_model_and_cost_qualification",
   "user_resume_request": true,
   "prior_pause_revoked": true,
   "user_correction": "old official vllm-ascend, explicitly not HUST",
@@ -31,13 +31,15 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "4cdccf1fea73d378907d10db801b755adcf69437",
+  "github_checkpoint": "efc430a277ca554922cc88a3b0290c206d030a22",
   "goal_achieved": false,
   "next": [
-    "finish independent144 raw16 operator checks with supported int32 native reference and both candidate slot dtypes",
-    "fresh original546 M165/N32 target math cases and paired costs",
-    "C128/F64/global192 integration if correctness/cost permits",
-    "fresh full463 own-AR gates, then Raw/Goodput assessment and final matched repeats"
+    "read fresh322 first-divergence records and direct all128 raw16 prefix/alias comparison",
+    "repair actual demonstrated cause without relaxing original matchers",
+    "fresh entire546 M165 neural qualification and16 paired target cost configurations",
+    "integrate128/64/192 only after model qualification; HOST319 bound tests already passed",
+    "fresh original startup/draft/branch/fixedpoint/twozero/full463 ownAR before any performance adoption",
+    "continue matched final comparisons; legacy021 not adopted and previous goal644.766 remains"
   ],
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
   "user_Raw_clarification": {
@@ -137,5 +139,23 @@
   "tree321_freeze_sha256": "14d7d5c3dae2e1f7ec4e02205df5ffd9e5722af6e37dbf1b9e8993107f1c05af",
   "tree319_future_cap_HOST28_passed": true,
   "tree319_future_cap_fixture_note": "minimum3 HOST boundary only; actual63 candidates under64 cap; production min1 unchanged",
-  "failure_comparison": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT318_320_FIRST_BRANCH_FAILURE_COMPARISON.json"
+  "failure_comparison": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT318_320_FIRST_BRANCH_FAILURE_COMPARISON.json",
+  "tree321_result": "diagnostic recorder FileExistsError: old-layout negative reference consumed positive output name; no neural qualification",
+  "tree321_owned_cleanup": true,
+  "tree322_guard_session": 59096,
+  "tree322_tag": "M165-N32-NZ166-root-v322-first-four-layers-v1",
+  "tree322_freeze_sha256": "a682b41007d9e2f63fb3006e33584c70f2657b3f573449ceeb1975e2791b6cd5",
+  "tree322_HOST_negative_routing_regression_passed": true,
+  "tree322_source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-first-divergence-v322",
+  "extra_Raw_eager_followup": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT316_EAGER_B4_EXCLUSIONS_RAW_FOLLOWUP_20261019.json",
+  "tree322_result": "first shadow-root divergence in layer0 attention; all128 prefix/alias raw16 equal; strict full hidden/KV gate fails as expected",
+  "tree322_owned_cleanup": true,
+  "tree323_source": "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323",
+  "tree323_guard_session": 40734,
+  "tree323_tag": "M165-N32-common-mask11-root-v323-B1to8-546-math-cost-v1",
+  "tree323_freeze_sha256": "de58e73c32160ab68f359546e31c59ecf0ceece7a3d0c3b794f33a9883c74850",
+  "tree323_HOST_all546_ancestry_passed": true,
+  "tree323_HOST_reference_masks_six_boundaries_passed": true,
+  "tree323_NPU_qualified": false,
+  "tree323_model_delta": "common FULL mask capacity11 in candidate and independent reference; all real visibility and positions retained; NZ threshold166 retained as320 control"
 }

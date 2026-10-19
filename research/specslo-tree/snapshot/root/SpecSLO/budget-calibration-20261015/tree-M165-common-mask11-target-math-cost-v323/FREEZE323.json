@@ -1,0 +1,30 @@
+{
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/probes323.py": "6e0984e54d2f02fd5915cad8d412cd879014b3f20587316e8abf228d8acc90ac",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/benchmark323.py": "3985d509afd56fc984102e6e167064775f47e0254f6bcfba1bed75c6952b7cf3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/frames323.py": "625ad2a397c00b35f72ea433739a45382bb2d1212a94868ab5b4259f1b970b51",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/HOST_REFERENCE323_RESULT.json": "9157b946b69d71354d7cedf7df5f6289656f64e27a9bcb032eb1dcc1f9f98615",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/static_base323.py": "bba28bfea71d23202683ccc13effc858b6a1c243ec735c929762944be04331aa",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/metadata323.py": "a21c561cb84cd4765d2039d38dacd98f062b40cf4d2158a446103fd5717993f5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/guard323.py": "22e713efffc8940a7ceef94e95a4902adededf01e9de0b7773730c34bbfe878a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/launch323.sh": "b096b27b4857140976d0342146f2efb2da9110c2cad605adcbd3693b07ac1664",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/startup323.sh": "400a8a854fe2e4343546d1ea550feb8af5530e0be560332f6c945cb710eb9b9b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/runtime323.py": "888726ada70f09b163c0bfb83ca75068d5b823c0a828d3fbd17789f55be959f0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/audit_static_calls323.py": "b955bfe4fe3b1bc84b4b9a9a97cf184b1f635edc8a6232d0c036fc2627260e0d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/FIXTURE323.json": "edcb1fbd258e1347d0e2f3094f69081f00f502a499c64142bdea5830df0e2232",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/check_reference323_HOST.py": "ca1b5238894a975c72d007fcdefc6d35377129dd1ff6dc37ff22c830496849a8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/check_geometry323_HOST.py": "404fa19102cb8cd61ea9e6f10f321108c23f3e0528e54c924a2ead7f624ef89a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/static_state323.py": "2f9b3d2af36786786591e3370b019074fcf567391a0f6a162ab43df7c28fbade",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/fixture323_HOST.py": "993f5c636b5a86f19b40ff91145ff0b33fab7ee1f2456b6cd415c2a63aee34ef",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/baseline323.py": "5e215b50e7b0b95c81704b7ed4ae3a7a36c3b6dee44a4d2fa6ffea4b6968c1d3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/HOST323_GEOMETRY_AND_SPLIT_RESULT.json": "ca26a8c30b1fd939ce3d3185ecc2fbde75770bb6d7304a41cee8b24b36fd69e6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/SOURCE323_REVIEW.json": "f2ab1bcb6fe80b3ae020677149fc5c73db6e81084f170ec22155382c11afaf8a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M165-common-mask11-target-math-cost-v323/oracle323.py": "740a9266d338b4d49ac792660672ccb61d087ce76b553f6c2bb7958f77697df7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M165-N32-NZ166-root-v322-first-four-layers-v1.json": "8727ed43ea6aaa115e1ee08e75ada975d453be802e71f9fafec12db371bbc23a",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT322_FIRST_DIVERGENCE_INDEPENDENT_READ.json": "bcecb147af3560e3dce17a374f9558dd38136a31efc0f78db74ad6a2ce01546f",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_ROOT323_common_mask_HOST.py": "1a1c3801ab0dfadb7726317b222bfda0e591b802d262436514174c790f91c5e8"
+  },
+  "all_original546_matchers_unchanged": true,
+  "actual_model_qualification_inherited": false,
+  "Goodput": null
+}

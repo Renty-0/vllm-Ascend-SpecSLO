@@ -1,0 +1,9 @@
+{
+  "status": "SOURCE_ONLY_common_mask_capacity11",
+  "reason": "Fresh322 trace: first root divergence at layer0 attention for independent side root; all128 prefix/alias tensors raw16 equal. NZ166 does not resolve it.",
+  "delta": "same Q11 allocated mask capacity for candidate primary/branch and independent reference; real queries5,33groups,165rows,visible keys and all KV positions unchanged",
+  "all546_cases_and_original_matchers_retained": true,
+  "new_NPU_qualification_required": true,
+  "performance": null,
+  "Goodput": null
+}

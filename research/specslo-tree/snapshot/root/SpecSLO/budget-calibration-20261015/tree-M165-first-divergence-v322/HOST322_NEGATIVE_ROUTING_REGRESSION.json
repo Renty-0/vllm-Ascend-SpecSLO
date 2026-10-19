@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "actual_nested_reference_wrapper_executed": true,
+  "negative_control_keeps_original_reference": true,
+  "positive_recorder_not_consumed": true,
+  "models_loaded": false,
+  "NPU_used": false
+}

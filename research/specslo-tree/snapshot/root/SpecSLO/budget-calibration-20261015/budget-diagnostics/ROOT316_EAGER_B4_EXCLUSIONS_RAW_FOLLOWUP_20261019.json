@@ -1,0 +1,43 @@
+{
+  "UTC": "2026-10-19T05:40:55.043594+00:00",
+  "scope": "historical316 actual counters; no new NPU run or performance inference",
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/measured-target-cost-risk-root-v316-B1to8-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+  "source_sha256": "97c1807785910ae41b82dec6f7c30a76661d44d0575f8bd2f77f2bd43133b5ea",
+  "counters": {
+    "spec_rhythm_tree_eager_promoted": 0,
+    "spec_rhythm_tree_eager_promotion_kv_move_rounds": 0,
+    "spec_rhythm_tree_eager_promotion_kv_move_rows": 0,
+    "spec_rhythm_tree_eager_promotion_kv_move_slots": 0,
+    "spec_rhythm_eager_parent_B1_seen": 55,
+    "spec_rhythm_eager_parent_B1_excluded_unqualified": 55,
+    "spec_rhythm_eager_parent_B2_seen": 73,
+    "spec_rhythm_eager_parent_B2_excluded_unqualified": 73,
+    "spec_rhythm_eager_parent_B3_seen": 12,
+    "spec_rhythm_eager_parent_B3_excluded_unqualified": 0,
+    "spec_rhythm_eager_parent_B4_seen": 19554,
+    "spec_rhythm_eager_parent_B4_excluded_unqualified": 19554,
+    "spec_rhythm_eager_parent_B5_seen": 0,
+    "spec_rhythm_eager_parent_B5_excluded_unqualified": 0,
+    "spec_rhythm_eager_parent_B6_seen": 0,
+    "spec_rhythm_eager_parent_B6_excluded_unqualified": 0,
+    "spec_rhythm_eager_parent_B7_seen": 0,
+    "spec_rhythm_eager_parent_B7_excluded_unqualified": 0,
+    "spec_rhythm_eager_parent_B8_seen": 9,
+    "spec_rhythm_eager_parent_B8_excluded_unqualified": 9,
+    "spec_rhythm_eager_parent_filter_calls": 2429
+  },
+  "events_are_not_unique_requests": true,
+  "not_all_excluded_candidates_would_be_profitable": true,
+  "observed_eager_promotions": 0,
+  "followup_hypothesis": "Qualify useful B4-parent eager work if larger-batch and main target-path changes remain insufficient",
+  "cannot_flip_filter_without_new_controls": [
+    "current original gate permits only B3 parents and complete B3 children",
+    "parentB4 may need one additional genuine draft root before child; account true queries and timings",
+    "respect original8-unit row window or explicitly implement and qualify a new window; no silent expansion",
+    "preserve parent epoch, KV repair, atomic commit/rollback and original arrivals/publications",
+    "fresh target/draft controls, own463 AR and measured benefit before adoption"
+  ],
+  "priority": "extra Raw followup after current M165 correctness and planned128/64/192 integration",
+  "implemented": false,
+  "Goodput": null
+}

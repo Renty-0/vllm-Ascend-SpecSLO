@@ -1,0 +1,303 @@
+{
+  "UTC": "2026-10-19T05:47:06.820948+00:00",
+  "status": "diagnostic_only_first_shadow_divergence_at_layer0_attention",
+  "all3targets": [
+    {
+      "rank": 1,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M165-N32-NZ166-root-v322-first-four-layers-v1/rank1-first-divergence322.json",
+      "sha256": "3f6c70558c95ff4b94da47970bb0d34a7b9bbc97cc24f762e3e727c701b7a3e9",
+      "first_shadow": {
+        "module": "layer0.attention.output.0",
+        "rows": [
+          {
+            "query": 0,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 1,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 2,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 3,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 4,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 5,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          }
+        ],
+        "independent_shadow_root": {
+          "candidate_root_vs_independent_side_root_raw16_equal": false,
+          "max_abs": 0.0001220703125
+        }
+      },
+      "first_real": {
+        "module": "layer1.attention.output.0",
+        "rows": [
+          {
+            "query": 0,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 1,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 2,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 3,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 4,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 5,
+            "raw16_equal": false,
+            "different_elements": 696,
+            "max_abs": 0.0009765625
+          }
+        ],
+        "independent_shadow_root": {
+          "candidate_root_vs_independent_side_root_raw16_equal": false,
+          "max_abs": 0.001953125
+        }
+      },
+      "prefix_alias_all128_raw16_equal": true,
+      "NZ_threshold": 166,
+      "chained165_admitted": true
+    },
+    {
+      "rank": 2,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M165-N32-NZ166-root-v322-first-four-layers-v1/rank2-first-divergence322.json",
+      "sha256": "f5008172b3e300580682c68fc9fe5edd57abf1105f3e0c063951471029e39d7b",
+      "first_shadow": {
+        "module": "layer0.attention.output.0",
+        "rows": [
+          {
+            "query": 0,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 1,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 2,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 3,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 4,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 5,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          }
+        ],
+        "independent_shadow_root": {
+          "candidate_root_vs_independent_side_root_raw16_equal": false,
+          "max_abs": 0.0001220703125
+        }
+      },
+      "first_real": {
+        "module": "layer1.attention.output.0",
+        "rows": [
+          {
+            "query": 0,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 1,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 2,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 3,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 4,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 5,
+            "raw16_equal": false,
+            "different_elements": 773,
+            "max_abs": 0.0009765625
+          }
+        ],
+        "independent_shadow_root": {
+          "candidate_root_vs_independent_side_root_raw16_equal": false,
+          "max_abs": 0.0009765625
+        }
+      },
+      "prefix_alias_all128_raw16_equal": true,
+      "NZ_threshold": 166,
+      "chained165_admitted": true
+    },
+    {
+      "rank": 3,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M165-N32-NZ166-root-v322-first-four-layers-v1/rank3-first-divergence322.json",
+      "sha256": "1468125f1ee4e053f32a8e0ff9874b4da737721fc72fa4381d08fb0adb398a9b",
+      "first_shadow": {
+        "module": "layer0.attention.output.0",
+        "rows": [
+          {
+            "query": 0,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 1,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 2,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 3,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 4,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 5,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          }
+        ],
+        "independent_shadow_root": {
+          "candidate_root_vs_independent_side_root_raw16_equal": false,
+          "max_abs": 0.00048828125
+        }
+      },
+      "first_real": {
+        "module": "layer1.attention.output.0",
+        "rows": [
+          {
+            "query": 0,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 1,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 2,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 3,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 4,
+            "raw16_equal": true,
+            "different_elements": 0,
+            "max_abs": 0.0
+          },
+          {
+            "query": 5,
+            "raw16_equal": false,
+            "different_elements": 500,
+            "max_abs": 0.000732421875
+          }
+        ],
+        "independent_shadow_root": {
+          "candidate_root_vs_independent_side_root_raw16_equal": false,
+          "max_abs": 0.0009765625
+        }
+      },
+      "prefix_alias_all128_raw16_equal": true,
+      "NZ_threshold": 166,
+      "chained165_admitted": true
+    }
+  ],
+  "not_a_complete_root_cause": true,
+  "next": "fresh323 common mask11, original real visibility unchanged and all546 strict gates required",
+  "Goodput": null
+}
