@@ -51,6 +51,7 @@ def main():
         'tree-single-validated-prefix-descriptors-host-v304',
         'tree-single-validated-prefix-prepare-host-v305',
         'tree-capacity-risk-single-prepare-full-v307',
+        'tree-range-packed-branch-layout-host-v308',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -86,6 +87,9 @@ def main():
         'ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json',
         'ROOT299_TERMINAL_GEOMETRY_HOST_REGRESSION.json',
         'ROOT_NEXT_PERFORMANCE_LEVERS_20261018.json',
+        'profile_ROOT305_prepare_HOST.py',
+        'ROOT305_CPU_PREPARE_PROFILE.json',
+        'ROOT257_287_ACTUAL_DELIVERY_MARGIN_AND_PHASES.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

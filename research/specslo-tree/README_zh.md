@@ -11,14 +11,15 @@
 | 固定串行 gamma4 | 双 batch、rolling-eager 和已有算子、计算图优化 | 对照 Goodput 501.6356 token/s。 |
 | v257 | Q5/M120 树形验证；463 请求均与独立自回归参考一致 | 当前最好树形结果：Raw 686.7756，Goodput 554.7604 token/s。 |
 | v287 | 根节点分叉，动态 B=1…8；完整 463 请求和三个 target rank 的独立自回归校验通过 | Raw 510.2503，Goodput 206.0838；性能退化，未采用。原 guard 的预算上限审计过期，保留原失败记录和独立修正审计。 |
-| v290 | 先为正常请求保留主链容量，再分配分叉预算 | HOST 测试通过，尚未进入端到端实验。 |
+| v290 | 先为正常请求保留主链容量，再分配分叉预算 | HOST 测试通过，已集成 v299，完整负载收益待测。 |
 | v294 | 按请求估计条件接受概率，处理未展开分支的观测截断 | HOST 测试通过，模型超参数和实际性能尚未验证。 |
 | v295 | 所有层的连续前缀合并复制，当前 K/V 双写 | 独立 NPU 算子测试通过；不能据此宣称端到端提升。 |
 | v291 | 将 v295 路径接入真实 target 模型 | 初始化时缓存检查失败，尚无模型数值或时延结果，不能采用。 |
 | v296 | 按实际缓存张量解析具体 NPU 编号，再执行原有严格缓存检查 | 三个 target rank 各 408 组数值检查及成对 target 时延验证通过；尚无完整负载 Goodput。 |
-| v299 | 组合主链容量保留、按请求估计收益、连续前缀复制与 K/V 双写 | 13 项 HOST 检查通过，源码已冻结，正在启动全套模型与完整负载验证。 |
+| v299 | 组合主链容量保留、按请求估计收益、连续前缀复制与 K/V 双写 | 13 项 HOST 检查及三个 target rank 各 408 个数值案例已完成；正在检查真实 draft，尚无完整负载结果。 |
 | v304/v305 | 保留一次完整映射校验，直接生成复制区间与当前 K/V 别名，省去无用缓冲 | 417 个映射场景及 408 组真实 HOST prepare 回调检查通过；尚未冻结、未接入模型。HOST 描述准备约从 5–6 ms 降到 1–2 ms，不能作为模型提速结果。 |
 | v307 | 仅将 v299 的准备路径替换为 v305 | 13 项 HOST 集成检查通过；尚未冻结或运行模型，是否测试取决于 v299 的完整结果。 |
+| v308 | 以连续区间生成分支复制与补齐索引，保留原布局检查 | 472 个真实 HOST 布局场景与原结果完全一致，6 项坏输入检查通过；HOST 布局准备小幅减少约 0.25 ms，尚未集成或测试 NPU。 |
 
 最终目标仍是动态预算树形方案超过固定 gamma4，并超过打开 MC2 的官方
 TP4 基线 1.5 倍。当前参考阈值为 644.7664 token/s，尚未达到。
@@ -36,12 +37,13 @@ TP4 基线 1.5 倍。当前参考阈值为 644.7664 token/s，尚未达到。
 | `tree-prefix-precopy-dual-cachewrite-host-v288/` | 原始字节复制与 K/V 双写内核。其旧的大网格前缀内核不可直接启动，见 v293 失败记录。 |
 | `tree-contiguous-prefix-span-copy-host-v292/` | 连续区间压缩与安全网格前缀内核。 |
 | `tree-safe-grid-span-dual-cache-probe-v295/` | 原始字节一致性和成对轮换时延验证。 |
-| `tree-all-layer-prefix-dual-cache-target-cost-v291/` | 尚待修复的模型集成诊断。 |
+| `tree-all-layer-prefix-dual-cache-target-cost-v291/` | 保留原失败的模型集成诊断；设备比较问题在 v296 修复。 |
 | `tree-concrete-device-span-dual-cache-target-cost-v296/` | 修复设备比较后的独立模型诊断，不继承前驱的数值验证资格。 |
 | `tree-capacity-request-risk-span-full-v299/` | 当前冻结的完整实验，需重新通过所有模型与独立 AR 校验。 |
 | `tree-single-validated-prefix-descriptors-host-v304/` | 不可变映射校验与直接区间描述，HOST 原型。 |
 | `tree-single-validated-prefix-prepare-host-v305/` | 精简 HOST prepare 回调，尚未执行 NPU 模型验证。 |
 | `tree-capacity-risk-single-prepare-full-v307/` | 后续完整实验候选，尚未启动 NPU。 |
+| `tree-range-packed-branch-layout-host-v308/` | 连续区间索引构造的 HOST 原型与完整差分检查，尚未接入运行版本。 |
 | `budget-diagnostics/` | 独立审计、逐类收益校准与最终比较脚本。 |
 
 运行时依赖还保存在 `snapshot/root/data/vllm-ascend-hust/`；

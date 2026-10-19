@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-18T23:38:04.777881+00:00",
-  "upstream_branch_base": "3243c76285906529f66980ae3acf4fb45597b0df",
+  "saved_UTC": "2026-10-19T00:01:16.732501+00:00",
+  "upstream_branch_base": "e91b0478c8c371d9f25ff60e22b71238f4f8e3bb",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -92,6 +92,12 @@
   ],
   "files": [
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_287_ACTUAL_DELIVERY_MARGIN_AND_PHASES.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_287_ACTUAL_DELIVERY_MARGIN_AND_PHASES.json",
+      "sha256": "d7ab19f97d5aaace4fcfbd371dc119e9f339123326ce22738a6501cf87563725",
+      "bytes": 6424
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_GENERATION_TEMPLATE.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_GENERATION_TEMPLATE.py",
       "sha256": "0fd615f2c4ff78776242b92a5b6be0b5d41a60dd57043572a691ddf14e010782",
@@ -150,6 +156,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT299_TERMINAL_GEOMETRY_HOST_REGRESSION.json",
       "sha256": "a9fb158cf70c3f40299ce60e9502a7e41af7c2287faef553394221eb26a59448",
       "bytes": 575
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT305_CPU_PREPARE_PROFILE.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT305_CPU_PREPARE_PROFILE.json",
+      "sha256": "09bde367a5a62045e5a485443ac5af26e75c5a1b5d32244cb383baa1b33c9c70",
+      "bytes": 61560
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
@@ -722,6 +734,12 @@
       "bytes": 1108
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/profile_ROOT305_prepare_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/profile_ROOT305_prepare_HOST.py",
+      "sha256": "a416094694f0305866e7bd8d67669e71fa9864d1db51bda1ddf31552cc1c0d39",
+      "bytes": 3734
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_common_publication_metrics.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_common_publication_metrics.py",
       "sha256": "bac15282709b4c0f802aff696d50916e14e1395e29bbd7e38ec15615f4e074ed",
@@ -736,8 +754,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "d4e4ef91ad3b282c5c94afe0491c6ac005ef44029f9acb7e9b6a2ec2861d97bd",
-      "bytes": 7448
+      "sha256": "aeebb9cc350b85de5f942f168e44430daddee6b5c985b14aa8005d7921958fba",
+      "bytes": 7650
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution/common_guard.py",
@@ -9504,6 +9522,24 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-query1-FULL-vs-FULL9-numeric-cost-diagnostic-v228/startup228.sh",
       "sha256": "c94ae5b3cf6aaa4ac41bc4dc577468f091eb084dc3de66d1470b866c8d7050ed",
       "bytes": 4827
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-range-packed-branch-layout-host-v308/HOST308_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-range-packed-branch-layout-host-v308/HOST308_RESULT.json",
+      "sha256": "6f447d012d852ea397d21e300455f30ed9c98b15aa5007dc265f6c310ff7225a",
+      "bytes": 51262
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-range-packed-branch-layout-host-v308/check308_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-range-packed-branch-layout-host-v308/check308_HOST.py",
+      "sha256": "de1c559313e325cdc6a41c77d303daa6b78962e89a76f6f2a5f3f317a44f79a5",
+      "bytes": 5206
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-range-packed-branch-layout-host-v308/layout308.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-range-packed-branch-layout-host-v308/layout308.py",
+      "sha256": "23b9238f668a150560886677a6cd8a4850ee7edc10c6e803b7cf8bea82e129ff",
+      "bytes": 3619
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-real-original-AR-partition-attention-origin-v239/check239.py",

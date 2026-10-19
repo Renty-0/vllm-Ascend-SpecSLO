@@ -1,0 +1,187 @@
+{
+  "UTC": "2026-10-18T23:49:19.474966+00:00",
+  "status": "HOST_actual_prior_traces_only_no_new_NPU_result",
+  "versions": {
+    "257": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/static-M120-root-v257-LIVE-target-SLO-first-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+      "source_sha256": "bbca2ce66af0418170ef4a4a04532bdc358c0ab887b5878d6cda7ecaece445e1",
+      "common_metrics": {
+        "all": {
+          "requests": 463,
+          "attained": 374,
+          "output_tokens": 118528,
+          "good_tokens": 95744,
+          "Raw": 686.7756316555451,
+          "Goodput": 554.7604454409803,
+          "TPOT_paper_median_ms": 38.24147683735646,
+          "TPOT_paper_P90_ms": 46.2514066563017,
+          "TPOT_observed_median_ms": 38.39144341318923,
+          "TPOT_observed_P90_ms": 46.43278472162053
+        },
+        "by_class": {
+          "loose": {
+            "requests": 96,
+            "attained": 96,
+            "output_tokens": 24576,
+            "good_tokens": 24576,
+            "Raw": 142.3984031078452,
+            "Goodput": 142.3984031078452,
+            "TPOT_paper_median_ms": 45.90230671874451,
+            "TPOT_paper_P90_ms": 50.188050967335585,
+            "TPOT_observed_median_ms": 46.08231576470037,
+            "TPOT_observed_P90_ms": 50.384866853481995
+          },
+          "normal": {
+            "requests": 96,
+            "attained": 96,
+            "output_tokens": 24576,
+            "good_tokens": 24576,
+            "Raw": 142.3984031078452,
+            "Goodput": 142.3984031078452,
+            "TPOT_paper_median_ms": 32.6489641547596,
+            "TPOT_paper_P90_ms": 35.712322221115755,
+            "TPOT_observed_median_ms": 32.77699930830767,
+            "TPOT_observed_P90_ms": 35.8523705435515
+          },
+          "tight": {
+            "requests": 271,
+            "attained": 182,
+            "output_tokens": 69376,
+            "good_tokens": 46592,
+            "Raw": 401.9788254398547,
+            "Goodput": 269.96363922528985,
+            "TPOT_paper_median_ms": 38.1960747508856,
+            "TPOT_paper_P90_ms": 43.20865767476789,
+            "TPOT_observed_median_ms": 38.34586327932045,
+            "TPOT_observed_P90_ms": 43.37810339113953
+          }
+        },
+        "elapsed_seconds": 172.58620506711304
+      },
+      "tight_cumulative_count_by_TPOT_ms": {
+        "35": 48,
+        "36": 72,
+        "37": 101,
+        "38": 130,
+        "39": 160,
+        "40": 182,
+        "41": 211,
+        "42": 228,
+        "43": 242,
+        "44": 252,
+        "45": 264,
+        "50": 271
+      },
+      "required_attained_count_at_unchanged_wall_for_goal": 435,
+      "maximum_wall_at_unchanged_attained_for_goal": 148.49407918186526,
+      "budget_histogram": {
+        "5": 347,
+        "4": 37764,
+        "3": 71,
+        "2": 187,
+        "1": 153
+      },
+      "phase_seconds": {
+        "draft": 0.0,
+        "target": 123.87260116590187,
+        "exchange": 4.828580817207694,
+        "verify": 0.0,
+        "broadcast": 1.0109597332775593,
+        "state_update": 6.280543623492122
+      },
+      "no_causal_or_counterfactual_Goodput_claim": true
+    },
+    "287": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/dynamic-root-alternate-root-v287-eager3-compatible-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+      "source_sha256": "cc698abce430b8558133792d76897371d87eaf7e8fc4b9402a576e8197fbb07c",
+      "common_metrics": {
+        "all": {
+          "requests": 463,
+          "attained": 187,
+          "output_tokens": 118528,
+          "good_tokens": 47872,
+          "Raw": 510.2503352849937,
+          "Goodput": 206.0838287220169,
+          "TPOT_paper_median_ms": 52.176992016029544,
+          "TPOT_paper_P90_ms": 75.57054636563407,
+          "TPOT_observed_median_ms": 52.38160767099436,
+          "TPOT_observed_P90_ms": 75.86690144942088
+        },
+        "by_class": {
+          "loose": {
+            "requests": 96,
+            "attained": 96,
+            "output_tokens": 24576,
+            "good_tokens": 24576,
+            "Raw": 105.7970457610354,
+            "Goodput": 105.7970457610354,
+            "TPOT_paper_median_ms": 73.49776991668477,
+            "TPOT_paper_P90_ms": 94.05798096940998,
+            "TPOT_observed_median_ms": 73.78599646537765,
+            "TPOT_observed_P90_ms": 94.42683579674099
+          },
+          "normal": {
+            "requests": 96,
+            "attained": 84,
+            "output_tokens": 24576,
+            "good_tokens": 21504,
+            "Raw": 105.7970457610354,
+            "Goodput": 92.57241504090598,
+            "TPOT_paper_median_ms": 39.418362849573896,
+            "TPOT_paper_P90_ms": 51.276121548653464,
+            "TPOT_observed_median_ms": 39.57294466467026,
+            "TPOT_observed_P90_ms": 51.477204378256026
+          },
+          "tight": {
+            "requests": 271,
+            "attained": 7,
+            "output_tokens": 69376,
+            "good_tokens": 1792,
+            "Raw": 298.6562437629229,
+            "Goodput": 7.714367920075499,
+            "TPOT_paper_median_ms": 51.89548467933491,
+            "TPOT_paper_P90_ms": 66.20856844892842,
+            "TPOT_observed_median_ms": 52.09899638395976,
+            "TPOT_observed_P90_ms": 66.46820989382617
+          }
+        },
+        "elapsed_seconds": 232.29382090223953
+      },
+      "tight_cumulative_count_by_TPOT_ms": {
+        "35": 1,
+        "36": 1,
+        "37": 1,
+        "38": 2,
+        "39": 3,
+        "40": 7,
+        "41": 11,
+        "42": 22,
+        "43": 31,
+        "44": 41,
+        "45": 56,
+        "50": 112
+      },
+      "required_attained_count_at_unchanged_wall_for_goal": 586,
+      "maximum_wall_at_unchanged_attained_for_goal": 74.24703959093263,
+      "budget_histogram": {
+        "8": 8130,
+        "1": 137,
+        "7": 1692,
+        "4": 23132,
+        "6": 1906,
+        "5": 2058,
+        "3": 130,
+        "2": 164
+      },
+      "phase_seconds": {
+        "draft": 0.0,
+        "target": 170.1090819062665,
+        "exchange": 13.846115007065237,
+        "verify": 0.0,
+        "broadcast": 1.215956759173423,
+        "state_update": 9.66699613025412
+      },
+      "no_causal_or_counterfactual_Goodput_claim": true
+    }
+  }
+}

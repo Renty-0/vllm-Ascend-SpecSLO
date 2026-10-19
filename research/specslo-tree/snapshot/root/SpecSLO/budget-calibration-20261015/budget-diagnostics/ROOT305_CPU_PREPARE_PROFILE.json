@@ -1,0 +1,1627 @@
+{
+  "schema": "ROOT305.HOST-prepare-profile.v1",
+  "UTC": "2026-10-18T23:58:02.671016+00:00",
+  "source_sha256": "a416094694f0305866e7bd8d67669e71fa9864d1db51bda1ddf31552cc1c0d39",
+  "scope": "CPU Native protocol fixture and arithmetic model double only",
+  "records": [
+    {
+      "N": 12,
+      "branch_owners": 0,
+      "rounds": 30,
+      "total_profile_seconds": 0.164996559,
+      "functions": [
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/profile_ROOT305_prepare_HOST.py",
+          "line": 44,
+          "function": "execute",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000285865,
+          "cumulative_seconds": 0.16518253300000002
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+          "line": 34,
+          "function": "forwarded",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00021205100000000002,
+          "cumulative_seconds": 0.159088228
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 133,
+          "function": "forward",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000818014,
+          "cumulative_seconds": 0.15885816700000002
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256/check_adapter246_HOST.py::CPU-actual-forward",
+          "line": 2,
+          "function": "target_tree_forward",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.017559062,
+          "cumulative_seconds": 0.15804015300000002
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 127,
+          "function": "metadata",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000364238,
+          "cumulative_seconds": 0.10971995100000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256/check_full256_HOST.py::original-fixture-prefix",
+          "line": 61,
+          "function": "<lambda>",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00039011700000000005,
+          "cumulative_seconds": 0.066952206
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 95,
+          "function": "make_host_tree_attention_metadata",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.013561844,
+          "cumulative_seconds": 0.066562089
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+          "line": 63,
+          "function": "prepared",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00011156000000000001,
+          "cumulative_seconds": 0.042388227
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+          "line": 22,
+          "function": "prepared",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0005385380000000001,
+          "cumulative_seconds": 0.042276667000000004
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.any>",
+          "primitive_calls": 1680,
+          "calls": 2400,
+          "total_seconds": 0.007285066000000001,
+          "cumulative_seconds": 0.025517063000000003
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+          "line": 43,
+          "function": "transform",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.004515189,
+          "cumulative_seconds": 0.022874029
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 83,
+          "function": "prepare",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000695842,
+          "cumulative_seconds": 0.018501053
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_model.py::CPU-original",
+          "line": 678,
+          "function": "make_tree_fia_mask",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.007229132,
+          "cumulative_seconds": 0.014580626000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+          "line": 10,
+          "function": "plan",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00784379,
+          "cumulative_seconds": 0.011118808
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/tree.py",
+          "line": 211,
+          "function": "pack_selected_tree_plan",
+          "primitive_calls": 720,
+          "calls": 720,
+          "total_seconds": 0.005279032,
+          "cumulative_seconds": 0.010327256
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 14,
+          "function": "is_fork",
+          "primitive_calls": 1440,
+          "calls": 1440,
+          "total_seconds": 0.002508316,
+          "cumulative_seconds": 0.010255647000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 42,
+          "function": "checked_host_tree_slots",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.008815589,
+          "cumulative_seconds": 0.01021761
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 107,
+          "function": "<genexpr>",
+          "primitive_calls": 15840,
+          "calls": 15840,
+          "total_seconds": 0.005973946,
+          "cumulative_seconds": 0.007564619000000001
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.sum>",
+          "primitive_calls": 150,
+          "calls": 150,
+          "total_seconds": 0.0009038440000000001,
+          "cumulative_seconds": 0.007532821
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+          "line": 16,
+          "function": "checked_layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 9.188200000000001e-05,
+          "cumulative_seconds": 0.007113111
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py",
+          "line": 45,
+          "function": "layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00013357200000000001,
+          "cumulative_seconds": 0.007021229
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py::original255-with-alternate-chain",
+          "line": 1,
+          "function": "layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000283886,
+          "cumulative_seconds": 0.0068680270000000005
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'copy_' of 'torch._C.TensorBase' objects>",
+          "primitive_calls": 810,
+          "calls": 810,
+          "total_seconds": 0.006483963000000001,
+          "cumulative_seconds": 0.006483963000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 71,
+          "function": "_cpu_values",
+          "primitive_calls": 1440,
+          "calls": 1440,
+          "total_seconds": 0.004577830000000001,
+          "cumulative_seconds": 0.006237236
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 87,
+          "function": "<genexpr>",
+          "primitive_calls": 750,
+          "calls": 750,
+          "total_seconds": 0.0005644420000000001,
+          "cumulative_seconds": 0.005901169
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/padding269.py",
+          "line": 20,
+          "function": "pad",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00014230000000000002,
+          "cumulative_seconds": 0.005808440000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/padding269.py::original-padding-new-domain",
+          "line": 1,
+          "function": "pad",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0022183890000000003,
+          "cumulative_seconds": 0.0056499490000000005
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py::original255-with-alternate-chain",
+          "line": 7,
+          "function": "<genexpr>",
+          "primitive_calls": 750,
+          "calls": 750,
+          "total_seconds": 0.000545173,
+          "cumulative_seconds": 0.005464093000000001
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.len>",
+          "primitive_calls": 43800,
+          "calls": 43800,
+          "total_seconds": 0.0053526780000000005,
+          "cumulative_seconds": 0.0053526780000000005
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'tolist' of 'torch._C.TensorBase' objects>",
+          "primitive_calls": 4680,
+          "calls": 4680,
+          "total_seconds": 0.004567576,
+          "cumulative_seconds": 0.004567576
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/fixed_mask_extent.py",
+          "line": 5,
+          "function": "padded",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0008206250000000001,
+          "cumulative_seconds": 0.004539827000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 16,
+          "function": "<genexpr>",
+          "primitive_calls": 7200,
+          "calls": 7200,
+          "total_seconds": 0.0032300030000000004,
+          "cumulative_seconds": 0.00433557
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method torch.tensor>",
+          "primitive_calls": 150,
+          "calls": 150,
+          "total_seconds": 0.004078412,
+          "cumulative_seconds": 0.004078412
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py::CPU-original-cache",
+          "line": 4733,
+          "function": "_ensure_cache_capacity",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 6.536e-05,
+          "cumulative_seconds": 0.0038907430000000003
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_cache.py",
+          "line": 128,
+          "function": "ensure_capacity",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0033427440000000004,
+          "cumulative_seconds": 0.0038253830000000003
+        }
+      ]
+    },
+    {
+      "N": 12,
+      "branch_owners": 1,
+      "rounds": 30,
+      "total_profile_seconds": 0.531818531,
+      "functions": [
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/profile_ROOT305_prepare_HOST.py",
+          "line": 44,
+          "function": "execute",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00030806400000000004,
+          "cumulative_seconds": 0.5322147150000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+          "line": 34,
+          "function": "forwarded",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000295064,
+          "cumulative_seconds": 0.522355734
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 133,
+          "function": "forward",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000816469,
+          "cumulative_seconds": 0.5220418800000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256/check_adapter246_HOST.py::CPU-actual-forward",
+          "line": 2,
+          "function": "target_tree_forward",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.018230947,
+          "cumulative_seconds": 0.5212254110000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 127,
+          "function": "metadata",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00044520800000000005,
+          "cumulative_seconds": 0.46549556300000006
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+          "line": 63,
+          "function": "prepared",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.005561348000000001,
+          "cumulative_seconds": 0.39607103400000004
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+          "line": 22,
+          "function": "prepared",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00053543,
+          "cumulative_seconds": 0.365763516
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 83,
+          "function": "prepare",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.001982831,
+          "cumulative_seconds": 0.330081508
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+          "line": 16,
+          "function": "checked_layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.002061605,
+          "cumulative_seconds": 0.307943214
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py",
+          "line": 45,
+          "function": "layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000202043,
+          "cumulative_seconds": 0.165488127
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py::original255-with-alternate-chain",
+          "line": 1,
+          "function": "layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.07665553500000001,
+          "cumulative_seconds": 0.16526954400000002
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304/descriptors304.py",
+          "line": 18,
+          "function": "__init__",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0009752020000000001,
+          "cumulative_seconds": 0.140393482
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.any>",
+          "primitive_calls": 2520,
+          "calls": 2550,
+          "total_seconds": 0.041934583000000004,
+          "cumulative_seconds": 0.13802551300000002
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 2,
+          "function": "checked",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.003250216,
+          "cumulative_seconds": 0.11891287700000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256/check_full256_HOST.py::original-fixture-prefix",
+          "line": 61,
+          "function": "<lambda>",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00034218700000000004,
+          "cumulative_seconds": 0.06896345000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 95,
+          "function": "make_host_tree_attention_metadata",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.013647389000000001,
+          "cumulative_seconds": 0.068621263
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.sum>",
+          "primitive_calls": 210,
+          "calls": 210,
+          "total_seconds": 0.017615899,
+          "cumulative_seconds": 0.056024117000000005
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 5,
+          "function": "<genexpr>",
+          "primitive_calls": 107550,
+          "calls": 107550,
+          "total_seconds": 0.041113904,
+          "cumulative_seconds": 0.041113904
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py::original255-with-alternate-chain",
+          "line": 82,
+          "function": "<genexpr>",
+          "primitive_calls": 107550,
+          "calls": 107550,
+          "total_seconds": 0.036389117000000006,
+          "cumulative_seconds": 0.036389117000000006
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+          "line": 43,
+          "function": "transform",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.004190778,
+          "cumulative_seconds": 0.034752746
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method torch.tensor>",
+          "primitive_calls": 390,
+          "calls": 390,
+          "total_seconds": 0.025537676000000002,
+          "cumulative_seconds": 0.025537676000000002
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.max>",
+          "primitive_calls": 1530,
+          "calls": 1530,
+          "total_seconds": 0.0026264870000000003,
+          "cumulative_seconds": 0.023027616
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304/descriptors304.py",
+          "line": 30,
+          "function": "separate",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.016654133,
+          "cumulative_seconds": 0.020498005
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304/descriptors304.py",
+          "line": 22,
+          "function": "<genexpr>",
+          "primitive_calls": 3990,
+          "calls": 3990,
+          "total_seconds": 0.019569025,
+          "cumulative_seconds": 0.019569025
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_model.py::CPU-original",
+          "line": 678,
+          "function": "make_tree_fia_mask",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.008980275000000001,
+          "cumulative_seconds": 0.01664158
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 12,
+          "function": "<genexpr>",
+          "primitive_calls": 53790,
+          "calls": 53790,
+          "total_seconds": 0.015760462,
+          "cumulative_seconds": 0.015760462
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 13,
+          "function": "<genexpr>",
+          "primitive_calls": 53790,
+          "calls": 53790,
+          "total_seconds": 0.015634139000000002,
+          "cumulative_seconds": 0.015634139000000002
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'append' of 'list' objects>",
+          "primitive_calls": 135030,
+          "calls": 135030,
+          "total_seconds": 0.015450292000000001,
+          "cumulative_seconds": 0.015450292000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 14,
+          "function": "is_fork",
+          "primitive_calls": 1470,
+          "calls": 1470,
+          "total_seconds": 0.003088663,
+          "cumulative_seconds": 0.011513597
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+          "line": 10,
+          "function": "plan",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00777929,
+          "cumulative_seconds": 0.011252349
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 42,
+          "function": "checked_host_tree_slots",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.008692554,
+          "cumulative_seconds": 0.010120828
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/tree.py",
+          "line": 211,
+          "function": "pack_selected_tree_plan",
+          "primitive_calls": 690,
+          "calls": 690,
+          "total_seconds": 0.005149248,
+          "cumulative_seconds": 0.010074342
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/padding269.py",
+          "line": 20,
+          "function": "pad",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00013240500000000002,
+          "cumulative_seconds": 0.009550917
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/padding269.py::original-padding-new-domain",
+          "line": 1,
+          "function": "pad",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.002346112,
+          "cumulative_seconds": 0.009402211
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'index_copy_' of 'torch._C.TensorBase' objects>",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.008937712,
+          "cumulative_seconds": 0.008937712
+        }
+      ]
+    },
+    {
+      "N": 12,
+      "branch_owners": 12,
+      "rounds": 30,
+      "total_profile_seconds": 0.6628954429999995,
+      "functions": [
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/profile_ROOT305_prepare_HOST.py",
+          "line": 44,
+          "function": "execute",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00027796600000000004,
+          "cumulative_seconds": 0.6630425750000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+          "line": 34,
+          "function": "forwarded",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000285625,
+          "cumulative_seconds": 0.65812097
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 133,
+          "function": "forward",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00076541,
+          "cumulative_seconds": 0.6578178450000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256/check_adapter246_HOST.py::CPU-actual-forward",
+          "line": 2,
+          "function": "target_tree_forward",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.013975528000000001,
+          "cumulative_seconds": 0.657052435
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 127,
+          "function": "metadata",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00042511500000000005,
+          "cumulative_seconds": 0.61816063
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+          "line": 63,
+          "function": "prepared",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.005098753,
+          "cumulative_seconds": 0.5622988750000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+          "line": 22,
+          "function": "prepared",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000536467,
+          "cumulative_seconds": 0.491859168
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 83,
+          "function": "prepare",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0021015440000000003,
+          "cumulative_seconds": 0.44767578
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+          "line": 16,
+          "function": "checked_layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.002828961,
+          "cumulative_seconds": 0.424869182
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py",
+          "line": 45,
+          "function": "layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000204543,
+          "cumulative_seconds": 0.26067649400000004
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py::original255-with-alternate-chain",
+          "line": 1,
+          "function": "layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.145608441,
+          "cumulative_seconds": 0.26045527100000004
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304/descriptors304.py",
+          "line": 18,
+          "function": "__init__",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.001348211,
+          "cumulative_seconds": 0.161363727
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.any>",
+          "primitive_calls": 1710,
+          "calls": 1740,
+          "total_seconds": 0.04122725,
+          "cumulative_seconds": 0.137163527
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 2,
+          "function": "checked",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0037270140000000003,
+          "cumulative_seconds": 0.122476809
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304/descriptors304.py",
+          "line": 30,
+          "function": "separate",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.057152747000000004,
+          "cumulative_seconds": 0.06107482400000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256/check_full256_HOST.py::original-fixture-prefix",
+          "line": 61,
+          "function": "<lambda>",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000343596,
+          "cumulative_seconds": 0.05542057
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 95,
+          "function": "make_host_tree_attention_metadata",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.009424691,
+          "cumulative_seconds": 0.055076974
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.sum>",
+          "primitive_calls": 210,
+          "calls": 210,
+          "total_seconds": 0.017477459,
+          "cumulative_seconds": 0.055042653000000004
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+          "line": 43,
+          "function": "transform",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.004401412,
+          "cumulative_seconds": 0.043253854
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 5,
+          "function": "<genexpr>",
+          "primitive_calls": 107550,
+          "calls": 107550,
+          "total_seconds": 0.041094495,
+          "cumulative_seconds": 0.041094495
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.max>",
+          "primitive_calls": 660,
+          "calls": 660,
+          "total_seconds": 0.01079092,
+          "cumulative_seconds": 0.039029761
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py::original255-with-alternate-chain",
+          "line": 82,
+          "function": "<genexpr>",
+          "primitive_calls": 107550,
+          "calls": 107550,
+          "total_seconds": 0.036521653,
+          "cumulative_seconds": 0.036521653
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method torch.tensor>",
+          "primitive_calls": 660,
+          "calls": 660,
+          "total_seconds": 0.032963648000000005,
+          "cumulative_seconds": 0.032963648000000005
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304/descriptors304.py",
+          "line": 22,
+          "function": "<genexpr>",
+          "primitive_calls": 47550,
+          "calls": 47550,
+          "total_seconds": 0.027687163,
+          "cumulative_seconds": 0.027687163
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 12,
+          "function": "<genexpr>",
+          "primitive_calls": 53790,
+          "calls": 53790,
+          "total_seconds": 0.015839201,
+          "cumulative_seconds": 0.015839201
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 13,
+          "function": "<genexpr>",
+          "primitive_calls": 53790,
+          "calls": 53790,
+          "total_seconds": 0.015771793000000003,
+          "cumulative_seconds": 0.015771793000000003
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'append' of 'list' objects>",
+          "primitive_calls": 133110,
+          "calls": 133110,
+          "total_seconds": 0.015321509,
+          "cumulative_seconds": 0.015321509
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'index_copy_' of 'torch._C.TensorBase' objects>",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.014485076000000001,
+          "cumulative_seconds": 0.014485076000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 14,
+          "function": "is_fork",
+          "primitive_calls": 930,
+          "calls": 930,
+          "total_seconds": 0.004281155,
+          "cumulative_seconds": 0.012567184
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+          "line": 10,
+          "function": "plan",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.008646454000000001,
+          "cumulative_seconds": 0.012459171000000002
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 9,
+          "function": "<setcomp>",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.011959514000000001,
+          "cumulative_seconds": 0.011959514000000001
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_model.py::CPU-original",
+          "line": 678,
+          "function": "make_tree_fia_mask",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.005232565000000001,
+          "cumulative_seconds": 0.011005696
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 42,
+          "function": "checked_host_tree_slots",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00870275,
+          "cumulative_seconds": 0.010095979000000001
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'nonzero' of 'torch._C.TensorBase' objects>",
+          "primitive_calls": 360,
+          "calls": 360,
+          "total_seconds": 0.009330856,
+          "cumulative_seconds": 0.009330856
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 107,
+          "function": "<genexpr>",
+          "primitive_calls": 15840,
+          "calls": 15840,
+          "total_seconds": 0.005978972000000001,
+          "cumulative_seconds": 0.0075698630000000005
+        }
+      ]
+    },
+    {
+      "N": 20,
+      "branch_owners": 4,
+      "rounds": 30,
+      "total_profile_seconds": 0.5717035050000006,
+      "functions": [
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/profile_ROOT305_prepare_HOST.py",
+          "line": 44,
+          "function": "execute",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000291333,
+          "cumulative_seconds": 0.571891966
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+          "line": 34,
+          "function": "forwarded",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000296835,
+          "cumulative_seconds": 0.5668914620000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 133,
+          "function": "forward",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.001015342,
+          "cumulative_seconds": 0.566577057
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256/check_adapter246_HOST.py::CPU-actual-forward",
+          "line": 2,
+          "function": "target_tree_forward",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.019046123,
+          "cumulative_seconds": 0.5655617150000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 127,
+          "function": "metadata",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00042910100000000004,
+          "cumulative_seconds": 0.5167902440000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+          "line": 63,
+          "function": "prepared",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.005467553,
+          "cumulative_seconds": 0.451267868
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+          "line": 22,
+          "function": "prepared",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000532273,
+          "cumulative_seconds": 0.409750814
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 83,
+          "function": "prepare",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.002046329,
+          "cumulative_seconds": 0.363124245
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+          "line": 16,
+          "function": "checked_layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.002305334,
+          "cumulative_seconds": 0.340702019
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py",
+          "line": 45,
+          "function": "layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000215121,
+          "cumulative_seconds": 0.192440084
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py::original255-with-alternate-chain",
+          "line": 1,
+          "function": "layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.09663933000000001,
+          "cumulative_seconds": 0.192207242
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304/descriptors304.py",
+          "line": 18,
+          "function": "__init__",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.001058294,
+          "cumulative_seconds": 0.14595660100000002
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.any>",
+          "primitive_calls": 2250,
+          "calls": 2280,
+          "total_seconds": 0.041865661000000005,
+          "cumulative_seconds": 0.13819203000000002
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 2,
+          "function": "checked",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.003348531,
+          "cumulative_seconds": 0.119988405
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256/check_full256_HOST.py::original-fixture-prefix",
+          "line": 61,
+          "function": "<lambda>",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00034726500000000003,
+          "cumulative_seconds": 0.06507684500000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 95,
+          "function": "make_host_tree_attention_metadata",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.012302362,
+          "cumulative_seconds": 0.06472958000000001
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.sum>",
+          "primitive_calls": 210,
+          "calls": 210,
+          "total_seconds": 0.017714396,
+          "cumulative_seconds": 0.056027110000000005
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+          "line": 43,
+          "function": "transform",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00446265,
+          "cumulative_seconds": 0.045576502000000005
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 5,
+          "function": "<genexpr>",
+          "primitive_calls": 107550,
+          "calls": 107550,
+          "total_seconds": 0.041154985000000005,
+          "cumulative_seconds": 0.041154985000000005
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py::original255-with-alternate-chain",
+          "line": 82,
+          "function": "<genexpr>",
+          "primitive_calls": 107550,
+          "calls": 107550,
+          "total_seconds": 0.036541961000000005,
+          "cumulative_seconds": 0.036541961000000005
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304/descriptors304.py",
+          "line": 30,
+          "function": "separate",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.028067012000000002,
+          "cumulative_seconds": 0.031824232
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.max>",
+          "primitive_calls": 1260,
+          "calls": 1260,
+          "total_seconds": 0.0047838030000000005,
+          "cumulative_seconds": 0.027114945
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method torch.tensor>",
+          "primitive_calls": 420,
+          "calls": 420,
+          "total_seconds": 0.027081915,
+          "cumulative_seconds": 0.027081915
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304/descriptors304.py",
+          "line": 22,
+          "function": "<genexpr>",
+          "primitive_calls": 15870,
+          "calls": 15870,
+          "total_seconds": 0.021596864,
+          "cumulative_seconds": 0.021596864
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'index_copy_' of 'torch._C.TensorBase' objects>",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.016045342,
+          "cumulative_seconds": 0.016045342
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 12,
+          "function": "<genexpr>",
+          "primitive_calls": 53790,
+          "calls": 53790,
+          "total_seconds": 0.015762464,
+          "cumulative_seconds": 0.015762464
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 13,
+          "function": "<genexpr>",
+          "primitive_calls": 53790,
+          "calls": 53790,
+          "total_seconds": 0.015728287,
+          "cumulative_seconds": 0.015728287
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_model.py::CPU-original",
+          "line": 678,
+          "function": "make_tree_fia_mask",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.007903785,
+          "cumulative_seconds": 0.015145257
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'append' of 'list' objects>",
+          "primitive_calls": 134310,
+          "calls": 134310,
+          "total_seconds": 0.014685962,
+          "cumulative_seconds": 0.014685962
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+          "line": 10,
+          "function": "plan",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.009294618000000001,
+          "cumulative_seconds": 0.013103804
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 14,
+          "function": "is_fork",
+          "primitive_calls": 1290,
+          "calls": 1290,
+          "total_seconds": 0.00339169,
+          "cumulative_seconds": 0.011836570000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 42,
+          "function": "checked_host_tree_slots",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.008707444,
+          "cumulative_seconds": 0.010096768
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/contract262.py",
+          "line": 9,
+          "function": "<setcomp>",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.009637956000000001,
+          "cumulative_seconds": 0.009637956000000001
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/tree.py",
+          "line": 211,
+          "function": "pack_selected_tree_plan",
+          "primitive_calls": 630,
+          "calls": 630,
+          "total_seconds": 0.004776589,
+          "cumulative_seconds": 0.009499864
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 107,
+          "function": "<genexpr>",
+          "primitive_calls": 15840,
+          "calls": 15840,
+          "total_seconds": 0.0059826670000000005,
+          "cumulative_seconds": 0.007564268000000001
+        }
+      ]
+    },
+    {
+      "N": 24,
+      "branch_owners": 0,
+      "rounds": 30,
+      "total_profile_seconds": 0.175853726,
+      "functions": [
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/profile_ROOT305_prepare_HOST.py",
+          "line": 44,
+          "function": "execute",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000292525,
+          "cumulative_seconds": 0.176041879
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+          "line": 34,
+          "function": "forwarded",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00022545600000000002,
+          "cumulative_seconds": 0.1713558
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 133,
+          "function": "forward",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0011200420000000001,
+          "cumulative_seconds": 0.17111241400000002
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256/check_adapter246_HOST.py::CPU-actual-forward",
+          "line": 2,
+          "function": "target_tree_forward",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.024103408,
+          "cumulative_seconds": 0.169992372
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 127,
+          "function": "metadata",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000353544,
+          "cumulative_seconds": 0.11418786600000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256/check_full256_HOST.py::original-fixture-prefix",
+          "line": 61,
+          "function": "<lambda>",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00035799700000000004,
+          "cumulative_seconds": 0.066837123
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 95,
+          "function": "make_host_tree_attention_metadata",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.013561934000000001,
+          "cumulative_seconds": 0.066479126
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+          "line": 63,
+          "function": "prepared",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000106043,
+          "cumulative_seconds": 0.046980839
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+          "line": 22,
+          "function": "prepared",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0005193320000000001,
+          "cumulative_seconds": 0.046874796
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+          "line": 43,
+          "function": "transform",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0045785470000000005,
+          "cumulative_seconds": 0.027089901000000003
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.any>",
+          "primitive_calls": 1680,
+          "calls": 2400,
+          "total_seconds": 0.007314127,
+          "cumulative_seconds": 0.025770863
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 83,
+          "function": "prepare",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000690863,
+          "cumulative_seconds": 0.018725615
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_model.py::CPU-original",
+          "line": 678,
+          "function": "make_tree_fia_mask",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.007275089,
+          "cumulative_seconds": 0.014647839000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+          "line": 10,
+          "function": "plan",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.009476202000000001,
+          "cumulative_seconds": 0.013202414
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/tree.py",
+          "line": 211,
+          "function": "pack_selected_tree_plan",
+          "primitive_calls": 720,
+          "calls": 720,
+          "total_seconds": 0.005355680000000001,
+          "cumulative_seconds": 0.010409297000000001
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 14,
+          "function": "is_fork",
+          "primitive_calls": 1440,
+          "calls": 1440,
+          "total_seconds": 0.0025462650000000002,
+          "cumulative_seconds": 0.0102669
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 42,
+          "function": "checked_host_tree_slots",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.008672268,
+          "cumulative_seconds": 0.010076799
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.sum>",
+          "primitive_calls": 150,
+          "calls": 150,
+          "total_seconds": 0.0010747080000000002,
+          "cumulative_seconds": 0.007913506
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 107,
+          "function": "<genexpr>",
+          "primitive_calls": 15840,
+          "calls": 15840,
+          "total_seconds": 0.005968689,
+          "cumulative_seconds": 0.007557185
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'copy_' of 'torch._C.TensorBase' objects>",
+          "primitive_calls": 810,
+          "calls": 810,
+          "total_seconds": 0.007531674,
+          "cumulative_seconds": 0.007531674
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305/static_state305.py",
+          "line": 16,
+          "function": "checked_layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 9.5921e-05,
+          "cumulative_seconds": 0.007088871
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py",
+          "line": 45,
+          "function": "layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 9.739e-05,
+          "cumulative_seconds": 0.00699295
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py::original255-with-alternate-chain",
+          "line": 1,
+          "function": "layout",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00025945600000000003,
+          "cumulative_seconds": 0.006878348
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host_target_metadata.py",
+          "line": 71,
+          "function": "_cpu_values",
+          "primitive_calls": 1440,
+          "calls": 1440,
+          "total_seconds": 0.00456706,
+          "cumulative_seconds": 0.006224467
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 87,
+          "function": "<genexpr>",
+          "primitive_calls": 750,
+          "calls": 750,
+          "total_seconds": 0.0005798390000000001,
+          "cumulative_seconds": 0.005932456
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/layout269.py::original255-with-alternate-chain",
+          "line": 7,
+          "function": "<genexpr>",
+          "primitive_calls": 750,
+          "calls": 750,
+          "total_seconds": 0.000563076,
+          "cumulative_seconds": 0.005477359
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method builtins.len>",
+          "primitive_calls": 44160,
+          "calls": 44160,
+          "total_seconds": 0.005349564,
+          "cumulative_seconds": 0.005349564
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<method 'tolist' of 'torch._C.TensorBase' objects>",
+          "primitive_calls": 5040,
+          "calls": 5040,
+          "total_seconds": 0.004837397,
+          "cumulative_seconds": 0.004837397
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/fixed_mask_extent.py",
+          "line": 5,
+          "function": "padded",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.000850288,
+          "cumulative_seconds": 0.004759461
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/padding269.py",
+          "line": 20,
+          "function": "pad",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.00011210300000000001,
+          "cumulative_seconds": 0.004393554
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py",
+          "line": 16,
+          "function": "<genexpr>",
+          "primitive_calls": 7200,
+          "calls": 7200,
+          "total_seconds": 0.0032801270000000003,
+          "cumulative_seconds": 0.004391444
+        },
+        {
+          "filename": "/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269/padding269.py::original-padding-new-domain",
+          "line": 1,
+          "function": "pad",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.0012917170000000002,
+          "cumulative_seconds": 0.004264831
+        },
+        {
+          "filename": "~",
+          "line": 0,
+          "function": "<built-in method torch.tensor>",
+          "primitive_calls": 150,
+          "calls": 150,
+          "total_seconds": 0.004051821000000001,
+          "cumulative_seconds": 0.004051821000000001
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py::CPU-original-cache",
+          "line": 4733,
+          "function": "_ensure_cache_capacity",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 6.2452e-05,
+          "cumulative_seconds": 0.003874845
+        },
+        {
+          "filename": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_cache.py",
+          "line": 128,
+          "function": "ensure_capacity",
+          "primitive_calls": 30,
+          "calls": 30,
+          "total_seconds": 0.003325905,
+          "cumulative_seconds": 0.0038123930000000003
+        }
+      ]
+    }
+  ],
+  "NPU_used": false,
+  "model_executed": false,
+  "serving_latency_measured": false,
+  "Goodput": null
+}
