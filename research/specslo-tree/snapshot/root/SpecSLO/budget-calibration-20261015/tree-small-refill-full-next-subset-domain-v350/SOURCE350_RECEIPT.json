@@ -1,0 +1,95 @@
+{
+  "freeze_sha256": "ed598707ecbc194a515fe8765cbb537852d1ce1916e6144125cd61c53f3f11fa",
+  "archive_sha256": "f12c68b6e7b1afec16793c281cf1f078cf75a5e21224fe3dc27144960c9cba70",
+  "own_archive_members": 15,
+  "own_archive_bytes": 12450,
+  "parent349_source_only_pins": {
+    "freeze_sha256": "c794dc2c3e782905f08db3b28a74d2fb87babae9ff10cd09327f4342362b7ee2",
+    "archive_sha256": "3f54df22fa43b82803f7b8f6109496adfc2aaa3efea82f2a31a14603108b180f",
+    "own_archive_members": 14,
+    "own_archive_bytes": 11441,
+    "parent347_source_only_pins": {
+      "freeze_sha256": "800cc56da053b31459ffb19d88ebe4c07d61acb585b2f9dbd799b9f43c61dc60",
+      "archive_sha256": "32c299b5f4debdc1f6c96929f6adc5e334bca99de09c1a2c9cc3d76a297c1312",
+      "own_archive_members": 15,
+      "own_archive_bytes": 11593,
+      "parent344_source_only_pins": {
+        "freeze_sha256": "f4aa9b02429020c9a1bdbaaa4d168253588b681897dce1796713aac72196b6c4",
+        "archive_sha256": "2db775f30864fa4b1372ab066e48dea7f28feeba15db9e52a045b9ed0f130807",
+        "own_archive_members": 21,
+        "own_archive_bytes": 21208,
+        "parent343_source_only_pins": {
+          "freeze_sha256": "f13e3e28482fac59088014f391c5dd0526cdd773228ebb1855747abb98aa488b",
+          "archive_sha256": "4efb97046a8062e9440e7ffd32d27c92694636ee500a5f01a6b7b028b196e59e",
+          "own_archive_members": 19,
+          "own_archive_bytes": 20026,
+          "parent342_source_only_pins": {
+            "freeze_sha256": "3e9762b9fde9a74c8d9e96f3faed3f28e38d536fcfe3c9e1f2ff5c962f7c821d",
+            "archive_sha256": "58792f61c231170defc079d8833b92f6de4f643f3c7fbf385b924f08740ffb78",
+            "own_archive_members": 16,
+            "own_archive_bytes": 17106,
+            "parent341_source_only_pins": {
+              "freeze_sha256": "e2aa2efe2804288c50c5fd36d67835e1cb5fe5d4f2d62f70186086bf924b22f4",
+              "archive_sha256": "38ce3c217cc058c06a6764a86bb386d795b1aafd056e7824f627077625800132",
+              "own_archive_members": 21,
+              "own_archive_bytes": 21940,
+              "parent339_source_only_pins": {
+                "freeze_sha256": "044b2eaf6617c6a4f49cbcc8b87c403f8f63d6a172f00dd84ed0541e74e93428",
+                "archive_sha256": "2f486aff3ff807a1fcf398e068575ec8103b127a704456bce8eb122b7f248643",
+                "own_archive_members": 15,
+                "own_archive_bytes": 13604,
+                "parent338_source_only_pins": {
+                  "freeze_sha256": "052cd156e304937591dca7d6158707fae4bc6cefdb4940d09df97208c178ab3a",
+                  "archive_sha256": "3e46a2fe998b40d6a33d68dce8b39504adadb3d27dbafbfbaa4f36e371bf2021",
+                  "own_archive_members": 14,
+                  "own_archive_bytes": 11627,
+                  "parent337_source_only_pins": {
+                    "freeze_sha256": "c883f0dcc3e48286c92bbb915ccb9d924d0c22c67069796997a046354932218a",
+                    "archive_sha256": "6bd1d8bc101f80ac4d66684b597ad2a09a72a16a1e827327136f16a2bf577d4e",
+                    "own_archive_members": 8,
+                    "own_archive_bytes": 6890,
+                    "parent336_source_only_pins": {
+                      "freeze_sha256": "1733a53d408a345b15f442a97595db92c2e23388aa19796f26eb9184e9e7f6ae",
+                      "archive_sha256": "c7d3dfdee31e60b8cfa9e77941639ed6ba18a9538491851f20075c1308b3d445",
+                      "own_archive_members": 20,
+                      "own_archive_bytes": 20035,
+                      "parent335_source_only_pins": {
+                        "freeze_sha256": "7e6eb8fa4a28db1e78ed4de514c47289e63749130d7cf300faa0cc64af795eba",
+                        "archive_sha256": "e2be79a2a164b7318ad7edb16eb65d65b81cb3cb9ae5be4bd6f9c8aa638b3929",
+                        "own_archive_members": 7,
+                        "own_archive_bytes": 7312,
+                        "parent333_source_only_pins": {
+                          "freeze_sha256": "27ebbaae666041785cf3dd8adc52aa9b05ec06a4198995c0cc2895305ba45014",
+                          "archive_sha256": "6fb6621ed12270cb3287b43174b3d5a0ec5dfc5016b55245e5d4923689540e59",
+                          "members": 3423,
+                          "archive_bytes": 29265300,
+                          "source_freeze": "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-F64-global192-full-v333/FREEZE333.json",
+                          "archive": "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-F64-global192-full-v333/SOURCE333.tar.gz",
+                          "HOST_only": true,
+                          "NPU_qualified": false,
+                          "Goodput": null
+                        },
+                        "model_or_performance_qualification_inherited": false
+                      },
+                      "model_or_performance_qualification_inherited": false
+                    },
+                    "device_qualification_inherited": false
+                  },
+                  "device_qualification_inherited": false
+                },
+                "device_qualification_inherited": false
+              },
+              "device_qualification_inherited": false
+            },
+            "device_qualification_inherited": false
+          },
+          "device_qualification_inherited": false
+        },
+        "device_qualification_inherited": false
+      },
+      "device_qualification_inherited": false
+    },
+    "device_qualification_inherited": false
+  },
+  "device_qualification_inherited": false
+}

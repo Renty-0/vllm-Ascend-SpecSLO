@@ -1,0 +1,8 @@
+{
+  "status": "passed_live_refill_auditor_HOST",
+  "NPU_used": false,
+  "fabricated_trace_only": true,
+  "actual_incumbent_tracking": true,
+  "duplicate_reordered_early_missing_interleaved_and_overcommitted_rejected": 6,
+  "no_model_qualification": true
+}

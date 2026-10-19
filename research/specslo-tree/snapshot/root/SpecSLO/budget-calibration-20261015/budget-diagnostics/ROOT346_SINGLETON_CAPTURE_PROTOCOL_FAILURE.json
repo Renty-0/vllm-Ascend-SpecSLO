@@ -1,0 +1,36 @@
+{
+  "UTC": "2026-10-19T13:35:23.091497+00:00",
+  "status": "failed_singleton_execution_capture_protocol",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M120-B8-coalesced-refill4-root-v346-current-cost-full463-ownAR-v1.json",
+  "receipt_sha256": "3bc75c4aafcd944a3c973fda5290ec74ce6c4f8c7b522fd626adbb926bf75362",
+  "all_four_idle": true,
+  "owned_remaining": [],
+  "sources_unchanged": true,
+  "pre_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "failure": "new small-refill N1 target expected exactly one model.forward capture; actual singleton helper can use prefill_exact graph.",
+  "original_all_components_completed_before_extra": true,
+  "new_small_NN_cases_completed": 0,
+  "canonical408_started": false,
+  "full463_started": false,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "next": "Additive singleton-aware recorder, original exact graph retained. First run bounded small component through actual graph and eager paths, then next full experiment."
+}

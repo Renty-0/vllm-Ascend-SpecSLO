@@ -43,6 +43,9 @@ SOURCES = (
     ('tree-Q5-uniform-KV-bucket-branch-math-cost-v344', 344),
     ('tree-coalesced-live-refill-host-v345', 345),
     ('tree-coalesced-live-refill-M120-B8-full-v346', 346),
+    ('tree-small-refill-singleton-graph-capture-v347', 347),
+    ('tree-small-refill-singleton-module-binding-v349', 349),
+    ('tree-small-refill-full-next-subset-domain-v350', 350),
 )
 
 
@@ -116,6 +119,10 @@ def main():
         'tree-Q5-uniform-KV-bucket-branch-math-cost-v344',
         'tree-coalesced-live-refill-host-v345',
         'tree-coalesced-live-refill-M120-B8-full-v346',
+        'tree-small-refill-singleton-graph-capture-v347',
+        'tree-small-refill-singleton-module-binding-v349',
+        'tree-small-refill-full-next-subset-domain-v350',
+        'tree-coalesced-live-refill-M120-singleton-capture-full-v348',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -242,6 +249,10 @@ def main():
         'HOST_ROOT346_TERMINAL_SOURCE_RESULT.json',
         'read_ROOT346_common_result_HOST.py',
         'HOST_ROOT346_COMMON_RESULT_READER.json',
+        'ROOT346_SINGLETON_CAPTURE_PROTOCOL_FAILURE.json',
+        'ROOT347_SUBSET_MODULE_BINDING_FAILURE.json',
+        'ROOT349_OWNED_ABORT_FOR_MISSING_NEXT_DRAFT_DOMAIN.json',
+        'ROOT346_HOST_INITIAL_PRIOR_COST_GATE_SCREEN.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

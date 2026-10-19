@@ -1,0 +1,17 @@
+{
+  "UTC": "2026-10-19T13:44:36.055643+00:00",
+  "scope": "Fresh four-role small prefill component: singleton target original exact201 graph plus multiowner eager3/4/8, independent fullphysical hidden/KV/roots, incumbent prefix protection, genuine nextdraft4, two zero sweeps.",
+  "warmup_cases": 4,
+  "main_cases": 12,
+  "finite_prefill_cases": 16,
+  "original_singleton201_wrapper_installed_after_model_load": true,
+  "all201_warmup_claimed": false,
+  "selected_exact_graph_warms_naturally": true,
+  "original_Native_and_numerical_gates_retained": true,
+  "graph_and_eager_capture_separated": true,
+  "source_only": true,
+  "NPU_qualified": false,
+  "full463": false,
+  "Goodput": null,
+  "fixed_local_subset_import": "Explicit frozen subset345, every local import resolved in HOST; no Native/model numerical gate changed."
+}

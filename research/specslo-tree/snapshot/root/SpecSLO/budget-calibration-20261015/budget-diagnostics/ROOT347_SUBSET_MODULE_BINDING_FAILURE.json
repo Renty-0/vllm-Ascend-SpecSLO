@@ -1,0 +1,24 @@
+{
+  "UTC": "2026-10-19T13:44:06.614408+00:00",
+  "status": "failed_local_subset_module_binding",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-small-refill-singleton-graph-eager-root-v347-16-own-model-cases-v1.json",
+  "receipt_sha256": "def4085969fca02f8326ab5d63a7d68432704366ad5409f5b2f937e7c97cf3f6",
+  "all_four_idle": true,
+  "owned_remaining": [],
+  "sources_unchanged": true,
+  "post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "error": "ModuleNotFoundError: subset347; mechanical adapter version replacement changed local import while actual checked planner lives in frozen subset345.",
+  "finite_cases_completed": 0,
+  "full463": false,
+  "Goodput": null,
+  "adopted": false,
+  "fix": "New349 explicitly imports frozen subset345, HOST resolves every local import before launch."
+}

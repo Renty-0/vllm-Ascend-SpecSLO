@@ -1,0 +1,9 @@
+{
+  "UTC": 1792417579.88203,
+  "supervisor_pid": 1057864,
+  "supervisor_start_ticks": "381374401",
+  "tag": "small-refill-singleton-binding-root-v349-16-own-model-cases-v1",
+  "reason": "Source review found original next4_209 only permits N1/16; new coalesced subsets require actual N2/4 independent checks. Stop before wasting full model run; no numerical gate relaxed.",
+  "signal": "SIGTERM to exact owned supervisor; existing cleanup handler used",
+  "new_version_required": true
+}

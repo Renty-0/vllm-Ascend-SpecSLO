@@ -1,0 +1,21 @@
+{
+  "status": "passed_singleton_graph_capture_regression_HOST",
+  "NPU_used": false,
+  "old_cached_graph_missing_forward_reproduced": true,
+  "cases": [
+    {
+      "cold": false,
+      "no_double_count": true,
+      "graph_result_retained": true
+    },
+    {
+      "cold": true,
+      "no_double_count": true,
+      "graph_result_retained": true
+    }
+  ],
+  "model_and_runner_instance_methods_restored": true,
+  "exception_restores_observation_depth": true,
+  "actual_model_execution": false,
+  "model_qualified": false
+}

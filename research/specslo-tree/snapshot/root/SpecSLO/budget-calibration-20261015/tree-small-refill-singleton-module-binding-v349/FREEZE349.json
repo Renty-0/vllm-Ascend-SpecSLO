@@ -1,0 +1,20 @@
+{
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/HOST349_CAPTURE_RESULT.json": "baa701b172c0e213fbc0090406c84cb73121bde8971d94004c32d64235cd19b4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/HOST349_RUNTIME_RESULT.json": "f80696ec6675a924a3ad28b4808211401bf23e468b98627b27562fd92d8652ad",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/PLAN349.json": "b900df02780d98dda52ade18b4781e7027ab0671cc2c15b5d0a24c5ba132bd29",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/audit349.py": "a63f4a779faf7067dd5d745593040d7fae1d6ca831882a6d7e2a47e1be655b23",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/capture349.py": "0c2c79aa7718da61be8c437cbf52e807556e60a2f0a9fa783c98b250cc6d6f72",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/check349.py": "cf667ef1753c3fb4c12d1d1d60af51b18800d8cfe7f5701a4c32f3c355c974d6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/check_capture349_HOST.py": "f8a1d48cef89dadf184433f7ef08ac32d2dc368e1aab3ff62e453a8bdccb4004",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/check_runtime349_HOST.py": "d246c5bd24d73c561e3c22ba6e611ee2aa5dd580bad1ca333528bc2906160501",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/guard349.py": "2f18bb8c8ba9abfe5c82453d340bc9dca0455eaa3348d0db789b218162577ca0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/prefill349.py": "b368ec33f48f71c72dd8bc90095c0eedc6cfa1ae99da5218419bd5f782f44e68",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/probe349.py": "46e8f79088d471dc9a8e5e68a9bddfe265c5e34736aabe2466218c2cb4d4c2d6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/runtime349.py": "bb6a7d6937c358bac78d811505ca69eb279895cab4a710fccb9dcc94a7bcc6d5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-module-binding-v349/startup349.sh": "579a6da928cca96d06242675469f449c3eed345c2a8ab49e8cb9fed39bee1e8a"
+  },
+  "parent_freeze_sha256": "800cc56da053b31459ffb19d88ebe4c07d61acb585b2f9dbd799b9f43c61dc60",
+  "parent_archive_sha256": "32c299b5f4debdc1f6c96929f6adc5e334bca99de09c1a2c9cc3d76a297c1312",
+  "device_qualification_inherited": false
+}

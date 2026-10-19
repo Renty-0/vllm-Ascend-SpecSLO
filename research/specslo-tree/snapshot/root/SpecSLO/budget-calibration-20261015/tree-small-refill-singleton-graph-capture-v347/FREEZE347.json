@@ -1,0 +1,21 @@
+{
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/HOST347_CAPTURE_RESULT.json": "baa701b172c0e213fbc0090406c84cb73121bde8971d94004c32d64235cd19b4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/HOST347_RUNTIME_RESULT.json": "abb9d316670101ac4d0d84f98b4b173319c24a9bc913495316798c5650745490",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/PLAN347.json": "bc963d0b7797a69616bd645471f7783d7bbb24b97e6af9205992f58b65e61c5c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/audit347.py": "1198ee7a1dda385bcbd6247465de3c828f3f4d5e4ff6cb798cd880f8524bfe72",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/capture347.py": "0c2c79aa7718da61be8c437cbf52e807556e60a2f0a9fa783c98b250cc6d6f72",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/check347.py": "ef9652d5876132b610a5f96c1e1afcdd5ced7f8c044feb61f0a9056e85de9caa",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/check_capture347_HOST.py": "99a1c70d2925a60087b777f808abd0647ee2a7d0411658cd6bc55d2fd2d66d30",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/check_runtime347_HOST.py": "493700f9a6bf2fa9e9efe08a676fa2674a6925a1af7f7551b31df5ad58e419eb",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/guard347.py": "0754044efe15e7581af5dd91b7442cb4595fb9097dd8246a9898006c1f7c8e12",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/prefill347.py": "4af84cd2648e4fada192841420b13f0f532b9c53c8db285f98e5aa3ae9784d0f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/probe347.py": "aca976d345b2da0586fe4ba2a55f68cefed5897671b8d076db112f1166643be2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/runtime347.py": "fd080770b757638578fd960a496c388f3f6e2a4216ee50d56e69c9cc9e99fc29",
+    "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-singleton-graph-capture-v347/startup347.sh": "2ac506820cfd46bedfdbb192abf372040b257defe66c376e034016e701f8e68f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/subset345.py": "2d0e5f0886a351cd63177c82cae1047ac5a8b997f2144d9539d23a755128663f"
+  },
+  "parent_freeze_sha256": "f4aa9b02429020c9a1bdbaaa4d168253588b681897dce1796713aac72196b6c4",
+  "parent_archive_sha256": "2db775f30864fa4b1372ab066e48dea7f28feeba15db9e52a045b9ed0f130807",
+  "device_qualification_inherited": false
+}

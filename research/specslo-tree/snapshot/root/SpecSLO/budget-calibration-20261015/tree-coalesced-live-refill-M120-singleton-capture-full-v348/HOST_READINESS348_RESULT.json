@@ -1,0 +1,16 @@
+{
+  "status": "passed_full_candidate_readiness_HOST",
+  "NPU_used": false,
+  "worker_source_inverse": true,
+  "worker_new_component_receipt": true,
+  "actual_LIVE_sha256": "dc199eea2575688ddd614678889cb02e4509684686103b12971f339e9f923ee1",
+  "actual_LIVE_removes_empty_active_guard": true,
+  "incumbent_pages_reserved": true,
+  "original_refill_time_accounting_retained": true,
+  "measured_target_ROI_gate_used": true,
+  "actual_small_refill_NN_proof_required": true,
+  "actual_full_refill_coverage_required": true,
+  "full463_and_own_AR_still_required": true,
+  "model_qualified": false,
+  "Goodput": null
+}

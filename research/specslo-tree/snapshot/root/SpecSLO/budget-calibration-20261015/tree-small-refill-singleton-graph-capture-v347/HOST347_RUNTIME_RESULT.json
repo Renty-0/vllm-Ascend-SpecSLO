@@ -1,0 +1,11 @@
+{
+  "status": "passed_small_component_runtime_source_HOST",
+  "NPU_used": false,
+  "original311_lifecycle_inverse": true,
+  "original_numerical_bodies_and_matchers": true,
+  "prewarm_cases": 4,
+  "current_cases": 12,
+  "total_prefill_cases": 16,
+  "singleton_graph_and_multiowner_eager_recorded_separately": true,
+  "no_model_qualification": true
+}

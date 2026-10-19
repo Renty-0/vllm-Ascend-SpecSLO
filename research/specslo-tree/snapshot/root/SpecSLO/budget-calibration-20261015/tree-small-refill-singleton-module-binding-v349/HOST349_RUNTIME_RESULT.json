@@ -1,0 +1,21 @@
+{
+  "status": "passed_small_component_runtime_source_HOST",
+  "NPU_used": false,
+  "original311_lifecycle_inverse": true,
+  "original_numerical_bodies_and_matchers": true,
+  "prewarm_cases": 4,
+  "current_cases": 12,
+  "total_prefill_cases": 16,
+  "singleton_graph_and_multiowner_eager_recorded_separately": true,
+  "all_local_numerical_module_imports_resolved": [
+    "base209",
+    "dual_bank_v146",
+    "pathlib",
+    "poisson_coverage_probe",
+    "production_probe_v101",
+    "publication209",
+    "scope_v146",
+    "subset345"
+  ],
+  "no_model_qualification": true
+}
