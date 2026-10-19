@@ -1,0 +1,20 @@
+{
+  "status": "passed_original_FIA_callbacks_HOST",
+  "NPU_used": false,
+  "capture_and_update_causal_arguments_identical": true,
+  "FULL_arguments_unchanged": true,
+  "original_live_capture_globals_preserved": true,
+  "forward": {
+    "original_source_SHA": "342d0e036a2dd04b724cee16f4f738d8fc8894ac3f7a44e82715d7f92b077e1f",
+    "projected_source_SHA": "76b97c8ed2b6dc5b594267fb0eed24b8ca61b9ef3f9d9ce2c1331a28c0124791",
+    "exact_source_inverse": true,
+    "original_live_module_globals_preserved": true
+  },
+  "update": {
+    "original_source_SHA": "bed4e88a4e9b2186b92e2a535b93a60e0dcb4dd74098719bbb297ca5441760e2",
+    "projected_source_SHA": "ad312c08bc0f5243cab1cf9e41c2b8b86ee8b4760affb372d6fa4b88bbdc80f6",
+    "exact_source_inverse": true,
+    "original_live_module_globals_preserved": true
+  },
+  "fake_operator_not_device_evidence": true
+}

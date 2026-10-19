@@ -1,0 +1,15 @@
+{
+  "UTC": "2026-10-19T11:37:08.500050+00:00",
+  "status": "source_only",
+  "scope": "Q5 M120/S24 same-cohort FULL2560/FULL homogeneous512bucket/causal inner1 target42cases, independent96original-prefix bank, both0/17futurecanaries, six real arms24rotated costs",
+  "whole_workload_AR_qualified": false,
+  "real_draft_generation": false,
+  "actual_dynamic_B_or_tree_branch_qualified": false,
+  "Goodput": null,
+  "prefill_precision_unchanged": "Causal precision patch installed only after independent96prefix bank. A complete candidate must keep future production prefills on their original ABI.",
+  "numerical_gates": "Original Native matchers plus strict hidden/all128KV/greedy and same-cohort FULL2560 crosscomparison; graph/eager KV bitwise.",
+  "original_qualification_calls": "Per-case observer captures all original changed/restored qualification calls, matched to actual capture/validation counters. No qualification flags assigned.",
+  "HOST_history": [
+    "Probe/reference and retained runtime compiled; actual installed closures and callbacks tested without a model."
+  ]
+}

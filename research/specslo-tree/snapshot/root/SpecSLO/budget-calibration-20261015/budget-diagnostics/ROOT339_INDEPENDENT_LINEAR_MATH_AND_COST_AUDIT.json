@@ -1,0 +1,64 @@
+{
+  "status": "completed_component_independently_audited_original_supervisor_failed_count_check",
+  "original_receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-linear-Q4-Q5-closure-aware-host-builder-v339-36-math-paired-cost-v1.json",
+  "original_receipt_SHA": "4028b6fbcc80c628811043e116479e39f606f51835aa16e7574766ae2a608af2",
+  "original_receipt_unchanged": true,
+  "original_supervisor_status": "failed",
+  "original_child_exit": 0,
+  "owned_cleanup": true,
+  "all_four_idle": true,
+  "finite_case_and_original_qualification_calls": 42,
+  "strict_original_math_and_cost_reader_status": "passed_finite_linear_model_math_and_cost",
+  "numerical": {
+    "status": "complete_current_target_component",
+    "cases_each_target": 36,
+    "canaries": 2,
+    "costs": [
+      {
+        "rank": 1,
+        "median_ms": {
+          "Q4-S24-N24": 51.89306545071304,
+          "Q4-S32-N24": 59.413720620796084,
+          "Q5-S24-control-N24": 53.871256997808814,
+          "Q4-S32-N32": 59.27240778692067
+        }
+      },
+      {
+        "rank": 2,
+        "median_ms": {
+          "Q4-S24-N24": 51.89258558675647,
+          "Q4-S32-N24": 59.386790031567216,
+          "Q5-S24-control-N24": 53.83955128490925,
+          "Q4-S32-N32": 59.24257915467024
+        }
+      },
+      {
+        "rank": 3,
+        "median_ms": {
+          "Q4-S24-N24": 51.85352987609804,
+          "Q4-S32-N24": 59.3950399197638,
+          "Q5-S24-control-N24": 53.843491012230515,
+          "Q4-S32-N32": 59.24502853304148
+        }
+      }
+    ],
+    "whole_workload_AR_qualified": false,
+    "real_draft_generation": false,
+    "actual_dynamic_B_or_tree_branch_qualified": false,
+    "formal_Goodput": false,
+    "adopted": false
+  },
+  "evidence": {
+    "real_node_heads_cross_rank": true,
+    "paired_costs_recomputed": true
+  },
+  "median_of_three_rank_medians_ms": {
+    "Q4-S24-N24": 51.89258558675647,
+    "Q4-S32-N24": 59.3950399197638,
+    "Q5-S24-control-N24": 53.843491012230515,
+    "Q4-S32-N32": 59.24502853304148
+  },
+  "actual_dynamic_B_or_tree_branch_qualified": false,
+  "Goodput": null,
+  "adopted": false
+}

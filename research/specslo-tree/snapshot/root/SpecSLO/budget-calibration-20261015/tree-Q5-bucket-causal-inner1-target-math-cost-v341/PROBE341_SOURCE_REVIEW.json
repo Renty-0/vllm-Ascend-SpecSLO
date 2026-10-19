@@ -1,0 +1,36 @@
+{
+  "origin": "frozen probe336.py",
+  "strict_matcher_and_bitwise_checks_retained": true,
+  "deltas": [
+    "from geometry336 import LAYOUTS, cases, cost_arms, make_plans, teacher_rows",
+    "def native_call(engine, bank, *, layout, owners, rows=None):",
+    "    width, groups = LAYOUTS[layout]\n    engine._q4_layout336 = layout",
+    "layout=case['layout']",
+    "layout=arm['layout'], owners=list(range(arm['N']))",
+    "out['used_tree_attention'] is True",
+    "engine._q4_last_inputs336",
+    "    from metadata336 import reference_frame",
+    "reference_frame(engine, case=case,",
+    "tokens=inputs, future=future)",
+    "range(20)",
+    "rounds=20",
+    "from metadata336 import install, ensure_zero",
+    "engine._q4_native_calls336",
+    "    records = []\n    for case in cases():",
+    "        comparisons = []",
+    "record = dict(case=case, comparisons=comparisons) if target else None",
+    "    rows = teacher_rows(case['owners'], case['width'])\n    out = native_call",
+    "return dict(tokens=tokens, hidden=hidden[:q].clone(), KV=graph_KV,",
+    "    model_metrics_before = engine.graph_metrics()",
+    "def run(engine, native, stage, output, fixture):"
+  ],
+  "new_checks": [
+    "same-cohort original FULL2560 token/hidden/all128KV",
+    "per-case actual Native qualification calls and graph work",
+    "fresh independent bank checkpoint",
+    "full stage local traceback"
+  ],
+  "cases": 42,
+  "cost_rotations": 24,
+  "performance_or_model_qualified": false
+}

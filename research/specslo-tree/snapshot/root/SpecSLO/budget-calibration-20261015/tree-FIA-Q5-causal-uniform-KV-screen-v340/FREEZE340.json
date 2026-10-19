@@ -1,0 +1,15 @@
+{
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q5-causal-uniform-KV-screen-v340/HOST340_AUDITOR_RESULT.json": "9af074f814f81ab2a33a5b6e6641ac7afd96118e695a88645644c7e706559004",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q5-causal-uniform-KV-screen-v340/HOST340_PLAN_RESULT.json": "1c9eaa7f5f84ceb397e7e1ba503796017b0ac73d4244ddbd41d3a91e67568d84",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q5-causal-uniform-KV-screen-v340/PLAN340.json": "cde6c2fd1555fcb82d9d38d463f5cd84302c135b68365fbbfe45796d5e8bba56",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q5-causal-uniform-KV-screen-v340/audit340.py": "32593b58706d7d552ede379d2996c82ab5639b64c9ecc23f25ac9b58c3f82e94",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q5-causal-uniform-KV-screen-v340/check_audit340_HOST.py": "d40613cbc84f14362d108e713a2fcdc8fca859902e8d8c09f20fc3c38a3dfc16",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q5-causal-uniform-KV-screen-v340/guard340.py": "ef7fece846a5c544003f6bfe52df4e14bb05996fa39ff146a463dac550e4dc9b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q5-causal-uniform-KV-screen-v340/probe340.py": "2db1768fd8dba781363fed66b9cf467d5a9924e0b3fec831e87c3b0319b2ca7d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q5-causal-uniform-KV-screen-v340/startup340.sh": "8181c88f7bbf77e2eb9daa925c20e97bd707d63ad8d0d227d7eccc16438d1850"
+  },
+  "parent_freeze_sha256": "7e6eb8fa4a28db1e78ed4de514c47289e63749130d7cf300faa0cc64af795eba",
+  "parent_archive_sha256": "e2be79a2a164b7318ad7edb16eb65d65b81cb3cb9ae5be4bd6f9c8aa638b3929",
+  "device_qualification_inherited": false
+}

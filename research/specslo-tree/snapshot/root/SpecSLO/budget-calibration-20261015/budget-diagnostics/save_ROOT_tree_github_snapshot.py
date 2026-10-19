@@ -36,6 +36,8 @@ SOURCES = (
     ('tree-Q4-original-output-root-adapter-v337', 337),
     ('tree-Q4-actual-host-builder-adapter-v338', 338),
     ('tree-Q4-closure-aware-host-builder-adapter-v339', 339),
+    ('tree-FIA-Q5-causal-uniform-KV-screen-v340', 340),
+    ('tree-Q5-bucket-causal-inner1-target-math-cost-v341', 341),
 )
 
 
@@ -102,6 +104,8 @@ def main():
         'tree-Q4-original-output-root-adapter-v337',
         'tree-Q4-actual-host-builder-adapter-v338',
         'tree-Q4-closure-aware-host-builder-adapter-v339',
+        'tree-FIA-Q5-causal-uniform-KV-screen-v340',
+        'tree-Q5-bucket-causal-inner1-target-math-cost-v341',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -211,6 +215,10 @@ def main():
         'ROOT336_OUTPUT_ROOT_STARTUP_FAILURE.json',
         'ROOT337_ACTUAL_FRONTEND_BYPASS_FAILURE.json',
         'ROOT338_ACTUAL_CHECKED_FRONTEND_WRAPPER_FAILURE.json',
+        'audit_ROOT339_retained_component_HOST.py',
+        'ROOT339_INDEPENDENT_LINEAR_MATH_AND_COST_AUDIT.json',
+        'ROOT257_ACTUAL_TARGET_CONTEXT_EXTENT_RAW_SCREEN_20261019.json',
+        'ROOT340_SYNTHETIC_UNIFORM_KV_CAUSAL_SCREEN.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

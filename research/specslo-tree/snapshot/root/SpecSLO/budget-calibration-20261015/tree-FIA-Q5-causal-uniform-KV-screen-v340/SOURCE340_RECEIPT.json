@@ -1,0 +1,25 @@
+{
+  "freeze_sha256": "f3d8deb85b80c7cff50330e4826540cd1230bce33934012a12873337f3e5035e",
+  "archive_sha256": "0b05dab6b5bf0241499ea80fa2dfa6e37419b77683083c75b4f1f59edf5b7075",
+  "own_archive_members": 9,
+  "own_archive_bytes": 9011,
+  "parent335_source_only_pins": {
+    "freeze_sha256": "7e6eb8fa4a28db1e78ed4de514c47289e63749130d7cf300faa0cc64af795eba",
+    "archive_sha256": "e2be79a2a164b7318ad7edb16eb65d65b81cb3cb9ae5be4bd6f9c8aa638b3929",
+    "own_archive_members": 7,
+    "own_archive_bytes": 7312,
+    "parent333_source_only_pins": {
+      "freeze_sha256": "27ebbaae666041785cf3dd8adc52aa9b05ec06a4198995c0cc2895305ba45014",
+      "archive_sha256": "6fb6621ed12270cb3287b43174b3d5a0ec5dfc5016b55245e5d4923689540e59",
+      "members": 3423,
+      "archive_bytes": 29265300,
+      "source_freeze": "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-F64-global192-full-v333/FREEZE333.json",
+      "archive": "/root/SpecSLO/budget-calibration-20261015/tree-M160-C128-F64-global192-full-v333/SOURCE333.tar.gz",
+      "HOST_only": true,
+      "NPU_qualified": false,
+      "Goodput": null
+    },
+    "model_or_performance_qualification_inherited": false
+  },
+  "device_qualification_inherited": false
+}

@@ -1,0 +1,22 @@
+{
+  "UTC": "2026-10-19T11:23:19.797154+00:00",
+  "status": "source_only",
+  "scope": "synthetic M120/S24 Q5 FULL homogeneous shorter extents versus exact Native causal ABI and causal inner1; all five independent root positions/group position/ABA, 16rotated costs",
+  "heads": [
+    [
+      24,
+      3
+    ],
+    [
+      16,
+      2
+    ]
+  ],
+  "observations": 294,
+  "cost_panels": 16,
+  "model_qualified": false,
+  "Goodput": null,
+  "parent335_source_only_not_inherited_qualification": true,
+  "historical267_not_repeated": "No per-owner mixed KV buckets or4096sentinel; uniform extent shared by all24groups in each FULL arm.",
+  "motivation_trace": "ROOT257_ACTUAL_TARGET_CONTEXT_EXTENT_RAW_SCREEN_20261019.json"
+}

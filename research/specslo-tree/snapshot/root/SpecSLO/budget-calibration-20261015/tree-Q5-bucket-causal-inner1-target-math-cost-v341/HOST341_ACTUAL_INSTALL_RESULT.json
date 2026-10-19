@@ -1,0 +1,46 @@
+{
+  "status": "passed_actual_premodel_installer_HOST",
+  "NPU_used": false,
+  "model_constructed": false,
+  "real_target_executed": false,
+  "actual_install234_executed": true,
+  "checked_and_qualified_wrappers_retained": true,
+  "complete_actual_wrapper_codes_identical": true,
+  "class_method_unchanged": true,
+  "original_accounting_all42_cases_passed": true,
+  "causal_proof": {
+    "scope": "causal inner_precise1 only; FULL ABI and all validation unchanged",
+    "eager_capture": {
+      "original_source_SHA": "342d0e036a2dd04b724cee16f4f738d8fc8894ac3f7a44e82715d7f92b077e1f",
+      "projected_source_SHA": "76b97c8ed2b6dc5b594267fb0eed24b8ca61b9ef3f9d9ce2c1331a28c0124791",
+      "exact_source_inverse": true,
+      "original_live_module_globals_preserved": true
+    },
+    "task_update": {
+      "original_source_SHA": "bed4e88a4e9b2186b92e2a535b93a60e0dcb4dd74098719bbb297ca5441760e2",
+      "projected_source_SHA": "ad312c08bc0f5243cab1cf9e41c2b8b86ee8b4760affb372d6fa4b88bbdc80f6",
+      "exact_source_inverse": true,
+      "original_live_module_globals_preserved": true
+    },
+    "actual_model_alias_bound": true,
+    "runtime_qualification_flags_assigned": false
+  },
+  "activation": {
+    "target_only": true,
+    "actual_M": 120,
+    "groups": 24,
+    "all_original_wrapper_code_and_signatures_preserved": true,
+    "original_model_forward_unchanged": true,
+    "Native_flags_assigned": false,
+    "deferred_read_done": false,
+    "actual_Native_HOST_builder_bound": true,
+    "original_inference_decorators_preserved": true,
+    "wrappers": [
+      "install.<locals>.checked_target",
+      "install.<locals>.qualified",
+      "target_tree_forward",
+      "target_tree_forward",
+      "install.<locals>.account_real_target_plans"
+    ]
+  }
+}

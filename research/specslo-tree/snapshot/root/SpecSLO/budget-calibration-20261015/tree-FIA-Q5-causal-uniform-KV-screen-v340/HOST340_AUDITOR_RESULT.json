@@ -1,0 +1,7 @@
+{
+  "status": "passed_HOST_auditor_only",
+  "fabricated_positive_schema_accepted": true,
+  "corrupt_fixtures_rejected": 8,
+  "no_actual_numeric_claim": true,
+  "NPU_used": false
+}

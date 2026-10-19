@@ -1,0 +1,639 @@
+{
+  "schema": "ROOT.V340.synthetic-FIA-supervisor.v1",
+  "status": "complete",
+  "started_UTC": "2026-10-19T11:23:47.063474+00:00",
+  "tag": "Q5-uniform-KV-causal-root-v340-synthetic-arithmetic-cost-v1",
+  "action": "synthetic-Q5-causal-uniform-KV-raw-screen",
+  "errors": [],
+  "readiness": {
+    "own_freeze_sha256": "f3d8deb85b80c7cff50330e4826540cd1230bce33934012a12873337f3e5035e",
+    "own_archive_sha256": "0b05dab6b5bf0241499ea80fa2dfa6e37419b77683083c75b4f1f59edf5b7075",
+    "own_archive_members": 9,
+    "parent_source_archive_verified_in_place": {
+      "own_freeze_sha256": "7e6eb8fa4a28db1e78ed4de514c47289e63749130d7cf300faa0cc64af795eba",
+      "own_archive_sha256": "e2be79a2a164b7318ad7edb16eb65d65b81cb3cb9ae5be4bd6f9c8aa638b3929",
+      "own_archive_members": 7,
+      "parent_source_archive_verified_in_place": {
+        "own_freeze_sha256": "27ebbaae666041785cf3dd8adc52aa9b05ec06a4198995c0cc2895305ba45014",
+        "own_archive_sha256": "6fb6621ed12270cb3287b43174b3d5a0ec5dfc5016b55245e5d4923689540e59",
+        "original218_freeze_sha256": "fa58f2866e8fed383e2d1ed1103b2fcb72a731aab3d65060e3a7c3e350a4d260",
+        "device_qualification_inherited": false,
+        "production_delta": "original startup/component gates, original constructorC96; after original controls actual LIVE N32/C128/F64/global192; fresh532 target with actual165 fully flushed MC2 and16 current-model cost panels,45 genuine draft,20 followup controls; original463 arrivals/SLO; independent own-AR after clocks end"
+      },
+      "source_members": 3430,
+      "model_qualification_inherited": false
+    },
+    "source_members": 3439,
+    "model_qualification_inherited": false
+  },
+  "child": {
+    "argv": [
+      "/usr/bin/env",
+      "-i",
+      "HOME=/root",
+      "USER=root",
+      "LOGNAME=root",
+      "SHELL=/bin/bash",
+      "LANG=C.UTF-8",
+      "PATH=/root/miniconda3/envs/vllm-hust-dev/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin",
+      "/bin/bash",
+      "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh",
+      "/bin/bash",
+      "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q5-causal-uniform-KV-screen-v340/startup340.sh",
+      "Q5-uniform-KV-causal-root-v340-synthetic-arithmetic-cost-v1"
+    ],
+    "log": "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q5-causal-uniform-KV-screen-v340/local-Q5-uniform-KV-causal-root-v340-synthetic-arithmetic-cost-v1.log",
+    "pid": 793998,
+    "exit_code": 0
+  },
+  "physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "execution_lock": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/.ROOT_NPU_EXECUTION.lock",
+    "nonblocking_exclusive": true,
+    "scope": "this supervisor lifetime; no outer flock"
+  },
+  "limits": {
+    "child_execution_seconds": 300,
+    "actual_tag_bytes": 16777216,
+    "aggregate_private_bytes": 134217728
+  },
+  "numeric_source_obligations_only": true,
+  "qualification_scope": "synthetic Q5 FULL/causal and uniform shorter KV arithmetic/cost; no models or service metrics",
+  "models_loaded": false,
+  "full463": false,
+  "formal_Goodput": false,
+  "adopted": false,
+  "synthetic_Q5": true,
+  "groups": [
+    24
+  ],
+  "model_or_service_performance": false,
+  "devices_before": {
+    "hardware": {
+      "argv": [
+        "npu-smi",
+        "info"
+      ],
+      "started_UTC": "2026-10-19T11:23:47.064705+00:00",
+      "timeout_seconds": 30,
+      "pid": 793395,
+      "exit_code": 0,
+      "output": "+------------------------------------------------------------------------------------------------------------------+\n| npu-smi 26.0.rc1                            Version: 26.0.rc1                                                    |\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU   Name                | Health        | Power(W)             Temp(C)                 Hugepages-Usage(page)   |\n| Chip                      | Bus-Id        | AICore(%)            Memory-Usage(MB)        HBM-Usage(MB)           |\n+===========================+===============+======================================================================+\n| 2     910B2               | OK            | 95.4                 41                      0    / 0                |\n| 0                         | 0000:C2:00.0  | 0                    0    / 0                3421 / 65536            |\n+===========================+===============+======================================================================+\n| 5     910B2               | OK            | 98.4                 41                      0    / 0                |\n| 0                         | 0000:41:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n| 6     910B2               | OK            | 92.9                 39                      0    / 0                |\n| 0                         | 0000:82:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n| 7     910B2               | OK            | 98.9                 41                      0    / 0                |\n| 0                         | 0000:42:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU     Chip              | Process id    | Process name       | Process memory(MB)    | Process id in container |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 2                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 5                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 6                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 7                                                                              |\n+===========================+===============+======================================================================+\n",
+      "timed_out": false,
+      "elapsed_seconds": 0.7218838729895651
+    },
+    "parsed_hardware": [
+      [
+        2,
+        "910B2"
+      ],
+      [
+        5,
+        "910B2"
+      ],
+      [
+        6,
+        "910B2"
+      ],
+      [
+        7,
+        "910B2"
+      ]
+    ],
+    "four_910B2": true,
+    "processes": {
+      "2": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "2",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T11:23:47.786965+00:00",
+        "timeout_seconds": 30,
+        "pid": 793407,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.45517206424847245,
+        "idle": true
+      },
+      "5": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "5",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T11:23:48.242448+00:00",
+        "timeout_seconds": 30,
+        "pid": 793419,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.4622052009217441,
+        "idle": true
+      },
+      "6": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "6",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T11:23:48.704696+00:00",
+        "timeout_seconds": 30,
+        "pid": 793431,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.45575204119086266,
+        "idle": true
+      },
+      "7": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "7",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T11:23:49.160489+00:00",
+        "timeout_seconds": 30,
+        "pid": 793558,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.45917123928666115,
+        "idle": true
+      }
+    },
+    "all_idle": true
+  },
+  "pre_verifier": {
+    "argv": [
+      "bash",
+      "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh",
+      "python",
+      "-B",
+      "/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/verify_lock.py",
+      "/root/data/specslo-baselines/nano-pearl-ascend-v1/lock.json"
+    ],
+    "exit_code": 0,
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/Q5-uniform-KV-causal-root-v340-synthetic-arithmetic-cost-v1-pre-verifier.log",
+    "sha256": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "actual_result": {
+      "baseline_id": "nano-pearl-ascend-v1",
+      "status": "pass",
+      "checked_frozen_files": 10496,
+      "checked_external_files": 15,
+      "checked_packages": 212,
+      "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+      "errors": []
+    }
+  },
+  "elapsed_seconds": 32.093331411946565,
+  "private_storage": {
+    "actual_tag_bytes": 354354,
+    "aggregate_private_bytes": 431727
+  },
+  "actual_component_audit": {
+    "status": "complete_synthetic_screen_only",
+    "rows": 294,
+    "arithmetic": {
+      "24-FULL512": {
+        "cases": 15,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "24-FULL1024": {
+        "cases": 18,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "24-FULL1536": {
+        "cases": 21,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "24-FULL2048": {
+        "cases": 21,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "24-FULL2560": {
+        "cases": 24,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "24-causal-Native": {
+        "cases": 24,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 5,
+        "max_abs_root": 0.0
+      },
+      "24-causal-inner1": {
+        "cases": 24,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "16-FULL512": {
+        "cases": 15,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "16-FULL1024": {
+        "cases": 18,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "16-FULL1536": {
+        "cases": 21,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "16-FULL2048": {
+        "cases": 21,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "16-FULL2560": {
+        "cases": 24,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      },
+      "16-causal-Native": {
+        "cases": 24,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 10,
+        "max_abs_root": 0.0
+      },
+      "16-causal-inner1": {
+        "cases": 24,
+        "independent_root_noninvariant": 0,
+        "group_position_noninvariant": 0,
+        "different_from_FULL2560": 0,
+        "max_abs_root": 0.0
+      }
+    },
+    "costs": [
+      {
+        "heads": 24,
+        "prefix": 0,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.11897540025529452,
+          "FULL512": 0.05757720282417722,
+          "causal-Native": 0.048247140512103215,
+          "causal-inner1": 0.0438907700299751
+        }
+      },
+      {
+        "heads": 24,
+        "prefix": 97,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.11647551946225576,
+          "FULL512": 0.05702282578567974,
+          "causal-Native": 0.05070804400020279,
+          "causal-inner1": 0.047810663090785965
+        }
+      },
+      {
+        "heads": 24,
+        "prefix": 123,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.11862851170008071,
+          "FULL512": 0.05865791899850592,
+          "causal-Native": 0.04998982694814913,
+          "causal-inner1": 0.04742331293527968
+        }
+      },
+      {
+        "heads": 24,
+        "prefix": 127,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.11993971929769032,
+          "FULL512": 0.057931265473598614,
+          "causal-Native": 0.051879320380976424,
+          "causal-inner1": 0.04819598325411789
+        }
+      },
+      {
+        "heads": 24,
+        "prefix": 128,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.1223331710207276,
+          "FULL512": 0.05768142727902159,
+          "causal-Native": 0.05175040496396832,
+          "causal-inner1": 0.047762539907125756
+        }
+      },
+      {
+        "heads": 24,
+        "prefix": 511,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.12138199235778302,
+          "FULL1024": 0.07398509478662163,
+          "causal-Native": 0.05803197927889414,
+          "causal-inner1": 0.06232867963262834
+        }
+      },
+      {
+        "heads": 24,
+        "prefix": 1505,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.12169091860414483,
+          "FULL1536": 0.09344254794996232,
+          "causal-Native": 0.08451483881799504,
+          "causal-inner1": 0.08457953663310036
+        }
+      },
+      {
+        "heads": 24,
+        "prefix": 2555,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.12005096868961118,
+          "causal-Native": 0.09956560097634792,
+          "causal-inner1": 0.10484505401109345
+        }
+      },
+      {
+        "heads": 16,
+        "prefix": 0,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.09522750042378902,
+          "FULL512": 0.04913184966426343,
+          "causal-Native": 0.04160010576015338,
+          "causal-inner1": 0.0390310087823309
+        }
+      },
+      {
+        "heads": 16,
+        "prefix": 97,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.09327379302703775,
+          "FULL512": 0.04873504803981632,
+          "causal-Native": 0.04451256972970441,
+          "causal-inner1": 0.04088611603947356
+        }
+      },
+      {
+        "heads": 16,
+        "prefix": 123,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.0951145302678924,
+          "FULL512": 0.049185142415808514,
+          "causal-Native": 0.043258958612568676,
+          "causal-inner1": 0.04110392910661176
+        }
+      },
+      {
+        "heads": 16,
+        "prefix": 127,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.09629406122257933,
+          "FULL512": 0.04975037518306635,
+          "causal-Native": 0.04322879613027908,
+          "causal-inner1": 0.042805982957361266
+        }
+      },
+      {
+        "heads": 16,
+        "prefix": 128,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.09513210170553066,
+          "FULL512": 0.04957990677212365,
+          "causal-Native": 0.04354888369562104,
+          "causal-inner1": 0.042681607737904415
+        }
+      },
+      {
+        "heads": 16,
+        "prefix": 511,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.0930996575334575,
+          "FULL1024": 0.06257110362639651,
+          "causal-Native": 0.04617275044438429,
+          "causal-inner1": 0.05647961006616242
+        }
+      },
+      {
+        "heads": 16,
+        "prefix": 1505,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.09426545148016885,
+          "FULL1536": 0.07169420496211387,
+          "causal-Native": 0.06460331860580482,
+          "causal-inner1": 0.07056317190290429
+        }
+      },
+      {
+        "heads": 16,
+        "prefix": 2555,
+        "median_per_FIA_ms": {
+          "FULL2560": 0.09317371586803347,
+          "causal-Native": 0.07913499575806782,
+          "causal-inner1": 0.08594563769293018
+        }
+      }
+    ],
+    "models_loaded": false,
+    "model_qualified": false,
+    "Goodput": null,
+    "adopted": false
+  },
+  "actual_local_coverage_status": "completed_synthetic_no_model_qualification",
+  "independent_synthetic_arithmetic": {
+    "all_rows_and_costs_recomputed": true
+  },
+  "actual_execution_complete": true,
+  "owned_remaining": [],
+  "sources_unchanged": true,
+  "post_verifier": {
+    "argv": [
+      "bash",
+      "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh",
+      "python",
+      "-B",
+      "/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/verify_lock.py",
+      "/root/data/specslo-baselines/nano-pearl-ascend-v1/lock.json"
+    ],
+    "exit_code": 0,
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/Q5-uniform-KV-causal-root-v340-synthetic-arithmetic-cost-v1-post-verifier.log",
+    "sha256": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "actual_result": {
+      "baseline_id": "nano-pearl-ascend-v1",
+      "status": "pass",
+      "checked_frozen_files": 10496,
+      "checked_external_files": 15,
+      "checked_packages": 212,
+      "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+      "errors": []
+    }
+  },
+  "devices_after": {
+    "hardware": {
+      "argv": [
+        "npu-smi",
+        "info"
+      ],
+      "started_UTC": "2026-10-19T11:24:33.574402+00:00",
+      "timeout_seconds": 30,
+      "pid": 795166,
+      "exit_code": 0,
+      "output": "+------------------------------------------------------------------------------------------------------------------+\n| npu-smi 26.0.rc1                            Version: 26.0.rc1                                                    |\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU   Name                | Health        | Power(W)             Temp(C)                 Hugepages-Usage(page)   |\n| Chip                      | Bus-Id        | AICore(%)            Memory-Usage(MB)        HBM-Usage(MB)           |\n+===========================+===============+======================================================================+\n| 2     910B2               | OK            | 95.5                 41                      0    / 0                |\n| 0                         | 0000:C2:00.0  | 0                    0    / 0                3422 / 65536            |\n+===========================+===============+======================================================================+\n| 5     910B2               | OK            | 98.3                 42                      0    / 0                |\n| 0                         | 0000:41:00.0  | 0                    0    / 0                3425 / 65536            |\n+===========================+===============+======================================================================+\n| 6     910B2               | OK            | 92.9                 40                      0    / 0                |\n| 0                         | 0000:82:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n| 7     910B2               | OK            | 98.8                 41                      0    / 0                |\n| 0                         | 0000:42:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU     Chip              | Process id    | Process name       | Process memory(MB)    | Process id in container |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 2                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 5                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 6                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 7                                                                              |\n+===========================+===============+======================================================================+\n",
+      "timed_out": false,
+      "elapsed_seconds": 0.7081773043610156
+    },
+    "parsed_hardware": [
+      [
+        2,
+        "910B2"
+      ],
+      [
+        5,
+        "910B2"
+      ],
+      [
+        6,
+        "910B2"
+      ],
+      [
+        7,
+        "910B2"
+      ]
+    ],
+    "four_910B2": true,
+    "processes": {
+      "2": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "2",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T11:24:34.282683+00:00",
+        "timeout_seconds": 30,
+        "pid": 795178,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.459059271030128,
+        "idle": true
+      },
+      "5": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "5",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T11:24:34.741782+00:00",
+        "timeout_seconds": 30,
+        "pid": 795190,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.4535335749387741,
+        "idle": true
+      },
+      "6": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "6",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T11:24:35.195352+00:00",
+        "timeout_seconds": 30,
+        "pid": 795202,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.45578572573140264,
+        "idle": true
+      },
+      "7": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "7",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T11:24:35.651176+00:00",
+        "timeout_seconds": 30,
+        "pid": 795214,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.45405768183991313,
+        "idle": true
+      }
+    },
+    "all_idle": true
+  },
+  "private_storage_final": {
+    "actual_tag_bytes": 354354,
+    "aggregate_private_bytes": 431728
+  },
+  "finished_UTC": "2026-10-19T11:24:36.107158+00:00"
+}

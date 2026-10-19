@@ -1,0 +1,12 @@
+{
+  "status": "passed_HOST_plan_only",
+  "cases": 294,
+  "timing_panels": 16,
+  "physical_M": 120,
+  "groups": 24,
+  "all_real_visible_keys_fit": true,
+  "causal_reference_futures_fit_page_tables": true,
+  "original_owned_guard_compiled": true,
+  "NPU_used": false,
+  "model_qualified": false
+}

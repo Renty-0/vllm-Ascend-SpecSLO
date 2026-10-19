@@ -1,0 +1,49 @@
+{
+  "UTC": "2026-10-19T11:19:54.508280+00:00",
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/static-M120-root-v257-LIVE-target-SLO-first-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+  "source_SHA": "bbca2ce66af0418170ef4a4a04532bdc358c0ab887b5878d6cda7ecaece445e1",
+  "scope": "descriptive retained actual257 only, no causal inference or speedup claim",
+  "target_calls": 2321,
+  "all_linear_calls": 2157,
+  "max_physical_visible_context_min_med_max": [
+    92,
+    1483,
+    2557
+  ],
+  "max_context_ceil128_histogram": {
+    "128": 9,
+    "256": 45,
+    "384": 40,
+    "512": 28,
+    "640": 59,
+    "768": 14,
+    "896": 222,
+    "1024": 278,
+    "1152": 148,
+    "1280": 96,
+    "1408": 113,
+    "1536": 175,
+    "1664": 248,
+    "1792": 204,
+    "1920": 155,
+    "2048": 210,
+    "2176": 168,
+    "2304": 10,
+    "2432": 39,
+    "2560": 60
+  },
+  "max_context_ceil512_histogram": {
+    "512": 122,
+    "1024": 573,
+    "1536": 532,
+    "2048": 817,
+    "2560": 277
+  },
+  "conservative_physical_span": true,
+  "notes": [
+    "B5 alternate last physical slot counted conservatively, although contiguous canonical side view can be shorter.",
+    "Current executed KV extent2560; histogram cannot be translated directly into full model latency.",
+    "Any shorter extent must preserve all real visible keys, actual query/writes, fixed M/group geometry and own-history reference consistency."
+  ],
+  "NPU_used": false
+}
