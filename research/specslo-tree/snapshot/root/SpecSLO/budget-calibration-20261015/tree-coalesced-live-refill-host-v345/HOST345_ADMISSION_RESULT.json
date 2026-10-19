@@ -1,0 +1,183 @@
+{
+  "status": "passed_actual_admission_HOST",
+  "NPU_used": false,
+  "model_constructed": false,
+  "descriptor": {
+    "original_sha256": "006382464e4d3172847280cbbd023a3598f922ef6ac427203115900e9450c906",
+    "projected_sha256": "f4fdbc9fd01320ea30dc65ac37909b414bc13bd5604bba7759124b253b6bcb57",
+    "minimum_refill": 4,
+    "active_limit": 48,
+    "actual_pages": 544,
+    "private_pages": 64,
+    "reservation_includes_incumbents": true,
+    "reservation_includes_prefetched_pending": true,
+    "future_tail": 8,
+    "original_arrival_offsets_and_clock_expressions": true,
+    "original_incumbent_prefill_time_accounting": true,
+    "original_prompt_prefill_helper": true,
+    "original_priority_order": true,
+    "model_qualified": false,
+    "whole463_qualified": false,
+    "Goodput": null
+  },
+  "fixtures": [
+    {
+      "case": "initial48",
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47
+      ],
+      "reserved_pages": 256
+    },
+    {
+      "case": "initial-long",
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21
+      ],
+      "reserved_pages": 526
+    },
+    {
+      "case": "refill4",
+      "selected": [
+        44,
+        45,
+        46,
+        47
+      ],
+      "reserved_pages": 256
+    },
+    {
+      "case": "defer3-of-many",
+      "selected": [],
+      "reserved_pages": 244
+    },
+    {
+      "case": "tail3",
+      "selected": [
+        45,
+        46,
+        47
+      ],
+      "reserved_pages": 256
+    },
+    {
+      "case": "arrival-only3",
+      "selected": [],
+      "reserved_pages": 224
+    },
+    {
+      "case": "priority",
+      "selected": [
+        47,
+        46,
+        45,
+        44,
+        43,
+        42,
+        41,
+        40
+      ],
+      "reserved_pages": 256
+    },
+    {
+      "case": "incumbent-pages",
+      "selected": [
+        20,
+        21
+      ],
+      "reserved_pages": 526
+    },
+    {
+      "case": "cached-pending",
+      "selected": [
+        20,
+        21
+      ],
+      "reserved_pages": 526
+    },
+    {
+      "case": "token-limited",
+      "selected": [
+        40,
+        41
+      ],
+      "reserved_pages": 232
+    }
+  ],
+  "randomized_actual_loop_cases": 200,
+  "whole_original_function_executed": true,
+  "original_prefill_time_charged_to_incumbents_ms": 50,
+  "original_arrival_and_prefill_clocks_retained": true,
+  "original_once_root_publication": true,
+  "original_draft_target_root_append": true,
+  "incumbent_tokens_and_homes_unchanged": true,
+  "whole_source_AST_inverse_passed": true,
+  "no_model_or_performance_qualification": true
+}

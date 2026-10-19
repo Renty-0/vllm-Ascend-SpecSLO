@@ -40,6 +40,7 @@ SOURCES = (
     ('tree-Q5-bucket-causal-inner1-target-math-cost-v341', 341),
     ('tree-Q5-uniform-KV-bucket-only-target-math-cost-v342', 342),
     ('tree-Q5-uniform-KV-bucket-branch-math-cost-v343', 343),
+    ('tree-Q5-uniform-KV-bucket-branch-math-cost-v344', 344),
 )
 
 
@@ -110,6 +111,8 @@ def main():
         'tree-Q5-bucket-causal-inner1-target-math-cost-v341',
         'tree-Q5-uniform-KV-bucket-only-target-math-cost-v342',
         'tree-Q5-uniform-KV-bucket-branch-math-cost-v343',
+        'tree-Q5-uniform-KV-bucket-branch-math-cost-v344',
+        'tree-coalesced-live-refill-host-v345',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -226,6 +229,7 @@ def main():
         'ROOT341_CAUSAL_CROSS_FULL_HIDDEN_FAILURE.json',
         'ROOT257_EMPTY_ACTIVE_ADMISSION_RAW_FOLLOWUP_20261019.json',
         'ROOT342_INDEPENDENT_FULL_BUCKET_MODEL_COST_AUDIT.json',
+        'ROOT343_NEGATIVE_CONTROL_OBSERVER_FAILURE.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

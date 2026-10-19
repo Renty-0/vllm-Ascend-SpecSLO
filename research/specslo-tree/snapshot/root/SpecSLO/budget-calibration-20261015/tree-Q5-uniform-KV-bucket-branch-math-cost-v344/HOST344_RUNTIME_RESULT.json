@@ -1,0 +1,22 @@
+{
+  "status": "passed_retained344_loader_and_domain_HOST",
+  "NPU_used": false,
+  "model_constructed": false,
+  "original311_worker_signature": true,
+  "original209_output_root": true,
+  "original311_teacher_fixture": true,
+  "maximum_extent_cases": 6,
+  "mixed_cases": 408,
+  "mid_cases": 90,
+  "short_cases": 90,
+  "total": 594,
+  "all_five_extents_covered": [
+    512,
+    1024,
+    1536,
+    2048,
+    2560
+  ],
+  "independent_reference_FULL2560": true,
+  "all_original_matchers_and_strict_bitwise_gate": true
+}

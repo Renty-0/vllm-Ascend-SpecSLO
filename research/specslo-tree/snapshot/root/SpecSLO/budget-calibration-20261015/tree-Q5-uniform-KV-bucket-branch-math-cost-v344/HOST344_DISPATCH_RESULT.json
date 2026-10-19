@@ -1,0 +1,13 @@
+{
+  "status": "passed_HOST_dispatch_schema_only",
+  "NPU_used": false,
+  "fabricated_records_per_phase": [
+    18,
+    408,
+    90,
+    90
+  ],
+  "corrupt_records_rejected": 8,
+  "original120row_bijection_checker_retained": true,
+  "no_model_or_graph_qualification": true
+}

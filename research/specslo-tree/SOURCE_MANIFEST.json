@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-19T12:20:29.607693+00:00",
-  "upstream_branch_base": "1e8642529d9bca97cd9bd38d1bbc64f393ab5f15",
+  "saved_UTC": "2026-10-19T12:34:46.258398+00:00",
+  "upstream_branch_base": "2649ec80ee01da891f840509b1d8e20570f85e4b",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -410,10 +410,16 @@
       "bytes": 1921
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT343_NEGATIVE_CONTROL_OBSERVER_FAILURE.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT343_NEGATIVE_CONTROL_OBSERVER_FAILURE.json",
+      "sha256": "6e6a45f8582fd84018c807f10a5dc0ca38b0e34f0e6b12f1be6abf89357ca206",
+      "bytes": 1906
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
-      "sha256": "740df42f3006941f9466e9c65c7702f579add9e07028c82aca10efae95a07b9b",
-      "bytes": 26496
+      "sha256": "5172b7ba3dea00add9bd5ac7f1917aaf636b588284a5c2fff451bbb58bb1f158",
+      "bytes": 27051
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
@@ -1210,8 +1216,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "ee95b938874749f482855034334b8e6529fe2c99db1a06906e91c38fc92df9a3",
-      "bytes": 16275
+      "sha256": "d2dd77b436dde11b33944014ddef0cf366c4a145a11bd6a968875697f4bca151",
+      "bytes": 16502
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/startup_ROOT331_runtime_import_HOST.sh",
@@ -3983,6 +3989,138 @@
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v343/startup343.sh",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v343/startup343.sh",
       "sha256": "a668fb7781df8a53ce32cc59525ae1c92712a599e0485288fc26d04121b60932",
+      "bytes": 6861
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/FREEZE344.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/FREEZE344.json",
+      "sha256": "f4aa9b02429020c9a1bdbaaa4d168253588b681897dce1796713aac72196b6c4",
+      "bytes": 3927
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_DISPATCH_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_DISPATCH_RESULT.json",
+      "sha256": "94101bddc219eb11c74e09344a746cd0b7f158e796b0582292d9926cd4c216ec",
+      "bytes": 274
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_OBSERVER_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_OBSERVER_RESULT.json",
+      "sha256": "ad65887a7489191e34cac50cad832743b93b5591f5500d54fb0a49762706c367",
+      "bytes": 275
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_PREPARE_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_PREPARE_RESULT.json",
+      "sha256": "a0a8d32be8b58784e5af86b67622085234f60e11a65ad715aff20a75cbe9298a",
+      "bytes": 345
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_RUNTIME_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_RUNTIME_RESULT.json",
+      "sha256": "18fe6c9af5d3219b13f1c06018651b6a4b99a77286f208cac03779f3c2a68237",
+      "bytes": 516
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/PLAN344.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/PLAN344.json",
+      "sha256": "f5848ec76c74451190e7ed1daf1531b4db314e98dcfd11479d05bc24933413b7",
+      "bytes": 1827
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/SOURCE344_RECEIPT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/SOURCE344_RECEIPT.json",
+      "sha256": "d5cd0bced8b85f3849b00ebd2a45cf4aa89e809a8c7739a7cc5db5be5756a383",
+      "bytes": 4049
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/audit344.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/audit344.py",
+      "sha256": "1f97e21a505f01745d009df72ffa757c6fb8dce54d915e912adc68c107f0feb8",
+      "bytes": 10353
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/benchmark344.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/benchmark344.py",
+      "sha256": "ecff231918e6338977a49223b2e081e5e6981a56d333cb950fc584a65282bd3f",
+      "bytes": 3485
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/bucket344.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/bucket344.py",
+      "sha256": "ed02d420dbed55c86eb985f0c34f92fbf5376eaf17bb14399904b5a41cb7d2e6",
+      "bytes": 3183
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/check344.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/check344.py",
+      "sha256": "53e1a286a691357eb93d62cdb4fd26a2833872caa8975c4cc977c4e956566bb0",
+      "bytes": 1214
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/check_dispatch344_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/check_dispatch344_HOST.py",
+      "sha256": "572ddf38212a372a3c728214a60fe80fa5ee88732f7fc0993abd0c173d33698e",
+      "bytes": 3692
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/check_observer344_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/check_observer344_HOST.py",
+      "sha256": "f89fbcd1653e62779fde1ff59d150d4dd278a340ab7d777ca839b48836ddde5f",
+      "bytes": 1872
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/check_prepare344_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/check_prepare344_HOST.py",
+      "sha256": "1d1d812befb20b61ea2e39733918ef359d1c79d538b598dd6ca9373485bb8f15",
+      "bytes": 4008
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/check_runtime344_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/check_runtime344_HOST.py",
+      "sha256": "4b8f088539642adc8b38c5f3a3eea6c0a8f1dc402e6e90a880f888165203142c",
+      "bytes": 2760
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/dispatch344.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/dispatch344.py",
+      "sha256": "64ed54b29c4aa673a2cb4a528045d7ab3d68a30f49b86cecb402ffb9facd02a2",
+      "bytes": 1675
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/domain344.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/domain344.py",
+      "sha256": "4f30db77956768382fd3844891e9ff1c9cabfece80a102c1342a24f3e86aad8d",
+      "bytes": 1548
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/guard344.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/guard344.py",
+      "sha256": "330c231a5fb1995d61c5ef636e423086c4bdcfc6f26656acd4abcba617b216e9",
+      "bytes": 5918
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/oracle344.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/oracle344.py",
+      "sha256": "ee830df37a77be0f955031072d94cf48549ba5aa52fb17ea0e6131e1875f0980",
+      "bytes": 4907
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/probe344.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/probe344.py",
+      "sha256": "6fe6aa1f3a76e378c7531b825bad1b2641a07719d0bb4031851b571aafd049e3",
+      "bytes": 5737
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/runtime344.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/runtime344.py",
+      "sha256": "dfdb28bc16b096d62fe8bf1be79a34054885257bcdecd54eddd77850aa0881db",
+      "bytes": 1922
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/startup344.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/startup344.sh",
+      "sha256": "8522fea6ce07101042f39b7bd1aca1ce811e30ead4bf1f48421eb470f489a018",
       "bytes": 6861
     },
     {
@@ -9828,6 +9966,48 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/trace205.py",
       "sha256": "059d5e7d80006dea0f0775158397a7c931e4a7c792d5feba3cdd002236a79cea",
       "bytes": 5017
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/HOST345_ADMISSION_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/HOST345_ADMISSION_RESULT.json",
+      "sha256": "afec2608d8a3c246f4717c35614d6a6991d44f90075703f161fa961b1eb1bd76",
+      "bytes": 3285
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/HOST345_COMPONENT_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/HOST345_COMPONENT_RESULT.json",
+      "sha256": "00660f95e77f02f7319b9b07cda29f830245998e293505da04570b7ba2222cd3",
+      "bytes": 519
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/admission345.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/admission345.py",
+      "sha256": "011bb591cc5290d95ce96e8fcce0ba3f47cd339ea0c14c46f0c7383f5b2762a2",
+      "bytes": 4788
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/check_admission345_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/check_admission345_HOST.py",
+      "sha256": "822ab539415a625a5779c16eec8c058585ff531ad141c259e775c496486e7dcd",
+      "bytes": 9924
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/check_component345_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/check_component345_HOST.py",
+      "sha256": "cf92f61dbc242e91b6560d8e4f7eb84f60a159b55b77af4ad80a2368202e33b3",
+      "bytes": 2829
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/prefill345.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/prefill345.py",
+      "sha256": "260e996d9ad49bded0653981e36dd901c3620852c8c3121900ca1043b7013343",
+      "bytes": 2779
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/subset345.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345/subset345.py",
+      "sha256": "2d0e5f0886a351cd63177c82cae1047ac5a8b997f2144d9539d23a755128663f",
+      "bytes": 846
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296/FREEZE296.json",
@@ -17510,6 +17690,10 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v343/FREEZE343.json",
       "sha256": "f13e3e28482fac59088014f391c5dd0526cdd773228ebb1855747abb98aa488b"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/FREEZE344.json",
+      "sha256": "f4aa9b02429020c9a1bdbaaa4d168253588b681897dce1796713aac72196b6c4"
     }
   ],
   "omitted_evidence": {
@@ -23399,6 +23583,26 @@
     },
     "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v343/PLAN343.json": {
       "sha256": "91516788128e2d1aad0d7673136c9b9effca237c7e34a35d8b516f61dfea5d41",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_DISPATCH_RESULT.json": {
+      "sha256": "94101bddc219eb11c74e09344a746cd0b7f158e796b0582292d9926cd4c216ec",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_OBSERVER_RESULT.json": {
+      "sha256": "ad65887a7489191e34cac50cad832743b93b5591f5500d54fb0a49762706c367",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_PREPARE_RESULT.json": {
+      "sha256": "a0a8d32be8b58784e5af86b67622085234f60e11a65ad715aff20a75cbe9298a",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/HOST344_RUNTIME_RESULT.json": {
+      "sha256": "18fe6c9af5d3219b13f1c06018651b6a4b99a77286f208cac03779f3c2a68237",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344/PLAN344.json": {
+      "sha256": "f5848ec76c74451190e7ed1daf1531b4db314e98dcfd11479d05bc24933413b7",
       "reason": "Historical evidence or fixture; not source"
     }
   },

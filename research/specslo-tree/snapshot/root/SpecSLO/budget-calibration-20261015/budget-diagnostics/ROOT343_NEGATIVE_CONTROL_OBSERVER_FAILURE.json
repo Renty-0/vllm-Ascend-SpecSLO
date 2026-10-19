@@ -1,0 +1,44 @@
+{
+  "UTC": "2026-10-19T12:28:39.326906+00:00",
+  "status": "failed_observer_on_unprojected_negative_control",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M120-uniform-KV-bucket-root-v343-594-branch-math-current-cost-v1.json",
+  "receipt_sha256": "80e0eac98f3d1e163ee68528daad946f164109316916f51b3917baca866b3041",
+  "child": {
+    "argv": [
+      "/usr/bin/env",
+      "-i",
+      "HOME=/root",
+      "USER=root",
+      "LOGNAME=root",
+      "SHELL=/bin/bash",
+      "LANG=C.UTF-8",
+      "PATH=/root/miniconda3/envs/vllm-hust-dev/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin",
+      "SPECSLO_V343_ROOT_FREEZE_SHA=f13e3e28482fac59088014f391c5dd0526cdd773228ebb1855747abb98aa488b",
+      "SPECSLO_V218_ROOT_FREEZE_SHA=fa58f2866e8fed383e2d1ed1103b2fcb72a731aab3d65060e3a7c3e350a4d260",
+      "/bin/bash",
+      "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh",
+      "/bin/bash",
+      "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v343/startup343.sh",
+      "M120-uniform-KV-bucket-root-v343-594-branch-math-current-cost-v1"
+    ],
+    "log": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/local-M120-uniform-KV-bucket-root-v343-594-branch-math-current-cost-v1.log",
+    "pid": 895903,
+    "exit_code": 1
+  },
+  "owned_remaining": [],
+  "sources_unchanged": true,
+  "all_four_idle": true,
+  "post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "all3_targets_same_failure": true,
+  "NN_bucket_branch_qualified": false,
+  "performance": false,
+  "adopted": false
+}

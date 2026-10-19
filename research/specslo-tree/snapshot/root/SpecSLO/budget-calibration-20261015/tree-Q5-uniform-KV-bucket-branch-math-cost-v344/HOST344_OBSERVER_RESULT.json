@@ -1,0 +1,8 @@
+{
+  "status": "passed_observer_actual_and_bypass_HOST",
+  "NPU_used": false,
+  "original_layout_negative_control_does_not_require_static_projection": true,
+  "original_greedy_result_retained": true,
+  "invalid_projected_calls_rejected": 2,
+  "no_model_qualification": true
+}

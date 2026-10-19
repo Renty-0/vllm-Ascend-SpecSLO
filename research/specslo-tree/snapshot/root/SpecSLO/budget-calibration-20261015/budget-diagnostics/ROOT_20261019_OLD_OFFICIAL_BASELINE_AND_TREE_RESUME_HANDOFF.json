@@ -404,7 +404,18 @@
   "tree343_tag": "M120-uniform-KV-bucket-root-v343-594-branch-math-current-cost-v1",
   "tree343_freeze_sha256": "f13e3e28482fac59088014f391c5dd0526cdd773228ebb1855747abb98aa488b",
   "tree343_archive_sha256": "4efb97046a8062e9440e7ffd32d27c92694636ee500a5f01a6b7b028b196e59e",
-  "tree343_pending": "fresh594 M120 B1..8 target cases:6maxextent families,408originalmixed,90mid,90short;216 independent prefills pertarget, fixedFULL2560 reference and strict allhidden/128KV/greedy;threebanks12panels20rotated costs, no realdraft/full463.",
+  "tree343_pending": false,
   "tree343_REQUIRED_HOST_all3_passed": true,
-  "tree343_guard_session": 17939
+  "tree343_guard_session": 17939,
+  "tree343_result": "failed_test_observer_on_original_negative_control; no positive branch qualification",
+  "tree344_source": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344",
+  "tree344_tag": "M120-uniform-KV-bucket-root-v344-594-branch-math-current-cost-v1",
+  "tree344_freeze_sha256": "f4aa9b02429020c9a1bdbaaa4d168253588b681897dce1796713aac72196b6c4",
+  "tree344_archive_sha256": "2db775f30864fa4b1372ab066e48dea7f28feeba15db9e52a045b9ed0f130807",
+  "tree344_pending": true,
+  "tree344_guard_session": 78840,
+  "tree345_HOST_source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345",
+  "tree345_HOST_only": true,
+  "latest_saved_Git_commit": "2649ec8",
+  "current_UTC": "2026-10-19T12:34:36.985320+00:00"
 }
