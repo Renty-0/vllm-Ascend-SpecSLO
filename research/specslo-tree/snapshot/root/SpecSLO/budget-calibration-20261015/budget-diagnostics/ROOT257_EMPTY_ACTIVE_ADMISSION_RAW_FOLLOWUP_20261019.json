@@ -1,0 +1,69 @@
+{
+  "UTC": "2026-10-19T11:47:10.794721+00:00",
+  "status": "retained_actual257_descriptive_followup_only",
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/static-M120-root-v257-LIVE-target-SLO-first-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+  "source_SHA": "bbca2ce66af0418170ef4a4a04532bdc358c0ab887b5878d6cda7ecaece445e1",
+  "scope_empty_active_only": true,
+  "prefill_mode": "standalone-whole-prompt-no-new-reservation",
+  "actual_cohort_sizes": [
+    1,
+    27,
+    48,
+    48,
+    48,
+    48,
+    48,
+    48,
+    48,
+    48,
+    48,
+    3
+  ],
+  "target_N_mean": 16.597156398104264,
+  "target_N_max": 24,
+  "by_class": {
+    "tight": {
+      "requests": 271,
+      "TTFT_wall_median_seconds": 9.18309211730957,
+      "TTFT_wall_max_seconds": 17.598718881607056,
+      "last_publication_seconds": 138.39294820884243
+    },
+    "normal": {
+      "requests": 96,
+      "TTFT_wall_median_seconds": 9.411897897720337,
+      "TTFT_wall_max_seconds": 29.9759418964386,
+      "last_publication_seconds": 137.42871263390407
+    },
+    "loose": {
+      "requests": 96,
+      "TTFT_wall_median_seconds": 54.499629616737366,
+      "TTFT_wall_max_seconds": 86.72595882415771,
+      "last_publication_seconds": 172.5452231876552
+    }
+  },
+  "full_wall_seconds": 172.58620506711304,
+  "future_hypothesis": "Qualify bounded rolling whole-prompt admission at quiescent decode boundaries with page-aware admission, incumbent prefix/proposal/continuation protections and ownAR; assess Raw as well as SLO. Current frozen empty-active policy remains unchanged.",
+  "production_implementation_started": false,
+  "causal_attribution_proven": false,
+  "NPU_used": false,
+  "Goodput_gain_claim": null,
+  "source_mechanism": {
+    "patch": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/empty209.py",
+    "effect": "insert if active:return closed immediately after receive_live_admissions",
+    "actual_install_binding": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/trace209.py"
+  },
+  "next_design": {
+    "status": "future_design_not_implemented",
+    "keep": "original Poisson arrivals, clocks, publication, full463 completion, priority and current global budgets",
+    "candidate": "bounded rolling whole-prompt refills at the existing admit_available boundary, with coalescing threshold4 as a first experiment; retain page-aware admission and whole-ticket budget checks",
+    "proof_obligations": [
+      "fresh actual incumbent committed/uncommitted KV and proposal/continuation protection",
+      "independent newowner wholeprompt+next draft4 math",
+      "actual controller/source inverse and no illegal prefill reservation",
+      "original old startup/components and fresh full NN scope",
+      "honest refill_ms charged to incumbents and every actual arrival retained",
+      "full463 original ownAR, measured Raw/Goodput; no expected gain assumed"
+    ],
+    "interaction": "prefill can raise incumbent TPOT; continuous admission is a hypothesis, not automatically faster."
+  }
+}

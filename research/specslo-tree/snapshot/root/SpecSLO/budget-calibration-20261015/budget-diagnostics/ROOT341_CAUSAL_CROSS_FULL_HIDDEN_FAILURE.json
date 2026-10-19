@@ -1,0 +1,24 @@
+{
+  "UTC": "2026-10-19T11:46:16.204016+00:00",
+  "status": "failed_strict_cross_FULL2560_hidden_first_causal_case",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-Q5-FULL-bucket-causal1-root-v341-42-math-six-cost-v1.json",
+  "receipt_SHA": "8d12d7b615b1d411f4ea588bfd0cc333994a380d3aa2e0f4d3c5c574764c9891",
+  "completed_cases_each_target": 2,
+  "completed_cases": [
+    "N1-origin0/FULL2560",
+    "N1-origin0/FULLbucket"
+  ],
+  "first_failed_case": "N1-origin0/causal-inner1",
+  "prefix_length": 1505,
+  "all3targets_same_failed_gate": true,
+  "greedy_cross_FULL2560_passed_by_execution_flow": true,
+  "hidden_cross_FULL2560_passed": false,
+  "independent_causal_reference_not_executed": true,
+  "costs_not_measured": true,
+  "source_unchanged": true,
+  "owned_remaining": [],
+  "all4_idle": true,
+  "adopted": false,
+  "Goodput": null,
+  "conclusion": "Reject causal1 route for integration. Uniform FULLbucket first case passed all original graph/eager, independent0/17 hidden/all128KV/token checks and cross-FULL2560. Continue that route alone in342; no qualification extrapolated."
+}

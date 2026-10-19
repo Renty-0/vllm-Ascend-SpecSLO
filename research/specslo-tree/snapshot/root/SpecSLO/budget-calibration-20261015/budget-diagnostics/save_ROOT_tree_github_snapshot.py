@@ -38,6 +38,7 @@ SOURCES = (
     ('tree-Q4-closure-aware-host-builder-adapter-v339', 339),
     ('tree-FIA-Q5-causal-uniform-KV-screen-v340', 340),
     ('tree-Q5-bucket-causal-inner1-target-math-cost-v341', 341),
+    ('tree-Q5-uniform-KV-bucket-only-target-math-cost-v342', 342),
 )
 
 
@@ -106,6 +107,7 @@ def main():
         'tree-Q4-closure-aware-host-builder-adapter-v339',
         'tree-FIA-Q5-causal-uniform-KV-screen-v340',
         'tree-Q5-bucket-causal-inner1-target-math-cost-v341',
+        'tree-Q5-uniform-KV-bucket-only-target-math-cost-v342',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -219,6 +221,9 @@ def main():
         'ROOT339_INDEPENDENT_LINEAR_MATH_AND_COST_AUDIT.json',
         'ROOT257_ACTUAL_TARGET_CONTEXT_EXTENT_RAW_SCREEN_20261019.json',
         'ROOT340_SYNTHETIC_UNIFORM_KV_CAUSAL_SCREEN.json',
+        'ROOT341_CAUSAL_CROSS_FULL_HIDDEN_FAILURE.json',
+        'ROOT257_EMPTY_ACTIVE_ADMISSION_RAW_FOLLOWUP_20261019.json',
+        'ROOT342_INDEPENDENT_FULL_BUCKET_MODEL_COST_AUDIT.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

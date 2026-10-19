@@ -1,0 +1,30 @@
+{
+  "status": "passed_actual_premodel_installer_HOST",
+  "NPU_used": false,
+  "model_constructed": false,
+  "real_target_executed": false,
+  "actual_install234_executed": true,
+  "checked_and_qualified_wrappers_retained": true,
+  "complete_actual_wrapper_codes_identical": true,
+  "class_method_unchanged": true,
+  "original_accounting_all28_cases_passed": true,
+  "causal_proof": null,
+  "activation": {
+    "target_only": true,
+    "actual_M": 120,
+    "groups": 24,
+    "all_original_wrapper_code_and_signatures_preserved": true,
+    "original_model_forward_unchanged": true,
+    "Native_flags_assigned": false,
+    "deferred_read_done": false,
+    "actual_Native_HOST_builder_bound": true,
+    "original_inference_decorators_preserved": true,
+    "wrappers": [
+      "install.<locals>.checked_target",
+      "install.<locals>.qualified",
+      "target_tree_forward",
+      "target_tree_forward",
+      "install.<locals>.account_real_target_plans"
+    ]
+  }
+}

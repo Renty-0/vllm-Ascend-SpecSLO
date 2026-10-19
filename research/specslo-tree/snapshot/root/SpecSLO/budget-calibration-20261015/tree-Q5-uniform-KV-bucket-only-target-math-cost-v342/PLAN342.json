@@ -1,0 +1,15 @@
+{
+  "UTC": "2026-10-19T11:45:42.522784+00:00",
+  "status": "source_only",
+  "scope": "FULL2560 versus homogeneous global KV bucket, same gamma4/M120/S24;28fresh target cases with both0/17 independent canaries and strict same-cohort cross-FULL2560 comparison;four arms20rotated costs",
+  "causal_precision_patch_installed": false,
+  "original_precision_callbacks_unchanged": true,
+  "causal341_rejected": "first1505prefix case hidden differs from FULL2560 onall3targets. Numeric gates not relaxed.",
+  "real_draft_generation": false,
+  "whole_workload_AR_qualified": false,
+  "actual_dynamic_B_or_tree_branch_qualified": false,
+  "Goodput": null,
+  "HOST_setup_corrections": [
+    "Updated runtime assertion to28 cases; fixed broad generated audit identifier328 back to342 before freeze."
+  ]
+}

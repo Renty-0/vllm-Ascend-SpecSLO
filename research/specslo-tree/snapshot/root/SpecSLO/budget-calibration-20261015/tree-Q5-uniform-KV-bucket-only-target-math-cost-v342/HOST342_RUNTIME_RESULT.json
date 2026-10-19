@@ -1,0 +1,13 @@
+{
+  "status": "passed_retained_runtime_and_scope_HOST",
+  "NPU_used": false,
+  "actual_worker_signature_preserved": true,
+  "original209_output_root": true,
+  "original326_prefix_fixture": true,
+  "all32_origins_covered": true,
+  "cases": 28,
+  "cost_arms": 4,
+  "cost_rotations": 20,
+  "original_attention_precision_callbacks_unchanged": true,
+  "full_service_or_dynamic_B_qualified": false
+}

@@ -1,0 +1,57 @@
+{
+  "UTC": "2026-10-19T11:53:26.646434+00:00",
+  "status": "complete_independently_audited_target_component_only",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-Q5-FULL-uniform-bucket-root-v342-28-math-four-cost-v1.json",
+  "receipt_SHA": "d7d5abcad54e7dafcb5124eaf9d807700eed3bf676f2481b41b535a4b63a25df",
+  "all4_idle_at_terminal": true,
+  "sources_unchanged": true,
+  "owned_remaining": [],
+  "actual_audit": {
+    "status": "complete_current_Q5_attention_model_component",
+    "cases_each_target": 28,
+    "strict_cross_FULL2560": true,
+    "strict_independent_canaries": true,
+    "costs": [
+      {
+        "rank": 1,
+        "median_ms": {
+          "mixed/FULL2560": 54.802189115434885,
+          "mixed/FULLbucket": 54.28954539820552,
+          "short/FULL2560": 54.54669473692775,
+          "short/FULLbucket": 49.64763508178294
+        }
+      },
+      {
+        "rank": 2,
+        "median_ms": {
+          "mixed/FULL2560": 54.78591891005635,
+          "mixed/FULLbucket": 54.300500778481364,
+          "short/FULL2560": 54.56482991576195,
+          "short/FULLbucket": 49.65373477898538
+        }
+      },
+      {
+        "rank": 3,
+        "median_ms": {
+          "mixed/FULL2560": 54.841674864292145,
+          "mixed/FULLbucket": 54.31741080246866,
+          "short/FULL2560": 54.576189955696464,
+          "short/FULLbucket": 49.6559354942292
+        }
+      }
+    ],
+    "median_of_three_rank_medians_ms": {
+      "mixed/FULL2560": 54.802189115434885,
+      "mixed/FULLbucket": 54.300500778481364,
+      "short/FULL2560": 54.56482991576195,
+      "short/FULLbucket": 49.65373477898538
+    },
+    "whole_workload_AR_qualified": false,
+    "actual_dynamic_B_or_tree_branch_qualified": false,
+    "real_draft_generation": false,
+    "Goodput": null,
+    "adopted": false
+  },
+  "Goodput": null,
+  "formal_candidate_adopted": false
+}
