@@ -233,6 +233,7 @@ def main():
         'ROOT257_EMPTY_ACTIVE_ADMISSION_RAW_FOLLOWUP_20261019.json',
         'ROOT342_INDEPENDENT_FULL_BUCKET_MODEL_COST_AUDIT.json',
         'ROOT343_NEGATIVE_CONTROL_OBSERVER_FAILURE.json',
+        'ROOT346_ARCHIVAL_FORMAT_CHECK_EXCEPTION.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

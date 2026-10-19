@@ -1,0 +1,15 @@
+{
+  "UTC": "2026-10-19T12:45:02.949747+00:00",
+  "commit": "b077a29",
+  "snapshot_files": 2981,
+  "Python_syntax_files": 2218,
+  "all_saved_SHA256_verified": true,
+  "git_diff_check": "failed_one_inherited_trailing_space; not a complete formatting pass",
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-M120-B8-full-v346/runtime346.py",
+  "line": 38,
+  "source_line": "        ('   if engine is not None:engine.exit()', ",
+  "reason": "Exact historical307 runtime template line copied before source freeze. Preserve frozen source bytes and record this formatting defect. No runtime semantic or numerical gate changed.",
+  "format_sh_ci": "unavailable: pre-commit not installed; existing environment preserved",
+  "action": "Keep archival snapshot exact; do not report whitespace/format checks as passed.",
+  "frozen_source_unchanged": true
+}

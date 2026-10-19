@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-19T12:44:04.628083+00:00",
-  "upstream_branch_base": "b65587e46cfeaad11682e08649a427a5780d6eda",
+  "saved_UTC": "2026-10-19T12:46:45.819188+00:00",
+  "upstream_branch_base": "b077a291468b1d8f07dbcd739d0626c8f2cd7ae8",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -416,10 +416,16 @@
       "bytes": 1906
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT346_ARCHIVAL_FORMAT_CHECK_EXCEPTION.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT346_ARCHIVAL_FORMAT_CHECK_EXCEPTION.json",
+      "sha256": "ef05eb00d36954197de27c6236f5f97267b86346df0f0d6577ba3549cbd2103e",
+      "bytes": 876
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
-      "sha256": "86fe2adac12861184c28b01097adbe154641ef677279ed64dd4a9fffeefec933",
-      "bytes": 27755
+      "sha256": "4bdd8834563dd052c8e7270c79eddde7c030893d9b591b3cfa36c5e552ed6e69",
+      "bytes": 28010
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
@@ -1216,8 +1222,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "aa4845bd82abfb37bc4937b0386d0e88e7c8539b8d1417d202e49196b045a43c",
-      "bytes": 16668
+      "sha256": "ad6d7507daae89ed716ff9b64c143cd300f894fe37e35d64412fa47c8abb0fe9",
+      "bytes": 16724
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/startup_ROOT331_runtime_import_HOST.sh",

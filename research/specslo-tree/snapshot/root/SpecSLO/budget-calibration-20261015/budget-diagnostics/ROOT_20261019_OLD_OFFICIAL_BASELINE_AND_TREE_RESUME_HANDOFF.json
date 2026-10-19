@@ -416,8 +416,8 @@
   "tree344_guard_session": 78840,
   "tree345_HOST_source": "/root/SpecSLO/budget-calibration-20261015/tree-coalesced-live-refill-host-v345",
   "tree345_HOST_only": true,
-  "latest_saved_Git_commit": "b65587e",
-  "current_UTC": "2026-10-19T12:44:00.050450+00:00",
+  "latest_saved_Git_commit": "b077a29",
+  "current_UTC": "2026-10-19T12:46:41.227822+00:00",
   "tree345_frozen": true,
   "tree345_freeze_sha256": "5de32ee205cbbe49e48dc3d527fbfaead2583329e6b428616d8cac831f4dd534",
   "tree345_archive_sha256": "2f7d54480d31d01ef88d7fd7b8ea4e0553848fdda9bf25592ce5a42e4ecc2102",
@@ -425,5 +425,9 @@
   "tree346_freeze_sha256": "c4f5013ba25822efd69970f34951d7a275d4d505d1f6e9ded39dcfecd438e99a",
   "tree346_archive_sha256": "0ff2651850d0672d0d5665a3dfd77f6834151b7d991139b6ae770ff821fbe762",
   "tree346_HOST_ready": true,
-  "tree346_launched": false
+  "tree346_launched": false,
+  "latest_Git_pushed": true,
+  "tree346_waits_for344_guard_exit": true,
+  "tree346_ready_full_scope": true,
+  "tree346_archive_format_exception": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT346_ARCHIVAL_FORMAT_CHECK_EXCEPTION.json"
 }
