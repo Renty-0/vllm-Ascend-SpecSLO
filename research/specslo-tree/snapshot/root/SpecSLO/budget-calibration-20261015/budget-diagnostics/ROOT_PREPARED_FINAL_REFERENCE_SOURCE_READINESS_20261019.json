@@ -1,0 +1,26 @@
+{
+  "UTC": "2026-10-19T14:32:02.703098+00:00",
+  "status": "HOST_readonly_prepared_reference_sources_check",
+  "NPU_used": false,
+  "model_processes_launched": 0,
+  "candidate_selected": false,
+  "goal_achieved": false,
+  "checks": {
+    "fixed": {
+      "manifest_path": "/root/SpecSLO/budget-calibration-20261015/final-fixed-gamma4-stream-witness-v1/PREPARED_SOURCE_MANIFEST.json",
+      "manifest_sha256": "b9a20faad5dba0bbb14d3d533bc1295dd0ccdca2608f9431bf1466b798684e08",
+      "archive_path": "/root/SpecSLO/budget-calibration-20261015/final-fixed-gamma4-stream-witness-v1/PREPARED_SOURCE_AND_HOST.tar.gz",
+      "archive_sha256": "52e43eb7fdd50a4afae00057b683f6c598757fb05b9b61591fae0d05271d64c5"
+    },
+    "official": {
+      "manifest_path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/final-official-tp4-publication-rebind-v2/PREPARED_PUBLICATION_V2_SOURCE_MANIFEST.json",
+      "manifest_sha256": "3c03fc5f3ca4348fb94dc31d0701c0a892fefe54ece53f78fa9df28979528936",
+      "archive_path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/final-official-tp4-publication-rebind-v2/PREPARED_PUBLICATION_V2_SOURCE.tar.gz",
+      "archive_sha256": "e0ad778bfc7ea66b144c720b83fe966697a7a3b9b0cee03997cc65c33f759632"
+    }
+  },
+  "errors": [],
+  "reference_dependency_files_checked": 3091,
+  "python_inventory_equal": true,
+  "runtime_framework_imported": false
+}

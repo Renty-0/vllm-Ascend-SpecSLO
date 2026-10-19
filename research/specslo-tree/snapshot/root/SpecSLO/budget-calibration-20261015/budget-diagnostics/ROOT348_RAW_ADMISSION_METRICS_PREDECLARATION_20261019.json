@@ -1,0 +1,36 @@
+{
+  "UTC": "2026-10-19T14:33:40.787253+00:00",
+  "status": "HOST_readonly_metrics_predeclared_before_full348",
+  "active_tag": "M120-B8-refill4-singleton-aware-root-v348-full463-ownAR-v1",
+  "active_freeze_sha256": "09119c918ad6d28d137a731cf041e69f7a0135dc302169455fa944df6caab5c8",
+  "main_result_reader": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_ROOT348_common_result_HOST.py",
+  "admission_reader": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/analyze_ROOT_live_refill_raw_HOST.py",
+  "reader_retained257_control": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_REFILL_RAW_READER_HOST_CONTROL.json",
+  "compare": [
+    "full463 Raw and Goodput, tight/normal/loose TPOT and attained counts",
+    "mean actual N and N24 fraction, true logical query and primary/side-group occupancy",
+    "actual prefill group sizes, inflight incumbent counts and original reported total online_refill_ms",
+    "actual first-publication minus original absolute-arrival TTFT by class, final publication by class",
+    "actual normal branch calls and B1..8 owner rounds; no claim that tree alone caused a joint change"
+  ],
+  "reference": {
+    "best_clean_tree": 257,
+    "Raw": 686.7756316555451,
+    "Goodput": 554.7604454409803,
+    "mean_N": 16.597156398104264,
+    "reported_online_refill_ms": 29278.79069931805,
+    "trace_sha256": "bbca2ce66af0418170ef4a4a04532bdc358c0ab887b5878d6cda7ecaece445e1"
+  },
+  "success": {
+    "fixed_gamma4_GP_gt": 501.63560407964184,
+    "strong_MC2_ON_GP_times": 1.5,
+    "strong_MC2_ON_GP_reference": 429.8442987424407,
+    "threshold_GP_gt": 644.766448113661,
+    "full463_all3_target_ownAR_exact_required": true,
+    "matched_repeats_pending": true
+  },
+  "no_perf_result_yet": true,
+  "NPU_used": false,
+  "active_frozen_source_changed": false,
+  "device_overlap_inferred_from_host_phase_sums": false
+}
