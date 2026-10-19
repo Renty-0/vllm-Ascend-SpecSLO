@@ -1,0 +1,20 @@
+{
+  "status": "PASS_HOST_four_step_top2_chain_lossless_codec_and_original_Native_checker",
+  "dependent_model_cases": 20,
+  "exact_float32_probabilities_checked": 3376,
+  "original_primary_and_sibling_order_preserved": true,
+  "subsequent_model_inputs_are_actual_preceding_primary_tokens": true,
+  "original_Native_output_checker_unchanged": true,
+  "one_changed_probability_bit_rejected": true,
+  "invalid_real_KV_slot_rejected": true,
+  "no_probability_rounding": true,
+  "model_quantization": false,
+  "NPU_used": false,
+  "runner_installed": false,
+  "real_draft_neural_math_qualified": false,
+  "full463_qualified": false,
+  "Raw": null,
+  "Goodput": null,
+  "source_sha256": "5e7e478eea8d4131a416b4bc9a8c95efdf2ca9103ce711343b0c4207ea983a8e",
+  "Native_checker_source_sha256": "a29c1d18e1588af8c94bb1b598af2da19ffef7c4630e87844befe086a69f3bf8"
+}

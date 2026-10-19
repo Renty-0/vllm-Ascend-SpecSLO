@@ -1,0 +1,21 @@
+{
+  "status": "PASS_HOST_synthetic363_auditor_positive_negative_and_seven_corruptions",
+  "synthetic_case_count": 640,
+  "synthetic_ABA_rows": 1920,
+  "valid_negative_diagnostic_retained_without_model_qualification": true,
+  "rejected_controls": [
+    "missing_case",
+    "wrong_query_count",
+    "invalid_ABA",
+    "wrong_source",
+    "false_model_qualification",
+    "impossible_pairwise_equality",
+    "checkpoint_disagreement"
+  ],
+  "synthetic_fixtures_only": true,
+  "NPU_used": false,
+  "numerical_offset_invariance_qualified": false,
+  "models_loaded": false,
+  "Raw": null,
+  "Goodput": null
+}

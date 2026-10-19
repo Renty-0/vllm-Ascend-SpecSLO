@@ -1,0 +1,17 @@
+{
+  "status": "PASS_HOST_original_dispatcher_private_raw_mode_and_graph_key_isolation",
+  "original_eager_model_body_preserved_outside_private_mode": true,
+  "full_original_dispatcher_AST_inverse": true,
+  "logical_row_count_in_private_key": true,
+  "state_restored_after_success_and_failure": true,
+  "original_Native_capture_and_output_checker_bodies_unmodified": true,
+  "CPU_eager_fixture_only": true,
+  "graph_capture_executed": false,
+  "NPU_used": false,
+  "serving_installed": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null,
+  "runner_source_sha256": "e95ed3caff0e7712403b325f3b3d5bc70770de2c2623a4a4d9c6f292a10630ed",
+  "execute_source_sha256": "d1920f0684e80a18478d1029c29cf696cd8bf58ab2fe4c4d968f726eea4e1c66"
+}

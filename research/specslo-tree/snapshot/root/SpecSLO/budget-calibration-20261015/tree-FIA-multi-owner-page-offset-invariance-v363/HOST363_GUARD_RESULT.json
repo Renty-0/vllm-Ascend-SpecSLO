@@ -1,0 +1,18 @@
+{
+  "status": "PASS_HOST_original_owned_synthetic_guard363_and_explicit_four_card_mapping",
+  "deadline_seconds": 600,
+  "tag_private_limit_MiB": 64,
+  "aggregate_limit_MiB": 256,
+  "actual_logical_target_device": 1,
+  "original_requested_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "serial_runtime_mapping_preserved": true,
+  "source_gate_matches_current_HOST_probe": true,
+  "all_model_and_serving_qualification_false": true,
+  "NPU_used": false,
+  "Goodput": null
+}

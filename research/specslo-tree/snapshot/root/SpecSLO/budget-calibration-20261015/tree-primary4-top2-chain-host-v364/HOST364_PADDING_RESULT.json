@@ -1,0 +1,13 @@
+{
+  "status": "PASS_HOST_primary_spine_real_rows_and_fixed_private_padding_roots",
+  "cases": 10,
+  "padding_inputs_match_original_per_depth_padder": true,
+  "model_input_rows_and_client_request_rows_explicitly_distinct": true,
+  "all_positive_original_physical_query_slots_retained": true,
+  "no_scratch_query_promoted_to_client_request": true,
+  "NPU_used": false,
+  "real_neural_math_qualified": false,
+  "Raw": null,
+  "Goodput": null,
+  "source_sha256": "d1920f0684e80a18478d1029c29cf696cd8bf58ab2fe4c4d968f726eea4e1c66"
+}

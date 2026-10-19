@@ -52,6 +52,7 @@ SOURCES = (
     ('tree-admission-closed-control-full-v355', 355),
     ('tree-priority-protected-refill-full-v356', 356),
     ('tree-Q5-bucket-completion-and-paired-mode-cost-v361', 361),
+    ('tree-FIA-multi-owner-page-offset-invariance-v363', 363),
 )
 
 
@@ -139,6 +140,9 @@ def main():
         'tree-Q4S32-prefix-alias-split-host-v359',
         'tree-Q4S32-depth3-target-adapter-host-v360',
         'tree-Q5-bucket-completion-and-paired-mode-cost-v361',
+        'tree-Q5-multi-owner-page-table-packing-host-v362',
+        'tree-FIA-multi-owner-page-offset-invariance-v363',
+        'tree-primary4-top2-chain-host-v364',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))

@@ -1,0 +1,20 @@
+{
+  "status": "PASS_HOST_all640_synthetic_FIA_metadata_and_ordered_KV_addresses",
+  "counts": {
+    "cases": 640,
+    "checked_real_query_masks": 3104,
+    "ordered_KV_addresses": 1794360,
+    "rejected_controls": 5
+  },
+  "ABA_rows_planned": 1920,
+  "original_FIA_TND_block128_sparse1_call_preserved": true,
+  "actual_TP3_heads_16over2_and24over3": true,
+  "whole_output_ABA_restoration_required": true,
+  "compared_to_original_FULL2560_and_same_extent_unshifted_controls": true,
+  "NPU_used": false,
+  "numerical_offset_invariance_qualified": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null,
+  "probe_sha256": "38eb0da30bf0a868bc1867ea3d1d45c6ce85230b5f2537ed3f1754e14cb86c3a"
+}

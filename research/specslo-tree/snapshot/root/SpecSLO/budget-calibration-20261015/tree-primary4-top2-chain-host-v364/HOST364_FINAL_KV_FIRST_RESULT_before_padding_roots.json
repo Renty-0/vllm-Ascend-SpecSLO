@@ -1,0 +1,14 @@
+{
+  "status": "PASS_HOST_optional_fifth_KV_only_step_and_unchanged_top2_output",
+  "cases": 4,
+  "last_input_is_actual_fourth_primary_token": true,
+  "no_fifth_LM_head_or_new_candidate": true,
+  "no_probability_rounding": true,
+  "model_quantization": false,
+  "NPU_used": false,
+  "actual_KV_neural_math_qualified": false,
+  "runtime_installed": false,
+  "Raw": null,
+  "Goodput": null,
+  "source_sha256": "5e7e478eea8d4131a416b4bc9a8c95efdf2ca9103ce711343b0c4207ea983a8e"
+}

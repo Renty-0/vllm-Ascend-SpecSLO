@@ -1,0 +1,60 @@
+{
+  "schema": "ROOT363.synthetic-FIA-page-offset-source.v1",
+  "parent_freeze_sha256": "27ebbaae666041785cf3dd8adc52aa9b05ec06a4198995c0cc2895305ba45014",
+  "parent_archive_sha256": "6fb6621ed12270cb3287b43174b3d5a0ec5dfc5016b55245e5d4923689540e59",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/build_ROOT363_synthetic_offset_guard_HOST.py": "1e8724a9fb47b4c9e8b8102ab3166efa21fa9e8a666fdbb2eaa80fcd0cf4f3a4",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT363_synthetic_offset_HOST.py": "d32b9c3d4e1b56be4fc1afc005c7a0d7b7838b9bb85b3c90426461f0a29e7a4e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q4-group-and-query-isolation-v335/guard335.py": "7514ce9d017dbad6cdbc93f9e0f762a51322a5fbad99d2ab5fb1c54fea8b3cef",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-Q4-group-and-query-isolation-v335/startup335.sh": "92938e26c0ff5747a25b6ed5a415f2730a54aea3ef6b453d0bc4d13aafa9486b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/HOST363_AUDIT_RESULT.json": "05e6d33ea4a397068027e50983e3ff4b846197b4cee830cfe65ff27003f488dd",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/HOST363_FIRST_RESULT_before_mapping_metadata.json": "b883b0a4b03cffff225bd093c16281ab89d03904d767d26908d7d81288dc510b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/HOST363_GUARD_RESULT.json": "3075051440a32bd569458c4a269ecb90acf7c04b781c8ae3357478417a604686",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/HOST363_RESULT.json": "4def32fa33012ca150b675baa6523e14c8cfc5e981b68716f1539408c9d37b27",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/audit363.py": "39ef8567f988fd84d053318b852af5e4a216bea015c49ec38c444d9918ec3c31",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/check363_HOST.py": "03f1169a60a9266e3afd1b0b4e22784c5cdca99d45a2bc073aa631cf349c3219",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/check_audit363_HOST.py": "6f673d1475dee6726ba03b212c3e9552f45e7d662b3e7efb3afaead8340b28b1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/check_guard363_HOST.py": "58295b788b0508815d9897b4ea9c7b5dd20fd49076139bbc161eb5dc3e2a59e1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/guard363.py": "aa4d917b293a76caadd454e4d6f307fc26e12d31bb102a4bea19c7c7ebec91aa",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/probe363.py": "38eb0da30bf0a868bc1867ea3d1d45c6ce85230b5f2537ed3f1754e14cb86c3a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/startup363.sh": "a698a617c601ee8bd425fcada8713a248f7fab0a953a128cd033f7fdeee54e1e"
+  },
+  "synthetic_cases": 640,
+  "ABA_rows": 1920,
+  "physical_M": 120,
+  "groups": 24,
+  "KV_heads": [
+    2,
+    3
+  ],
+  "Q_heads": [
+    16,
+    24
+  ],
+  "mask_capacities": [
+    10,
+    11
+  ],
+  "uniform_extents": [
+    2560,
+    4096
+  ],
+  "original_reference_extent": 2560,
+  "deadline_seconds": 600,
+  "private_tag_limit_MiB": 64,
+  "aggregate_limit_MiB": 256,
+  "original_requested_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "logical_device": 1,
+  "models_loaded": false,
+  "model_qualified": false,
+  "performance": false,
+  "qualification_inherited": false,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}
