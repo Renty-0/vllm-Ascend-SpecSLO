@@ -1,0 +1,22 @@
+{
+  "status": "PASS_HOST_actual_optimized_stack_source_inventory_auditor_and_guard_ABI",
+  "math_rows": 510,
+  "timing_calls": 320,
+  "rejected_corruptions": [
+    "missing_case",
+    "bare_native_baseline",
+    "confidence",
+    "ledger",
+    "KV",
+    "wrong_work_charge",
+    "timing_order",
+    "unvalidated",
+    "invented_Raw"
+  ],
+  "actual_fast_root_and_replay_installers_present": true,
+  "probe_sha256": "777c909272a736230e68942af19468ba2dc54f985ad22c6a0f7154ff42d54d80",
+  "NPU_used": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

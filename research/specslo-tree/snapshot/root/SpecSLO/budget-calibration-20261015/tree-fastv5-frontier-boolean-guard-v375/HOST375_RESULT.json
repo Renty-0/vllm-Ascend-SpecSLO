@@ -1,0 +1,9 @@
+{
+  "status": "PASS_HOST_actual_frontier_list_to_Boolean_contract_and_empty_negative",
+  "complete_original_method_AST_inverse": true,
+  "numerical_body_unchanged": true,
+  "CPU_metadata_fixture_only": true,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

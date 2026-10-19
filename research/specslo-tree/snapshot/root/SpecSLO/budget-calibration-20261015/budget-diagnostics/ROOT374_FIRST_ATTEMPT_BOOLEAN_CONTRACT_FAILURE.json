@@ -1,0 +1,10 @@
+{
+  "status": "failed_before_first_fused_model_call",
+  "tag": "FastV5-all-eager-frontier-fused-root-v374-draft-only-v1",
+  "receipt_sha256": "4d758a6ca39e4e9f6368f752d738cd2056e50eb0eb7005c3b4123bf62559e740",
+  "cause": "strict need(value is True) was passed a nonempty frontier list rather than bool(frontiers)",
+  "fixed_by": "source-pinned375 Boolean-only method projection with positive+empty HOST controls",
+  "numerical_results": null,
+  "Raw": null,
+  "Goodput": null
+}

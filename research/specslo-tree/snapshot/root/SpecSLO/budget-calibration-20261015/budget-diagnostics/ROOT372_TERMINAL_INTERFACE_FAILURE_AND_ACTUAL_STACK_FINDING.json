@@ -1,0 +1,24 @@
+{
+  "status": "terminal_failed_before_new_draft_math_no_formal_result",
+  "UTC": "2026-10-19T19:48:59.672114+00:00",
+  "tag": "static-M120-B5-tail3-root-v372-full463-ownAR-v1",
+  "receipt_sha256": "a31ed4c60005ebe0f23ea295df426736e56de6698ad4de2ae0367c130ace53b0",
+  "sources_unchanged": true,
+  "owned_remaining": [],
+  "all4idle": true,
+  "original_startup_and_components_completed": true,
+  "target227_checkpoint_counts": [
+    227,
+    227,
+    227,
+    227
+  ],
+  "new_draft_cases": 0,
+  "formal463_started": false,
+  "Raw": null,
+  "Goodput": null,
+  "cause": "Actual production draft entry is RootSeed over FastV5 optimized chain, not bare Native function required by369 projector",
+  "finding": "Both normal and rolling-eager already use chained draft graphs; component370/371 speedups were against unoptimized Native and are not incremental production gains",
+  "next": "Actual-stack optimized-baseline all-eager frontier+chain fusion373 HOST40 passed; build real0.6B component374 before new full run",
+  "goal_achieved": false
+}

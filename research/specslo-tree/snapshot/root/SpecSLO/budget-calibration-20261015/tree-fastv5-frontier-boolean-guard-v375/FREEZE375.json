@@ -1,0 +1,15 @@
+{
+  "schema": "ROOT375.Boolean-only-frontier-guard-source.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-fastv5-frontier-boolean-guard-v375/bootstrap375.py": "89e4c7bf917ee96cdba6096a9211e2014c3fc924c5fa99c47bcfff6f02de5d67",
+    "/root/SpecSLO/budget-calibration-20261015/tree-fastv5-frontier-boolean-guard-v375/boolean375.py": "8185001efa7468dd018b34dfd4179798d21bfde14077c8efe177763dcc36f387",
+    "/root/SpecSLO/budget-calibration-20261015/tree-fastv5-frontier-boolean-guard-v375/guard375.py": "0ea2edd63d9fd05455343d8ebd51c5535108e08e5bb196f40bb767845f19cac8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-fastv5-frontier-boolean-guard-v375/check375_HOST.py": "47e2c91058a5303ced3940462339af3aa0228ba1c0b90a340c63c4a0c0e11946",
+    "/root/SpecSLO/budget-calibration-20261015/tree-fastv5-frontier-boolean-guard-v375/startup375.sh": "48061d30036285dfcbd0bc417b770c12295f2cc723f82e679a1ef2255ecdece0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-fastv5-frontier-boolean-guard-v375/HOST375_RESULT.json": "a8c3493e5529f240c13b5a6b19f63267f138573c61620a8a00dfd520ebfef889",
+    "/root/SpecSLO/budget-calibration-20261015/tree-fastv5-eager-frontier-chain-device-v374/SOURCE374_RECEIPT.json": "528d5ffad15c6e933285acff89ac4af9e440c7c2ce43d020ceca675cb8a13dbf"
+  },
+  "numerical_body_changed": false,
+  "Native_qualification_flags_modified": false,
+  "NPU_used": false
+}

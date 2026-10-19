@@ -1,0 +1,31 @@
+{
+  "status": "retained_all3_target227_math_passed_job_failed_before_draft_and_formal",
+  "UTC": "2026-10-19T19:57:57.319467+00:00",
+  "tag": "static-M120-B5-tail3-root-v372-full463-ownAR-v1",
+  "evidence": [
+    {
+      "rank": 1,
+      "proof_sha256": "c53fd757076840be10addc66c93e6fa2b23ef71030065945e409c8ad9cec6a1d",
+      "cases": 227,
+      "all_hidden_KV_greedy_bitwise": true
+    },
+    {
+      "rank": 2,
+      "proof_sha256": "8e07b66070dd72221b6310ffcffa6805bc2fa68ff7112b5f14e70a64feca91de",
+      "cases": 227,
+      "all_hidden_KV_greedy_bitwise": true
+    },
+    {
+      "rank": 3,
+      "proof_sha256": "28433a9d43d0c6d1fa4108316bd3adc6496020c70089091e5f26b58c93420a7b",
+      "cases": 227,
+      "all_hidden_KV_greedy_bitwise": true
+    }
+  ],
+  "all3_target_heads_equal": true,
+  "new_draft_math_cases": 0,
+  "full463": false,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false
+}

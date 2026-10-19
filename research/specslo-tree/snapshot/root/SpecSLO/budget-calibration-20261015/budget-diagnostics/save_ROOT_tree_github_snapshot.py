@@ -60,6 +60,8 @@ SOURCES = (
     ('tree-primary4-tail3-top2-chain-device-v370', 370),
     ('tree-primary4-tail3-eager-allN-device-v371', 371),
     ('tree-primary4-tail3-best257-full-v372', 372),
+    ('tree-fastv5-eager-frontier-chain-device-v374', 374),
+    ('tree-fastv5-frontier-boolean-guard-v375', 375),
 )
 
 
@@ -158,6 +160,9 @@ def main():
         'tree-primary4-tail3-top2-chain-device-v370',
         'tree-primary4-tail3-eager-allN-device-v371',
         'tree-primary4-tail3-best257-full-v372',
+        'tree-fastv5-eager-frontier-chain-host-v373',
+        'tree-fastv5-eager-frontier-chain-device-v374',
+        'tree-fastv5-frontier-boolean-guard-v375',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -349,6 +354,12 @@ def main():
         'ROOT371_INDEPENDENT_REAL_DRAFT_EAGER_RESULT.json',
         'ROOT372_FULL_TAIL3_PLAN_20261019.json',
         'monitor_ROOT372_readonly_HOST.py',
+        'audit_ROOT372_terminal_full_HOST.py',
+        'read_ROOT372_common_result_HOST.py',
+        'ROOT372_GITHUB_VALIDATION_CONTEXT.json',
+        'ROOT372_TERMINAL_INTERFACE_FAILURE_AND_ACTUAL_STACK_FINDING.json',
+        'ROOT372_RETAINED_TARGET227_CHECKPOINT.json',
+        'ROOT374_FIRST_ATTEMPT_BOOLEAN_CONTRACT_FAILURE.json',
         'ROOT355_CONCURRENT_HOST_VALIDATION_TIMING_CONTEXT.json',
     ):
         path = BASE / 'budget-diagnostics' / filename

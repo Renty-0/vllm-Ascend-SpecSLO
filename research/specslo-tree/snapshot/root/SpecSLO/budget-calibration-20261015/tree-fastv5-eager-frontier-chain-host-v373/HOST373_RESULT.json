@@ -1,0 +1,21 @@
+{
+  "status": "PASS_HOST_actual_RootSeed_FastV5_closure_and_fused_frontier_chain_oracle",
+  "cases": 40,
+  "frontier_argmax_then_original_top2_exact": true,
+  "all_dependent_CPU_model_inputs_equal": true,
+  "original_int64_checker_used": true,
+  "complete_actual_FastV5_function_AST_inverse": true,
+  "normal_and_mixed_fallback_design": true,
+  "model_precision_not_changed": true,
+  "original_confidence_encoding_retained": true,
+  "NPU_used": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null,
+  "source_sha256": {
+    "forward373.py": "8035414a48fd1902d9dcd3a797a4f088bee91e6c2071f7efd530f594565ba228",
+    "spine373.py": "3fbfce6f1cdad74305167d194a24afb6885184771cf9003842819918b210eae6",
+    "runner373.py": "2945fee67b16244905423174da954bff27d273162b5c11423f641b5cdba3ae4d",
+    "check373_HOST.py": "dc4abac6894a9cbe59bd0a1b88b6b09228f7d494da44465b2c7b24320ca51832"
+  }
+}

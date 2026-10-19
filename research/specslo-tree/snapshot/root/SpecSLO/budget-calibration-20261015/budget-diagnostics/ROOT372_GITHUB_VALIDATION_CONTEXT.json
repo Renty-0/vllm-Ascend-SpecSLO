@@ -1,0 +1,12 @@
+{
+  "UTC": "2026-10-19T19:03:47.436478+00:00",
+  "commit": "e391226",
+  "git_diff_check_passed": false,
+  "issue": "One inherited trailing space at frozen runtime372.py line31",
+  "source_whitespace_preserved_for_SHA256": true,
+  "source_sha256": "3089ae7128671f254607fa1152921c9363764e3a786a70e532378cc5dac3bfc1",
+  "repo_format_script_runnable": false,
+  "format_script_reason": "pre-commit is not installed; no environment installation performed",
+  "HOST372_and_scope_checks_passed": true,
+  "NPU_full_experiment_status": "running; no performance result"
+}
