@@ -1,0 +1,12 @@
+{
+  "schema": "ROOT366.source-only-dependency-union-guard.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-owned-guard-v366/guard366.py": "d317dfe7473daaaa43525358c65e19ac0ff0cdada7029f00d0f8ac415880934b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-owned-guard-v366/HOST366_RESULT.json": "03e753b4a8af288516541f8a9126337a7f2f4011cbfe1cd4dc8f486bd16668cf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-device-v365/SOURCE365_RECEIPT.json": "bc6683617865412502c574740b0772178be3b44b72c7dec2bdb3412ef5ce1cda"
+  },
+  "component365_freeze": "1898d07c61172569789260ea6a44de587254dd96e701a26f69ae86cee3eebbe8",
+  "component365_archive": "51375a74480e742ff8c65be655a0fc5baccad3f3b9f428509cde916264f5f08b",
+  "NPU_used": false,
+  "numerical_body_unchanged": true
+}

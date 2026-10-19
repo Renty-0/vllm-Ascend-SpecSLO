@@ -1,0 +1,24 @@
+{
+  "status": "PASS_HOST_inventory_independent_auditor_and_actual_three_item_guard_ABI",
+  "math_rows": 99,
+  "timing_calls": 320,
+  "rejected_corruptions": [
+    "missing_math",
+    "missing_catchup",
+    "probabilities",
+    "KV",
+    "graph_fallback",
+    "dropped_query_charge",
+    "timing_order",
+    "prefix_corruption",
+    "unvalidated",
+    "invented_Raw"
+  ],
+  "invalid_dict_supervisor_ABI_rejected": true,
+  "original_qualification_flag_assignments": false,
+  "probe_sha256": "11a4d13cf2db275914098c9de7d0e53058bd2e183bf2c35d9f0e1bdae8e75682",
+  "NPU_used": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

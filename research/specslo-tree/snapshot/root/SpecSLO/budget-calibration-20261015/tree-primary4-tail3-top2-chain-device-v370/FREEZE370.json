@@ -1,0 +1,33 @@
+{
+  "schema": "ROOT370.real-draft-first-plus-tail3-source.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-device-v370/check370_HOST.py": "713a8f6f3a6b519832c0471c534707ff1c123c96f2388129fb0e4c7b940dfd72",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-device-v370/guard370.py": "2f5a1f3efbf88743d4ff17540f8ddfa954bd01d8dd5a4d4d3d76a45d0f036112",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-device-v370/probe370.py": "11a4d13cf2db275914098c9de7d0e53058bd2e183bf2c35d9f0e1bdae8e75682",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-device-v370/audit370.py": "30986f9a786f5f59368fc9d41985a14d9114e5e731292c8890e82e64e460d290",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-device-v370/startup370.sh": "49c3752e4eef6f6e04e224a16a2b7da2d7daf5292556838cae791d378e8c3ed6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-device-v370/HOST370_RESULT.json": "b0872da2bed29ccc4b82d7c297bf8ede6d86ec77dcba2d9a07f198948fabaa91",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-host-v369/spine369.py": "1d6f8d649b03b48394fde3d4dbb6a38f5632503ba03e12b7b16ca3b59ea2014d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-host-v369/runner369.py": "54c2a8828de7fe05d343acb01de591b2045b51cdcb8dc51f933fcb9390c39863",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-host-v369/forward369.py": "9af1f616649b493f66107dd69a03349c8e726e527babd726b90102e92386bc3f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-host-v369/check369_HOST.py": "601e48932b5e56cf639af175207c4f6e5cca168bed68bf7cfe3b94a19cbb4774",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-tail3-top2-chain-host-v369/HOST369_RESULT.json": "43331d26134621cda989042371432f043b3d83e445daccef99bfe058cebe52dc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-compiler-cache-v368/SOURCE368_RECEIPT.json": "092e5c38059d7024aecb03fd6d2f4b2f43ab1151d41a0c0efb7dcf902be02fa1"
+  },
+  "math_rows": 99,
+  "timing_calls": 320,
+  "physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "models_planned": [
+    "Qwen3-0.6B"
+  ],
+  "target_model_loaded": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null,
+  "NPU_used": false
+}

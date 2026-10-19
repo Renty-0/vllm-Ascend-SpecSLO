@@ -1,0 +1,12 @@
+{
+  "schema": "ROOT367.runtime-init-only-source.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-runtime-init-v367/bootstrap367.py": "f9496af66806ad3868e9e21e6afe0557e8f6185430a091b6b343815a42873228",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-runtime-init-v367/guard367.py": "0aa30544ee03e3be155f4dcb45c443af9b09e9b21157294ebef60aa5b94debf8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-runtime-init-v367/startup367.sh": "e4f2221a0f26911ca80fb518f434fc3687e76608039d571b43e1a03b75d5990c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-runtime-init-v367/HOST367_RESULT.json": "6ccecaab099def4ea592945a772dbc1158ef5ecdee8f0c3889720fbd2059ae00",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-owned-guard-v366/SOURCE366_RECEIPT.json": "f392c629a31df8e4125503fc6881f4e3050222c5c6c10e5887761cf7cc1b4d9b"
+  },
+  "NPU_used": false,
+  "neural_sources_unchanged": true
+}

@@ -1,0 +1,11 @@
+{
+  "status": "PASS_HOST_guard_scope_runtime_and_source_gate",
+  "deadline_seconds": 1200,
+  "model_scope": [
+    "Qwen3-0.6B"
+  ],
+  "target_loaded": false,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

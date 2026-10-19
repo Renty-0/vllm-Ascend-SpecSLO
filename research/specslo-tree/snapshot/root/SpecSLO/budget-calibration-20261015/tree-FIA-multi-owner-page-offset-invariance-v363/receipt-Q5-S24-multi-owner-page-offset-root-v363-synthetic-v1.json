@@ -1,6 +1,6 @@
 {
   "schema": "ROOT.V363.synthetic-FIA-page-offset-supervisor.v1",
-  "status": "running",
+  "status": "complete",
   "started_UTC": "2026-10-19T18:06:27.631660+00:00",
   "tag": "Q5-S24-multi-owner-page-offset-root-v363-synthetic-v1",
   "action": "synthetic-FIA-Q5-S24-multi-owner-page-offset-invariance",
@@ -36,7 +36,8 @@
       "Q5-S24-multi-owner-page-offset-root-v363-synthetic-v1"
     ],
     "log": "/root/SpecSLO/budget-calibration-20261015/tree-FIA-multi-owner-page-offset-invariance-v363/local-Q5-S24-multi-owner-page-offset-root-v363-synthetic-v1.log",
-    "pid": 1525397
+    "pid": 1525397,
+    "exit_code": 0
   },
   "physical_cards": [
     2,
@@ -208,9 +209,348 @@
       "errors": []
     }
   },
-  "elapsed_seconds": 37.11822265107185,
+  "elapsed_seconds": 52.16500560706481,
   "private_storage": {
-    "actual_tag_bytes": 1830485,
-    "aggregate_private_bytes": 1946221
-  }
+    "actual_tag_bytes": 7315037,
+    "aggregate_private_bytes": 7447786
+  },
+  "actual_component_audit": {
+    "status": "completed_synthetic_FIA_multi_owner_page_offset_diagnostic",
+    "cases": 640,
+    "rows": 1920,
+    "summaries": {
+      "KV2-extent2560-sizes2-3": {
+        "rows": 48,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent2560-sizes2-3": {
+        "rows": 48,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent4096-sizes2-3": {
+        "rows": 96,
+        "noninvariant": 24,
+        "offset_noninvariant": 24,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent4096-sizes2-3": {
+        "rows": 96,
+        "noninvariant": 24,
+        "offset_noninvariant": 24,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent2560-sizes3-2": {
+        "rows": 48,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent2560-sizes3-2": {
+        "rows": 48,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent4096-sizes3-2": {
+        "rows": 96,
+        "noninvariant": 24,
+        "offset_noninvariant": 24,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent4096-sizes3-2": {
+        "rows": 96,
+        "noninvariant": 24,
+        "offset_noninvariant": 24,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent2560-sizes2-2-1": {
+        "rows": 48,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent2560-sizes2-2-1": {
+        "rows": 48,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent4096-sizes2-2-1": {
+        "rows": 72,
+        "noninvariant": 24,
+        "offset_noninvariant": 24,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent4096-sizes2-2-1": {
+        "rows": 72,
+        "noninvariant": 24,
+        "offset_noninvariant": 24,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent2560-sizes1-4": {
+        "rows": 48,
+        "noninvariant": 0,
+        "offset_noninvariant": 0,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent2560-sizes1-4": {
+        "rows": 48,
+        "noninvariant": 0,
+        "offset_noninvariant": 0,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent4096-sizes1-4": {
+        "rows": 96,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent4096-sizes1-4": {
+        "rows": 96,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent2560-sizes4-1": {
+        "rows": 48,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent2560-sizes4-1": {
+        "rows": 48,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent4096-sizes4-1": {
+        "rows": 96,
+        "noninvariant": 24,
+        "offset_noninvariant": 24,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent4096-sizes4-1": {
+        "rows": 96,
+        "noninvariant": 24,
+        "offset_noninvariant": 24,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent2560-sizes1-1-1-1-1": {
+        "rows": 48,
+        "noninvariant": 0,
+        "offset_noninvariant": 0,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent2560-sizes1-1-1-1-1": {
+        "rows": 48,
+        "noninvariant": 0,
+        "offset_noninvariant": 0,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent4096-sizes1-1-1-1-1": {
+        "rows": 72,
+        "noninvariant": 0,
+        "offset_noninvariant": 0,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent4096-sizes1-1-1-1-1": {
+        "rows": 72,
+        "noninvariant": 0,
+        "offset_noninvariant": 0,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent2560-sizes2-2": {
+        "rows": 48,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent2560-sizes2-2": {
+        "rows": 48,
+        "noninvariant": 12,
+        "offset_noninvariant": 12,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV2-extent4096-sizes2-2": {
+        "rows": 96,
+        "noninvariant": 24,
+        "offset_noninvariant": 24,
+        "unshifted_extent_noninvariant": 0
+      },
+      "KV3-extent4096-sizes2-2": {
+        "rows": 96,
+        "noninvariant": 24,
+        "offset_noninvariant": 24,
+        "unshifted_extent_noninvariant": 0
+      }
+    },
+    "all_page_offsets_raw16_invariant": false,
+    "all_match_original_FULL2560": false,
+    "all_unshifted_extents_match_FULL2560": true,
+    "result_sha256": "c1c09250db02404c27f42f4002d63efdb68ffb9f492c2435e5b16f2c6b18a37c",
+    "models_loaded": false,
+    "model_qualified": false,
+    "performance": false,
+    "full463_qualified": false,
+    "Raw": null,
+    "Goodput": null,
+    "adopted": false
+  },
+  "actual_local_coverage_status": "completed_synthetic_no_model_qualification",
+  "independent_synthetic_arithmetic": {
+    "all640_cases_and_ABA_recounted": true,
+    "full2560_and_same_extent_controls_recounted": true,
+    "Native_counters_claimed": false
+  },
+  "actual_execution_complete": true,
+  "owned_remaining": [],
+  "sources_unchanged": true,
+  "post_verifier": {
+    "argv": [
+      "bash",
+      "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh",
+      "python",
+      "-B",
+      "/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/verify_lock.py",
+      "/root/data/specslo-baselines/nano-pearl-ascend-v1/lock.json"
+    ],
+    "exit_code": 0,
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/Q5-S24-multi-owner-page-offset-root-v363-synthetic-v1-post-verifier.log",
+    "sha256": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "actual_result": {
+      "baseline_id": "nano-pearl-ascend-v1",
+      "status": "pass",
+      "checked_frozen_files": 10496,
+      "checked_external_files": 15,
+      "checked_packages": 212,
+      "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+      "errors": []
+    }
+  },
+  "devices_after": {
+    "hardware": {
+      "argv": [
+        "npu-smi",
+        "info"
+      ],
+      "started_UTC": "2026-10-19T18:07:34.753872+00:00",
+      "timeout_seconds": 30,
+      "pid": 1527254,
+      "exit_code": 0,
+      "output": "+------------------------------------------------------------------------------------------------------------------+\n| npu-smi 26.0.rc1                            Version: 26.0.rc1                                                    |\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU   Name                | Health        | Power(W)             Temp(C)                 Hugepages-Usage(page)   |\n| Chip                      | Bus-Id        | AICore(%)            Memory-Usage(MB)        HBM-Usage(MB)           |\n+===========================+===============+======================================================================+\n| 2     910B2               | OK            | 96.1                 41                      0    / 0                |\n| 0                         | 0000:C2:00.0  | 0                    0    / 0                3422 / 65536            |\n+===========================+===============+======================================================================+\n| 5     910B2               | OK            | 99.4                 43                      0    / 0                |\n| 0                         | 0000:41:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n| 6     910B2               | OK            | 93.2                 40                      0    / 0                |\n| 0                         | 0000:82:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n| 7     910B2               | OK            | 99.2                 42                      0    / 0                |\n| 0                         | 0000:42:00.0  | 0                    0    / 0                3423 / 65536            |\n+===========================+===============+======================================================================+\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU     Chip              | Process id    | Process name       | Process memory(MB)    | Process id in container |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 2                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 5                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 6                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 7                                                                              |\n+===========================+===============+======================================================================+\n",
+      "timed_out": false,
+      "elapsed_seconds": 0.7104292521253228
+    },
+    "parsed_hardware": [
+      [
+        2,
+        "910B2"
+      ],
+      [
+        5,
+        "910B2"
+      ],
+      [
+        6,
+        "910B2"
+      ],
+      [
+        7,
+        "910B2"
+      ]
+    ],
+    "four_910B2": true,
+    "processes": {
+      "2": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "2",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T18:07:35.464438+00:00",
+        "timeout_seconds": 30,
+        "pid": 1527266,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.4600711986422539,
+        "idle": true
+      },
+      "5": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "5",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T18:07:35.924550+00:00",
+        "timeout_seconds": 30,
+        "pid": 1527281,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.459831234999001,
+        "idle": true
+      },
+      "6": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "6",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T18:07:36.384423+00:00",
+        "timeout_seconds": 30,
+        "pid": 1527293,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.4586741281673312,
+        "idle": true
+      },
+      "7": {
+        "argv": [
+          "npu-smi",
+          "info",
+          "-t",
+          "proc-mem",
+          "-i",
+          "7",
+          "-c",
+          "0"
+        ],
+        "started_UTC": "2026-10-19T18:07:36.843138+00:00",
+        "timeout_seconds": 30,
+        "pid": 1527306,
+        "exit_code": 0,
+        "output": "\tNo process in device.\n",
+        "timed_out": false,
+        "elapsed_seconds": 0.4506923886947334,
+        "idle": true
+      }
+    },
+    "all_idle": true
+  },
+  "private_storage_final": {
+    "actual_tag_bytes": 7315037,
+    "aggregate_private_bytes": 7447786
+  },
+  "finished_UTC": "2026-10-19T18:07:37.295948+00:00"
 }

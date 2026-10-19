@@ -1,0 +1,39 @@
+{
+  "schema": "ROOT365.real-draft-chain-source.v1",
+  "parent_freeze_sha256": "27ebbaae666041785cf3dd8adc52aa9b05ec06a4198995c0cc2895305ba45014",
+  "parent_archive_sha256": "6fb6621ed12270cb3287b43174b3d5a0ec5dfc5016b55245e5d4923689540e59",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/FIXTURE326.json": "edcb1fbd258e1347d0e2f3094f69081f00f502a499c64142bdea5830df0e2232",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/bank326.py": "e228170e5623c10f2bb00431fbced62f1ed53402531d2cb30aa2388b60ebbcae",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/dual_bank_v146.py": "8adf7f3781be167328138dcb7acc48ff234de24bb88bfd94d077ed85853d90a3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-device-v365/HOST365_GUARD_RESULT.json": "26b04b9419468a6b2dee71011d2ec19f3225ef4790316f174bd4e1429249921a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-device-v365/HOST365_RESULT.json": "78cda4593195dc855363c1300f3f03b67674ab4e55564f443d043b0b8efc7862",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-device-v365/audit365.py": "0d493f1286802f9f722e93b101e88486e1bf4ae385304f857dd4dd616cceaa51",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-device-v365/check365_HOST.py": "3b5ba861ecebf561714aacf222c910b8f46d948966a566729aee0403365d47c6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-device-v365/guard365.py": "f17ff7aa695ff065a5d15e51e55e4e318de84bfabafeea0ec0a0222df3467f42",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-device-v365/probe365.py": "8f3a2525c073acfe108e744aaf6ba2dda80549953f16bc594a9fd0c29aea4b18",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-device-v365/startup365.sh": "7b0ebb296c4c032027f393af6b78d4b1346cf5c0afe337db70fec326e57452e9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-host-v364/HOST364_FINAL_KV_RESULT.json": "7925bb360803cbdcef2125b97d6d853b41b2240b36984aeb878a15deee95153e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-host-v364/HOST364_PADDING_RESULT.json": "a178a7bd2e98cc99b804ef3961bfa8bdd78e717871eab026aaa4fb9d758944d2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-host-v364/HOST364_RESULT.json": "76615df1fc2a47217a3258ee7196f4e84cbfd80c8647c1489945292d52900246",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-host-v364/HOST364_RUNNER_RESULT.json": "13497ee8ff8a8bdb4017cb0166f87b427407ea21fd520b79ab8ddbf120a7b003",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-host-v364/check364_HOST.py": "b04f70fcb0147408a68a6835ee7862a9ac8234bdbd4fcc8bc2c1eb47c9c3b553",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-host-v364/check_finalKV364_HOST.py": "61275f880a68670f3dcc0076b55ecd82494d0dbf7112d7b5fa2c5d62fc71cdd2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-host-v364/check_padding364_HOST.py": "dc095fca7a5139c0f02ea3af10feec54b9aafa8a180bd1da65edc2714b3805dc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-host-v364/check_runner364_HOST.py": "d6e467c222b2af395454f7e5b8b70be1e6130854ea3578c50117724ed9f3ab66",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-host-v364/runner364.py": "e95ed3caff0e7712403b325f3b3d5bc70770de2c2623a4a4d9c6f292a10630ed",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-host-v364/spine364.py": "d1920f0684e80a18478d1029c29cf696cd8bf58ab2fe4c4d968f726eea4e1c66"
+  },
+  "models_loaded": false,
+  "planned_models": [
+    "Qwen3-0.6B"
+  ],
+  "planned_TP": 1,
+  "target_model_loaded": false,
+  "math_rows": 33,
+  "timing_calls": 240,
+  "Raw": null,
+  "Goodput": null,
+  "model_qualified": false,
+  "NPU_used": false
+}

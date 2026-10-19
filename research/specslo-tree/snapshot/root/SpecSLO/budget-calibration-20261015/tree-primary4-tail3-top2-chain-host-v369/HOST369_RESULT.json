@@ -1,0 +1,24 @@
+{
+  "status": "PASS_HOST_actual_original_depth_loop_first_catchup_plus_tail3",
+  "cases": 20,
+  "original_FP32_node_probabilities_compared": 2336,
+  "original_first_call_and_all_four_dependent_model_inputs_exact": true,
+  "original_raw8_and_mean_confidence_bitwise": true,
+  "logical_model_steps": 4,
+  "CPU_simulated_submissions_before": 4,
+  "CPU_simulated_submissions_after": 2,
+  "complete_original_function_AST_inverse": true,
+  "CPU_simulated_graph_submission_metadata": true,
+  "graph_capture_executed": false,
+  "NPU_used": false,
+  "model_qualified": false,
+  "serving_installed": false,
+  "Raw": null,
+  "Goodput": null,
+  "source_sha256": {
+    "spine369.py": "1d6f8d649b03b48394fde3d4dbb6a38f5632503ba03e12b7b16ca3b59ea2014d",
+    "runner369.py": "54c2a8828de7fe05d343acb01de591b2045b51cdcb8dc51f933fcb9390c39863",
+    "forward369.py": "9af1f616649b493f66107dd69a03349c8e726e527babd726b90102e92386bc3f",
+    "check369_HOST.py": "601e48932b5e56cf639af175207c4f6e5cca168bed68bf7cfe3b94a19cbb4774"
+  }
+}

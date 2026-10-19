@@ -1,0 +1,11 @@
+{
+  "schema": "ROOT368.optional-host-PCH-source.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-compiler-cache-v368/guard368.py": "de90ec8f83c924af36a277b756ae4a87dc8ea7cdb2901215617932e530f696e2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-compiler-cache-v368/startup368.sh": "c78e8585a336bf0d1168b53ae521bdee0049d6576d2db8d8ea75a685e00d9701",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-compiler-cache-v368/HOST368_RESULT.json": "6699e8d86253914d01b17fcbbb6621a366acf4442e8f1c7c93971c3cf917cf68",
+    "/root/SpecSLO/budget-calibration-20261015/tree-primary4-top2-chain-runtime-init-v367/SOURCE367_RECEIPT.json": "384d577551d3e30ea65044c2b63a085a22eec29b73cd0d5fd03b3bc70c9f6c98"
+  },
+  "NPU_used": false,
+  "neural_sources_unchanged": true
+}

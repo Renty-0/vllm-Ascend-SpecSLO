@@ -1,0 +1,33 @@
+{
+  "status": "PASS_HOST_inventory_original_bindings_and_independent_auditor",
+  "probe_sha256": "8f3a2525c073acfe108e744aaf6ba2dda80549953f16bc594a9fd0c29aea4b18",
+  "math_rows": 33,
+  "timing_calls": 240,
+  "rejected_corruptions": [
+    "missing_math",
+    "KV_tolerance",
+    "probability_bits",
+    "fallback",
+    "uncharged_fifth",
+    "unqualified",
+    "missing_timing",
+    "invented_Raw",
+    "target_loaded"
+  ],
+  "original_method_bindings": [
+    "_activate_cache_sequence",
+    "_allocate_cache",
+    "_cache_slot_mapping",
+    "_ensure_cache_capacity",
+    "_pack_tree_draft_level",
+    "_pad_tree_draft_graph_requests",
+    "_prepare_attention_metadata",
+    "_release_cache",
+    "draft_tree_forward"
+  ],
+  "model_loaded": false,
+  "NPU_used": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}
