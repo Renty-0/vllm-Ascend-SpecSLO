@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-19T14:38:09.687584+00:00",
-  "upstream_branch_base": "e8381c99ffab8df0ac566738a8c46798090cd73b",
+  "saved_UTC": "2026-10-19T14:46:11.678442+00:00",
+  "upstream_branch_base": "fbc98195847f0b1079c9fb305244bd98b22cc52d",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -476,6 +476,12 @@
       "bytes": 1116
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_INDEPENDENT_SMALL_REFILL_COMPONENT_AUDIT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_INDEPENDENT_SMALL_REFILL_COMPONENT_AUDIT.json",
+      "sha256": "9da7e3772e4ee2f5547d6dbf8be1c953a27dab8d733a44f7fd187f36867152a8",
+      "bytes": 22204
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_RAW_ADMISSION_METRICS_PREDECLARATION_20261019.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_RAW_ADMISSION_METRICS_PREDECLARATION_20261019.json",
       "sha256": "f97b35e2fef1277a52e16af22dd42a907dc9b3a7b08f4ada344da5b6c68015cf",
@@ -508,8 +514,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
-      "sha256": "c7fb39484e7dd58031b1e7c1188d3e48d81de97b3bd279024a06d64a969a3241",
-      "bytes": 34813
+      "sha256": "e38a9311749ba92445e4ff77d28d967e9705ed7707cdbaaad1da69bdf6a0175a",
+      "bytes": 35231
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
@@ -714,6 +720,12 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT346_terminal_full_HOST.py",
       "sha256": "1f394507c93ce0260314a7f88679b38f3468995389aabc7c4855748388232f76",
       "bytes": 9477
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT348_small_refill_component_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT348_small_refill_component_HOST.py",
+      "sha256": "ce1f7cb58fe0f5182149fc572707c54500d662955c200b2eddcd718a3385bba2",
+      "bytes": 5972
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT348_terminal_full_HOST.py",
@@ -1384,8 +1396,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "461c28c48854750bd293bc77484fac15c95a8aa17311d5766b9800174c35caa5",
-      "bytes": 18980
+      "sha256": "b6bb0291efc104f068af868b01e71d590e013e044440ea994d60f95dfa567073",
+      "bytes": 19101
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/startup_ROOT331_runtime_import_HOST.sh",
@@ -16978,8 +16990,8 @@
     {
       "source": "/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
-      "sha256": "1bd7428f5cbb2362e2644fc3c5585426cf18b405f9e4949654b640ae04befbe8",
-      "bytes": 318145
+      "sha256": "3572e352c0e5eb6e1fcb6687e45655420c4c8ad1f7dc6b8fd423a3353449b721",
+      "bytes": 318602
     },
     {
       "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/ops/triton/batch_memcpy.py",

@@ -1,5 +1,5 @@
 {
-  "UTC": "2026-10-19T14:38:04.755178+00:00",
+  "UTC": "2026-10-19T14:46:06.794699+00:00",
   "status": "active_ROOT348_complete_initialized_live_refill_full463_ownAR",
   "user_resume_request": true,
   "prior_pause_revoked": true,
@@ -31,7 +31,7 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "e8381c9",
+  "github_checkpoint": "fbc9819",
   "goal_achieved": false,
   "next": [
     "fresh real-model Q4/S24 and Q4/S32 target-only diagnostic, retain hidden/all128KV/greedy/graph-eager proofs; choose by measured cost rather than nominal capacity",
@@ -341,7 +341,7 @@
   "tree339_archive_sha256": "2f486aff3ff807a1fcf398e068575ec8103b127a704456bce8eb122b7f248643",
   "tree339_actual_installer_and_complete_frontend_HOST_passed": true,
   "tree339_guard_session": null,
-  "github_commit": "e8381c9",
+  "github_commit": "fbc9819",
   "tree339_result": "complete_numeric_cost_independently_audited_original_supervisor_count_failed_42_vs36",
   "tree339_original_receipt_failed": true,
   "tree339_owned_cleanup": true,
@@ -467,7 +467,7 @@
   "tree351_archive_sha256": "68598a11d0013eb24f83a13b1eca133f9523cb79f0cc983ecd1e65031fbb76a1",
   "tree351_pending": false,
   "tree351_tag": "small-refill-incumbent-prefix-root-v351-16-own-model-cases-v1",
-  "tree348_pending351_neural_qualification": true,
+  "tree348_pending351_neural_qualification": false,
   "tree351_guard_session": 9871,
   "tree351_result": "Wrong original218 env pin from numeric350to351 rename; failed before models; all4 idle and source unchanged.",
   "tree352_source": "/root/SpecSLO/budget-calibration-20261015/tree-small-refill-original-launch-pin-v352",
@@ -497,9 +497,13 @@
   "risk_CPU_original_cost_gate_identical_cases": 576,
   "tree348_prefill201_complete": true,
   "tree348_original_finite_startup_complete": true,
-  "tree348_original_components": "B4, causal80 and multiowner2/32 complete; seven-N second pass running; no errors; small16 not yet started",
+  "tree348_original_components": "Original B4, causal80, multiowner2/32 and sevenN three-pass components complete. Additional small16 current component and pure-data audit passed. Fresh canonical408 currently73; no full performance or full ownAR yet.",
   "tree348_readonly_monitor": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/monitor_ROOT348_readonly_HOST.py",
   "tree348_Raw_metrics_plan": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_RAW_ADMISSION_METRICS_PREDECLARATION_20261019.json",
   "prepared_final_reference_3091_sources_checked": true,
-  "prepared_final_reference_check": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_PREPARED_FINAL_REFERENCE_SOURCE_READINESS_20261019.json"
+  "prepared_final_reference_check": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_PREPARED_FINAL_REFERENCE_SOURCE_READINESS_20261019.json",
+  "tree348_original_components_complete": true,
+  "tree348_small_refill_component_passed": true,
+  "tree348_small_refill_independent_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT348_INDEPENDENT_SMALL_REFILL_COMPONENT_AUDIT.json",
+  "tree348_current_target_nodes_per_rank": 73
 }

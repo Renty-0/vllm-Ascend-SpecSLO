@@ -273,6 +273,8 @@ def main():
         'ROOT257_REFILL_RAW_READER_HOST_CONTROL.json',
         'ROOT348_RAW_ADMISSION_METRICS_PREDECLARATION_20261019.json',
         'ROOT_PREPARED_FINAL_REFERENCE_SOURCE_READINESS_20261019.json',
+        'audit_ROOT348_small_refill_component_HOST.py',
+        'ROOT348_INDEPENDENT_SMALL_REFILL_COMPONENT_AUDIT.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():
