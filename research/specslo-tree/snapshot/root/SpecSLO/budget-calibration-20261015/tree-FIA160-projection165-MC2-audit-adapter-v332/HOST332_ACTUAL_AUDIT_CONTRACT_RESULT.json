@@ -1,0 +1,9 @@
+{
+  "status": "HOST_pass",
+  "original_tuple_error_reproduced": true,
+  "corrected_actual_audit_code_all3routes128_checked": true,
+  "parent3tuple_contract_preserved": true,
+  "whole_original_audit_inverse": true,
+  "no_model_or_NPU_run": true,
+  "no_neural_or_performance_qualification": true
+}

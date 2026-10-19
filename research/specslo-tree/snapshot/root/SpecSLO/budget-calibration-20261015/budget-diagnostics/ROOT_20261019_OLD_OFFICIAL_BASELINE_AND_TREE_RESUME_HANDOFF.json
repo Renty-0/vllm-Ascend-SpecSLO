@@ -31,7 +31,7 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "dc5912d",
+  "github_checkpoint": "8b20588",
   "goal_achieved": false,
   "next": [
     "finish329 actual installer/account callback all532 HOST regression and constructorC128 binding",
@@ -196,9 +196,22 @@
   "tree329_all6_invalid_limit_cases_rejected": true,
   "tree329_model_qualification": false,
   "tree329_tag": "M160-S32-C128-root-v329-B1to8-532-math-cost-v1",
-  "updated_UTC": "2026-10-19T06:49:01.715543+00:00",
+  "updated_UTC": "2026-10-19T07:01:55.847673+00:00",
   "tree329_guard_pid": 292972,
   "tree329_all_four_capacity_before_model_passed": true,
   "tree330_source_only": true,
-  "tree330_plan": "physicalFIA160/S32, actual165projectionMC2, trim160; HOST under development; no neural claim"
+  "tree330_plan": "physicalFIA160/S32, actual165projectionMC2, trim160; HOST under development; no neural claim",
+  "github_pushed_as": "Renty-0",
+  "tree330_HOST_original_code_transport_passed": true,
+  "tree330_freeze_sha256": "6f92a1a0b918261281907ccaf2c716d153bd5fc8cda1b2ea13e0bcb579a09aa4",
+  "tree331_freeze_sha256": "fea0e3c69858b0e8b4b35f82332a103ed256f9a0733980541b5c6785bb3df569",
+  "tree331_parent_and_source_bindings_HOST_passed": true,
+  "tree331_source_only_not_launched": true,
+  "tree331_runtime_import_HOST_passed": true,
+  "tree331_audit_return_contract_HOST_discovered_and_fixed_additively": true,
+  "tree332_guard_source": "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-MC2-audit-adapter-v332",
+  "tree332_guard_freeze_sha256": "b14c31542a98d6cffb742a1632210ea235a61bf86028ea70d4ca710157fc6eea",
+  "tree332_HOST_actual_late_audit_tuple_contract_passed": true,
+  "tree331_neural_runtime_unchanged_by_guard332": true,
+  "tree331_pending": "wait329 complete+cleanup; launchexact331 model viaHOST-checkedguard332 forfresh532"
 }

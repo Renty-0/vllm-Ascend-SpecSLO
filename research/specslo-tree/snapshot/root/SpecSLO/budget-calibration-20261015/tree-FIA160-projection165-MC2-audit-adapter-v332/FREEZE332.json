@@ -1,0 +1,10 @@
+{
+  "UTC": "2026-10-19T07:00:13.709211+00:00",
+  "scope": "HOST-verified parent audit tuple return fix only; exact331 model and runtime; must rerun fresh532",
+  "parent331": "fea0e3c69858b0e8b4b35f82332a103ed256f9a0733980541b5c6785bb3df569",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-MC2-audit-adapter-v332/HOST332_ACTUAL_AUDIT_CONTRACT_RESULT.json": "8f6c4ac02b9b64590be99cf029288ef9ebf09f92ea8d8442975c16bbeb5bf5ae",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-MC2-audit-adapter-v332/check_audit332_HOST.py": "1dfe755c4d0ce722a77638e69cde4e4f4acd34ecf917587a960835aebb2fac40",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-MC2-audit-adapter-v332/guard332.py": "1e8d224cce352f2376156747a2788a2a3df8bdd547991f298b2966d2f072c99f"
+  }
+}

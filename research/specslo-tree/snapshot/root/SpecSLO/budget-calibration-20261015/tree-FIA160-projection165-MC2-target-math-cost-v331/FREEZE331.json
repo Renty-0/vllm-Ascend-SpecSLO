@@ -1,0 +1,17 @@
+{
+  "UTC": "2026-10-19T06:53:05.051307+00:00",
+  "scope": "Fresh532 model/cost only. Physical FIA160/S32, exact profile165 projection padding. No production/Goodput qualification.",
+  "parent329_SHA": "8ad8a253fbf54cb026b2a8498efc8d3b1a7b7a28e4d08f671d94f64b4e3fd949",
+  "HOST330_SHA": "6f92a1a0b918261281907ccaf2c716d153bd5fc8cda1b2ea13e0bcb579a09aa4",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-MC2-target-math-cost-v331/check331.py": "b8ac02f53b33fd1697a396305a3388d4df73eafed4c69862c1b89b6ab7997b09",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-MC2-target-math-cost-v331/guard331.py": "5812456ee7ce86a077b57dbcced0c9e89c1435df9985b6dd9b942a5fc4c88595",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-MC2-target-math-cost-v331/launch331.sh": "22a4df77e3be20f36ffbec9310d70e016aab85dbd47755b2e993bc66da77bdb2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-MC2-target-math-cost-v331/runtime331.py": "091f203b029199ea730ade09b005283c20b6215dfcb39f46ecf188794701633d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-FIA160-projection165-MC2-target-math-cost-v331/startup331.sh": "a26d6c61a1e65a6be2b2e5103b99d4831b4f83c6bb003ff75dc9313de4230b1e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-actual165-MC2-bridge-host-v330/FREEZE330.json": "6f92a1a0b918261281907ccaf2c716d153bd5fc8cda1b2ea13e0bcb579a09aa4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-actual165-MC2-bridge-host-v330/HOST330_BRIDGE_RESULT.json": "8d4064220fc28a884434a6a35cd4f897d0f8185db1961531f6e8b0a252cf6062",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-actual165-MC2-bridge-host-v330/bridge330.py": "849c2126a7a17675b3e08cd2c585372b9b03a0772aa31c8c123dfc3b4836cb07",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-actual165-MC2-bridge-host-v330/check_bridge330_HOST.py": "c89278aa01dcbaffd0aea179b3423ec44b18b9c28303ebd7fdecc036b78b1b96"
+  }
+}

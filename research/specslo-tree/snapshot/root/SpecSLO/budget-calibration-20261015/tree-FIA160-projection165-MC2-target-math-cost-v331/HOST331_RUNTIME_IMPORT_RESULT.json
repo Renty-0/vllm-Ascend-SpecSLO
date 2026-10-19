@@ -1,0 +1,10 @@
+{
+  "status": "HOST_pass",
+  "worker331_actual_runtime326_registration": true,
+  "worker329_capacity_wrapper_preserved": true,
+  "actual_constructor_C128": true,
+  "worker_pickling_roundtrip": true,
+  "no_model_constructed": true,
+  "no_NPU_model_run": true,
+  "no_performance_claim": true
+}

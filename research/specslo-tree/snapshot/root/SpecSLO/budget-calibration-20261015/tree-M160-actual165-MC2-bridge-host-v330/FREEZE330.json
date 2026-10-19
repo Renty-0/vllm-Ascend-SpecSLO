@@ -1,0 +1,9 @@
+{
+  "UTC": "2026-10-19T06:52:25.990832+00:00",
+  "scope": "HOST prototype; original binder code and both native projection codepaths; no NPU or model qualification",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-actual165-MC2-bridge-host-v330/HOST330_BRIDGE_RESULT.json": "8d4064220fc28a884434a6a35cd4f897d0f8185db1961531f6e8b0a252cf6062",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-actual165-MC2-bridge-host-v330/bridge330.py": "849c2126a7a17675b3e08cd2c585372b9b03a0772aa31c8c123dfc3b4836cb07",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-actual165-MC2-bridge-host-v330/check_bridge330_HOST.py": "c89278aa01dcbaffd0aea179b3423ec44b18b9c28303ebd7fdecc036b78b1b96"
+  }
+}
