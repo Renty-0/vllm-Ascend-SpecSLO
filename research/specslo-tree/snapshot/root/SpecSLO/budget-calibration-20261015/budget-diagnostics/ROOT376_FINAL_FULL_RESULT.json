@@ -1,0 +1,76 @@
+{
+  "status": "complete_independently_audited_single_run",
+  "source_terminal_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT376_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+  "source_terminal_audit_sha256": "ece504288693d89a0d90ba8defa9c764474d06edfa2ccc28d776aee082e56d56",
+  "source_freeze_sha256": "ae723ddfddeb6d47f04605a3842de0c3690196b0addf39fa17c5bd1ca248765c",
+  "source_archive_sha256": "d0102997fe19bc7c40bff8a0c91f128a553058c55f4d22488baf7be2b2fdeeea",
+  "Raw": 699.6987403391912,
+  "Goodput": 609.0250374874602,
+  "attained": 403,
+  "requests": 463,
+  "TPOT_median_ms": 37.330832758016186,
+  "TPOT_P90_ms": 47.59447852629819,
+  "TPOT_definition": "actual original event first-to-last wall",
+  "TPOT_denominator": 256,
+  "by_class": {
+    "tight": {
+      "requests": 271,
+      "attained": 211,
+      "SLO_ms": 40.0,
+      "TPOT_median_ms": 37.10516880164505,
+      "TPOT_P90_ms": 42.07788642452215,
+      "Goodput": 318.86918836192086
+    },
+    "normal": {
+      "requests": 96,
+      "attained": 96,
+      "SLO_ms": 50.0,
+      "TPOT_median_ms": 31.804473074771522,
+      "TPOT_P90_ms": 35.13516348994017,
+      "Goodput": 145.07792456276968
+    },
+    "loose": {
+      "requests": 96,
+      "attained": 96,
+      "SLO_ms": 150.0,
+      "TPOT_median_ms": 46.98586930953752,
+      "TPOT_P90_ms": 54.11884755631036,
+      "Goodput": 145.07792456276968
+    }
+  },
+  "observed_TPOT_parallel_definition": {
+    "attained": 398,
+    "Goodput": 601.4688955831492,
+    "mean_ms": 38.55298260666693,
+    "median_ms": 37.47722818059664,
+    "P90_ms": 47.78112354012681,
+    "TPOT_denominator": 255,
+    "clock": "same actual original event first-to-last wall"
+  },
+  "target_calls": 2320,
+  "mean_N": 16.62155172413793,
+  "budget_owner_rounds": {
+    "1": 149,
+    "2": 182,
+    "3": 58,
+    "4": 38054,
+    "5": 119
+  },
+  "whole463_own_AR_qualified": true,
+  "fresh_target227_and_all_original_components_qualified": true,
+  "fresh_target681_uniform_KV_qualified": true,
+  "original_best257_optimized_draft_preserved": true,
+  "original_global_warm_twozero_sealing_retained": true,
+  "historical_fixed_gamma4_GP": 501.63560407964184,
+  "historical_strong_official_MC2_GP": 429.8442987424407,
+  "historical_best_tree_GP": 554.7604454409803,
+  "GP_over_fixed_gamma4": 1.2140785712466469,
+  "GP_over_strong_official_MC2": 1.4168503322464285,
+  "GP_over_historical_best_tree": 1.0978162601397163,
+  "historical_1p5_threshold": 644.766448113661,
+  "measured_above_historical_floors": false,
+  "matched_repeats_completed": 0,
+  "adopted": false,
+  "goal_achieved": false,
+  "NPU_used": false
+}

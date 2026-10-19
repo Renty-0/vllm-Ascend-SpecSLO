@@ -12,7 +12,7 @@
   "selected_baseline_pending_stability": false,
   "stability_plan": "/root/SpecSLO/official-v021-baseline-20261019/RECOVERY_PLAN.json",
   "build_session": 8191,
-  "NPU_measurement_started": false,
+  "NPU_measurement_started": true,
   "physical_cards": [
     2,
     5,
@@ -20,8 +20,8 @@
     7
   ],
   "prior_completed316_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT316_FINAL_FULL_RESULT.json",
-  "best_clean_tree_GP": 554.7604454409803,
-  "best_clean_tree_version": 257,
+  "best_clean_tree_GP": 609.0250374874602,
+  "best_clean_tree_version": 376,
   "fixed_reference_GP": 501.63560407964184,
   "previous_official_history_reference_GP": 429.8442987424407,
   "adopt_legacy_official_only_if_repeat_stable": true,
@@ -31,9 +31,9 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "479ffdf",
+  "github_checkpoint": "90222b1",
   "goal_achieved": false,
-  "next": "Monitor376 all original startup/components+227 FULL target+681 new target cases, unchanged optimized draft, warm/twozero/seal/full463/all3ownAR. Only then independently audit clocks. Goal false;0/9.",
+  "next": "Prepare and qualify adaptive M80/M120 target padding with same real budgets and KV buckets. Current376 GP609.03 remains below644.77; preserve it as bestcorrect. No final9 yet.",
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
   "user_Raw_clarification": {
     "UTC": "2026-10-19T02:55:43.056404+00:00",
@@ -789,13 +789,32 @@
     "version": 376,
     "tag": "static-M120-uniform-KV-root-v376-full463-ownAR-v1",
     "guardian_session": 11754,
-    "status": "launched_full463_pending_fresh_gates",
+    "status": "complete_independently_audited_all463_AR_exact",
     "UTC": "2026-10-19T20:38:03.817666+00:00",
     "freeze_sha256": "ae723ddfddeb6d47f04605a3842de0c3690196b0addf39fa17c5bd1ca248765c",
     "archive_sha256": "d0102997fe19bc7c40bff8a0c91f128a553058c55f4d22488baf7be2b2fdeeea",
-    "Raw": null,
-    "Goodput": null
+    "Raw": 699.6987403391912,
+    "Goodput": 609.0250374874602,
+    "heartbeat_UTC": "2026-10-19T21:37:24.639969+00:00",
+    "original_startup_components_passed": true,
+    "original_FULL227_each_target_complete": true,
+    "new_target_cases_each_bank": {
+      "mixed": 227,
+      "mid": 227,
+      "short": 227
+    },
+    "formal463_clock_started": false,
+    "completed_UTC": "2026-10-19T21:55:24.249946+00:00",
+    "attained": 403,
+    "receipt_sha256": "d3c1607ce6165d760f40ddf318e39273d6cacb51e5eb59b31fe776d80324007d",
+    "all4idle": true,
+    "owned_remaining": []
   },
   "prepared_next_full376": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT376_BEST257_KV_BUCKET_FULL_PLAN.json",
-  "completed361_target_component_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT361_FINAL_TARGET_KV_BUCKET_AND_COST_RESULT.json"
+  "completed361_target_component_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT361_FINAL_TARGET_KV_BUCKET_AND_COST_RESULT.json",
+  "conditional_next_Raw_design_only": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FUTURE_ADAPTIVE_M80_M120_TAIL_RAW_PLAN_20261019.json",
+  "best_clean_tree_Raw": 699.6987403391912,
+  "best_clean_tree_attained": 403,
+  "best_clean_tree_final_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT376_FINAL_FULL_RESULT.json",
+  "previous_best257_GP": 554.7604454409803
 }

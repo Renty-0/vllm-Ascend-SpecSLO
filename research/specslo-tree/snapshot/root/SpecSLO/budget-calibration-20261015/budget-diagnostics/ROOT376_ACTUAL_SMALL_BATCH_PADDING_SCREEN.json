@@ -1,0 +1,16 @@
+{
+  "status": "HOST_actual376_calls_only_no_new_performance_claim",
+  "UTC": "2026-10-19T21:49:50.121828+00:00",
+  "source_trace": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/static-M120-uniform-KV-root-v376-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+  "source_generation": 5,
+  "target_calls": 2320,
+  "whole_M80_eligible_calls": 918,
+  "eligible_fraction": 0.3956896551724138,
+  "conditional_queries_removed": 36720,
+  "original_executed_queries": 278400,
+  "all_original_real_queries_unchanged": true,
+  "latency_reduction_measured": false,
+  "Raw": null,
+  "Goodput": null,
+  "NPU_used": false
+}

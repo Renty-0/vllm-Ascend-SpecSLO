@@ -1,0 +1,47 @@
+{
+  "UTC": "2026-10-19T21:11:40.680719+00:00",
+  "status": "conditional_source_design_only_not_implemented_or_launched",
+  "purpose": "Additional tree Raw direction only if current376 remains below required performance; retain original dynamic-budget/tree priority",
+  "current_NPU_job": "376 unchanged",
+  "hypothesis": "Fixed120 target rows still execute for small closing cohorts. Eligible80-row geometry might reduce tail padding while retaining all logical nodes.",
+  "geometry_selection": {
+    "small": {
+      "M": 80,
+      "Q": 5,
+      "S": 16,
+      "condition": "N+number_of_B5_side_groups<=16 and real_query_count<=80"
+    },
+    "otherwise": {
+      "M": 120,
+      "Q": 5,
+      "S": 24
+    }
+  },
+  "known_source_references": [
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-contiguous-full463-own-AR-v235",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-SLO-first-full463-own-AR-v257"
+  ],
+  "proposed_deltas": [
+    "same original N24/C96/B1..5 allocator, arrivals, publications, RootSeed/FastV5 draft",
+    "choose physical target geometry from actual complete primary+side query groups",
+    "separate qualified per-geometry copy state/buffers; no double copy or stale enabled state",
+    "retain validated FULL/512-rounded visible KV ranges"
+  ],
+  "required_before_live": [
+    "source-bound complete projection and copy destination checks",
+    "fresh same-model cross-M80/M120 hidden/greedy/all128KV qualification, including mixed-family ABA and original committed prefix protection",
+    "actualM80 MC2 route profile and qualification without forced flags",
+    "same-instance alternating full target cost including HOST preparation",
+    "all original scope/warm/twozero/seal requirements plus full463/all3 ownAR"
+  ],
+  "caveats": [
+    "Different MatMul/attention geometries may change BF16 bits; no equivalence or speedup is assumed",
+    "Existing235 or257 results cannot qualify a newly combined runtime",
+    "Do not substitute smaller shapes for current running376 source"
+  ],
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "goal_achieved": false
+}

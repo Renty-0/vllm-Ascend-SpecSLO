@@ -165,6 +165,7 @@ def main():
         'tree-fastv5-eager-frontier-chain-device-v374',
         'tree-fastv5-frontier-boolean-guard-v375',
         'tree-best257-uniform-KV-buckets-full-v376',
+        'tree-adaptive-M80-M120-target-host-v377',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -365,6 +366,11 @@ def main():
         'ROOT375_ACTUAL_OPTIMIZED_FRONTIER_FUSION_RESULT.json',
         'ROOT376_BEST257_KV_BUCKET_FULL_PLAN.json',
         'ROOT361_FINAL_TARGET_KV_BUCKET_AND_COST_RESULT.json',
+        'ROOT376_FINAL_FULL_RESULT.json',
+        'ROOT376_TERMINAL_INDEPENDENT_FULL_AUDIT.json',
+        'ROOT376_PRELIMINARY_FULL_COMMON_METRICS.json',
+        'ROOT376_ACTUAL_SMALL_BATCH_PADDING_SCREEN.json',
+        'ROOT_FUTURE_ADAPTIVE_M80_M120_TAIL_RAW_PLAN_20261019.json',
         'HOST_ROOT376_ACTUAL_FROZEN_CONSTRUCTION.json',
         'ROOT376_GITHUB_VALIDATION_CONTEXT.json',
         'freeze_ROOT376_best257_KV_buckets_HOST.py',

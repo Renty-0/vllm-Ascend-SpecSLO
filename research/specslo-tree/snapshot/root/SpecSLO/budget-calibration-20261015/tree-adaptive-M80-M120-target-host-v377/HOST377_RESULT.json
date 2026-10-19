@@ -1,0 +1,34 @@
+{
+  "status": "PASS_HOST377_REAL227_GEOMETRY_AND_SINGLE_STATE_CALLBACKS",
+  "NPU_used": false,
+  "neural_qualified": false,
+  "physical_family_case_counts": {
+    "80": 108,
+    "120": 119
+  },
+  "graph_families": [
+    [
+      80,
+      10
+    ],
+    [
+      80,
+      11
+    ],
+    [
+      120,
+      10
+    ],
+    [
+      120,
+      11
+    ]
+  ],
+  "real_queries_checked": 13081,
+  "original_real_permutations_and_budgets_preserved": true,
+  "original_State_prepare_code_preserved": true,
+  "allocation_HOST_double_only": true,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false
+}
