@@ -1,8 +1,8 @@
 {
   "UTC": "2026-10-19T20:09:01.138356+00:00",
-  "status": "source_frozen_HOST_checks_passed_pending_component361",
+  "status": "launched_full463_pending_fresh_same_instance_gates",
   "candidate": "best257 original draft/allocator/admission plus uniform target KV extent",
-  "pending_component361": true,
+  "pending_component361": false,
   "preserve": [
     "original227 fixed-FULL target math",
     "original201 and all inherited component gates",
@@ -26,5 +26,9 @@
   "source_archive_sha256": "d0102997fe19bc7c40bff8a0c91f128a553058c55f4d22488baf7be2b2fdeeea",
   "source_files": 2470,
   "guard_deadline_seconds": 10800,
-  "neural_model_or_performance_inherited": false
+  "neural_model_or_performance_inherited": false,
+  "component361_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT361_FINAL_TARGET_KV_BUCKET_AND_COST_RESULT.json",
+  "guardian_session": 11754,
+  "tag": "static-M120-uniform-KV-root-v376-full463-ownAR-v1",
+  "launched_UTC": "2026-10-19T20:38:03.817666+00:00"
 }

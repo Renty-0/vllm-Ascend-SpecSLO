@@ -31,9 +31,9 @@
   "source_only_M165_no_NPU_qualification": true,
   "github_branch": "SpecSLO-Tree",
   "github_identity": "Renty-0",
-  "github_checkpoint": "85a75e3",
+  "github_checkpoint": "479ffdf",
   "goal_achieved": false,
-  "next": "Run frozen361 target-only complete594+sameinstance cost andpaired FULL/bucket controls; preserve all old594 math and qualification. Combine only if whole math passes andactualtime benefit, then full best257+qualified additions. No final GPgoal;0/9.",
+  "next": "Monitor376 all original startup/components+227 FULL target+681 new target cases, unchanged optimized draft, warm/twozero/seal/full463/all3ownAR. Only then independently audit clocks. Goal false;0/9.",
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
   "user_Raw_clarification": {
     "UTC": "2026-10-19T02:55:43.056404+00:00",
@@ -786,12 +786,16 @@
   "tree375_all510_exact": true,
   "tree375_component_gain_small": true,
   "current_execution": {
-    "version": 361,
-    "tag": "Q5-KV-bucket-all594-and-paired-FULL-root-v361-target-component-v1",
-    "guardian_pid": 1733957,
-    "status": "running_target_component",
-    "UTC": "2026-10-19T20:06:18.382846+00:00",
-    "full463_result": false
+    "version": 376,
+    "tag": "static-M120-uniform-KV-root-v376-full463-ownAR-v1",
+    "guardian_session": 11754,
+    "status": "launched_full463_pending_fresh_gates",
+    "UTC": "2026-10-19T20:38:03.817666+00:00",
+    "freeze_sha256": "ae723ddfddeb6d47f04605a3842de0c3690196b0addf39fa17c5bd1ca248765c",
+    "archive_sha256": "d0102997fe19bc7c40bff8a0c91f128a553058c55f4d22488baf7be2b2fdeeea",
+    "Raw": null,
+    "Goodput": null
   },
-  "prepared_next_full376": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT376_BEST257_KV_BUCKET_FULL_PLAN.json"
+  "prepared_next_full376": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT376_BEST257_KV_BUCKET_FULL_PLAN.json",
+  "completed361_target_component_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT361_FINAL_TARGET_KV_BUCKET_AND_COST_RESULT.json"
 }
