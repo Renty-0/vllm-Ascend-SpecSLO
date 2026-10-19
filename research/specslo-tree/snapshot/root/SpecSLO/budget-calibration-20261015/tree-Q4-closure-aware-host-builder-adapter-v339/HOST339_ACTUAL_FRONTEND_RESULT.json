@@ -1,0 +1,61 @@
+{
+  "status": "passed_actual_retained_frontend_CPU",
+  "old337_bypass_reproduced": true,
+  "old338_wrapper_failure_reproduced": true,
+  "actual_checked_accounting_preserved": true,
+  "model_callback_never_called_in_actual_fast_frontend": true,
+  "actual_frontend_code_unchanged": true,
+  "actual_HOST_builder_rebound": true,
+  "physical_rows": [
+    96,
+    128,
+    120
+  ],
+  "activation": {
+    "target_only": true,
+    "physical_rows": [
+      96,
+      120,
+      128
+    ],
+    "original_model_forward_unchanged": true,
+    "original_capture_validation_replay_unchanged": true,
+    "Native_flags_assigned": false,
+    "actual_qualified_MC2_rows": true,
+    "deferred_read_done": false,
+    "actual_Native_HOST_builder_bound": true,
+    "original_inference_decorators_preserved": true,
+    "all_original_wrapper_code_and_signatures_preserved": true,
+    "target_frontend_code_identical": true,
+    "target_defaults_preserved": true,
+    "model_callback_not_required": true,
+    "only_target_global_rebound": "_dynamic_tree_make_host_metadata",
+    "target_closure_functions": [
+      {
+        "name": "factory.<locals>.checked_target",
+        "file": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/tree_entry.py"
+      },
+      {
+        "name": "install.<locals>.qualified",
+        "file": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/verification_qualification.py"
+      },
+      {
+        "name": "target_tree_forward",
+        "file": "/usr/local/python3.12.13/lib/python3.12/site-packages/torch/utils/_contextlib.py"
+      },
+      {
+        "name": "target_tree_forward",
+        "file": "/root/SpecSLO/budget-calibration-20261015/tree-canonical-contiguous-full463-own-AR-v235/root_padding_forward231.py::host-and-root-padding"
+      },
+      {
+        "name": "fixture.<locals>.account",
+        "file": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check339_HOST.py"
+      }
+    ],
+    "actual_HOST_body": "target_tree_forward"
+  },
+  "fake_graph_is_not_NPU_evidence": true,
+  "real_model_constructed": false,
+  "NPU_used": false,
+  "model_math_qualified": false
+}

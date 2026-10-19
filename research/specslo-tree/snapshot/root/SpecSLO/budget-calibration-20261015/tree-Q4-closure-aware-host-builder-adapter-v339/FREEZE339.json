@@ -1,0 +1,22 @@
+{
+  "schema": "ROOT339.additive-source-only.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_ACTUAL_FRONTEND_RESULT.json": "398e49a36781d5fb274733d1776c109bf7bbe142227b8a820c97f1ca89c19f74",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_ACTUAL_INSTALL_RESULT.json": "2915baa73ddcb524ba0291956fc671a2a1843e29ee014bc801eb0e036e84fcd0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_RUNTIME_RESULT.json": "29d950377202eb7c8e06bf3128286c9e4390eb7780a2ce191dbcd24a06c8784c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/PLAN339.json": "eea5ef7aa05236907229ddd9add0ca1c81e24624b3e2d40a8b7ca4c313d3f476",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check339.py": "bd9f58e89416932bcb78e653615ba083ebb8613e665365aab7de41b0de0ee508",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check339_HOST.py": "75e9810b6f14826dfd628d4df3399da94dc6126f676afcd866540136320ea22d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check_actual_install339_HOST.py": "ebb9b3843d834ec6d8dfc520f2d6b67cd8b3a6a32a58aa6ec7a070c34006abbc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check_runtime339_HOST.py": "4982233f8751aa315590c3db69ae91f4ff8968a7a04ff2f5cca54e7c11eb1085",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/guard339.py": "e01c38c06d30c13ee2797792a331219c0c993ec4e03815540894b68fe332e89f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/metadata339.py": "8abd6d4e911903cbcb012dd1b8aa61c923717e25c8ad313e1651fcfac1d1c291",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/probe339.py": "ca38f5b233b897f7c750bc80a6a36eaaa4d4e7bd9d0caea2bc9bb70ac642a9b8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/runtime339.py": "1728686320e9da17b06e05182dbc4dbe96136f04d8497f127837fc723fe52f3c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/startup339.sh": "e552581291adc75397efd7ae2968f97bd99bb0b56fcc07981d98603c786cc690",
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/startup_install339_HOST.sh": "2faac5a0cad4eddebab754bccf68354868a22ecf2e48434dd99965220eb03f6e"
+  },
+  "parent_freeze_sha256": "052cd156e304937591dca7d6158707fae4bc6cefdb4940d09df97208c178ab3a",
+  "parent_archive_sha256": "3e46a2fe998b40d6a33d68dce8b39504adadb3d27dbafbfbaa4f36e371bf2021",
+  "device_qualification_inherited": false
+}

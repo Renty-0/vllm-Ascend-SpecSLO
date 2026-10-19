@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-19T11:01:39.469138+00:00",
-  "upstream_branch_base": "4b5276ffd41f13690943dd7e2cd802e73846ef70",
+  "saved_UTC": "2026-10-19T11:10:00.206797+00:00",
+  "upstream_branch_base": "2f0d6a37016abe8e0d1347727c154b3810a291be",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -368,10 +368,16 @@
       "bytes": 1061
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT338_ACTUAL_CHECKED_FRONTEND_WRAPPER_FAILURE.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT338_ACTUAL_CHECKED_FRONTEND_WRAPPER_FAILURE.json",
+      "sha256": "959d86b8e86fc3f89456b6035d0092dc1ae55ad348d20497ffd95cc17d2c3913",
+      "bytes": 1389
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
-      "sha256": "8cd58314a11d0a98d42c26df0f056afe576c4e8b0ca8d6cc78571cf17c50f17a",
-      "bytes": 21014
+      "sha256": "7eb99631fff56d79db0dedb6a2cdd72ef015e5f3952e78887dd27354c17f0300",
+      "bytes": 21962
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_FINAL_ELIGIBILITY_B8_DOMAIN_REGRESSION.json",
@@ -1162,8 +1168,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "3fa77c615592c170a15398183d253978f268da22604aef7149e2eaf00dfd1450",
-      "bytes": 15164
+      "sha256": "147db98eaa6fa23e5778775606c2d06f8fde29ea28bee5b06f879fe25ecb6205",
+      "bytes": 15349
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/startup_ROOT331_runtime_import_HOST.sh",
@@ -3324,6 +3330,102 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/startup338.sh",
       "sha256": "223e017bc2f36484d10d3925b704be89ca4af41e7ddcfd8b32a964ee1b6c1542",
       "bytes": 6485
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/FREEZE339.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/FREEZE339.json",
+      "sha256": "044b2eaf6617c6a4f49cbcc8b87c403f8f63d6a172f00dd84ed0541e74e93428",
+      "bytes": 2901
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_ACTUAL_FRONTEND_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_ACTUAL_FRONTEND_RESULT.json",
+      "sha256": "398e49a36781d5fb274733d1776c109bf7bbe142227b8a820c97f1ca89c19f74",
+      "bytes": 2206
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_ACTUAL_INSTALL_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_ACTUAL_INSTALL_RESULT.json",
+      "sha256": "2915baa73ddcb524ba0291956fc671a2a1843e29ee014bc801eb0e036e84fcd0",
+      "bytes": 2150
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_RUNTIME_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_RUNTIME_RESULT.json",
+      "sha256": "29d950377202eb7c8e06bf3128286c9e4390eb7780a2ce191dbcd24a06c8784c",
+      "bytes": 441
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/PLAN339.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/PLAN339.json",
+      "sha256": "eea5ef7aa05236907229ddd9add0ca1c81e24624b3e2d40a8b7ca4c313d3f476",
+      "bytes": 673
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/SOURCE339_RECEIPT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/SOURCE339_RECEIPT.json",
+      "sha256": "80900dfb26b0794c20ca07feed72845571ccf94f7d25b5b17f68f90a2eec5710",
+      "bytes": 2353
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check339.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check339.py",
+      "sha256": "bd9f58e89416932bcb78e653615ba083ebb8613e665365aab7de41b0de0ee508",
+      "bytes": 1199
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check339_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check339_HOST.py",
+      "sha256": "75e9810b6f14826dfd628d4df3399da94dc6126f676afcd866540136320ea22d",
+      "bytes": 7629
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check_actual_install339_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check_actual_install339_HOST.py",
+      "sha256": "ebb9b3843d834ec6d8dfc520f2d6b67cd8b3a6a32a58aa6ec7a070c34006abbc",
+      "bytes": 2767
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check_runtime339_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/check_runtime339_HOST.py",
+      "sha256": "4982233f8751aa315590c3db69ae91f4ff8968a7a04ff2f5cca54e7c11eb1085",
+      "bytes": 2969
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/guard339.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/guard339.py",
+      "sha256": "e01c38c06d30c13ee2797792a331219c0c993ec4e03815540894b68fe332e89f",
+      "bytes": 6838
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/metadata339.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/metadata339.py",
+      "sha256": "8abd6d4e911903cbcb012dd1b8aa61c923717e25c8ad313e1651fcfac1d1c291",
+      "bytes": 4489
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/probe339.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/probe339.py",
+      "sha256": "ca38f5b233b897f7c750bc80a6a36eaaa4d4e7bd9d0caea2bc9bb70ac642a9b8",
+      "bytes": 2298
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/runtime339.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/runtime339.py",
+      "sha256": "1728686320e9da17b06e05182dbc4dbe96136f04d8497f127837fc723fe52f3c",
+      "bytes": 2178
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/startup339.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/startup339.sh",
+      "sha256": "e552581291adc75397efd7ae2968f97bd99bb0b56fcc07981d98603c786cc690",
+      "bytes": 6589
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/startup_install339_HOST.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/startup_install339_HOST.sh",
+      "sha256": "2faac5a0cad4eddebab754bccf68354868a22ecf2e48434dd99965220eb03f6e",
+      "bytes": 6458
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336/FREEZE336.json",
@@ -16926,6 +17028,10 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/FREEZE338.json",
       "sha256": "052cd156e304937591dca7d6158707fae4bc6cefdb4940d09df97208c178ab3a"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/FREEZE339.json",
+      "sha256": "044b2eaf6617c6a4f49cbcc8b87c403f8f63d6a172f00dd84ed0541e74e93428"
     }
   ],
   "omitted_evidence": {
@@ -22731,6 +22837,22 @@
     },
     "/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/PLAN338.json": {
       "sha256": "374844a32333d7408f698e487dcb3d31b8f99b88261bb6dc6758ac7fd7190b37",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_ACTUAL_FRONTEND_RESULT.json": {
+      "sha256": "398e49a36781d5fb274733d1776c109bf7bbe142227b8a820c97f1ca89c19f74",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_ACTUAL_INSTALL_RESULT.json": {
+      "sha256": "2915baa73ddcb524ba0291956fc671a2a1843e29ee014bc801eb0e036e84fcd0",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/HOST339_RUNTIME_RESULT.json": {
+      "sha256": "29d950377202eb7c8e06bf3128286c9e4390eb7780a2ce191dbcd24a06c8784c",
+      "reason": "Historical evidence or fixture; not source"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339/PLAN339.json": {
+      "sha256": "eea5ef7aa05236907229ddd9add0ca1c81e24624b3e2d40a8b7ca4c313d3f476",
       "reason": "Historical evidence or fixture; not source"
     }
   },

@@ -1,0 +1,16 @@
+{
+  "status": "source_only",
+  "UTC": "2026-10-19T11:09:08.064713+00:00",
+  "numeric_source": "unchanged frozen336 candidate/reference/cost functions",
+  "delta": "Private rebind of actual HOST delegate through all actual checked/qualified/inference closure links. All wrapper code objects and signatures retained; no class method mutation.",
+  "actual_install234_HOST": true,
+  "all36_original_accounting_HOST": true,
+  "old337_and338_failures_reproduced": true,
+  "NPU_qualification_inherited": false,
+  "Goodput": null,
+  "real_draft_generation": false,
+  "full463": false,
+  "HOST_failure_history": [
+    "Initial CPU import lacked338 path; fixed before freeze."
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "status": "failed_before_bank_or_numeric_cases",
+  "UTC": "2026-10-19T11:06:30.389506+00:00",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-linear-Q4-Q5-actual-host-builder-v338-36-math-paired-cost-v1.json",
+  "receipt_SHA": "db0be31ba2c277bf232b3b0cba2608bcdd84dd50ced3b45cb80f8195231c7971",
+  "errors": [
+    "Traceback (most recent call last):\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338/guard338.py::original-owned-supervision\", line 127, in execute_locked\n    archive=write_archive(ARCHIVE,archive_sources(f));storage();prepared()\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/base209.py\", line 14, in require\n    if ok is not True:raise RuntimeError('V209: '+message)\n                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: V209: actual child completed within1800seconds\n"
+  ],
+  "cause": "Actual install234 includes verification_qualification and tree_entry.checked_target wrappers with closure links but no __wrapped__;338 test covered the decorated host substitution only.",
+  "actual_models_loaded": true,
+  "numeric_cases": 0,
+  "costs_measured": false,
+  "adopted": false,
+  "original_receipt_unchanged": true,
+  "all4_idle_at_terminal": null,
+  "owned_cleanup": []
+}

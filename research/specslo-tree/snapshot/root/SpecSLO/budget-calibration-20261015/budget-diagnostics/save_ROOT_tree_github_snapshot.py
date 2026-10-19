@@ -35,6 +35,7 @@ SOURCES = (
     ('tree-Q4-linear-target-math-cost-v336', 336),
     ('tree-Q4-original-output-root-adapter-v337', 337),
     ('tree-Q4-actual-host-builder-adapter-v338', 338),
+    ('tree-Q4-closure-aware-host-builder-adapter-v339', 339),
 )
 
 
@@ -100,6 +101,7 @@ def main():
         'tree-Q4-linear-target-math-cost-v336',
         'tree-Q4-original-output-root-adapter-v337',
         'tree-Q4-actual-host-builder-adapter-v338',
+        'tree-Q4-closure-aware-host-builder-adapter-v339',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -208,6 +210,7 @@ def main():
         'ROOT_FUTURE_RISK_CPU_PROFILE_RAW_PLAN_20261019.json',
         'ROOT336_OUTPUT_ROOT_STARTUP_FAILURE.json',
         'ROOT337_ACTUAL_FRONTEND_BYPASS_FAILURE.json',
+        'ROOT338_ACTUAL_CHECKED_FRONTEND_WRAPPER_FAILURE.json',
     ):
         path = BASE / 'budget-diagnostics' / filename
         if path.exists():

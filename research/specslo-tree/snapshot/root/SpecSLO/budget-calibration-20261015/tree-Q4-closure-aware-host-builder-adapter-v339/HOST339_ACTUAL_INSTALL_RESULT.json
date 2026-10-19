@@ -1,0 +1,54 @@
+{
+  "status": "passed_actual_premodel_installer_HOST",
+  "NPU_used": false,
+  "model_constructed": false,
+  "real_target_executed": false,
+  "actual_install234_executed": true,
+  "checked_and_qualified_wrappers_retained": true,
+  "complete_actual_wrapper_codes_identical": true,
+  "class_method_unchanged": true,
+  "original_accounting_all36_cases_passed": true,
+  "activation": {
+    "target_only": true,
+    "physical_rows": [
+      96,
+      120,
+      128
+    ],
+    "original_model_forward_unchanged": true,
+    "original_capture_validation_replay_unchanged": true,
+    "Native_flags_assigned": false,
+    "actual_qualified_MC2_rows": true,
+    "deferred_read_done": false,
+    "actual_Native_HOST_builder_bound": true,
+    "original_inference_decorators_preserved": true,
+    "all_original_wrapper_code_and_signatures_preserved": true,
+    "target_frontend_code_identical": true,
+    "target_defaults_preserved": true,
+    "model_callback_not_required": true,
+    "only_target_global_rebound": "_dynamic_tree_make_host_metadata",
+    "target_closure_functions": [
+      {
+        "name": "install.<locals>.checked_target",
+        "file": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/source209.py::private-tree-entry"
+      },
+      {
+        "name": "install.<locals>.qualified",
+        "file": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/verification_qualification.py"
+      },
+      {
+        "name": "target_tree_forward",
+        "file": "/root/miniconda3/envs/vllm-hust-dev/lib/python3.11/site-packages/torch/utils/_contextlib.py"
+      },
+      {
+        "name": "target_tree_forward",
+        "file": "/root/SpecSLO/budget-calibration-20261015/tree-contiguous-branch-tail-final-metadata-math-v234/root_padding_forward231.py::host-and-root-padding"
+      },
+      {
+        "name": "install.<locals>.account_real_target_plans",
+        "file": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/source209.py::private-tree-entry"
+      }
+    ],
+    "actual_HOST_body": "target_tree_forward"
+  }
+}
