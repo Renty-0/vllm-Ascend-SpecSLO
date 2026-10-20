@@ -1,0 +1,69 @@
+{
+  "status": "complete",
+  "started_UTC": "2026-10-20T19:03:55.228235+00:00",
+  "source_hashes": {
+    "/root/SpecSLO/sharegpt-gamma4-20261021/run_sharegpt.py": "ae4cedb4da5e25335288893175534575c12784b1e7a6c7220262071d9c802fd3",
+    "/root/SpecSLO/sharegpt-gamma4-20261021/launch.sh": "41a1ae55d41c6251b142436db72163b12c02dbf6ef8434d2da92f0f98c10530c",
+    "/root/SpecSLO/sharegpt-gamma4-20261021/supervise.py": "b5745f8a681b853aaf1e1765fd61a87fed1b7d29afc927781c96b51189150ee3"
+  },
+  "physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "model_pair": [
+    "Qwen3-0.6B",
+    "Qwen3-32B"
+  ],
+  "devices_before": {
+    "2": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "5": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "6": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "7": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    }
+  },
+  "child_pid": 64937,
+  "child_exit_code": 0,
+  "elapsed_seconds": 360.1344724050723,
+  "sources_unchanged": true,
+  "devices_after": {
+    "2": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "5": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "6": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "7": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    }
+  },
+  "all4idle": true,
+  "finished_UTC": "2026-10-20T19:09:59.082787+00:00"
+}

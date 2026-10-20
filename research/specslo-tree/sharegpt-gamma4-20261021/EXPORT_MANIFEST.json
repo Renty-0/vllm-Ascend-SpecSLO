@@ -1,0 +1,36 @@
+{
+  "scope": "ShareGPT fixed-gamma4 acceptance diagnostic; no model weights, complete dataset, full prompt/output token rows or compiler caches",
+  "source_directory": "/root/SpecSLO/sharegpt-gamma4-20261021",
+  "files": {
+    "HOST-preflight.json": "5a36b69d6e251f3fd3a4f61636796cb5509ac3697e4a89a7e4b283931be91028",
+    "REPORT_zh.md": "3cbda8f723cee6901c6668ecd5daa8c53d4335f11eee01ad79090a3df0b22c2f",
+    "STATUS.json": "8f444fc614f753161fe1eaf337f695c2353f2c8f59191386f74eba20aff0e925",
+    "acceptance-by-prompt-length.csv": "ed9e398b03e13c6f96a2a1bdb0c3933fee4ac82702d341548833d0339abd445a",
+    "audit_results.py": "0aa80cb9ba422069af3f243a54aeaf5d7a77530ea077a524d9885cfb063d462a",
+    "dataset-provenance.json": "0d5842762b084b75e9787a97a01bb724636c0cbeb2685ea9cc5fc40fc324f8b5",
+    "dependencies/calibrate.py": "9b1caf5305202e65b11ba81697429c8728d18c36cabf1bdb56f4e44ec9931dca",
+    "dependencies/manifest.json": "58b5737621d62c1d81a22bf53a43c9bb061ab208d3849e31700415b9644f3d09",
+    "dependencies/map-current.py": "300e4e9894af7f7275a718bc9f549d1c62c880a5e7b1665f7d1268c6f2097975",
+    "dependencies/runtime.sh": "107a11a58764eabe4f8b6e5d752d9234cf67f9e898d81a8619e47e684e83af7c",
+    "independent-audit.json": "03ce19df773164b17b594289bda85b06e830d5e9687efdc6011dbbe2bda417d5",
+    "launch.sh": "41a1ae55d41c6251b142436db72163b12c02dbf6ef8434d2da92f0f98c10530c",
+    "post-verifier.json": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "pre-verifier.json": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "receipt.json": "9ac559662cd1a0b5af61424e5a7f9ad142dbe44c05b55c67009ee78c0ae0b844",
+    "request-counters.csv": "d7e7a91dbe9415ca758f7acfa56e17183dc9662f939991767c4bbea79b8d9402",
+    "run-plan.json": "f8011cb6c7054be6c1461c3bbc49699a37cd242d72449596d8c49add0da98776",
+    "run_sharegpt.py": "ae4cedb4da5e25335288893175534575c12784b1e7a6c7220262071d9c802fd3",
+    "selection.csv": "cda21ea5bb5ed6ecd46f5f8fda58c82e41205ac0634709dfc60c641566421e38",
+    "summary.json": "ae50e95d829481a1d93e3bfd5ee3daa41c2c351ee0199c1b581cca5345d19b8b",
+    "supervise.py": "b5745f8a681b853aaf1e1765fd61a87fed1b7d29afc927781c96b51189150ee3",
+    "worker-exit.json": "5c9a6dd39165774a41a8bd525627510e51600dbb8a769ea57e40d898c69ce89c",
+    "VALIDATION.json": "fb8a2b2a8f1be995a58b493b5108c2ce77bb5e1688cfe99fd1ac4d1b82d1b356"
+  },
+  "retained_private_only": [
+    "inputs.json",
+    "results.json",
+    "worker-metrics.json",
+    "run.log",
+    "triton-cache"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "path": "/data/shared_datasets/strict-inputs/ShareGPT_V3_unfiltered_cleaned_split.json",
+  "resolved_path": "/data/shared_datasets/strict-inputs/ShareGPT_V3_unfiltered_cleaned_split.json",
+  "size_bytes": 672837942,
+  "sha256": "35f0e213ce091ed9b9af2a1f0755e9d39f9ccec34ab281cd4ca60d70f6479ba4",
+  "conversations": 94145,
+  "origin": "Pre-existing public dataset file on this machine; upstream revision not independently established",
+  "downloaded_or_copied_by_this_task": false
+}

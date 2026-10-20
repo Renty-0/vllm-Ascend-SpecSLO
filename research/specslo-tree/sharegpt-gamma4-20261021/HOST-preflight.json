@@ -1,0 +1,13 @@
+{
+  "status": "pass",
+  "actual_integer_token_lists": true,
+  "weighted_acceptance_aggregation_passed": true,
+  "inputs_sha256": "9944620cf02090b9a899a7354c89c11bc2b30e69793db7bdeffc3a423a2d65f8",
+  "requests": 128,
+  "dataset_rows": 94145,
+  "inspected_before_selecting": 234,
+  "seed": 0,
+  "prompt_min": 10,
+  "prompt_max": 979,
+  "model_workers_started": false
+}

@@ -1,0 +1,15 @@
+{
+  "status": "measurement_and_independent_audit_passed",
+  "host_python_ast": "pass",
+  "shell_syntax": "pass",
+  "exported_source_bytes": "pass",
+  "independent_sampling_and_metric_audit": "pass",
+  "frozen_pre_and_post_verifiers": "pass",
+  "all4idle": true,
+  "format_ci": {
+    "attempted": true,
+    "exit_code": 1,
+    "reason": "pre-commit is not installed; no environment packages changed"
+  },
+  "scope": "ShareGPT acceptance diagnostic only; no frozen engine changes, new Goodput or full AR-equivalence claim"
+}

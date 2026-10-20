@@ -1,0 +1,30 @@
+{
+  "status": "complete",
+  "scope": "ShareGPT fixed-gamma4 acceptance only; original tree optimization remains paused",
+  "path": "/root/SpecSLO/sharegpt-gamma4-20261021",
+  "model_pair": [
+    "Qwen3-0.6B TP1 draft",
+    "Qwen3-32B TP3 target"
+  ],
+  "gamma": 4,
+  "max_new_tokens": 256,
+  "respect_eos": true,
+  "requests": 128,
+  "seed": 0,
+  "first_user_turn_only": true,
+  "public_dataset": "/data/shared_datasets/strict-inputs/ShareGPT_V3_unfiltered_cleaned_split.json",
+  "physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "started_UTC": "2026-10-20T19:03:55.058842+00:00",
+  "independent_audit": "pass",
+  "overall_acceptance_rate": 0.37731973367332483,
+  "accepted_draft_tokens": 21308,
+  "verified_draft_tokens": 56472,
+  "all4idle": true,
+  "finished_UTC": "2026-10-20T19:09:59.082787+00:00",
+  "report": "/root/SpecSLO/sharegpt-gamma4-20261021/REPORT_zh.md"
+}
