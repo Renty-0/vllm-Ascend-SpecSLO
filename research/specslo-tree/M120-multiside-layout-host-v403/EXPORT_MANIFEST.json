@@ -1,0 +1,34 @@
+{
+  "FREEZE403.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/FREEZE403.json",
+    "sha256": "5dd4b5e6f76fcd0e029e09f1dc2933d3db1a343c849091b882e443bc31bf40c6"
+  },
+  "HOST403_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/HOST403_RESULT.json",
+    "sha256": "a33cfdf4e8ad399f2c59d0737ea051f6df561457b8fc6217ba35a08587bdf5cf"
+  },
+  "PLAN403.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/PLAN403.json",
+    "sha256": "f46b336096e8aeb49bc50688d408ac367ce0b6a6de259bf5943d50b51eec4e5c"
+  },
+  "README.md": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/README.md",
+    "sha256": "783ed3ee8ba84e839a308fe61f8ad07bd2db487bdaa0f87dec167101266b1cd0"
+  },
+  "SOURCE403.tar.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/SOURCE403.tar.gz",
+    "sha256": "a8c5f07abc4e5b2b18fa967c08a3d539df27bc191336a160d963b886974b9aa3"
+  },
+  "SOURCE403_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/SOURCE403_RECEIPT.json",
+    "sha256": "26ca9049f5b6730980923c7b89f9076240c7c4430945b898125c221babd6a059"
+  },
+  "check403_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/check403_HOST.py",
+    "sha256": "8609d2d8ab194ec20fe58f5dc64e62fd0145afb2150f5e1b9603cfb7f51a688f"
+  },
+  "layout403.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/layout403.py",
+    "sha256": "0068d1d1e704e534cea40973db4e474f84ab8a6d832579598020709433f197ea"
+  }
+}

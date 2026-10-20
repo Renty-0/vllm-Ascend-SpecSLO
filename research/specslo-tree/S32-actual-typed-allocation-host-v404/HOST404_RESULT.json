@@ -1,0 +1,19 @@
+{
+  "status": "PASS_HOST404_ACTUAL_TYPED_S32_PAID_CAPS",
+  "exact_narrow_typed_cases": 914,
+  "wide_typed_cases": 286,
+  "wide_cases_with_original_B3_eager": 194,
+  "original_policy_closure_and_callback_source": true,
+  "original_admission32_and_global64_retained": true,
+  "class_and_deferred_age_large_slot_priority": true,
+  "original_gain_observations_and_request_states_preserved": true,
+  "original_phase_generation_authoritative": true,
+  "actual_LIVE_serving_binding_implemented": false,
+  "fresh_S32_math_and_cost_required": true,
+  "NPU_used": false,
+  "models_constructed": 0,
+  "model_qualification": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

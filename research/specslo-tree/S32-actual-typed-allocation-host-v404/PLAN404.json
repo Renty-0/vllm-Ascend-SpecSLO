@@ -1,0 +1,25 @@
+{
+  "status": "HOST_ACTUAL_TYPED_ALLOCATION_ONLY_NOT_LIVE_INSTALLED",
+  "UTC": "2026-10-20T23:57:35.771772+00:00",
+  "global_active_limit": 64,
+  "normal_admission": 32,
+  "wide_normal_candidates": 88,
+  "wide_B3_owner_limit": 24,
+  "normal_budget_cap": 3,
+  "hypothesis": "Pay independent S32 q4-slot and C88 resources before drafting, preserving actual typed g/need/priority and normal admission ages. More target owners may reduce global64 round-robin delay; no real performance measured.",
+  "original_B3_eager_preserved_in_HOST": 194,
+  "actual_callback_source_tested": true,
+  "original_request_states_unchanged": true,
+  "required_followup": [
+    "finite independent S32 model and paired target cost via pending399/400",
+    "dual old S24 versus new S32 whole-ticket target route with reservation consistency",
+    "actual LIVE generation binding and clean startup origins",
+    "complete original gates, warm and two zero deltas",
+    "full global64 fixed-arrival workload and all3 target ownAR"
+  ],
+  "actual_LIVE_binding": false,
+  "NPU_launched": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

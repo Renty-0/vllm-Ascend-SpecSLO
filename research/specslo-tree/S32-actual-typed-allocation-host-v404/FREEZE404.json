@@ -1,0 +1,22 @@
+{
+  "schema": "ROOT404.HOST_TYPED_ONLY.FROZEN.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/shape404.py": "4a9b0fc47b91d4e02859a355996e0ebd93c304568057b4653c93cf9c3fae4eaf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/check404_HOST.py": "f16f683e17294719ceec126ebc0a8c8b46c13c1aefb5e7fa70e20387c8fda83a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/HOST404_RESULT.json": "67083cb546c54cd2d072d6b705cac149b81d2e8353a04f1de1da983e7d83f26e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/PLAN404.json": "4d717c45a0c9dd52e74563cc2fbbb850381ba97994c563d7f962591e3ce5390d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/README.md": "008978a7c057ce960b1734a278c9bcbb7db774ec01da5030a77da431f4706640"
+  },
+  "inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_typed_HOST.py": "eb65b736105dc4f85d5d2528c666642be5a357a883beadcfc4ee919e29012c06",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/check401_HOST.py": "f3d7392b41c07fc36941a1583b7c2def58bf58a19f59fd4571c86f1e4e3a21b5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/candidate_controls_v132.py": "c1f1e7dc83ae61fd0f9b350e4ec19d1d3a34486b6160c219aaf6005f41f57da4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/split_shape_v132.py": "a3ded36984e28d10bc20d09f4df82550e5ce9e9c7acb6cca33c87f239ed1e7d1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/split_budget_v132.py": "b760c493e22a65c5573202137ba9e30abe9301dd4724aefe40ccc8a6b27c78a0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/normal_admission_v140.py": "f1049e73dd0f3cd026f97e3209c7afb66080d7277f337f34744186c16e6bfda8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/budget_policy.py": "1637090cb3c8f997be5ae36bce3e1ae840100cdb2e3407c67e5016b9e1cbd4f5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/tree-gain-model.json": "26640a1b13eddefda05ff1dd51782f6695abbba793d986508a9eaaa03398d7d8"
+  },
+  "NPU_used": false,
+  "production_permission": false
+}

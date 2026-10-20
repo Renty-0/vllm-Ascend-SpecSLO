@@ -1,0 +1,86 @@
+{
+  "status": "FROZEN_HOST_LAYOUT_PASS_NOT_A_SERVING_CANDIDATE",
+  "UTC": "2026-10-20T23:55:14.554958+00:00",
+  "global_active_limit_required": 64,
+  "small_batch_alternate_leaves": {
+    "primary_depth": 4,
+    "retained_candidates": [
+      5,
+      6,
+      7,
+      8
+    ],
+    "M": 120,
+    "S": 24,
+    "C_max": 96,
+    "copy_slots": 1792,
+    "independent_resource_bounds": [
+      "real request count<=24",
+      "real primary+side groups<=24",
+      "real candidates<=96",
+      "actual branch-tail copies<=1792"
+    ],
+    "conservative_global_alternate_limit": 13,
+    "exact_prefix_shorter_cases_can_fit_more": true
+  },
+  "hypothesis": "Actual FastV5 computes top1 and top2 for four steps already; additional retained alternate leaves may improve small-batch delivered tokens. Complete optimized-worker cost, model/KV equivalence, and serving performance remain unmeasured.",
+  "HOST_tests": {
+    "status": "PASS_HOST403_M120_MULTISIDE_RELOCATION_AND_LEGACY_EQUIVALENCE",
+    "exact_legacy_B5_cases": 180,
+    "new_multi_side_relocation_cases": 319,
+    "actual_CPU_tree_plans_and_masks_used": true,
+    "copy_capacity_overrun_rejected": true,
+    "real_group25_rejected": true,
+    "observed_real_budget_counts": {
+      "4": 670,
+      "6": 299,
+      "5": 472,
+      "7": 258,
+      "8": 329
+    },
+    "original_function_unchanged": true,
+    "source": {
+      "original_sha256": "f42c437269e6f0a91aa0f261b9be95e31da9c64256b67201d96db9ad39b51467",
+      "projected_sha256": "1bc57894b7163a94f286007e49e3839b4fcedde375513d3a44e8eaa33ce6248a",
+      "M": 120,
+      "physical_target_segments": 24,
+      "fixed_copy_slots": 1792,
+      "spine_length": 4,
+      "maximum_alternate_leaves_per_owner": 4,
+      "conservative_global_side_leaf_limit": 13,
+      "exact_group24_and_candidate96_and_copy1792_bounds": true,
+      "original_layout_function_modified": false,
+      "NPU_qualified": false,
+      "production_permission": false,
+      "Raw": null,
+      "Goodput": null
+    },
+    "NPU_used": false,
+    "models_constructed": 0,
+    "production_runtime_installed": false,
+    "model_qualification": false,
+    "required_followup": [
+      "actual typed caps/whole-ticket group and copy resource control",
+      "maxGamma8 and physical KV reserve consistency",
+      "reject unqualified eager parents6..8",
+      "actual optimized draft compatibility and full-worker cost before claiming free gain",
+      "fresh independent model and all128KV comparison",
+      "complete global64 workload ownAR and real performance"
+    ],
+    "Raw": null,
+    "Goodput": null
+  },
+  "NPU_launched": false,
+  "production_runtime_installed": false,
+  "model_qualification": false,
+  "Raw": null,
+  "Goodput": null,
+  "required_followup": [
+    "actual typed caps/whole-ticket group and copy resource control",
+    "maxGamma8 and physical KV reserve consistency",
+    "reject unqualified eager parents6..8",
+    "actual optimized draft compatibility and full-worker cost before claiming free gain",
+    "fresh independent model and all128KV comparison",
+    "complete global64 workload ownAR and real performance"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "FREEZE404.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/FREEZE404.json",
+    "sha256": "403a76730a1ea75b6569927f58d6c20041a2be14bb8de18c4f4cb8efe9368a86"
+  },
+  "HOST404_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/HOST404_RESULT.json",
+    "sha256": "67083cb546c54cd2d072d6b705cac149b81d2e8353a04f1de1da983e7d83f26e"
+  },
+  "PLAN404.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/PLAN404.json",
+    "sha256": "4d717c45a0c9dd52e74563cc2fbbb850381ba97994c563d7f962591e3ce5390d"
+  },
+  "README.md": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/README.md",
+    "sha256": "008978a7c057ce960b1734a278c9bcbb7db774ec01da5030a77da431f4706640"
+  },
+  "SOURCE404.tar.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/SOURCE404.tar.gz",
+    "sha256": "db554c7fda6e9ff55019bb28153a1dfbc2d5b46a7cd8dfa3a0e475a0794d8b94"
+  },
+  "SOURCE404_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/SOURCE404_RECEIPT.json",
+    "sha256": "4e90f3bd9905a1d90500d7f42894c8553fe212b2fda032347576a8e2cf48daaa"
+  },
+  "check404_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/check404_HOST.py",
+    "sha256": "f16f683e17294719ceec126ebc0a8c8b46c13c1aefb5e7fa70e20387c8fda83a"
+  },
+  "shape404.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S32-actual-typed-allocation-host-v404/shape404.py",
+    "sha256": "4a9b0fc47b91d4e02859a355996e0ebd93c304568057b4653c93cf9c3fae4eaf"
+  }
+}

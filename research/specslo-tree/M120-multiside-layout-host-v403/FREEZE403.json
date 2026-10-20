@@ -1,0 +1,18 @@
+{
+  "schema": "ROOT403.HOST_LAYOUT_ONLY.FROZEN.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/layout403.py": "0068d1d1e704e534cea40973db4e474f84ab8a6d832579598020709433f197ea",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/check403_HOST.py": "8609d2d8ab194ec20fe58f5dc64e62fd0145afb2150f5e1b9603cfb7f51a688f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/HOST403_RESULT.json": "a33cfdf4e8ad399f2c59d0737ea051f6df561457b8fc6217ba35a08587bdf5cf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/PLAN403.json": "f46b336096e8aeb49bc50688d408ac367ce0b6a6de259bf5943d50b51eec4e5c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-multiside-copy1792-host-v403/README.md": "783ed3ee8ba84e839a308fe61f8ad07bd2db487bdaa0f87dec167101266b1cd0"
+  },
+  "inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/bootstrap399.py": "b31a2ebb940efdd3dbc000988ab02763dec77c223c7ee2329fd3e414f4aa37e1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/FREEZE399.json": "2b358bc162f42527eeeeeb9738fc9655a541e1a9e45353a0980530a95d0b0b37",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/branch_tail255.py": "b11e35aeb13bbe39f0d34b6dbe9019380e3cba79c1baaf08ec2a35fa687bb98a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py": "5cb14a81d4c0bfe99becd15237b733fb454fcc21e6d55b17f6ab31c0042e47fa"
+  },
+  "NPU_used": false,
+  "production_permission": false
+}
