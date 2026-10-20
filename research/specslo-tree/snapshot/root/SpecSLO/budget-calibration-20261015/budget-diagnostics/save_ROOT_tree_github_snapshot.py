@@ -70,6 +70,9 @@ SOURCES = (
     ('tree-M80-attention-GEMM120-target-v382', 382),
     ('tree-hybrid-native-method-dedent-v384', 384),
     ('tree-real-M120-deferred-chain-profile-v385', 385),
+    ('tree-parent4-child4-original-bounded-v386', 386),
+    ('tree-parent4-full-archive-guard-v387', 387),
+    ('tree-parent4-owned-exit-path-v388', 388),
 )
 
 
@@ -206,6 +209,10 @@ def main():
         'build_ROOT299_capacity_risk_span_full_HOST.py',
         'freeze_ROOT299_capacity_risk_span_full_HOST.py',
         'save_ROOT_tree_github_snapshot.py',
+        'ROOT385_REAL_DEFERRED_CHAIN_RESULT.json',
+        'HOST_ROOT388_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'freeze_ROOT387_parent4_complete_archive_guard_HOST.py',
+        'freeze_ROOT388_parent4_owned_exit_path_HOST.py',
         'ROOT296_INDEPENDENT_TARGET_MATH_AND_COST_AUDIT.json',
         'ROOT296_VS280_HISTORICAL_TARGET_COST.json',
         'build_ROOT305_single_validated_prepare_HOST.py',

@@ -786,17 +786,15 @@
   "tree375_all510_exact": true,
   "tree375_component_gain_small": true,
   "current_execution": {
-    "version": 385,
-    "tag": "real-M120-deferred-chain-root-v385-operator-qualifier-v1",
-    "guardian_session": 78406,
-    "status": "running_genuine_payload_original_deferred_chain_qualifier_no_profile_installed",
-    "UTC": "2026-10-19T23:44:30.963659+00:00",
-    "freeze_sha256": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
-    "archive_sha256": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
-    "operator_cases_each_target": 1,
-    "independent_prefills_each_target": 72,
-    "models_requested": true,
-    "new_profile_installed": false,
+    "version": 388,
+    "tag": "parent4-child4-shared4-root-v388-bounded-v2",
+    "guardian_session": 13225,
+    "status": "running_original199_bounded_P4_child4_fresh173_baseline",
+    "UTC": "2026-10-20T00:00:55.449785+00:00",
+    "freeze_sha256": "1d660aacce3653ea25492c29e91cebd8dbf5862b5a81af1f09c3473c5b4557a9",
+    "archive_sha256": "47e475f190079d25eb03b8110a70a8b93dea51bade40065ae72d93497e86a777",
+    "output_root": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199",
+    "production_permission": false,
     "Raw": null,
     "Goodput": null
   },
@@ -899,7 +897,7 @@
   },
   "conditional_full383_scaffold": "/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-GEMM120-best376-full-v383",
   "conditional_full383_decision": "prepared and HOST checked, not frozen/launched because actual component time did not improve",
-  "next_extra_Raw385": "unfrozen original whole-length MC2 deferred-read-done qualifier over genuine current M120 payloads; no Native flags overridden",
+  "next_extra_Raw385": "completed real M120 chain qualifier; no reliable speedup, not installed",
   "previous_execution384": {
     "version": 384,
     "tag": "hybrid-M80-GEMM120-root-v384-target693-and-cost-v2",
@@ -923,5 +921,33 @@
     "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/SHARED4_NORMAL_B4_EAGER_B3_SOURCE_FEASIBILITY_zh.md",
     "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/SCOPE199.txt"
   ],
-  "important_parent4_tree_semantics": "tree eager child root is parent.prefix+path_len+1; parent4 uses real fifth frontier token; do not infer serial no-bonus semantics apply to tree"
+  "important_parent4_tree_semantics": "tree eager child root is parent.prefix+path_len+1; parent4 uses real fifth frontier token; do not infer serial no-bonus semantics apply to tree",
+  "next_original_direction": "fresh bounded parent4-child4 shared4 protocol actor from original199, with original173 baseline and source/env guards, no production issuer",
+  "previous_execution385": {
+    "version": 385,
+    "tag": "real-M120-deferred-chain-root-v385-operator-qualifier-v1",
+    "guardian_session": 78406,
+    "status": "COMPLETE_REAL128_CHAIN_EXACT_BUT_NO_PRACTICAL_SPEEDUP",
+    "UTC": "2026-10-19T23:44:30.963659+00:00",
+    "freeze_sha256": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+    "archive_sha256": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
+    "operator_cases_each_target": 1,
+    "independent_prefills_each_target": 72,
+    "models_requested": true,
+    "new_profile_installed": false,
+    "Raw": null,
+    "Goodput": null,
+    "result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT385_REAL_DEFERRED_CHAIN_RESULT.json",
+    "all4idle": true,
+    "owned_remaining": [],
+    "finished_UTC": "2026-10-19T23:47:14.906950+00:00"
+  },
+  "previous_execution386": {
+    "status": "stopped_early_by_ROOT_missing_exit_import_fixed388",
+    "sources_unchanged": true,
+    "owned_remaining": [],
+    "all4idle": true,
+    "Raw": null,
+    "Goodput": null
+  }
 }

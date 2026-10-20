@@ -1,0 +1,17 @@
+{
+  "schema": "ROOT387.complete386-source-supervisor.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-full-archive-guard-v387/guard387.py": "4b2d2b48628631a4d385203dd0a97301013831ae0bbaf4c8ebdb17eee811d8d3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-full-archive-guard-v387/HOST387_CONSTRUCTION_RESULT.json": "bd5651d969cc67b7ee385857c9a5bc4e792b53d6bb1a855b78503b0a69d20c5f",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT387_parent4_complete_archive_guard_HOST.py": "a9c77d94cb0cd4608bd682cacc566f2d2190bc61c9a1adfab1732b7c11932829"
+  },
+  "complete386_freeze_sha256": "0909f2ed2a3c5fbd0ef94a3e9122611c48bf4cc4e164afdbd558ce27afbb1b96",
+  "complete386_archive_sha256": "0be545fb5f19bd4a817ec5b6399a0521c0937525f00d57ddc20720765a1bfb49",
+  "original199_runtime_and_actors_unchanged": true,
+  "child_runtime_source_gate_and_owned_exit_only": true,
+  "NPU_used": false,
+  "model_qualification_inherited": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

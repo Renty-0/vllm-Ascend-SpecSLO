@@ -1,0 +1,19 @@
+{
+  "status": "PASS_HOST388_ACTUAL_FROZEN_WORKER_SUPERVISOR_EXIT_PATH",
+  "source_members": 4258,
+  "NPU_used": false,
+  "models_qualified": false,
+  "previous386_terminal_clean_all4idle": true,
+  "pins": {
+    "freeze_sha256": "1d660aacce3653ea25492c29e91cebd8dbf5862b5a81af1f09c3473c5b4557a9",
+    "archive_sha256": "47e475f190079d25eb03b8110a70a8b93dea51bade40065ae72d93497e86a777",
+    "archive_members": 7,
+    "archive_bytes": 5870,
+    "NPU_used": false,
+    "models_qualified": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "Raw": null,
+  "Goodput": null
+}

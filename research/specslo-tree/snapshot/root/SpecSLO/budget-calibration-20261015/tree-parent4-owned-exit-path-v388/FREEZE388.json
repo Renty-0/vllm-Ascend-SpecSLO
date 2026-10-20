@@ -1,0 +1,20 @@
+{
+  "schema": "ROOT388.complete386-source-supervisor.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-owned-exit-path-v388/guard388.py": "3c61645f8717510eacb02a774317f508aae672fb977d7e824b0971766ee9d32a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-owned-exit-path-v388/runtime388.py": "d4c0dcc54fa236885c85319b9b6a92922c8b29286d8da218ba46697a49ca1506",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-owned-exit-path-v388/check388_HOST.py": "9ce03a94b0021e08c4d8e81e57669771ccfd67995e081b90c94bb400250b2743",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-owned-exit-path-v388/HOST388_CONSTRUCTION_RESULT.json": "9669a2569168fd96e7bf53ca2c607931773d60f91827029e79a5d1b70a693b17",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-owned-exit-path-v388/startup388.sh": "16be6b62507c1a1f5b5f90d4389e40af619fa44c3ce7c0515e9f9ce3b16eb344",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT388_parent4_owned_exit_path_HOST.py": "63da532fa20ee8d5e2086519772d15208e65c8768f4c5d4d4b40bd48a2431c92"
+  },
+  "parent387_freeze_sha256": "b15f3876538e5f1a04e2d8c16950e16e264034205783f45d4d08e6dcad3be1a4",
+  "parent387_archive_sha256": "9c61ef0e3efe3f9bedb981614b89d42ec7167792d3d78d766fe74e86052fe329",
+  "original199_runtime_and_actors_unchanged": true,
+  "child_runtime_source_gate_and_owned_exit_only": true,
+  "NPU_used": false,
+  "model_qualification_inherited": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

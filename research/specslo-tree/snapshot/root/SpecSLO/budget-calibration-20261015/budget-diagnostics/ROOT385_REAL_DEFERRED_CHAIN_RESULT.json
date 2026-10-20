@@ -1,0 +1,90 @@
+{
+  "status": "COMPLETE_REAL128_CHAIN_EXACT_BUT_NO_PRACTICAL_SPEEDUP",
+  "UTC": "2026-10-19T23:48:43.242209+00:00",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-real-M120-deferred-chain-root-v385-operator-qualifier-v1.json",
+  "receipt_sha256": "f7c845c8ebf0787d0bbea81b4b4507558dbd05f9847afa14223a6c0a2e87aebd",
+  "audit": {
+    "status": "retained_original_real120_chain_measurement385",
+    "qualified_by_original_loader": true,
+    "original_loader_rejection": null,
+    "evidence": {
+      "qualified": true,
+      "execution_mode": "graph",
+      "chain_scope": "whole_model",
+      "layer_count": 64,
+      "operations_per_chain": 128,
+      "source_sha256": "d1ec5326d4613e9361dbdf3f25c7053f95d3ea492f6721febe48274f4c88649d",
+      "qualified_row_counts": [
+        120
+      ],
+      "minimum_samples": 7,
+      "minimum_speedup": 1.0,
+      "reports": [
+        {
+          "row_count": 120,
+          "report_sha256": "4dabf3611dd4987d86bb9cf088fdbe966726cac874141b69888b98031e4c2319",
+          "report_path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/real-M120-deferred-chain-root-v385-operator-qualifier-v1/actual-original-M120-deferred-chain385.json",
+          "attention_input_source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/real-M120-deferred-chain-root-v385-operator-qualifier-v1/same-instance-live-payloads385/attention",
+          "down_input_source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/real-M120-deferred-chain-root-v385-operator-qualifier-v1/same-instance-live-payloads385/down",
+          "fully_flushed_latency_ms": [
+            14.865987608209252,
+            14.872436644509435,
+            14.854796044528484,
+            14.853944559581578,
+            14.876579865813255,
+            14.865296753123403,
+            14.865386299788952,
+            14.903262304142118,
+            14.845498139038682
+          ],
+          "deferred_chain_latency_ms": [
+            14.863487589173019,
+            14.868406159803271,
+            14.850147906690836,
+            14.881757460534573,
+            14.873873791657388,
+            14.86988679971546,
+            14.86398030538112,
+            14.860815741121769,
+            14.864305360242724
+          ],
+          "p50_speedup": 1.0000727204884474,
+          "p95_speedup": 1.0009399629046831,
+          "layer_count": 64,
+          "operations_per_chain": 128
+        }
+      ]
+    },
+    "summary": {
+      "baseline": {
+        "p50_ms": 15.119523904286325,
+        "p95_ms": 15.545281139202416
+      },
+      "fully_flushed": {
+        "p50_ms": 14.865386299788952,
+        "p95_ms": 14.892589328810573
+      },
+      "deferred_chain": {
+        "p50_ms": 14.864305360242724,
+        "p95_ms": 14.878603992983699
+      },
+      "deferred_vs_fully_flushed_p50": 1.0000727204884474,
+      "deferred_vs_fully_flushed_p95": 1.0009399629046831
+    },
+    "no_profile_installed": true,
+    "full463": false,
+    "Raw": null,
+    "Goodput": null,
+    "adopted": false
+  },
+  "reason": "operator_measurement_retained_not_serving_qualification",
+  "sources_unchanged": true,
+  "owned_remaining": [],
+  "all4idle": true,
+  "new_profile_installed": false,
+  "decision": "do not replace profile for a 0.0073-percent median difference; resume parent4 rolling-eager protocol work",
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "goal_achieved": false
+}
