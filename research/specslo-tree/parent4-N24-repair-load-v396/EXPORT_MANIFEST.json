@@ -1,0 +1,118 @@
+{
+  "FREEZE396.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/FREEZE396.json",
+    "sha256": "59c70fbaf6e63d5ae8970c2924e40f81762486bd8e5eac423abf1a578f47c31a"
+  },
+  "HOST396_SCOPE_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/HOST396_SCOPE_RESULT.json",
+    "sha256": "fdf74208ceff9aa3344d9361335204070b50b5bb813624941fd3e634d0953e44"
+  },
+  "SOURCE396_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/SOURCE396_RECEIPT.json",
+    "sha256": "4476f8cd1c4bbdf2fe0e4182b41b217c0691068b523c6745584c3d9033ca454b"
+  },
+  "SOURCE_PROJECTION396.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/SOURCE_PROJECTION396.json",
+    "sha256": "22dc61e082784d0fa951df3bfa5cc323706fc273567ecb2214e72bbbbb5ef6ea"
+  },
+  "actor396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/actor396.py",
+    "sha256": "21275cfed206f2201f80f30aad3f15b520ee0e416da39b60e25ba7d91ebe6c11"
+  },
+  "audit396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/audit396.py",
+    "sha256": "0673de13220969e979091566ecff6781e941973dfa815e2a790bdff0c29fa0ac"
+  },
+  "binding396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/binding396.py",
+    "sha256": "580788232dd433d497958927096c6ef55235aeffb8f3921e207d56873156d70f"
+  },
+  "budget396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/budget396.py",
+    "sha256": "408599c173a417ec4d26cf7dfd6c34a7b472be58f22178bec7c4753a6a5d3c39"
+  },
+  "check396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/check396.py",
+    "sha256": "5e689aadefc49ceaae3577988ea50ac3f28bc7f7d63ff02f17da60547a910eed"
+  },
+  "check396_scope_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/check396_scope_HOST.py",
+    "sha256": "6031089e38c89686a251a4b1b03bfd603a8fce87cc2e5c99582f29e67a4b9f2c"
+  },
+  "component396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/component396.py",
+    "sha256": "7b0b69a1b9e2b95f74986b12da3d0af6f0b6e06e2431dda56f00dcebef71f530"
+  },
+  "draft396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/draft396.py",
+    "sha256": "aea783205375b840e4f66fcd678f59e72b8deca697cd6c5e1abfde580a7ceadc"
+  },
+  "extension396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/extension396.py",
+    "sha256": "7bd1822310c4f0271774213f59a41b357fea2b9037d2a575f85dacb0d1e44332"
+  },
+  "fast396.generated.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/fast396.generated.py",
+    "sha256": "936fcf8eaecd0db4522da76d0956c04bb325ba51560d50f69d40b6e335e7fb10"
+  },
+  "guard396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/guard396.py",
+    "sha256": "16a34a34d16879a7d91c4bd720a5937822703b4b6ffddf6813c1698fa0456b31"
+  },
+  "live396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/live396.py",
+    "sha256": "dd895068f5053f34436d71266a1c654ee3f2e2aa7823422b9d0da3b14d7a1ca6"
+  },
+  "next396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/next396.py",
+    "sha256": "c894e8704f790fd95e3c9d81ef1a2346571e4ebf0d7a22edbe00adf131a5478e"
+  },
+  "protocol396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/protocol396.py",
+    "sha256": "9f0d79014ab146bb09d94db4e5aa294893cbd9231c48fb7cef7577d26a3da511"
+  },
+  "provider396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/provider396.py",
+    "sha256": "a19bf90022ea82ec503826f4fc900e80a8e8459bef345a2bd91f29569268e417"
+  },
+  "runtime396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/runtime396.py",
+    "sha256": "e9425bb984372ede2b5bc857713c47ecedc0df76ce313825dd356be523715ed7"
+  },
+  "scope396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/scope396.py",
+    "sha256": "8b11fce49ed19536adb969c780ffe1fb5d0a99d53c96170b76843711741ab9f9"
+  },
+  "startup396.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396/startup396.sh",
+    "sha256": "465dd0613e48d33336a330ea1613eb50843231389f296ea02f3aa65ccdef20b2"
+  },
+  "tools/prepare_ROOT396_N24_repair_scope_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/prepare_ROOT396_N24_repair_scope_HOST.py",
+    "sha256": "5e1b632fb635a348f47b192774141a9d467a0fa6dcffc0576afe932517483198"
+  },
+  "tools/freeze_ROOT396_N24_repair_scope_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT396_N24_repair_scope_HOST.py",
+    "sha256": "82b4296f7a1a25c42c3bc9c57073413eeae09c1febd8d4d11ac24f40fe5e9d35"
+  },
+  "tools/check_ROOT396_real_startup_construction_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/check_ROOT396_real_startup_construction_HOST.py",
+    "sha256": "3f1fad4e5fcb24cc51d38a4580fb8e9ca3b06f24d1990a1cb894f8443b909569"
+  },
+  "tools/ROOT396_REAL_STARTUP_CONSTRUCTION_HOST_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT396_REAL_STARTUP_CONSTRUCTION_HOST_RESULT.json",
+    "sha256": "f7baabc8c6a21e856ec911111684bfd86dab8d110cf3cc45686caf54996f7bcb"
+  },
+  "tools/ROOT396_exact_startup_preconstructor_HOST.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT396_exact_startup_preconstructor_HOST.sh",
+    "sha256": "ef25b18d641ce4c820c17eba2caecf0bcf52ebbea2b4e2ea06babc322b6d13c0"
+  },
+  "tools/audit_ROOT394_previous_repair_load_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT394_previous_repair_load_HOST.py",
+    "sha256": "d3ef85a13b05d1fdd35cad5b2fcb36a0484ff5b2a52599a2d86df330cb272a01"
+  },
+  "tools/ROOT394_PREVIOUS_LINEAR_REPAIR_LOAD_INFERENCE.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT394_PREVIOUS_LINEAR_REPAIR_LOAD_INFERENCE.json",
+    "sha256": "2cd4b2e6a6b73465ec0ee64d76bf4bb76b6818dce5f22f89f1ed96fdd9853794"
+  }
+}

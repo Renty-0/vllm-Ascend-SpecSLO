@@ -1,0 +1,55 @@
+{
+  "status": "HOST_SCOPE_AND_REAL_PRECONSTRUCTOR_PASS_DEVICE_PENDING",
+  "NPU_qualified": false,
+  "full463": false,
+  "production_permission": false,
+  "global_max_num_seqs": 64,
+  "finite_normalN": 24,
+  "finite_E": 4,
+  "finite_R": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24
+  ],
+  "format_ci": "unavailable: pre-commit is not installed; environment unchanged",
+  "staged_whitespace": "PASS git diff --cached --check",
+  "frozen_source_bytes_preserved": true,
+  "HOST_attempt_notes": [
+    {
+      "attempt": 1,
+      "result": "original startup authorization correctly required; HOST harness corrected to use actual require_ready plus activate_local_diagnostic"
+    },
+    {
+      "attempt": 2,
+      "result": "setup and origin checks passed, HOST JSON could not serialize TreeBudgetPolicy; switched only HOST evidence to type and repr"
+    },
+    {
+      "attempt": 3,
+      "result": "PASS actual preconstructor setup, canonical origins, worker bindings, model constructor calls0, NPU lazy init calls0"
+    }
+  ],
+  "Raw": null,
+  "Goodput": null
+}

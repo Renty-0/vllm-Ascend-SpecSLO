@@ -1,0 +1,224 @@
+{
+  "scope396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/scope393.py",
+    "source_sha256": "f1bc8c2908bfd7d7b86f6a468caaa0ceb46108db38624601fb61c3fc529ace16",
+    "edits": [
+      [
+        "393",
+        "396",
+        0
+      ],
+      [
+        "1<=self.eager<=8",
+        "self.eager==4",
+        1
+      ],
+      [
+        "self.repair_count in (0,1)",
+        "0<=self.repair_count<=24 ",
+        1
+      ],
+      [
+        "N24/P24 E1..8/R0..1",
+        "N24/P24 E4/R0..24",
+        1
+      ],
+      [
+        "Case(e,r)for e in range(1,9)for r in (0,1)",
+        "Case(4,r)for r in range(25)",
+        1
+      ],
+      [
+        "source_only=True",
+        "source_only=False,finite_component_only=True",
+        1
+      ]
+    ],
+    "inverse_verified": true
+  },
+  "draft396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/draft393.py",
+    "source_sha256": "662a90b982f085ac75634e5cec8d01cdcac9bc7917fecb2f05d5c6f6fd02806b",
+    "edits": [
+      [
+        "393",
+        "396",
+        2
+      ]
+    ],
+    "inverse_verified": true
+  },
+  "actor396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/actor393.py",
+    "source_sha256": "8515988aacde5720c74bd8b5a99af281859737021813a62cdb825d409ea4b176",
+    "edits": [
+      [
+        "393",
+        "396",
+        6
+      ]
+    ],
+    "inverse_verified": true
+  },
+  "protocol396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/protocol393.py",
+    "source_sha256": "229234b5520626337c1262629bd011289d1ca85de9bbcb9a1f6eb1b3c801f9b7",
+    "edits": [
+      [
+        "393",
+        "396",
+        1
+      ]
+    ],
+    "inverse_verified": true
+  },
+  "next396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/next393.py",
+    "source_sha256": "e420357d623bd668f37de8a3027a83beba2bd63e42d78b1ed9ed5da89dbd18fe",
+    "edits": [
+      [
+        "393",
+        "396",
+        2
+      ],
+      [
+        "parent3",
+        "parent4",
+        5
+      ],
+      [
+        "child3",
+        "child4",
+        1
+      ]
+    ],
+    "inverse_verified": true
+  },
+  "budget396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/budget393.py",
+    "source_sha256": "1682488ebf214abd8a386f3287d8bc3662b7abef8e1d83fdb8c1018e13d4ad50",
+    "edits": [
+      [
+        "393",
+        "396",
+        1
+      ]
+    ],
+    "inverse_verified": true
+  },
+  "provider396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/provider393.py",
+    "source_sha256": "881e8b5a34f4cc32548e321bcdacefecee668afcee5fff99b9c77921ebe9cbe1",
+    "edits": [
+      [
+        "393",
+        "396",
+        2
+      ]
+    ],
+    "inverse_verified": true
+  },
+  "binding396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/binding393.py",
+    "source_sha256": "ede5822cc209fe393a1a23fe8ac6f841f0f13c0043ddc44517b27800433b3ece",
+    "edits": [
+      [
+        "393",
+        "396",
+        3
+      ]
+    ],
+    "inverse_verified": true
+  },
+  "live396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/live393.py",
+    "source_sha256": "cc3d69729c12a633ccf1421267e419f6418ab9e68f54f14936d6df215f5f1efd",
+    "edits": [
+      [
+        "393",
+        "396",
+        6
+      ],
+      [
+        "frozenset((24,e)for e in range(1,9)),frozenset((e,1)for e in range(1,9))",
+        "frozenset({(24,4)}),frozenset((4,r)for r in range(1,25))",
+        1
+      ],
+      [
+        "N24/E1..8/single repair/M28or32",
+        "N24/E4/R0..24/M28",
+        1
+      ]
+    ],
+    "inverse_verified": true
+  },
+  "runtime396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/runtime391.py",
+    "edits": [
+      [
+        "391",
+        "396",
+        9
+      ]
+    ],
+    "inverse_verified": true
+  },
+  "audit396.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/audit199.py",
+    "edits": [
+      [
+        "from scope199 import cases,FAILURES,NATIVE_COUNTERS",
+        "from scope396 import cases,FAILURES,NATIVE_COUNTERS",
+        1
+      ],
+      [
+        "len(bound['traces'])==15",
+        "len(bound['traces'])==3*len(cases())",
+        1
+      ],
+      [
+        "exact5x3 traces",
+        "exact25x3 traces",
+        1
+      ],
+      [
+        "len(phase['owners'])<=16",
+        "len(phase['owners'])<=24",
+        1
+      ],
+      [
+        "mixed16Q80",
+        "mixed24Q120",
+        3
+      ],
+      [
+        "def audit(output):",
+        "def base_audit(output):",
+        1
+      ]
+    ],
+    "original_all_proof_obligations_retained": true,
+    "added_checks": "Actual391 target metadata and physical M120/S24 for every phase"
+  },
+  "startup396.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395/startup395.sh",
+    "edits": [
+      [
+        "tree-parent4-current-M120-import-repair-v395/check395.py",
+        "tree-parent4-normal24-repair-load-protocol-v396/check396.py",
+        1
+      ],
+      [
+        "tree-parent4-current-M120-import-repair-v395/runtime395.py",
+        "tree-parent4-normal24-repair-load-protocol-v396/runtime396.py",
+        1
+      ],
+      [
+        "export PYTHONPATH=",
+        "export PYTHONPATH=/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-repair-load-protocol-v396:",
+        1
+      ]
+    ],
+    "inverse_verified": true
+  }
+}
