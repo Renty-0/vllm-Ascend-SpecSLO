@@ -1,0 +1,8 @@
+{
+  "status": "PASS_HOST394_OLD48_RECEIPT_REJECTED",
+  "NPU_used": false,
+  "old48_receipt_verified_before_rejection": true,
+  "correct_rejection": "terminal supervisor source identity differs; old48 results cannot be published as current64",
+  "exit_code": 1,
+  "stderr_tail": "AssertionError: terminal394 active64 supervisor"
+}

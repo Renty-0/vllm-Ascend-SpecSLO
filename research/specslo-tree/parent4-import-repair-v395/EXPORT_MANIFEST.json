@@ -1,0 +1,20 @@
+{
+  "source_directory": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395",
+  "files": {
+    "guard395.py": "f359ec312942b36e25bffd6dd6db17dc0c0e1940379cf353cf3187de5b991fe6",
+    "startup395.sh": "2c683ff1cb55c3290ccbfa822fc7e75d95e20bad69457c68bda2072f75030c8e",
+    "check395_startup_HOST.py": "0be016db2c171ce09dcbca17ee0a9afbce3be49b1a5c76d85f31527c7617b4c6",
+    "runtime395.py": "c006e245b2a9f23d8ad311a53ed590cf5f1c803053fa130fe92d365fc5d95ad4",
+    "VALIDATION.json": "e03f3e9d571d9d5ea1b2c349ac6dfb76efe9639e7355d2a256658875686c2f23",
+    "HOST395_STARTUP_RESULT.json": "9d150ab2c8086cc00e5d7b9e826c3ff67320b2b79ed31796557953e97525d257",
+    "FREEZE395.json": "d3ccc5f6547ec6844df3308132a5f759beb23c08bec93a4befe6d585d7716516",
+    "SOURCE395_RECEIPT.json": "badd6c68b08838b972a1e6ee75ef3c6a1b475a6f4d9a540b90dbbee6b056ad47",
+    "REPAIR395.json": "b2708eb7e271d24711b8d30828fd08bc85ad0696f13faf09a6453001c60324a0",
+    "check395.py": "d5c3201943b8e9b6b529761a8a416146a68ee37ac4b06bb3604eda057946e58b",
+    "README_zh.md": "816be41b42eb8c91d1eb30403f1588f8693f1251654bb3a9d62726e41bafa505",
+    "tools/freeze_ROOT395_startup_repair_HOST.py": "ebdfcc7c8d4684140a94994605f7b37ea50412a0793e75fe80150a592ac5ef54"
+  },
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null
+}

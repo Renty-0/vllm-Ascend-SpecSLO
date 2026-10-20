@@ -1,0 +1,26 @@
+{
+  "parent_startup": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/startup391.sh",
+  "parent_startup_sha256": "e0db78c9d669145695326e83f05c7886f9a5968f6e09e95ae6d5a6cde2db85b4",
+  "added_search_directories": [
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-full463-own-AR-v251",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-projection-host-v249",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-long-prefix-origins-node-math-v246",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-projection-host-v243",
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-contiguous-full463-own-AR-v235"
+  ],
+  "original391_runtime_and_neural_modules_edited": false,
+  "finite_normalN": 16,
+  "eager_child_E": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "configured_max_num_seqs": 64,
+  "production_permission": false,
+  "model_qualification": false,
+  "Raw": null,
+  "Goodput": null
+}

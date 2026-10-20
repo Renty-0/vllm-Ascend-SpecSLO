@@ -1,0 +1,45 @@
+{
+  "schema": "ROOT395.current-M120-parent4-startup-path-only.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395/guard395.py": "f359ec312942b36e25bffd6dd6db17dc0c0e1940379cf353cf3187de5b991fe6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395/startup395.sh": "2c683ff1cb55c3290ccbfa822fc7e75d95e20bad69457c68bda2072f75030c8e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395/check395_startup_HOST.py": "0be016db2c171ce09dcbca17ee0a9afbce3be49b1a5c76d85f31527c7617b4c6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395/runtime395.py": "c006e245b2a9f23d8ad311a53ed590cf5f1c803053fa130fe92d365fc5d95ad4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395/HOST395_STARTUP_RESULT.json": "9d150ab2c8086cc00e5d7b9e826c3ff67320b2b79ed31796557953e97525d257",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395/REPAIR395.json": "b2708eb7e271d24711b8d30828fd08bc85ad0696f13faf09a6453001c60324a0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395/check395.py": "d5c3201943b8e9b6b529761a8a416146a68ee37ac4b06bb3604eda057946e58b",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT395_startup_repair_HOST.py": "ebdfcc7c8d4684140a94994605f7b37ea50412a0793e75fe80150a592ac5ef54"
+  },
+  "parent391_freeze_sha256": "a9a4bfaa81f9bc8f95a75a533612fb1bd8b8202638a6f65c6d35b8185fe8fa98",
+  "parent391_archive_sha256": "e97edf491453ea415c815a1f7b372511c0e35184fdb32b9265a184a38f207ed8",
+  "original391_numerical_bodies_changed": false,
+  "added_dependency_directories": [
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-full463-own-AR-v251",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-projection-host-v249",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-long-prefix-origins-node-math-v246",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-projection-host-v243",
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-contiguous-full463-own-AR-v235"
+  ],
+  "configured_max_num_seqs": 64,
+  "finite_normal_N": 16,
+  "parent_N": 16,
+  "parent_B": 4,
+  "child_B": 4,
+  "E": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "fresh_original173_baseline_required": true,
+  "original391_current_M120_checks_required": true,
+  "early_observer392_retained": true,
+  "Native_qualification_flags_assigned": false,
+  "full463": false,
+  "production_permission": false,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

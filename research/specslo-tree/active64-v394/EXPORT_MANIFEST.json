@@ -37,7 +37,12 @@
     "audit_reference394.py": "8608b0868e541e28561f58a37b46b23aa9c2049a8b717f72787c4187da14ae70",
     "projection394.py": "5afe1b0afd32b3ec2f077eba5b6e82d557c2936cd5021a609c5383e47e6d4d1a",
     "PLAN394.json": "faad1117532ceb208ab9aaffa5d9367fa206e25fe5690fc01d027c4b9e911d01",
-    "VALIDATION.json": "b9df80d565fe7a23a41ec5f50f46dcb411ba82ef1298e6f77803cf4f351b3d3b"
+    "VALIDATION.json": "b9df80d565fe7a23a41ec5f50f46dcb411ba82ef1298e6f77803cf4f351b3d3b",
+    "tools/freeze_ROOT394_active64_HOST.py": "4f551f91a8640bb11611c96a5a42d0042bee7c9048505f8df4ced254c05e02ca",
+    "tools/read_ROOT394_common_result_HOST.py": "e8636661547b3b881665ed719a0b9e9a99e5eba43c4e0cbcd3b6efae4c7bbbea",
+    "tools/HOST_ROOT394_OLD48_REJECTION.json": "569bcea80761615b1638876b38e21d8160c0cb0ac217e54f01995c32af6c2d4e",
+    "tools/audit_ROOT394_terminal_full_HOST.py": "b05ef5dbbb6011cfbe734359e584c6aaa4dbce596dad1d6aeb869271cd7cf2d2",
+    "tools/prepare_ROOT394_active64_HOST.py": "affdb6213e0bcf65ef960d6b4906b89fd3dd2f3790caaa43c22774567a5b7e85"
   },
   "NPU_qualification_claimed": false,
   "Raw": null,

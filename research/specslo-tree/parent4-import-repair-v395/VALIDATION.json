@@ -1,0 +1,18 @@
+{
+  "status": "frozen_HOST_prepared_not_NPU_launched",
+  "actual_sanitized_startup_and_callback_construction": "pass",
+  "model_constructors_in_HOST": 0,
+  "source_members_verified": 4297,
+  "numerical_qualification_claimed": false,
+  "configured_max_num_seqs": 64,
+  "finite_protocol_N": 16,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "staged_whitespace_check": "pass",
+  "format_ci": {
+    "attempted": true,
+    "exit_code": 1,
+    "reason": "pre-commit not installed; no runtime environment packages changed"
+  }
+}
