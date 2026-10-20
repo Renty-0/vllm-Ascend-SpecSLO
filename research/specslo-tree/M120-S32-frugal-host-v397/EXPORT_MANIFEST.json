@@ -1,0 +1,18 @@
+{
+  "HOST397_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-budget-projection-host-v397/HOST397_RESULT.json",
+    "sha256": "2bc571b435aa0c8cd7ef91bf204a18b9f339b3d271ad7376658568cc34b39c58"
+  },
+  "PLAN397.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-budget-projection-host-v397/PLAN397.json",
+    "sha256": "df2537abe93b8655e9275581b86046c72fe1089faeaa6d2995690b86e2f278dd"
+  },
+  "check397_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-budget-projection-host-v397/check397_HOST.py",
+    "sha256": "1093d0504d7311ef0c3a4166255462bce21a897d9f952483e0f0e9b081c9d440"
+  },
+  "projection397.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-budget-projection-host-v397/projection397.py",
+    "sha256": "7b18f12ed6c7dd8aab119bb1206740f228586e535b7c51d0de9e1514d27f0a6f"
+  }
+}

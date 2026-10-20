@@ -1,0 +1,12 @@
+{
+  "status": "HOST397_PASS_ONLY",
+  "CPU_structural_cases": 1344,
+  "CPU_tensor_cases": 64,
+  "NPU_used": false,
+  "model_executed": false,
+  "runtime_implemented": false,
+  "format_ci": "unavailable: pre-commit is not installed; environment unchanged",
+  "staged_whitespace": "PASS git diff --cached --check",
+  "Raw": null,
+  "Goodput": null
+}
