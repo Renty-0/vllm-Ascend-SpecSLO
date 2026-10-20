@@ -1,0 +1,121 @@
+{
+  "status": "PASS_HOST390_ACTUAL_NATIVE_PACKER_AND_STATIC_PROJECTION",
+  "NPU_used": false,
+  "model_forward_called": false,
+  "model_weights_loaded": false,
+  "production_FIA_ABI_on_CPU_carriers": true,
+  "observations": [
+    {
+      "N": 1,
+      "prefix": 128,
+      "extent": 512,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 1,
+      "prefix": 511,
+      "extent": 1024,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 1,
+      "prefix": 1500,
+      "extent": 1536,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 1,
+      "prefix": 2555,
+      "extent": 2560,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 16,
+      "prefix": 128,
+      "extent": 512,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 16,
+      "prefix": 511,
+      "extent": 1024,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 16,
+      "prefix": 1500,
+      "extent": 1536,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 16,
+      "prefix": 2555,
+      "extent": 2560,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 24,
+      "prefix": 128,
+      "extent": 512,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 24,
+      "prefix": 511,
+      "extent": 1024,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 24,
+      "prefix": 1500,
+      "extent": 1536,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    },
+    {
+      "N": 24,
+      "prefix": 2555,
+      "extent": 2560,
+      "all120_input_tokens": true,
+      "original_real_KV_slots": true,
+      "all24_Q5_groups": true,
+      "changed_roots_only": true
+    }
+  ],
+  "numerical_qualification": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -185,6 +185,8 @@ def main():
         'tree-hybrid-native-method-dedent-v384',
         'tree-real-M120-deferred-chain-profile-v385',
         'tree-adaptive80-GEMM120-best376-full-v383',
+        'tree-parent4-best376-target-binding-host-v390',
+        'tree-parent4-current-M120-target-protocol-v391',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -210,6 +212,8 @@ def main():
         'build_ROOT299_capacity_risk_span_full_HOST.py',
         'freeze_ROOT299_capacity_risk_span_full_HOST.py',
         'save_ROOT_tree_github_snapshot.py',
+        'ROOT389_GOAL_MARGIN_ARITHMETIC.json',
+        'ROOT389_BEST376_ACTUAL_CLASS_GAIN_SCREEN.json',
         'freeze_ROOT389_parent4_atomic_storage_HOST.py',
         'ROOT388_ATOMIC_STORAGE_MONITOR_FAILURE.json',
         'HOST_ROOT389_ACTUAL_FROZEN_CONSTRUCTION.json',

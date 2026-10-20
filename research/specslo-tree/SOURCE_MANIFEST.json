@@ -1,7 +1,7 @@
 {
   "schema": "SpecSLO-Tree-source-snapshot-v1",
-  "saved_UTC": "2026-10-20T00:09:44.986196+00:00",
-  "upstream_branch_base": "994b982bcb5896e25b35f2f02ba171bbf91ee725",
+  "saved_UTC": "2026-10-20T00:24:37.331867+00:00",
+  "upstream_branch_base": "9d400c51e52a3199f3a217fd2573fcb129891d59",
   "local_plugin_base": "b8f3ad9e326d2407902cae6f1fd918e62f43c6ca",
   "core_commit": "933842ab0fdd53ee47dee8148bca1671d7d6da61",
   "companion_core_sources": [
@@ -876,6 +876,18 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT388_PARENT4_EAGER_FOLLOWUP_PLAN.json",
       "sha256": "c54af8d7566318cddf30d59c2eed013faf52e49aff9421248db801ce77931252",
       "bytes": 1836
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT389_BEST376_ACTUAL_CLASS_GAIN_SCREEN.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT389_BEST376_ACTUAL_CLASS_GAIN_SCREEN.json",
+      "sha256": "6e82935e71547930e41f6e7443eeb566aa4e4fb1e6c4412bd4f02f1bfdd58d25",
+      "bytes": 3602
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT389_GOAL_MARGIN_ARITHMETIC.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT389_GOAL_MARGIN_ARITHMETIC.json",
+      "sha256": "b828b1c04e4d5f58c49c0e600b432d29fa5a85dcd5b69052c719eb2e38d14930",
+      "bytes": 546
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_20261019_OLD_OFFICIAL_BASELINE_AND_TREE_RESUME_HANDOFF.json",
@@ -2014,8 +2026,8 @@
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/save_ROOT_tree_github_snapshot.py",
-      "sha256": "ca3598681f779bbad5343cdf8fc3b5e9be1fb9204a3098b4d1485055971c1f4b",
-      "bytes": 27467
+      "sha256": "32ec6b592b5f5ee9c291726ffb377aa352096fdf5f5ff7cd4ae409154cdb746e",
+      "bytes": 27686
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/startup_ROOT331_runtime_import_HOST.sh",
@@ -17852,6 +17864,30 @@
       "bytes": 3121
     },
     {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-best376-target-binding-host-v390/HOST390_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-best376-target-binding-host-v390/HOST390_RESULT.json",
+      "sha256": "87b90caaa4db085763b35e0c6ab9fe7319347cbe918130cf4bf46ea14bdf06a1",
+      "bytes": 2830
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-best376-target-binding-host-v390/SCOPE390.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-best376-target-binding-host-v390/SCOPE390.json",
+      "sha256": "9e8dad24da9061de7f22740d129722dde29afadc7f10461f6f4d5bf053d43339",
+      "bytes": 628
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-best376-target-binding-host-v390/check390_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-best376-target-binding-host-v390/check390_HOST.py",
+      "sha256": "8d59ebca0a87d452a4cfa85d9fa6e3c249acb5fd84cc1ffc4473ba507ffa5317",
+      "bytes": 4531
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-best376-target-binding-host-v390/metadata390.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-best376-target-binding-host-v390/metadata390.py",
+      "sha256": "5314d63a65d61f7cee4be4d3085c5c33dad33e9608fb9d5431854af1ec22b534",
+      "bytes": 2027
+    },
+    {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-child4-original-bounded-v386/FREEZE386.json",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-child4-original-bounded-v386/FREEZE386.json",
       "sha256": "0909f2ed2a3c5fbd0ef94a3e9122611c48bf4cc4e164afdbd558ce27afbb1b96",
@@ -17886,6 +17922,90 @@
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-child4-original-bounded-v386/startup386.sh",
       "sha256": "4a4c79a9362cb9a5f091d022a3093cd5a368f3a616ba27bbf7cc923aff7ce1af",
       "bytes": 7956
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/HOST391_CONSTRUCTION_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/HOST391_CONSTRUCTION_RESULT.json",
+      "sha256": "a2451beef3dc4e272db3e41a16666b9a420927b10fb3ef83897e7b814c2dd23f",
+      "bytes": 283
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/HOST391_RESULT.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/HOST391_RESULT.json",
+      "sha256": "7ba7c2463375eb201a61772b2f7ba7cb01ee9bc81caa49d265e54682dd013f95",
+      "bytes": 642
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/SCOPE391.json",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/SCOPE391.json",
+      "sha256": "16dd1a8d2bf6029a05c5a400379136189701a7364e31afd10c48454b538251db",
+      "bytes": 507
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/actor391.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/actor391.py",
+      "sha256": "55e3a407e400c476c8d6e2200666f2b0f31f9d841f356d116f1339dfaf6fdc21",
+      "bytes": 1316
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/audit391.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/audit391.py",
+      "sha256": "47c1e8fd59765aef668c9485dcb36bae7f336564a44fd4048c9ed0cdcda39359",
+      "bytes": 1442
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/binding391.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/binding391.py",
+      "sha256": "0b02eda1efd28604c946662bde9a8f16701b0a114ab75d2728a10fcfd7e698db",
+      "bytes": 2041
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/check391.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/check391.py",
+      "sha256": "239b6f345c3720d7684c353c6698799847781a3c2805017b015b789bf8f792ad",
+      "bytes": 1345
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/check391_HOST.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/check391_HOST.py",
+      "sha256": "72e5de8a93e8b39bff1aa78d5a1441f157357f22869d5da99615571390a88556",
+      "bytes": 2921
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/component391.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/component391.py",
+      "sha256": "2b61f334c7132a3be33edc271a444a47f4e4bc6682067a0ad43dfef645e14919",
+      "bytes": 965
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/extension391.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/extension391.py",
+      "sha256": "58e379184a5a2451a468f5a6e3e2e32d072b4809bf5b58df2f267a0aeb3385b8",
+      "bytes": 688
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/guard391.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/guard391.py",
+      "sha256": "dbe946578f1b7363a929680cbc63c52575cbafa06e08e87f6c4059e84216c51b",
+      "bytes": 4082
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/runtime391.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/runtime391.py",
+      "sha256": "4612597e2608bfeeef0b6b7e25fc2f9b91fc4970aaa84a8c02ce0b7d28c73aba",
+      "bytes": 2597
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/startup391.sh",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/startup391.sh",
+      "sha256": "99db577d09a41001f0b6ee5a3caad2469a2cc9b1f4541f81101614650274afb8",
+      "bytes": 8314
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/target391.py",
+      "saved": "research/specslo-tree/snapshot/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/target391.py",
+      "sha256": "5114668dda86d40871e95bff76fc78ec8217b32693d11367cf1176b34ac9210e",
+      "bytes": 2535
     },
     {
       "source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-full-archive-guard-v387/FREEZE387.json",
@@ -22132,8 +22252,8 @@
     {
       "source": "/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
       "saved": "research/specslo-tree/snapshot/root/SpecSLO/tpot-report-20261015/DATASET_TPOT_AND_OPTIMIZATION_REPORT_zh.md",
-      "sha256": "643dfd478c218fc433581d26153cf86805b91b8181deacc30b9fe98fe7e4c40a",
-      "bytes": 341777
+      "sha256": "240a5a8641f3c91d07177e7ad5af26ddf5bc766cdf976e8b02170e6af6b231fe",
+      "bytes": 343823
     },
     {
       "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/examples/check_specslo_mc2_deferred_chain.py",

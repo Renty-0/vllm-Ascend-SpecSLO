@@ -1,0 +1,10 @@
+{
+  "status": "PASS_HOST391_UNFROZEN_PROJECTED_ACTUAL_WORKER_FACTORY",
+  "NPU_used": false,
+  "Torch_imported": false,
+  "source_gate_mocked_only_for_unfrozen_constructor": true,
+  "actual_frozen_gate_verified": false,
+  "models_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

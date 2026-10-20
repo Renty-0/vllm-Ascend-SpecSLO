@@ -1,0 +1,18 @@
+{
+  "status": "PASS_HOST391_ACTUAL_CALLBACK_GLOBALS_AND_SCOPE_REJECTIONS",
+  "target_proof_code_objects_preserved": true,
+  "actual_actor_target_delegate": true,
+  "actual_full_history_and_original_numeric_matcher_preserved": true,
+  "original173_cache_seal_rejections": [
+    "ROOT391 fresh original173 baseline required",
+    "ROOT391 independent target epoch before seal with released cache",
+    "ROOT391 independent target epoch before seal with released cache"
+  ],
+  "shape_cases": 24,
+  "NPU_used": false,
+  "Torch_imported": false,
+  "model_qualification": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

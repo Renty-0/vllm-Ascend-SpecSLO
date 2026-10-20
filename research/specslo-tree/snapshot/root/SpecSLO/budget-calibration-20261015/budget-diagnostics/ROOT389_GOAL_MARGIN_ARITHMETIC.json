@@ -1,0 +1,14 @@
+{
+  "scope": "arithmetic from completed376, not a performance forecast",
+  "current_Goodput": 609.0250374874602,
+  "current_Raw": 699.6987403391912,
+  "goal_floor": 644.766448113661,
+  "relative_GP_increase_needed": 0.05868627466229048,
+  "current_common_wall_s": 169.39861852908507,
+  "if_same_403_attained_requests_max_wall_s": 160.0083259633468,
+  "wall_reduction_needed_s": 9.390292565738264,
+  "if_same_wall_minimum_attained_requests": 427,
+  "current_attained": 403,
+  "original_request_count": 463,
+  "no_timing_or_arrival_change": true
+}
