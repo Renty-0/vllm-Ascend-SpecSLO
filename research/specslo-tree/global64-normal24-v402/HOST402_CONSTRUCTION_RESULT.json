@@ -1,0 +1,33 @@
+{
+  "status": "PASS_HOST402_ACTUAL_SANITIZED_STARTUP_CALLBACK_CONSTRUCTION",
+  "NPU_used": false,
+  "model_constructors_called": 0,
+  "exact_startup_PYTHONPATH": true,
+  "imported_origins": {
+    "projection247": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/projection247.py",
+    "projection255": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+    "window402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/window402.py",
+    "empty402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/empty402.py",
+    "reference402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/reference402.py",
+    "audit_reference402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit_reference402.py",
+    "audit_base402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit_base402.py",
+    "runtime402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/runtime402.py",
+    "trace402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/trace402.py",
+    "scope402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/scope402.py",
+    "audit402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit402.py",
+    "extension402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/extension402.py",
+    "bucket402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/bucket402.py",
+    "oracle402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/oracle402.py",
+    "qualify402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/qualify402.py",
+    "guard402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/guard402.py",
+    "shape402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/shape402.py",
+    "admission402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/admission402.py",
+    "audit_normal402": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit_normal402.py"
+  },
+  "configured_max_num_seqs": 64,
+  "effective_active_ceiling": 64,
+  "original_owned_verifier_and_cleanup_retained": true,
+  "original227_and_additional681_and_all463_ownAR_required": true,
+  "neural_qualification_inherited": false,
+  "deadline_seconds": 10800
+}

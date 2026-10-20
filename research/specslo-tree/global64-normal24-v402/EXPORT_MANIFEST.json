@@ -1,0 +1,238 @@
+{
+  "generation402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/generation402.py",
+    "sha256": "c4937acacc4da292c3744dc2ccc2874eb6a41442f002361650405a754a86d574"
+  },
+  "HOST402_CLEAN_STARTUP_RUN.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402_CLEAN_STARTUP_RUN.json",
+    "sha256": "45df27f5375bfa33d1e84bada5bf2d1a5aa72cc1f82fccb322d7868770b7b6b6"
+  },
+  "HOST402_TYPED_ALLOCATION_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402_TYPED_ALLOCATION_RESULT.json",
+    "sha256": "73d61a38257f0aa23599fc09c96412a05f9470316e382d4058e68b28247de236"
+  },
+  "check402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402.py",
+    "sha256": "49bde421e68ba9178d1104f21354bef07827fbbec6d7e75162947c1d7ac4c012"
+  },
+  "launch402.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/launch402.sh",
+    "sha256": "6f4dc2bbcbf0c7bfe97b5236f9b5add462bde3ec95ee77c40f801c0e82306356"
+  },
+  "window402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/window402.py",
+    "sha256": "50ae391a1eb1e61d5cae900570933d119ee077988847023cead4c3bde1698d85"
+  },
+  "shape402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/shape402.py",
+    "sha256": "eeb68f38acc5c9b68457a3764f6f2cd3bb8188bc734fe00246975e5b7e77a77b"
+  },
+  "empty402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/empty402.py",
+    "sha256": "a1cc5bb823147e16a6d67612d3a0f20985e0778d22f2f60150cc572e5d3da7a7"
+  },
+  "check402_construction_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_construction_HOST.py",
+    "sha256": "9d9050dc661d15c63f9797de04678694b7dd1aa7d3b8b5849af5771b7641dd54"
+  },
+  "HOST402-check402_live_binding_HOST.py.log": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402-check402_live_binding_HOST.py.log",
+    "sha256": "e2e06c4da1dff2b163bd53a202fa14edb8db08fc775c7ec8f6416a297911f210"
+  },
+  "extension402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/extension402.py",
+    "sha256": "920a96e99a92ad746f3a1cb6e3d55293715625b7c27e3ea77a00c5c1071c6268"
+  },
+  "bucket402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/bucket402.py",
+    "sha256": "2585096ad9ebeb2f67215e5e8b691416104f6139912cfb92d91f82a721d8b7d2"
+  },
+  "dispatch402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/dispatch402.py",
+    "sha256": "8f33319464e219814031f46a90288bcdabd074e9883b6016b0d7a4ecd0969f77"
+  },
+  "HOST402.generated-LIVE.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402.generated-LIVE.py",
+    "sha256": "2a5352d5fb0ffa9a1f669fa96b30db167daec42a66c3168e3367f43839d6c82c"
+  },
+  "check402_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_HOST.py",
+    "sha256": "74830f0b6baf01bf4a623c980b4af3a5d66bf71f65b1be72ffb9f6f4ee72e10c"
+  },
+  "audit_reference402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit_reference402.py",
+    "sha256": "8608b0868e541e28561f58a37b46b23aa9c2049a8b717f72787c4187da14ae70"
+  },
+  "DERIVATION402.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/DERIVATION402.json",
+    "sha256": "7fe838259c67692fa6ba7f6bd9af019d7f308fe78e758b046b2ae4fdaffeeee2"
+  },
+  "audit_normal402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit_normal402.py",
+    "sha256": "9de56ea72cc03d2b242da02b6d44756ba88c33f69eac2d5c5738a060eba94987"
+  },
+  "HOST402_PACKING_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402_PACKING_RESULT.json",
+    "sha256": "91cf8bd2fc3f07e1d4aeca9dbbf9bb836de0a8d99c4956b975b17ebe3e2f79a3"
+  },
+  "prefixes402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/prefixes402.py",
+    "sha256": "d2997bbc47d6425a7df94234400773b0bb1d1b78a6f7a640d73789096b7bd8b7"
+  },
+  "scope402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/scope402.py",
+    "sha256": "02923aa42501eb6524344ed7c874793b6c400a22acc6f76e3809706a23245879"
+  },
+  "audit402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit402.py",
+    "sha256": "df86b7dcb25d14a5bf1e350fef1825406557d23f2e2e8154b101cd1013c3eec3"
+  },
+  "admission402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/admission402.py",
+    "sha256": "e772739d92b1fe8f5ae95974b9631a47b21a803e3c5acfae3fae8eb4db9e3933"
+  },
+  "check402_packing_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_packing_HOST.py",
+    "sha256": "e653283374e7c221980ef6af7513abe509e51800f6b4c4e75ad062c2882229cc"
+  },
+  "HOST402_CAPACITY_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402_CAPACITY_RESULT.json",
+    "sha256": "11a249790da79b0d2b0f4aa41f4b115ecb5035ae09d5eecf18d80df7810356d9"
+  },
+  "HOST402-check402_packing_HOST.py.log": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402-check402_packing_HOST.py.log",
+    "sha256": "6b663f4af7cba0b104f47f2266228a77fa109635289adcc9c8db1885a978393d"
+  },
+  "check402_capacity_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_capacity_HOST.py",
+    "sha256": "712bd80b7d09c90a2ec4146514976063df983f851daab83b5224b476b8f6f75b"
+  },
+  "HOST402_SCOPE_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402_SCOPE_RESULT.json",
+    "sha256": "a84b946e66c2e3076c3bd94dc455a12002c1cc5ec2a3034516756969b280ce29"
+  },
+  "HOST402_LIVE_BINDING_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402_LIVE_BINDING_RESULT.json",
+    "sha256": "c459e288a1de73c1cbd068f4a5857b9d5113a115805f86cc92a70d5048cb78a7"
+  },
+  "check402_typed_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_typed_HOST.py",
+    "sha256": "eb65b736105dc4f85d5d2528c666642be5a357a883beadcfc4ee919e29012c06"
+  },
+  "HOST402_CONSTRUCTION_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402_CONSTRUCTION_RESULT.json",
+    "sha256": "d958590a01480a5090c8a605ef61d61350c6818433752950e10a8514dd683866"
+  },
+  "projection402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/projection402.py",
+    "sha256": "186f6d9c1fdff1f69ff8586ec8fe215cf2fff9e943f3108486a1150c6da74485"
+  },
+  "PLAN402.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/PLAN402.json",
+    "sha256": "4aefeb10967bf2d3003f8419985baeace88890a22ad3244f215aacf0f1215cc2"
+  },
+  "check_scope402_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check_scope402_HOST.py",
+    "sha256": "e3b6408548a8eb5f3fdc41c02e9d921658f5d3f95ba439034443a791b49745a4"
+  },
+  "startup402.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/startup402.sh",
+    "sha256": "00954838a121d4707ae72308009040de659a6087c304ff7d1d7706d9ed94dffe"
+  },
+  "packing402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/packing402.py",
+    "sha256": "cfb31485bcea9d1907d557699886db0bd5043bc0566c473542b17d548825b06f"
+  },
+  "HOST402_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/HOST402_RESULT.json",
+    "sha256": "6707f1098740695d0141bd69e80cb9dcaf6bab74c20af85f3125ad169aa2ee1c"
+  },
+  "check402_live_binding_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_live_binding_HOST.py",
+    "sha256": "449899c8dd34a0f023da17f8695ac808669843ba37822675336c1c04526ed746"
+  },
+  "runtime402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/runtime402.py",
+    "sha256": "a22d663b03bb00e944e610318abceb51c084d4711858442a72e943872924d33d"
+  },
+  "audit_base402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit_base402.py",
+    "sha256": "42b9dd22fabcd387f9f0261081170f2e890ca03b6e821434e50a65c47fe77d0a"
+  },
+  "trace402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/trace402.py",
+    "sha256": "ad6a3fa9b556552eeb124184d5e96e02d5db5fd1047d6755e6b3ceeb67fafe58"
+  },
+  "oracle402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/oracle402.py",
+    "sha256": "ab60014da2e2b6e1303de5b5bbcb324363bac7ea8c1e08913a1378253bf33adc"
+  },
+  "guard402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/guard402.py",
+    "sha256": "0c44d4dfbfa0daa9bf98e3481e75db1780cdc5f83da1735a199b8902a1212a31"
+  },
+  "reference402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/reference402.py",
+    "sha256": "4365ea0c0fcb7273c9271d5e25481067e827113a25ac5c635e6bcb616a88e3ea"
+  },
+  "qualify402.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/qualify402.py",
+    "sha256": "36499791b584fedfb6281c4cd3c124f1b4e98e76d896cfde81093abb28b3ed7b"
+  },
+  "FREEZE402.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/FREEZE402.json",
+    "sha256": "ea6d0ba1012f45ccf13fb4b248aaa341e4b9de204cdeb39ce720b56841a2ee5d"
+  },
+  "SOURCE402_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/SOURCE402_RECEIPT.json",
+    "sha256": "2991ed8cd017295a0b4f378ca49676d45e5379dd002db66a6fe905a6dc8ade4c"
+  },
+  "tools/freeze_ROOT402_normal24_full_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT402_normal24_full_HOST.py",
+    "sha256": "abf1b2c297b1f1979237843cdfd90ba88f7213f136b519d84a52c4ac9f6aa295"
+  },
+  "tools/prepare_ROOT402_full_integration_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/prepare_ROOT402_full_integration_HOST.py",
+    "sha256": "208768777eaa08b0cbdba03d7d265b23ff8cdbb33f323ea2eb1dc0e4829504cc"
+  },
+  "tools/run_ROOT402_actual_startup_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT402_actual_startup_HOST.py",
+    "sha256": "b798e06797eb7036f5e46537bdd3d79f941eafce50d4d6cb45e63946984a91c7"
+  },
+  "tools/ROOT402_CURRENT_TYPED_POLICY_FINDINGS.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT402_CURRENT_TYPED_POLICY_FINDINGS.json",
+    "sha256": "861e77641e7176b4c572f241caf9f7e9d47028b3e96277e632b1e86549e0236e"
+  },
+  "tools/archive_ROOT402_old_private_evidence.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/archive_ROOT402_old_private_evidence.py",
+    "sha256": "a5f6d41e24660041327cf19b1977032126449f8bd506ebd5b0d63d14fbef9121"
+  },
+  "tools/ROOT402_VERIFIED_PRIVATE_ARCHIVAL_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT402_VERIFIED_PRIVATE_ARCHIVAL_RESULT.json",
+    "sha256": "086bb3ce4b753424cb3baab7f015c1a0e8aced1abfc1c742d000cf98d0fb222b"
+  },
+  "tools/ROOT398_FINAL_FULL_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_FINAL_FULL_RESULT.json",
+    "sha256": "d40c1751030cdae1ea8912d7fa3218786f3ef22047f0668ca8739e0d4bc7b8e4"
+  },
+  "tools/prepare_ROOT402_terminal_readers_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/prepare_ROOT402_terminal_readers_HOST.py",
+    "sha256": "f6dc0bafe604c2eea16f69a5af659b6a63c71b70e5d31c5d6efd640933a133ff"
+  },
+  "tools/audit_ROOT402_terminal_full_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT402_terminal_full_HOST.py",
+    "sha256": "f40d77e420dba91d6cb99fdd2c1a8e435f8a6ea731c676d04c4642e2efa3c3e5"
+  },
+  "tools/read_ROOT402_common_result_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_ROOT402_common_result_HOST.py",
+    "sha256": "be9d540d57e83f201fb9f3795520c9daa14ab4f62a077cae8b73246bd931a228"
+  },
+  "tools/HOST402_TERMINAL_READERS_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/HOST402_TERMINAL_READERS_RESULT.json",
+    "sha256": "0f4440acf17bd8004a1f5de49788a9d041b2021025f03fafc8818ce7f00bf766"
+  },
+  "tools/audit_ROOT395_terminal_finite_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT395_terminal_finite_HOST.py",
+    "sha256": "ec2c30e732bde29be726ab52609349e6ec83e0a7537ae729f93fb5e9d3ecef20"
+  }
+}

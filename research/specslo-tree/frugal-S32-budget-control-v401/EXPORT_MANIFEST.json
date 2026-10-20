@@ -34,5 +34,9 @@
   "tools/freeze_ROOT401_paid_control_HOST.py": {
     "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT401_paid_control_HOST.py",
     "sha256": "dc1a093f941f81a216cc0da08c4a255636bdae9862e4c2b97e9f0efff067e0a6"
+  },
+  "COMPATIBILITY_NOTE.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT401_COMPATIBILITY_NOTE.json",
+    "sha256": "d173890c0ef22b951cfb051de3a5f73528ed2a597c62f3de03c79265d464e82f"
   }
 }

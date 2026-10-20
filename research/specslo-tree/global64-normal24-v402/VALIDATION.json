@@ -1,0 +1,18 @@
+{
+  "status": "FROZEN_HOST_PASS_FULL_DEVICE_VALIDATION_PENDING",
+  "global_active_limit": 64,
+  "normal_work_limit": 24,
+  "original_typed_priority_gain_and_role_accounting_preserved": true,
+  "HOST_typed_cases": 800,
+  "HOST_exact_narrow_cases": 587,
+  "HOST_capped_class_age_cases": 213,
+  "HOST_original_controller_equivalence_and_segment_cases": 1000,
+  "actual_clean_startup_and_live_source_binding": true,
+  "original_neural_gates_not_replaced": true,
+  "source_archive_private_not_public": true,
+  "format_ci": "unavailable: pre-commit not installed; existing environment retained",
+  "NPU_launched": false,
+  "full463_completed": false,
+  "Raw": null,
+  "Goodput": null
+}

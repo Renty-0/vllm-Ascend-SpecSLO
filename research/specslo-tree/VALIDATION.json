@@ -68,5 +68,13 @@
   "ROOT398_changes_git_diff_check": "pass",
   "ROOT398_format_ci": "unavailable: pre-commit not installed; no environment changes",
   "ROOT395_current_finite_NPU_run": "running; no performance claim",
-  "ROOT399_400_NPU": "not launched; finite math/cost only"
+  "ROOT399_400_NPU": "not launched; finite math/cost only",
+  "ROOT402_HOST_source_frozen": true,
+  "ROOT402_actual_global_limit": 64,
+  "ROOT402_normal_work_limit": 24,
+  "ROOT402_typed_HOST_cases": 800,
+  "ROOT402_device_full_qualification": "not launched",
+  "ROOT402_original_gain_model_and_paid_role_limits_unchanged": true,
+  "ROOT401_base_shaper_HOST_not_installed_typed_callback": true,
+  "ROOT402_private_archival": "old394 and negative299; all archive hashes checked; current/best/control untouched"
 }

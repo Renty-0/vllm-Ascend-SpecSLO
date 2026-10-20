@@ -1,0 +1,11 @@
+{
+  "status": "PASS_HOST402_TERMINAL_READERS_BOUND_AND_PRIOR398_REJECTED",
+  "expected_freeze_sha256": "ea6d0ba1012f45ccf13fb4b248aaa341e4b9de204cdeb39ce720b56841a2ee5d",
+  "expected_archive_sha256": "da6043da883855b681abb4eeaa7d5559508412f006ae246362be1cdcf5c04faf",
+  "source_auditor_sha256": "f40d77e420dba91d6cb99fdd2c1a8e435f8a6ea731c676d04c4642e2efa3c3e5",
+  "source_reader_sha256": "be9d540d57e83f201fb9f3795520c9daa14ab4f62a077cae8b73246bd931a228",
+  "different_qualified_control_receipt_rejected_before_metrics": true,
+  "Raw": null,
+  "Goodput": null,
+  "NPU_used": false
+}
