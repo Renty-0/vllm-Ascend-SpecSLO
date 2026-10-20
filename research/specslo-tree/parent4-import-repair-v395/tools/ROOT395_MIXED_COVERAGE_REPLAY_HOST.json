@@ -1,0 +1,373 @@
+{
+  "status": "PASS_HOST395_SAVED_GATE_REPLAY_AND_GENUINELY_MISSING_MIXED_CASE",
+  "cases": [
+    {
+      "case": "N16-parent16-P4-E1-B4-R0-M20",
+      "actual": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/actual/parent4-child4-current-M120-root-v395-import-repair-v1/bounded199/rank0-pass0-N16-parent16-P4-E1-B4-R0-M20.json.gz",
+      "actual_sha256": "582bbd4a0d950e594056c8531e8092b02651f4c4379c21eccc4c357cb7a9ab9b",
+      "original_first_plan": {
+        "owners": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "eager": [],
+        "N": 16,
+        "mixed": false
+      },
+      "original_second_plan": {
+        "owners": [
+          16
+        ],
+        "eager": [
+          16
+        ],
+        "target_home": 1,
+        "deferred": [],
+        "N": 1,
+        "Q": 5,
+        "C": 4
+      },
+      "actual_promotions_retained": [
+        16
+      ],
+      "proposed_diagnostic_SLO_first_plan": {
+        "owners": [
+          16,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "eager": [
+          16
+        ],
+        "N": 16,
+        "mixed": true
+      },
+      "proposed_mixed_neural_checks_executed": false
+    },
+    {
+      "case": "N16-parent16-P4-E1-B4-R1-M20",
+      "actual": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/actual/parent4-child4-current-M120-root-v395-import-repair-v1/bounded199/rank0-pass0-N16-parent16-P4-E1-B4-R1-M20.json.gz",
+      "actual_sha256": "634f519095cb3c147127bdd9d55fd9b10deb65e12e48d8e394b0ffaea4db3f7d",
+      "original_first_plan": {
+        "owners": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "eager": [],
+        "N": 16,
+        "mixed": false
+      },
+      "original_second_plan": {
+        "owners": [
+          16
+        ],
+        "eager": [
+          16
+        ],
+        "target_home": 1,
+        "deferred": [],
+        "N": 1,
+        "Q": 5,
+        "C": 4
+      },
+      "actual_promotions_retained": [
+        16
+      ],
+      "proposed_diagnostic_SLO_first_plan": {
+        "owners": [
+          16,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "eager": [
+          16
+        ],
+        "N": 16,
+        "mixed": true
+      },
+      "proposed_mixed_neural_checks_executed": false
+    },
+    {
+      "case": "N16-parent16-P4-E2-B4-R1-M20",
+      "actual": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/actual/parent4-child4-current-M120-root-v395-import-repair-v1/bounded199/rank0-pass0-N16-parent16-P4-E2-B4-R1-M20.json.gz",
+      "actual_sha256": "4fba16d81bd7685a844440820eb029a86e39b2d1eeeb0cfb8299b45243d44a9d",
+      "original_first_plan": {
+        "owners": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "eager": [],
+        "N": 16,
+        "mixed": false
+      },
+      "original_second_plan": {
+        "owners": [
+          16
+        ],
+        "eager": [
+          16
+        ],
+        "target_home": 1,
+        "deferred": [],
+        "N": 1,
+        "Q": 5,
+        "C": 4
+      },
+      "actual_promotions_retained": [
+        16
+      ],
+      "proposed_diagnostic_SLO_first_plan": {
+        "owners": [
+          16,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "eager": [
+          16
+        ],
+        "N": 16,
+        "mixed": true
+      },
+      "proposed_mixed_neural_checks_executed": false
+    },
+    {
+      "case": "N16-parent16-P4-E3-B4-R1-M20",
+      "actual": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/actual/parent4-child4-current-M120-root-v395-import-repair-v1/bounded199/rank0-pass0-N16-parent16-P4-E3-B4-R1-M20.json.gz",
+      "actual_sha256": "1867dbaadae70206f3015cafbe8042842e426a7be467084664ea7ac34f5561c3",
+      "original_first_plan": {
+        "owners": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "eager": [],
+        "N": 16,
+        "mixed": false
+      },
+      "original_second_plan": {
+        "owners": [
+          16,
+          17
+        ],
+        "eager": [
+          16,
+          17
+        ],
+        "target_home": 1,
+        "deferred": [],
+        "N": 2,
+        "Q": 10,
+        "C": 8
+      },
+      "actual_promotions_retained": [
+        16,
+        17
+      ],
+      "proposed_diagnostic_SLO_first_plan": {
+        "owners": [
+          16,
+          17,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "eager": [
+          16,
+          17
+        ],
+        "N": 16,
+        "mixed": true
+      },
+      "proposed_mixed_neural_checks_executed": false
+    },
+    {
+      "case": "N16-parent16-P4-E4-B4-R1-M20",
+      "actual": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/actual/parent4-child4-current-M120-root-v395-import-repair-v1/bounded199/rank0-pass0-N16-parent16-P4-E4-B4-R1-M20.json.gz",
+      "actual_sha256": "ce26faa484efc8cebc75c86559ef70b9b3568e89a6d80e4dd43605550427b64e",
+      "original_first_plan": {
+        "owners": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "eager": [],
+        "N": 16,
+        "mixed": false
+      },
+      "original_second_plan": {
+        "owners": [
+          16,
+          17
+        ],
+        "eager": [
+          16,
+          17
+        ],
+        "target_home": 1,
+        "deferred": [],
+        "N": 2,
+        "Q": 10,
+        "C": 8
+      },
+      "actual_promotions_retained": [
+        16,
+        17
+      ],
+      "proposed_diagnostic_SLO_first_plan": {
+        "owners": [
+          16,
+          17,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "eager": [
+          16,
+          17
+        ],
+        "N": 16,
+        "mixed": true
+      },
+      "proposed_mixed_neural_checks_executed": false
+    }
+  ],
+  "actual395_coverage_status_changed": false,
+  "reason": "all16 ordinary tickets selected first; naturally promoted child1/2 tickets selected separately",
+  "misleading_explanation_rejected": "M80 label versus actualM120 alone does not explain the false predicate; it tests real owner count and eager membership",
+  "proposal": "fresh finite protocol using diagnostic SLO inputs plus real production priority/target_slo_first switches",
+  "proposed_mixed_neural_qualification": false,
+  "NPU_used": false,
+  "Native_qualification_flags_assigned": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

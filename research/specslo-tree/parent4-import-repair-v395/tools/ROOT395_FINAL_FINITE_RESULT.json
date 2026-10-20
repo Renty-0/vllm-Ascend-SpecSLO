@@ -1,0 +1,42 @@
+{
+  "status": "COMPLETE_FINITE_NUMERICAL_PROTOCOL_SUBSET_NOT_PRODUCTION",
+  "terminal_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT395_TERMINAL_INDEPENDENT_FINITE_AUDIT.json",
+  "terminal_audit_sha256": "bc29a118850ded58416267f80da5a273be7e798b56f36caa80b1bbd10b601a7e",
+  "source_freeze_sha256": "d3ccc5f6547ec6844df3308132a5f759beb23c08bec93a4befe6d585d7716516",
+  "source_archive_sha256": "d7c3f53b7564c308d5957f20aade43fa6e863b65bcbeb476a82bc8fe1ce5828a",
+  "real_NPU_experiment": true,
+  "independent_HOST_audit_NPU_used": false,
+  "actual_current_M120_target": true,
+  "original_optimized_best257_draft_claimed": false,
+  "scope": {
+    "normal_N": 16,
+    "parent_B": 4,
+    "child_B": 4,
+    "eager_E": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "repair_R": [
+      0,
+      1
+    ],
+    "prefix": 128
+  },
+  "cases_per_rank": 15,
+  "required_natural_coverage": false,
+  "first_and_second_repeated_pass_all21_zero": true,
+  "natural_positive": true,
+  "natural_reject": true,
+  "full_leaf_repair": true,
+  "mixed_normal_child_N16_observed": false,
+  "mixed_reason": "all16 ordinary tickets selected first; naturally promoted child1/2 tickets selected separately",
+  "all_source_and_environment_checks_passed": true,
+  "owned_remaining": [],
+  "production_permission": false,
+  "full463": false,
+  "Raw": null,
+  "Goodput": null,
+  "next": "new finite diagnostic with real SLO inputs and production priority/target_slo_first switches; new mixed model/KV checks still required"
+}

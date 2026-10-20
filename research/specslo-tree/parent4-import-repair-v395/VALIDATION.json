@@ -1,5 +1,5 @@
 {
-  "status": "frozen_HOST_prepared_not_NPU_launched",
+  "status": "COMPLETE_FINITE_NUMERICAL_PROTOCOL_SUBSET_NOT_PRODUCTION",
   "actual_sanitized_startup_and_callback_construction": "pass",
   "model_constructors_in_HOST": 0,
   "source_members_verified": 4297,
@@ -14,5 +14,11 @@
     "attempted": true,
     "exit_code": 1,
     "reason": "pre-commit not installed; no runtime environment packages changed"
-  }
+  },
+  "NPU_finite_cases_per_rank": 15,
+  "actual_M120_target": true,
+  "full_required_natural_coverage": false,
+  "natural_positive_and_reject_and_leaf_repair": true,
+  "mixed_normal_child_N16": false,
+  "two_complete_all21_zero_traces": true
 }
