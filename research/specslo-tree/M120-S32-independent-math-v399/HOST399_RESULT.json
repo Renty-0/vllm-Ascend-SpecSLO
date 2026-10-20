@@ -1,0 +1,1840 @@
+{
+  "status": "PASS_HOST399_ACTUAL_PADDING_AND_ALL_INDEPENDENT_S24_NODE_FRAMES",
+  "cases": 200,
+  "case_records": [
+    {
+      "extent": 512,
+      "name": "N25-all1",
+      "N": 25,
+      "C": 25,
+      "Q": 50,
+      "independent_frames": 4,
+      "independent_nodes": 50
+    },
+    {
+      "extent": 512,
+      "name": "N25-all2",
+      "N": 25,
+      "C": 50,
+      "Q": 75,
+      "independent_frames": 6,
+      "independent_nodes": 75
+    },
+    {
+      "extent": 512,
+      "name": "N25-saturated",
+      "N": 25,
+      "C": 74,
+      "Q": 99,
+      "independent_frames": 7,
+      "independent_nodes": 99
+    },
+    {
+      "extent": 512,
+      "name": "N25-reversed",
+      "N": 25,
+      "C": 74,
+      "Q": 99,
+      "independent_frames": 7,
+      "independent_nodes": 99
+    },
+    {
+      "extent": 512,
+      "name": "N25-mixed",
+      "N": 25,
+      "C": 49,
+      "Q": 74,
+      "independent_frames": 6,
+      "independent_nodes": 74
+    },
+    {
+      "extent": 512,
+      "name": "N26-all1",
+      "N": 26,
+      "C": 26,
+      "Q": 52,
+      "independent_frames": 4,
+      "independent_nodes": 52
+    },
+    {
+      "extent": 512,
+      "name": "N26-all2",
+      "N": 26,
+      "C": 52,
+      "Q": 78,
+      "independent_frames": 6,
+      "independent_nodes": 78
+    },
+    {
+      "extent": 512,
+      "name": "N26-saturated",
+      "N": 26,
+      "C": 76,
+      "Q": 102,
+      "independent_frames": 7,
+      "independent_nodes": 102
+    },
+    {
+      "extent": 512,
+      "name": "N26-reversed",
+      "N": 26,
+      "C": 76,
+      "Q": 102,
+      "independent_frames": 7,
+      "independent_nodes": 102
+    },
+    {
+      "extent": 512,
+      "name": "N26-mixed",
+      "N": 26,
+      "C": 51,
+      "Q": 77,
+      "independent_frames": 6,
+      "independent_nodes": 77
+    },
+    {
+      "extent": 512,
+      "name": "N27-all1",
+      "N": 27,
+      "C": 27,
+      "Q": 54,
+      "independent_frames": 4,
+      "independent_nodes": 54
+    },
+    {
+      "extent": 512,
+      "name": "N27-all2",
+      "N": 27,
+      "C": 54,
+      "Q": 81,
+      "independent_frames": 6,
+      "independent_nodes": 81
+    },
+    {
+      "extent": 512,
+      "name": "N27-saturated",
+      "N": 27,
+      "C": 78,
+      "Q": 105,
+      "independent_frames": 7,
+      "independent_nodes": 105
+    },
+    {
+      "extent": 512,
+      "name": "N27-reversed",
+      "N": 27,
+      "C": 78,
+      "Q": 105,
+      "independent_frames": 7,
+      "independent_nodes": 105
+    },
+    {
+      "extent": 512,
+      "name": "N27-mixed",
+      "N": 27,
+      "C": 54,
+      "Q": 81,
+      "independent_frames": 6,
+      "independent_nodes": 81
+    },
+    {
+      "extent": 512,
+      "name": "N28-all1",
+      "N": 28,
+      "C": 28,
+      "Q": 56,
+      "independent_frames": 4,
+      "independent_nodes": 56
+    },
+    {
+      "extent": 512,
+      "name": "N28-all2",
+      "N": 28,
+      "C": 56,
+      "Q": 84,
+      "independent_frames": 6,
+      "independent_nodes": 84
+    },
+    {
+      "extent": 512,
+      "name": "N28-saturated",
+      "N": 28,
+      "C": 80,
+      "Q": 108,
+      "independent_frames": 7,
+      "independent_nodes": 108
+    },
+    {
+      "extent": 512,
+      "name": "N28-reversed",
+      "N": 28,
+      "C": 80,
+      "Q": 108,
+      "independent_frames": 7,
+      "independent_nodes": 108
+    },
+    {
+      "extent": 512,
+      "name": "N28-mixed",
+      "N": 28,
+      "C": 55,
+      "Q": 83,
+      "independent_frames": 6,
+      "independent_nodes": 83
+    },
+    {
+      "extent": 512,
+      "name": "N29-all1",
+      "N": 29,
+      "C": 29,
+      "Q": 58,
+      "independent_frames": 4,
+      "independent_nodes": 58
+    },
+    {
+      "extent": 512,
+      "name": "N29-all2",
+      "N": 29,
+      "C": 58,
+      "Q": 87,
+      "independent_frames": 6,
+      "independent_nodes": 87
+    },
+    {
+      "extent": 512,
+      "name": "N29-saturated",
+      "N": 29,
+      "C": 82,
+      "Q": 111,
+      "independent_frames": 7,
+      "independent_nodes": 111
+    },
+    {
+      "extent": 512,
+      "name": "N29-reversed",
+      "N": 29,
+      "C": 82,
+      "Q": 111,
+      "independent_frames": 7,
+      "independent_nodes": 111
+    },
+    {
+      "extent": 512,
+      "name": "N29-mixed",
+      "N": 29,
+      "C": 57,
+      "Q": 86,
+      "independent_frames": 6,
+      "independent_nodes": 86
+    },
+    {
+      "extent": 512,
+      "name": "N30-all1",
+      "N": 30,
+      "C": 30,
+      "Q": 60,
+      "independent_frames": 4,
+      "independent_nodes": 60
+    },
+    {
+      "extent": 512,
+      "name": "N30-all2",
+      "N": 30,
+      "C": 60,
+      "Q": 90,
+      "independent_frames": 6,
+      "independent_nodes": 90
+    },
+    {
+      "extent": 512,
+      "name": "N30-saturated",
+      "N": 30,
+      "C": 84,
+      "Q": 114,
+      "independent_frames": 7,
+      "independent_nodes": 114
+    },
+    {
+      "extent": 512,
+      "name": "N30-reversed",
+      "N": 30,
+      "C": 84,
+      "Q": 114,
+      "independent_frames": 7,
+      "independent_nodes": 114
+    },
+    {
+      "extent": 512,
+      "name": "N30-mixed",
+      "N": 30,
+      "C": 60,
+      "Q": 90,
+      "independent_frames": 6,
+      "independent_nodes": 90
+    },
+    {
+      "extent": 512,
+      "name": "N31-all1",
+      "N": 31,
+      "C": 31,
+      "Q": 62,
+      "independent_frames": 4,
+      "independent_nodes": 62
+    },
+    {
+      "extent": 512,
+      "name": "N31-all2",
+      "N": 31,
+      "C": 62,
+      "Q": 93,
+      "independent_frames": 6,
+      "independent_nodes": 93
+    },
+    {
+      "extent": 512,
+      "name": "N31-saturated",
+      "N": 31,
+      "C": 86,
+      "Q": 117,
+      "independent_frames": 7,
+      "independent_nodes": 117
+    },
+    {
+      "extent": 512,
+      "name": "N31-reversed",
+      "N": 31,
+      "C": 86,
+      "Q": 117,
+      "independent_frames": 7,
+      "independent_nodes": 117
+    },
+    {
+      "extent": 512,
+      "name": "N31-mixed",
+      "N": 31,
+      "C": 61,
+      "Q": 92,
+      "independent_frames": 6,
+      "independent_nodes": 92
+    },
+    {
+      "extent": 512,
+      "name": "N32-all1",
+      "N": 32,
+      "C": 32,
+      "Q": 64,
+      "independent_frames": 4,
+      "independent_nodes": 64
+    },
+    {
+      "extent": 512,
+      "name": "N32-all2",
+      "N": 32,
+      "C": 64,
+      "Q": 96,
+      "independent_frames": 6,
+      "independent_nodes": 96
+    },
+    {
+      "extent": 512,
+      "name": "N32-saturated",
+      "N": 32,
+      "C": 88,
+      "Q": 120,
+      "independent_frames": 7,
+      "independent_nodes": 120
+    },
+    {
+      "extent": 512,
+      "name": "N32-reversed",
+      "N": 32,
+      "C": 88,
+      "Q": 120,
+      "independent_frames": 7,
+      "independent_nodes": 120
+    },
+    {
+      "extent": 512,
+      "name": "N32-mixed",
+      "N": 32,
+      "C": 63,
+      "Q": 95,
+      "independent_frames": 6,
+      "independent_nodes": 95
+    },
+    {
+      "extent": 1024,
+      "name": "N25-all1",
+      "N": 25,
+      "C": 25,
+      "Q": 50,
+      "independent_frames": 4,
+      "independent_nodes": 50
+    },
+    {
+      "extent": 1024,
+      "name": "N25-all2",
+      "N": 25,
+      "C": 50,
+      "Q": 75,
+      "independent_frames": 6,
+      "independent_nodes": 75
+    },
+    {
+      "extent": 1024,
+      "name": "N25-saturated",
+      "N": 25,
+      "C": 74,
+      "Q": 99,
+      "independent_frames": 7,
+      "independent_nodes": 99
+    },
+    {
+      "extent": 1024,
+      "name": "N25-reversed",
+      "N": 25,
+      "C": 74,
+      "Q": 99,
+      "independent_frames": 7,
+      "independent_nodes": 99
+    },
+    {
+      "extent": 1024,
+      "name": "N25-mixed",
+      "N": 25,
+      "C": 49,
+      "Q": 74,
+      "independent_frames": 6,
+      "independent_nodes": 74
+    },
+    {
+      "extent": 1024,
+      "name": "N26-all1",
+      "N": 26,
+      "C": 26,
+      "Q": 52,
+      "independent_frames": 4,
+      "independent_nodes": 52
+    },
+    {
+      "extent": 1024,
+      "name": "N26-all2",
+      "N": 26,
+      "C": 52,
+      "Q": 78,
+      "independent_frames": 6,
+      "independent_nodes": 78
+    },
+    {
+      "extent": 1024,
+      "name": "N26-saturated",
+      "N": 26,
+      "C": 76,
+      "Q": 102,
+      "independent_frames": 7,
+      "independent_nodes": 102
+    },
+    {
+      "extent": 1024,
+      "name": "N26-reversed",
+      "N": 26,
+      "C": 76,
+      "Q": 102,
+      "independent_frames": 7,
+      "independent_nodes": 102
+    },
+    {
+      "extent": 1024,
+      "name": "N26-mixed",
+      "N": 26,
+      "C": 51,
+      "Q": 77,
+      "independent_frames": 6,
+      "independent_nodes": 77
+    },
+    {
+      "extent": 1024,
+      "name": "N27-all1",
+      "N": 27,
+      "C": 27,
+      "Q": 54,
+      "independent_frames": 4,
+      "independent_nodes": 54
+    },
+    {
+      "extent": 1024,
+      "name": "N27-all2",
+      "N": 27,
+      "C": 54,
+      "Q": 81,
+      "independent_frames": 6,
+      "independent_nodes": 81
+    },
+    {
+      "extent": 1024,
+      "name": "N27-saturated",
+      "N": 27,
+      "C": 78,
+      "Q": 105,
+      "independent_frames": 7,
+      "independent_nodes": 105
+    },
+    {
+      "extent": 1024,
+      "name": "N27-reversed",
+      "N": 27,
+      "C": 78,
+      "Q": 105,
+      "independent_frames": 7,
+      "independent_nodes": 105
+    },
+    {
+      "extent": 1024,
+      "name": "N27-mixed",
+      "N": 27,
+      "C": 54,
+      "Q": 81,
+      "independent_frames": 6,
+      "independent_nodes": 81
+    },
+    {
+      "extent": 1024,
+      "name": "N28-all1",
+      "N": 28,
+      "C": 28,
+      "Q": 56,
+      "independent_frames": 4,
+      "independent_nodes": 56
+    },
+    {
+      "extent": 1024,
+      "name": "N28-all2",
+      "N": 28,
+      "C": 56,
+      "Q": 84,
+      "independent_frames": 6,
+      "independent_nodes": 84
+    },
+    {
+      "extent": 1024,
+      "name": "N28-saturated",
+      "N": 28,
+      "C": 80,
+      "Q": 108,
+      "independent_frames": 7,
+      "independent_nodes": 108
+    },
+    {
+      "extent": 1024,
+      "name": "N28-reversed",
+      "N": 28,
+      "C": 80,
+      "Q": 108,
+      "independent_frames": 7,
+      "independent_nodes": 108
+    },
+    {
+      "extent": 1024,
+      "name": "N28-mixed",
+      "N": 28,
+      "C": 55,
+      "Q": 83,
+      "independent_frames": 6,
+      "independent_nodes": 83
+    },
+    {
+      "extent": 1024,
+      "name": "N29-all1",
+      "N": 29,
+      "C": 29,
+      "Q": 58,
+      "independent_frames": 4,
+      "independent_nodes": 58
+    },
+    {
+      "extent": 1024,
+      "name": "N29-all2",
+      "N": 29,
+      "C": 58,
+      "Q": 87,
+      "independent_frames": 6,
+      "independent_nodes": 87
+    },
+    {
+      "extent": 1024,
+      "name": "N29-saturated",
+      "N": 29,
+      "C": 82,
+      "Q": 111,
+      "independent_frames": 7,
+      "independent_nodes": 111
+    },
+    {
+      "extent": 1024,
+      "name": "N29-reversed",
+      "N": 29,
+      "C": 82,
+      "Q": 111,
+      "independent_frames": 7,
+      "independent_nodes": 111
+    },
+    {
+      "extent": 1024,
+      "name": "N29-mixed",
+      "N": 29,
+      "C": 57,
+      "Q": 86,
+      "independent_frames": 6,
+      "independent_nodes": 86
+    },
+    {
+      "extent": 1024,
+      "name": "N30-all1",
+      "N": 30,
+      "C": 30,
+      "Q": 60,
+      "independent_frames": 4,
+      "independent_nodes": 60
+    },
+    {
+      "extent": 1024,
+      "name": "N30-all2",
+      "N": 30,
+      "C": 60,
+      "Q": 90,
+      "independent_frames": 6,
+      "independent_nodes": 90
+    },
+    {
+      "extent": 1024,
+      "name": "N30-saturated",
+      "N": 30,
+      "C": 84,
+      "Q": 114,
+      "independent_frames": 7,
+      "independent_nodes": 114
+    },
+    {
+      "extent": 1024,
+      "name": "N30-reversed",
+      "N": 30,
+      "C": 84,
+      "Q": 114,
+      "independent_frames": 7,
+      "independent_nodes": 114
+    },
+    {
+      "extent": 1024,
+      "name": "N30-mixed",
+      "N": 30,
+      "C": 60,
+      "Q": 90,
+      "independent_frames": 6,
+      "independent_nodes": 90
+    },
+    {
+      "extent": 1024,
+      "name": "N31-all1",
+      "N": 31,
+      "C": 31,
+      "Q": 62,
+      "independent_frames": 4,
+      "independent_nodes": 62
+    },
+    {
+      "extent": 1024,
+      "name": "N31-all2",
+      "N": 31,
+      "C": 62,
+      "Q": 93,
+      "independent_frames": 6,
+      "independent_nodes": 93
+    },
+    {
+      "extent": 1024,
+      "name": "N31-saturated",
+      "N": 31,
+      "C": 86,
+      "Q": 117,
+      "independent_frames": 7,
+      "independent_nodes": 117
+    },
+    {
+      "extent": 1024,
+      "name": "N31-reversed",
+      "N": 31,
+      "C": 86,
+      "Q": 117,
+      "independent_frames": 7,
+      "independent_nodes": 117
+    },
+    {
+      "extent": 1024,
+      "name": "N31-mixed",
+      "N": 31,
+      "C": 61,
+      "Q": 92,
+      "independent_frames": 6,
+      "independent_nodes": 92
+    },
+    {
+      "extent": 1024,
+      "name": "N32-all1",
+      "N": 32,
+      "C": 32,
+      "Q": 64,
+      "independent_frames": 4,
+      "independent_nodes": 64
+    },
+    {
+      "extent": 1024,
+      "name": "N32-all2",
+      "N": 32,
+      "C": 64,
+      "Q": 96,
+      "independent_frames": 6,
+      "independent_nodes": 96
+    },
+    {
+      "extent": 1024,
+      "name": "N32-saturated",
+      "N": 32,
+      "C": 88,
+      "Q": 120,
+      "independent_frames": 7,
+      "independent_nodes": 120
+    },
+    {
+      "extent": 1024,
+      "name": "N32-reversed",
+      "N": 32,
+      "C": 88,
+      "Q": 120,
+      "independent_frames": 7,
+      "independent_nodes": 120
+    },
+    {
+      "extent": 1024,
+      "name": "N32-mixed",
+      "N": 32,
+      "C": 63,
+      "Q": 95,
+      "independent_frames": 6,
+      "independent_nodes": 95
+    },
+    {
+      "extent": 1536,
+      "name": "N25-all1",
+      "N": 25,
+      "C": 25,
+      "Q": 50,
+      "independent_frames": 4,
+      "independent_nodes": 50
+    },
+    {
+      "extent": 1536,
+      "name": "N25-all2",
+      "N": 25,
+      "C": 50,
+      "Q": 75,
+      "independent_frames": 6,
+      "independent_nodes": 75
+    },
+    {
+      "extent": 1536,
+      "name": "N25-saturated",
+      "N": 25,
+      "C": 74,
+      "Q": 99,
+      "independent_frames": 7,
+      "independent_nodes": 99
+    },
+    {
+      "extent": 1536,
+      "name": "N25-reversed",
+      "N": 25,
+      "C": 74,
+      "Q": 99,
+      "independent_frames": 7,
+      "independent_nodes": 99
+    },
+    {
+      "extent": 1536,
+      "name": "N25-mixed",
+      "N": 25,
+      "C": 49,
+      "Q": 74,
+      "independent_frames": 6,
+      "independent_nodes": 74
+    },
+    {
+      "extent": 1536,
+      "name": "N26-all1",
+      "N": 26,
+      "C": 26,
+      "Q": 52,
+      "independent_frames": 4,
+      "independent_nodes": 52
+    },
+    {
+      "extent": 1536,
+      "name": "N26-all2",
+      "N": 26,
+      "C": 52,
+      "Q": 78,
+      "independent_frames": 6,
+      "independent_nodes": 78
+    },
+    {
+      "extent": 1536,
+      "name": "N26-saturated",
+      "N": 26,
+      "C": 76,
+      "Q": 102,
+      "independent_frames": 7,
+      "independent_nodes": 102
+    },
+    {
+      "extent": 1536,
+      "name": "N26-reversed",
+      "N": 26,
+      "C": 76,
+      "Q": 102,
+      "independent_frames": 7,
+      "independent_nodes": 102
+    },
+    {
+      "extent": 1536,
+      "name": "N26-mixed",
+      "N": 26,
+      "C": 51,
+      "Q": 77,
+      "independent_frames": 6,
+      "independent_nodes": 77
+    },
+    {
+      "extent": 1536,
+      "name": "N27-all1",
+      "N": 27,
+      "C": 27,
+      "Q": 54,
+      "independent_frames": 4,
+      "independent_nodes": 54
+    },
+    {
+      "extent": 1536,
+      "name": "N27-all2",
+      "N": 27,
+      "C": 54,
+      "Q": 81,
+      "independent_frames": 6,
+      "independent_nodes": 81
+    },
+    {
+      "extent": 1536,
+      "name": "N27-saturated",
+      "N": 27,
+      "C": 78,
+      "Q": 105,
+      "independent_frames": 7,
+      "independent_nodes": 105
+    },
+    {
+      "extent": 1536,
+      "name": "N27-reversed",
+      "N": 27,
+      "C": 78,
+      "Q": 105,
+      "independent_frames": 7,
+      "independent_nodes": 105
+    },
+    {
+      "extent": 1536,
+      "name": "N27-mixed",
+      "N": 27,
+      "C": 54,
+      "Q": 81,
+      "independent_frames": 6,
+      "independent_nodes": 81
+    },
+    {
+      "extent": 1536,
+      "name": "N28-all1",
+      "N": 28,
+      "C": 28,
+      "Q": 56,
+      "independent_frames": 4,
+      "independent_nodes": 56
+    },
+    {
+      "extent": 1536,
+      "name": "N28-all2",
+      "N": 28,
+      "C": 56,
+      "Q": 84,
+      "independent_frames": 6,
+      "independent_nodes": 84
+    },
+    {
+      "extent": 1536,
+      "name": "N28-saturated",
+      "N": 28,
+      "C": 80,
+      "Q": 108,
+      "independent_frames": 7,
+      "independent_nodes": 108
+    },
+    {
+      "extent": 1536,
+      "name": "N28-reversed",
+      "N": 28,
+      "C": 80,
+      "Q": 108,
+      "independent_frames": 7,
+      "independent_nodes": 108
+    },
+    {
+      "extent": 1536,
+      "name": "N28-mixed",
+      "N": 28,
+      "C": 55,
+      "Q": 83,
+      "independent_frames": 6,
+      "independent_nodes": 83
+    },
+    {
+      "extent": 1536,
+      "name": "N29-all1",
+      "N": 29,
+      "C": 29,
+      "Q": 58,
+      "independent_frames": 4,
+      "independent_nodes": 58
+    },
+    {
+      "extent": 1536,
+      "name": "N29-all2",
+      "N": 29,
+      "C": 58,
+      "Q": 87,
+      "independent_frames": 6,
+      "independent_nodes": 87
+    },
+    {
+      "extent": 1536,
+      "name": "N29-saturated",
+      "N": 29,
+      "C": 82,
+      "Q": 111,
+      "independent_frames": 7,
+      "independent_nodes": 111
+    },
+    {
+      "extent": 1536,
+      "name": "N29-reversed",
+      "N": 29,
+      "C": 82,
+      "Q": 111,
+      "independent_frames": 7,
+      "independent_nodes": 111
+    },
+    {
+      "extent": 1536,
+      "name": "N29-mixed",
+      "N": 29,
+      "C": 57,
+      "Q": 86,
+      "independent_frames": 6,
+      "independent_nodes": 86
+    },
+    {
+      "extent": 1536,
+      "name": "N30-all1",
+      "N": 30,
+      "C": 30,
+      "Q": 60,
+      "independent_frames": 4,
+      "independent_nodes": 60
+    },
+    {
+      "extent": 1536,
+      "name": "N30-all2",
+      "N": 30,
+      "C": 60,
+      "Q": 90,
+      "independent_frames": 6,
+      "independent_nodes": 90
+    },
+    {
+      "extent": 1536,
+      "name": "N30-saturated",
+      "N": 30,
+      "C": 84,
+      "Q": 114,
+      "independent_frames": 7,
+      "independent_nodes": 114
+    },
+    {
+      "extent": 1536,
+      "name": "N30-reversed",
+      "N": 30,
+      "C": 84,
+      "Q": 114,
+      "independent_frames": 7,
+      "independent_nodes": 114
+    },
+    {
+      "extent": 1536,
+      "name": "N30-mixed",
+      "N": 30,
+      "C": 60,
+      "Q": 90,
+      "independent_frames": 6,
+      "independent_nodes": 90
+    },
+    {
+      "extent": 1536,
+      "name": "N31-all1",
+      "N": 31,
+      "C": 31,
+      "Q": 62,
+      "independent_frames": 4,
+      "independent_nodes": 62
+    },
+    {
+      "extent": 1536,
+      "name": "N31-all2",
+      "N": 31,
+      "C": 62,
+      "Q": 93,
+      "independent_frames": 6,
+      "independent_nodes": 93
+    },
+    {
+      "extent": 1536,
+      "name": "N31-saturated",
+      "N": 31,
+      "C": 86,
+      "Q": 117,
+      "independent_frames": 7,
+      "independent_nodes": 117
+    },
+    {
+      "extent": 1536,
+      "name": "N31-reversed",
+      "N": 31,
+      "C": 86,
+      "Q": 117,
+      "independent_frames": 7,
+      "independent_nodes": 117
+    },
+    {
+      "extent": 1536,
+      "name": "N31-mixed",
+      "N": 31,
+      "C": 61,
+      "Q": 92,
+      "independent_frames": 6,
+      "independent_nodes": 92
+    },
+    {
+      "extent": 1536,
+      "name": "N32-all1",
+      "N": 32,
+      "C": 32,
+      "Q": 64,
+      "independent_frames": 4,
+      "independent_nodes": 64
+    },
+    {
+      "extent": 1536,
+      "name": "N32-all2",
+      "N": 32,
+      "C": 64,
+      "Q": 96,
+      "independent_frames": 6,
+      "independent_nodes": 96
+    },
+    {
+      "extent": 1536,
+      "name": "N32-saturated",
+      "N": 32,
+      "C": 88,
+      "Q": 120,
+      "independent_frames": 7,
+      "independent_nodes": 120
+    },
+    {
+      "extent": 1536,
+      "name": "N32-reversed",
+      "N": 32,
+      "C": 88,
+      "Q": 120,
+      "independent_frames": 7,
+      "independent_nodes": 120
+    },
+    {
+      "extent": 1536,
+      "name": "N32-mixed",
+      "N": 32,
+      "C": 63,
+      "Q": 95,
+      "independent_frames": 6,
+      "independent_nodes": 95
+    },
+    {
+      "extent": 2048,
+      "name": "N25-all1",
+      "N": 25,
+      "C": 25,
+      "Q": 50,
+      "independent_frames": 4,
+      "independent_nodes": 50
+    },
+    {
+      "extent": 2048,
+      "name": "N25-all2",
+      "N": 25,
+      "C": 50,
+      "Q": 75,
+      "independent_frames": 6,
+      "independent_nodes": 75
+    },
+    {
+      "extent": 2048,
+      "name": "N25-saturated",
+      "N": 25,
+      "C": 74,
+      "Q": 99,
+      "independent_frames": 7,
+      "independent_nodes": 99
+    },
+    {
+      "extent": 2048,
+      "name": "N25-reversed",
+      "N": 25,
+      "C": 74,
+      "Q": 99,
+      "independent_frames": 7,
+      "independent_nodes": 99
+    },
+    {
+      "extent": 2048,
+      "name": "N25-mixed",
+      "N": 25,
+      "C": 49,
+      "Q": 74,
+      "independent_frames": 6,
+      "independent_nodes": 74
+    },
+    {
+      "extent": 2048,
+      "name": "N26-all1",
+      "N": 26,
+      "C": 26,
+      "Q": 52,
+      "independent_frames": 4,
+      "independent_nodes": 52
+    },
+    {
+      "extent": 2048,
+      "name": "N26-all2",
+      "N": 26,
+      "C": 52,
+      "Q": 78,
+      "independent_frames": 6,
+      "independent_nodes": 78
+    },
+    {
+      "extent": 2048,
+      "name": "N26-saturated",
+      "N": 26,
+      "C": 76,
+      "Q": 102,
+      "independent_frames": 7,
+      "independent_nodes": 102
+    },
+    {
+      "extent": 2048,
+      "name": "N26-reversed",
+      "N": 26,
+      "C": 76,
+      "Q": 102,
+      "independent_frames": 7,
+      "independent_nodes": 102
+    },
+    {
+      "extent": 2048,
+      "name": "N26-mixed",
+      "N": 26,
+      "C": 51,
+      "Q": 77,
+      "independent_frames": 6,
+      "independent_nodes": 77
+    },
+    {
+      "extent": 2048,
+      "name": "N27-all1",
+      "N": 27,
+      "C": 27,
+      "Q": 54,
+      "independent_frames": 4,
+      "independent_nodes": 54
+    },
+    {
+      "extent": 2048,
+      "name": "N27-all2",
+      "N": 27,
+      "C": 54,
+      "Q": 81,
+      "independent_frames": 6,
+      "independent_nodes": 81
+    },
+    {
+      "extent": 2048,
+      "name": "N27-saturated",
+      "N": 27,
+      "C": 78,
+      "Q": 105,
+      "independent_frames": 7,
+      "independent_nodes": 105
+    },
+    {
+      "extent": 2048,
+      "name": "N27-reversed",
+      "N": 27,
+      "C": 78,
+      "Q": 105,
+      "independent_frames": 7,
+      "independent_nodes": 105
+    },
+    {
+      "extent": 2048,
+      "name": "N27-mixed",
+      "N": 27,
+      "C": 54,
+      "Q": 81,
+      "independent_frames": 6,
+      "independent_nodes": 81
+    },
+    {
+      "extent": 2048,
+      "name": "N28-all1",
+      "N": 28,
+      "C": 28,
+      "Q": 56,
+      "independent_frames": 4,
+      "independent_nodes": 56
+    },
+    {
+      "extent": 2048,
+      "name": "N28-all2",
+      "N": 28,
+      "C": 56,
+      "Q": 84,
+      "independent_frames": 6,
+      "independent_nodes": 84
+    },
+    {
+      "extent": 2048,
+      "name": "N28-saturated",
+      "N": 28,
+      "C": 80,
+      "Q": 108,
+      "independent_frames": 7,
+      "independent_nodes": 108
+    },
+    {
+      "extent": 2048,
+      "name": "N28-reversed",
+      "N": 28,
+      "C": 80,
+      "Q": 108,
+      "independent_frames": 7,
+      "independent_nodes": 108
+    },
+    {
+      "extent": 2048,
+      "name": "N28-mixed",
+      "N": 28,
+      "C": 55,
+      "Q": 83,
+      "independent_frames": 6,
+      "independent_nodes": 83
+    },
+    {
+      "extent": 2048,
+      "name": "N29-all1",
+      "N": 29,
+      "C": 29,
+      "Q": 58,
+      "independent_frames": 4,
+      "independent_nodes": 58
+    },
+    {
+      "extent": 2048,
+      "name": "N29-all2",
+      "N": 29,
+      "C": 58,
+      "Q": 87,
+      "independent_frames": 6,
+      "independent_nodes": 87
+    },
+    {
+      "extent": 2048,
+      "name": "N29-saturated",
+      "N": 29,
+      "C": 82,
+      "Q": 111,
+      "independent_frames": 7,
+      "independent_nodes": 111
+    },
+    {
+      "extent": 2048,
+      "name": "N29-reversed",
+      "N": 29,
+      "C": 82,
+      "Q": 111,
+      "independent_frames": 7,
+      "independent_nodes": 111
+    },
+    {
+      "extent": 2048,
+      "name": "N29-mixed",
+      "N": 29,
+      "C": 57,
+      "Q": 86,
+      "independent_frames": 6,
+      "independent_nodes": 86
+    },
+    {
+      "extent": 2048,
+      "name": "N30-all1",
+      "N": 30,
+      "C": 30,
+      "Q": 60,
+      "independent_frames": 4,
+      "independent_nodes": 60
+    },
+    {
+      "extent": 2048,
+      "name": "N30-all2",
+      "N": 30,
+      "C": 60,
+      "Q": 90,
+      "independent_frames": 6,
+      "independent_nodes": 90
+    },
+    {
+      "extent": 2048,
+      "name": "N30-saturated",
+      "N": 30,
+      "C": 84,
+      "Q": 114,
+      "independent_frames": 7,
+      "independent_nodes": 114
+    },
+    {
+      "extent": 2048,
+      "name": "N30-reversed",
+      "N": 30,
+      "C": 84,
+      "Q": 114,
+      "independent_frames": 7,
+      "independent_nodes": 114
+    },
+    {
+      "extent": 2048,
+      "name": "N30-mixed",
+      "N": 30,
+      "C": 60,
+      "Q": 90,
+      "independent_frames": 6,
+      "independent_nodes": 90
+    },
+    {
+      "extent": 2048,
+      "name": "N31-all1",
+      "N": 31,
+      "C": 31,
+      "Q": 62,
+      "independent_frames": 4,
+      "independent_nodes": 62
+    },
+    {
+      "extent": 2048,
+      "name": "N31-all2",
+      "N": 31,
+      "C": 62,
+      "Q": 93,
+      "independent_frames": 6,
+      "independent_nodes": 93
+    },
+    {
+      "extent": 2048,
+      "name": "N31-saturated",
+      "N": 31,
+      "C": 86,
+      "Q": 117,
+      "independent_frames": 7,
+      "independent_nodes": 117
+    },
+    {
+      "extent": 2048,
+      "name": "N31-reversed",
+      "N": 31,
+      "C": 86,
+      "Q": 117,
+      "independent_frames": 7,
+      "independent_nodes": 117
+    },
+    {
+      "extent": 2048,
+      "name": "N31-mixed",
+      "N": 31,
+      "C": 61,
+      "Q": 92,
+      "independent_frames": 6,
+      "independent_nodes": 92
+    },
+    {
+      "extent": 2048,
+      "name": "N32-all1",
+      "N": 32,
+      "C": 32,
+      "Q": 64,
+      "independent_frames": 4,
+      "independent_nodes": 64
+    },
+    {
+      "extent": 2048,
+      "name": "N32-all2",
+      "N": 32,
+      "C": 64,
+      "Q": 96,
+      "independent_frames": 6,
+      "independent_nodes": 96
+    },
+    {
+      "extent": 2048,
+      "name": "N32-saturated",
+      "N": 32,
+      "C": 88,
+      "Q": 120,
+      "independent_frames": 7,
+      "independent_nodes": 120
+    },
+    {
+      "extent": 2048,
+      "name": "N32-reversed",
+      "N": 32,
+      "C": 88,
+      "Q": 120,
+      "independent_frames": 7,
+      "independent_nodes": 120
+    },
+    {
+      "extent": 2048,
+      "name": "N32-mixed",
+      "N": 32,
+      "C": 63,
+      "Q": 95,
+      "independent_frames": 6,
+      "independent_nodes": 95
+    },
+    {
+      "extent": 2560,
+      "name": "N25-all1",
+      "N": 25,
+      "C": 25,
+      "Q": 50,
+      "independent_frames": 4,
+      "independent_nodes": 50
+    },
+    {
+      "extent": 2560,
+      "name": "N25-all2",
+      "N": 25,
+      "C": 50,
+      "Q": 75,
+      "independent_frames": 6,
+      "independent_nodes": 75
+    },
+    {
+      "extent": 2560,
+      "name": "N25-saturated",
+      "N": 25,
+      "C": 74,
+      "Q": 99,
+      "independent_frames": 7,
+      "independent_nodes": 99
+    },
+    {
+      "extent": 2560,
+      "name": "N25-reversed",
+      "N": 25,
+      "C": 74,
+      "Q": 99,
+      "independent_frames": 7,
+      "independent_nodes": 99
+    },
+    {
+      "extent": 2560,
+      "name": "N25-mixed",
+      "N": 25,
+      "C": 49,
+      "Q": 74,
+      "independent_frames": 6,
+      "independent_nodes": 74
+    },
+    {
+      "extent": 2560,
+      "name": "N26-all1",
+      "N": 26,
+      "C": 26,
+      "Q": 52,
+      "independent_frames": 4,
+      "independent_nodes": 52
+    },
+    {
+      "extent": 2560,
+      "name": "N26-all2",
+      "N": 26,
+      "C": 52,
+      "Q": 78,
+      "independent_frames": 6,
+      "independent_nodes": 78
+    },
+    {
+      "extent": 2560,
+      "name": "N26-saturated",
+      "N": 26,
+      "C": 76,
+      "Q": 102,
+      "independent_frames": 7,
+      "independent_nodes": 102
+    },
+    {
+      "extent": 2560,
+      "name": "N26-reversed",
+      "N": 26,
+      "C": 76,
+      "Q": 102,
+      "independent_frames": 7,
+      "independent_nodes": 102
+    },
+    {
+      "extent": 2560,
+      "name": "N26-mixed",
+      "N": 26,
+      "C": 51,
+      "Q": 77,
+      "independent_frames": 6,
+      "independent_nodes": 77
+    },
+    {
+      "extent": 2560,
+      "name": "N27-all1",
+      "N": 27,
+      "C": 27,
+      "Q": 54,
+      "independent_frames": 4,
+      "independent_nodes": 54
+    },
+    {
+      "extent": 2560,
+      "name": "N27-all2",
+      "N": 27,
+      "C": 54,
+      "Q": 81,
+      "independent_frames": 6,
+      "independent_nodes": 81
+    },
+    {
+      "extent": 2560,
+      "name": "N27-saturated",
+      "N": 27,
+      "C": 78,
+      "Q": 105,
+      "independent_frames": 7,
+      "independent_nodes": 105
+    },
+    {
+      "extent": 2560,
+      "name": "N27-reversed",
+      "N": 27,
+      "C": 78,
+      "Q": 105,
+      "independent_frames": 7,
+      "independent_nodes": 105
+    },
+    {
+      "extent": 2560,
+      "name": "N27-mixed",
+      "N": 27,
+      "C": 54,
+      "Q": 81,
+      "independent_frames": 6,
+      "independent_nodes": 81
+    },
+    {
+      "extent": 2560,
+      "name": "N28-all1",
+      "N": 28,
+      "C": 28,
+      "Q": 56,
+      "independent_frames": 4,
+      "independent_nodes": 56
+    },
+    {
+      "extent": 2560,
+      "name": "N28-all2",
+      "N": 28,
+      "C": 56,
+      "Q": 84,
+      "independent_frames": 6,
+      "independent_nodes": 84
+    },
+    {
+      "extent": 2560,
+      "name": "N28-saturated",
+      "N": 28,
+      "C": 80,
+      "Q": 108,
+      "independent_frames": 7,
+      "independent_nodes": 108
+    },
+    {
+      "extent": 2560,
+      "name": "N28-reversed",
+      "N": 28,
+      "C": 80,
+      "Q": 108,
+      "independent_frames": 7,
+      "independent_nodes": 108
+    },
+    {
+      "extent": 2560,
+      "name": "N28-mixed",
+      "N": 28,
+      "C": 55,
+      "Q": 83,
+      "independent_frames": 6,
+      "independent_nodes": 83
+    },
+    {
+      "extent": 2560,
+      "name": "N29-all1",
+      "N": 29,
+      "C": 29,
+      "Q": 58,
+      "independent_frames": 4,
+      "independent_nodes": 58
+    },
+    {
+      "extent": 2560,
+      "name": "N29-all2",
+      "N": 29,
+      "C": 58,
+      "Q": 87,
+      "independent_frames": 6,
+      "independent_nodes": 87
+    },
+    {
+      "extent": 2560,
+      "name": "N29-saturated",
+      "N": 29,
+      "C": 82,
+      "Q": 111,
+      "independent_frames": 7,
+      "independent_nodes": 111
+    },
+    {
+      "extent": 2560,
+      "name": "N29-reversed",
+      "N": 29,
+      "C": 82,
+      "Q": 111,
+      "independent_frames": 7,
+      "independent_nodes": 111
+    },
+    {
+      "extent": 2560,
+      "name": "N29-mixed",
+      "N": 29,
+      "C": 57,
+      "Q": 86,
+      "independent_frames": 6,
+      "independent_nodes": 86
+    },
+    {
+      "extent": 2560,
+      "name": "N30-all1",
+      "N": 30,
+      "C": 30,
+      "Q": 60,
+      "independent_frames": 4,
+      "independent_nodes": 60
+    },
+    {
+      "extent": 2560,
+      "name": "N30-all2",
+      "N": 30,
+      "C": 60,
+      "Q": 90,
+      "independent_frames": 6,
+      "independent_nodes": 90
+    },
+    {
+      "extent": 2560,
+      "name": "N30-saturated",
+      "N": 30,
+      "C": 84,
+      "Q": 114,
+      "independent_frames": 7,
+      "independent_nodes": 114
+    },
+    {
+      "extent": 2560,
+      "name": "N30-reversed",
+      "N": 30,
+      "C": 84,
+      "Q": 114,
+      "independent_frames": 7,
+      "independent_nodes": 114
+    },
+    {
+      "extent": 2560,
+      "name": "N30-mixed",
+      "N": 30,
+      "C": 60,
+      "Q": 90,
+      "independent_frames": 6,
+      "independent_nodes": 90
+    },
+    {
+      "extent": 2560,
+      "name": "N31-all1",
+      "N": 31,
+      "C": 31,
+      "Q": 62,
+      "independent_frames": 4,
+      "independent_nodes": 62
+    },
+    {
+      "extent": 2560,
+      "name": "N31-all2",
+      "N": 31,
+      "C": 62,
+      "Q": 93,
+      "independent_frames": 6,
+      "independent_nodes": 93
+    },
+    {
+      "extent": 2560,
+      "name": "N31-saturated",
+      "N": 31,
+      "C": 86,
+      "Q": 117,
+      "independent_frames": 7,
+      "independent_nodes": 117
+    },
+    {
+      "extent": 2560,
+      "name": "N31-reversed",
+      "N": 31,
+      "C": 86,
+      "Q": 117,
+      "independent_frames": 7,
+      "independent_nodes": 117
+    },
+    {
+      "extent": 2560,
+      "name": "N31-mixed",
+      "N": 31,
+      "C": 61,
+      "Q": 92,
+      "independent_frames": 6,
+      "independent_nodes": 92
+    },
+    {
+      "extent": 2560,
+      "name": "N32-all1",
+      "N": 32,
+      "C": 32,
+      "Q": 64,
+      "independent_frames": 4,
+      "independent_nodes": 64
+    },
+    {
+      "extent": 2560,
+      "name": "N32-all2",
+      "N": 32,
+      "C": 64,
+      "Q": 96,
+      "independent_frames": 6,
+      "independent_nodes": 96
+    },
+    {
+      "extent": 2560,
+      "name": "N32-saturated",
+      "N": 32,
+      "C": 88,
+      "Q": 120,
+      "independent_frames": 7,
+      "independent_nodes": 120
+    },
+    {
+      "extent": 2560,
+      "name": "N32-reversed",
+      "N": 32,
+      "C": 88,
+      "Q": 120,
+      "independent_frames": 7,
+      "independent_nodes": 120
+    },
+    {
+      "extent": 2560,
+      "name": "N32-mixed",
+      "N": 32,
+      "C": 63,
+      "Q": 95,
+      "independent_frames": 6,
+      "independent_nodes": 95
+    }
+  ],
+  "candidate_S": 32,
+  "independent_reference_S": 24,
+  "all_case_M": 120,
+  "global_active_limit_required": 64,
+  "fresh_independent_prefix_bank_owners": 96,
+  "selected_candidate_limit": 88,
+  "actual_original_neural_matchers_and_strict_bits_retained": true,
+  "independent_reference_does_not_invoke_candidate_projector": true,
+  "source_hashes": {
+    "audit399.py": "f0b1932d4bb5526836789bd15c8b155dbee69bc729286ea915f4e0316161ecab",
+    "bank399.py": "e228170e5623c10f2bb00431fbced62f1ed53402531d2cb30aa2388b60ebbcae",
+    "bootstrap399.py": "b31a2ebb940efdd3dbc000988ab02763dec77c223c7ee2329fd3e414f4aa37e1",
+    "capture_key399.py": "e02ff1fef623d7c012d98bf59c2587916f0702cdb9e7ed548baf762133329bb5",
+    "check399.py": "62cb1e3a333657c52898be12e9a02ea63ed993dfd31a06c72367f660da35da47",
+    "check399_HOST.py": "e89532292c2a87709758851ae211678bfc13ee66ac4b50bb5325f265e10edefc",
+    "check399_preconstructor_HOST.py": "fed12ca8d67dbc0572dfe5a7e47fbeccf7cd53393ae045534d49c04d5c0af5c9",
+    "domain399.py": "0f3394d33fa163ef705a37dc1c8d7aff7fde05bf098bba528c3f060b2dccd0aa",
+    "guard399.py": "2c2c33ba14ec0d4c639972e35da1e0f3063c70f5d946b142bafcb06895141b18",
+    "mapper399.py": "fecf06b0bc99f05619496d1564a294646603a5fc6e6c6cff210821330c804b07",
+    "metadata399.py": "3cee4c20b6097bf125d989c6d21cba48f53195e6e52f9f46a8a52f8264b73822",
+    "oracle399.py": "1d794926b3db855ece6668a6ef3adc08582e7fbb1650b9061cc497811f51ae66",
+    "padding399.py": "16274b87cfd4bc1fb5f2f31cbb1ca4836b915b9591525fd208a5af6be28c3f59",
+    "prepare399.py": "23433ec8136df12aa154d04a2aeea61036c32199dc8609dcc3b25db7715b5299",
+    "probes399.py": "253173475deaa48d02a114fd27f9799f2152e4a1e747f8fe6cae2dcb92cb70f8",
+    "reference_schedule399.py": "29fe18a652b35d22005f9d50fb970a8b5024d9b52d43b142be665314e4f0b26d",
+    "runtime399.py": "62ae7f09d019f99abc15e13ee1c11d0f71afacfad1577c473da13ef3bcc4b320",
+    "static_state399.py": "2ca9241536b93e2ee280582383f96a027bcfc8ada314ef3806119f41cface8fc"
+  },
+  "NPU_used": false,
+  "model_qualification": false,
+  "runtime_prepared": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

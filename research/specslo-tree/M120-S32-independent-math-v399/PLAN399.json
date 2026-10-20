@@ -1,0 +1,59 @@
+{
+  "status": "HOST_SOURCE_AND_REAL_PRECONSTRUCTOR_PASS_FINITE_RUNTIME_PREPARED_NO_NPU",
+  "UTC": "2026-10-20T21:21:55.926572+00:00",
+  "basis": "prototype397 M120/S32 q4*24+q3*8",
+  "global_active_request_limit_required": 64,
+  "finite_N": [
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32
+  ],
+  "patterns": [
+    "all1",
+    "all2",
+    "saturated",
+    "reversed",
+    "mixed"
+  ],
+  "KV_extents": [
+    512,
+    1024,
+    1536,
+    2048,
+    2560
+  ],
+  "new_target_S": 32,
+  "physical_M": 120,
+  "normal_candidate_cap": 88,
+  "new_target_budget_range": [
+    1,
+    2,
+    3
+  ],
+  "all_existing_frozen_graph_flags_preserved": true,
+  "neural_reference": {
+    "S": 24,
+    "M": 120,
+    "independent_prefix_owners": 96,
+    "all128_KV_and_hidden_bitwise_required": true,
+    "no_candidate_KV_or_projector_used_in_reference": true
+  },
+  "actual_HOST_prepared_cases": 200,
+  "independent_S24_frames_cover_every_real_node_once": true,
+  "additional_all120_physical_graph_eager_hidden_KV_required": true,
+  "next": "Use bounded numeric runtime and an owned supervisor after repaired active64 control and primary B4 work; do not run a full production candidate before fresh numerical qualification and cost.",
+  "production_low_load_route": "Existing M120/S24 B1..5 to remain separate; production dispatcher and paid C88 priority allocator not implemented.",
+  "NPU_launched": false,
+  "runtime_prepared": true,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "goal_achieved": false,
+  "serving_candidate_implemented": false,
+  "source_parent398_reused": true
+}

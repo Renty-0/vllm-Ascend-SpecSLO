@@ -1,0 +1,55 @@
+{
+  "padding399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/padding255.py",
+    "source_sha256": "57fdec779bb22a6776c6f1e4a0ff93357abcaaf66f6c38f7e6b4fa2113796333",
+    "delta": "mapper399 plus exact finite B1..3 /24-large-row precondition"
+  },
+  "reference_schedule399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/reference_schedule255.py",
+    "source_sha256": "f0415e0472ce5187706aa33d7ab38992c2ac204184880d3aeb7df98cb8971d0f",
+    "edits": [
+      [
+        "1<=n<=24",
+        "1<=n<=32"
+      ],
+      [
+        "aligned real N<=24",
+        "aligned real N<=32"
+      ],
+      [
+        "reference_owner=24+i",
+        "reference_owner=32+i"
+      ],
+      [
+        "reference_owner=48+i",
+        "reference_owner=64+i"
+      ]
+    ],
+    "independent_reference_S24_M120_unchanged": true
+  },
+  "bank399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/bank326.py",
+    "source_sha256": "e228170e5623c10f2bb00431fbced62f1ed53402531d2cb30aa2388b60ebbcae",
+    "byte_identical": true
+  },
+  "static_state399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py",
+    "source_sha256": "eaf5fcd1638ec91d4621068584d84404d98927618aacb3e7e92558ff8462f378",
+    "delta": "projector397, pad399, actual visible-KV bucket, finite no-branch assertion and truthful32-group labels; original all120-row inverse and callbacks retained"
+  },
+  "FIXTURE399.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/FIXTURE326.json",
+    "source_sha256": "edcb1fbd258e1347d0e2f3094f69081f00f502a499c64142bdea5830df0e2232",
+    "byte_identical": true
+  },
+  "runtime399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/runtime326.py",
+    "source_sha256": "61614908dd57b1274acdb6add084ef1ff810dc0c88242873af4fedd07632b755",
+    "declared_changes": [
+      "reviewed398 startup dependency paths via bootstrap399",
+      "own399 readiness, finite action, 200-case callback and own retained audit",
+      "shared actual preconstructor helper retains original replay source check",
+      "original4-role API launch and owned shutdown234/worker exit retained"
+    ]
+  }
+}

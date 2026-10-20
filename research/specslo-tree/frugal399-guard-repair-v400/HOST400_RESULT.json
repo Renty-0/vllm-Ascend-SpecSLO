@@ -1,0 +1,20 @@
+{
+  "status": "PASS_HOST400_ACTUAL_RECEIPT_DUPLICATE_REPRODUCTION_AND_REPAIR",
+  "NPU_used": false,
+  "models_constructed": 0,
+  "device_tools_called": 0,
+  "exact_original_metadata_expression_executed": true,
+  "duplicate_keywords_removed": [
+    "action",
+    "numeric_source_obligations_only"
+  ],
+  "original399_supervision_body_and_numeric_runtime_retained": true,
+  "original399_neural_sources_changed": false,
+  "original399_NPU_launched": false,
+  "global_max_num_seqs": 64,
+  "finite_N": 32,
+  "finite_C": 88,
+  "Raw": null,
+  "Goodput": null,
+  "production_permission": false
+}

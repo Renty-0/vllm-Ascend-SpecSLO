@@ -1,0 +1,27 @@
+{
+  "schema": "ROOT400.finite399-guard-metadata-repair-source.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal399-guard-metadata-repair-v400/guard400.py": "b81d49f702d616cc8b7785697cffa5f61b7c0aaa6b1235a95a5e6e8b06509681",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal399-guard-metadata-repair-v400/check400_HOST.py": "e976dee1a99c535f9faa6a51c938039c850bd8ae9b307a19b32a196565cb1f7e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal399-guard-metadata-repair-v400/HOST400_RESULT.json": "595c5825bb83273926b276b5104120ad6d46b72fe61bf45185872d9befd577eb",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT400_metadata_repair_HOST.py": "158fe79660948ea905cdddbd9326771fa571b8746f66abf728502bb974770d3e"
+  },
+  "parent399_freeze_sha256": "2b358bc162f42527eeeeeb9738fc9655a541e1a9e45353a0980530a95d0b0b37",
+  "parent399_archive_sha256": "51fd4d110516e4d4516f520158a79060ad256568158d994f52ee83f47591d97d",
+  "numerical_sources_changed": false,
+  "original399_runtime_unchanged": true,
+  "removed_duplicate_receipt_keywords": [
+    "action",
+    "numeric_source_obligations_only"
+  ],
+  "configured_max_num_seqs": 64,
+  "finite_normal_N": 32,
+  "finite_C": 88,
+  "fresh200_cross_backend_cases_still_required": true,
+  "NPU_used": false,
+  "models_qualified": false,
+  "full463": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,118 @@
+{
+  "FIXTURE399.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/FIXTURE399.json",
+    "sha256": "edcb1fbd258e1347d0e2f3094f69081f00f502a499c64142bdea5830df0e2232"
+  },
+  "FREEZE399.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/FREEZE399.json",
+    "sha256": "2b358bc162f42527eeeeeb9738fc9655a541e1a9e45353a0980530a95d0b0b37"
+  },
+  "HOST399_PRECONSTRUCTOR_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/HOST399_PRECONSTRUCTOR_RESULT.json",
+    "sha256": "ca06ae5b946a8f6bdde433704f739caefa56b6013323f02eb5ba1fa2be4e5e1b"
+  },
+  "HOST399_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/HOST399_RESULT.json",
+    "sha256": "063f149e4b455f7206aedeaf17c93f0127706c762212193ab250ceec41212396"
+  },
+  "PLAN399.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/PLAN399.json",
+    "sha256": "671415a8cc08aa6b67ca48471a3bb5f027dfcdad749e8cc5bbaf21e3da8bfeb7"
+  },
+  "SOURCE399.tar.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/SOURCE399.tar.gz",
+    "sha256": "51fd4d110516e4d4516f520158a79060ad256568158d994f52ee83f47591d97d"
+  },
+  "SOURCE399_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/SOURCE399_RECEIPT.json",
+    "sha256": "c64ce19a4d2b535e773abe47b774175ad7cdb324e480f95359fdc7e729b24d5b"
+  },
+  "SOURCE_PROJECTION399.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/SOURCE_PROJECTION399.json",
+    "sha256": "cd812ced8df8ec9c957e56195d72a66d4157834f42e4fd3ff7d2cd99e3460cf7"
+  },
+  "audit399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/audit399.py",
+    "sha256": "f0b1932d4bb5526836789bd15c8b155dbee69bc729286ea915f4e0316161ecab"
+  },
+  "bank399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/bank399.py",
+    "sha256": "e228170e5623c10f2bb00431fbced62f1ed53402531d2cb30aa2388b60ebbcae"
+  },
+  "bootstrap399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/bootstrap399.py",
+    "sha256": "b31a2ebb940efdd3dbc000988ab02763dec77c223c7ee2329fd3e414f4aa37e1"
+  },
+  "capture_key399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/capture_key399.py",
+    "sha256": "e02ff1fef623d7c012d98bf59c2587916f0702cdb9e7ed548baf762133329bb5"
+  },
+  "check399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/check399.py",
+    "sha256": "62cb1e3a333657c52898be12e9a02ea63ed993dfd31a06c72367f660da35da47"
+  },
+  "check399_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/check399_HOST.py",
+    "sha256": "e89532292c2a87709758851ae211678bfc13ee66ac4b50bb5325f265e10edefc"
+  },
+  "check399_preconstructor_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/check399_preconstructor_HOST.py",
+    "sha256": "fed12ca8d67dbc0572dfe5a7e47fbeccf7cd53393ae045534d49c04d5c0af5c9"
+  },
+  "domain399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/domain399.py",
+    "sha256": "0f3394d33fa163ef705a37dc1c8d7aff7fde05bf098bba528c3f060b2dccd0aa"
+  },
+  "guard399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/guard399.py",
+    "sha256": "2c2c33ba14ec0d4c639972e35da1e0f3063c70f5d946b142bafcb06895141b18"
+  },
+  "launch399.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/launch399.sh",
+    "sha256": "d18b78a0af8fa7ecb0e300166bf42b1cc9a00b34f17270a54f3b4c4637a5814e"
+  },
+  "mapper399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/mapper399.py",
+    "sha256": "fecf06b0bc99f05619496d1564a294646603a5fc6e6c6cff210821330c804b07"
+  },
+  "metadata399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/metadata399.py",
+    "sha256": "3cee4c20b6097bf125d989c6d21cba48f53195e6e52f9f46a8a52f8264b73822"
+  },
+  "oracle399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/oracle399.py",
+    "sha256": "1d794926b3db855ece6668a6ef3adc08582e7fbb1650b9061cc497811f51ae66"
+  },
+  "padding399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/padding399.py",
+    "sha256": "16274b87cfd4bc1fb5f2f31cbb1ca4836b915b9591525fd208a5af6be28c3f59"
+  },
+  "prepare399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/prepare399.py",
+    "sha256": "23433ec8136df12aa154d04a2aeea61036c32199dc8609dcc3b25db7715b5299"
+  },
+  "probes399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/probes399.py",
+    "sha256": "253173475deaa48d02a114fd27f9799f2152e4a1e747f8fe6cae2dcb92cb70f8"
+  },
+  "reference_schedule399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/reference_schedule399.py",
+    "sha256": "29fe18a652b35d22005f9d50fb970a8b5024d9b52d43b142be665314e4f0b26d"
+  },
+  "runtime399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/runtime399.py",
+    "sha256": "62ae7f09d019f99abc15e13ee1c11d0f71afacfad1577c473da13ef3bcc4b320"
+  },
+  "startup399.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/startup399.sh",
+    "sha256": "688493c6e5b4e99c29a9cf335d27a40424848df5cbb5a90bfa7f917339fd4cce"
+  },
+  "static_state399.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/static_state399.py",
+    "sha256": "2ca9241536b93e2ee280582383f96a027bcfc8ada314ef3806119f41cface8fc"
+  },
+  "tools/freeze_ROOT399_finite_cross_backend_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT399_finite_cross_backend_HOST.py",
+    "sha256": "4dc4deb163bf1b194dd7bbd77ceceb13fa93892facc7c901edb3a4214f96fda4"
+  }
+}

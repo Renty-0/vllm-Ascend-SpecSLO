@@ -1,0 +1,11 @@
+{
+  "status": "PASS_HOST398_REJECT_PRIOR_FAILED394_BEFORE_ANY_METRICS",
+  "NPU_used": false,
+  "old_failed_receipt_sha256": "7d950d91fe7c4e1c898703daf9bd12de10cb610dcf25b60929cd7362f2252737",
+  "wrong_version_rejected": true,
+  "no_result_file_created": true,
+  "stderr_tail": [
+    "    raise AssertionError(message)",
+    "AssertionError: terminal398 active64 supervisor"
+  ]
+}

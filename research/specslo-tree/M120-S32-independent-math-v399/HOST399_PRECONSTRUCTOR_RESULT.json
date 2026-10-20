@@ -1,0 +1,23 @@
+{
+  "status": "PASS_HOST399_ACTUAL_FINITE_PREMODEL_INSTALL_AND_REPLAY_SOURCE",
+  "NPU_used": false,
+  "model_constructor_calls": 0,
+  "NPU_lazy_init_calls": 0,
+  "actual_original_replay_dispatch": {
+    "actual_code_reconstructed_equal": true,
+    "source_SHA": "8ff9ddcd948f3cdc4f7935e1490e8419ca07c4b08b72a8488d808cca1b543aa6",
+    "actual_code_filename": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/tree_target_replay.py:_run_target",
+    "actual_annotation_compiler_flags": 3,
+    "models_loaded": false,
+    "performance": false
+  },
+  "output": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/HOST399-before-model-dgccp8m7",
+  "configured_max_num_seqs": 64,
+  "candidate_S": 32,
+  "reference_S": 24,
+  "original_full_components_executed": false,
+  "production_permission": false,
+  "model_qualification": false,
+  "Raw": null,
+  "Goodput": null
+}

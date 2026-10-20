@@ -1,0 +1,17 @@
+{
+  "status": "HOST_ONLY_FROZEN_NPU_NOT_LAUNCHED",
+  "scope_cases": 200,
+  "actual_preconstructor_model_calls": 0,
+  "NPU_used": false,
+  "full463": false,
+  "Raw": null,
+  "Goodput": null,
+  "source_archive_incremental": true,
+  "launch_finite399_only_via_guard400": true,
+  "guard399_direct_launch_has_prelaunch_duplicate_metadata_keywords": true,
+  "guard400_reproduces_and_fixes_only_receipt_metadata": true,
+  "original399_neural_runtime_sources_unchanged": true,
+  "format_ci": "unavailable: pre-commit is not installed; environment unchanged",
+  "staged_whitespace": "PASS git diff --cached --check",
+  "production_permission": false
+}

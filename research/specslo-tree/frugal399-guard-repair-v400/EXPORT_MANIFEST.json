@@ -1,0 +1,30 @@
+{
+  "FREEZE400.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal399-guard-metadata-repair-v400/FREEZE400.json",
+    "sha256": "63bb159305a421bcee894b5716057ad5b4c444f4cffca07876dc4273637510bf"
+  },
+  "HOST400_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal399-guard-metadata-repair-v400/HOST400_RESULT.json",
+    "sha256": "595c5825bb83273926b276b5104120ad6d46b72fe61bf45185872d9befd577eb"
+  },
+  "SOURCE400.tar.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal399-guard-metadata-repair-v400/SOURCE400.tar.gz",
+    "sha256": "31853bbfff18f4784149d32663f1cf3fe4eaebd2205c7cc38bc756036926c82d"
+  },
+  "SOURCE400_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal399-guard-metadata-repair-v400/SOURCE400_RECEIPT.json",
+    "sha256": "463467dc5cdabe131117c93c53cf3fd563134884579cbd6230d66e86db55b45f"
+  },
+  "check400_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal399-guard-metadata-repair-v400/check400_HOST.py",
+    "sha256": "e976dee1a99c535f9faa6a51c938039c850bd8ae9b307a19b32a196565cb1f7e"
+  },
+  "guard400.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal399-guard-metadata-repair-v400/guard400.py",
+    "sha256": "b81d49f702d616cc8b7785697cffa5f61b7c0aaa6b1235a95a5e6e8b06509681"
+  },
+  "tools/freeze_ROOT400_metadata_repair_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT400_metadata_repair_HOST.py",
+    "sha256": "158fe79660948ea905cdddbd9326771fa571b8746f66abf728502bb974770d3e"
+  }
+}

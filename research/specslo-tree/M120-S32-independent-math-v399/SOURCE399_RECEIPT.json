@@ -1,0 +1,11 @@
+{
+  "freeze_sha256": "2b358bc162f42527eeeeeb9738fc9655a541e1a9e45353a0980530a95d0b0b37",
+  "archive_sha256": "51fd4d110516e4d4516f520158a79060ad256568158d994f52ee83f47591d97d",
+  "archive_bytes": 54774,
+  "archive_members": 31,
+  "parent_archive_reused": true,
+  "NPU_used": false,
+  "models_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}
