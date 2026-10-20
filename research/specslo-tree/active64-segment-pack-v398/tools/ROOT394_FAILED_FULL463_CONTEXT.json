@@ -1,0 +1,61 @@
+{
+  "status": "FAILED_FULL463_SEGMENT_PACKING_BOUNDARY_RETAINED_NO_PERFORMANCE",
+  "UTC": "2026-10-20T20:41:17.088844+00:00",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-best376-active64-root-v394-full463-ownAR-v1.json",
+  "receipt_sha256": "7d950d91fe7c4e1c898703daf9bd12de10cb610dcf25b60929cd7362f2252737",
+  "terminal_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT394_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+  "retained_additional681_strict_checks_by_target": {
+    "1": 681,
+    "2": 681,
+    "3": 681
+  },
+  "retained_target_failures": {
+    "2": {
+      "error": {
+        "type": "builtins.ValueError",
+        "message": "at most24 real primary/side groups and exact real boundary"
+      },
+      "active_owner_count_in_failure_snapshot": 64,
+      "source_generation": 5,
+      "observed_proposals": 24,
+      "observed_B5_count": 4,
+      "current_round_binding_proved": false
+    },
+    "3": {
+      "error": {
+        "type": "builtins.ValueError",
+        "message": "at most24 real primary/side groups and exact real boundary"
+      },
+      "active_owner_count_in_failure_snapshot": 64,
+      "source_generation": 5,
+      "observed_proposals": 24,
+      "observed_B5_count": 4,
+      "current_round_binding_proved": false
+    },
+    "1": {
+      "error": {
+        "type": "builtins.ValueError",
+        "message": "at most24 real primary/side groups and exact real boundary"
+      },
+      "active_owner_count_in_failure_snapshot": 64,
+      "source_generation": 5,
+      "observed_proposals": 24,
+      "observed_B5_count": 4,
+      "current_round_binding_proved": false
+    }
+  },
+  "reason": "Actual projection rejected its real primary/side group count or boundary. The old whole-proposal packer constrained N24/C96 but did not constrain the independently required N+B5_segments<=24.",
+  "snapshot_claim_limit": "Saved local execution-plan/payload snapshots explicitly lack synchronized current-round binding. Their24/four-B5 geometry is a reproducible regression input, not relabelled as an exact failed model-call receipt.",
+  "whole463_completed": false,
+  "whole_AR": false,
+  "all_sources_unchanged": true,
+  "owned_remaining": 0,
+  "all4_idle": true,
+  "termination": "Only verified owned failed child PGID108360 received SIGTERM after target error records; original guardian retained failure and completed independent cleanup. Generic within10800seconds wording is not evidence of a timeout.",
+  "elapsed_seconds": 3931.1352673261426,
+  "next": "v398 additive whole-ticket attention-segment packing, global64 maintained; original neural code and B allocator retained; repeat full463 ownAR before performance.",
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "goal_achieved": false
+}

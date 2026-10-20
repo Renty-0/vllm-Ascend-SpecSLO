@@ -1,0 +1,31 @@
+{
+  "status": "PRELAUNCH_HOST_PASSED_NOT_MODEL_QUALIFIED",
+  "UTC": "2026-10-20T20:43:54.025206+00:00",
+  "parent394_status": "full463 failed physical primary/side group bound after original227 and additional681 passed",
+  "primary_delta": "Add whole-ticket target attention-segment packing at the sole LIVE build_plan call",
+  "actual_global_active_limit": 64,
+  "same_global64_as_failed394": true,
+  "historical_best_tree_active_limit": 48,
+  "physical_target": {
+    "M": 120,
+    "Q": 5,
+    "S": 24,
+    "max_requests": 24,
+    "C": 96,
+    "max_primary_side_segments": 24
+  },
+  "canonical_paid_B1to5_unchanged": true,
+  "draft_RootSeed_FastV5_unchanged": true,
+  "Neural_code_unchanged": true,
+  "all_original201_44_114_and_other_baselines_required": true,
+  "fresh_original227_and_additional681_required": true,
+  "warm_twozero_seal_required": true,
+  "full463_all3_independent_ownAR_required": true,
+  "models_arrivals_SLO_original_clocks_unchanged": true,
+  "Native_flags_assigned": false,
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "goal_achieved": false
+}

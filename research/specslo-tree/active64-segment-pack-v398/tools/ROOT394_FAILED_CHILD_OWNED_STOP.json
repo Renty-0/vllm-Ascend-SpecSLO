@@ -1,0 +1,12 @@
+{
+  "UTC": "2026-10-20T20:31:51.290317+00:00",
+  "status": "OWNED_FAILED_CHILD_SIGTERM_REQUESTED",
+  "tag": "best376-active64-root-v394-full463-ownAR-v1",
+  "pid": 108360,
+  "pgid": 108360,
+  "receipt_sha256_before_signal": "aec09672ed8c225a3c179f8a5c193c26e3ee83043218fdf93474f21a40151689",
+  "reason": "All three target roles retained formal generation5 ValueError: at most24 real primary/side groups and exact real boundary. Current full463 failed; no complete performance can be recovered. Stop only this verified owned child process group; supervisor remains to retain rejection and cleanup.",
+  "user_pause": false,
+  "Raw": null,
+  "Goodput": null
+}

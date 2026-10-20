@@ -1,0 +1,21 @@
+{
+  "status": "FROZEN_HOST398_PASS_FULL_DEVICE_RUN_IN_PROGRESS",
+  "host_legacy_equivalence_cases": 500,
+  "host_new_segment_bound_cases": 500,
+  "actual_generated_LIVE_bound": true,
+  "original_controller_class_unmodified": true,
+  "source_neural_changes": false,
+  "global_active_limit": 64,
+  "physical_target_segments": 24,
+  "source_frozen_bytes_preserved": true,
+  "NPU_full_run_completed": false,
+  "Raw": null,
+  "Goodput": null,
+  "format_ci": "unavailable: pre-commit is not installed; environment unchanged",
+  "staged_whitespace": "one inherited trailing whitespace in frozen runtime398.py line31; exact launched source bytes preserved",
+  "HOST_harness_notes": [
+    "Pre-freeze probe initially supplied one tag instead of original four CLI arguments; corrected HOST wrapper only.",
+    "Next HOST wrapper omitted original218 freeze environment; replaced it with exact reviewed launch398 shell environment.",
+    "Actual original readiness, context activation, source-builder and new LIVE binding then passed with model construction0 and NPU init0."
+  ]
+}

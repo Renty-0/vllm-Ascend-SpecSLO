@@ -1,0 +1,178 @@
+{
+  "DERIVATION398.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/DERIVATION398.json",
+    "sha256": "d9d9d484e36d75b1fa8639736adcae3ccf697176a96964e824c2e9c9cb6387a0"
+  },
+  "FREEZE398.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/FREEZE398.json",
+    "sha256": "dfb6cfd44d2f524d7ad28892ec055d50d1035910fb71dbbc5486dc060cb5e73d"
+  },
+  "HOST398.generated-LIVE.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/HOST398.generated-LIVE.py",
+    "sha256": "e8858542fdeb514ad0eabcded7e91e373f2ad97bf42cfc659deffeb3ff3a167c"
+  },
+  "HOST398_CAPACITY_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/HOST398_CAPACITY_RESULT.json",
+    "sha256": "11ff839453a2f62f3db0f9838d9391717efe1eb10664a23a2c2899315949464e"
+  },
+  "HOST398_CONSTRUCTION_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/HOST398_CONSTRUCTION_RESULT.json",
+    "sha256": "1d77ab4b1fa0c62cf0027554337a95755bc15dac05f95a1ddccc7cb6a70be9c1"
+  },
+  "HOST398_LIVE_BINDING_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/HOST398_LIVE_BINDING_RESULT.json",
+    "sha256": "32000e90b91478c74219d5440672b5e5663b26c473a55e36c0ab9518d083df2f"
+  },
+  "HOST398_PACKING_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/HOST398_PACKING_RESULT.json",
+    "sha256": "e1771f63581da532a1e96dc98d45e99a6628e772d4cd5e2ed7ad6f628abad78b"
+  },
+  "HOST398_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/HOST398_RESULT.json",
+    "sha256": "22ed2abd5c61c2feeea117649d0cec42945f2dae40a6f4f092a920185a2e5d1a"
+  },
+  "HOST398_SCOPE_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/HOST398_SCOPE_RESULT.json",
+    "sha256": "1ec66bf283bb270c3e98b7f8d27a8e0449d4df6d9d7b9180c612ec6808b5e30c"
+  },
+  "PLAN398.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/PLAN398.json",
+    "sha256": "37b0ec4979e67f74b287ea20ecff9219e4663e91b692c3e1eb35e079ddf2f6ad"
+  },
+  "SOURCE398_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/SOURCE398_RECEIPT.json",
+    "sha256": "7613ec0a28c2e2179defe353bbc6c4b4afac7223f44e352f51cad554046d102f"
+  },
+  "audit398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit398.py",
+    "sha256": "8cae5bda6ddc039a45796b86a44ea3590ddaac6a7baf987b828b26985cf545e6"
+  },
+  "audit_base398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit_base398.py",
+    "sha256": "ed8e5a519acef7a3331b49b36ed4a55d319f293e374ff5e6b06924d0e82ba08b"
+  },
+  "audit_reference398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit_reference398.py",
+    "sha256": "8608b0868e541e28561f58a37b46b23aa9c2049a8b717f72787c4187da14ae70"
+  },
+  "bucket398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/bucket398.py",
+    "sha256": "e3502595b9345ef710bc3786e28628fbd4c7f75e53a8769cdf5daedec835b705"
+  },
+  "check398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398.py",
+    "sha256": "f5d4f4e271c2c1b46dfe7f9b77d10cffc6044f3e3442ba5b5f98eb5976715278"
+  },
+  "check398_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_HOST.py",
+    "sha256": "e0ea1bfd8cf544628b6ac74191f95ce1846b6785e0de7ee3109c31bbd3847d57"
+  },
+  "check398_capacity_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_capacity_HOST.py",
+    "sha256": "d4248ad300f59cc4f7b700956c77bdcb1b808e9431d0d69bd25c9d8a9850e1b3"
+  },
+  "check398_construction_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_construction_HOST.py",
+    "sha256": "0a453c66e0cb227149d36815ba3b67f00b7d2c6b2a4a715f131b3e82882aebb3"
+  },
+  "check398_live_binding_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_live_binding_HOST.py",
+    "sha256": "34a086882c518ce9964b22a606b5028633fc33c58601cc6045de26c9a5ade3f3"
+  },
+  "check398_packing_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_packing_HOST.py",
+    "sha256": "8b2a45e27c7f3dee5a6cf7ba0aded2543806aea7fe83d493ac08270045df9aed"
+  },
+  "check_scope398_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check_scope398_HOST.py",
+    "sha256": "d558b678181d9a85ebdbea6b25e63e1af6b999bd5f770f950337a2c5cbb40417"
+  },
+  "dispatch398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/dispatch398.py",
+    "sha256": "0dea04e1a47c5751b8d4a9009d663ee3d042103955d610ffbe4d40ffbe8e07c2"
+  },
+  "empty398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/empty398.py",
+    "sha256": "a1cc5bb823147e16a6d67612d3a0f20985e0778d22f2f60150cc572e5d3da7a7"
+  },
+  "extension398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/extension398.py",
+    "sha256": "f20b44c088f55370bee12ace7c3e6266b561b512e5f33cc79e88fbfb29508094"
+  },
+  "generation398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/generation398.py",
+    "sha256": "9fea580022aed3d2c0261d57dc3f88c53d6bb68830071c51fe4379d708553bbd"
+  },
+  "guard398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/guard398.py",
+    "sha256": "0afd77f0bd698ac3dce7b46d6e53f291743adbbdde414ca1cf4e3b086f76ebb2"
+  },
+  "launch398.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/launch398.sh",
+    "sha256": "710d376503730f465e1b6d299ad8a3362113e942ba5b2938f31656a6807e0c18"
+  },
+  "oracle398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/oracle398.py",
+    "sha256": "5e4561152967ee84869d127f3774b35fc450b93def553e7c9cad33d6272687f1"
+  },
+  "packing398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/packing398.py",
+    "sha256": "ea666a7e508870ea7781637de42490be7e1f849238099555479cc32c0d6f14ba"
+  },
+  "prefixes398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/prefixes398.py",
+    "sha256": "2f32ac7f81b23b7834da4a5dcacde9717efb3e012cf6881507b624c2ba33fa75"
+  },
+  "projection398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/projection398.py",
+    "sha256": "a63d369c1549041a47bd75f582570af4c879275fc5c57f87bcf93bc4e710e20b"
+  },
+  "qualify398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/qualify398.py",
+    "sha256": "f15302d02d432c133ba83ce7b6af1ba1a9efb6564c054e9e7c2bbcd78482a2bb"
+  },
+  "reference398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/reference398.py",
+    "sha256": "4365ea0c0fcb7273c9271d5e25481067e827113a25ac5c635e6bcb616a88e3ea"
+  },
+  "runtime398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/runtime398.py",
+    "sha256": "2fef0c7696f906242b1b3663e1cb5cdcfd2c83ee7605ef2e185cccab5102f35a"
+  },
+  "scope398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/scope398.py",
+    "sha256": "223265b4d19c4ae9bb9e48d0cc8a045a0d854a22c0d1675f5a9438f2f92ecb2d"
+  },
+  "startup398.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/startup398.sh",
+    "sha256": "01536a829bcbce342792bdf148261ab0a87e3e6605a2e2b6aec186fcdaba7a65"
+  },
+  "trace398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/trace398.py",
+    "sha256": "4737ccd7c395eb7f5c049ca4d874325d1723bc96a5f3b983946957368be9fef1"
+  },
+  "window398.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/window398.py",
+    "sha256": "50ae391a1eb1e61d5cae900570933d119ee077988847023cead4c3bde1698d85"
+  },
+  "tools/freeze_ROOT398_segment_pack_full_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT398_segment_pack_full_HOST.py",
+    "sha256": "025dfe7b6d1d271273db073c7662c95896af89c5a255a388febd6cac66834003"
+  },
+  "tools/audit_ROOT398_terminal_full_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT398_terminal_full_HOST.py",
+    "sha256": "8d1cef154c5879685e7589185c8ed2337eb42fd853d6688344f405e009d29979"
+  },
+  "tools/read_ROOT398_common_result_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_ROOT398_common_result_HOST.py",
+    "sha256": "883443944a9b27b543a6dde0943b764f0635c93c3ca172010a6eac189aa5b29d"
+  },
+  "tools/ROOT394_FAILED_FULL463_CONTEXT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT394_FAILED_FULL463_CONTEXT.json",
+    "sha256": "b929860fe0f9e2d12d7e90b3463c96d32d8fecd4171b4c2c6fe257048fb9060d"
+  },
+  "tools/ROOT394_FAILED_CHILD_OWNED_STOP.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT394_FAILED_CHILD_OWNED_STOP.json",
+    "sha256": "c021392cc47ff90a9f8c7127b4619a8d89bcd57369fa6bb69f0dc0656bf00f6f"
+  }
+}

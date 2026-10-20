@@ -1,0 +1,159 @@
+{
+  "parent394_freeze_sha256": "80e7d19dce412ec870cecb68d9222ea99433fecf00aeaa8f3357cda04982d9b6",
+  "parent376_freeze_sha256": "ae723ddfddeb6d47f04605a3842de0c3690196b0addf39fa17c5bd1ca248765c",
+  "declared_delta": "Keep actual global64, numerical code, source arrivals, normal B allocation, draft and all existing gates. Add whole-ticket physical attention-segment limit24 to the sole actual LIVE target packer. No original controller class mutation.",
+  "files": [
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/window394.py",
+      "source_sha256": "77f86dbd4f1d81084f94d4108434e87967450924373bd7d8ce56613bd620127c",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/window398.py",
+      "output_sha256": "50ae391a1eb1e61d5cae900570933d119ee077988847023cead4c3bde1698d85"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/qualify394.py",
+      "source_sha256": "ebbd82976cdcf25a87a3d2f7ef57f767a3f29db9890ae051f3ebff0123ad33e0",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/qualify398.py",
+      "output_sha256": "f15302d02d432c133ba83ce7b6af1ba1a9efb6564c054e9e7c2bbcd78482a2bb"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/trace394.py",
+      "source_sha256": "38d137663a5edcffdba8ee84d25e2012ddf14c3d34b8d092237e491f0355b3e6",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/trace398.py",
+      "output_sha256": "4737ccd7c395eb7f5c049ca4d874325d1723bc96a5f3b983946957368be9fef1"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/empty394.py",
+      "source_sha256": "a1cc5bb823147e16a6d67612d3a0f20985e0778d22f2f60150cc572e5d3da7a7",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/empty398.py",
+      "output_sha256": "a1cc5bb823147e16a6d67612d3a0f20985e0778d22f2f60150cc572e5d3da7a7"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/check394_construction_HOST.py",
+      "source_sha256": "6892a3ba5492420e68840d72602d879f14316d3aab16ce7c05e2d074e48fedbe",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_construction_HOST.py",
+      "output_sha256": "0a453c66e0cb227149d36815ba3b67f00b7d2c6b2a4a715f131b3e82882aebb3"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/check394_HOST.py",
+      "source_sha256": "4eac54e797846f66a31bb9bc58664c6f050001ea280d39f6e3ca3e1998c0f197",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_HOST.py",
+      "output_sha256": "e0ea1bfd8cf544628b6ac74191f95ce1846b6785e0de7ee3109c31bbd3847d57"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/prefixes394.py",
+      "source_sha256": "a167bf85a67d390413ef029be1b56a8ecdff7e1a59d3803242d98e722c973a4e",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/prefixes398.py",
+      "output_sha256": "2f32ac7f81b23b7834da4a5dcacde9717efb3e012cf6881507b624c2ba33fa75"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/dispatch394.py",
+      "source_sha256": "d3ec522010ef5453fea858fdc5130aec0fc80f56fa962e37f7ee08a6486072ba",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/dispatch398.py",
+      "output_sha256": "0dea04e1a47c5751b8d4a9009d663ee3d042103955d610ffbe4d40ffbe8e07c2"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/reference394.py",
+      "source_sha256": "4365ea0c0fcb7273c9271d5e25481067e827113a25ac5c635e6bcb616a88e3ea",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/reference398.py",
+      "output_sha256": "4365ea0c0fcb7273c9271d5e25481067e827113a25ac5c635e6bcb616a88e3ea"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/audit_base394.py",
+      "source_sha256": "e545f70b31f11a86a82a7d2fef13e997be03f5ddd31647f6b6b59d50afed41a8",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit_base398.py",
+      "output_sha256": "ed8e5a519acef7a3331b49b36ed4a55d319f293e374ff5e6b06924d0e82ba08b"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/runtime394.py",
+      "source_sha256": "f5fce779b10f01024b08e1db2d188c51a95dc16f398ac482fc74c56fdce9a1b7",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/runtime398.py",
+      "output_sha256": "2fef0c7696f906242b1b3663e1cb5cdcfd2c83ee7605ef2e185cccab5102f35a"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/startup394.sh",
+      "source_sha256": "1db1c15d5453b1736291788883a60330007f398ace14f528283dff425f7e4c69",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/startup398.sh",
+      "output_sha256": "01536a829bcbce342792bdf148261ab0a87e3e6605a2e2b6aec186fcdaba7a65"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/check_scope394_HOST.py",
+      "source_sha256": "10c011f30a81a48afd1055038e54c7aaf33468e9da265635fc33cfb84b4ca148",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check_scope398_HOST.py",
+      "output_sha256": "d558b678181d9a85ebdbea6b25e63e1af6b999bd5f770f950337a2c5cbb40417"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/check394.py",
+      "source_sha256": "bae7f5a4b87f1f0e10b32b4a0b1adc699c74beb36057d1fbbd6c01997cba919c",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398.py",
+      "output_sha256": "f5d4f4e271c2c1b46dfe7f9b77d10cffc6044f3e3442ba5b5f98eb5976715278"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/launch394.sh",
+      "source_sha256": "6d2e33636dde6511dcfa8ba5db535cb846b8365edaa0379fc300e41b0a477e48",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/launch398.sh",
+      "output_sha256": "710d376503730f465e1b6d299ad8a3362113e942ba5b2938f31656a6807e0c18"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/check394_capacity_HOST.py",
+      "source_sha256": "e396744228c29ccf05e0f46f5e323f31306696680974cb822f5e6af2285c5fbd",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_capacity_HOST.py",
+      "output_sha256": "d4248ad300f59cc4f7b700956c77bdcb1b808e9431d0d69bd25c9d8a9850e1b3"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/audit394.py",
+      "source_sha256": "32b65f483422f99ebeefcc54990e047ad6a2d8e627bf0543bad9b767e4844828",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit398.py",
+      "output_sha256": "8cae5bda6ddc039a45796b86a44ea3590ddaac6a7baf987b828b26985cf545e6"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/guard394.py",
+      "source_sha256": "572dd2803d11474a9c8a78919c265d6fafb7606da26d96dfb28b98c592c1eda6",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/guard398.py",
+      "output_sha256": "0afd77f0bd698ac3dce7b46d6e53f291743adbbdde414ca1cf4e3b086f76ebb2"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/extension394.py",
+      "source_sha256": "ca35fc1cec4d00671c83cf2f615558433e5db5e88c3e73309caefbe3ac4df09c",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/extension398.py",
+      "output_sha256": "f20b44c088f55370bee12ace7c3e6266b561b512e5f33cc79e88fbfb29508094"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/scope394.py",
+      "source_sha256": "2837216008b829e3da9556b478270c0f0560ded8ec2be8f40643b342c07ad001",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/scope398.py",
+      "output_sha256": "223265b4d19c4ae9bb9e48d0cc8a045a0d854a22c0d1675f5a9438f2f92ecb2d"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/bucket394.py",
+      "source_sha256": "5827d88f577f34603f7d9cbba190c95adf0365d902bb896778f40863fc619299",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/bucket398.py",
+      "output_sha256": "e3502595b9345ef710bc3786e28628fbd4c7f75e53a8769cdf5daedec835b705"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/oracle394.py",
+      "source_sha256": "833461a65f8cd229f1a0ee49246ceb7e0a22e05fabcd2a9c376e2fb68c3d8e80",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/oracle398.py",
+      "output_sha256": "5e4561152967ee84869d127f3774b35fc450b93def553e7c9cad33d6272687f1"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/audit_reference394.py",
+      "source_sha256": "8608b0868e541e28561f58a37b46b23aa9c2049a8b717f72787c4187da14ae70",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit_reference398.py",
+      "output_sha256": "8608b0868e541e28561f58a37b46b23aa9c2049a8b717f72787c4187da14ae70"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/projection394.py",
+      "source_sha256": "5afe1b0afd32b3ec2f077eba5b6e82d557c2936cd5021a609c5383e47e6d4d1a",
+      "output": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/projection398.py",
+      "output_sha256": "a63d369c1549041a47bd75f582570af4c879275fc5c57f87bcf93bc4e710e20b"
+    }
+  ],
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null,
+  "post_copy_changes": [
+    "check398 also requires actual new whole-ticket and LIVE binding HOST results",
+    "window398 doc names actual64 ceiling",
+    "previous operational cap64, historical best376 cap48 recorded separately"
+  ]
+}
