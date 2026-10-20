@@ -1,0 +1,15 @@
+{
+  "status": "measurement_and_independent_audit_passed",
+  "host_python_ast": "pass",
+  "shell_syntax": "pass",
+  "exported_source_bytes": "pass",
+  "frozen_pre_and_post_verifiers": "pass",
+  "all4idle": true,
+  "format_ci": {
+    "attempted": true,
+    "exit_code": 1,
+    "reason": "pre-commit is not installed; no environment packages changed"
+  },
+  "scope": "Acceptance diagnostic and immutable experiment records only; no frozen engine code changes, no new Goodput or AR-equivalence claim",
+  "csv_line_endings": "LF; counters unchanged"
+}

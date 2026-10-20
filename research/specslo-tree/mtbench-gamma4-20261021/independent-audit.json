@@ -1,0 +1,41 @@
+{
+  "status": "pass",
+  "all80_questions_both_turns": true,
+  "first_turn_actual_answers_in_second_turn": true,
+  "exact_prompt_tokens_reencoded": true,
+  "independent_weighted_acceptance_recomputed": true,
+  "frozen_source_and_environment_checked": true,
+  "helper_sources_unchanged": true,
+  "all4idle": true,
+  "target_AR_equivalence_tested": false,
+  "new_model_calls": false,
+  "overall": {
+    "turns": 160,
+    "accepted_draft_tokens": 29384,
+    "verified_draft_tokens": 63792,
+    "acceptance_rate": 0.46062202157010285,
+    "verification_rounds": 15948,
+    "accepted_per_verification_round": 1.8424880862804114,
+    "output_tokens": 40960,
+    "reached_output_cap": 160,
+    "mean_request_acceptance_rate": 0.47617487295042216
+  },
+  "evidence_hashes": {
+    "run-plan.json": "2a981f1e9574956d925bf19d9bad0ae8753998f408a2178022904ebc69db9ec4",
+    "turn2-inputs.json": "bbe0daf473eaf67925b1ae84f47134d3c12cc8a536a8a88f8f000ae969cf5666",
+    "summary.json": "8834ebafaaf742093f92b8e370ac42740a492290436e4049190ec669bd276e53",
+    "post-verifier.json": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "worker-processes.json": "478d6386b7b53dcacf350c3516a9f62b895e40367b50c0918b4371e1daf1e2a9",
+    "turn2-results.json": "655ce41928c921ea8cf6d68eb0c76d5121f3e457e300854ed268617a403b5b01",
+    "STATUS.json": "82a3acb8ef389360c2736921a8df5ed50ed7b1517e1696a19f5163ebbdd0fa7b",
+    "turn2-worker-metrics.json": "c9343c648780fa7a2e3d496b5f0ac9440b91415338fc154908bddee4e6426044",
+    "turn1-inputs.json": "71617cfaa2b039378ac16f49314c92a8546175fb7ae4e7ad28551840c9bfbc48",
+    "worker-exit.json": "5c9a6dd39165774a41a8bd525627510e51600dbb8a769ea57e40d898c69ce89c",
+    "turn1-worker-metrics.json": "b996e6e692022531b516ab30425f16768e5b010f2aa1529542a95f4d58f7fba5",
+    "HOST-preflight.json": "af78cd9ece5261ca10b778b273101f42fb870ba3f9478d530392e53d8863ffcd",
+    "receipt.json": "8f4737a179dc7f3f860befcf9ba7d10a90b2dd7538b2a49f705b70bda006c16c",
+    "turn1-results.json": "78831bd46add028a6556ad37e8e5811c50f61f3333bf547bbfcda8b3b6ad8418",
+    "progress.json": "11834acb30f0dbb5bf705531344098f93b84bac9e87812f15eb0769af093a5a3",
+    "pre-verifier.json": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a"
+  }
+}

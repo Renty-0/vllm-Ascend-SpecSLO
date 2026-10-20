@@ -1,0 +1,33 @@
+{
+  "status": "complete",
+  "scope": "MT-Bench fixed-gamma4 acceptance only; tree optimization remains paused",
+  "path": "/root/SpecSLO/mtbench-gamma4-20261021",
+  "guardian_session": 7058,
+  "model_pair": [
+    "Qwen3-0.6B TP1 draft",
+    "Qwen3-32B TP3 target"
+  ],
+  "gamma": 4,
+  "max_new_tokens": 256,
+  "respect_eos": true,
+  "questions": 80,
+  "turns_per_question": 2,
+  "public_dataset": "/data/shared_upload/SpecSLO/datasets/MT-Bench/question-b494d0c6b4e7.jsonl",
+  "physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "started_UTC": "2026-10-20T18:41:43.557702+00:00",
+  "attempt": 2,
+  "initialization_repair": "Enable standard precompile_serial_draft_graphs; no qualification bypass",
+  "attempt1_preserved": "attempts/attempt1",
+  "independent_audit": "pass",
+  "overall_acceptance_rate": 0.46062202157010285,
+  "overall_accepted_draft_tokens": 29384,
+  "overall_verified_draft_tokens": 63792,
+  "finished_UTC": "2026-10-20T18:53:15.270264+00:00",
+  "all4idle": true,
+  "report": "/root/SpecSLO/mtbench-gamma4-20261021/REPORT_zh.md"
+}

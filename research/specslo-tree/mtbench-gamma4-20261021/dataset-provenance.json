@@ -1,0 +1,9 @@
+{
+  "source_repository": "https://github.com/lm-sys/FastChat",
+  "source_commit": "b494d0c6b4e7935f1764f8439e75da3e66beccc7",
+  "url": "https://raw.githubusercontent.com/lm-sys/FastChat/b494d0c6b4e7935f1764f8439e75da3e66beccc7/fastchat/llm_judge/data/mt_bench/question.jsonl",
+  "sha256": "119565adbab82227089cefdb44c8d7e2cf04dc0a0ec233634c82e7d4e2a944f7",
+  "questions": 80,
+  "turns_per_question": 2,
+  "downloaded_UTC": "2026-10-20T18:37:19.322861+00:00"
+}

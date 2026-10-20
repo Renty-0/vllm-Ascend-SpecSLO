@@ -1,0 +1,21 @@
+{
+  "recorded_UTC": "2026-10-20T18:49:33.627123+00:00",
+  "scope": "Helper sources snapshotted during initialization; effective config retained in run-plan",
+  "files": [
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/serial-v1/calibrate.py",
+      "snapshot": "/root/SpecSLO/mtbench-gamma4-20261021/dependencies/calibrate.py",
+      "sha256": "9b1caf5305202e65b11ba81697429c8728d18c36cabf1bdb56f4e44ec9931dca"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh",
+      "snapshot": "/root/SpecSLO/mtbench-gamma4-20261021/dependencies/runtime.sh",
+      "sha256": "107a11a58764eabe4f8b6e5d752d9234cf67f9e898d81a8619e47e684e83af7c"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/serial-v1/map-current.py",
+      "snapshot": "/root/SpecSLO/mtbench-gamma4-20261021/dependencies/map-current.py",
+      "sha256": "300e4e9894af7f7275a718bc9f549d1c62c880a5e7b1665f7d1268c6f2097975"
+    }
+  ]
+}

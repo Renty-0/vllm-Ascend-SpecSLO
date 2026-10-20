@@ -1,0 +1,42 @@
+{
+  "scope": "MT-Bench fixed-gamma4 acceptance diagnostic; no model weights, dataset question files, full prompt/output token rows or compiler cache",
+  "source_directory": "/root/SpecSLO/mtbench-gamma4-20261021",
+  "all160_verifications_fixed_gamma4": true,
+  "files": {
+    "HOST-preflight.json": "af78cd9ece5261ca10b778b273101f42fb870ba3f9478d530392e53d8863ffcd",
+    "REPORT_zh.md": "3221234823c22e79687485326300f134262cb6d2cfd2f5213d5b7de9d0086d1f",
+    "STATUS.json": "82a3acb8ef389360c2736921a8df5ed50ed7b1517e1696a19f5163ebbdd0fa7b",
+    "acceptance-by-category.csv": "62e01d12544de3f124a5c3ccf2262c4800570e41217ec58703e273766793d733",
+    "attempts/attempt1/launch.sh": "531048944dc1c1293e5697f6c1a9af53d6fcbdcbfd7ece18f5a13ba4fb029c7c",
+    "attempts/attempt1/preservation.json": "94b1dfe0388fdacd0570d057cecd5c053336e6b5a53b00caceb8db69f51113ea",
+    "attempts/attempt1/receipt.json": "f209c7400c48209ff230300b5d0996db316fbd7a80873654646cd17e38a4b2fb",
+    "attempts/attempt1/run_mtbench.py": "921c559db3ada44697989b2c07e05cbc91490273da8e10fb3e1156282fb590f1",
+    "attempts/attempt1/supervise.py": "37a2c08434cb59f97276befb7cd3cd0768047f87bb10572f34c52e929c1d108b",
+    "audit_results.py": "787a8e04bd79996dab188d4fc7f0661f6a11deeec53001efe44395dcc5986144",
+    "dataset-provenance.json": "8c13ac720c49008f41587485bf9555b8e62e269934421485c6ea05fe6b66c943",
+    "dependencies/calibrate.py": "9b1caf5305202e65b11ba81697429c8728d18c36cabf1bdb56f4e44ec9931dca",
+    "dependencies/manifest.json": "cb8daff47884fe1046b26ffdab0f0ecfbbac251ae5242afba5ea04357496bba8",
+    "dependencies/map-current.py": "300e4e9894af7f7275a718bc9f549d1c62c880a5e7b1665f7d1268c6f2097975",
+    "dependencies/runtime.sh": "107a11a58764eabe4f8b6e5d752d9234cf67f9e898d81a8619e47e684e83af7c",
+    "independent-audit.json": "980afcabd5b9fea561fa1b4a0192a7b0c74e52e20e9d86f9524ff33641a425be",
+    "launch.sh": "531048944dc1c1293e5697f6c1a9af53d6fcbdcbfd7ece18f5a13ba4fb029c7c",
+    "post-verifier.json": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "pre-verifier.json": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "receipt.json": "8f4737a179dc7f3f860befcf9ba7d10a90b2dd7538b2a49f705b70bda006c16c",
+    "request-counters.csv": "e8c5738d07e248d119f32ee412c3e88bf163227215d8d9b866c8d7432727d412",
+    "run-plan.json": "2a981f1e9574956d925bf19d9bad0ae8753998f408a2178022904ebc69db9ec4",
+    "run_mtbench.py": "365392aed24f5cf8cb61dabaca50affb00ccbf1e8a123519622bb4c401064a58",
+    "summary.json": "8834ebafaaf742093f92b8e370ac42740a492290436e4049190ec669bd276e53",
+    "supervise.py": "37a2c08434cb59f97276befb7cd3cd0768047f87bb10572f34c52e929c1d108b",
+    "worker-exit.json": "5c9a6dd39165774a41a8bd525627510e51600dbb8a769ea57e40d898c69ce89c",
+    "VALIDATION.json": "e87d93c2f9b4e42f9c86f2f0cea6b7f92b5d9d6d0ecfd60cdf5db0e9939a23dc"
+  },
+  "retained_private_only": [
+    "turn1-inputs.json",
+    "turn2-inputs.json",
+    "turn1-results.json",
+    "turn2-results.json",
+    "run.log",
+    "triton-cache"
+  ]
+}

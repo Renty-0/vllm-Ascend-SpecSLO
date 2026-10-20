@@ -1,0 +1,9 @@
+{
+  "status": "pass",
+  "actual_integer_token_lists": true,
+  "first_prompt_min": 20,
+  "first_prompt_max": 364,
+  "questions": 80,
+  "weighted_acceptance_aggregation_passed": true,
+  "model_workers_started": false
+}

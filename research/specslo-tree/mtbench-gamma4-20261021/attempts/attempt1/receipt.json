@@ -1,0 +1,69 @@
+{
+  "status": "failed",
+  "started_UTC": "2026-10-20T18:41:43.557702+00:00",
+  "source_hashes": {
+    "/root/SpecSLO/mtbench-gamma4-20261021/run_mtbench.py": "921c559db3ada44697989b2c07e05cbc91490273da8e10fb3e1156282fb590f1",
+    "/root/SpecSLO/mtbench-gamma4-20261021/launch.sh": "531048944dc1c1293e5697f6c1a9af53d6fcbdcbfd7ece18f5a13ba4fb029c7c",
+    "/root/SpecSLO/mtbench-gamma4-20261021/supervise.py": "37a2c08434cb59f97276befb7cd3cd0768047f87bb10572f34c52e929c1d108b"
+  },
+  "physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "model_pair": [
+    "Qwen3-0.6B",
+    "Qwen3-32B"
+  ],
+  "devices_before": {
+    "2": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "5": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "6": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "7": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    }
+  },
+  "child_pid": 20438,
+  "child_exit_code": 1,
+  "elapsed_seconds": 210.05082875816151,
+  "sources_unchanged": true,
+  "devices_after": {
+    "2": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "5": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "6": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    },
+    "7": {
+      "exit_code": 0,
+      "output": "\tNo process in device.\n",
+      "idle": true
+    }
+  },
+  "all4idle": true,
+  "finished_UTC": "2026-10-20T18:45:17.328696+00:00"
+}
