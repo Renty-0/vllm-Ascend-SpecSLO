@@ -1,0 +1,21 @@
+{
+  "status": "OPTIONAL_UNIMPLEMENTED_UNMEASURED_RAW_FOLLOWUP",
+  "UTC": "2026-10-20T00:47:31.073660+00:00",
+  "priority": "after current original B4 eager protocol and actual incremental-cost diagnosis",
+  "source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_model.py",
+  "code_observation": "NativeColumnLinear.forward selects pre-existing large_m_nz_weight only above large_m_nz_min_rows; current target threshold161 exceeds M120",
+  "candidate": "only if actual model inventory confirms selected FFN gate/up NZ copies: isolated tree M120 gate/up test, keep row-parallel MC2 projection weights and all other model paths unchanged",
+  "obligations": [
+    "BF16 weight layouts only, no quantization or Native qualification flag override",
+    "do not change prefill or existing independent reference bank numerics",
+    "distinct genuine Native graph entries or runner instances for ND and NZ so a cached ND graph cannot masquerade as NZ",
+    "fresh all-node hidden/128KV/greedy and committed-prefix checks against original ND M120, including long/mid/short contexts",
+    "balanced paired component costs; reject numerical failures or unreliable improvements before any full candidate",
+    "if worthwhile, fresh original full controls, unchanged463 arrivals/publications and all3 ownAR, then final matched comparison"
+  ],
+  "prior_causal_target_negative": "ROOT341_CAUSAL_CROSS_FULL_HIDDEN_FAILURE.json; do not treat causal inner1 as untried",
+  "implemented": false,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

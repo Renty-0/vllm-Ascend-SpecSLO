@@ -1,6 +1,6 @@
 {
-  "UTC": "2026-10-19T16:01:16.013742+00:00",
-  "status": "active_tree_optimization",
+  "UTC": "2026-10-20T00:57:11.827240+00:00",
+  "status": "paused_after_v391_import_failure",
   "user_resume_request": true,
   "prior_pause_revoked": true,
   "user_correction": "old official vllm-ascend, explicitly not HUST",
@@ -33,7 +33,7 @@
   "github_identity": "Renty-0",
   "github_checkpoint": "307b316",
   "goal_achieved": false,
-  "next": "Prepare narrow first-layer80/120 divergence diagnostic. First378 M80 case changed2 of80greedy heads, hidden/KV mismatch. No performance adoption. Preservebest376 GP609.03; goalfalse0/9.",
+  "next": "Paused by user after391; no new NPU launch. Resume only when user asks. Retained plan in ROOT391_FINAL_RESULT_AND_PAUSE.json.",
   "goal_tool_metadata": "user resumed; existing paused metadata is stale; API provides no active/resume status",
   "user_Raw_clarification": {
     "UTC": "2026-10-19T02:55:43.056404+00:00",
@@ -59,7 +59,7 @@
   "official_plugin_tag": "v0.21.0rc1",
   "official_core_tag": "v0.21.0",
   "HUST_baseline_requested_or_launched": false,
-  "user_latest_request": "Only official v0.21 series; compare variation with existing official0.23; keep original tree plan and add tree Raw as extra direction",
+  "user_latest_request": "测完这个方案先暂停",
   "private_core_Git_metadata_durable": true,
   "tree317_declared_HOST_cases": 546,
   "tree317_all_KV_ancestry_and_split_HOST_passed": true,
@@ -189,7 +189,7 @@
   "tree329_all6_invalid_limit_cases_rejected": true,
   "tree329_model_qualification": true,
   "tree329_tag": "M160-S32-C128-root-v329-B1to8-532-math-cost-v1",
-  "updated_UTC": "2026-10-19T20:02:45.894498+00:00",
+  "updated_UTC": "2026-10-20T00:57:11.827240+00:00",
   "tree329_guard_pid": 292336,
   "tree329_all_four_capacity_before_model_passed": true,
   "tree330_source_only": true,
@@ -789,7 +789,7 @@
     "version": 391,
     "tag": "parent4-child4-current-M120-root-v391-early392-bounded-v1",
     "guardian_session": 5680,
-    "status": "running_fresh173_then_currentM120_P4_with_early_observer392",
+    "status": "failed_first_new_B4_target_prepare_import_projection247",
     "UTC": "2026-10-20T00:34:26.962587+00:00",
     "freeze_sha256": "a9a4bfaa81f9bc8f95a75a533612fb1bd8b8202638a6f65c6d35b8185fe8fa98",
     "archive_sha256": "e97edf491453ea415c815a1f7b372511c0e35184fdb32b9265a184a38f207ed8",
@@ -808,7 +808,17 @@
     "original_best376_draft_claimed": false,
     "production_permission": false,
     "Raw": null,
-    "Goodput": null
+    "Goodput": null,
+    "finished_UTC": "2026-10-20T00:55:01.759475+00:00",
+    "guardian_session_closed": true,
+    "terminal_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT391_TERMINAL_RETAINED_AUDIT.json",
+    "final_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT391_FINAL_RESULT_AND_PAUSE.json",
+    "bounded_cases_completed": 0,
+    "owned_remaining": [],
+    "all4idle": true,
+    "sources_unchanged": true,
+    "environment_verified": true,
+    "adopted": false
   },
   "prepared_next_full376": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT376_BEST257_KV_BUCKET_FULL_PLAN.json",
   "completed361_target_component_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT361_FINAL_TARGET_KV_BUCKET_AND_COST_RESULT.json",
@@ -999,5 +1009,34 @@
     "all4idle": true,
     "result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT389_FRONTIER_REFERENCE_OBSERVER_FAILURE.json"
   },
-  "prepared_current_target391": "frozen and launched with actual current M120 backend; no original227/681/full463 claimed; observer392 read-only hook before capture"
+  "prepared_current_target391": "frozen and launched with actual current M120 backend; no original227/681/full463 claimed; observer392 read-only hook before capture",
+  "source_only_next393": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393",
+    "status": "unfrozen proposed finite N24/parent24 E1..8 R0/1; actual DTO/source scopes/Fast factory HOST pass; no runtime yet",
+    "models_qualified": false
+  },
+  "actual_eager_window_screen": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT393_CURRENT_BEST_EAGER_WINDOW_SCREEN.json",
+  "optional_extra_Raw_plan": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_EXTRA_RAW_GATEUP_NZ120_CONDITIONAL_PLAN.json",
+  "last_verified_github_commit": "a6b8c82",
+  "user_stop_after_current": {
+    "requested": true,
+    "UTC": "2026-10-20T00:50:52.486009+00:00",
+    "current_tag": "parent4-child4-current-M120-root-v391-early392-bounded-v1",
+    "instruction": "finish this current scheme, retain terminal audit and save code/results/thoughts, then pause; do not launch another NPU job",
+    "fulfilled": true,
+    "fulfilled_UTC": "2026-10-20T00:57:11.827240+00:00",
+    "next_NPU_job_launched": false
+  },
+  "paused": true,
+  "paused_after_current": true,
+  "completed391_result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT391_FINAL_RESULT_AND_PAUSE.json",
+  "retained_next_steps_after_resume": [
+    "Additive frozen successor: restore the existing projection247 dependency search path; verify actual spawned-worker imports using the exact sanitized startup environment before loading models. Do not edit frozen391.",
+    "Finish strict current-M120 B4 parent/child hidden, all128KV, natural promotion/reject/consume/rollback/next and zero-new-entry qualification. Preserve subset coverage if nature does not exercise every branch.",
+    "Then validate prepared N24/E1..8 source-only393 using the actual majority production batch scope. No performance or online qualification is inherited from HOST.",
+    "Measure actual marginal eager cost and admission-window fit. Actual376 normal N24 terminal estimator52.91ms versus target50.31ms is a screen, not a causal timing proof or permission to relax the window.",
+    "Additional Raw direction: inspect measured cost of actual RootSeed/FastV5 normal path;1975/2320 nonempty calls used root seed with head outside graph. Counts alone do not establish an optimization benefit. Keep optional M120 gate/up NZ experiment lower priority.",
+    "Only after model and cost checks pass, run complete463 plus independent ownAR, then final matched three-block comparison; keep original arrival/SLO/baseline and >644.766448113661 target."
+  ],
+  "normal_root_seed_screen": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT393_CURRENT_BEST_NORMAL_ROOT_SEED_SCREEN.json"
 }

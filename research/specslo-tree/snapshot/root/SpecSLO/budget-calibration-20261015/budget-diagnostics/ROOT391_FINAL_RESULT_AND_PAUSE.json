@@ -1,0 +1,86 @@
+{
+  "schema": "ROOT391.current-scheme-finished-user-pause.v1",
+  "UTC": "2026-10-20T00:57:11.827240+00:00",
+  "status": "FAILED_STARTUP_IMPORT_IN_FIRST_NEW_B4_CASE_PAUSED_AS_REQUESTED",
+  "actual_tag": "parent4-child4-current-M120-root-v391-early392-bounded-v1",
+  "terminal_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT391_TERMINAL_RETAINED_AUDIT.json",
+  "terminal_audit_sha256": "16d2a5fd212fe216c2a1c52d2f5841255ef59ae4ef7909b2d079f47c92061d21",
+  "original_prefill201_target44_draft114_completed": true,
+  "fresh_original_B4_and_causal80_completed_all4": true,
+  "completed_new_B4_cases": 0,
+  "Raw": null,
+  "Goodput": null,
+  "production_permission": false,
+  "adopted": false,
+  "failure_stage": "V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare",
+  "failure_cause": "ModuleNotFoundError: No module named 'projection247'",
+  "source_inspection": {
+    "module_exists": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/projection247.py",
+    "direct_caller": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+    "omitted_from_actual_startup391_PYTHONPATH": true,
+    "HOST390_had_extra_dependency_directory": true,
+    "frozen391_sources_edited": false,
+    "repair_implemented": false
+  },
+  "observer392": {
+    "passed_old_missing_reference_stage": true,
+    "full_new_case_not_completed": true,
+    "full_NPU_qualification": false
+  },
+  "cleanup": {
+    "sources_rehashed": 4288,
+    "environment_verified": true,
+    "owned_remaining": [],
+    "all4idle": true
+  },
+  "best_complete_unchanged": {
+    "Raw": 699.6987403391912,
+    "Goodput": 609.0250374874602,
+    "attained": 403,
+    "requests": 463,
+    "whole463_own_AR_qualified": true,
+    "GP_over_fixed_gamma4": 1.2140785712466469,
+    "GP_over_strong_official_MC2": 1.4168503322464285,
+    "historical_1p5_threshold": 644.766448113661,
+    "goal_achieved": false
+  },
+  "source_only393": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393",
+    "normalN": 24,
+    "parentN": 24,
+    "parent_B": 4,
+    "child_B": 4,
+    "E": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "HOST_only": true,
+    "runtime_ready": false,
+    "NPU_qualified": false,
+    "production_permission": false,
+    "launched": false
+  },
+  "retained_future_directions_after_user_resumes": [
+    "Additive frozen successor: restore the existing projection247 dependency search path; verify actual spawned-worker imports using the exact sanitized startup environment before loading models. Do not edit frozen391.",
+    "Finish strict current-M120 B4 parent/child hidden, all128KV, natural promotion/reject/consume/rollback/next and zero-new-entry qualification. Preserve subset coverage if nature does not exercise every branch.",
+    "Then validate prepared N24/E1..8 source-only393 using the actual majority production batch scope. No performance or online qualification is inherited from HOST.",
+    "Measure actual marginal eager cost and admission-window fit. Actual376 normal N24 terminal estimator52.91ms versus target50.31ms is a screen, not a causal timing proof or permission to relax the window.",
+    "Additional Raw direction: inspect measured cost of actual RootSeed/FastV5 normal path;1975/2320 nonempty calls used root seed with head outside graph. Counts alone do not establish an optimization benefit. Keep optional M120 gate/up NZ experiment lower priority.",
+    "Only after model and cost checks pass, run complete463 plus independent ownAR, then final matched three-block comparison; keep original arrival/SLO/baseline and >644.766448113661 target."
+  ],
+  "saved_context_files": [
+    "ROOT393_CURRENT_BEST_EAGER_WINDOW_SCREEN.json",
+    "ROOT393_CURRENT_BEST_NORMAL_ROOT_SEED_SCREEN.json",
+    "ROOT_EXTRA_RAW_GATEUP_NZ120_CONDITIONAL_PLAN.json",
+    "ROOT389_GOAL_MARGIN_ARITHMETIC.json"
+  ],
+  "user_pause_requested": true,
+  "paused_after_current": true,
+  "next_NPU_job_launched": false
+}

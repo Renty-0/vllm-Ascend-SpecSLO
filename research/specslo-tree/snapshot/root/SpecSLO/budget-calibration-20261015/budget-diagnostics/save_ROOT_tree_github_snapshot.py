@@ -189,6 +189,7 @@ def main():
         'tree-parent4-best376-target-binding-host-v390',
         'tree-parent4-current-M120-target-protocol-v391',
         'tree-parent4-frontier-observer-before-capture-host-v392',
+        'tree-parent4-normal24-draft-shape-host-v393',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -217,6 +218,12 @@ def main():
         'freeze_ROOT391_parent4_current_target_and_early_observer_HOST.py',
         'HOST_ROOT391_ACTUAL_FROZEN_CONSTRUCTION.json',
         'ROOT389_FRONTIER_REFERENCE_OBSERVER_FAILURE.json',
+        'ROOT393_CURRENT_BEST_EAGER_WINDOW_SCREEN.json',
+        'ROOT393_CURRENT_BEST_NORMAL_ROOT_SEED_SCREEN.json',
+        'ROOT_EXTRA_RAW_GATEUP_NZ120_CONDITIONAL_PLAN.json',
+        'audit_ROOT391_terminal_retained_HOST.py',
+        'ROOT391_TERMINAL_RETAINED_AUDIT.json',
+        'ROOT391_FINAL_RESULT_AND_PAUSE.json',
         'ROOT389_GOAL_MARGIN_ARITHMETIC.json',
         'ROOT389_BEST376_ACTUAL_CLASS_GAIN_SCREEN.json',
         'freeze_ROOT389_parent4_atomic_storage_HOST.py',

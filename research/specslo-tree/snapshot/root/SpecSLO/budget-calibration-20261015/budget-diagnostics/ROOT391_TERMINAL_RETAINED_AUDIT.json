@@ -1,0 +1,89 @@
+{
+  "schema": "ROOT391.retained-terminal-failure-audit.v1",
+  "UTC": "2026-10-20T00:56:30.434010+00:00",
+  "status": "EXPECTED_IMPORT_FAILURE_RETAINED_AND_CLEANUP_VERIFIED",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/receipt-parent4-child4-current-M120-root-v391-early392-bounded-v1.json",
+  "receipt_sha256": "863a54877f1b6473429c3f87f1edb65f999d1948f00b1f5acb82eef15075cd42",
+  "actual_output": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/actual/parent4-child4-current-M120-root-v391-early392-bounded-v1",
+  "source_members_rehashed": 4288,
+  "failure_stage": "V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare",
+  "failure_cause": "ModuleNotFoundError: No module named 'projection247'",
+  "source_manifest_sha256": "a9a4bfaa81f9bc8f95a75a533612fb1bd8b8202638a6f65c6d35b8185fe8fa98",
+  "workers": [
+    {
+      "rank": 0,
+      "original_B4_completed": true,
+      "original_causal80_completed": true,
+      "error_last_line": "RuntimeError: V75 allrank startup boundary failed V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare: [{'rank': 0, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': None}, {'rank': 1, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}, {'rank': 2, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}, {'rank': 3, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}]"
+    },
+    {
+      "rank": 1,
+      "original_B4_completed": true,
+      "original_causal80_completed": true,
+      "error_last_line": "RuntimeError: V75 allrank startup boundary failed V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare: [{'rank': 0, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': None}, {'rank': 1, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}, {'rank': 2, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}, {'rank': 3, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}]"
+    },
+    {
+      "rank": 2,
+      "original_B4_completed": true,
+      "original_causal80_completed": true,
+      "error_last_line": "RuntimeError: V75 allrank startup boundary failed V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare: [{'rank': 0, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': None}, {'rank': 1, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}, {'rank': 2, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}, {'rank': 3, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}]"
+    },
+    {
+      "rank": 3,
+      "original_B4_completed": true,
+      "original_causal80_completed": true,
+      "error_last_line": "RuntimeError: V75 allrank startup boundary failed V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare: [{'rank': 0, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': None}, {'rank': 1, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}, {'rank': 2, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}, {'rank': 3, 'label': 'V199/pass0/N16-parent16-P4-E1-B4-R0-M20/real-parent16-B4/greedy/first/prepare', 'error': \"ModuleNotFoundError: No module named 'projection247'\"}]"
+    }
+  ],
+  "original_inventory": [
+    {
+      "rank": 1,
+      "prefill": 201,
+      "target_inventory": 44
+    },
+    {
+      "rank": 2,
+      "prefill": 201,
+      "target_inventory": 44
+    },
+    {
+      "rank": 3,
+      "prefill": 201,
+      "target_inventory": 44
+    }
+  ],
+  "original_draft_inventory": 114,
+  "bounded_cases_completed": 0,
+  "sources_unchanged": true,
+  "environment_verified": true,
+  "worker_exit_verified": true,
+  "owned_remaining": [],
+  "independently_idle_devices": [
+    {
+      "card": 2,
+      "idle": true
+    },
+    {
+      "card": 5,
+      "idle": true
+    },
+    {
+      "card": 6,
+      "idle": true
+    },
+    {
+      "card": 7,
+      "idle": true
+    }
+  ],
+  "guardian_error_context": "Generic nonzero-child gate says within1800seconds; actual child exit_code=1, elapsed about1232s, not evidence of an1800s timeout.",
+  "observer392_full_model_qualification": false,
+  "original173_proofs_recomputed_by_HOST": false,
+  "new_target_hidden_KV_proof_completed": false,
+  "production_permission": false,
+  "full463": false,
+  "Raw": null,
+  "Goodput": null,
+  "pause_requested_by_user": true,
+  "next_NPU_job_launched": false
+}

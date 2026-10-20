@@ -1,0 +1,16 @@
+{
+  "status": "PASS_HOST393_REAL_FAST_MODULE_FACTORY_AND_HELPER_SOURCE_INVERSE",
+  "prepared": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/fast393.generated.py",
+    "production_scope_opened": false
+  },
+  "actual_fast_source": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-draft-shape-host-v393/fast393.generated.py",
+  "Torch_imported": false,
+  "NPU_used": false,
+  "original_algorithms_preserved_except_explicit_role_scope": true,
+  "runtime_prepared": false,
+  "model_qualification": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

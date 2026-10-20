@@ -1,0 +1,27 @@
+{
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/static-M120-uniform-KV-root-v376-full463-ownAR-v1/rank0-local-diagnostic.json",
+  "generation": 5,
+  "formal_after_minus_before": {
+    "chain_real_queries": 116940,
+    "repair_padded_queries": 0,
+    "chain_calls": 2320,
+    "root_seed_root_queries": 37274,
+    "root_seed_PA_real_queries": 50335,
+    "repair_real_queries": 0,
+    "repair_PA_calls": 0,
+    "root_seed_calls": 1975,
+    "repair_calls": 0,
+    "chain_padded_queries": 120550,
+    "root_seed_committed_repair_queries": 13061,
+    "root_seed_head_padded_rows": 38376,
+    "root_seed_PA_padded_queries": 53160,
+    "root_seed_model_stages": 7900,
+    "root_seed_head_outside_graph_calls": 1975,
+    "generated_candidates": 308428
+  },
+  "claim": "executed counts only, not a timing decomposition or speedup",
+  "candidate": "investigate packed-root PA plus explicit head plus tail3 graph submissions only after current P4 protocol/cost, no new graph or ABI implemented",
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

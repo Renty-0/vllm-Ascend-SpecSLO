@@ -1,0 +1,69 @@
+{
+  "scope": "completed376 estimator state; not matched component timing or direct hardware overlap",
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/static-M120-uniform-KV-root-v376-full463-ownAR-v1/rank0-local-diagnostic.json",
+  "source_sha256": "dc1857566f25a36f90a42a200d2241bd61614ba0a9edddbead45a58cae047e0c",
+  "state": {
+    "available": true,
+    "source_generation": 5,
+    "estimator_type": "packed_window.PackedTreeWindowEstimator",
+    "summary": {
+      "bootstrap_row_offers": 12,
+      "eager_observations": 0,
+      "normal_bucket16_ms": 40.95708585108104,
+      "normal_bucket12_ms": 38.69936404154098,
+      "normal_bucket8_ms": 34.84360416236607,
+      "normal_bucket4_ms": 32.85829211433226,
+      "normal_bucket2_ms": 32.12257059607903,
+      "normal_bucket1_ms": 27.93435413185904,
+      "normal_bucket24_ms": 52.908694828482155,
+      "normal_bucket20_ms": 46.57865636837788
+    },
+    "normal_ms": [
+      {
+        "bucket": 1,
+        "ms": 27.93435413185904
+      },
+      {
+        "bucket": 2,
+        "ms": 32.12257059607903
+      },
+      {
+        "bucket": 4,
+        "ms": 32.85829211433226
+      },
+      {
+        "bucket": 8,
+        "ms": 34.84360416236607
+      },
+      {
+        "bucket": 12,
+        "ms": 38.69936404154098
+      },
+      {
+        "bucket": 16,
+        "ms": 40.95708585108104
+      },
+      {
+        "bucket": 20,
+        "ms": 46.57865636837788
+      },
+      {
+        "bucket": 24,
+        "ms": 52.908694828482155
+      }
+    ],
+    "overhead_ms": [],
+    "target_verify_ms": 50.311645720360275,
+    "communication_ms": 0.0,
+    "eager_fixed_overhead_ms": null,
+    "probe_offers": 12,
+    "eager_observations": 0
+  },
+  "observed_eager_calls": 0,
+  "implication": "N24 estimated normal draft cost52.91ms exceeds target50.31ms at terminal snapshot; parent4 correctness alone does not imply window eligibility or a speedup",
+  "next": "finish real current-M120 P4 protocol, then measure actual incremental E cost before selecting any new window rule; original8-unit window stays unchanged until explicit measured replacement",
+  "causal_target_route_prior_negative": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT341_CAUSAL_CROSS_FULL_HIDDEN_FAILURE.json",
+  "do_not_repeat_causal1_without_new_evidence": true,
+  "Raw": null,
+  "Goodput": null
+}

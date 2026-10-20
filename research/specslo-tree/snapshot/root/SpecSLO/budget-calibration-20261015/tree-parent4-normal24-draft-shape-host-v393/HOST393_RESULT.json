@@ -1,0 +1,191 @@
+{
+  "status": "PASS_HOST393_ACTUAL_TYPED_GRANTS_SOURCE_OWNER_AND_ROLE_INVERSE",
+  "NPU_used": false,
+  "Torch_imported": false,
+  "actual_original_cap3_unchanged": true,
+  "actual64_prefix_contexts": true,
+  "parent_draft_role_projection_inverse_exact": true,
+  "cases": [
+    {
+      "N": 24,
+      "E": 1,
+      "R": 0,
+      "chain_M": 28,
+      "F": 1,
+      "U": 1,
+      "normal_C": 96,
+      "eager_C": 4,
+      "selected_C": 100
+    },
+    {
+      "N": 24,
+      "E": 1,
+      "R": 1,
+      "chain_M": 28,
+      "F": 1,
+      "U": 2,
+      "normal_C": 96,
+      "eager_C": 4,
+      "selected_C": 100
+    },
+    {
+      "N": 24,
+      "E": 2,
+      "R": 0,
+      "chain_M": 28,
+      "F": 2,
+      "U": 2,
+      "normal_C": 96,
+      "eager_C": 8,
+      "selected_C": 104
+    },
+    {
+      "N": 24,
+      "E": 2,
+      "R": 1,
+      "chain_M": 28,
+      "F": 2,
+      "U": 4,
+      "normal_C": 96,
+      "eager_C": 8,
+      "selected_C": 104
+    },
+    {
+      "N": 24,
+      "E": 3,
+      "R": 0,
+      "chain_M": 28,
+      "F": 4,
+      "U": 4,
+      "normal_C": 96,
+      "eager_C": 12,
+      "selected_C": 108
+    },
+    {
+      "N": 24,
+      "E": 3,
+      "R": 1,
+      "chain_M": 28,
+      "F": 4,
+      "U": 8,
+      "normal_C": 96,
+      "eager_C": 12,
+      "selected_C": 108
+    },
+    {
+      "N": 24,
+      "E": 4,
+      "R": 0,
+      "chain_M": 28,
+      "F": 4,
+      "U": 4,
+      "normal_C": 96,
+      "eager_C": 16,
+      "selected_C": 112
+    },
+    {
+      "N": 24,
+      "E": 4,
+      "R": 1,
+      "chain_M": 28,
+      "F": 4,
+      "U": 8,
+      "normal_C": 96,
+      "eager_C": 16,
+      "selected_C": 112
+    },
+    {
+      "N": 24,
+      "E": 5,
+      "R": 0,
+      "chain_M": 32,
+      "F": 8,
+      "U": 8,
+      "normal_C": 96,
+      "eager_C": 20,
+      "selected_C": 116
+    },
+    {
+      "N": 24,
+      "E": 5,
+      "R": 1,
+      "chain_M": 32,
+      "F": 8,
+      "U": 12,
+      "normal_C": 96,
+      "eager_C": 20,
+      "selected_C": 116
+    },
+    {
+      "N": 24,
+      "E": 6,
+      "R": 0,
+      "chain_M": 32,
+      "F": 8,
+      "U": 8,
+      "normal_C": 96,
+      "eager_C": 24,
+      "selected_C": 120
+    },
+    {
+      "N": 24,
+      "E": 6,
+      "R": 1,
+      "chain_M": 32,
+      "F": 8,
+      "U": 12,
+      "normal_C": 96,
+      "eager_C": 24,
+      "selected_C": 120
+    },
+    {
+      "N": 24,
+      "E": 7,
+      "R": 0,
+      "chain_M": 32,
+      "F": 8,
+      "U": 8,
+      "normal_C": 96,
+      "eager_C": 28,
+      "selected_C": 124
+    },
+    {
+      "N": 24,
+      "E": 7,
+      "R": 1,
+      "chain_M": 32,
+      "F": 8,
+      "U": 12,
+      "normal_C": 96,
+      "eager_C": 28,
+      "selected_C": 124
+    },
+    {
+      "N": 24,
+      "E": 8,
+      "R": 0,
+      "chain_M": 32,
+      "F": 8,
+      "U": 8,
+      "normal_C": 96,
+      "eager_C": 32,
+      "selected_C": 128
+    },
+    {
+      "N": 24,
+      "E": 8,
+      "R": 1,
+      "chain_M": 32,
+      "F": 8,
+      "U": 12,
+      "normal_C": 96,
+      "eager_C": 32,
+      "selected_C": 128
+    }
+  ],
+  "model_qualification": false,
+  "runtime_prepared": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

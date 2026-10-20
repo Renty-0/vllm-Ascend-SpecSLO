@@ -1,0 +1,119 @@
+{
+  "status": "SOURCE_ONLY_UNFROZEN_NO_RUNTIME",
+  "draft_source": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/draft199.py",
+  "draft_exact_inverse": true,
+  "draft_changes": [
+    [
+      "from scope199 import",
+      "from scope393 import",
+      1
+    ],
+    [
+      "from provider199 import",
+      "from provider393 import",
+      1
+    ],
+    [
+      "range(16,32)",
+      "range(24,48)",
+      7
+    ],
+    [
+      "range(16)",
+      "range(24)",
+      3
+    ],
+    [
+      "[p]*16",
+      "[p]*24",
+      1
+    ],
+    [
+      "4,16)",
+      "4,24)",
+      1
+    ],
+    [
+      "if i<16",
+      "if i<24",
+      2
+    ],
+    [
+      "i<32",
+      "i<48",
+      1
+    ],
+    [
+      "i-16",
+      "i-24",
+      2
+    ],
+    [
+      "actual_chain_M=16",
+      "actual_chain_M=24",
+      1
+    ],
+    [
+      "(20,4,2)",
+      "(bucket(c.count),4,2)",
+      1
+    ],
+    [
+      "parent_M=16,shared_M=20",
+      "parent_M=24,shared_M=bucket(c.count)",
+      1
+    ],
+    [
+      "selected=64+4*c.eager",
+      "selected=96+4*c.eager",
+      1
+    ],
+    [
+      "actual M20 complete four-step",
+      "actual full physical bucket complete four-step",
+      1
+    ],
+    [
+      "decode(encoded_parent,16,4)",
+      "decode(encoded_parent,24,4)",
+      1
+    ],
+    [
+      "f['roots'][:16]",
+      "f['roots'][:24]",
+      1
+    ],
+    [
+      "parent16",
+      "parent24",
+      3
+    ]
+  ],
+  "budget_changes": [
+    [
+      "'_v199_private_typed_budget'",
+      "'_v393_private_typed_budget'",
+      1
+    ],
+    [
+      "normal=dict.fromkeys(range(16),4)",
+      "normal=dict.fromkeys(range(case.normal),4)",
+      1
+    ],
+    [
+      "selected_total=64+4*case.eager,normal_candidates=64",
+      "selected_total=4*case.normal+4*case.eager,normal_candidates=4*case.normal",
+      1
+    ]
+  ],
+  "normalC": 96,
+  "future_maxC": 32,
+  "globalC_limit": 192,
+  "selected_total_max": 128,
+  "normal_N": 24,
+  "parent_N": 24,
+  "model_qualification": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

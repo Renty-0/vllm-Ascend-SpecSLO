@@ -1,0 +1,174 @@
+{
+  "status": "SOURCE_ONLY_NOT_RUNTIME_OR_NUMERIC_QUALIFIED",
+  "source_root": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199",
+  "edits": {
+    "protocol199.py": [
+      [
+        "import target199 as target",
+        "import target391 as target",
+        1
+      ],
+      [
+        "from budget199 import",
+        "from budget393 import",
+        1
+      ],
+      [
+        "range(16,32)",
+        "range(24,48)",
+        1
+      ],
+      [
+        "range(16)",
+        "range(24)",
+        1
+      ],
+      [
+        "range(32)",
+        "range(48)",
+        1
+      ],
+      [
+        "if i<16",
+        "if i<24",
+        3
+      ]
+    ],
+    "next199.py": [
+      [
+        "from scope199 import",
+        "from scope393 import",
+        1
+      ],
+      [
+        "import draft199 as draft",
+        "import draft393 as draft",
+        1
+      ]
+    ],
+    "actor199.py": [
+      [
+        "from scope199 import",
+        "from scope393 import",
+        1
+      ],
+      [
+        "import draft199 as draft",
+        "import draft393 as draft",
+        1
+      ],
+      [
+        "import protocol199 as protocol",
+        "import protocol393 as protocol",
+        1
+      ],
+      [
+        "import target199 as target",
+        "import target391 as target",
+        1
+      ],
+      [
+        "from provider199 import evidence",
+        "from provider393 import evidence",
+        1
+      ],
+      [
+        "from next199 import",
+        "from next393 import",
+        1
+      ],
+      [
+        "range(16,32)",
+        "range(24,48)",
+        2
+      ],
+      [
+        "list(range(32))",
+        "list(range(48))",
+        1
+      ],
+      [
+        "max_target_requests=16",
+        "max_target_requests=24",
+        1
+      ],
+      [
+        "if len(ids)==16 and eager",
+        "if len(ids)==24 and eager",
+        1
+      ],
+      [
+        "from live199 import diagnostic",
+        "from binding393 import diagnostic",
+        1
+      ],
+      [
+        "mixed16Q80_child_observed",
+        "mixed24Q120_child_observed",
+        2
+      ],
+      [
+        "mixed16Q80_child=",
+        "mixed24Q120_child=",
+        1
+      ],
+      [
+        "real-parent16-B4",
+        "real-parent24-B4",
+        1
+      ]
+    ],
+    "live199.py": [
+      [
+        "from base199 import P,V159,functions,checked,require",
+        "from base199 import B,V159,functions,checked,require\nfrom pathlib import Path\nP=Path(__file__).parent",
+        1
+      ],
+      [
+        "(16,e)for e in(1,2,3,4)",
+        "(24,e)for e in range(1,9)",
+        1
+      ],
+      [
+        "(e,1)for e in(1,2,3,4)",
+        "(e,1)for e in range(1,9)",
+        1
+      ],
+      [
+        "from budget199 import clear",
+        "from budget393 import clear",
+        1
+      ],
+      [
+        "len(normal)==16",
+        "len(normal)==24",
+        1
+      ],
+      [
+        "==20",
+        "==bucket393(len(ids))",
+        1
+      ],
+      [
+        "exact diagnostic parent4/child4/N16/E1..4/single repair/M20",
+        "exact diagnostic parent4/child4/N24/E1..8/single repair/M28or32",
+        1
+      ],
+      [
+        "from live199 import fused_prelude,validate",
+        "from live393 import fused_prelude,validate",
+        1
+      ],
+      [
+        "fast199.generated.py",
+        "fast393.generated.py",
+        1
+      ],
+      [
+        "from scope159 import Capability,native_ready",
+        "from scope159 import Capability,native_ready\nfrom scope393 import bucket as bucket393",
+        1
+      ]
+    ]
+  }
+}

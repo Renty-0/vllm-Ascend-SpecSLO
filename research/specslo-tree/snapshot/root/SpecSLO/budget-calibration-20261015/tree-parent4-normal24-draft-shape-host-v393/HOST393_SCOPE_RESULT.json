@@ -1,0 +1,110 @@
+{
+  "status": "PASS_HOST393_ACTUAL_FINITE_SCOPE_AND_GLOBAL_BUDGET_NEGATIVES",
+  "NPU_used": false,
+  "Torch_imported": false,
+  "CPU_scope_carriers_only": true,
+  "cases": [
+    {
+      "case": "N24-parent24-P4-E1-B4-R0-M28",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E1-B4-R1-M28",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E2-B4-R0-M28",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E2-B4-R1-M28",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E3-B4-R0-M28",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E3-B4-R1-M28",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E4-B4-R0-M28",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E4-B4-R1-M28",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E5-B4-R0-M32",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E5-B4-R1-M32",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E6-B4-R0-M32",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E6-B4-R1-M32",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E7-B4-R0-M32",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E7-B4-R1-M32",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E8-B4-R0-M32",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    },
+    {
+      "case": "N24-parent24-P4-E8-B4-R1-M32",
+      "scope_positive": true,
+      "wrong_steps_rejected": true,
+      "context_revoked": true
+    }
+  ],
+  "global_selected_limit_negative": true,
+  "model_qualification": false,
+  "runtime_prepared": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}
