@@ -1,0 +1,16 @@
+{
+  "status": "FAILED_MONITOR_ONLY_BEFORE_PARENT4_CASES",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/receipt-parent4-child4-shared4-root-v388-bounded-v2.json",
+  "error": [
+    "Traceback (most recent call last):\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-parent4-child4-original-bounded-v386/guard386.py::original-owned-supervision\", line 123, in execute_locked\n    retained_HOST_evidence=state['evidence'],execution_guard_inputs=guard_inputs(),ROOT_source_reviewed=True,\n                                                                           ^^^^^^^^^^^^\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-parent4-child4-original-bounded-v386/guard386.py\", line 61, in storage\n    actual = 0 if tag is None else original.bytes_under(DONOR/'actual'/tag)\n                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v209-root-execution/guard209.py\", line 21, in bytes_under\n    def bytes_under(path):return _storage.bytes_under(path,live_roots=(P/'actual',),require=require)\n                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v177-root-safe-storage-overlay/safe_storage177.py\", line 22, in bytes_under\n    total += item.stat().st_size\n             ^^^^^^^^^^^\n  File \"/usr/local/python3.12.13/lib/python3.12/pathlib.py\", line 840, in stat\n    return os.stat(self, follow_symlinks=follow_symlinks)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nFileNotFoundError: [Errno 2] No such file or directory: '/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/actual/parent4-child4-shared4-root-v388-bounded-v2/startup-progress/prefill-rank2.tmp'\n"
+  ],
+  "sources_unchanged": true,
+  "owned_remaining": [],
+  "all4idle": true,
+  "completed_prefill_shapes": 94,
+  "total_prefill_shapes": 201,
+  "model_case_result": null,
+  "Raw": null,
+  "Goodput": null,
+  "repair": "guard389 binds existing safe_storage177 transient tmp exception to actual P199 output root"
+}

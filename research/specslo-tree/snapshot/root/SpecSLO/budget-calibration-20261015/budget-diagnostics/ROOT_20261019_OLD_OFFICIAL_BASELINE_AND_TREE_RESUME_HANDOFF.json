@@ -786,14 +786,15 @@
   "tree375_all510_exact": true,
   "tree375_component_gain_small": true,
   "current_execution": {
-    "version": 388,
-    "tag": "parent4-child4-shared4-root-v388-bounded-v2",
-    "guardian_session": 13225,
+    "version": 389,
+    "tag": "parent4-child4-shared4-root-v389-bounded-v3",
+    "guardian_session": 41648,
     "status": "running_original199_bounded_P4_child4_fresh173_baseline",
-    "UTC": "2026-10-20T00:00:55.449785+00:00",
-    "freeze_sha256": "1d660aacce3653ea25492c29e91cebd8dbf5862b5a81af1f09c3473c5b4557a9",
-    "archive_sha256": "47e475f190079d25eb03b8110a70a8b93dea51bade40065ae72d93497e86a777",
+    "UTC": "2026-10-20T00:09:38.236249+00:00",
+    "freeze_sha256": "e233543cad3a82dc6defce6f17f7d32c30a6e96a58a39c9ec12a7298a49cde29",
+    "archive_sha256": "0527ec6a75a5f0b006bbb52aaa8b01c975c34594ae2f5fed8277b6d06844203d",
     "output_root": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199",
+    "same_model_runtime_as388": true,
     "production_permission": false,
     "Raw": null,
     "Goodput": null
@@ -949,5 +950,23 @@
     "all4idle": true,
     "Raw": null,
     "Goodput": null
+  },
+  "previous_execution388": {
+    "version": 388,
+    "tag": "parent4-child4-shared4-root-v388-bounded-v2",
+    "guardian_session": 13225,
+    "status": "failed_monitor_atomic_tmp_race_before_P4_cases",
+    "UTC": "2026-10-20T00:00:55.449785+00:00",
+    "freeze_sha256": "1d660aacce3653ea25492c29e91cebd8dbf5862b5a81af1f09c3473c5b4557a9",
+    "archive_sha256": "47e475f190079d25eb03b8110a70a8b93dea51bade40065ae72d93497e86a777",
+    "output_root": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199",
+    "production_permission": false,
+    "Raw": null,
+    "Goodput": null,
+    "finished_UTC": "2026-10-20T00:07:16.683740+00:00",
+    "sources_unchanged": true,
+    "owned_remaining": [],
+    "all4idle": true,
+    "result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT388_ATOMIC_STORAGE_MONITOR_FAILURE.json"
   }
 }

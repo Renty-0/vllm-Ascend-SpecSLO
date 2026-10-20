@@ -1,0 +1,22 @@
+{
+  "status": "PASS_HOST389_ACTUAL_FROZEN_SOURCE_AND_STORAGE",
+  "source_members": 4263,
+  "storage": {
+    "actual_tag_bytes": 0,
+    "aggregate_private_bytes": 68673020
+  },
+  "pins": {
+    "freeze_sha256": "e233543cad3a82dc6defce6f17f7d32c30a6e96a58a39c9ec12a7298a49cde29",
+    "archive_sha256": "0527ec6a75a5f0b006bbb52aaa8b01c975c34594ae2f5fed8277b6d06844203d",
+    "archive_members": 5,
+    "archive_bytes": 3825,
+    "NPU_used": false,
+    "models_qualified": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "NPU_used": false,
+  "models_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

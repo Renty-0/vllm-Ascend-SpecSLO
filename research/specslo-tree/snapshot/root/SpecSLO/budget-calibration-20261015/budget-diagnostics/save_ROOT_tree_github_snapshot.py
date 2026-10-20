@@ -73,6 +73,7 @@ SOURCES = (
     ('tree-parent4-child4-original-bounded-v386', 386),
     ('tree-parent4-full-archive-guard-v387', 387),
     ('tree-parent4-owned-exit-path-v388', 388),
+    ('tree-parent4-atomic-output-storage-guard-v389', 389),
 )
 
 
@@ -209,6 +210,11 @@ def main():
         'build_ROOT299_capacity_risk_span_full_HOST.py',
         'freeze_ROOT299_capacity_risk_span_full_HOST.py',
         'save_ROOT_tree_github_snapshot.py',
+        'freeze_ROOT389_parent4_atomic_storage_HOST.py',
+        'ROOT388_ATOMIC_STORAGE_MONITOR_FAILURE.json',
+        'HOST_ROOT389_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'ROOT388_CURRENT_BEST_TARGET_SIZE_SCOPE_SCREEN.json',
+        'ROOT388_PARENT4_EAGER_FOLLOWUP_PLAN.json',
         'ROOT385_REAL_DEFERRED_CHAIN_RESULT.json',
         'HOST_ROOT388_ACTUAL_FROZEN_CONSTRUCTION.json',
         'freeze_ROOT387_parent4_complete_archive_guard_HOST.py',

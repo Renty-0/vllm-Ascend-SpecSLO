@@ -1,0 +1,42 @@
+{
+  "schema": "ROOT388.current-eager-proof-and-followup.v1",
+  "UTC": "2026-10-20T00:07:25.618978+00:00",
+  "current_job": {
+    "tag": "parent4-child4-shared4-root-v388-bounded-v2",
+    "runtime": "original199 actors with owned exit import fix388",
+    "normal_N": 16,
+    "parent_N": 16,
+    "parent_B": 4,
+    "child_B": 4,
+    "E": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "real_prefix": 128,
+    "production_permission": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "best376": {
+    "Goodput": 609.0250374874602,
+    "Raw": 699.6987403391912,
+    "actual_eager_promoted": 0
+  },
+  "unresolved_production_deltas": [
+    "current best376 target uses fixed M120/Q5/S24 uniform KV; bounded199 target uses original173 causal same-M path",
+    "best376 actual normal draft is original RootSeed/FastV5; bounded199 uses fused FastV5 prelude",
+    "original typed future budget maximum is3; child4 needs explicit budget extension or independently qualified child3 scope",
+    "N16/E1..4 finite proof does not qualify N24/E1..8; current best target N24 frequency1196/2320 is a target histogram, not normal work histogram"
+  ],
+  "next_conditioned_steps": [
+    "await original199 complete real math and natural positive/negative/consume/next; preserve any negative result",
+    "if genuine positive observed, bind the protocol to actual best376 target backend and original draft dispatch without replacing Native flags",
+    "extend exact useful normal/eager/repair shapes using fresh independent histories and costs",
+    "only then enable corresponding live allocator/filter scope, seal and run unchanged full463 plus all3 ownAR",
+    "compare Raw and common-clock Goodput; preserve stronger best result and require final matched three-block comparison"
+  ],
+  "new_performance_claim": false,
+  "final_goal_achieved": false
+}

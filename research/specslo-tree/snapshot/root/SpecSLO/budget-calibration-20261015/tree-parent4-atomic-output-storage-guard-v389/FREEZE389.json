@@ -1,0 +1,18 @@
+{
+  "schema": "ROOT389.complete386-source-supervisor.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-atomic-output-storage-guard-v389/guard389.py": "3d3cf30e0114bd8425eff670becb12eda363b608b3fdaa5cf9dcf490b3aae55d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-atomic-output-storage-guard-v389/check389_HOST.py": "2b033663bee18b74df14ffa4ffc48e8502ecb9ce83a376e54d10cc5ddcfc6b60",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-atomic-output-storage-guard-v389/HOST389_RESULT.json": "74285f09292795a5f2ba56e56f7dea0548dd658838a54cb68067b43e136b1595",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT389_parent4_atomic_storage_HOST.py": "1f62b1395608ab95e36c1d4070c238fb3809023324849d2403de0218afab246c"
+  },
+  "parent388_freeze_sha256": "1d660aacce3653ea25492c29e91cebd8dbf5862b5a81af1f09c3473c5b4557a9",
+  "parent388_archive_sha256": "47e475f190079d25eb03b8110a70a8b93dea51bade40065ae72d93497e86a777",
+  "original199_runtime_and_actors_unchanged": true,
+  "child_runtime_source_gate_and_owned_exit_only": true,
+  "NPU_used": false,
+  "model_qualification_inherited": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}
