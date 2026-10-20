@@ -1,0 +1,23 @@
+{
+  "compressed_evidence": [
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+      "original_sha256": "1ed64511f735735a604385e0b98dc0bb6a656783326ff9bc4c5748c6939964b0",
+      "export": "tools/ROOT398_TERMINAL_INDEPENDENT_FULL_AUDIT.json.gz",
+      "compression": "gzip",
+      "compressed_sha256": "51d70f967f0d74817bb7ee4045b2c14349b02fa5702604d945de5c2bb6fa2f2e"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-active64-whole-ticket-S24-segments-root-v398-full463-ownAR-v1.json",
+      "original_sha256": "bcb5ee368c14206c3fb7820a439b484b5690a10abc73424eecb764964fd8867d",
+      "export": "tools/ROOT398_TERMINAL_SUPERVISOR_RECEIPT.json.gz",
+      "compression": "gzip",
+      "compressed_sha256": "2a36bd13752502c52acc392d43a332a4c0e1607268f1cba627ab64460838a504"
+    }
+  ],
+  "raw_tensors_or_graph_cache_exported": false,
+  "neural_source_bytes_unchanged": true,
+  "model_or_dataset_copied": false,
+  "previous_pending_count_filenames_retained": true,
+  "pending_filenames_describe_extraction_time_not_final_qualification": true
+}

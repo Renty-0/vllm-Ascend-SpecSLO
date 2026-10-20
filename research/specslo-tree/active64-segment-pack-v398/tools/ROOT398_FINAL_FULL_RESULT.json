@@ -1,0 +1,106 @@
+{
+  "status": "complete_independently_audited_single_run",
+  "source_terminal_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+  "source_terminal_audit_sha256": "1ed64511f735735a604385e0b98dc0bb6a656783326ff9bc4c5748c6939964b0",
+  "source_freeze_sha256": "dfb6cfd44d2f524d7ad28892ec055d50d1035910fb71dbbc5486dc060cb5e73d",
+  "source_archive_sha256": "5c79ae661393d9bb347dd6f53ff447d34e09fa121bc90d4d43844cdb63357f6a",
+  "Raw": 599.5623377435959,
+  "Goodput": 214.96187487135404,
+  "attained": 166,
+  "requests": 463,
+  "active_request_ceiling": 64,
+  "actual_active": {
+    "configured_max_num_seqs": 64,
+    "effective_active_ceiling": 64,
+    "active_peak": 64,
+    "peak64_observed": true,
+    "cohort_sizes": [
+      1,
+      26,
+      52,
+      64,
+      64,
+      64,
+      64,
+      64,
+      49,
+      15
+    ],
+    "single_target_max_requests": 24
+  },
+  "historical_best_tree_active_ceiling": 48,
+  "actual_target_segment_packing": {
+    "limit": 24,
+    "peak": 24,
+    "calls": 2690,
+    "branch_calls": 352,
+    "source_sha256": "ea666a7e508870ea7781637de42490be7e1f849238099555479cc32c0d6f14ba",
+    "whole_proposals_retained": true,
+    "global_active_limit": 64
+  },
+  "TPOT_median_ms": 51.379031894612126,
+  "TPOT_P90_ms": 66.22734094380576,
+  "TPOT_definition": "actual original event first-to-last wall",
+  "TPOT_denominator": 256,
+  "by_class": {
+    "tight": {
+      "requests": 271,
+      "attained": 34,
+      "SLO_ms": 40.0,
+      "TPOT_median_ms": 49.98340545716928,
+      "TPOT_P90_ms": 58.26816944500024,
+      "Goodput": 44.02833581702432
+    },
+    "normal": {
+      "requests": 96,
+      "attained": 36,
+      "SLO_ms": 50.0,
+      "TPOT_median_ms": 56.61332092859084,
+      "TPOT_P90_ms": 68.14060421947943,
+      "Goodput": 46.618237923908104
+    },
+    "loose": {
+      "requests": 96,
+      "attained": 96,
+      "SLO_ms": 150.0,
+      "TPOT_median_ms": 55.210228148098395,
+      "TPOT_P90_ms": 78.1413697577591,
+      "Goodput": 124.31530113042162
+    }
+  },
+  "observed_TPOT_parallel_definition": {
+    "attained": 163,
+    "Goodput": 211.07702171102838,
+    "mean_ms": 52.3085121729369,
+    "median_ms": 51.58051829419884,
+    "P90_ms": 66.48705600633049,
+    "TPOT_denominator": 255,
+    "clock": "same actual original event first-to-last wall"
+  },
+  "target_calls": 2690,
+  "mean_N": 14.974349442379182,
+  "budget_owner_rounds": {
+    "1": 1065,
+    "2": 817,
+    "3": 10329,
+    "4": 26988,
+    "5": 1082
+  },
+  "whole463_own_AR_qualified": true,
+  "fresh_target227_and_all_original_components_qualified": true,
+  "fresh_target681_uniform_KV_qualified": true,
+  "original_best257_optimized_draft_preserved": true,
+  "original_global_warm_twozero_sealing_retained": true,
+  "historical_fixed_gamma4_GP": 501.63560407964184,
+  "historical_strong_official_MC2_GP": 429.8442987424407,
+  "historical_best_tree_GP": 609.0250374874602,
+  "GP_over_fixed_gamma4": 0.4285219651937341,
+  "GP_over_strong_official_MC2": 0.5000924183483413,
+  "GP_over_historical_best_tree": 0.35296065291204076,
+  "historical_1p5_threshold": 644.766448113661,
+  "measured_above_historical_floors": false,
+  "matched_repeats_completed": 0,
+  "adopted": false,
+  "goal_achieved": false,
+  "NPU_used": false
+}

@@ -57,5 +57,16 @@
     0
   ],
   "paused_after_current316": true,
-  "additional_NPU_experiment_started_after316": false
+  "additional_NPU_experiment_started_after316": false,
+  "latest_snapshot_files_verified": 4091,
+  "latest_snapshot_python_syntax_verified": 3011,
+  "ROOT398_actual_global64_full_ownAR_all3": true,
+  "ROOT398_actual_global64_Raw": 599.5623377435959,
+  "ROOT398_actual_global64_Goodput": 214.96187487135404,
+  "ROOT398_actual_global64_attained": 166,
+  "ROOT398_actual_global64_goal_met": false,
+  "ROOT398_changes_git_diff_check": "pass",
+  "ROOT398_format_ci": "unavailable: pre-commit not installed; no environment changes",
+  "ROOT395_current_finite_NPU_run": "running; no performance claim",
+  "ROOT399_400_NPU": "not launched; finite math/cost only"
 }

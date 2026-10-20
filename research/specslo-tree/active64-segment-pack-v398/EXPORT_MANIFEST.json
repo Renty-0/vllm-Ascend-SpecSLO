@@ -174,5 +174,41 @@
   "tools/ROOT394_FAILED_CHILD_OWNED_STOP.json": {
     "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT394_FAILED_CHILD_OWNED_STOP.json",
     "sha256": "c021392cc47ff90a9f8c7127b4619a8d89bcd57369fa6bb69f0dc0656bf00f6f"
+  },
+  "tools/ROOT398_TERMINAL_INDEPENDENT_FULL_AUDIT.json.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_TERMINAL_INDEPENDENT_FULL_AUDIT.json.gz",
+    "sha256": "51d70f967f0d74817bb7ee4045b2c14349b02fa5702604d945de5c2bb6fa2f2e"
+  },
+  "tools/ROOT398_TERMINAL_SUPERVISOR_RECEIPT.json.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_TERMINAL_SUPERVISOR_RECEIPT.json.gz",
+    "sha256": "2a36bd13752502c52acc392d43a332a4c0e1607268f1cba627ab64460838a504"
+  },
+  "tools/ROOT398_FINAL_FULL_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_FINAL_FULL_RESULT.json",
+    "sha256": "d40c1751030cdae1ea8912d7fa3218786f3ef22047f0668ca8739e0d4bc7b8e4"
+  },
+  "tools/ROOT398_OBSERVED_BUDGET_PRODUCTIVITY.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_OBSERVED_BUDGET_PRODUCTIVITY.json",
+    "sha256": "0a685552e8ca5d33c1e90b34c11bec7221375a62bb7e3d96a69b97060ae3b882"
+  },
+  "tools/audit_ROOT398_budget_productivity_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT398_budget_productivity_HOST.py",
+    "sha256": "75b3b78849252bedcbc6ac9a4f63d46cc4f775746c4201dc994ffe2bc5f32905"
+  },
+  "tools/export_ROOT398_terminal_checkpoint_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/export_ROOT398_terminal_checkpoint_HOST.py",
+    "sha256": "4df680d46bcd29b54cebbfb68c7234b1be6b4fca44f6e384cc87743598f36b36"
+  },
+  "tools/ROOT398_ACTUAL_EAGER_COUNTS_OWN_AR_PENDING.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_ACTUAL_EAGER_COUNTS_OWN_AR_PENDING.json",
+    "sha256": "74974506b92d17b8e9d0e4fe60b13209924c9cde1727a794808b7d1857581ac6"
+  },
+  "tools/ROOT398_FORMAL_PHYSICAL_UTILIZATION_OWN_AR_PENDING.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_FORMAL_PHYSICAL_UTILIZATION_OWN_AR_PENDING.json",
+    "sha256": "83743ddeb3cd601aea8302df14f25204a30b2fe0d0719bc9f78e77f15be69898"
+  },
+  "tools/ROOT398_TERMINAL_EXPORT_PROVENANCE.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_TERMINAL_EXPORT_PROVENANCE.json",
+    "sha256": "ac93782de168fd147c6d78565e10c5f543e7f8aed17be48e6862e0a0f16ca5a5"
   }
 }

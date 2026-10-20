@@ -26,5 +26,9 @@
   "tools/freeze_ROOT400_metadata_repair_HOST.py": {
     "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT400_metadata_repair_HOST.py",
     "sha256": "158fe79660948ea905cdddbd9326771fa571b8746f66abf728502bb974770d3e"
+  },
+  "tools/audit_ROOT400_finite399_terminal_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT400_finite399_terminal_HOST.py",
+    "sha256": "806f7e90c30eac9e6675c5eeac2dba9d45fa97265f9e1276e684e05ba02b1817"
   }
 }

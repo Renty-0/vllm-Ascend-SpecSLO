@@ -1,0 +1,30 @@
+{
+  "schema": "ROOT398.actual-draft-eager-counts-own-AR-pending.v1",
+  "UTC": "2026-10-20T21:57:00.225127+00:00",
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/active64-whole-ticket-S24-segments-root-v398-full463-ownAR-v1/windows/window64/full463/rank0-full463-actual-trace.json.gz",
+  "source_sha256": "13d086483f09d4662c89b4a721db1e6b4e88cc8d9198c336cb215a598737431f",
+  "counts": {
+    "spec_rhythm_tree_rounds": 2690,
+    "spec_rhythm_tree_eager_promoted": 575,
+    "spec_rhythm_tree_eager_invalidated": 792,
+    "spec_rhythm_tree_eager_dependency_rejections": 792,
+    "spec_rhythm_peak_active_requests": 64,
+    "spec_rhythm_draft_model_calls": 4791,
+    "spec_rhythm_draft_graph_calls": 4791,
+    "spec_rhythm_eager_parent_B1_seen": 883,
+    "spec_rhythm_eager_parent_B1_excluded_unqualified": 883,
+    "spec_rhythm_eager_parent_B2_seen": 556,
+    "spec_rhythm_eager_parent_B2_excluded_unqualified": 556,
+    "spec_rhythm_eager_parent_B3_seen": 6733,
+    "spec_rhythm_eager_parent_B3_excluded_unqualified": 0,
+    "spec_rhythm_eager_parent_B4_seen": 13337,
+    "spec_rhythm_eager_parent_B4_excluded_unqualified": 13337,
+    "spec_rhythm_eager_parent_B5_seen": 519,
+    "spec_rhythm_eager_parent_B5_excluded_unqualified": 519
+  },
+  "whole_workload_AR_at_extraction": "pending",
+  "Raw": null,
+  "Goodput": null,
+  "counts_are_not_timing_or_independent_speedup": true,
+  "production_global_ceiling": 64
+}

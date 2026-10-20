@@ -1,5 +1,5 @@
 {
-  "status": "FROZEN_HOST398_PASS_FULL_DEVICE_RUN_IN_PROGRESS",
+  "status": "FULL398_GLOBAL64_COMPLETE_INDEPENDENTLY_AUDITED_REGRESSION_RETAINED",
   "host_legacy_equivalence_cases": 500,
   "host_new_segment_bound_cases": 500,
   "actual_generated_LIVE_bound": true,
@@ -8,14 +8,26 @@
   "global_active_limit": 64,
   "physical_target_segments": 24,
   "source_frozen_bytes_preserved": true,
-  "NPU_full_run_completed": false,
-  "Raw": null,
-  "Goodput": null,
+  "NPU_full_run_completed": true,
+  "Raw": 599.5623377435959,
+  "Goodput": 214.96187487135404,
   "format_ci": "unavailable: pre-commit is not installed; environment unchanged",
   "staged_whitespace": "one inherited trailing whitespace in frozen runtime398.py line31; exact launched source bytes preserved",
   "HOST_harness_notes": [
     "Pre-freeze probe initially supplied one tag instead of original four CLI arguments; corrected HOST wrapper only.",
     "Next HOST wrapper omitted original218 freeze environment; replaced it with exact reviewed launch398 shell environment.",
     "Actual original readiness, context activation, source-builder and new LIVE binding then passed with model construction0 and NPU init0."
-  ]
+  ],
+  "attained": 166,
+  "requests": 463,
+  "actual_active_peak": 64,
+  "independent_own_AR_targets": 3,
+  "exact_output_tokens_per_target": 118528,
+  "additional_uniform_KV_math_per_target": 681,
+  "original_math_per_target": 227,
+  "performance_goal_met": false,
+  "adopted": false,
+  "matched_repeats": 0,
+  "historical609_result_active_limit": 48,
+  "next_scope": "finite B4 diagnostic; then prioritize frugal S32 NN/cost; preserve global64"
 }

@@ -1,0 +1,3378 @@
+{
+  "status": "PASS_COMPLETE_EVENT_ALIGNMENT_AND_OBSERVED_BUDGET_COUNTS",
+  "qualification_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT398_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+  "qualification_audit_sha256": "1ed64511f735735a604385e0b98dc0bb6a656783326ff9bc4c5748c6939964b0",
+  "runs": {
+    "v376_historical_active48": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/static-M120-uniform-KV-root-v376-full463-ownAR-v1/windows/window48/full463/rank1-full463-actual-trace.json.gz",
+      "source_sha256": "be48850f9d900325fd02f1655523d9bceca07c3d18ef5a22bc42cef0676936fe",
+      "active_limit": 48,
+      "target_calls": 2320,
+      "mean_owners_per_target": 16.62155172413793,
+      "mean_real_queries_per_target": 82.78448275862068,
+      "useful_query_fraction": 0.6898706896551724,
+      "active_owner_histogram": {
+        "1": 119,
+        "2": 34,
+        "3": 33,
+        "4": 209,
+        "5": 18,
+        "6": 28,
+        "7": 22,
+        "8": 16,
+        "9": 18,
+        "10": 24,
+        "11": 11,
+        "12": 12,
+        "13": 16,
+        "14": 15,
+        "15": 19,
+        "16": 15,
+        "17": 20,
+        "18": 5,
+        "19": 9,
+        "20": 10,
+        "21": 16,
+        "22": 17,
+        "23": 14,
+        "24": 21,
+        "25": 14,
+        "26": 129,
+        "27": 7,
+        "28": 8,
+        "29": 10,
+        "30": 4,
+        "31": 8,
+        "32": 13,
+        "33": 11,
+        "34": 8,
+        "35": 16,
+        "36": 11,
+        "37": 16,
+        "38": 6,
+        "39": 14,
+        "40": 10,
+        "41": 11,
+        "42": 16,
+        "43": 14,
+        "44": 23,
+        "45": 31,
+        "46": 12,
+        "47": 34,
+        "48": 1173
+      },
+      "active_and_selected_histogram": [
+        {
+          "active": 1,
+          "selected": 1,
+          "calls": 119
+        },
+        {
+          "active": 2,
+          "selected": 1,
+          "calls": 24
+        },
+        {
+          "active": 2,
+          "selected": 2,
+          "calls": 10
+        },
+        {
+          "active": 3,
+          "selected": 1,
+          "calls": 13
+        },
+        {
+          "active": 3,
+          "selected": 2,
+          "calls": 16
+        },
+        {
+          "active": 3,
+          "selected": 3,
+          "calls": 4
+        },
+        {
+          "active": 4,
+          "selected": 1,
+          "calls": 4
+        },
+        {
+          "active": 4,
+          "selected": 2,
+          "calls": 196
+        },
+        {
+          "active": 4,
+          "selected": 3,
+          "calls": 6
+        },
+        {
+          "active": 4,
+          "selected": 4,
+          "calls": 3
+        },
+        {
+          "active": 5,
+          "selected": 1,
+          "calls": 1
+        },
+        {
+          "active": 5,
+          "selected": 2,
+          "calls": 8
+        },
+        {
+          "active": 5,
+          "selected": 3,
+          "calls": 7
+        },
+        {
+          "active": 5,
+          "selected": 4,
+          "calls": 1
+        },
+        {
+          "active": 5,
+          "selected": 5,
+          "calls": 1
+        },
+        {
+          "active": 6,
+          "selected": 2,
+          "calls": 8
+        },
+        {
+          "active": 6,
+          "selected": 3,
+          "calls": 10
+        },
+        {
+          "active": 6,
+          "selected": 4,
+          "calls": 9
+        },
+        {
+          "active": 6,
+          "selected": 6,
+          "calls": 1
+        },
+        {
+          "active": 7,
+          "selected": 1,
+          "calls": 1
+        },
+        {
+          "active": 7,
+          "selected": 2,
+          "calls": 4
+        },
+        {
+          "active": 7,
+          "selected": 3,
+          "calls": 5
+        },
+        {
+          "active": 7,
+          "selected": 4,
+          "calls": 6
+        },
+        {
+          "active": 7,
+          "selected": 5,
+          "calls": 6
+        },
+        {
+          "active": 8,
+          "selected": 2,
+          "calls": 4
+        },
+        {
+          "active": 8,
+          "selected": 3,
+          "calls": 3
+        },
+        {
+          "active": 8,
+          "selected": 4,
+          "calls": 2
+        },
+        {
+          "active": 8,
+          "selected": 5,
+          "calls": 2
+        },
+        {
+          "active": 8,
+          "selected": 6,
+          "calls": 5
+        },
+        {
+          "active": 9,
+          "selected": 2,
+          "calls": 1
+        },
+        {
+          "active": 9,
+          "selected": 3,
+          "calls": 4
+        },
+        {
+          "active": 9,
+          "selected": 4,
+          "calls": 2
+        },
+        {
+          "active": 9,
+          "selected": 5,
+          "calls": 3
+        },
+        {
+          "active": 9,
+          "selected": 6,
+          "calls": 5
+        },
+        {
+          "active": 9,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 10,
+          "selected": 1,
+          "calls": 1
+        },
+        {
+          "active": 10,
+          "selected": 3,
+          "calls": 3
+        },
+        {
+          "active": 10,
+          "selected": 4,
+          "calls": 7
+        },
+        {
+          "active": 10,
+          "selected": 5,
+          "calls": 2
+        },
+        {
+          "active": 10,
+          "selected": 6,
+          "calls": 7
+        },
+        {
+          "active": 10,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 10,
+          "selected": 9,
+          "calls": 1
+        },
+        {
+          "active": 11,
+          "selected": 1,
+          "calls": 1
+        },
+        {
+          "active": 11,
+          "selected": 4,
+          "calls": 3
+        },
+        {
+          "active": 11,
+          "selected": 5,
+          "calls": 1
+        },
+        {
+          "active": 11,
+          "selected": 6,
+          "calls": 1
+        },
+        {
+          "active": 11,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 11,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 11,
+          "selected": 10,
+          "calls": 1
+        },
+        {
+          "active": 12,
+          "selected": 4,
+          "calls": 1
+        },
+        {
+          "active": 12,
+          "selected": 5,
+          "calls": 5
+        },
+        {
+          "active": 12,
+          "selected": 6,
+          "calls": 1
+        },
+        {
+          "active": 12,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 12,
+          "selected": 8,
+          "calls": 2
+        },
+        {
+          "active": 13,
+          "selected": 1,
+          "calls": 2
+        },
+        {
+          "active": 13,
+          "selected": 5,
+          "calls": 4
+        },
+        {
+          "active": 13,
+          "selected": 7,
+          "calls": 1
+        },
+        {
+          "active": 13,
+          "selected": 8,
+          "calls": 5
+        },
+        {
+          "active": 13,
+          "selected": 9,
+          "calls": 1
+        },
+        {
+          "active": 13,
+          "selected": 12,
+          "calls": 3
+        },
+        {
+          "active": 14,
+          "selected": 2,
+          "calls": 2
+        },
+        {
+          "active": 14,
+          "selected": 5,
+          "calls": 2
+        },
+        {
+          "active": 14,
+          "selected": 6,
+          "calls": 2
+        },
+        {
+          "active": 14,
+          "selected": 8,
+          "calls": 3
+        },
+        {
+          "active": 14,
+          "selected": 9,
+          "calls": 5
+        },
+        {
+          "active": 14,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 15,
+          "selected": 6,
+          "calls": 5
+        },
+        {
+          "active": 15,
+          "selected": 7,
+          "calls": 6
+        },
+        {
+          "active": 15,
+          "selected": 8,
+          "calls": 5
+        },
+        {
+          "active": 15,
+          "selected": 9,
+          "calls": 2
+        },
+        {
+          "active": 15,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 16,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 16,
+          "selected": 8,
+          "calls": 7
+        },
+        {
+          "active": 16,
+          "selected": 9,
+          "calls": 3
+        },
+        {
+          "active": 16,
+          "selected": 10,
+          "calls": 2
+        },
+        {
+          "active": 17,
+          "selected": 4,
+          "calls": 1
+        },
+        {
+          "active": 17,
+          "selected": 6,
+          "calls": 1
+        },
+        {
+          "active": 17,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 17,
+          "selected": 8,
+          "calls": 5
+        },
+        {
+          "active": 17,
+          "selected": 9,
+          "calls": 6
+        },
+        {
+          "active": 17,
+          "selected": 10,
+          "calls": 3
+        },
+        {
+          "active": 17,
+          "selected": 11,
+          "calls": 1
+        },
+        {
+          "active": 18,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 18,
+          "selected": 9,
+          "calls": 1
+        },
+        {
+          "active": 18,
+          "selected": 11,
+          "calls": 1
+        },
+        {
+          "active": 18,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 18,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 19,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 19,
+          "selected": 9,
+          "calls": 3
+        },
+        {
+          "active": 19,
+          "selected": 10,
+          "calls": 4
+        },
+        {
+          "active": 19,
+          "selected": 11,
+          "calls": 1
+        },
+        {
+          "active": 20,
+          "selected": 6,
+          "calls": 1
+        },
+        {
+          "active": 20,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 20,
+          "selected": 10,
+          "calls": 4
+        },
+        {
+          "active": 20,
+          "selected": 12,
+          "calls": 3
+        },
+        {
+          "active": 20,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 21,
+          "selected": 8,
+          "calls": 2
+        },
+        {
+          "active": 21,
+          "selected": 10,
+          "calls": 5
+        },
+        {
+          "active": 21,
+          "selected": 11,
+          "calls": 5
+        },
+        {
+          "active": 21,
+          "selected": 13,
+          "calls": 3
+        },
+        {
+          "active": 21,
+          "selected": 15,
+          "calls": 1
+        },
+        {
+          "active": 22,
+          "selected": 9,
+          "calls": 2
+        },
+        {
+          "active": 22,
+          "selected": 10,
+          "calls": 3
+        },
+        {
+          "active": 22,
+          "selected": 11,
+          "calls": 5
+        },
+        {
+          "active": 22,
+          "selected": 12,
+          "calls": 4
+        },
+        {
+          "active": 22,
+          "selected": 13,
+          "calls": 3
+        },
+        {
+          "active": 23,
+          "selected": 10,
+          "calls": 2
+        },
+        {
+          "active": 23,
+          "selected": 11,
+          "calls": 6
+        },
+        {
+          "active": 23,
+          "selected": 12,
+          "calls": 4
+        },
+        {
+          "active": 23,
+          "selected": 13,
+          "calls": 2
+        },
+        {
+          "active": 24,
+          "selected": 11,
+          "calls": 4
+        },
+        {
+          "active": 24,
+          "selected": 12,
+          "calls": 10
+        },
+        {
+          "active": 24,
+          "selected": 13,
+          "calls": 6
+        },
+        {
+          "active": 24,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 25,
+          "selected": 10,
+          "calls": 1
+        },
+        {
+          "active": 25,
+          "selected": 11,
+          "calls": 2
+        },
+        {
+          "active": 25,
+          "selected": 12,
+          "calls": 4
+        },
+        {
+          "active": 25,
+          "selected": 13,
+          "calls": 5
+        },
+        {
+          "active": 25,
+          "selected": 14,
+          "calls": 2
+        },
+        {
+          "active": 26,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 26,
+          "selected": 13,
+          "calls": 125
+        },
+        {
+          "active": 26,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 26,
+          "selected": 15,
+          "calls": 1
+        },
+        {
+          "active": 26,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 27,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 27,
+          "selected": 13,
+          "calls": 2
+        },
+        {
+          "active": 27,
+          "selected": 14,
+          "calls": 4
+        },
+        {
+          "active": 28,
+          "selected": 12,
+          "calls": 2
+        },
+        {
+          "active": 28,
+          "selected": 15,
+          "calls": 3
+        },
+        {
+          "active": 28,
+          "selected": 16,
+          "calls": 3
+        },
+        {
+          "active": 29,
+          "selected": 13,
+          "calls": 3
+        },
+        {
+          "active": 29,
+          "selected": 14,
+          "calls": 3
+        },
+        {
+          "active": 29,
+          "selected": 15,
+          "calls": 2
+        },
+        {
+          "active": 29,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 29,
+          "selected": 17,
+          "calls": 1
+        },
+        {
+          "active": 30,
+          "selected": 15,
+          "calls": 1
+        },
+        {
+          "active": 30,
+          "selected": 16,
+          "calls": 2
+        },
+        {
+          "active": 30,
+          "selected": 17,
+          "calls": 1
+        },
+        {
+          "active": 31,
+          "selected": 14,
+          "calls": 2
+        },
+        {
+          "active": 31,
+          "selected": 15,
+          "calls": 2
+        },
+        {
+          "active": 31,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 31,
+          "selected": 17,
+          "calls": 2
+        },
+        {
+          "active": 31,
+          "selected": 18,
+          "calls": 1
+        },
+        {
+          "active": 32,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 32,
+          "selected": 15,
+          "calls": 4
+        },
+        {
+          "active": 32,
+          "selected": 17,
+          "calls": 6
+        },
+        {
+          "active": 32,
+          "selected": 18,
+          "calls": 2
+        },
+        {
+          "active": 33,
+          "selected": 15,
+          "calls": 2
+        },
+        {
+          "active": 33,
+          "selected": 16,
+          "calls": 4
+        },
+        {
+          "active": 33,
+          "selected": 17,
+          "calls": 3
+        },
+        {
+          "active": 33,
+          "selected": 18,
+          "calls": 1
+        },
+        {
+          "active": 33,
+          "selected": 19,
+          "calls": 1
+        },
+        {
+          "active": 34,
+          "selected": 15,
+          "calls": 1
+        },
+        {
+          "active": 34,
+          "selected": 16,
+          "calls": 2
+        },
+        {
+          "active": 34,
+          "selected": 17,
+          "calls": 2
+        },
+        {
+          "active": 34,
+          "selected": 18,
+          "calls": 2
+        },
+        {
+          "active": 34,
+          "selected": 19,
+          "calls": 1
+        },
+        {
+          "active": 35,
+          "selected": 15,
+          "calls": 2
+        },
+        {
+          "active": 35,
+          "selected": 16,
+          "calls": 4
+        },
+        {
+          "active": 35,
+          "selected": 18,
+          "calls": 2
+        },
+        {
+          "active": 35,
+          "selected": 19,
+          "calls": 5
+        },
+        {
+          "active": 35,
+          "selected": 20,
+          "calls": 3
+        },
+        {
+          "active": 36,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 36,
+          "selected": 17,
+          "calls": 1
+        },
+        {
+          "active": 36,
+          "selected": 18,
+          "calls": 5
+        },
+        {
+          "active": 36,
+          "selected": 19,
+          "calls": 2
+        },
+        {
+          "active": 36,
+          "selected": 20,
+          "calls": 1
+        },
+        {
+          "active": 36,
+          "selected": 21,
+          "calls": 1
+        },
+        {
+          "active": 37,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 37,
+          "selected": 17,
+          "calls": 1
+        },
+        {
+          "active": 37,
+          "selected": 18,
+          "calls": 5
+        },
+        {
+          "active": 37,
+          "selected": 19,
+          "calls": 7
+        },
+        {
+          "active": 37,
+          "selected": 21,
+          "calls": 2
+        },
+        {
+          "active": 38,
+          "selected": 19,
+          "calls": 4
+        },
+        {
+          "active": 38,
+          "selected": 20,
+          "calls": 1
+        },
+        {
+          "active": 38,
+          "selected": 21,
+          "calls": 1
+        },
+        {
+          "active": 39,
+          "selected": 18,
+          "calls": 3
+        },
+        {
+          "active": 39,
+          "selected": 19,
+          "calls": 4
+        },
+        {
+          "active": 39,
+          "selected": 20,
+          "calls": 7
+        },
+        {
+          "active": 40,
+          "selected": 18,
+          "calls": 1
+        },
+        {
+          "active": 40,
+          "selected": 19,
+          "calls": 1
+        },
+        {
+          "active": 40,
+          "selected": 20,
+          "calls": 4
+        },
+        {
+          "active": 40,
+          "selected": 21,
+          "calls": 2
+        },
+        {
+          "active": 40,
+          "selected": 22,
+          "calls": 2
+        },
+        {
+          "active": 41,
+          "selected": 19,
+          "calls": 1
+        },
+        {
+          "active": 41,
+          "selected": 20,
+          "calls": 2
+        },
+        {
+          "active": 41,
+          "selected": 21,
+          "calls": 4
+        },
+        {
+          "active": 41,
+          "selected": 22,
+          "calls": 2
+        },
+        {
+          "active": 41,
+          "selected": 23,
+          "calls": 2
+        },
+        {
+          "active": 42,
+          "selected": 19,
+          "calls": 4
+        },
+        {
+          "active": 42,
+          "selected": 20,
+          "calls": 2
+        },
+        {
+          "active": 42,
+          "selected": 21,
+          "calls": 3
+        },
+        {
+          "active": 42,
+          "selected": 22,
+          "calls": 3
+        },
+        {
+          "active": 42,
+          "selected": 23,
+          "calls": 4
+        },
+        {
+          "active": 43,
+          "selected": 20,
+          "calls": 1
+        },
+        {
+          "active": 43,
+          "selected": 21,
+          "calls": 5
+        },
+        {
+          "active": 43,
+          "selected": 22,
+          "calls": 6
+        },
+        {
+          "active": 43,
+          "selected": 23,
+          "calls": 2
+        },
+        {
+          "active": 44,
+          "selected": 21,
+          "calls": 8
+        },
+        {
+          "active": 44,
+          "selected": 22,
+          "calls": 5
+        },
+        {
+          "active": 44,
+          "selected": 23,
+          "calls": 10
+        },
+        {
+          "active": 45,
+          "selected": 22,
+          "calls": 15
+        },
+        {
+          "active": 45,
+          "selected": 23,
+          "calls": 16
+        },
+        {
+          "active": 46,
+          "selected": 23,
+          "calls": 9
+        },
+        {
+          "active": 46,
+          "selected": 24,
+          "calls": 3
+        },
+        {
+          "active": 47,
+          "selected": 23,
+          "calls": 14
+        },
+        {
+          "active": 47,
+          "selected": 24,
+          "calls": 20
+        },
+        {
+          "active": 48,
+          "selected": 24,
+          "calls": 1173
+        }
+      ],
+      "calls_active_gt24": 1599,
+      "calls_active_gt24_selected_lt24": 403,
+      "single_owner_calls_at_single_active": 119,
+      "owner_rounds": 38562,
+      "output_tokens": 118528,
+      "by_class_budget": [
+        {
+          "slo_class": "all",
+          "budget": 1,
+          "counts": {
+            "owner_rounds": 149,
+            "committed_tokens": 149,
+            "allocated_candidates": 149,
+            "terminal_owner_rounds": 149,
+            "delivered_1": 149
+          },
+          "observed_mean_committed_tokens": 1.0,
+          "observed_committed_per_candidate": 1.0
+        },
+        {
+          "slo_class": "all",
+          "budget": 2,
+          "counts": {
+            "owner_rounds": 182,
+            "committed_tokens": 318,
+            "allocated_candidates": 364,
+            "terminal_owner_rounds": 136,
+            "delivered_2": 136,
+            "delivered_1": 46
+          },
+          "observed_mean_committed_tokens": 1.7472527472527473,
+          "observed_committed_per_candidate": 0.8736263736263736
+        },
+        {
+          "slo_class": "all",
+          "budget": 3,
+          "counts": {
+            "owner_rounds": 58,
+            "committed_tokens": 146,
+            "allocated_candidates": 174,
+            "terminal_owner_rounds": 10,
+            "delivered_2": 7,
+            "delivered_4": 15,
+            "delivered_1": 18,
+            "delivered_3": 18
+          },
+          "observed_mean_committed_tokens": 2.5172413793103448,
+          "observed_committed_per_candidate": 0.8390804597701149
+        },
+        {
+          "slo_class": "all",
+          "budget": 4,
+          "counts": {
+            "owner_rounds": 38054,
+            "committed_tokens": 117112,
+            "allocated_candidates": 152216,
+            "terminal_owner_rounds": 166,
+            "delivered_5": 13049,
+            "delivered_1": 9924,
+            "delivered_3": 4783,
+            "delivered_4": 3499,
+            "delivered_2": 6799
+          },
+          "observed_mean_committed_tokens": 3.077521416933831,
+          "observed_committed_per_candidate": 0.7693803542334577
+        },
+        {
+          "slo_class": "all",
+          "budget": 5,
+          "counts": {
+            "owner_rounds": 119,
+            "committed_tokens": 340,
+            "allocated_candidates": 595,
+            "terminal_owner_rounds": 2,
+            "delivered_5": 29,
+            "delivered_3": 17,
+            "delivered_2": 38,
+            "delivered_1": 24,
+            "delivered_4": 11
+          },
+          "observed_mean_committed_tokens": 2.857142857142857,
+          "observed_committed_per_candidate": 0.5714285714285714
+        },
+        {
+          "slo_class": "loose",
+          "budget": 1,
+          "counts": {
+            "owner_rounds": 32,
+            "committed_tokens": 32,
+            "allocated_candidates": 32,
+            "terminal_owner_rounds": 32,
+            "delivered_1": 32
+          },
+          "observed_mean_committed_tokens": 1.0,
+          "observed_committed_per_candidate": 1.0
+        },
+        {
+          "slo_class": "loose",
+          "budget": 2,
+          "counts": {
+            "owner_rounds": 35,
+            "committed_tokens": 56,
+            "allocated_candidates": 70,
+            "terminal_owner_rounds": 21,
+            "delivered_1": 14,
+            "delivered_2": 21
+          },
+          "observed_mean_committed_tokens": 1.6,
+          "observed_committed_per_candidate": 0.8
+        },
+        {
+          "slo_class": "loose",
+          "budget": 4,
+          "counts": {
+            "owner_rounds": 9265,
+            "committed_tokens": 24353,
+            "allocated_candidates": 37060,
+            "terminal_owner_rounds": 43,
+            "delivered_5": 2004,
+            "delivered_4": 906,
+            "delivered_1": 3205,
+            "delivered_2": 1946,
+            "delivered_3": 1204
+          },
+          "observed_mean_committed_tokens": 2.628494333513222,
+          "observed_committed_per_candidate": 0.6571235833783055
+        },
+        {
+          "slo_class": "loose",
+          "budget": 5,
+          "counts": {
+            "owner_rounds": 18,
+            "committed_tokens": 39,
+            "allocated_candidates": 90,
+            "terminal_owner_rounds": 0,
+            "delivered_5": 1,
+            "delivered_3": 5,
+            "delivered_1": 5,
+            "delivered_2": 7
+          },
+          "observed_mean_committed_tokens": 2.1666666666666665,
+          "observed_committed_per_candidate": 0.43333333333333335
+        },
+        {
+          "slo_class": "normal",
+          "budget": 1,
+          "counts": {
+            "owner_rounds": 31,
+            "committed_tokens": 31,
+            "allocated_candidates": 31,
+            "terminal_owner_rounds": 31,
+            "delivered_1": 31
+          },
+          "observed_mean_committed_tokens": 1.0,
+          "observed_committed_per_candidate": 1.0
+        },
+        {
+          "slo_class": "normal",
+          "budget": 2,
+          "counts": {
+            "owner_rounds": 30,
+            "committed_tokens": 53,
+            "allocated_candidates": 60,
+            "terminal_owner_rounds": 23,
+            "delivered_2": 23,
+            "delivered_1": 7
+          },
+          "observed_mean_committed_tokens": 1.7666666666666666,
+          "observed_committed_per_candidate": 0.8833333333333333
+        },
+        {
+          "slo_class": "normal",
+          "budget": 3,
+          "counts": {
+            "owner_rounds": 13,
+            "committed_tokens": 30,
+            "allocated_candidates": 39,
+            "terminal_owner_rounds": 8,
+            "delivered_1": 4,
+            "delivered_3": 8,
+            "delivered_2": 1
+          },
+          "observed_mean_committed_tokens": 2.3076923076923075,
+          "observed_committed_per_candidate": 0.7692307692307693
+        },
+        {
+          "slo_class": "normal",
+          "budget": 4,
+          "counts": {
+            "owner_rounds": 6704,
+            "committed_tokens": 24356,
+            "allocated_candidates": 26816,
+            "terminal_owner_rounds": 33,
+            "delivered_5": 3489,
+            "delivered_3": 656,
+            "delivered_2": 875,
+            "delivered_1": 1181,
+            "delivered_4": 503
+          },
+          "observed_mean_committed_tokens": 3.633054892601432,
+          "observed_committed_per_candidate": 0.908263723150358
+        },
+        {
+          "slo_class": "normal",
+          "budget": 5,
+          "counts": {
+            "owner_rounds": 3,
+            "committed_tokens": 10,
+            "allocated_candidates": 15,
+            "terminal_owner_rounds": 1,
+            "delivered_4": 1,
+            "delivered_1": 1,
+            "delivered_5": 1
+          },
+          "observed_mean_committed_tokens": 3.3333333333333335,
+          "observed_committed_per_candidate": 0.6666666666666666
+        },
+        {
+          "slo_class": "tight",
+          "budget": 1,
+          "counts": {
+            "owner_rounds": 86,
+            "committed_tokens": 86,
+            "allocated_candidates": 86,
+            "terminal_owner_rounds": 86,
+            "delivered_1": 86
+          },
+          "observed_mean_committed_tokens": 1.0,
+          "observed_committed_per_candidate": 1.0
+        },
+        {
+          "slo_class": "tight",
+          "budget": 2,
+          "counts": {
+            "owner_rounds": 117,
+            "committed_tokens": 209,
+            "allocated_candidates": 234,
+            "terminal_owner_rounds": 92,
+            "delivered_1": 25,
+            "delivered_2": 92
+          },
+          "observed_mean_committed_tokens": 1.7863247863247864,
+          "observed_committed_per_candidate": 0.8931623931623932
+        },
+        {
+          "slo_class": "tight",
+          "budget": 3,
+          "counts": {
+            "owner_rounds": 45,
+            "committed_tokens": 116,
+            "allocated_candidates": 135,
+            "terminal_owner_rounds": 2,
+            "delivered_2": 6,
+            "delivered_4": 15,
+            "delivered_1": 14,
+            "delivered_3": 10
+          },
+          "observed_mean_committed_tokens": 2.577777777777778,
+          "observed_committed_per_candidate": 0.8592592592592593
+        },
+        {
+          "slo_class": "tight",
+          "budget": 4,
+          "counts": {
+            "owner_rounds": 22085,
+            "committed_tokens": 68403,
+            "allocated_candidates": 88340,
+            "terminal_owner_rounds": 90,
+            "delivered_5": 7556,
+            "delivered_1": 5538,
+            "delivered_3": 2923,
+            "delivered_4": 2090,
+            "delivered_2": 3978
+          },
+          "observed_mean_committed_tokens": 3.0972605841068597,
+          "observed_committed_per_candidate": 0.7743151460267149
+        },
+        {
+          "slo_class": "tight",
+          "budget": 5,
+          "counts": {
+            "owner_rounds": 98,
+            "committed_tokens": 291,
+            "allocated_candidates": 490,
+            "terminal_owner_rounds": 1,
+            "delivered_5": 27,
+            "delivered_3": 12,
+            "delivered_2": 31,
+            "delivered_1": 18,
+            "delivered_4": 10
+          },
+          "observed_mean_committed_tokens": 2.9693877551020407,
+          "observed_committed_per_candidate": 0.5938775510204082
+        }
+      ]
+    },
+    "v398_actual_active64": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/active64-whole-ticket-S24-segments-root-v398-full463-ownAR-v1/windows/window64/full463/rank1-full463-actual-trace.json.gz",
+      "source_sha256": "d3b88408d67740aa8c2e6e1d6c5f8278f01bc1ed0752a4ccf9401742ab61160b",
+      "active_limit": 64,
+      "target_calls": 2690,
+      "mean_owners_per_target": 14.974349442379182,
+      "mean_real_queries_per_target": 69.63903345724907,
+      "useful_query_fraction": 0.580325278810409,
+      "active_owner_histogram": {
+        "1": 154,
+        "2": 102,
+        "3": 28,
+        "4": 33,
+        "5": 51,
+        "6": 40,
+        "7": 65,
+        "8": 35,
+        "9": 17,
+        "10": 36,
+        "11": 21,
+        "12": 12,
+        "13": 19,
+        "14": 28,
+        "15": 199,
+        "16": 13,
+        "17": 63,
+        "18": 9,
+        "19": 17,
+        "20": 15,
+        "21": 12,
+        "22": 20,
+        "23": 3,
+        "24": 14,
+        "25": 22,
+        "26": 123,
+        "27": 12,
+        "28": 6,
+        "29": 8,
+        "30": 10,
+        "31": 9,
+        "32": 8,
+        "33": 6,
+        "34": 8,
+        "35": 4,
+        "36": 9,
+        "37": 10,
+        "38": 4,
+        "39": 8,
+        "40": 11,
+        "41": 3,
+        "42": 6,
+        "43": 8,
+        "44": 12,
+        "45": 14,
+        "46": 6,
+        "47": 3,
+        "48": 9,
+        "49": 203,
+        "50": 8,
+        "51": 5,
+        "52": 138,
+        "53": 9,
+        "54": 7,
+        "55": 9,
+        "56": 13,
+        "57": 6,
+        "58": 15,
+        "59": 2,
+        "60": 15,
+        "61": 11,
+        "62": 34,
+        "63": 45,
+        "64": 845
+      },
+      "active_and_selected_histogram": [
+        {
+          "active": 1,
+          "selected": 1,
+          "calls": 154
+        },
+        {
+          "active": 2,
+          "selected": 1,
+          "calls": 93
+        },
+        {
+          "active": 2,
+          "selected": 2,
+          "calls": 9
+        },
+        {
+          "active": 3,
+          "selected": 1,
+          "calls": 9
+        },
+        {
+          "active": 3,
+          "selected": 2,
+          "calls": 10
+        },
+        {
+          "active": 3,
+          "selected": 3,
+          "calls": 9
+        },
+        {
+          "active": 4,
+          "selected": 1,
+          "calls": 5
+        },
+        {
+          "active": 4,
+          "selected": 2,
+          "calls": 20
+        },
+        {
+          "active": 4,
+          "selected": 3,
+          "calls": 5
+        },
+        {
+          "active": 4,
+          "selected": 4,
+          "calls": 3
+        },
+        {
+          "active": 5,
+          "selected": 1,
+          "calls": 15
+        },
+        {
+          "active": 5,
+          "selected": 2,
+          "calls": 8
+        },
+        {
+          "active": 5,
+          "selected": 3,
+          "calls": 10
+        },
+        {
+          "active": 5,
+          "selected": 4,
+          "calls": 17
+        },
+        {
+          "active": 5,
+          "selected": 5,
+          "calls": 1
+        },
+        {
+          "active": 6,
+          "selected": 1,
+          "calls": 4
+        },
+        {
+          "active": 6,
+          "selected": 2,
+          "calls": 4
+        },
+        {
+          "active": 6,
+          "selected": 3,
+          "calls": 23
+        },
+        {
+          "active": 6,
+          "selected": 4,
+          "calls": 1
+        },
+        {
+          "active": 6,
+          "selected": 5,
+          "calls": 5
+        },
+        {
+          "active": 6,
+          "selected": 6,
+          "calls": 3
+        },
+        {
+          "active": 7,
+          "selected": 1,
+          "calls": 1
+        },
+        {
+          "active": 7,
+          "selected": 2,
+          "calls": 3
+        },
+        {
+          "active": 7,
+          "selected": 3,
+          "calls": 25
+        },
+        {
+          "active": 7,
+          "selected": 4,
+          "calls": 27
+        },
+        {
+          "active": 7,
+          "selected": 5,
+          "calls": 3
+        },
+        {
+          "active": 7,
+          "selected": 6,
+          "calls": 2
+        },
+        {
+          "active": 7,
+          "selected": 7,
+          "calls": 4
+        },
+        {
+          "active": 8,
+          "selected": 1,
+          "calls": 3
+        },
+        {
+          "active": 8,
+          "selected": 2,
+          "calls": 6
+        },
+        {
+          "active": 8,
+          "selected": 3,
+          "calls": 3
+        },
+        {
+          "active": 8,
+          "selected": 4,
+          "calls": 8
+        },
+        {
+          "active": 8,
+          "selected": 5,
+          "calls": 3
+        },
+        {
+          "active": 8,
+          "selected": 6,
+          "calls": 8
+        },
+        {
+          "active": 8,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 8,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 9,
+          "selected": 1,
+          "calls": 2
+        },
+        {
+          "active": 9,
+          "selected": 2,
+          "calls": 2
+        },
+        {
+          "active": 9,
+          "selected": 3,
+          "calls": 1
+        },
+        {
+          "active": 9,
+          "selected": 4,
+          "calls": 4
+        },
+        {
+          "active": 9,
+          "selected": 5,
+          "calls": 3
+        },
+        {
+          "active": 9,
+          "selected": 6,
+          "calls": 1
+        },
+        {
+          "active": 9,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 9,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 10,
+          "selected": 1,
+          "calls": 2
+        },
+        {
+          "active": 10,
+          "selected": 3,
+          "calls": 4
+        },
+        {
+          "active": 10,
+          "selected": 4,
+          "calls": 12
+        },
+        {
+          "active": 10,
+          "selected": 6,
+          "calls": 12
+        },
+        {
+          "active": 10,
+          "selected": 7,
+          "calls": 4
+        },
+        {
+          "active": 10,
+          "selected": 9,
+          "calls": 2
+        },
+        {
+          "active": 11,
+          "selected": 4,
+          "calls": 6
+        },
+        {
+          "active": 11,
+          "selected": 5,
+          "calls": 3
+        },
+        {
+          "active": 11,
+          "selected": 6,
+          "calls": 3
+        },
+        {
+          "active": 11,
+          "selected": 7,
+          "calls": 8
+        },
+        {
+          "active": 11,
+          "selected": 10,
+          "calls": 1
+        },
+        {
+          "active": 12,
+          "selected": 2,
+          "calls": 2
+        },
+        {
+          "active": 12,
+          "selected": 5,
+          "calls": 4
+        },
+        {
+          "active": 12,
+          "selected": 6,
+          "calls": 1
+        },
+        {
+          "active": 12,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 12,
+          "selected": 10,
+          "calls": 2
+        },
+        {
+          "active": 13,
+          "selected": 3,
+          "calls": 1
+        },
+        {
+          "active": 13,
+          "selected": 6,
+          "calls": 8
+        },
+        {
+          "active": 13,
+          "selected": 7,
+          "calls": 9
+        },
+        {
+          "active": 13,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 14,
+          "selected": 4,
+          "calls": 1
+        },
+        {
+          "active": 14,
+          "selected": 6,
+          "calls": 5
+        },
+        {
+          "active": 14,
+          "selected": 7,
+          "calls": 13
+        },
+        {
+          "active": 14,
+          "selected": 8,
+          "calls": 7
+        },
+        {
+          "active": 14,
+          "selected": 10,
+          "calls": 2
+        },
+        {
+          "active": 15,
+          "selected": 3,
+          "calls": 2
+        },
+        {
+          "active": 15,
+          "selected": 5,
+          "calls": 1
+        },
+        {
+          "active": 15,
+          "selected": 7,
+          "calls": 96
+        },
+        {
+          "active": 15,
+          "selected": 8,
+          "calls": 97
+        },
+        {
+          "active": 15,
+          "selected": 10,
+          "calls": 1
+        },
+        {
+          "active": 15,
+          "selected": 12,
+          "calls": 2
+        },
+        {
+          "active": 16,
+          "selected": 6,
+          "calls": 1
+        },
+        {
+          "active": 16,
+          "selected": 7,
+          "calls": 1
+        },
+        {
+          "active": 16,
+          "selected": 8,
+          "calls": 9
+        },
+        {
+          "active": 16,
+          "selected": 9,
+          "calls": 1
+        },
+        {
+          "active": 16,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 17,
+          "selected": 4,
+          "calls": 1
+        },
+        {
+          "active": 17,
+          "selected": 8,
+          "calls": 28
+        },
+        {
+          "active": 17,
+          "selected": 9,
+          "calls": 30
+        },
+        {
+          "active": 17,
+          "selected": 10,
+          "calls": 2
+        },
+        {
+          "active": 17,
+          "selected": 11,
+          "calls": 1
+        },
+        {
+          "active": 17,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 18,
+          "selected": 5,
+          "calls": 1
+        },
+        {
+          "active": 18,
+          "selected": 8,
+          "calls": 2
+        },
+        {
+          "active": 18,
+          "selected": 9,
+          "calls": 5
+        },
+        {
+          "active": 18,
+          "selected": 10,
+          "calls": 1
+        },
+        {
+          "active": 19,
+          "selected": 8,
+          "calls": 4
+        },
+        {
+          "active": 19,
+          "selected": 9,
+          "calls": 3
+        },
+        {
+          "active": 19,
+          "selected": 10,
+          "calls": 5
+        },
+        {
+          "active": 19,
+          "selected": 11,
+          "calls": 5
+        },
+        {
+          "active": 20,
+          "selected": 5,
+          "calls": 1
+        },
+        {
+          "active": 20,
+          "selected": 8,
+          "calls": 2
+        },
+        {
+          "active": 20,
+          "selected": 9,
+          "calls": 2
+        },
+        {
+          "active": 20,
+          "selected": 10,
+          "calls": 3
+        },
+        {
+          "active": 20,
+          "selected": 11,
+          "calls": 1
+        },
+        {
+          "active": 20,
+          "selected": 12,
+          "calls": 4
+        },
+        {
+          "active": 20,
+          "selected": 15,
+          "calls": 2
+        },
+        {
+          "active": 21,
+          "selected": 9,
+          "calls": 2
+        },
+        {
+          "active": 21,
+          "selected": 10,
+          "calls": 4
+        },
+        {
+          "active": 21,
+          "selected": 11,
+          "calls": 5
+        },
+        {
+          "active": 21,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 22,
+          "selected": 7,
+          "calls": 1
+        },
+        {
+          "active": 22,
+          "selected": 9,
+          "calls": 3
+        },
+        {
+          "active": 22,
+          "selected": 10,
+          "calls": 4
+        },
+        {
+          "active": 22,
+          "selected": 11,
+          "calls": 4
+        },
+        {
+          "active": 22,
+          "selected": 12,
+          "calls": 5
+        },
+        {
+          "active": 22,
+          "selected": 13,
+          "calls": 3
+        },
+        {
+          "active": 23,
+          "selected": 11,
+          "calls": 1
+        },
+        {
+          "active": 23,
+          "selected": 12,
+          "calls": 2
+        },
+        {
+          "active": 24,
+          "selected": 9,
+          "calls": 1
+        },
+        {
+          "active": 24,
+          "selected": 12,
+          "calls": 11
+        },
+        {
+          "active": 24,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 24,
+          "selected": 15,
+          "calls": 1
+        },
+        {
+          "active": 25,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 25,
+          "selected": 9,
+          "calls": 1
+        },
+        {
+          "active": 25,
+          "selected": 11,
+          "calls": 1
+        },
+        {
+          "active": 25,
+          "selected": 12,
+          "calls": 5
+        },
+        {
+          "active": 25,
+          "selected": 13,
+          "calls": 6
+        },
+        {
+          "active": 25,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 25,
+          "selected": 16,
+          "calls": 2
+        },
+        {
+          "active": 25,
+          "selected": 18,
+          "calls": 3
+        },
+        {
+          "active": 26,
+          "selected": 9,
+          "calls": 2
+        },
+        {
+          "active": 26,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 26,
+          "selected": 13,
+          "calls": 116
+        },
+        {
+          "active": 26,
+          "selected": 14,
+          "calls": 2
+        },
+        {
+          "active": 26,
+          "selected": 17,
+          "calls": 2
+        },
+        {
+          "active": 27,
+          "selected": 7,
+          "calls": 3
+        },
+        {
+          "active": 27,
+          "selected": 11,
+          "calls": 3
+        },
+        {
+          "active": 27,
+          "selected": 16,
+          "calls": 3
+        },
+        {
+          "active": 27,
+          "selected": 20,
+          "calls": 3
+        },
+        {
+          "active": 28,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 28,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 28,
+          "selected": 16,
+          "calls": 2
+        },
+        {
+          "active": 28,
+          "selected": 17,
+          "calls": 1
+        },
+        {
+          "active": 28,
+          "selected": 19,
+          "calls": 1
+        },
+        {
+          "active": 29,
+          "selected": 7,
+          "calls": 1
+        },
+        {
+          "active": 29,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 29,
+          "selected": 10,
+          "calls": 1
+        },
+        {
+          "active": 29,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 29,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 29,
+          "selected": 15,
+          "calls": 1
+        },
+        {
+          "active": 29,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 29,
+          "selected": 22,
+          "calls": 1
+        },
+        {
+          "active": 30,
+          "selected": 10,
+          "calls": 1
+        },
+        {
+          "active": 30,
+          "selected": 14,
+          "calls": 3
+        },
+        {
+          "active": 30,
+          "selected": 16,
+          "calls": 4
+        },
+        {
+          "active": 30,
+          "selected": 18,
+          "calls": 1
+        },
+        {
+          "active": 30,
+          "selected": 20,
+          "calls": 1
+        },
+        {
+          "active": 31,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 31,
+          "selected": 15,
+          "calls": 4
+        },
+        {
+          "active": 31,
+          "selected": 16,
+          "calls": 3
+        },
+        {
+          "active": 31,
+          "selected": 21,
+          "calls": 1
+        },
+        {
+          "active": 32,
+          "selected": 11,
+          "calls": 1
+        },
+        {
+          "active": 32,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 32,
+          "selected": 16,
+          "calls": 2
+        },
+        {
+          "active": 32,
+          "selected": 17,
+          "calls": 2
+        },
+        {
+          "active": 32,
+          "selected": 19,
+          "calls": 1
+        },
+        {
+          "active": 32,
+          "selected": 24,
+          "calls": 1
+        },
+        {
+          "active": 33,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 33,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 33,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 33,
+          "selected": 17,
+          "calls": 1
+        },
+        {
+          "active": 33,
+          "selected": 20,
+          "calls": 2
+        },
+        {
+          "active": 34,
+          "selected": 10,
+          "calls": 1
+        },
+        {
+          "active": 34,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 34,
+          "selected": 17,
+          "calls": 2
+        },
+        {
+          "active": 34,
+          "selected": 18,
+          "calls": 2
+        },
+        {
+          "active": 34,
+          "selected": 24,
+          "calls": 2
+        },
+        {
+          "active": 35,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 35,
+          "selected": 18,
+          "calls": 1
+        },
+        {
+          "active": 35,
+          "selected": 19,
+          "calls": 1
+        },
+        {
+          "active": 35,
+          "selected": 23,
+          "calls": 1
+        },
+        {
+          "active": 36,
+          "selected": 10,
+          "calls": 1
+        },
+        {
+          "active": 36,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 36,
+          "selected": 16,
+          "calls": 2
+        },
+        {
+          "active": 36,
+          "selected": 18,
+          "calls": 3
+        },
+        {
+          "active": 36,
+          "selected": 20,
+          "calls": 2
+        },
+        {
+          "active": 37,
+          "selected": 15,
+          "calls": 1
+        },
+        {
+          "active": 37,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 37,
+          "selected": 17,
+          "calls": 1
+        },
+        {
+          "active": 37,
+          "selected": 18,
+          "calls": 1
+        },
+        {
+          "active": 37,
+          "selected": 19,
+          "calls": 2
+        },
+        {
+          "active": 37,
+          "selected": 20,
+          "calls": 2
+        },
+        {
+          "active": 37,
+          "selected": 21,
+          "calls": 1
+        },
+        {
+          "active": 37,
+          "selected": 24,
+          "calls": 1
+        },
+        {
+          "active": 38,
+          "selected": 18,
+          "calls": 2
+        },
+        {
+          "active": 38,
+          "selected": 20,
+          "calls": 2
+        },
+        {
+          "active": 39,
+          "selected": 18,
+          "calls": 2
+        },
+        {
+          "active": 39,
+          "selected": 19,
+          "calls": 1
+        },
+        {
+          "active": 39,
+          "selected": 20,
+          "calls": 1
+        },
+        {
+          "active": 39,
+          "selected": 21,
+          "calls": 2
+        },
+        {
+          "active": 39,
+          "selected": 22,
+          "calls": 1
+        },
+        {
+          "active": 39,
+          "selected": 24,
+          "calls": 1
+        },
+        {
+          "active": 40,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 40,
+          "selected": 15,
+          "calls": 1
+        },
+        {
+          "active": 40,
+          "selected": 16,
+          "calls": 1
+        },
+        {
+          "active": 40,
+          "selected": 18,
+          "calls": 2
+        },
+        {
+          "active": 40,
+          "selected": 20,
+          "calls": 2
+        },
+        {
+          "active": 40,
+          "selected": 21,
+          "calls": 1
+        },
+        {
+          "active": 40,
+          "selected": 22,
+          "calls": 2
+        },
+        {
+          "active": 40,
+          "selected": 24,
+          "calls": 1
+        },
+        {
+          "active": 41,
+          "selected": 18,
+          "calls": 1
+        },
+        {
+          "active": 41,
+          "selected": 20,
+          "calls": 1
+        },
+        {
+          "active": 41,
+          "selected": 21,
+          "calls": 1
+        },
+        {
+          "active": 42,
+          "selected": 17,
+          "calls": 1
+        },
+        {
+          "active": 42,
+          "selected": 20,
+          "calls": 1
+        },
+        {
+          "active": 42,
+          "selected": 21,
+          "calls": 1
+        },
+        {
+          "active": 42,
+          "selected": 22,
+          "calls": 1
+        },
+        {
+          "active": 42,
+          "selected": 24,
+          "calls": 2
+        },
+        {
+          "active": 43,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 43,
+          "selected": 20,
+          "calls": 2
+        },
+        {
+          "active": 43,
+          "selected": 22,
+          "calls": 1
+        },
+        {
+          "active": 43,
+          "selected": 23,
+          "calls": 3
+        },
+        {
+          "active": 43,
+          "selected": 24,
+          "calls": 1
+        },
+        {
+          "active": 44,
+          "selected": 19,
+          "calls": 1
+        },
+        {
+          "active": 44,
+          "selected": 20,
+          "calls": 3
+        },
+        {
+          "active": 44,
+          "selected": 21,
+          "calls": 1
+        },
+        {
+          "active": 44,
+          "selected": 22,
+          "calls": 3
+        },
+        {
+          "active": 44,
+          "selected": 23,
+          "calls": 1
+        },
+        {
+          "active": 44,
+          "selected": 24,
+          "calls": 3
+        },
+        {
+          "active": 45,
+          "selected": 3,
+          "calls": 1
+        },
+        {
+          "active": 45,
+          "selected": 15,
+          "calls": 2
+        },
+        {
+          "active": 45,
+          "selected": 20,
+          "calls": 1
+        },
+        {
+          "active": 45,
+          "selected": 21,
+          "calls": 1
+        },
+        {
+          "active": 45,
+          "selected": 22,
+          "calls": 3
+        },
+        {
+          "active": 45,
+          "selected": 23,
+          "calls": 3
+        },
+        {
+          "active": 45,
+          "selected": 24,
+          "calls": 3
+        },
+        {
+          "active": 46,
+          "selected": 22,
+          "calls": 3
+        },
+        {
+          "active": 46,
+          "selected": 23,
+          "calls": 1
+        },
+        {
+          "active": 46,
+          "selected": 24,
+          "calls": 2
+        },
+        {
+          "active": 47,
+          "selected": 21,
+          "calls": 1
+        },
+        {
+          "active": 47,
+          "selected": 24,
+          "calls": 2
+        },
+        {
+          "active": 48,
+          "selected": 23,
+          "calls": 2
+        },
+        {
+          "active": 48,
+          "selected": 24,
+          "calls": 7
+        },
+        {
+          "active": 49,
+          "selected": 1,
+          "calls": 9
+        },
+        {
+          "active": 49,
+          "selected": 2,
+          "calls": 1
+        },
+        {
+          "active": 49,
+          "selected": 4,
+          "calls": 1
+        },
+        {
+          "active": 49,
+          "selected": 5,
+          "calls": 1
+        },
+        {
+          "active": 49,
+          "selected": 22,
+          "calls": 3
+        },
+        {
+          "active": 49,
+          "selected": 23,
+          "calls": 1
+        },
+        {
+          "active": 49,
+          "selected": 24,
+          "calls": 187
+        },
+        {
+          "active": 50,
+          "selected": 7,
+          "calls": 1
+        },
+        {
+          "active": 50,
+          "selected": 22,
+          "calls": 1
+        },
+        {
+          "active": 50,
+          "selected": 24,
+          "calls": 6
+        },
+        {
+          "active": 51,
+          "selected": 5,
+          "calls": 1
+        },
+        {
+          "active": 51,
+          "selected": 20,
+          "calls": 1
+        },
+        {
+          "active": 51,
+          "selected": 24,
+          "calls": 3
+        },
+        {
+          "active": 52,
+          "selected": 4,
+          "calls": 1
+        },
+        {
+          "active": 52,
+          "selected": 5,
+          "calls": 2
+        },
+        {
+          "active": 52,
+          "selected": 7,
+          "calls": 1
+        },
+        {
+          "active": 52,
+          "selected": 24,
+          "calls": 134
+        },
+        {
+          "active": 53,
+          "selected": 4,
+          "calls": 1
+        },
+        {
+          "active": 53,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 53,
+          "selected": 24,
+          "calls": 7
+        },
+        {
+          "active": 54,
+          "selected": 7,
+          "calls": 2
+        },
+        {
+          "active": 54,
+          "selected": 24,
+          "calls": 5
+        },
+        {
+          "active": 55,
+          "selected": 9,
+          "calls": 1
+        },
+        {
+          "active": 55,
+          "selected": 23,
+          "calls": 1
+        },
+        {
+          "active": 55,
+          "selected": 24,
+          "calls": 7
+        },
+        {
+          "active": 56,
+          "selected": 5,
+          "calls": 1
+        },
+        {
+          "active": 56,
+          "selected": 6,
+          "calls": 1
+        },
+        {
+          "active": 56,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 56,
+          "selected": 9,
+          "calls": 1
+        },
+        {
+          "active": 56,
+          "selected": 24,
+          "calls": 9
+        },
+        {
+          "active": 57,
+          "selected": 9,
+          "calls": 1
+        },
+        {
+          "active": 57,
+          "selected": 24,
+          "calls": 5
+        },
+        {
+          "active": 58,
+          "selected": 7,
+          "calls": 1
+        },
+        {
+          "active": 58,
+          "selected": 10,
+          "calls": 1
+        },
+        {
+          "active": 58,
+          "selected": 11,
+          "calls": 1
+        },
+        {
+          "active": 58,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 58,
+          "selected": 24,
+          "calls": 11
+        },
+        {
+          "active": 59,
+          "selected": 24,
+          "calls": 2
+        },
+        {
+          "active": 60,
+          "selected": 9,
+          "calls": 2
+        },
+        {
+          "active": 60,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 60,
+          "selected": 20,
+          "calls": 1
+        },
+        {
+          "active": 60,
+          "selected": 24,
+          "calls": 11
+        },
+        {
+          "active": 61,
+          "selected": 8,
+          "calls": 1
+        },
+        {
+          "active": 61,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 61,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 61,
+          "selected": 18,
+          "calls": 1
+        },
+        {
+          "active": 61,
+          "selected": 24,
+          "calls": 7
+        },
+        {
+          "active": 62,
+          "selected": 13,
+          "calls": 1
+        },
+        {
+          "active": 62,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 62,
+          "selected": 15,
+          "calls": 6
+        },
+        {
+          "active": 62,
+          "selected": 24,
+          "calls": 26
+        },
+        {
+          "active": 63,
+          "selected": 10,
+          "calls": 2
+        },
+        {
+          "active": 63,
+          "selected": 11,
+          "calls": 1
+        },
+        {
+          "active": 63,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 63,
+          "selected": 14,
+          "calls": 1
+        },
+        {
+          "active": 63,
+          "selected": 15,
+          "calls": 2
+        },
+        {
+          "active": 63,
+          "selected": 17,
+          "calls": 1
+        },
+        {
+          "active": 63,
+          "selected": 18,
+          "calls": 2
+        },
+        {
+          "active": 63,
+          "selected": 24,
+          "calls": 35
+        },
+        {
+          "active": 64,
+          "selected": 9,
+          "calls": 14
+        },
+        {
+          "active": 64,
+          "selected": 10,
+          "calls": 6
+        },
+        {
+          "active": 64,
+          "selected": 11,
+          "calls": 3
+        },
+        {
+          "active": 64,
+          "selected": 12,
+          "calls": 1
+        },
+        {
+          "active": 64,
+          "selected": 13,
+          "calls": 5
+        },
+        {
+          "active": 64,
+          "selected": 14,
+          "calls": 6
+        },
+        {
+          "active": 64,
+          "selected": 15,
+          "calls": 17
+        },
+        {
+          "active": 64,
+          "selected": 16,
+          "calls": 80
+        },
+        {
+          "active": 64,
+          "selected": 17,
+          "calls": 17
+        },
+        {
+          "active": 64,
+          "selected": 18,
+          "calls": 15
+        },
+        {
+          "active": 64,
+          "selected": 19,
+          "calls": 15
+        },
+        {
+          "active": 64,
+          "selected": 20,
+          "calls": 6
+        },
+        {
+          "active": 64,
+          "selected": 21,
+          "calls": 7
+        },
+        {
+          "active": 64,
+          "selected": 22,
+          "calls": 2
+        },
+        {
+          "active": 64,
+          "selected": 23,
+          "calls": 4
+        },
+        {
+          "active": 64,
+          "selected": 24,
+          "calls": 647
+        }
+      ],
+      "calls_active_gt24": 1684,
+      "calls_active_gt24_selected_lt24": 556,
+      "single_owner_calls_at_single_active": 154,
+      "owner_rounds": 40281,
+      "output_tokens": 118528,
+      "by_class_budget": [
+        {
+          "slo_class": "all",
+          "budget": 1,
+          "counts": {
+            "owner_rounds": 1065,
+            "committed_tokens": 1762,
+            "allocated_candidates": 1065,
+            "terminal_owner_rounds": 174,
+            "delivered_1": 368,
+            "delivered_2": 697
+          },
+          "observed_mean_committed_tokens": 1.6544600938967136,
+          "observed_committed_per_candidate": 1.6544600938967136
+        },
+        {
+          "slo_class": "all",
+          "budget": 2,
+          "counts": {
+            "owner_rounds": 817,
+            "committed_tokens": 1827,
+            "allocated_candidates": 1634,
+            "terminal_owner_rounds": 113,
+            "delivered_2": 222,
+            "delivered_1": 201,
+            "delivered_3": 394
+          },
+          "observed_mean_committed_tokens": 2.2362301101591187,
+          "observed_committed_per_candidate": 1.1181150550795593
+        },
+        {
+          "slo_class": "all",
+          "budget": 3,
+          "counts": {
+            "owner_rounds": 10329,
+            "committed_tokens": 28902,
+            "allocated_candidates": 30987,
+            "terminal_owner_rounds": 30,
+            "delivered_2": 1721,
+            "delivered_4": 4702,
+            "delivered_1": 2533,
+            "delivered_3": 1373
+          },
+          "observed_mean_committed_tokens": 2.798141155968632,
+          "observed_committed_per_candidate": 0.9327137186562107
+        },
+        {
+          "slo_class": "all",
+          "budget": 4,
+          "counts": {
+            "owner_rounds": 26988,
+            "committed_tokens": 81844,
+            "allocated_candidates": 107952,
+            "terminal_owner_rounds": 132,
+            "delivered_5": 8987,
+            "delivered_1": 7387,
+            "delivered_3": 3356,
+            "delivered_4": 2469,
+            "delivered_2": 4789
+          },
+          "observed_mean_committed_tokens": 3.032607084630206,
+          "observed_committed_per_candidate": 0.7581517711575515
+        },
+        {
+          "slo_class": "all",
+          "budget": 5,
+          "counts": {
+            "owner_rounds": 1082,
+            "committed_tokens": 3730,
+            "allocated_candidates": 5410,
+            "terminal_owner_rounds": 14,
+            "delivered_5": 449,
+            "delivered_3": 151,
+            "delivered_2": 208,
+            "delivered_1": 160,
+            "delivered_4": 114
+          },
+          "observed_mean_committed_tokens": 3.4473197781885396,
+          "observed_committed_per_candidate": 0.6894639556377079
+        },
+        {
+          "slo_class": "loose",
+          "budget": 1,
+          "counts": {
+            "owner_rounds": 907,
+            "committed_tokens": 1576,
+            "allocated_candidates": 907,
+            "terminal_owner_rounds": 33,
+            "delivered_1": 238,
+            "delivered_2": 669
+          },
+          "observed_mean_committed_tokens": 1.7375964718853363,
+          "observed_committed_per_candidate": 1.7375964718853363
+        },
+        {
+          "slo_class": "loose",
+          "budget": 2,
+          "counts": {
+            "owner_rounds": 84,
+            "committed_tokens": 159,
+            "allocated_candidates": 168,
+            "terminal_owner_rounds": 24,
+            "delivered_1": 30,
+            "delivered_2": 33,
+            "delivered_3": 21
+          },
+          "observed_mean_committed_tokens": 1.8928571428571428,
+          "observed_committed_per_candidate": 0.9464285714285714
+        },
+        {
+          "slo_class": "loose",
+          "budget": 3,
+          "counts": {
+            "owner_rounds": 656,
+            "committed_tokens": 1624,
+            "allocated_candidates": 1968,
+            "terminal_owner_rounds": 0,
+            "delivered_4": 226,
+            "delivered_2": 130,
+            "delivered_3": 80,
+            "delivered_1": 220
+          },
+          "observed_mean_committed_tokens": 2.475609756097561,
+          "observed_committed_per_candidate": 0.8252032520325203
+        },
+        {
+          "slo_class": "loose",
+          "budget": 4,
+          "counts": {
+            "owner_rounds": 8198,
+            "committed_tokens": 21064,
+            "allocated_candidates": 32792,
+            "terminal_owner_rounds": 39,
+            "delivered_5": 1656,
+            "delivered_4": 789,
+            "delivered_1": 2952,
+            "delivered_2": 1727,
+            "delivered_3": 1074
+          },
+          "observed_mean_committed_tokens": 2.569407172481093,
+          "observed_committed_per_candidate": 0.6423517931202732
+        },
+        {
+          "slo_class": "loose",
+          "budget": 5,
+          "counts": {
+            "owner_rounds": 26,
+            "committed_tokens": 57,
+            "allocated_candidates": 130,
+            "terminal_owner_rounds": 0,
+            "delivered_5": 2,
+            "delivered_3": 5,
+            "delivered_1": 8,
+            "delivered_2": 10,
+            "delivered_4": 1
+          },
+          "observed_mean_committed_tokens": 2.1923076923076925,
+          "observed_committed_per_candidate": 0.43846153846153846
+        },
+        {
+          "slo_class": "normal",
+          "budget": 1,
+          "counts": {
+            "owner_rounds": 44,
+            "committed_tokens": 56,
+            "allocated_candidates": 44,
+            "terminal_owner_rounds": 33,
+            "delivered_1": 32,
+            "delivered_2": 12
+          },
+          "observed_mean_committed_tokens": 1.2727272727272727,
+          "observed_committed_per_candidate": 1.2727272727272727
+        },
+        {
+          "slo_class": "normal",
+          "budget": 2,
+          "counts": {
+            "owner_rounds": 52,
+            "committed_tokens": 111,
+            "allocated_candidates": 104,
+            "terminal_owner_rounds": 21,
+            "delivered_2": 23,
+            "delivered_1": 11,
+            "delivered_3": 18
+          },
+          "observed_mean_committed_tokens": 2.1346153846153846,
+          "observed_committed_per_candidate": 1.0673076923076923
+        },
+        {
+          "slo_class": "normal",
+          "budget": 3,
+          "counts": {
+            "owner_rounds": 1039,
+            "committed_tokens": 3270,
+            "allocated_candidates": 3117,
+            "terminal_owner_rounds": 14,
+            "delivered_1": 175,
+            "delivered_4": 634,
+            "delivered_3": 99,
+            "delivered_2": 131
+          },
+          "observed_mean_committed_tokens": 3.14725697786333,
+          "observed_committed_per_candidate": 1.0490856592877766
+        },
+        {
+          "slo_class": "normal",
+          "budget": 4,
+          "counts": {
+            "owner_rounds": 5148,
+            "committed_tokens": 18808,
+            "allocated_candidates": 20592,
+            "terminal_owner_rounds": 17,
+            "delivered_5": 2714,
+            "delivered_3": 503,
+            "delivered_2": 655,
+            "delivered_1": 895,
+            "delivered_4": 381
+          },
+          "observed_mean_committed_tokens": 3.6534576534576533,
+          "observed_committed_per_candidate": 0.9133644133644133
+        },
+        {
+          "slo_class": "normal",
+          "budget": 5,
+          "counts": {
+            "owner_rounds": 604,
+            "committed_tokens": 2235,
+            "allocated_candidates": 3020,
+            "terminal_owner_rounds": 11,
+            "delivered_3": 72,
+            "delivered_4": 66,
+            "delivered_1": 80,
+            "delivered_5": 301,
+            "delivered_2": 85
+          },
+          "observed_mean_committed_tokens": 3.7003311258278146,
+          "observed_committed_per_candidate": 0.7400662251655629
+        },
+        {
+          "slo_class": "tight",
+          "budget": 1,
+          "counts": {
+            "owner_rounds": 114,
+            "committed_tokens": 130,
+            "allocated_candidates": 114,
+            "terminal_owner_rounds": 108,
+            "delivered_1": 98,
+            "delivered_2": 16
+          },
+          "observed_mean_committed_tokens": 1.1403508771929824,
+          "observed_committed_per_candidate": 1.1403508771929824
+        },
+        {
+          "slo_class": "tight",
+          "budget": 2,
+          "counts": {
+            "owner_rounds": 681,
+            "committed_tokens": 1557,
+            "allocated_candidates": 1362,
+            "terminal_owner_rounds": 68,
+            "delivered_1": 160,
+            "delivered_2": 166,
+            "delivered_3": 355
+          },
+          "observed_mean_committed_tokens": 2.2863436123348015,
+          "observed_committed_per_candidate": 1.1431718061674008
+        },
+        {
+          "slo_class": "tight",
+          "budget": 3,
+          "counts": {
+            "owner_rounds": 8634,
+            "committed_tokens": 24008,
+            "allocated_candidates": 25902,
+            "terminal_owner_rounds": 16,
+            "delivered_2": 1460,
+            "delivered_4": 3842,
+            "delivered_1": 2138,
+            "delivered_3": 1194
+          },
+          "observed_mean_committed_tokens": 2.7806347000231644,
+          "observed_committed_per_candidate": 0.9268782333410548
+        },
+        {
+          "slo_class": "tight",
+          "budget": 4,
+          "counts": {
+            "owner_rounds": 13642,
+            "committed_tokens": 41972,
+            "allocated_candidates": 54568,
+            "terminal_owner_rounds": 76,
+            "delivered_5": 4617,
+            "delivered_1": 3540,
+            "delivered_3": 1779,
+            "delivered_4": 1299,
+            "delivered_2": 2407
+          },
+          "observed_mean_committed_tokens": 3.0766749743439377,
+          "observed_committed_per_candidate": 0.7691687435859844
+        },
+        {
+          "slo_class": "tight",
+          "budget": 5,
+          "counts": {
+            "owner_rounds": 452,
+            "committed_tokens": 1438,
+            "allocated_candidates": 2260,
+            "terminal_owner_rounds": 3,
+            "delivered_5": 146,
+            "delivered_3": 74,
+            "delivered_2": 113,
+            "delivered_1": 72,
+            "delivered_4": 47
+          },
+          "observed_mean_committed_tokens": 3.1814159292035398,
+          "observed_committed_per_candidate": 0.636283185840708
+        }
+      ]
+    }
+  },
+  "claim_limits": [
+    "Budgets were chosen by the live policy, not randomly assigned.",
+    "Conditional means are observed productivity, not causal g(i,n) curves.",
+    "Tokens include correction/bonus tokens and terminal output truncation.",
+    "Comparisons change active limit and segment packing together.",
+    "Phase clocks and replay cost do not independently measure overlap.",
+    "No new model execution, performance result, or production qualification."
+  ],
+  "NPU_used": false,
+  "production_permission": false
+}
