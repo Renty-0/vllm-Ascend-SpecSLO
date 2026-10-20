@@ -1,0 +1,20 @@
+{
+  "status": "PASS_HOST391_ACTUAL_FROZEN_WORKER_SUPERVISOR_AND_EARLY_OBSERVER_SOURCE",
+  "source_members": 4288,
+  "pins": {
+    "freeze_sha256": "a9a4bfaa81f9bc8f95a75a533612fb1bd8b8202638a6f65c6d35b8185fe8fa98",
+    "archive_sha256": "e97edf491453ea415c815a1f7b372511c0e35184fdb32b9265a184a38f207ed8",
+    "archive_members": 25,
+    "archive_bytes": 18919,
+    "NPU_used": false,
+    "models_qualified": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "NPU_used": false,
+  "Torch_imported": false,
+  "models_qualified": false,
+  "previous389_terminal_source_clean_all4idle": true,
+  "Raw": null,
+  "Goodput": null
+}

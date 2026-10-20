@@ -2213,3 +2213,10 @@ v385 已在真实 M120 模型输入上完成原有 MC2 链式资格程序。三�
 当前最好完整正确结果仍是 **v376：Raw 699.70、Goodput 609.03、403/463 达标**。最终目标仍为强官方 MC2 ON 基线的 1.5 倍，即 Goodput >644.77；最终三组匹配比较仍为 0/9。官方旧版稳定性测量已结束，未重测 HUST TP4 基线。
 
 复核记录：`ROOT385_REAL_DEFERRED_CHAIN_RESULT.json`、`ROOT388_ATOMIC_STORAGE_MONITOR_FAILURE.json`、`HOST_ROOT389_ACTUAL_FROZEN_CONSTRUCTION.json`；当前输出目录为 `tree-bounded-parent4-shared4-eager-diagnostic-v199/actual/parent4-child4-shared4-root-v389-bounded-v3`。
+
+
+<!-- ROOT389_REFERENCE_OBSERVER_FAILURE_AND391_ACTIVE_20261020 -->
+
+v389 后续记录：201 项 prefill、44 项 target、114 项 draft 图及原 B4/causal80 基础协议均完成；首个新增 B4 用例在观察器缺少 captured/eager hidden 参考时终止，尚未完成新增数值比较，也未测 Raw/Goodput。实际启动清单已包含对应 PA frontier 图；观察器原来在构造结束后注册，无法记录此前捕获的中间 hidden。v392 的主机回归直接使用原观察器代码复现这一时序缺陷，并验证提前注册、构造结束后保留引用的修复；模型调用数不变，Native 资格标志未改。
+
+v391 已封存并启动：使用修复后的只读观察器，重新完成原有基础检查，再在实际 v376 的 M120/Q5/S24/KV 分档 target 后端执行同一有限 B4 协议；实际 Native 元数据还须逐项匹配独立构造结果。它仍是 N16、E1～4 的局部模型检查，draft 为原 v199 融合路径，不冒称完整 v376 优化栈；未授予生产资格，没有新增性能结果。v389 的失败回执、前后源码核验、自有进程退出与四卡空闲记录均保留。

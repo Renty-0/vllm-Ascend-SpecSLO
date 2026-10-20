@@ -1,7 +1,11 @@
 {
-  "status": "PASS_HOST391_UNFROZEN_PROJECTED_ACTUAL_WORKER_FACTORY",
+  "status": "PASS_HOST391_ACTUAL_EXTENSION_EARLY_OBSERVER_AND_WORKER_CONSTRUCTION",
   "NPU_used": false,
   "Torch_imported": false,
+  "actual_extension391_after_install_called": true,
+  "real_original392_constructor_regression_repaired": true,
+  "model_forward_called": false,
+  "constructor_simulation_only": true,
   "source_gate_mocked_only_for_unfrozen_constructor": true,
   "actual_frozen_gate_verified": false,
   "models_qualified": false,

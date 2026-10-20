@@ -23,6 +23,12 @@ def ready(expected=None):
         host=json.loads(path.read_text())
         if not host['status'].startswith(prefix)or host['NPU_used']is not False:
             raise RuntimeError('ROOT391 current HOST evidence required')
+    physical=json.loads((P/'HOST391_PHYSICAL_RESULT.json').read_text())
+    if not physical['status'].startswith('PASS_HOST391_REAL_OBSERVER')or physical['NPU_used']is not False:
+        raise RuntimeError('ROOT391 actual physical metadata observer HOST evidence required')
+    early=json.loads((B/'tree-parent4-frontier-observer-before-capture-host-v392/HOST392_RESULT.json').read_text())
+    if not early['status'].startswith('PASS_HOST392_ACTUAL_ORIGINAL_OBSERVER')or early['NPU_used']is not False:
+        raise RuntimeError('ROOT391 early observer actual HOST regression required')
     check386.ready()
     return value
 

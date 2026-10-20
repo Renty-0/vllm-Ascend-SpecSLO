@@ -74,6 +74,7 @@ SOURCES = (
     ('tree-parent4-full-archive-guard-v387', 387),
     ('tree-parent4-owned-exit-path-v388', 388),
     ('tree-parent4-atomic-output-storage-guard-v389', 389),
+    ('tree-parent4-current-M120-target-protocol-v391', 391),
 )
 
 
@@ -187,6 +188,7 @@ def main():
         'tree-adaptive80-GEMM120-best376-full-v383',
         'tree-parent4-best376-target-binding-host-v390',
         'tree-parent4-current-M120-target-protocol-v391',
+        'tree-parent4-frontier-observer-before-capture-host-v392',
     ):
         selected.update(p for p in (BASE / directory).iterdir()
                         if p.suffix in {'.py', '.sh', '.json'} and not p.name.startswith('FIXTURE'))
@@ -212,6 +214,9 @@ def main():
         'build_ROOT299_capacity_risk_span_full_HOST.py',
         'freeze_ROOT299_capacity_risk_span_full_HOST.py',
         'save_ROOT_tree_github_snapshot.py',
+        'freeze_ROOT391_parent4_current_target_and_early_observer_HOST.py',
+        'HOST_ROOT391_ACTUAL_FROZEN_CONSTRUCTION.json',
+        'ROOT389_FRONTIER_REFERENCE_OBSERVER_FAILURE.json',
         'ROOT389_GOAL_MARGIN_ARITHMETIC.json',
         'ROOT389_BEST376_ACTUAL_CLASS_GAIN_SCREEN.json',
         'freeze_ROOT389_parent4_atomic_storage_HOST.py',

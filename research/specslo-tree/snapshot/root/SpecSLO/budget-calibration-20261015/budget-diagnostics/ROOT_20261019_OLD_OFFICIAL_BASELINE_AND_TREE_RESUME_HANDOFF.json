@@ -786,15 +786,26 @@
   "tree375_all510_exact": true,
   "tree375_component_gain_small": true,
   "current_execution": {
-    "version": 389,
-    "tag": "parent4-child4-shared4-root-v389-bounded-v3",
-    "guardian_session": 41648,
-    "status": "running_original199_bounded_P4_child4_fresh173_baseline",
-    "UTC": "2026-10-20T00:09:38.236249+00:00",
-    "freeze_sha256": "e233543cad3a82dc6defce6f17f7d32c30a6e96a58a39c9ec12a7298a49cde29",
-    "archive_sha256": "0527ec6a75a5f0b006bbb52aaa8b01c975c34594ae2f5fed8277b6d06844203d",
+    "version": 391,
+    "tag": "parent4-child4-current-M120-root-v391-early392-bounded-v1",
+    "guardian_session": 5680,
+    "status": "running_fresh173_then_currentM120_P4_with_early_observer392",
+    "UTC": "2026-10-20T00:34:26.962587+00:00",
+    "freeze_sha256": "a9a4bfaa81f9bc8f95a75a533612fb1bd8b8202638a6f65c6d35b8185fe8fa98",
+    "archive_sha256": "e97edf491453ea415c815a1f7b372511c0e35184fdb32b9265a184a38f207ed8",
     "output_root": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199",
-    "same_model_runtime_as388": true,
+    "finite_normalN": 16,
+    "parentN": 16,
+    "parent_B": 4,
+    "child_B": 4,
+    "E": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "current_target_M120_Q5_S24": true,
+    "original_best376_draft_claimed": false,
     "production_permission": false,
     "Raw": null,
     "Goodput": null
@@ -968,5 +979,25 @@
     "owned_remaining": [],
     "all4idle": true,
     "result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT388_ATOMIC_STORAGE_MONITOR_FAILURE.json"
-  }
+  },
+  "previous_execution389": {
+    "version": 389,
+    "tag": "parent4-child4-shared4-root-v389-bounded-v3",
+    "guardian_session": 41648,
+    "status": "failed_first_new_P4_case_missing_constructor_frontier_hidden_references",
+    "UTC": "2026-10-20T00:09:38.236249+00:00",
+    "freeze_sha256": "e233543cad3a82dc6defce6f17f7d32c30a6e96a58a39c9ec12a7298a49cde29",
+    "archive_sha256": "0527ec6a75a5f0b006bbb52aaa8b01c975c34594ae2f5fed8277b6d06844203d",
+    "output_root": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199",
+    "same_model_runtime_as388": true,
+    "production_permission": false,
+    "Raw": null,
+    "Goodput": null,
+    "finished_UTC": "2026-10-20T00:29:57.308476+00:00",
+    "sources_unchanged": true,
+    "owned_remaining": [],
+    "all4idle": true,
+    "result": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT389_FRONTIER_REFERENCE_OBSERVER_FAILURE.json"
+  },
+  "prepared_current_target391": "frozen and launched with actual current M120 backend; no original227/681/full463 claimed; observer392 read-only hook before capture"
 }

@@ -9,6 +9,7 @@ PARENT=B/'tree-bounded-parent4-shared4-eager-diagnostic-v199'
 sys.path.insert(0,str(PARENT))
 sys.path.insert(0,str(B/'tree-contiguous-branch-tail-final-metadata-math-v234'))
 sys.path.insert(0,str(B/'tree-parent4-best376-target-binding-host-v390'))
+sys.path.insert(0,str(B/'tree-parent4-frontier-observer-before-capture-host-v392'))
 import runtime199 as original
 _RUNTIME=None
 

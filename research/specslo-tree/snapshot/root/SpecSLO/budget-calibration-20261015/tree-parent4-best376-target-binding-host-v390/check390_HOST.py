@@ -21,7 +21,7 @@ from vllm_ascend.spec_decode.pearl.tree import cached_cpu_tree_speculation_plan,
 import metadata390
 
 
-def main():
+def carrier():
     assert not torch.npu.is_initialized()
     tables=[[-1]*32 for _ in range(527)]
     for i in range(24):tables[i][:21]=list(range(21*i,21*i+21))
@@ -43,6 +43,12 @@ def main():
     engine=SimpleNamespace(model=model,draft_vocab_size=151936,device=torch.device('cpu'),
         cache_allocation=SimpleNamespace(block_tables=tables),
         _branch_tail_state=SimpleNamespace(uniform_KV_bucket376_enabled=True))
+    return engine
+
+
+def main():
+    engine=carrier()
+    tables=engine.cache_allocation.block_tables
     observations=[]
     for n in (1,16,24):
         for prefix in (128,511,1500,2555):

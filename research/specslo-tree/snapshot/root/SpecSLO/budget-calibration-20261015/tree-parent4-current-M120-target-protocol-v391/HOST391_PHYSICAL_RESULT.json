@@ -1,0 +1,18 @@
+{
+  "status": "PASS_HOST391_REAL_OBSERVER_POSITIVE_AND_CONTROLLED_METADATA_NEGATIVES",
+  "NPU_used": false,
+  "model_forward_called": false,
+  "CPU_carriers_only": true,
+  "actual_observer_function_called": true,
+  "real_packer_and_projection": true,
+  "changed_input_checked": true,
+  "negative_fields": [
+    "context_lens",
+    "sequence_lens",
+    "input"
+  ],
+  "numerical_qualification": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

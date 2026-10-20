@@ -25,6 +25,8 @@ def main():
         assert fn.__globals__['target_shape']is target391.target_shape
         assert fn.__globals__['original_call']is target391.original_call
         assert fn.__globals__['rebuild_history']is target391.rebuild_history
+    import inspect
+    assert inspect.getclosurevars(target391.original_call).nonlocals['base'].__code__ is target199.original_call.__code__
     assert actor391.run.__globals__['run_case'].__globals__['target']is target391
     assert actor391.run.__globals__['run_case'].__code__ is actor199.run_case.__code__
     for n in range(1,25):

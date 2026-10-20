@@ -1,0 +1,14 @@
+{
+  "status": "PASS_HOST392_ACTUAL_ORIGINAL_OBSERVER_CONSTRUCTOR_REFERENCE_LOSS_REPRODUCED",
+  "original_failure_reproduced": true,
+  "early_capture_and_eager_references_preserved": true,
+  "engine_postconstructor_does_not_clear_references": true,
+  "model_call_count_unchanged": true,
+  "target_role_untouched": true,
+  "Native_qualification_flag_modified": false,
+  "NPU_used": false,
+  "Torch_imported": false,
+  "numerical_qualification": false,
+  "Raw": null,
+  "Goodput": null
+}

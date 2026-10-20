@@ -38,7 +38,7 @@ def launch_argv(tag):
 
 def storage(tag=None):
     value=parent.storage(tag)
-    value['aggregate_private_bytes']+=parent.bytes_under(HERE)+parent.bytes_under(B/'tree-parent4-best376-target-binding-host-v390')
+    value['aggregate_private_bytes']+=sum(parent.bytes_under(folder)for folder in (HERE,B/'tree-parent4-best376-target-binding-host-v390',B/'tree-parent4-frontier-observer-before-capture-host-v392'))
     require(value['aggregate_private_bytes']<=parent.parent.parent.original.MAX_AGGREGATE_BYTES,'unchanged aggregate private storage limit')
     return value
 
@@ -58,7 +58,7 @@ def execution_namespace():
     namespace=parent.execution_namespace()
     namespace.update(prepared=prepared,launch_argv=launch_argv,storage=storage,actual_audit=actual_audit,G=HERE)
     namespace['SCOPE']=dict(namespace['SCOPE'],current_M120_target_requested=True,
-        original_best376_draft_claimed=False)
+        original_best376_draft_claimed=False,frontier_observer392_before_capture_requested=True)
     require(namespace['execute_locked'].__globals__ is namespace,'actual391 supervisor callbacks')
     return namespace
 
