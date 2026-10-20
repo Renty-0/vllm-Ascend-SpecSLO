@@ -1,0 +1,138 @@
+{
+  "parent376_freeze_sha256": "ae723ddfddeb6d47f04605a3842de0c3690196b0addf39fa17c5bd1ca248765c",
+  "declared_delta": "active request ceiling48to64; matching cohort/reference/audit windows; no target math, draft or budget-policy change",
+  "files": [
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/guard376.py",
+      "source_sha256": "44ce0c4d422fde704317d398d1c8ade97145cd432183b6807e78a0221dbb4b65",
+      "output": "guard394.py",
+      "output_sha256": "572dd2803d11474a9c8a78919c265d6fafb7606da26d96dfb28b98c592c1eda6"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/check_scope376_HOST.py",
+      "source_sha256": "5173c66e6a47e60f0575471d459e3c24da11d912b2fc38b1b3338c6e1ca7e4c3",
+      "output": "check_scope394_HOST.py",
+      "output_sha256": "10c011f30a81a48afd1055038e54c7aaf33468e9da265635fc33cfb84b4ca148"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/audit376.py",
+      "source_sha256": "fa625f5045a1f899307384007d5dad13dec8f5d3714065970c233289b46bbb00",
+      "output": "audit394.py",
+      "output_sha256": "32b65f483422f99ebeefcc54990e047ad6a2d8e627bf0543bad9b767e4844828"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/scope376.py",
+      "source_sha256": "841afa593196dc0f80e5b0c943a2eb620403bcb2f84d3baa19a2151d0415ded1",
+      "output": "scope394.py",
+      "output_sha256": "2837216008b829e3da9556b478270c0f0560ded8ec2be8f40643b342c07ad001"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/trace376.py",
+      "source_sha256": "19eba6c7bf388aecdc5c265491072b8759375f5e685c99950e12b993fc730b5f",
+      "output": "trace394.py",
+      "output_sha256": "38d137663a5edcffdba8ee84d25e2012ddf14c3d34b8d092237e491f0355b3e6"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/bucket376.py",
+      "source_sha256": "88ced2d965a38ceffca2f6c930a23e6aa35d971cfe621e219cc2c2400801a4c9",
+      "output": "bucket394.py",
+      "output_sha256": "5827d88f577f34603f7d9cbba190c95adf0365d902bb896778f40863fc619299"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/projection376.py",
+      "source_sha256": "154f7b2b070d365c47dce9e5efe7c7464cf94e14f728d80a1e228c2f58ad09c6",
+      "output": "projection394.py",
+      "output_sha256": "5afe1b0afd32b3ec2f077eba5b6e82d557c2936cd5021a609c5383e47e6d4d1a"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/check376.py",
+      "source_sha256": "d3a4207b2bcaa5c3a7d7f8cf58ed3c57df2a2105daa07f5f06acd779a91b5ff5",
+      "output": "check394.py",
+      "output_sha256": "bae7f5a4b87f1f0e10b32b4a0b1adc699c74beb36057d1fbbd6c01997cba919c"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/prefixes376.py",
+      "source_sha256": "e809cf70cd2ddd780428b82f6193651264b7d713df40c05de5eaf950b8ffa998",
+      "output": "prefixes394.py",
+      "output_sha256": "a167bf85a67d390413ef029be1b56a8ecdff7e1a59d3803242d98e722c973a4e"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/runtime376.py",
+      "source_sha256": "4b2b4f3195f779aa15fdfbfb699bcec3f35d680750cb58f85b4309f04a0fa31d",
+      "output": "runtime394.py",
+      "output_sha256": "f5fce779b10f01024b08e1db2d188c51a95dc16f398ac482fc74c56fdce9a1b7"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/oracle376.py",
+      "source_sha256": "3bd1b07ac3061d57bb2f0f81d4b1ebe7b7bd58c03769bf77e337de84647398ca",
+      "output": "oracle394.py",
+      "output_sha256": "833461a65f8cd229f1a0ee49246ceb7e0a22e05fabcd2a9c376e2fb68c3d8e80"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/check376_HOST.py",
+      "source_sha256": "63d6aa50afb2dcdbe82440a68a678f6f1035ed95e62142a122e73c3b799fb79a",
+      "output": "check394_HOST.py",
+      "output_sha256": "4eac54e797846f66a31bb9bc58664c6f050001ea280d39f6e3ca3e1998c0f197"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/qualify376.py",
+      "source_sha256": "520c7ede7ab6133b1e66863e7dfbebab49bc7b6569331f566b54333df2700b0a",
+      "output": "qualify394.py",
+      "output_sha256": "ebbd82976cdcf25a87a3d2f7ef57f767a3f29db9890ae051f3ebff0123ad33e0"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/extension376.py",
+      "source_sha256": "9a24ac061b8725b5c8eb8eee122eca7df9c6db9a607720ddd63bf549b91d8f14",
+      "output": "extension394.py",
+      "output_sha256": "ca35fc1cec4d00671c83cf2f615558433e5db5e88c3e73309caefbe3ac4df09c"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/startup376.sh",
+      "source_sha256": "9bdb098acbaba1337d095c40014224a2443526cf81d8df7dce959f06489a26ac",
+      "output": "startup394.sh",
+      "output_sha256": "1db1c15d5453b1736291788883a60330007f398ace14f528283dff425f7e4c69"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/launch376.sh",
+      "source_sha256": "a3ff725dbfc7f7b25a8bbc99168b6e0a770d7eefc4bba6329dfbb31bdc06ea85",
+      "output": "launch394.sh",
+      "output_sha256": "6d2e33636dde6511dcfa8ba5db535cb846b8365edaa0379fc300e41b0a477e48"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/dispatch376.py",
+      "source_sha256": "13394c5f7f62c6c55d5d656e12dea1df17acd28f35165f689a55c95d7ec3093e",
+      "output": "dispatch394.py",
+      "output_sha256": "d3ec522010ef5453fea858fdc5130aec0fc80f56fa962e37f7ee08a6486072ba"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-SLO-first-full463-own-AR-v257/window257.py",
+      "source_sha256": "10ac72788eb821b20b95d00253fee9f948e4e4a7c42a73bd0a76e354cd6c1d09",
+      "output": "window394.py",
+      "output_sha256": "77f86dbd4f1d81084f94d4108434e87967450924373bd7d8ce56613bd620127c"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-SLO-first-full463-own-AR-v257/empty257.py",
+      "source_sha256": "3eeead19c299945fd00030369c987662f41b11bfb2eb221ca98b7a3ee65cffd9",
+      "output": "empty394.py",
+      "output_sha256": "a1cc5bb823147e16a6d67612d3a0f20985e0778d22f2f60150cc572e5d3da7a7"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-SLO-first-full463-own-AR-v257/reference257.py",
+      "source_sha256": "e20c76193b67cd5ecaf39643c06400750cf3eabd6ba41b68853ddf90b61e4a1e",
+      "output": "reference394.py",
+      "output_sha256": "4365ea0c0fcb7273c9271d5e25481067e827113a25ac5c635e6bcb616a88e3ea"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-SLO-first-full463-own-AR-v257/audit_reference257.py",
+      "source_sha256": "0d4af3e834adbbbe3dbda9948bd0086a0a6c28a5f9ef6eb2794f7f2ac59fe04e",
+      "output": "audit_reference394.py",
+      "output_sha256": "8608b0868e541e28561f58a37b46b23aa9c2049a8b717f72787c4187da14ae70"
+    }
+  ],
+  "NPU_used": false,
+  "additional_sources": [
+    "audit_base394.py",
+    "check394_capacity_HOST.py",
+    "check394_construction_HOST.py"
+  ]
+}

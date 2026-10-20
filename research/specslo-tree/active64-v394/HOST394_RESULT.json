@@ -1,0 +1,10 @@
+{
+  "status": "PASS_HOST394_BOUNDARIES_CALLBACKS_RUNTIME_AND_227_DISPATCH_CORRUPTIONS",
+  "NPU_used": false,
+  "neural_qualification_inherited": false,
+  "production_qualified": false,
+  "original_worker_source_sha256": "0cdc40d45dcbfef3d14f8166765eccaaa841068845115e46bfad76fe4343546f",
+  "exact_reversible_runtime_changes": 13,
+  "actual_retained_dispatch_cases": 227,
+  "all_original_draft_and_qualification_bodies_preserved": true
+}

@@ -1,0 +1,30 @@
+{
+  "status": "PASS_HOST394_ACTUAL_SANITIZED_STARTUP_CALLBACK_CONSTRUCTION",
+  "NPU_used": false,
+  "model_constructors_called": 0,
+  "exact_startup_PYTHONPATH": true,
+  "imported_origins": {
+    "projection247": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/projection247.py",
+    "projection255": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+    "window394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/window394.py",
+    "empty394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/empty394.py",
+    "reference394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/reference394.py",
+    "audit_reference394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/audit_reference394.py",
+    "audit_base394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/audit_base394.py",
+    "runtime394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/runtime394.py",
+    "trace394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/trace394.py",
+    "scope394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/scope394.py",
+    "audit394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/audit394.py",
+    "extension394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/extension394.py",
+    "bucket394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/bucket394.py",
+    "oracle394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/oracle394.py",
+    "qualify394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/qualify394.py",
+    "guard394": "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v394/guard394.py"
+  },
+  "configured_max_num_seqs": 64,
+  "effective_active_ceiling": 64,
+  "original_owned_verifier_and_cleanup_retained": true,
+  "original227_and_additional681_and_all463_ownAR_required": true,
+  "neural_qualification_inherited": false,
+  "deadline_seconds": 10800
+}

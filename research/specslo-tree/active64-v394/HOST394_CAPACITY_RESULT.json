@@ -1,0 +1,14 @@
+{
+  "status": "PASS_HOST394_REAL_ACTIVE64_ADAPTER_COHORT_REFERENCE_BOUNDARIES",
+  "NPU_used": false,
+  "effective_active_ceiling": 64,
+  "previous_active_ceiling": 48,
+  "configured_max_num_seqs": 64,
+  "target_max_requests": 24,
+  "target_candidates": 96,
+  "target_model_math_unchanged": true,
+  "independent_reference_math_unchanged": true,
+  "actual_observed_peak_required_in_device_result": true,
+  "Native_qualification_flags_assigned": false,
+  "production_qualified": false
+}

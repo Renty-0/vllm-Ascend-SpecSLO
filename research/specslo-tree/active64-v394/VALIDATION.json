@@ -1,0 +1,25 @@
+{
+  "status": "HOST_passed_device_run_in_progress",
+  "model_math_claimed": false,
+  "Raw": null,
+  "Goodput": null,
+  "host_capacity_boundary_tests": "pass",
+  "actual_sanitized_startup_imports_and_callbacks": "pass",
+  "immutable_parent376_preserved": true,
+  "format_ci": {
+    "attempted": true,
+    "exit_code": 1,
+    "reason": "pre-commit not installed; no environment packages changed"
+  },
+  "staged_whitespace_check": {
+    "exit_code": 2,
+    "issues": [
+      {
+        "file": "runtime394.py",
+        "line": 31,
+        "kind": "one inherited trailing space"
+      }
+    ],
+    "resolution": "Retain exact frozen source bytes used by the running model experiment; no source edits during run"
+  }
+}

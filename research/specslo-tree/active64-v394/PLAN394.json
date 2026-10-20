@@ -1,0 +1,41 @@
+{
+  "UTC": "2026-10-20T19:24:37.123432+00:00",
+  "status": "HOST_passed_pending_frozen_full463_device_run",
+  "user_request": "Resume SpecSLO optimization; make batch_size ceiling64",
+  "effective_active_ceiling": 64,
+  "previous_active_ceiling": 48,
+  "configured_max_num_seqs": 64,
+  "target_max_requests": 24,
+  "target_candidates": 96,
+  "physical_target": "M120 Q5 S24",
+  "dataset_manifest": "/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/manifest.jsonl",
+  "dataset_manifest_sha256": "dc58dc5af1c5b28c6944f8f3faadeaae2dae34298c07b3ac84745d367c67d662",
+  "requests": 463,
+  "arrival_rate": 4,
+  "arrival_seed": 0,
+  "TPOT_SLO_ms": [
+    40,
+    50,
+    150
+  ],
+  "required": [
+    "fresh_original201_44_114_and_all_inherited_components",
+    "fresh_original227_FULL_target_math",
+    "fresh_additional681_uniform_KV_math",
+    "original_bounded_prewarm_and_two_zero_traces",
+    "natural_graph_seal",
+    "complete463_online_original_clocks",
+    "independent_own_AR_on_all3_target_ranks",
+    "actual_active_peak_and_cohort_size_audit"
+  ],
+  "Raw": null,
+  "Goodput": null,
+  "model_qualification_inherited": false,
+  "scope_note": "Global active request ceiling64. Single target microbatch remains24; no claim that all64 verify simultaneously. All future production candidates must retain global64.",
+  "next_original_direction": "After64 control, repair existing projection247 startup import in additive B4 successor, retain strict parent/child/KV/promotion/rollback checks; then measure marginal draft cost before full run",
+  "historical_best_GP": 609.0250374874602,
+  "historical_fixed_GP": 501.63560407964184,
+  "historical_strong_MC2_GP": 429.8442987424407,
+  "historical_goal_GP_gt": 644.766448113661,
+  "final_matched_cells_completed": 0
+}
