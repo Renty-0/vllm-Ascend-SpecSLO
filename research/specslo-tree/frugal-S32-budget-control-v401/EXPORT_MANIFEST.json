@@ -1,0 +1,38 @@
+{
+  "policy401.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/policy401.py",
+    "sha256": "67f725b1ec3de048ba77c2e702a9ad7f3ba21148ed764ae2fb5adb3d303ea5c2"
+  },
+  "packing401.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/packing401.py",
+    "sha256": "929e96434e74f84c089ae930b29bb6aed5df52696aac371a8516b94169133069"
+  },
+  "check401_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/check401_HOST.py",
+    "sha256": "f3d7392b41c07fc36941a1583b7c2def58bf58a19f59fd4571c86f1e4e3a21b5"
+  },
+  "HOST401_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/HOST401_RESULT.json",
+    "sha256": "5fe88cd284033fafedaa314e7d3b9aa417ae4f26e02bcdc6868e6143fba25308"
+  },
+  "PLAN401.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/PLAN401.json",
+    "sha256": "c98d3ae9353026f0e3f33b2afff50117a782a6075db63fc417416d42b3315f2a"
+  },
+  "FREEZE401.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/FREEZE401.json",
+    "sha256": "b53b7d663e0fa43a722897afeac0f56970528b558ed1c7691559af9a0d30e019"
+  },
+  "SOURCE401_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/SOURCE401_RECEIPT.json",
+    "sha256": "94ab5c50c62d63b460788fc90cbc5eb6e803dd3234e755b1fd4635d6664ae001"
+  },
+  "SOURCE401.tar.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/SOURCE401.tar.gz",
+    "sha256": "2e12d9194b599515f83f420c5e57de0d92ae53d01fcd00958f115d5eeabb5e43"
+  },
+  "tools/freeze_ROOT401_paid_control_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT401_paid_control_HOST.py",
+    "sha256": "dc1a093f941f81a216cc0da08c4a255636bdae9862e4c2b97e9f0efff067e0a6"
+  }
+}

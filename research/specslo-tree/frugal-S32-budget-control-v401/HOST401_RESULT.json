@@ -1,0 +1,40 @@
+{
+  "status": "PASS_HOST401_ORIGINAL_CONTROL_ACCOUNTING_AND_WHOLE_TICKET_RESOURCES",
+  "exact_legacy_shaper_cases": 254,
+  "paid_wide_shaper_cases": 346,
+  "whole_ready_ticket_resource_cases": 600,
+  "C88_does_not_replace_independent_B3_quota_regression": true,
+  "unsafe_replay_reservation_rejected": true,
+  "repeated_paid_roof_original_age_coverage": 32,
+  "strict_class_priority_large_caps": true,
+  "global65_rejected_without_lowering_global64": true,
+  "original_request_states_and_controller_class_unchanged": true,
+  "source_sha256": {
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/roofline.py": "7c50ee1768c8568a0b02b1fbeb56894073a298954c6984bc26ba99d07b0e5ef5",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/spec_rhythm.py": "8bedd1cc21452b190e8bb95f0cad03c3ab0487b32f28011fe8412f45375f175f"
+  },
+  "packing": {
+    "original_source_sha256": "6df2af91708925bc7901bede57040620fca53cb22ccc19ce85be568a96554cf0",
+    "parent398_projected_sha256": "944134f164a2fe819c4734cbc57fa45a1c3879dcbadba694f6e453ab389f3760",
+    "projected_source_sha256": "ca8d2666bfea579337e43574afe4e5fcc355c4f5002b55b34fd8d46e321bd9dd",
+    "resource_is_count_of_B3_owners": true,
+    "maximum_B3_owners": 24,
+    "physical_attention_groups": 32,
+    "C": 88,
+    "M": 120,
+    "original_controller_class_modified": false,
+    "tickets_trimmed": false,
+    "NPU_qualified": false,
+    "production_permission": false
+  },
+  "actual_global_limit": 64,
+  "HOST_package_shells_used_only_to_load_exact_pure_control_sources": true,
+  "model_backends_imported": false,
+  "NPU_used": false,
+  "models_constructed": 0,
+  "production_runtime_installed": false,
+  "model_qualification": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

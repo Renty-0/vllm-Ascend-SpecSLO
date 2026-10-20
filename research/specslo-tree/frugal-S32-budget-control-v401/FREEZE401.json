@@ -1,0 +1,20 @@
+{
+  "schema": "ROOT401.HOST-only-paid-S32-control-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/policy401.py": "67f725b1ec3de048ba77c2e702a9ad7f3ba21148ed764ae2fb5adb3d303ea5c2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/packing401.py": "929e96434e74f84c089ae930b29bb6aed5df52696aac371a8516b94169133069",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/check401_HOST.py": "f3d7392b41c07fc36941a1583b7c2def58bf58a19f59fd4571c86f1e4e3a21b5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/HOST401_RESULT.json": "5fe88cd284033fafedaa314e7d3b9aa417ae4f26e02bcdc6868e6143fba25308",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/PLAN401.json": "c98d3ae9353026f0e3f33b2afff50117a782a6075db63fc417416d42b3315f2a",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/freeze_ROOT401_paid_control_HOST.py": "dc1a093f941f81a216cc0da08c4a255636bdae9862e4c2b97e9f0efff067e0a6"
+  },
+  "parent398_freeze_sha256": "dfb6cfd44d2f524d7ad28892ec055d50d1035910fb71dbbc5486dc060cb5e73d",
+  "frozen_control_sources": {
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/roofline.py": "7c50ee1768c8568a0b02b1fbeb56894073a298954c6984bc26ba99d07b0e5ef5",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/spec_rhythm.py": "8bedd1cc21452b190e8bb95f0cad03c3ab0487b32f28011fe8412f45375f175f"
+  },
+  "parent_packing398_sha256": "ea666a7e508870ea7781637de42490be7e1f849238099555479cc32c0d6f14ba",
+  "projection397_sha256": "7b18f12ed6c7dd8aab119bb1206740f228586e535b7c51d0de9e1514d27f0a6f",
+  "model_qualification": false,
+  "production_permission": false
+}

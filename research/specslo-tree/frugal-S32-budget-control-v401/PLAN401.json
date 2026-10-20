@@ -1,0 +1,35 @@
+{
+  "kind": "HOST_ONLY_NOT_INSTALLED",
+  "global_max_num_seqs": 64,
+  "narrow": "original shaper unchanged when normal group is at most24",
+  "wide": "25..32 newly proposed normal owners, C<=88, at most24 B3 owners; others B<=2",
+  "per_request_caps": "strict SLO class then original deferred age, urgency and expected progress",
+  "live_state": "unchanged original request states; shadow caps supplied to original shaper",
+  "whole_tickets": "existing tickets never shortened; independent large-group packing constraint",
+  "optional_eager": "disabled for this unqualified wide candidate, narrow behavior unchanged",
+  "nn_dependency": "finite399 via guard400 not yet launched or qualified",
+  "future_integration": [
+    "Require399 independent hidden/all128KV/graph-eager passes on all3 targets first.",
+    "Require actual paired S32 and S24 graph costs; host layout is not a speedup.",
+    "Use original S24 branch path for B4/B5 and narrow target calls.",
+    "Use S32 only for25..32 whole linear B1..3 tickets with paid C88 and large-group quota.",
+    "Actual pad, prepare and observed dispatch must agree on the selected mode on every rank.",
+    "Preserve same M120 weights and uniform KV extents, sampler, arrival/SLO clocks and guards.",
+    "Requalify dual dispatch, full463 with global64, two zero traces and independent own-AR.",
+    "Compare matching global64 fixed gamma4 and official MC2 baselines; no historical48 claim."
+  ],
+  "current64_control": {
+    "Raw": 599.5623377435959,
+    "Goodput": 214.96187487135404,
+    "attained": 166,
+    "requests": 463,
+    "independently_own_AR_qualified": true
+  },
+  "neural_sources_modified": false,
+  "NPU_used": false,
+  "models_constructed": 0,
+  "production_permission": false,
+  "full463": false,
+  "Raw": null,
+  "Goodput": null
+}
