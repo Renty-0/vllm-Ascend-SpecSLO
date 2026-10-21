@@ -1,0 +1,155 @@
+{
+  "status": "complete_independently_audited_single_run",
+  "source_terminal_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT405_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+  "source_terminal_audit_sha256": "fd3a4ead49e858dffed95c3ed09dcc08148abc9f5a26dadc647044b85a8cee4a",
+  "source_freeze_sha256": "4972b71c2217af361c95da2516de5f50c92223d367ac3d8175a5e3a729931926",
+  "source_archive_sha256": "bd37b476e70de922bafd9bd58dda2ff6164d8a57fb98070eee3d6ada9933703b",
+  "Raw": 616.1578948255769,
+  "Goodput": 439.1622144545149,
+  "attained": 330,
+  "requests": 463,
+  "actual_normal_work_policy_limit": 24,
+  "actual_class_age_admission": [
+    {
+      "generation": 5,
+      "calls": 2804,
+      "overflow_calls": 1019,
+      "retained_interesting_calls": 1019,
+      "global_limit": 64,
+      "normal_work_limit": 24,
+      "every_deferred_owner_retained": true,
+      "exact_class_age_policy": true,
+      "neural_math_recomputed": false
+    },
+    {
+      "generation": 5,
+      "calls": 2804,
+      "overflow_calls": 1019,
+      "retained_interesting_calls": 1019,
+      "global_limit": 64,
+      "normal_work_limit": 24,
+      "every_deferred_owner_retained": true,
+      "exact_class_age_policy": true,
+      "neural_math_recomputed": false
+    },
+    {
+      "generation": 5,
+      "calls": 2804,
+      "overflow_calls": 1019,
+      "retained_interesting_calls": 1019,
+      "global_limit": 64,
+      "normal_work_limit": 24,
+      "every_deferred_owner_retained": true,
+      "exact_class_age_policy": true,
+      "neural_math_recomputed": false
+    },
+    {
+      "generation": 5,
+      "calls": 2804,
+      "overflow_calls": 1019,
+      "retained_interesting_calls": 1019,
+      "global_limit": 64,
+      "normal_work_limit": 24,
+      "every_deferred_owner_retained": true,
+      "exact_class_age_policy": true,
+      "neural_math_recomputed": false
+    }
+  ],
+  "prior_global64_control_GP": 214.96187487135404,
+  "GP_over_prior_global64_control": 2.04297722429773,
+  "active_request_ceiling": 64,
+  "actual_active": {
+    "configured_max_num_seqs": 64,
+    "effective_active_ceiling": 64,
+    "active_peak": 64,
+    "peak64_observed": true,
+    "cohort_sizes": [
+      1,
+      27,
+      52,
+      64,
+      64,
+      64,
+      64,
+      64,
+      49,
+      14
+    ],
+    "single_target_max_requests": 24
+  },
+  "historical_best_tree_active_ceiling": 48,
+  "actual_target_segment_packing": {
+    "limit": 24,
+    "peak": 24,
+    "calls": 2627,
+    "branch_calls": 337,
+    "source_sha256": "b16664ad9cf4fb3e6e7e323688cf39ca4874b8d4360745d31b1f6646defee393",
+    "whole_proposals_retained": true,
+    "global_active_limit": 64
+  },
+  "TPOT_median_ms": 40.58403057024407,
+  "TPOT_P90_ms": 61.136332401292755,
+  "TPOT_definition": "actual original event first-to-last wall",
+  "TPOT_denominator": 256,
+  "by_class": {
+    "tight": {
+      "requests": 271,
+      "attained": 187,
+      "SLO_ms": 40.0,
+      "TPOT_median_ms": 37.939064191959915,
+      "TPOT_P90_ms": 46.02912248810753,
+      "Goodput": 248.8585881908918
+    },
+    "normal": {
+      "requests": 96,
+      "attained": 47,
+      "SLO_ms": 50.0,
+      "TPOT_median_ms": 50.888659914562595,
+      "TPOT_P90_ms": 67.93263101735647,
+      "Goodput": 62.547345695036974
+    },
+    "loose": {
+      "requests": 96,
+      "attained": 96,
+      "SLO_ms": 150.0,
+      "TPOT_median_ms": 50.83065894814354,
+      "TPOT_P90_ms": 75.74480570747255,
+      "Goodput": 127.75628056858616
+    }
+  },
+  "observed_TPOT_parallel_definition": {
+    "attained": 327,
+    "Goodput": 435.1698306867466,
+    "mean_ms": 44.84872313432308,
+    "median_ms": 40.74318363130385,
+    "P90_ms": 61.37608272443508,
+    "TPOT_denominator": 255,
+    "clock": "same actual original event first-to-last wall"
+  },
+  "target_calls": 2627,
+  "mean_N": 14.686714883897983,
+  "budget_owner_rounds": {
+    "1": 138,
+    "2": 171,
+    "3": 74,
+    "4": 37040,
+    "5": 1159
+  },
+  "whole463_own_AR_qualified": true,
+  "fresh_target227_and_all_original_components_qualified": true,
+  "fresh_target681_uniform_KV_qualified": true,
+  "original_best257_optimized_draft_preserved": true,
+  "original_global_warm_twozero_sealing_retained": true,
+  "historical_fixed_gamma4_GP": 501.63560407964184,
+  "historical_strong_official_MC2_GP": 429.8442987424407,
+  "historical_best_tree_GP": 609.0250374874602,
+  "GP_over_fixed_gamma4": 0.8754606150021035,
+  "GP_over_strong_official_MC2": 1.0216774207296337,
+  "GP_over_historical_best_tree": 0.7210905749725557,
+  "historical_1p5_threshold": 644.766448113661,
+  "measured_above_historical_floors": false,
+  "matched_repeats_completed": 0,
+  "adopted": false,
+  "goal_achieved": false,
+  "NPU_used": false
+}

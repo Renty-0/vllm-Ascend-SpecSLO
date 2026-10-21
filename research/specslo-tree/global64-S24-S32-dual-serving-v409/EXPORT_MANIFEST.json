@@ -274,5 +274,13 @@
   "diagnostics/ROOT409_SUPERSEDED355356_PRIVATE_ARCHIVAL_RESULT.json": {
     "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT409_SUPERSEDED355356_PRIVATE_ARCHIVAL_RESULT.json",
     "sha256": "284c2c3d80b454da3c5068cfabb20eb3f416db4cc4c68540576f4bf93783bdee"
+  },
+  "diagnostics/read_ROOT409_common_result_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_ROOT409_common_result_HOST.py",
+    "sha256": "95503c840e0f0a7bc707b619d0df204b708137a3d2f4a2873f7b99b8e9af84f9"
+  },
+  "diagnostics/audit_ROOT409_terminal_full_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT409_terminal_full_HOST.py",
+    "sha256": "4b4c4a3c8e3e4cbd5eb26c70f821ef7e6671c5640ba7f3eb34950f097ff2f995"
   }
 }

@@ -238,5 +238,21 @@
   "tools/ROOT405_FAILED402_PRIVATE_ARCHIVAL_RESULT.json": {
     "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT405_FAILED402_PRIVATE_ARCHIVAL_RESULT.json",
     "sha256": "6977dfbdf6f93004ac34d02432257e4e3e1a8c68b1ba2a3ff60da1407e8aa117"
+  },
+  "diagnostics/ROOT405_FINAL_FULL_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT405_FINAL_FULL_RESULT.json",
+    "sha256": "dbeaca20271197ba7cdf6da3e273cd0c685daaec2bf2f74f6e8ca62682a90fb3"
+  },
+  "diagnostics/ROOT405_TERMINAL_INDEPENDENT_FULL_AUDIT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT405_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+    "sha256": "fd3a4ead49e858dffed95c3ed09dcc08148abc9f5a26dadc647044b85a8cee4a"
+  },
+  "diagnostics/read_ROOT405_common_result_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_ROOT405_common_result_HOST.py",
+    "sha256": "219a065a934a792ac9bea4e51af4b772e29b9082fafe3785b988c2a79f9b1b1e"
+  },
+  "diagnostics/audit_ROOT405_terminal_full_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT405_terminal_full_HOST.py",
+    "sha256": "7ec5fc28b63f614727f193d87b4090fc5c3cb737c07d1503bbe19a96ba3dceee"
   }
 }
