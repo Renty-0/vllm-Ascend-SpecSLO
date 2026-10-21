@@ -1,0 +1,26 @@
+{
+  "PLAN407.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-whole-ticket-routing-host-v407/PLAN407.json",
+    "sha256": "b083808cc1ef495d8d987ca17b1342084a1a069391ac23dd928e8666ed3cb548"
+  },
+  "SOURCE407_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-whole-ticket-routing-host-v407/SOURCE407_RECEIPT.json",
+    "sha256": "b9ad26803032d553c94ff8dc867f8578a0039b2ee9c7c97bbdd608b90cd7fdb1"
+  },
+  "FREEZE407.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-whole-ticket-routing-host-v407/FREEZE407.json",
+    "sha256": "ce6967a1a9587419e27e4fabdaba6c209ae68e59c313edc44cd0e8c6b1191ae0"
+  },
+  "check407_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-whole-ticket-routing-host-v407/check407_HOST.py",
+    "sha256": "969ed2f9eb98dfc30d6d4e8738046b6a8f38800a11d6cacf87cb72144922cf62"
+  },
+  "HOST407_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-whole-ticket-routing-host-v407/HOST407_RESULT.json",
+    "sha256": "dca08d3d657d5d40087d48efda10f123d828f6d1a86c9fd69a26a9a91e87e07d"
+  },
+  "packing407.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-whole-ticket-routing-host-v407/packing407.py",
+    "sha256": "cf40eff1cc484e0ec1b229a48450c730894e2d2faf2ce00fd5fff59acbe30b2c"
+  }
+}

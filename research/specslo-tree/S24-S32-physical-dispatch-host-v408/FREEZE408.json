@@ -1,0 +1,21 @@
+{
+  "schema": "ROOT408.HOST_ONLY_DUAL_TARGET_COMPONENT.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/projection408.py": "937443296898160bf75783b272eb21a122e1454abae4ff0233d54d4bc35ba4e6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/padding408.py": "49eba6d652daf293697a8d6fd3bf3c9e61ff804742860942a7d4b38fc5f392c6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/static408.py": "58ac2257fdd0a8d2d7492990d5795eb42c7bd5a0002f560dbafa8402f8160b3d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/check408_HOST.py": "c967d6c9889f5719fe3e7457ff7bbfbe463d9ae8b9b7113a17e2f1b23f1ec76f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/HOST408_RESULT.json": "7a561aef308cf8236ebf4f592e22faeac8eaf85bd0092faac0f95f0b70a8d205",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/PLAN408.json": "8c8961a8e930e7066be9b750eeedbbece3ac49f886ce1145f906b3812ed73060"
+  },
+  "inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/static_state255.py": "eaf5fcd1638ec91d4621068584d84404d98927618aacb3e7e92558ff8462f378",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py": "5cb14a81d4c0bfe99becd15237b733fb454fcc21e6d55b17f6ab31c0042e47fa",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/padding255.py": "57fdec779bb22a6776c6f1e4a0ff93357abcaaf66f6c38f7e6b4fa2113796333",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-budget-projection-host-v397/projection397.py": "7b18f12ed6c7dd8aab119bb1206740f228586e535b7c51d0de9e1514d27f0a6f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-budget-projection-host-v397/check397_HOST.py": "1093d0504d7311ef0c3a4166255462bce21a897d9f952483e0f0e9b081c9d440",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-S32-frugal-independent-target-host-v399/padding399.py": "16274b87cfd4bc1fb5f2f31cbb1ca4836b915b9591525fd208a5af6be28c3f59"
+  },
+  "NPU_used": false,
+  "production_permission": false
+}

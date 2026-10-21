@@ -1,0 +1,59 @@
+{
+  "status": "COMPLETE_FINITE200_STRICT_CROSS_BACKEND_MATH_AND_GRAPH_COST",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-frugal-S32-M120-import-fixed-root-v406-200cases-v1.json",
+  "receipt_sha256": "589c7a269ded49c645997f6f2520a483becb53fa32d20671b0e185ca770e1530",
+  "cases_per_target": 200,
+  "targets": 3,
+  "actual_component_only": true,
+  "all128_KV_and_hidden_and_greedy_and_graph_eager_bitwise": true,
+  "cost_panels": [
+    {
+      "KV_extent": 512,
+      "S24_graph_median_ms": 43.886095052585006,
+      "S32_graph_median_ms": 43.25549607165158,
+      "S32_over_S24_graph_cost": 0.9856310072660183,
+      "S24_max_rank_p95_ms": 44.05867215245962,
+      "S32_max_rank_p95_ms": 43.309591710567474
+    },
+    {
+      "KV_extent": 1024,
+      "S24_graph_median_ms": 43.98110741749406,
+      "S32_graph_median_ms": 44.66640716418624,
+      "S32_over_S24_graph_cost": 1.0155816846580719,
+      "S24_max_rank_p95_ms": 44.06421817839146,
+      "S32_max_rank_p95_ms": 44.75426860153675
+    },
+    {
+      "KV_extent": 1536,
+      "S24_graph_median_ms": 45.21482205018401,
+      "S32_graph_median_ms": 46.31014773622155,
+      "S32_over_S24_graph_cost": 1.0242249252871511,
+      "S24_max_rank_p95_ms": 45.34338414669037,
+      "S32_max_rank_p95_ms": 46.44719930365682
+    },
+    {
+      "KV_extent": 2048,
+      "S24_graph_median_ms": 46.218423871323466,
+      "S32_graph_median_ms": 47.77025105431676,
+      "S32_over_S24_graph_cost": 1.0335759433795002,
+      "S24_max_rank_p95_ms": 46.32914485409856,
+      "S32_max_rank_p95_ms": 47.886347863823175
+    },
+    {
+      "KV_extent": 2560,
+      "S24_graph_median_ms": 47.14453546330333,
+      "S32_graph_median_ms": 49.247350078076124,
+      "S32_over_S24_graph_cost": 1.044603570575207,
+      "S24_max_rank_p95_ms": 47.31544805690646,
+      "S32_max_rank_p95_ms": 49.42405689507723
+    }
+  ],
+  "cost_scope": "prepared physical graph calls; excludes proposal building, serving traffic and draft/target overlap",
+  "global_active_limit_required": 64,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "full463": false,
+  "whole_AR": false,
+  "adopted": false
+}

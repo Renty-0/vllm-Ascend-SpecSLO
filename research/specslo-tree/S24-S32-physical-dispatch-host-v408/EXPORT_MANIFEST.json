@@ -1,0 +1,34 @@
+{
+  "static408.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/static408.py",
+    "sha256": "58ac2257fdd0a8d2d7492990d5795eb42c7bd5a0002f560dbafa8402f8160b3d"
+  },
+  "FREEZE408.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/FREEZE408.json",
+    "sha256": "7ced4aecc2bf0b2f7ccb7d80ce7717b974c5f1e41fc3b454577b0ba0e4f4e7d3"
+  },
+  "projection408.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/projection408.py",
+    "sha256": "937443296898160bf75783b272eb21a122e1454abae4ff0233d54d4bc35ba4e6"
+  },
+  "PLAN408.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/PLAN408.json",
+    "sha256": "8c8961a8e930e7066be9b750eeedbbece3ac49f886ce1145f906b3812ed73060"
+  },
+  "HOST408_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/HOST408_RESULT.json",
+    "sha256": "7a561aef308cf8236ebf4f592e22faeac8eaf85bd0092faac0f95f0b70a8d205"
+  },
+  "check408_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/check408_HOST.py",
+    "sha256": "c967d6c9889f5719fe3e7457ff7bbfbe463d9ae8b9b7113a17e2f1b23f1ec76f"
+  },
+  "SOURCE408_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/SOURCE408_RECEIPT.json",
+    "sha256": "46c886d0452136ee63fe1a72843d6a1d442fcee976ea24b02d0ddeb420f50469"
+  },
+  "padding408.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-physical-dispatch-host-v408/padding408.py",
+    "sha256": "49eba6d652daf293697a8d6fd3bf3c9e61ff804742860942a7d4b38fc5f392c6"
+  }
+}

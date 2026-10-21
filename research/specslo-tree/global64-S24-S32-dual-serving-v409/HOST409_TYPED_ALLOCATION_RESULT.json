@@ -1,0 +1,20 @@
+{
+  "status": "PASS_HOST409_ACTUAL_DERIVED_TYPED_NARROW_AND_PAID_WIDE32",
+  "actual_original_typed_callback_source_used": true,
+  "exact_narrow_low_load_plan_counter_age_cases": 497,
+  "paid_wide_or_high_load_cases": 303,
+  "per_role96_global192_paid_limits_retained": true,
+  "original_model_and_online_observations_not_changed": true,
+  "original_phase_generation_authoritative": true,
+  "independent_retained_admission_audit_and_corruption_control": true,
+  "normal_admission_original32": true,
+  "wide_C88_and_B3_quota24": true,
+  "global_active_limit": 64,
+  "production_runtime_installed": false,
+  "NPU_used": false,
+  "models_constructed": 0,
+  "model_qualification": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

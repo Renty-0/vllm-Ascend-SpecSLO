@@ -1,0 +1,17 @@
+{
+  "status": "PASS_HOST409_REAL_ACTIVE64_ADAPTER_COHORT_REFERENCE_BOUNDARIES",
+  "NPU_used": false,
+  "effective_active_ceiling": 64,
+  "previous_active_ceiling": 64,
+  "historical_best_active_ceiling": 48,
+  "configured_max_num_seqs": 64,
+  "target_max_requests": 32,
+  "target_candidates": 96,
+  "wide_candidates": 88,
+  "target_model_weights_and_dtype_unchanged": true,
+  "target_metadata_fresh200_required": true,
+  "independent_reference_math_unchanged": true,
+  "actual_observed_peak_required_in_device_result": true,
+  "Native_qualification_flags_assigned": false,
+  "production_qualified": false
+}

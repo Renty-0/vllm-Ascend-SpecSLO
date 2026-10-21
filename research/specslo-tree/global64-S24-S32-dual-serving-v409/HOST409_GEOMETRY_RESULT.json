@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST409_REAL_2690_NARROW_AND24_WIDE_GEOMETRY_CORRUPTIONS",
+  "retained_actual398_narrow_calls_checked": 2690,
+  "new_wide_structural_witnesses": 24,
+  "actual_extent_rebuilt_from_real_contexts": true,
+  "full_row_permutation_and_unqualified_copy_and_B3_quota_corruptions": true,
+  "no_neural_qualification_inherited": true,
+  "NPU_used": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

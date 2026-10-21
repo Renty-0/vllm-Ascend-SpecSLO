@@ -1,0 +1,16 @@
+{
+  "schema": "ROOT407.HOST_ONLY_DUAL_TARGET_COMPONENT.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-whole-ticket-routing-host-v407/packing407.py": "cf40eff1cc484e0ec1b229a48450c730894e2d2faf2ce00fd5fff59acbe30b2c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-whole-ticket-routing-host-v407/check407_HOST.py": "969ed2f9eb98dfc30d6d4e8738046b6a8f38800a11d6cacf87cb72144922cf62",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-whole-ticket-routing-host-v407/HOST407_RESULT.json": "dca08d3d657d5d40087d48efda10f123d828f6d1a86c9fd69a26a9a91e87e07d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-S24-S32-whole-ticket-routing-host-v407/PLAN407.json": "b083808cc1ef495d8d987ca17b1342084a1a069391ac23dd928e8666ed3cb548"
+  },
+  "inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/packing398.py": "ea666a7e508870ea7781637de42490be7e1f849238099555479cc32c0d6f14ba",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/packing401.py": "929e96434e74f84c089ae930b29bb6aed5df52696aac371a8516b94169133069",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-paid-budget-control-host-v401/check401_HOST.py": "f3d7392b41c07fc36941a1583b7c2def58bf58a19f59fd4571c86f1e4e3a21b5"
+  },
+  "NPU_used": false,
+  "production_permission": false
+}

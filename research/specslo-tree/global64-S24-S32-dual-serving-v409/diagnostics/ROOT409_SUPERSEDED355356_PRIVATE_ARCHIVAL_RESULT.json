@@ -1,0 +1,67 @@
+{
+  "status": "COMPLETE_VERIFIED_PRIVATE_ARCHIVAL",
+  "runs": [
+    {
+      "schema": "ROOT409.superseded355356-verified-private-evidence-archive.v1",
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M120-B8-closed-control-root-v355-full463-ownAR-v1",
+      "source_terminal_status": "complete",
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M120-B8-closed-control-root-v355-full463-ownAR-v1.json",
+      "receipt_sha256": "41a050bd2a96d53c307f2dd660e4f1b88627cf525881a8c436271fdb198f654b",
+      "archive": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/M120-B8-closed-control-root-v355-full463-ownAR-v1.tar.gz",
+      "archive_sha256": "2ecb33cc4a25e39907fc17f4ab8ee9335badb7d7a710c40a2fde091364015a49",
+      "original_file_count": 2540,
+      "original_file_bytes": 147953105,
+      "archive_bytes": 22311223,
+      "all_archive_members_size_and_SHA_verified": true,
+      "original_files_rehashed_before_removal": true,
+      "intersection_with_all_current_FREEZE_file_paths": 0,
+      "public_storage_used": false,
+      "model_or_dataset_moved": false,
+      "current_running_and_best376_and_control398_untouched": true,
+      "restore_base": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209",
+      "restore_argv": [
+        "tar",
+        "-xzf",
+        "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/M120-B8-closed-control-root-v355-full463-ownAR-v1.tar.gz",
+        "-C",
+        "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209"
+      ],
+      "full_index": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/M120-B8-closed-control-root-v355-full463-ownAR-v1.index.json.gz",
+      "full_index_sha256": "473dd75ddb70e13d623f98b99b79e63bab6ac554770b65e7a7b417e07fbb63a2",
+      "retained_small_error_files": []
+    },
+    {
+      "schema": "ROOT409.superseded355356-verified-private-evidence-archive.v1",
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M120-B8-protected-tight-normal-root-v356-full463-ownAR-v1",
+      "source_terminal_status": "complete",
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M120-B8-protected-tight-normal-root-v356-full463-ownAR-v1.json",
+      "receipt_sha256": "0824fa201afd1800d60e682d84ad55dc831c8003b66fdc3873c205abe39de72f",
+      "archive": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/M120-B8-protected-tight-normal-root-v356-full463-ownAR-v1.tar.gz",
+      "archive_sha256": "9a9c401aa6145e8eda4ea5198d8bf21cecd1a7f5c48c798f19be202080369a6a",
+      "original_file_count": 2592,
+      "original_file_bytes": 147262642,
+      "archive_bytes": 22455675,
+      "all_archive_members_size_and_SHA_verified": true,
+      "original_files_rehashed_before_removal": true,
+      "intersection_with_all_current_FREEZE_file_paths": 0,
+      "public_storage_used": false,
+      "model_or_dataset_moved": false,
+      "current_running_and_best376_and_control398_untouched": true,
+      "restore_base": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209",
+      "restore_argv": [
+        "tar",
+        "-xzf",
+        "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/M120-B8-protected-tight-normal-root-v356-full463-ownAR-v1.tar.gz",
+        "-C",
+        "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209"
+      ],
+      "full_index": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/M120-B8-protected-tight-normal-root-v356-full463-ownAR-v1.index.json.gz",
+      "full_index_sha256": "f0c268009310a334f60482b8bedb8e6b210262bd3aa7d813dab367c5b70ab3a8",
+      "retained_small_error_files": []
+    }
+  ],
+  "current_NPU_job_changed": false,
+  "source_frozen_paths_modified": false,
+  "models_or_datasets_moved": false,
+  "public_storage_used": false
+}

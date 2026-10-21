@@ -1,0 +1,11 @@
+{
+  "status": "PREPARING_FULL_DUAL_ROUTE_UNFROZEN",
+  "global_active_limit": 64,
+  "parent405_fresh_device_qualification_inherited": false,
+  "component406_serving_qualification_inherited": false,
+  "static408_HOST_only": true,
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null,
+  "required": "complete actual LIVE binding, both metadata routes, retained strict audits and all fresh model/zero/full-ownAR gates"
+}

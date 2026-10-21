@@ -1,0 +1,16 @@
+{
+  "status": "PASS_HOST409_COMPACT_BANK_AUDIT_EQUIVALENCE_AND_SCOPE_CORRUPTIONS",
+  "retained406_used_only_as_HOST_JSON_schema_fixture": true,
+  "original_finite_audit_exactly_preserved": true,
+  "current_path_hash_rank_and_case_checks": true,
+  "unvalidated_HOST_graph_double_rejected": true,
+  "escaped_old_run_bank_rejected": true,
+  "copied_candidate_KV_rejected_even_after_consistent_checksum_update": true,
+  "ephemeral_fixture_removed": true,
+  "NPU_used": false,
+  "model_constructors": 0,
+  "model_qualification_inherited": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

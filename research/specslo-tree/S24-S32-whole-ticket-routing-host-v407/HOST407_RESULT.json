@@ -1,0 +1,33 @@
+{
+  "status": "PASS_HOST407_DUAL_WHOLE_TICKET_ROUTES_AND_AGE_EQUIVALENCE",
+  "exact_narrow_route_cases": 825,
+  "exact_wide_route_cases": 375,
+  "actual_selected_N_gt24_cases": 375,
+  "original_priority_and_wait_age_and_ticket_identity": true,
+  "independent_large_group_quota_and_unsafe_reservation": true,
+  "deep_leftover_narrow_fallback": true,
+  "global65_rejected": true,
+  "resources": {
+    "global_active_limit": 64,
+    "wide_N": 32,
+    "wide_C": 88,
+    "wide_B3_owner_limit": 24,
+    "narrow_N": 24,
+    "narrow_C": 96,
+    "narrow_primary_side_groups": 24,
+    "complete_tickets_only": true,
+    "original_class_method_unchanged": true,
+    "original_priority_and_wait_age": true,
+    "one_original_build_call": true,
+    "LIVE_installed": false,
+    "NPU_qualified": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "NPU_used": false,
+  "model_backends_imported": false,
+  "LIVE_installed": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

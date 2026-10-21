@@ -58,5 +58,17 @@
   "tools/ROOT400_TERMINAL_INDEPENDENT_FAILED_AUDIT.json": {
     "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT400_TERMINAL_INDEPENDENT_FAILED_AUDIT.json",
     "sha256": "cb74a615ad3f2ae10d42d4904cddace687d9f82d847a11ea05a7da50faa1e0d2"
+  },
+  "diagnostics/ROOT406_FINAL_FINITE_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT406_FINAL_FINITE_RESULT.json",
+    "sha256": "2bdb82b60e28c9db8593cc564f1c290c267f613e9bf9d6425c4c3efe95eba686"
+  },
+  "diagnostics/ROOT406_TERMINAL_INDEPENDENT_FINITE_AUDIT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT406_TERMINAL_INDEPENDENT_FINITE_AUDIT.json",
+    "sha256": "f2fc3db3c6bc56b83374532085d62c96de0e80ff4ddbce6f4751127e8e23e1e6"
+  },
+  "diagnostics/audit_ROOT406_finite399_terminal_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT406_finite399_terminal_HOST.py",
+    "sha256": "2586c14996eb87c0f1875ba758293d446726d8b99a907224d37b57df5bf3dbd6"
   }
 }

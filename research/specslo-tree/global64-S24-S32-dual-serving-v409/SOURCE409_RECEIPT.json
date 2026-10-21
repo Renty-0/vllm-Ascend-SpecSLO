@@ -1,0 +1,9 @@
+{
+  "schema": "ROOT409.source-archive-receipt.v1",
+  "freeze_sha256": "62018730f2831dca46d42957eab3f4106671866f69b34b42c40bda5e2d8c3ce0",
+  "archive_sha256": "8d622dda7e3103326ff79cf611529a507a6c7f04dfc62fd074863eef7ce3f919",
+  "archive_bytes": 24954438,
+  "members": 2717,
+  "no_NPU_launched": true,
+  "no_inherited_model_permission": true
+}

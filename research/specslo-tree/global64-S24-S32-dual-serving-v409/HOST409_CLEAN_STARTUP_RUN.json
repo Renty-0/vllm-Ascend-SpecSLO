@@ -1,0 +1,33 @@
+{
+  "status": "PASS_HOST409_ACTUAL_RUNTIME_CLEAN_PACKING_AND_LIVE_BINDING",
+  "results": [
+    {
+      "script": "check409_derived_callback_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-global64-S24-S32-dual-serving-v409/HOST409-check409_derived_callback_HOST.py.log"
+    },
+    {
+      "script": "check409_packing_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-global64-S24-S32-dual-serving-v409/HOST409-check409_packing_HOST.py.log"
+    },
+    {
+      "script": "check409_live_binding_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-global64-S24-S32-dual-serving-v409/HOST409-check409_live_binding_HOST.py.log"
+    },
+    {
+      "script": "check409_construction_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-global64-S24-S32-dual-serving-v409/HOST409-check409_construction_HOST.py.log"
+    },
+    {
+      "script": "check409_imports_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-global64-S24-S32-dual-serving-v409/HOST409-check409_imports_HOST.py.log"
+    }
+  ],
+  "NPU_used": false,
+  "model_constructors": 0,
+  "existing_runtime_and_only_existing_freeze_environment_fields": true
+}

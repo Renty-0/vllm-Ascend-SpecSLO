@@ -1,0 +1,63 @@
+{
+  "schema": "ROOT409.unmeasured-dual-serving-candidate.v1",
+  "hypothesis": "At global active64, serve up to32 ready owners within the same M120 graph and cap new high-load drafts at B3, reducing owner rotation without increasing padded token rows.",
+  "global_active_limit": 64,
+  "configured_max_num_seqs": 64,
+  "normal_work_limit": 32,
+  "narrow": {
+    "N_max": 24,
+    "C_max": 96,
+    "M": 120,
+    "S": 24,
+    "B_max": 5,
+    "primary_plus_side_groups_max": 24
+  },
+  "wide": {
+    "N_min": 25,
+    "N_max": 32,
+    "C_max": 88,
+    "M": 120,
+    "S": 32,
+    "B_max": 3,
+    "B3_owner_max": 24,
+    "copy_enabled": false
+  },
+  "high_active_draft_threshold": 48,
+  "high_active_draft_max_B": 3,
+  "global64_does_not_require_each_forward64": true,
+  "unselected_requests_remain_active": true,
+  "original_g_online_observations_class_age_and_B3_eager_preserved": true,
+  "fresh_gates": {
+    "original_components": true,
+    "canonical_math": 227,
+    "uniform_KV_math": 681,
+    "new_S32_independent_math": 200,
+    "warm_twozero_seal": true,
+    "full_requests": 463,
+    "postfull_all3_ownAR": true
+  },
+  "historical_component406_permission_inherited": false,
+  "production_qualified": false,
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null,
+  "controls": {
+    "global64_last_qualified_version": 398,
+    "global64_last_qualified_GP": 214.96187487135404,
+    "historical_fixed_gamma4_global64_GP": 501.63560407964184,
+    "official_MC2_ON_GP": 429.8442987424407,
+    "goal_GP": 644.766448113661
+  },
+  "sources_of_new_ROUTE": "frozen407 and408; fresh409 geometry/bucket/runtime scope",
+  "HOST_only_checks": [
+    "actual derived Controls constructor/select and whole after_install",
+    "800 typed policy cases",
+    "600 real CPU whole-ticket plans",
+    "2690 retained narrow plus24 wide geometry witnesses",
+    "96 physical projection CPU cases from408",
+    "fresh-proof descriptor corruption and escape rejection",
+    "all named imports in actual startup"
+  ],
+  "root_seed_and_FastV5_neural_draft_unchanged": true,
+  "tree_B4_eager_permission_added": false
+}

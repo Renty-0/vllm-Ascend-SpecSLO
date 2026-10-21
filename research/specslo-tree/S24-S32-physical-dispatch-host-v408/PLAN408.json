@@ -1,0 +1,44 @@
+{
+  "status": "HOST_ONLY_NO_LIVE_OR_NPU_INSTALL",
+  "global_active_limit_required": 64,
+  "HOST_result": {
+    "status": "PASS_HOST408_CPU_DUAL_PROJECTOR_EQUIVALENCE_AND_STATE_INVERSE",
+    "exact_narrow_tensor_cases": 48,
+    "exact_wide_tensor_cases": 48,
+    "complete120_row_input_position_KV_mask_equivalence": true,
+    "unqualified_wide_branch_copy_rejected": true,
+    "static_state": {
+      "original_sha256": "384a1ace467cc3f5af5cd4ab8ae22b6af448ae45128fae33682e1dda572c79a2",
+      "projected_sha256": "e4e0e62aa97c8edfcc846f8899e3e82d678933757aa48db13b04f9012dafa96c",
+      "original_static_install_unmodified": true,
+      "complete_source_inverse": true,
+      "M": 120,
+      "narrow_S": 24,
+      "wide_S": 32,
+      "real_owner_count_explicit": true,
+      "original_forward_and_eager_model_calls_preserved": true,
+      "uniform_KV_bucketing_not_implemented": true,
+      "NPU_used": false,
+      "LIVE_installed": false,
+      "production_permission": false,
+      "Raw": null,
+      "Goodput": null
+    },
+    "NPU_used": false,
+    "model_constructors": 0,
+    "Native_state_installed": false,
+    "uniform_bucket_and_FULL_runtime_integration_pending": true,
+    "production_permission": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "required_followup": [
+    "actual LIVE dual route and typed callback binding",
+    "uniform KV bucket shape checks for both physical backends",
+    "fresh full model qualification, warm/twozero/seal",
+    "full463 and all3 independent ownAR"
+  ],
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}
