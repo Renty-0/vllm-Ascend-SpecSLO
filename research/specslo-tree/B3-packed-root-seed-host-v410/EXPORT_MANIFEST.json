@@ -1,0 +1,26 @@
+{
+  "HOST410_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-B3-packed-root-seed-host-v410/HOST410_RESULT.json",
+    "sha256": "c2eeaa3cf9441d49083614203be987199ad5583cfbdc6ca6117341fc65617c1f"
+  },
+  "SOURCE410_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-B3-packed-root-seed-host-v410/SOURCE410_RECEIPT.json",
+    "sha256": "f5c82dbf19d1ec5ca50733463f2eda11c9d42a743ec00e50e05efde35d90de74"
+  },
+  "root_seed410.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-B3-packed-root-seed-host-v410/root_seed410.py",
+    "sha256": "e5b11d7bdca33949f35415685902eff498856923dbee3c3b46e34bae5a650bb5"
+  },
+  "PLAN410.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-B3-packed-root-seed-host-v410/PLAN410.json",
+    "sha256": "805801f6123b33c87c9a9cf2ad6d14dfc444e584a369968af37ea67acaffdf7a"
+  },
+  "check410_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-B3-packed-root-seed-host-v410/check410_HOST.py",
+    "sha256": "fb9042891df0ff8c82acb01a210e367cd92375028b08811d9840eebc74c9539c"
+  },
+  "FREEZE410.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-B3-packed-root-seed-host-v410/FREEZE410.json",
+    "sha256": "5c0261729f97bf9a4f17f49db08984763e9b03359fad1c1439fb1d1a03e0702c"
+  }
+}

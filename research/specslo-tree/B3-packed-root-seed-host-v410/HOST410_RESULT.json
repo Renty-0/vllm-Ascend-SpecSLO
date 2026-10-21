@@ -1,0 +1,33 @@
+{
+  "status": "PASS_HOST410_ACTUAL_FASTV5_CPU_CONTRACTS_ONLY",
+  "CPU_cases": 54,
+  "actual_original_FastV5_callback_executed": true,
+  "fake_arithmetic_model_explicit": true,
+  "actual_Native_engine_used": false,
+  "padded_tokens_confidence_parent_indices_ledger_and_KV_contracts_equal": true,
+  "repair_plus_three_steps_vs_packed_root_plus_two_steps": true,
+  "reference_hidden_repair_steps_one_to_three": true,
+  "candidate_two_graph_calls_in_HOST_double": true,
+  "fallbacks_checked": 4,
+  "invalid_inputs_rejected": 2,
+  "source_projection": {
+    "original_root_seed_file_sha256": "64842e3f229304e167baec16fdab85db2c07422685b80f17de21b5bba03c8d56",
+    "original_callback_sha256": "6c51f8758774db2374ad513ae77fc88c0b98a77c7ec4e85000c5377ba399c239",
+    "projected_callback_sha256": "b198a8a49389670d6bc8530c182fa002453873e4195da1768e2a1ab5ebd266e3",
+    "original_callback_complete_inverse": true,
+    "public_row_depth": 4,
+    "predicted_levels": 3,
+    "padded_sibling_rows": 8,
+    "confidence_denominator": 6,
+    "model_stages": 3,
+    "NPU_qualified": false,
+    "serving_installed": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "NPU_used": false,
+  "model_qualification": false,
+  "serving_installed": false,
+  "Raw": null,
+  "Goodput": null
+}

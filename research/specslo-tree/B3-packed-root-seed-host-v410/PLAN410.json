@@ -1,0 +1,72 @@
+{
+  "schema": "ROOT410.B3-packed-root-host-only.v1",
+  "status": "HOST_ONLY_FROZEN_NOT_INSTALLED",
+  "global_active_limit_required": 64,
+  "new_policy": false,
+  "neural_weights_dtype_and_sampler_unchanged": true,
+  "change": "For normal groups with maximum B3 and a missing committed suffix, one packed suffix/root hidden call plus an explicit root head and a two-step tail replaces sequential repair plus a three-step FastV5 chain.",
+  "sources_of_possible_savings": "One to three separate committed-repair stages may be removed; both single-token-repair paths still submit two graph calls. No timing gain has been measured.",
+  "constraints": {
+    "width": 2,
+    "depth": 4,
+    "max_budget": 3,
+    "normal_only": true,
+    "greedy_only": true,
+    "private_packed_query_limit": 128,
+    "public_candidate_row_width": 8,
+    "non_generated_spine_and_sibling_row_zero_padding": true,
+    "confidence_denominator": 6,
+    "last_predicted_leaf_KV_deferred": true
+  },
+  "fallbacks": [
+    "no repair",
+    "other maximum budget",
+    "eager parents",
+    "packed capacity exceeded"
+  ],
+  "CPU_cases": 54,
+  "actual_FastV5_function_executed": true,
+  "CPU_fake_model_not_neural_proof": true,
+  "neural_qualification": false,
+  "serving_installed": false,
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null,
+  "next_required_neural_validation": {
+    "independent_prefix_banks": true,
+    "requests": [
+      1,
+      8,
+      24,
+      32
+    ],
+    "prefix_lengths": [
+      32,
+      512,
+      1536
+    ],
+    "repair_lengths": [
+      1,
+      2,
+      3
+    ],
+    "budget_patterns": [
+      "all3",
+      "mixed123"
+    ],
+    "cases": 72,
+    "outputs": [
+      "complete padded token rows",
+      "top2 encoded confidence and returned confidence",
+      "root and parent metadata",
+      "original known-KV ledger",
+      "all actual draft-layer committed-prefix and written KV"
+    ],
+    "no_reference_to_candidate_KV_copy": true,
+    "actual_Native_flags_assigned": false,
+    "original_graph_validation_failure_counters_zero": true,
+    "paired_actual_device_costs": true,
+    "production_permission_not_from_HOST": true
+  },
+  "full_integration_after_finite_pass": "Fresh same-engine numerical scope and explicit callback provenance, retained original warm/twozero/seal/full463/all3 ownAR; current409 runtime is unaffected."
+}

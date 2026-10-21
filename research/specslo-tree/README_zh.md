@@ -53,6 +53,7 @@ M165/N32 仍处于 HOST 原型及设备验证准备阶段，尚未获得真实�
 | `global64-S24-S32-dual-serving-v409/` | 已封存的全局64双路径候选、实际Controls/LIVE绑定、资格与审计代码；完整设备验证已启动。 |
 | `S24-S32-whole-ticket-routing-host-v407/` | 保留整票和优先级的双路径资源选择。 |
 | `S24-S32-physical-dispatch-host-v408/` | 按真实请求数选择完整M120/S24或M120/S32物理映射。 |
+| `B3-packed-root-seed-host-v410/` | 普通B3的修复/root合并原型，54个CPU模拟用例通过；尚无NPU数学或性能资格。 |
 | `S32-startup-import-repair-v406/` | 有限200用例严格数值与图成本的独立终态摘要。 |
 | `global64-normal24-derived-callback-v405/` | 本轮已完成完整own-AR的普通draft24对照。 |
 
