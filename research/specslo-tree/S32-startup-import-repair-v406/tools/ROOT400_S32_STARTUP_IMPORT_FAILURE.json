@@ -1,0 +1,12 @@
+{
+  "status": "FAILED_FIRST_S32_TARGET_MISSING_BUCKET376_IMPORT",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-frugal-S32-M120-independent-root-v400-200cases-v1.json",
+  "completed_finite_cases": 0,
+  "Raw": null,
+  "Goodput": null,
+  "source_unchanged": true,
+  "environment_post": "pass",
+  "owned_remaining": [],
+  "all4_NPU_idle": true,
+  "repair": "new406 launcher prepends frozen existing bucket376 directory; same399 numerical code"
+}

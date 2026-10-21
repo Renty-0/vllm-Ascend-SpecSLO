@@ -1,0 +1,22 @@
+{
+  "schema": "ROOT406.finite399-startup-import-only.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/startup406.sh": "4f0dc4a9f1f88b46b9c4f265728da7b576bf5544349692df338fead654d41132",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/HOST406_CLEAN_STARTUP_RUN.json": "66b1c8c9be723b4885339fa2e41e7c9953fcfacbd341addd53bfafd65dd38a64",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/launch406.sh": "b476af15e01b76826356fb777001f37a3b5f2af77707e9456ac8b102e5087fee",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/HOST406-check406_imports_HOST.py.log": "d4f5ae2e485325526003d831ae5292e4be3f711f782a43cbbd39f60459c1b81c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/check406_imports_HOST.py": "0f011b7c6ba20f6fb7296b2be13fc960d3e8277ccd1c43ad1d83a64905de6416",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/PLAN406.json": "f6caf79160b7d9387c830a7787ccf5e169fef1c81ea3c6729806ddb1d224f8de",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/HOST406_IMPORTS_RESULT.json": "b2da9339ebba017ddf87bba8101af0ade31b3585f2bdfc814a4ba8e2eae2457c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/guard406.py": "4e1631a3262add3bbf78405aa932bd042c74255ffa2536e8d56a991b1bb32c84",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT406_actual_startup_HOST.py": "4f5dfb51fc4bc0d8d8384d97885b19bc1243aa712beb44c3cb27542bfde30898",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT400_S32_STARTUP_IMPORT_FAILURE.json": "d3554c08dd834385b749fce3aec3bb495cc14a68abcb33f2684cebb80147c1c5"
+  },
+  "existing_inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376/bucket376.py": "88ced2d965a38ceffca2f6c930a23e6aa35d971cfe621e219cc2c2400801a4c9"
+  },
+  "parent400_freeze_sha256": "63bb159305a421bcee894b5716057ad5b4c444f4cffca07876dc4273637510bf",
+  "parent400_archive_sha256": "31853bbfff18f4784149d32663f1cf3fe4eaebd2205c7cc38bc756036926c82d",
+  "neural_bodies_changed": false,
+  "NPU_launched": false
+}

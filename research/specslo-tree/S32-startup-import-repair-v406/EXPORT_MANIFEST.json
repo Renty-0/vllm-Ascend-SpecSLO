@@ -1,0 +1,62 @@
+{
+  "SOURCE406_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/SOURCE406_RECEIPT.json",
+    "sha256": "ee5d1206ac01e01214de9319b36f8994afab8c2fd160ad14ec7831d0f1564005"
+  },
+  "startup406.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/startup406.sh",
+    "sha256": "4f0dc4a9f1f88b46b9c4f265728da7b576bf5544349692df338fead654d41132"
+  },
+  "HOST406_CLEAN_STARTUP_RUN.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/HOST406_CLEAN_STARTUP_RUN.json",
+    "sha256": "66b1c8c9be723b4885339fa2e41e7c9953fcfacbd341addd53bfafd65dd38a64"
+  },
+  "FREEZE406.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/FREEZE406.json",
+    "sha256": "74061739adf86de5a7fa51e01f92bc1626f2ff00725d4d49a1bbaf0ba57973d5"
+  },
+  "launch406.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/launch406.sh",
+    "sha256": "b476af15e01b76826356fb777001f37a3b5f2af77707e9456ac8b102e5087fee"
+  },
+  "HOST406-check406_imports_HOST.py.log": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/HOST406-check406_imports_HOST.py.log",
+    "sha256": "d4f5ae2e485325526003d831ae5292e4be3f711f782a43cbbd39f60459c1b81c"
+  },
+  "check406_imports_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/check406_imports_HOST.py",
+    "sha256": "0f011b7c6ba20f6fb7296b2be13fc960d3e8277ccd1c43ad1d83a64905de6416"
+  },
+  "PLAN406.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/PLAN406.json",
+    "sha256": "f6caf79160b7d9387c830a7787ccf5e169fef1c81ea3c6729806ddb1d224f8de"
+  },
+  "SOURCE406.tar.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/SOURCE406.tar.gz",
+    "sha256": "2cd7659a1393d6a45c3f87890a3d7a1201b1d25dc4d53d84d8620ded57333d2d"
+  },
+  "HOST406_IMPORTS_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/HOST406_IMPORTS_RESULT.json",
+    "sha256": "b2da9339ebba017ddf87bba8101af0ade31b3585f2bdfc814a4ba8e2eae2457c"
+  },
+  "guard406.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-frugal-S32-startup-import-repair-v406/guard406.py",
+    "sha256": "4e1631a3262add3bbf78405aa932bd042c74255ffa2536e8d56a991b1bb32c84"
+  },
+  "tools/run_ROOT406_actual_startup_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT406_actual_startup_HOST.py",
+    "sha256": "4f5dfb51fc4bc0d8d8384d97885b19bc1243aa712beb44c3cb27542bfde30898"
+  },
+  "tools/audit_ROOT406_finite399_terminal_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT406_finite399_terminal_HOST.py",
+    "sha256": "2586c14996eb87c0f1875ba758293d446726d8b99a907224d37b57df5bf3dbd6"
+  },
+  "tools/ROOT400_S32_STARTUP_IMPORT_FAILURE.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT400_S32_STARTUP_IMPORT_FAILURE.json",
+    "sha256": "d3554c08dd834385b749fce3aec3bb495cc14a68abcb33f2684cebb80147c1c5"
+  },
+  "tools/ROOT400_TERMINAL_INDEPENDENT_FAILED_AUDIT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT400_TERMINAL_INDEPENDENT_FAILED_AUDIT.json",
+    "sha256": "cb74a615ad3f2ae10d42d4904cddace687d9f82d847a11ea05a7da50faa1e0d2"
+  }
+}

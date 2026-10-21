@@ -1,0 +1,43 @@
+{
+  "status": "COMPLETE_VERIFIED_PRIVATE_ARCHIVAL",
+  "runs": [
+    {
+      "schema": "ROOT405.failed402-verified-private-evidence-archive.v1",
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/normal24-global64-root-v402-full463-ownAR-v1",
+      "source_terminal_status": "failed",
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-normal24-global64-root-v402-full463-ownAR-v1.json",
+      "receipt_sha256": "26b96f7fc71932ea326bcdadc225662af77a943ff39f3a2ebb8f4a3c91234cc6",
+      "archive": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/normal24-global64-root-v402-full463-ownAR-v1.tar.gz",
+      "archive_sha256": "b4298e5e3acb6e372191f227e82bd3dcb5c10f37db0b6f23d38056c837c03797",
+      "original_file_count": 4349,
+      "original_file_bytes": 91462106,
+      "archive_bytes": 13685487,
+      "all_archive_members_size_and_SHA_verified": true,
+      "original_files_rehashed_before_removal": true,
+      "intersection_with_all_current_FREEZE_file_paths": 0,
+      "public_storage_used": false,
+      "model_or_dataset_moved": false,
+      "current_running_and_best376_and_control398_untouched": true,
+      "restore_base": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209",
+      "restore_argv": [
+        "tar",
+        "-xzf",
+        "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/normal24-global64-root-v402-full463-ownAR-v1.tar.gz",
+        "-C",
+        "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209"
+      ],
+      "full_index": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/normal24-global64-root-v402-full463-ownAR-v1.index.json.gz",
+      "full_index_sha256": "d1df01564e942b582d93592bd66942bccfa9a5001296ae2665eaadc4e8534ac3",
+      "retained_small_error_files": [
+        "rank0-last-error.json",
+        "rank1-last-error.json",
+        "rank2-last-error.json",
+        "rank3-last-error.json"
+      ]
+    }
+  ],
+  "current_NPU_job_changed": false,
+  "source_frozen_paths_modified": false,
+  "models_or_datasets_moved": false,
+  "public_storage_used": false
+}

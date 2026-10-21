@@ -1,0 +1,8 @@
+{
+  "freeze_sha256": "74061739adf86de5a7fa51e01f92bc1626f2ff00725d4d49a1bbaf0ba57973d5",
+  "archive_sha256": "2cd7659a1393d6a45c3f87890a3d7a1201b1d25dc4d53d84d8620ded57333d2d",
+  "archive_bytes": 10268,
+  "archive_members": 11,
+  "NPU_launched": false,
+  "model_qualification": false
+}

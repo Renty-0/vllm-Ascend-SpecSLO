@@ -1,0 +1,13 @@
+{
+  "status": "FROZEN_HOST_IMPORT_REPAIR_NO_NUMERICAL_CHANGE",
+  "parent400_freeze_sha256": "63bb159305a421bcee894b5716057ad5b4c444f4cffca07876dc4273637510bf",
+  "parent400_archive_sha256": "31853bbfff18f4784149d32663f1cf3fe4eaebd2205c7cc38bc756036926c82d",
+  "actual_startup_delta": "prepend only frozen bucket376 directory",
+  "finite_cases_per_target": 200,
+  "full463": false,
+  "original399_neural_bodies_unchanged": true,
+  "NPU_launched": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

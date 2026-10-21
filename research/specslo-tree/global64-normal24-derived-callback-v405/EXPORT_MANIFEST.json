@@ -1,0 +1,242 @@
+{
+  "callback405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/callback405.py",
+    "sha256": "bb42bb37f6e07eea4be9dc3526a4fb37cad623675c1f599684f348308ba52772"
+  },
+  "check405_typed_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/check405_typed_HOST.py",
+    "sha256": "23cb5f16685e79c8dc04b6e27f76f74fc7fe8d327440cd7429191db54d6492ff"
+  },
+  "HOST405-check405_construction_HOST.py.log": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405-check405_construction_HOST.py.log",
+    "sha256": "a3bd0e92adf98b77dae7904019afb464b8cc9fff198c826009cbd578bb0a135c"
+  },
+  "HOST405_PACKING_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405_PACKING_RESULT.json",
+    "sha256": "e5b135b31e3386090f4bcaa7d6c397eb8877e09a28a7bd8723a145bd2da156af"
+  },
+  "shape405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/shape405.py",
+    "sha256": "f0b3bd1cd4bd235758a54be7856791019e50c7f541e28a96c4324c0b68f1f18e"
+  },
+  "HOST405.generated-LIVE.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405.generated-LIVE.py",
+    "sha256": "d257ef1092c12bf8ba6da7c2eddcc12e173071290bc13d6d80b4774e092be48e"
+  },
+  "oracle405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/oracle405.py",
+    "sha256": "ddd645a33cf3f0127850e13088912e0c999d9121b389fa6b701d0b5b775b6235"
+  },
+  "check405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/check405.py",
+    "sha256": "667007eea644b0dc2676108be7fc5c47d65ade09c98c58c1be0d2b87cd900774"
+  },
+  "HOST405_LIVE_BINDING_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405_LIVE_BINDING_RESULT.json",
+    "sha256": "32f16b66f3469da6c9dcd185d322ea7d5f89211900b7a6b7eee6bb1be78da577"
+  },
+  "audit_normal405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/audit_normal405.py",
+    "sha256": "d40cd9b3e8fd6ce743bc26905fc8e7881511e25dd6f45d50db08da17c63a5b7c"
+  },
+  "startup405.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/startup405.sh",
+    "sha256": "68b8726b691069e4bccb8a5a9cd14a74acb2c13b14b2091561bc63cc6297ba1b"
+  },
+  "generation405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/generation405.py",
+    "sha256": "9cea30d8a752c2f08d33e38bde9c03c11652193af53069fe25371fad3ecc305a"
+  },
+  "check405_capacity_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/check405_capacity_HOST.py",
+    "sha256": "2f2d0744161ad19274d5a52a68dfc54e860ac7237a329adebeb6c16239db2c7e"
+  },
+  "audit_base405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/audit_base405.py",
+    "sha256": "4b248c34201386ab0d73c88720c572a06bcffd2b7eb03bef1d12c524fe8f8fe5"
+  },
+  "HOST405_SCOPE_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405_SCOPE_RESULT.json",
+    "sha256": "0a991697fb36c4c245da786386fab7e7304418486b9c7b96a88b90e4c508c8eb"
+  },
+  "qualify405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/qualify405.py",
+    "sha256": "638ac429b5340983452177d33ae87c4272b959423a40bf00946518e1b5fb33b8"
+  },
+  "HOST405_CAPACITY_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405_CAPACITY_RESULT.json",
+    "sha256": "a21b37796826cb46dd948b31f27b9c3bf79dff3eb0f5b5881fb5dea9388bbf61"
+  },
+  "packing405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/packing405.py",
+    "sha256": "b16664ad9cf4fb3e6e7e323688cf39ca4874b8d4360745d31b1f6646defee393"
+  },
+  "DERIVATION405.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/DERIVATION405.json",
+    "sha256": "f4ac16a8460d78aa65efca27265febd5f8cbcfc9d497c5b6cd72ef3ef7cb2629"
+  },
+  "check405_derived_callback_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/check405_derived_callback_HOST.py",
+    "sha256": "fa35711a060e33723a4849de06e9d3382f4ab9671d9d43fc2e0cb30144b3b26f"
+  },
+  "runtime405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/runtime405.py",
+    "sha256": "c42f43b58dc014564415d1ca9fc043e972377605d1dc343cf80e332f17401114"
+  },
+  "PLAN405.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/PLAN405.json",
+    "sha256": "6911e5e726a5dd33034310a30ecb8910449110ba94abc286f0217a6e51851457"
+  },
+  "HOST405_CLEAN_STARTUP_RUN.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405_CLEAN_STARTUP_RUN.json",
+    "sha256": "f3ae80e5c5964d74521d6ed197dfc206f339765c342978a2115ab5061d4825f8"
+  },
+  "wide405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/wide405.py",
+    "sha256": "45ab7692cf43b130fe8ef90bfa4b063ffeb0b3ce91ed202ed38a39d12422d936"
+  },
+  "guard405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/guard405.py",
+    "sha256": "84b83a131b4a302919785cb57155215a424c5053feb31d275df2e889786429e6"
+  },
+  "check405_packing_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/check405_packing_HOST.py",
+    "sha256": "4c9c72ec247bd000cc334ae02cec1c5379d28bb5a900e9389848907a84687aaa"
+  },
+  "check405_live_binding_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/check405_live_binding_HOST.py",
+    "sha256": "549c082ef845092c5903d447e346619c7c8327fa5af2b1ca405c040c05e27e67"
+  },
+  "bucket405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/bucket405.py",
+    "sha256": "5278802f70e693f902b1f859df7ac5e1a178f9cd0e3a2ba5727ba2fe3d9e00a7"
+  },
+  "HOST405-check405_live_binding_HOST.py.log": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405-check405_live_binding_HOST.py.log",
+    "sha256": "b81b6edda0678869e89679b383ca18b4f6ec333dbc1a4be51ded35ef1b1ca5a7"
+  },
+  "trace405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/trace405.py",
+    "sha256": "ebd5fc8a35dad3f67c7ef7611cf6e53ffce8cf49c208d883b5a4876645d8601b"
+  },
+  "admission405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/admission405.py",
+    "sha256": "d25a7adde5092dda661d22b1f191fbb62fe8501c3c067491d0ac436fc689d1a5"
+  },
+  "reference405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/reference405.py",
+    "sha256": "4365ea0c0fcb7273c9271d5e25481067e827113a25ac5c635e6bcb616a88e3ea"
+  },
+  "empty405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/empty405.py",
+    "sha256": "a1cc5bb823147e16a6d67612d3a0f20985e0778d22f2f60150cc572e5d3da7a7"
+  },
+  "HOST405_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405_RESULT.json",
+    "sha256": "67b844d2b45ef63adba0ff44f1edef8d7633f8f1704591c487f1d0bada845ddc"
+  },
+  "HOST405-check405_packing_HOST.py.log": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405-check405_packing_HOST.py.log",
+    "sha256": "40907681a45cfb913b52662224b432ac27f55bfab88a75b10e91edc483cf2454"
+  },
+  "FREEZE405.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/FREEZE405.json",
+    "sha256": "4972b71c2217af361c95da2516de5f50c92223d367ac3d8175a5e3a729931926"
+  },
+  "HOST405-check405_derived_callback_HOST.py.log": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405-check405_derived_callback_HOST.py.log",
+    "sha256": "8166ee3c4397332bc1de19244741b82fb57d52e3e114d466a7ee3ebf92b14065"
+  },
+  "window405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/window405.py",
+    "sha256": "50ae391a1eb1e61d5cae900570933d119ee077988847023cead4c3bde1698d85"
+  },
+  "extension405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/extension405.py",
+    "sha256": "7696233afea55abd218f9d13f324ab7cdacdc80f16aec91236b59cebda7d0bbd"
+  },
+  "dispatch405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/dispatch405.py",
+    "sha256": "8fa5f8b1e68909406bcd960cf2fd22951380bf768fe01785f5e3e8fa1c6ffbaa"
+  },
+  "prefixes405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/prefixes405.py",
+    "sha256": "59323ac5b04c806692585c52d5dcedb4e28411f53f07ed2b299f522d5901c326"
+  },
+  "SOURCE405_RECEIPT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/SOURCE405_RECEIPT.json",
+    "sha256": "701f006acfe94570bad22d193a0c62de2edb47654d5d27dbf6bff249cae4d7f7"
+  },
+  "HOST405_DERIVED_CALLBACK_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405_DERIVED_CALLBACK_RESULT.json",
+    "sha256": "92dffbf250bc297b57d2017541267bcbe51b900295cb4059901c47da734f822e"
+  },
+  "HOST405_CONSTRUCTION_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405_CONSTRUCTION_RESULT.json",
+    "sha256": "69fcd1505712c59e226537e85c3c1d66afdaa2117e1b26e481229ff58acab0cf"
+  },
+  "projection405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/projection405.py",
+    "sha256": "15b13cb28c3c6bcc45dc228f54315fae71277974c10be8d762d4965be5a8d6d7"
+  },
+  "check405_construction_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/check405_construction_HOST.py",
+    "sha256": "d62fcfc1625865652937d1c39d98b7afab4fc5a66895b3f31ef0627f4835581d"
+  },
+  "check_scope405_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/check_scope405_HOST.py",
+    "sha256": "ec95da5ec888d42d38c0149a35ab7ecdef62c656cd3ed946f05d7ff1468c0339"
+  },
+  "audit_reference405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/audit_reference405.py",
+    "sha256": "8608b0868e541e28561f58a37b46b23aa9c2049a8b717f72787c4187da14ae70"
+  },
+  "launch405.sh": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/launch405.sh",
+    "sha256": "f4fcb42ca4dd77fdd711bc478851db2d7e1cbb42cbe4343df18b53b0e3014dfc"
+  },
+  "check405_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/check405_HOST.py",
+    "sha256": "4498e821d0140d655104f0d9d2b62a96eb904defee987ebeb216094dc027b10c"
+  },
+  "scope405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/scope405.py",
+    "sha256": "9dd216da72daa12169bf82db389cf24486c2dc3e30ed1de24106edbcf1a4c12f"
+  },
+  "HOST405_TYPED_ALLOCATION_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/HOST405_TYPED_ALLOCATION_RESULT.json",
+    "sha256": "64f3ff231ca058f673b24e1fd5337443ab580f835c2921a00eccd5ea95b9401d"
+  },
+  "audit405.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/audit405.py",
+    "sha256": "c63cebbd86cf406974a935c4a9cca9db78c134a3d1d5be96832822cdbcad23f3"
+  },
+  "tools/run_ROOT405_actual_startup_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT405_actual_startup_HOST.py",
+    "sha256": "de3988dc0a4ec2bfcfdf7c8c6b28205b170850760bd3ec4391804380f98e01ef"
+  },
+  "tools/audit_ROOT405_terminal_full_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_ROOT405_terminal_full_HOST.py",
+    "sha256": "7ec5fc28b63f614727f193d87b4090fc5c3cb737c07d1503bbe19a96ba3dceee"
+  },
+  "tools/read_ROOT405_common_result_HOST.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/read_ROOT405_common_result_HOST.py",
+    "sha256": "219a065a934a792ac9bea4e51af4b772e29b9082fafe3785b988c2a79f9b1b1e"
+  },
+  "tools/ROOT402_TERMINAL_PREWARM_FAILURE.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT402_TERMINAL_PREWARM_FAILURE.json",
+    "sha256": "76b37c2f51b92cf1ce71801adfab35a42841b9e38645c3c924b95b7556d1d5d2"
+  },
+  "tools/ROOT404_DERIVED_CALLBACK_COMPATIBILITY_NOTE.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT404_DERIVED_CALLBACK_COMPATIBILITY_NOTE.json",
+    "sha256": "bfd90bdb1fbefe2e8a19eee2e1459f3b5676fb6baca5ddb43c98b8ccdc03fd2f"
+  },
+  "tools/archive_ROOT405_failed402_private.py": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/archive_ROOT405_failed402_private.py",
+    "sha256": "aeed4d9cfa4add315903dae3b6247fb0dd41fa12f88f856efe1c65c9760be810"
+  },
+  "tools/ROOT405_FAILED402_PRIVATE_ARCHIVAL_RESULT.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT405_FAILED402_PRIVATE_ARCHIVAL_RESULT.json",
+    "sha256": "6977dfbdf6f93004ac34d02432257e4e3e1a8c68b1ba2a3ff60da1407e8aa117"
+  }
+}
