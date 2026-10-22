@@ -1,0 +1,18 @@
+{
+  "UTC": "2026-10-18T14:46:48.831684+00:00",
+  "schema": "ROOT263.synthetic-copy-probe-review.v1",
+  "existing_native_environment_only": true,
+  "existing_Triton_and_TritonAscend": true,
+  "scope": "synthetic K/V copy only, no real weights/attention/decoding/Goodput",
+  "actual172_maps_each_width256_384": true,
+  "old4ops_and_new1op_ACLGraph": true,
+  "all65536_raw16_bit_payloads_changed_restored_graph_replays": true,
+  "HOST_map_checks_before_device_index_upload": true,
+  "Triton_warm_outside_graph_capture": true,
+  "scalar_address_uint8_copy_no_BF16_math_or_Torch_device_dtype_view": true,
+  "private_Triton_cache_only": true,
+  "original_source_verifier_and_ROOT_lock_and_all4idle_required": true,
+  "neural_qualified": false,
+  "performance_qualified": false,
+  "production_installed": false
+}

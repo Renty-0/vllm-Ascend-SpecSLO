@@ -1,0 +1,23 @@
+{
+  "UTC": "2026-10-18T03:00:14.141024+00:00",
+  "status": "ROOT_bounded_source_and_HOST_checked",
+  "scope": "explicit canonical FULL9 decode metadata numerical observation, with uninstalled FP32 tie observer; original sampler unchanged; no production qualification",
+  "contexts": 4,
+  "includes_current_ROOT224_new_remaining_request0_difference148": true,
+  "HOST_full_mask_slot_frames": 427,
+  "HOST_owned_shutdown_cases": 3,
+  "actual_original_CPU_bucket_logic_checked": true,
+  "original_all80_hidden_and128_query_KV_eager_reference_match_required": true,
+  "dynamic_body_cost": {
+    "M": 80,
+    "N": 16,
+    "ABBA_blocks": 3,
+    "cells_per_block": 4,
+    "alternate_adjacent_frames_replays_per_cell": 6,
+    "original_task_update_and_skip_counter_deltas": true,
+    "body_only_not_Goodput": true
+  },
+  "new_neural_or_performance_qualification_not_inherited": true,
+  "Native_flags_assigned": false,
+  "original_API_exit_retained_with_additional_own_child_join_seconds": 90
+}

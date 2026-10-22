@@ -1,0 +1,86 @@
+{
+  "status": "HOST_original_observer_capture_eager_snapshot_regression_passed",
+  "cases": [
+    {
+      "N": 1,
+      "steps": 1,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 1,
+      "steps": 2,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 1,
+      "steps": 3,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 1,
+      "steps": 4,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 2,
+      "steps": 1,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 2,
+      "steps": 2,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 2,
+      "steps": 3,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 2,
+      "steps": 4,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 16,
+      "steps": 1,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 16,
+      "steps": 2,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 16,
+      "steps": 3,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    },
+    {
+      "N": 16,
+      "steps": 4,
+      "original_encoding_unchanged": true,
+      "all_hidden_available": true
+    }
+  ],
+  "case_count": 12,
+  "missing_observer_negative_controls_rejected": true,
+  "original_hook_body_executed": true,
+  "observer_installed_before_any_real_constructor": true,
+  "CPU_arithmetic_fixture_only": true,
+  "NN_model_used": false,
+  "NPU_used": false,
+  "Goodput": null,
+  "adopted": false
+}

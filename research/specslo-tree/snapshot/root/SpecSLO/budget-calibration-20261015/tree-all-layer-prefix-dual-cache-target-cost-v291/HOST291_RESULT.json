@@ -1,0 +1,20 @@
+{
+  "status": "HOST_declared408_and_exact_legacy227_reference_extension_passed",
+  "cases": 408,
+  "unchanged_legacy_cases": 227,
+  "new_cases": 181,
+  "real_nodes": 26441,
+  "legacy_reference_frames_byte_semantics_unchanged": 1057,
+  "new_reference_frames": 905,
+  "all_original_matcher_bodies_retained": true,
+  "all_real_nodes_covered_once": true,
+  "model_dtype_or_sampler_changed": false,
+  "original_startup_inventory_not_run_by_this_diagnostic": true,
+  "paired_target_cost_configurations": 11,
+  "rotated_rounds": 20,
+  "source_only": true,
+  "NPU_used": false,
+  "neural_qualified": false,
+  "whole_workload_AR_qualified": false,
+  "Goodput": null
+}

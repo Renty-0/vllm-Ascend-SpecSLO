@@ -1,0 +1,18 @@
+{
+  "status": "PASS_HOST430_ACTUAL_RUNTIME_CLEAN_PACKING_AND_LIVE_BINDING",
+  "results": [
+    {
+      "script": "check430_binding_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-prestartup-commit-binding-v430/HOST430-check430_binding_HOST.py.log"
+    },
+    {
+      "script": "check430_construction_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-prestartup-commit-binding-v430/HOST430-check430_construction_HOST.py.log"
+    }
+  ],
+  "NPU_used": false,
+  "model_constructors": 0,
+  "existing_runtime_and_only_existing_freeze_environment_fields": true
+}

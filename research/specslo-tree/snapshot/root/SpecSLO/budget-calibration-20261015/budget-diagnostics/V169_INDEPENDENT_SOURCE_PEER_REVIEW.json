@@ -1,0 +1,124 @@
+{
+  "CPU": {
+    "elapsed_seconds": 3.5548493722453713,
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/CPU_RESULT169.json",
+    "sha256": "0c8db8584c8d6c8945940b222015580f9f40fc1c65ca75b455160ccdbe73ef50",
+    "status": "passed",
+    "tests_run": 4
+  },
+  "NPU_used": false,
+  "Torch_imported": false,
+  "actual_guard_source_state_HOST": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V169_ACTUAL_GUARD_SOURCE_STATE_HOST.json",
+    "sha256": "9d76bc51e24a0a53630bc10beb242a387d9333193d112fb68b81971e3fc48fd9"
+  },
+  "actual_raw_read": false,
+  "candidate": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169",
+  "candidate_imported": false,
+  "candidate_sources_modified": false,
+  "execution_source_review": [
+    "Fresh P169 namespace redirects runtime/progress/artifact writes to own directory while immutable P148/P160 inputs are read. Named canonical Fast/shape/control bindings and actual source filenames are checked; no broad sys.modules getattr pseudofile scan is introduced.",
+    "Original201prefill/44target/114draft startup remains, followed by current new P3/P4 component. Main worker and all4 stage error propagation are retained; actual lease failure must reach common all4 status. Target anddraft role callbacks preserve explicit None boundaries.",
+    "Only activewindow32 changes admission; configured64, queued463, storage527, scratch64, pages544, original arrivals, output limits and outer host clock remain. Per-trace gain generation reset and release are actual; peak32 is not reported as achieved64.",
+    "Bounded per-window warm fixed point uses original rolewarmup65 and private attempt directories until all21 counters are zero across4ranks; original warm/two complete65zero traces/single seal/full463 then run. Source audit recomputes actual counters and mapper geometry per trace.",
+    "trace169 metrics explicitly imports sha and checked into isolated full_metrics globals, correcting inherited missing-sha binding. Existing P166 retained terminal full32 SHA is a fixture dependency, not P169 numerical/full qualification.",
+    "Guardian retains original ROOT lifetime self-lock with no outerflock, original10496/15/212 baseline verifier pre/post, four-card idle checks, owned-session cleanup, clean environment fixed launcher and action/tag validation, 7200second deadline,256MiBtag/512MiBaggregate limits.",
+    "Prepare requires explicit ROOTreview SHA plus designated current peer SHA and exact flat reviewed_inputs. Freeze binds33local/253selected/existingHOSTevidence/CPU/4guards; archive validates actual regular member bytes. P14873MB andP160 archives are verified in place, not copied; selected preexisting P154 dependency remains explicit.",
+    "Static inspection found no duplicate explicit keywords against SCOPE in own freeze or inherited supervisor row/print constructors. Existing actual guardian source_state HOST uses exact final CPU/local/external/guard maps; this peer does not re-execute it."
+  ],
+  "freeze_or_launch_performed": false,
+  "frozen_sources_modified": false,
+  "limitations": [
+    "This is independent source and retained HOST-evidence review. No candidate module import, suite rerun, model construction, Torch/NPU/ACL call, or actual P169 tensor computation was performed by this reviewer.",
+    "Current-process mathematical/protocol qualification, natural positive consume, twozero traces and full463 measurements remain required actual runtime gates. A passed source review is not a device, whole-workload AR, quality, Goodput or adoption result.",
+    "Retained hidden/KV boolean/hash markers cannot be tensor-recomputed by HOST; source gate and actual runtime execution provide that evidence. Raw target heads, encodings, scores and metadata can be independently reconstructed by audit169.",
+    "P3 finite representatives and P4 finite fixtures plus structural guards do not establish every possible token tuple. Full output AR compatibility is not claimed; adopted=False and formal_Goodput=False remain explicit."
+  ],
+  "mathematical_and_protocol_source_review": [
+    "P3 current full527 representatives remain actual N1/E1/R1, N1/E3/F4/R1/U8 interior padding, N32/E32/R32; independent original PA followed by read-only reorder checks all physical hidden, full encoded, own leases and56 written KV. These are finite representative gates, not all-token qualification.",
+    "New parent is genuine four-step chain atM16, canonical8 top2 encoding and actual primary path0,1,2,3. Atprefix128 the frontier query is132 and child3 prefix133. It is not B5 branching and does not alter targetmax32/C96/Q128.",
+    "P4 R0/F16/U16, R1/U20 andR16/U32 use actual original Native greedy or hidden prelude plusheadM16, then shared4M32. Parent and mixed graph-owned hidden/encoded are cloned before later replays; independent fresh epochs recompute their own parent4, original PA, head and four dependent steps without copying candidate KV or calling candidate fusion helper.",
+    "Hard numerical gates compare every physical parent/prelude/chain hidden row, full encoded, actual roots, canonical8/score8/confidence denominator8, ledger, and all56 written KV by original device matcher and explicit finite checks. Exact KV hashes are retained witnesses; hash differences do not replace or weaken original matcher numerical gate.",
+    "Ten metadata fields are checked against independent original PA within each allocation using authoritative owner pages, slots, logical positions andpadding. Across independently allocated epochs only page-independent semantics are compared; physical table equality is not incorrectly required across fresh allocations.",
+    "Natural fixture contains8 genuine P166 source prefix identities but6 unique token prefixes, disclosed by HOST proof; only tokens through current root are model input, never observed targetfuture. Teacher-forced initial prefix is explicit. Positive status is not fabricated from old output.",
+    "Original current target verifier broadcasts before before_parent hook. All4 agree actual predicted finish gates before optional own-union reference; exact actual draft/ledger restoration occurs before original preflight, compaction andcommit. Target parent4, normal4, consumed child3 use separate valid typed C/Q calls.",
+    "Raw audit executes pinned original Native host verifier from actual whole TP head tokens, recomputes all16 parent dependency/frontier/proposal/accepted predicates, and rechecks naturally promoted exact child ticket identity and actual consume. Actual original finish code decides promotion. Positive child continuation and invalid-parent nextdraft use real committed histories, missing suffix and actual repair positions.",
+    "Nextdraft remains original B3 two-wave32 method; oldhistory and reference globals bind draft169/source169 and independently replay true parent4/union/shared4 history. Source warm/restore uses the same per-owner repair vector; no hardcoded parent3 history or copied candidate KV.",
+    "P4 production is enabled only by current engine/object-identical component proof after fixture cache release. Per-call actual Native entry validation and hard P4 N/E/total bounds remain; B5 still defers eager. P3 shared3 path and original P3 shared4/union domain are preserved by revision2.",
+    "Zero genuine parent4 positive returns discovery_subset with no full463 execution or issuer. Positive current own math/protocol proof can authorize bounded full32 only. No old S35/mixed-target scope or parent hardware qualification is borrowed."
+  ],
+  "mechanical_check": {
+    "AST_count": 32,
+    "all_current_source_bytes_match_CPU_pre_and_post": true,
+    "bash_n": 2,
+    "bytes": 18310578,
+    "guard": 4,
+    "local": 33,
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V169_INDEPENDENT_PEER_MECHANICAL_SOURCE_CHECK.json",
+    "selected_external": 253,
+    "sha256": "ea4ee467369aebac1645573648c9bcfdbdad26ee42249f461b56e794f9242fbd",
+    "unique_bound_files": 297
+  },
+  "old_suite_rerun": false,
+  "reviewed_guard_inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v169-root-execution/GUARD_INPUTS169.json": "4f20d3ae39a2e93000e540115548b4f65854b8a7953aa9bb30bbafbe1760c8dd",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v169-root-execution/guard169.py": "54ffe50a54493ab85ad866e08588c91ddb7c017e1fc47ad83356d9647d31afd6",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v169-root-execution/launch169.sh": "fca62efbd641dff1112c14953a8bde2b562fa944d66f8368b29a215e5b0a36b7",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v169-root-execution/startup169.sh": "d5ada15bd9fd5d7c9e8960e5103760218e7d2630278591f953d64ae7c3ec28a2"
+  },
+  "reviewed_local_files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/FIXTURE_INPUT169.json": "d86523f99d673015ade3db81e99a046bf99a6bae7fb4024a5792fb8fddaa9f21",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/INPUTS169.json": "6518d6ee559b74dbd97e61345e5bd5751ce112f180fa98d48f9bea5f76307351",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actor169.py": "f672f3886c1c6f31cceb9f6be9c080104fef4b9c36b64f1fe7dde90c562350c7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/audit169.py": "d7db8b36d71bda7b5590c53885d65f64762c037538413b7f4a1fc5db035ed2a6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/audit_full169.py": "ad7a4d34463a31fd7613d15846b2aa4920f465de2304ed6f4080145c14b04905",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/bank169.py": "41859573ac10bb9e805927d6aab365cdb67356fa1650ab79289bbbae08076a6d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/base169.py": "2ba2611d906bee1486f3d2ccdd5ba4f646452343c3bf84d9b4190ef240b93eae",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/binding169.py": "03bf4a49c40da3f3b908b1f8c20bae119083c0c807a75b7c35b3404d949cdb70",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/budget169.py": "4b91b9eb9f87244c72a639e8e22e88dfa6592e020f1cc7475708891e6c2df603",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/check169.py": "c2b7c291c9aef2c7bf694c5396f6bcbdca149b8d36485e6ef5ad82e78dc46493",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/component169.py": "d7354bd8e587b2f4c450b18b0282344307713d266e5642f07ecbeaedb3add1e2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/controls169.py": "7ee6cadc9dcae22769cb6a2260d9ac64d42c32f8a6dbddc37c31619c9307f6cb",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/draft169.py": "8ad26e8d717e98a2fa6288a027a69bc20642fc7e7b7b9b8f0c3f1b6b10ea170d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/extension169.py": "5c29d23434f68cd28d51df8a9e07e21e472cb2571ac1231a7f9bd2491a53e0f9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/fast169.generated.py": "39f9dbb18769c3b97956d6201a912d4192648ad3587d31716dcdd3e061b9ca69",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/host169.py": "864db09eabd65c9ccf290894e2c5f4dc4285d4c30dd8469d270565bbf7234207",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/live169.py": "0fd9177cfeaabd84b4532e53f00495dd7d18d245bb7d4456ecb9db6a4b1a3876",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/metadata169.py": "095dd0637b46827215a3924cf06b561c73b2f3eaa143004920026b5451bbfbdf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/next169.py": "57e71603da8120fad2ff25e7273a3805fe64de3f4e8824ede3643c21ed7c66d2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/observer169.py": "2620d99032c7605be7b03f6f4f3659119628f7e52d3549920d549fadcb178e80",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/progress169.py": "888d5bbebc280858c4b8a169bc659cf983c9d43754b3d5518c9339d77a87678b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/protocol169.py": "8b2b31a0abc20c601542c07c225a3f33fa8d1325643c1d7f783fd43ee373c048",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/provider169.py": "13ca2640b9617dfbebbbfa4c7b620f0598eed7bed324d5d0676994eaceddd867",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/pure169.py": "166cd8b7f19a4efa941a18a7d2beb01cab6f5ecdf9c804e78dff3f66cc6738ac",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/raw169.py": "c3a600523e05995bd2697f7794d76c6095f960765c9e210ee5f25c5365a66c28",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/runtime169.py": "35d87c5dc8d9576c38800a37b9d936ac9e38fd88e6f45c467b4c5cb7c5b65db6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/scope169.py": "be2cf204693a8133ad7d8539ba475711695557047d55b30766fe37f7185cc149",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/shape169.generated.py": "cc57ab53828dbd6c52b8f27f968a049e397558672e7851e5f53ebebb3f24855a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/source169.py": "72092a54509728f6f95b76fd96b23dcec155fc8add3fd815680c8a14a1c52227",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/source_epoch.py": "755f44889d5687c14a826eef6fceb1a7c84bc2bdada0fb1087966bc9f6022703",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/target169.py": "26088628726f52eccdccdbd40c1a9809b83b19f1b2b54c32293e0e8dc4db599b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/test_host169.py": "71e6a8125d2a3071ec48cea105c3fbee20a9d5aa17ec17e0a5239feeb94d10df",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/trace169.py": "899ad9e2f9023eb6461013636b8568dfb41a9f4c5c8015518c009bb4a2867697"
+  },
+  "reviewed_ready": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V169_PARENT4_CURRENT_COMPONENT_AND_FULL32_READY_FOR_ROOT_REVIEW_REVISION2.json",
+    "sha256": "d15c3fbcb877c6a11a72de48598c99362848fbb179b7a01f831ca5c5f54d2e48"
+  },
+  "reviewer": "/root/v148_peer",
+  "revision2": {
+    "P3_original_domain_restored": true,
+    "P4_local_guards_remain_N_max16_E_max16_total_rows_max32": true,
+    "ROOT_scope_decision": "ROOT explicitly requested restoration of P3 original domain; final source does so.",
+    "changed_core_files": [
+      "live169.py",
+      "test_host169.py"
+    ],
+    "new_HOST_scope": "Existing revised test executes actual activate with explicit HOST current-engine carrier and checks P3(17,15)/(32,32), union(32,32); actual generated kept expression still excludes P4 atN17.",
+    "preserved_revision1": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v169-before-original-P3-production-domain-restoration/P169",
+    "production_change": "Only activate capability ranges1..16→1..32 for shared4 and union; exact inverse returns preserved live source."
+  },
+  "schema": "V169.independent-source-and-guard-peer-review.v1",
+  "source_blockers": [],
+  "status": "passed_source_review"
+}

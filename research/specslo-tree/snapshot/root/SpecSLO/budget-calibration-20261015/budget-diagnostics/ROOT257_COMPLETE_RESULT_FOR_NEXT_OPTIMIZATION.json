@@ -1,0 +1,64 @@
+{
+  "UTC": "2026-10-18T13:22:45.836167+00:00",
+  "status": "complete_independently_audited",
+  "epoch": 257,
+  "terminal_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT257_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+  "terminal_audit_sha256": "f7bd56b50167f5027072d33163d6713dbe0e586aa827376b305babc59869d409",
+  "receipt_sha256": "e7c20bb3b75b2fefecba69dbf9a3e6e55a0c5d67eff287b1faa75c6870854854",
+  "all463_equal_on_all3targets": true,
+  "metrics": {
+    "requests": 463,
+    "attained": 374,
+    "output_tokens": 118528,
+    "good_tokens": 95744,
+    "Raw": 686.7756316555451,
+    "Goodput": 554.7604454409803,
+    "TPOT_paper_median_ms": 38.24147683735646,
+    "TPOT_paper_P90_ms": 46.2514066563017,
+    "TPOT_observed_median_ms": 38.39144341318923,
+    "TPOT_observed_P90_ms": 46.43278472162053
+  },
+  "by_class": {
+    "loose": {
+      "requests": 96,
+      "attained": 96,
+      "output_tokens": 24576,
+      "good_tokens": 24576,
+      "Raw": 142.3984031078452,
+      "Goodput": 142.3984031078452,
+      "TPOT_paper_median_ms": 45.90230671874451,
+      "TPOT_paper_P90_ms": 50.188050967335585,
+      "TPOT_observed_median_ms": 46.08231576470037,
+      "TPOT_observed_P90_ms": 50.384866853481995
+    },
+    "normal": {
+      "requests": 96,
+      "attained": 96,
+      "output_tokens": 24576,
+      "good_tokens": 24576,
+      "Raw": 142.3984031078452,
+      "Goodput": 142.3984031078452,
+      "TPOT_paper_median_ms": 32.6489641547596,
+      "TPOT_paper_P90_ms": 35.712322221115755,
+      "TPOT_observed_median_ms": 32.77699930830767,
+      "TPOT_observed_P90_ms": 35.8523705435515
+    },
+    "tight": {
+      "requests": 271,
+      "attained": 182,
+      "output_tokens": 69376,
+      "good_tokens": 46592,
+      "Raw": 401.9788254398547,
+      "Goodput": 269.96363922528985,
+      "TPOT_paper_median_ms": 38.1960747508856,
+      "TPOT_paper_P90_ms": 43.20865767476789,
+      "TPOT_observed_median_ms": 38.34586327932045,
+      "TPOT_observed_P90_ms": 43.37810339113953
+    }
+  },
+  "full_elapsed_seconds": 172.58620506711304,
+  "goal_achieved": false,
+  "adopted": false,
+  "single_round_not_independent_stability_evidence": true,
+  "next": "Actual packet258 metadata comparison then new full candidate if worthwhile; do not modify frozen257."
+}

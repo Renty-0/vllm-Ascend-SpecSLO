@@ -1,0 +1,12 @@
+{
+  "status": "source_only_unqualified",
+  "hypothesis": "one-query FULL segments remove future-window-dependent reductions; M80 body for all fresh variants",
+  "original_visibility_preserved": true,
+  "own_physical_KV_lengths": true,
+  "original_sampler_unchanged": true,
+  "original_Native_graph_validation_retained": true,
+  "caveat": "Branched queries still contain masked physical KV holes; no full AR equivalence assumed.",
+  "production_installed": false,
+  "performance_qualified": false,
+  "adopted": false
+}

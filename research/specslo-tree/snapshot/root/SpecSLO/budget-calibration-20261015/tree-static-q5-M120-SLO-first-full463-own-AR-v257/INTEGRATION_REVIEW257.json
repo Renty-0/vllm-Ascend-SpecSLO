@@ -1,0 +1,23 @@
+{
+  "UTC": "2026-10-18T12:24:45.465809+00:00",
+  "schema": "ROOT257.live-SLO-first-integration-review.v1",
+  "original256_full_correct_result_summary": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT256_COMPLETE_RESULT_FOR_NEXT_POLICY.json",
+  "original256_full_summary_sha256": "18da477bf6dd8be7f5dc34ebd580f428d8ea13df3fdcff1019bbb1b8de7a9390",
+  "actual_model_implementation": "immutable255 M120/S24/KV2560; identical weights/sampler/geometry",
+  "original_global_environment_TARGET0_unchanged": true,
+  "only_LIVE_build_plan_target_slo_first_and_counter_changed": true,
+  "actual_LIVE_target_SLO_first": true,
+  "actual_LIVE_policy_counter": 1,
+  "whole_ticket_and_budget_checks_preserved": true,
+  "real_N24_C96": true,
+  "active48": true,
+  "global_draft192": true,
+  "original463_arrivals_SLO_and_output256_unchanged": true,
+  "all_original_startup_and_components_required": true,
+  "fresh_same_instance227_and72_independent_prefixes_required": true,
+  "original_warm_twozero_seal_full463_and_complete_ownAR_required": true,
+  "NPU_qualification_inherited": false,
+  "performance_qualified": false,
+  "whole_workload_AR_qualified": false,
+  "adopted": false
+}

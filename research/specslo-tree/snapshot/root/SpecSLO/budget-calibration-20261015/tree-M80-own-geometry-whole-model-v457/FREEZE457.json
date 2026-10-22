@@ -1,0 +1,33 @@
+{
+  "schema": "ROOT457.own80-source-freeze.v1",
+  "UTC": "2026-10-22T13:27:45.578974+00:00",
+  "parent455_original_export_sha256": "f55502f11b1636893ab6cc47b2442aaebc34d9d66f2d2795418120464a83a435",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/guard457.py": "40fcbdc5c2f342da72f071ab9bf96bf62fd51d1cfb71935a524abb3653e116c5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/check457_HOST.py": "7ea0e71dd1e344aebf35546548c681424b44f3dc0a782eee26ea307df56d0b2e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/runtime457.py": "14bec4f9edb20909e11e827d1ec72811f9d85979e28bf07e0b53f7377c6a781f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/whole457.py": "524a702f706e4a4cedd9fadc4eb03a2c5d3fb58455de07b1019bbcfd6aa2b6d4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/startup457.sh": "62e8b8f78700a89c40d5eed175e3efc5ce9ec3313af01645579f67e0846d20e2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/probe457.py": "91f889f40a1d29551e8b0f3c65b2d32d01bbfeffafcba5d329e5b6bcc15242e1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/PLAN457.json": "4983896aa1589b1ad4e664c55608dc9974bef784e1878611aea2a18d65c4dad4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/check457.py": "9eed4af6ba6cd0578727fef31fb3f41d0c2589bf08e2e3f171a3b3cf1b2120b8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/audit457.py": "aae8653809219ce13cde799cb8298bd711ab04314e1a91fd862827fd629fcd9f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/flat457.py": "ade36c6182e33eb60d969d15886650acaffcada59fe86ffd2cdfb5a846d9abe4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/host_env457.py": "0213da23d822b83b9cf36ecac69481aa2e9ff25dcac4fe5e075a2acbe4e769da",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/HOST457_CONSTRUCTION_RESULT.json": "6aaf83898db2e5e1f2a368074463bb6baf295ada9ec93600c82d55dce6afd6b1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/freeze457_HOST.py": "28ad1f3cad4daaa5fc1040badbe0b7e3d0505206ae4a638221f2d1b9730960bb",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT455_TERMINAL_INDEPENDENT_WHOLE_MODEL_AUDIT_HOST.json": "0d2fea49819ecf9c655c0acbef9f849f0036e194a234d9f2a8dc31d799253576",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT378_NEGATIVE_FIRST_MODEL_CASE.json": "007aebfdd44ae9fa3522686182b56583d3da41c4ca46af498aa49cce4d489240",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT379_REAL_FIRST_QKV_DIVERGENCE_RESULT.json": "8a7a9abe0fc4fb451d8831410303c5519ac6bf1987981e348eccee804f35b3fd"
+  },
+  "global_active_ceiling": 64,
+  "physical_M": [
+    80,
+    120
+  ],
+  "original_MC2_profile_retained": true,
+  "cross_M120_discrepancy_not_qualified": true,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

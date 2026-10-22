@@ -1,0 +1,38 @@
+{
+  "status": "FROZEN_HOST_PASS_DEVICE_NOT_LAUNCHED",
+  "global_active_limit": 64,
+  "current_target": {
+    "N": 24,
+    "C": 96,
+    "M": 120,
+    "primary_side_groups": 24
+  },
+  "actual_normal_work_admission": {
+    "previous_limit": 32,
+    "policy_limit": 24,
+    "original_priority_age_and_owner_order": true,
+    "deferred_requests_remain_active": true
+  },
+  "original_typed_gain_model_and_role_limits_unchanged": true,
+  "normal_candidates": 96,
+  "future_eager_candidates": 96,
+  "global_selected_candidates": 192,
+  "original_B3_parent_B3_child_eager_filter_and_window_gates_unchanged": true,
+  "original_optimized_draft_neural_code_unchanged": true,
+  "original_allocator_admission_unchanged": false,
+  "numerical_backend_changed": false,
+  "new_Native_qualification_flags_assigned": false,
+  "fresh_original227_and_additional681_and_full463_own_AR_required": true,
+  "warm_twozero_seal_required": true,
+  "reference_control398": {
+    "Raw": 599.5623377435959,
+    "Goodput": 214.96187487135404,
+    "attained": 166,
+    "requests": 463,
+    "active_limit": 64
+  },
+  "NPU_launched": false,
+  "model_qualification": false,
+  "Raw": null,
+  "Goodput": null
+}

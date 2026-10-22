@@ -1,0 +1,8 @@
+{
+  "status": "PASS_actual_torch_device_unspecified_index_regression",
+  "positives": 8,
+  "invalid_bindings_rejected": 5,
+  "original_failure_reproduced": true,
+  "no_tensor_allocated": true,
+  "NPU_used": false
+}

@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST389_REAL_ATOMIC_STAT_RACE_AND_STRICT_NEGATIVES",
+  "NPU_used": false,
+  "actual_tmp_race_reproduced": true,
+  "non_tmp_error_preserved": true,
+  "outside_live_tmp_error_preserved": true,
+  "symlink_rejection_preserved": true,
+  "real_file_byte_count": true,
+  "model_runtime_changed": false,
+  "Raw": null,
+  "Goodput": null
+}

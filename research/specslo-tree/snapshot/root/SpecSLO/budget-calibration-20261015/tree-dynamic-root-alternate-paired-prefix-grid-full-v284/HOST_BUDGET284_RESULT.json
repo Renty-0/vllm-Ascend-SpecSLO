@@ -1,0 +1,389 @@
+{
+  "status": "HOST_positive_B8_priority_and_whole_ticket_caps_passed",
+  "positive_shapes": [
+    {
+      "N": 12,
+      "positive_B8_grants": 12,
+      "selected_candidates": 96,
+      "low_priority_deferred": []
+    },
+    {
+      "N": 24,
+      "positive_B8_grants": 12,
+      "selected_candidates": 96,
+      "low_priority_deferred": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23
+      ]
+    },
+    {
+      "N": 32,
+      "positive_B8_grants": 12,
+      "selected_candidates": 96,
+      "low_priority_deferred": [
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ]
+    }
+  ],
+  "actual_controller_cases": [
+    {
+      "N": 12,
+      "branch_B": 5,
+      "forks": 1,
+      "selected": 12,
+      "actual_candidates": 49,
+      "actual_groups": 13
+    },
+    {
+      "N": 12,
+      "branch_B": 6,
+      "forks": 1,
+      "selected": 12,
+      "actual_candidates": 50,
+      "actual_groups": 13
+    },
+    {
+      "N": 12,
+      "branch_B": 7,
+      "forks": 1,
+      "selected": 12,
+      "actual_candidates": 51,
+      "actual_groups": 13
+    },
+    {
+      "N": 12,
+      "branch_B": 8,
+      "forks": 1,
+      "selected": 12,
+      "actual_candidates": 52,
+      "actual_groups": 13
+    },
+    {
+      "N": 12,
+      "branch_B": 5,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 60,
+      "actual_groups": 24
+    },
+    {
+      "N": 12,
+      "branch_B": 6,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 72,
+      "actual_groups": 24
+    },
+    {
+      "N": 12,
+      "branch_B": 7,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 84,
+      "actual_groups": 24
+    },
+    {
+      "N": 12,
+      "branch_B": 8,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 96,
+      "actual_groups": 24
+    },
+    {
+      "N": 16,
+      "branch_B": 5,
+      "forks": 1,
+      "selected": 16,
+      "actual_candidates": 65,
+      "actual_groups": 17
+    },
+    {
+      "N": 16,
+      "branch_B": 6,
+      "forks": 1,
+      "selected": 16,
+      "actual_candidates": 66,
+      "actual_groups": 17
+    },
+    {
+      "N": 16,
+      "branch_B": 7,
+      "forks": 1,
+      "selected": 16,
+      "actual_candidates": 67,
+      "actual_groups": 17
+    },
+    {
+      "N": 16,
+      "branch_B": 8,
+      "forks": 1,
+      "selected": 16,
+      "actual_candidates": 68,
+      "actual_groups": 17
+    },
+    {
+      "N": 16,
+      "branch_B": 5,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 60,
+      "actual_groups": 24
+    },
+    {
+      "N": 16,
+      "branch_B": 6,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 72,
+      "actual_groups": 24
+    },
+    {
+      "N": 16,
+      "branch_B": 7,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 84,
+      "actual_groups": 24
+    },
+    {
+      "N": 16,
+      "branch_B": 8,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 96,
+      "actual_groups": 24
+    },
+    {
+      "N": 20,
+      "branch_B": 5,
+      "forks": 1,
+      "selected": 20,
+      "actual_candidates": 81,
+      "actual_groups": 21
+    },
+    {
+      "N": 20,
+      "branch_B": 6,
+      "forks": 1,
+      "selected": 20,
+      "actual_candidates": 82,
+      "actual_groups": 21
+    },
+    {
+      "N": 20,
+      "branch_B": 7,
+      "forks": 1,
+      "selected": 20,
+      "actual_candidates": 83,
+      "actual_groups": 21
+    },
+    {
+      "N": 20,
+      "branch_B": 8,
+      "forks": 1,
+      "selected": 20,
+      "actual_candidates": 84,
+      "actual_groups": 21
+    },
+    {
+      "N": 20,
+      "branch_B": 5,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 60,
+      "actual_groups": 24
+    },
+    {
+      "N": 20,
+      "branch_B": 6,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 72,
+      "actual_groups": 24
+    },
+    {
+      "N": 20,
+      "branch_B": 7,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 84,
+      "actual_groups": 24
+    },
+    {
+      "N": 20,
+      "branch_B": 8,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 96,
+      "actual_groups": 24
+    },
+    {
+      "N": 24,
+      "branch_B": 5,
+      "forks": 1,
+      "selected": 23,
+      "actual_candidates": 93,
+      "actual_groups": 24
+    },
+    {
+      "N": 24,
+      "branch_B": 6,
+      "forks": 1,
+      "selected": 23,
+      "actual_candidates": 94,
+      "actual_groups": 24
+    },
+    {
+      "N": 24,
+      "branch_B": 7,
+      "forks": 1,
+      "selected": 23,
+      "actual_candidates": 95,
+      "actual_groups": 24
+    },
+    {
+      "N": 24,
+      "branch_B": 8,
+      "forks": 1,
+      "selected": 23,
+      "actual_candidates": 96,
+      "actual_groups": 24
+    },
+    {
+      "N": 24,
+      "branch_B": 5,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 60,
+      "actual_groups": 24
+    },
+    {
+      "N": 24,
+      "branch_B": 6,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 72,
+      "actual_groups": 24
+    },
+    {
+      "N": 24,
+      "branch_B": 7,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 84,
+      "actual_groups": 24
+    },
+    {
+      "N": 24,
+      "branch_B": 8,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 96,
+      "actual_groups": 24
+    },
+    {
+      "N": 32,
+      "branch_B": 5,
+      "forks": 1,
+      "selected": 23,
+      "actual_candidates": 93,
+      "actual_groups": 24
+    },
+    {
+      "N": 32,
+      "branch_B": 6,
+      "forks": 1,
+      "selected": 23,
+      "actual_candidates": 94,
+      "actual_groups": 24
+    },
+    {
+      "N": 32,
+      "branch_B": 7,
+      "forks": 1,
+      "selected": 23,
+      "actual_candidates": 95,
+      "actual_groups": 24
+    },
+    {
+      "N": 32,
+      "branch_B": 8,
+      "forks": 1,
+      "selected": 23,
+      "actual_candidates": 96,
+      "actual_groups": 24
+    },
+    {
+      "N": 32,
+      "branch_B": 5,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 60,
+      "actual_groups": 24
+    },
+    {
+      "N": 32,
+      "branch_B": 6,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 72,
+      "actual_groups": 24
+    },
+    {
+      "N": 32,
+      "branch_B": 7,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 84,
+      "actual_groups": 24
+    },
+    {
+      "N": 32,
+      "branch_B": 8,
+      "forks": 12,
+      "selected": 12,
+      "actual_candidates": 96,
+      "actual_groups": 24
+    }
+  ],
+  "explicit_private_normal_perowner_cap8": true,
+  "original_DTO_unchanged": true,
+  "C96_future96_global192_unchanged": true,
+  "actual_target_groups24_preserved": true,
+  "ready_ticket_identity_and_publication_unchanged": true,
+  "eager_parent_B1to8_recognized_only_B3_eligible": true,
+  "HOST_fixture_g_not_empirical": true,
+  "NPU_used": false,
+  "Goodput": null,
+  "adopted": false
+}

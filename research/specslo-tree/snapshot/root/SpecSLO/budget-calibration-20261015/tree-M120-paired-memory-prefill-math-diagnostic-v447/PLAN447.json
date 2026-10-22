@@ -1,0 +1,27 @@
+{
+  "schema": "ROOT447.bounded-pair-known-prefill-diagnostic.v1",
+  "fresh_same_engine445_neural_and_timing_body_retained": true,
+  "parent445_explicit_graph_reset_after_saved_evidence": true,
+  "synchronize_GC_empty_cache_after_parent_and_each_variant": true,
+  "collective_minimum_free_GiB_before_capture": 3,
+  "maximum_bulk_diagnostic_graphs": 2,
+  "all9_initial_and_continuation_cases_retained": true,
+  "NN_outputs_saved_before_each_pair_and_checked_again_after_replay": true,
+  "per_variant9_balanced_baseline_and_variant_events": true,
+  "physical_M": 120,
+  "physical_S": 24,
+  "original72_prefixes_protected": true,
+  "branch_copy_qualified": false,
+  "draft_prefill_qualified": false,
+  "admission_qualified": false,
+  "full463": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "caps": {
+    "seconds": 3600,
+    "tag_MiB": 192,
+    "aggregate_MiB": 3584
+  },
+  "Git_pushes": 0
+}

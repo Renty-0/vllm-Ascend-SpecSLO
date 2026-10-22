@@ -1,0 +1,398 @@
+{
+  "ROOT_prepare_conditions": [
+    "Run original guard source_state(archive=True)/prepared path before freeze/launch so original P148/P160/P173 archived member bytes are verified in place. Cold author proof deliberately used archive=False.",
+    "Use actual749-input guardian map before adding peer, and separately bind the five additional D evidence artifacts as ROOT has been notified.",
+    "Explicitly disclose the unique selected P154 PREPARED_SOURCE_ARCHIVE_V154.tar.gz 4,163,298-byte nested copy. P148/P160/P173 large archives stay in place; do not claim every old binary archive is excluded."
+  ],
+  "UTC": "2026-10-17T16:00:22.055924+00:00",
+  "blocking_findings": [],
+  "candidate": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199",
+  "findings": [
+    {
+      "anchors": [
+        "scope199.py:13",
+        "live199.py:11",
+        "live199.py:20",
+        "budget199.py:6",
+        "budget199.py:34"
+      ],
+      "conclusion": "Only five finite scopes: original parent16 B4, normal16 B4, child E1..4 B4, R0 or single R1 as declared; shared main physical M20, exact F1/2/4 and U1/2/4/8. New FastV5 preserves sources-empty original startup behavior. Nonempty new work requires the current private context and exact N/steps/parents/repair/frontier conditions. Production cap3 class/config/shape remains unchanged; E4 private module/class is separate and removed in finally, together with the private engine permission. No production issuer or arbitrary tuple scope exists.",
+      "topic": "Diagnostic permission and exact domain"
+    },
+    {
+      "anchors": [
+        "runtime199.py:24",
+        "runtime199.py:31",
+        "runtime199.py:60",
+        "component199.py:5",
+        "extension199.py:27"
+      ],
+      "conclusion": "Exact original Native protocol is captured once before tree_entry install and constructor; the original_native_protocol_v75.commit_states function object is separately saved and required at every commit. No late compile or missing generic native_protocol adapter is used. Original201/44/114 startup and complete current original full527 B4 and M80 components execute before bounded work. Only a fresh component173 function namespace changes actor_v146 origin checker import to the new strict origin checker; parent globals and every other canonical origin remain exact BASE paths/SHA. New generated FastV5 must equal its frozen materialization. Actual HOST exercises the real baseline factory until its actor-import boundary and exact whole inverse, without a model.",
+      "topic": "One fresh original173 baseline and source origin binding"
+    },
+    {
+      "anchors": [
+        "draft199.py:23",
+        "draft199.py:50",
+        "draft199.py:70",
+        "draft199.py:89",
+        "fast199.generated.py:103"
+      ],
+      "conclusion": "Parent16 truly executes four top2 model steps with root plus three written proposal KVs, then actual frontier prelude consumes d4 at p+4. Child prefix is p+5 and four shared steps write its root/e1/e2/e3 while predicting e4. Independent fresh bank reconstructs its own parent4, original PA frontier/repair prelude, full-F head and allphysical M20 four-step encoded8. Complete actual parent M16 hidden/encoding/56KV and shared prelude/hidden/raw8/mean8/ledger/all56 queryKV are matched. No reference KV is initialized from candidate data; source-prefix protection and explicit source-epoch restore remain hard gates.",
+      "topic": "Genuine P4 and child4 draft math"
+    },
+    {
+      "anchors": [
+        "draft199.py:50",
+        "draft199.py:62",
+        "observe199.py:22",
+        "epoch199.py:8"
+      ],
+      "conclusion": "Independent oracle builds real E+R PA rows using original producer then permutes real/interior/tail rows on each tensor own device; CPU context uses CPU indices. Actual ten-field metadata is checked in the SAME actual allocation before fresh reference, including own physical owner/slot/table mappings and all dummy slot=-1. The observer keeps model metadata/order intact and uses only a separate read-only real/dummy view for unchanged padding inspection; CPU context index is explicitly moved to its native CPU device. Draft scratch64..101 and target actual scratch463..526 are disjoint from64 real owners. Actual NativePrefixCache HOST proves166/192 unique fixture pages under storage527/pages544/block128; this is a bounded fixture proof, not whole-workload HBM evidence.",
+      "topic": "Interior padding and device-indexed metadata"
+    },
+    {
+      "anchors": [
+        "scope199.py:30",
+        "target199.py:6",
+        "target199.py:12",
+        "protocol199.py:43"
+      ],
+      "conclusion": "Original173 current Controls installs its mapper into canonical target_layout.envelope before target_shape is called; actual current N16/Q80 therefore uses M80/S16 after its genuine own issuer. All target plans/roots/rows/IDs come from the original planner/current ticket payloads and logical root lengths. Target greedy and hidden F/T/F, cold3/warm1 greedy wrapper handling, independent full-M model/head/queryKV reconstruction, old history replay and every committed root/path128 KV tensor are checked. Target padding invokes the actual current engine method and original scratch owners, not copied frame IDs. NativeGraphExecution.used_aclgraph access is a valid property; retained asdict execution remains four stored fields.",
+      "topic": "Current target geometry and independent history"
+    },
+    {
+      "anchors": [
+        "actor199.py:19",
+        "actor199.py:50",
+        "actor199.py:73",
+        "protocol199.py:58",
+        "audit199.py:29"
+      ],
+      "conclusion": "Original parent full acceptance, parent ticket identity, exact dependency4 tokens and frontier equality determine promotion; all4 agree on these gates before conditional finish. Original captured preflight/finite consensus/compaction/finish/cleanup and unchanged commit_states actual identity perform the transaction. The actual original controller receives all32 active logical owners, max_target_requests16/C96 and whole current proposal counts; it consumes selected tickets each time, leaves deferred normal/child tickets intact and closes them exactly once. Retained HOST proves default normal16 first then promoted child tail, so child-containing mixed N16/Q80 can remain absent and must yield passed_bounded_subset. No artificial waitage, target future injection, forced accepted path, manual target reordering or production permission is introduced.",
+      "topic": "Natural promotion, real planner consumption, honest subset"
+    },
+    {
+      "anchors": [
+        "actor199.py:88",
+        "next199.py:36",
+        "next199.py:65",
+        "actor199.py:97"
+      ],
+      "conclusion": "The actual child4 fullaccept leaves e4 as a potentially missing committed draft suffix; next proof explicitly detects source-ledger missing suffix0/1 and runs original PA repair plus genuine B3 next waves over all64 logical owners. It checks fullphysical next hidden/encoding,56 KV, exact roots/rows/confidences and independent ledger after rebuilding the actual old shared4 history. Child3 is only source contrast, not new execution evidence. Stale epoch must fail before Native counters change, then original controller invalidation removes all pending tickets. Revision2 now restores real parent/shared4 on a common stage before rollback next snapshots ledger, preserving all exact gates; rollback is not falsely credited as model restore merely because the stale invoke rejected.",
+      "topic": "True child4 leaf repair and independent ownnext"
+    },
+    {
+      "anchors": [
+        "actor199.py:127",
+        "actor199.py:143",
+        "draft199.py:110",
+        "audit199.py:15"
+      ],
+      "conclusion": "Actual entry dictionaries, original object IDs and disabled set are observed, without guessed zero new families. New hidden counterparts may arise through original machinery; naturally validated real-row counts are required. Discovery and two full five-case sweeps subtract all21 original fields; later sweeps must have zero deltas and exact original ticket/commit/ownnext fingerprints. Current model allphysical gates are mandatory and not inherited from any old receipt. Saved hashes/encoded integers/metadata/consensus are source-bound evidence; a HOST auditor cannot recompute unretained hidden/KV model math.",
+      "topic": "Natural current Native keys, two complete traces and limitations"
+    },
+    {
+      "anchors": [
+        "check199.py:11",
+        "guard199.py:22",
+        "guard199.py:50",
+        "guard199.py:68",
+        "guard199.py:97"
+      ],
+      "conclusion": "All seven attempt records and every actual HOST source/log file are retained, including failed preparation/failed first HOST and prior successful revisions. The superseded ready03bbbb, original CPU901e and249 regular source/evidence members are preserved in an exact byte archive. Guardian keeps self-ROOT-lock, original10496/15/212 pre/post verifier, owned group cleanup/all4 idle,7200 seconds and256MiB tag/512MiB aggregate. Frozen177 only tolerates missing mutable private actual .tmp files; other storage/symlink failures remain rejected. Exact new ROOT review/peer/freeze/archive/source identity is required before any model entry. No parent or frozen candidate bytes were edited by this peer.",
+      "topic": "Source closure, attempts and guardian"
+    }
+  ],
+  "limitations": [
+    "This is SOURCE/HOST readiness only. No new actual199 model qualification, natural positive, accepted child4, full leaf repair, timing, or mixed child-containing N16 coverage is asserted.",
+    "Default actual planner fixture can complete only as subset even when all finite math/protocol gates pass; no full463 or production issuer is available.",
+    "No independent whole-workload AR/canonical equality, new g posterior, formal Goodput or adoption claim.",
+    "Selected closure465 is not a complete transitive installed environment/import closure.",
+    "Original historical SOURCE ready and all successful/failed attempts remain preserved, not retroactively relabelled as passing the corrected runtime path."
+  ],
+  "mechanical_evidence": {
+    "bytes": 318840,
+    "counts": {
+      "AST": 25,
+      "bash_n": 2,
+      "guard": 4,
+      "guard_flat_before_peer": 749,
+      "guard_retained": 251,
+      "local": 28,
+      "preserved_old_tar_members": 249,
+      "readonly": 465,
+      "ready_flat": 754,
+      "ready_retained": 256,
+      "whole_text_projections": 9
+    },
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V199_INDEPENDENT_STATIC_MECHANICAL_EVIDENCE_REVISION2.json",
+    "sha256": "68a159c836da6c141b5ddf2b66efd3fe7fc7b9b28d0961fd9970cc6de31e9eea"
+  },
+  "peer_actions": {
+    "NPU_used": false,
+    "Torch_imported": false,
+    "candidate_imported": false,
+    "candidate_or_guard_edited": false,
+    "current_canonical_V2_actual_read": false,
+    "device_query": false,
+    "freeze_or_launch": false,
+    "model_initialized": false,
+    "new_suite_run": false,
+    "old_suites_run": false
+  },
+  "provenance": {
+    "AST_parse_compile_only": 25,
+    "CPU_elapsed_outer": 1.7389922081492841,
+    "HOST": {
+      "CPU_path": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/CPU_RESULT199.json",
+      "CPU_sha256": "266e42c1b3611e4611d30ef983f7f11c6b02c0accefc95e837f7dad7eead1d06",
+      "actual_attempt_count": 7,
+      "actual_guard_cold": {
+        "elapsed_seconds": 7.746118404902518,
+        "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V199_COLD_ACTUAL_GUARD_SOURCE_STATE_HOST_RESULT_REVISION2.json",
+        "sha256": "2acff79cfe07c70b3e0ff50b71b422c0f7a58a35cd0c830b8d82d0bebe7f1c3e"
+      },
+      "attempt_statuses": {
+        "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/HOST_ATTEMPT199_1792251448453530435.json": "failed",
+        "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/HOST_ATTEMPT199_1792251505774686326.json": "passed",
+        "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/HOST_ATTEMPT199_1792251579800489561.json": "passed",
+        "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/HOST_ATTEMPT199_1792251664440246473.json": "passed",
+        "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/HOST_ATTEMPT199_1792251906011371190.json": "passed",
+        "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/HOST_ATTEMPT199_1792252520462698243.json": "passed",
+        "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/HOST_ATTEMPT199_preparation_1792251183984367461.json": "failed_preparation"
+      },
+      "elapsed_seconds": 1.7389922081492841,
+      "errors": 0,
+      "failures": 0,
+      "no_old_suites_rerun": true,
+      "tests_run": 4,
+      "unittest_log": "780e9f49a08706e29a4bf4d65553f214a3ef6de643a57ca21ce61798288c54d0"
+    },
+    "actual_guard_flat_before_peer": 749,
+    "additional5_D_evidence": {
+      "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V199_BOUNDED_PARENT4_CHILD4_SHARED4_DIAGNOSTIC_SOURCE_AND_HOST_READY_FOR_ROOT_REVIEW.json": "03bbbbb849d9fbbdcdf9d08231471bb98b1cb5adc63c734fb75fa581e5de0dd8",
+      "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V199_COLD_ACTUAL_GUARD_SOURCE_STATE_HOST_RESULT.json": "b0837fc9976481e279f2ae268ab7ccf6801c67be5a57a9607c278d3c96e78f0b",
+      "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V199_COLD_ACTUAL_GUARD_SOURCE_STATE_HOST_RESULT_REVISION2.json": "2acff79cfe07c70b3e0ff50b71b422c0f7a58a35cd0c830b8d82d0bebe7f1c3e",
+      "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/cold_guard_source_v199_HOST.py": "4be94f020a39313751055865f8aee0978b79aea2f1bdfa78c78a2a4824295fbb",
+      "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/cold_guard_source_v199_revision2_HOST.py": "3f1c7473eab391c9e0bf43e0280e1cdc131394a24d330c3a64a7d2928c9397ee"
+    },
+    "all7_attempts_retained": true,
+    "archives": {
+      "archives": [
+        {
+          "copied": false,
+          "member_set_and_all_bytes_exact": true,
+          "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/PREPARED_SOURCE_ARCHIVE173.tar.gz",
+          "regular_members": 158,
+          "sha256": "058f41b1a40f15d7bb189b8d4195939761f329284c9cf846410694b72f51a78c"
+        },
+        {
+          "copied": false,
+          "member_set_and_all_bytes_exact": true,
+          "path": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/host-archive/V148_FINAL_CPU_SOURCE.tar.gz",
+          "regular_members": 6390,
+          "sha256": "64f3bf65451ceee2c14b8e80c446b573681d03195bdfbd59991581e2ae4b848b"
+        },
+        {
+          "copied": false,
+          "member_set_and_all_bytes_exact": true,
+          "path": "/root/SpecSLO/budget-calibration-20261015/tree-active-window32-16-local-v160/PREPARED_SOURCE_ARCHIVE160.tar.gz",
+          "regular_members": 42,
+          "sha256": "8c72c7305a6692fc02ad90a82ac444c189913b608aa8cc7000dcb2b8c9c44388"
+        }
+      ],
+      "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V198_INDEPENDENT_STATIC_MECHANICAL_EVIDENCE.json",
+      "sha256": "f374976fb8b7ed8f388a82cfdcb34e5b2d3a06794ed955f1f9e30a7cfb19c696"
+    },
+    "bash_n_only": 2,
+    "current_4_HOST_reviewed_not_executed": true,
+    "guard_evidence_files": 251,
+    "old_4_HOST_not_rerun_by_peer": true,
+    "raw_ready_flat": 754,
+    "ready_evidence_files": 256,
+    "root_review_binding_instruction": "Build reviewed_inputs from actual guard.source_state (749 inputs before peers), not the descriptive ready754 flat map. ROOT should separately bind the five additional D proof artifacts by exact SHA/full evidence; this peer also binds their hashes. Original attempts and source preservation are in the actual251 guard evidence files.",
+    "selected_old_archive_exception": {
+      "bytes": 4163298,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-natural-positive-union-discovery-local-v154/PREPARED_SOURCE_ARCHIVE_V154.tar.gz",
+      "sha256": "27f2176c2749ea9fb49bc02c6fba6fc845dc4f86f5ce4b3024705098d59e787b",
+      "will_be_nested_by_archive_sources": true
+    },
+    "unittest_log": {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/full-host-attempts/1792252518782064701/unittest.log",
+      "sha256": "780e9f49a08706e29a4bf4d65553f214a3ef6de643a57ca21ce61798288c54d0"
+    },
+    "whole_source_projections": [
+      {
+        "exact_deltas": 9,
+        "file": "base199.py",
+        "namespace": [
+          "197",
+          "199"
+        ],
+        "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/base197.py",
+        "parent_sha256": "7a8ee69d1516b2e83e6c1e81caf94709b1f3a4fcd118cfa0a83e91fd2d1f44e7",
+        "whole_text_projection": true
+      },
+      {
+        "exact_deltas": 0,
+        "file": "source199.py",
+        "namespace": [
+          "197",
+          "199"
+        ],
+        "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/source197.py",
+        "parent_sha256": "afa0133d3df983bd1e5015bd0a8af6c0faa33b25404ed68376c3aac2549c2954",
+        "whole_text_projection": true
+      },
+      {
+        "exact_deltas": 0,
+        "file": "progress199.py",
+        "namespace": [
+          "197",
+          "199"
+        ],
+        "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/progress197.py",
+        "parent_sha256": "580274b5e8a8c37386b9f5a5b7883d538f50cebf2dcdac449f8b3d2b0308c8ef",
+        "whole_text_projection": true
+      },
+      {
+        "exact_deltas": 0,
+        "file": "config199.py",
+        "namespace": [
+          "197",
+          "199"
+        ],
+        "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/config197.py",
+        "parent_sha256": "7eed2bd90250f35cadd07d47d7648db8dc5dc44e2efd571f761b9c8630991c98",
+        "whole_text_projection": true
+      },
+      {
+        "exact_deltas": 1,
+        "file": "check199.py",
+        "namespace": [
+          "197",
+          "199"
+        ],
+        "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/check197.py",
+        "parent_sha256": "94b27f06b2af8d50e4b193356509a4545a33be8cfb38f2608ff59c212d3ef05f",
+        "whole_text_projection": true
+      },
+      {
+        "exact_deltas": 0,
+        "file": "host_full199.py",
+        "namespace": [
+          "197",
+          "199"
+        ],
+        "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/host_full197.py",
+        "parent_sha256": "4ed7c66977905d6516383bc5ff5b594acab1f703c6c252f5699e2f67e3f11480",
+        "whole_text_projection": true
+      },
+      {
+        "exact_deltas": 29,
+        "file": "runtime199.py",
+        "namespace": [
+          "197",
+          "199"
+        ],
+        "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/runtime197.py",
+        "parent_sha256": "fac238515e5b389e2efce4f8a2babeae66fc9f426f53e304c6f16b1f22eddfdc",
+        "whole_text_projection": true
+      },
+      {
+        "exact_deltas": 0,
+        "file": "provider199.py",
+        "namespace": [
+          "179",
+          "199"
+        ],
+        "parent": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-bank-binding-full-v179/provider179.py",
+        "parent_sha256": "413d76170a6a72f3863b6a1f9ad57a105606b7a8ed2b17b03b7fb8a32aae4f08",
+        "whole_text_projection": true
+      },
+      {
+        "exact_deltas": 1,
+        "file": "observe199.py",
+        "namespace": [
+          "179",
+          "199"
+        ],
+        "parent": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-bank-binding-full-v179/observer179.py",
+        "parent_sha256": "b21bb614d610285cbb8c210ef2c2fe4174ccaed5f39880ad3a8ef4a96a394088",
+        "whole_text_projection": true
+      }
+    ]
+  },
+  "ready": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V199_BOUNDED_PARENT4_CHILD4_SHARED4_DIAGNOSTIC_SOURCE_AND_HOST_READY_FOR_ROOT_REVIEW_REVISION2.json",
+    "sha256": "939bc2d968be8feaede93ede4175358b031e047ad29aea77009b7009328dbc72"
+  },
+  "resolved_blocker": {
+    "actual_control_proof": {
+      "actual_actor_two_statements": true,
+      "actual_next_restore_and_strict_initial_ledger_gate": true,
+      "actual_parent_shared4_restore_precedes_snapshot": true,
+      "common_unconditional_stage": true,
+      "first_next3_boundary_reached": true,
+      "ledger_gate_relaxed": false,
+      "numerical_model_work_executed": false,
+      "original_last_only_path_rejected": true
+    },
+    "exact_actor_inverse_verified": true,
+    "old249_source_and_all_HOST_bytes": {
+      "all249_regular_member_bytes_exact": true,
+      "archive": {
+        "members": 249,
+        "path": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/full-host-attempts/BEFORE_ROLLBACK_SOURCE_RESTORE_REVISION2/PREVIOUS_SOURCE_AND_ALL_HOST_EVIDENCE.tar.gz",
+        "sha256": "325247e06f96023c48a4b1e3652e60f686cd504808bf0717c2fbe9ea70065373"
+      },
+      "manifest_path": "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/full-host-attempts/BEFORE_ROLLBACK_SOURCE_RESTORE_REVISION2/PRESERVED.json",
+      "manifest_sha256": "c0de0414237195c94886256f6308f61bd074020af422f5ceb261c34fff6f40c9"
+    },
+    "original_ready": {
+      "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V199_BOUNDED_PARENT4_CHILD4_SHARED4_DIAGNOSTIC_SOURCE_AND_HOST_READY_FOR_ROOT_REVIEW.json",
+      "reason": "independent peer found prefix-only rollback ledger snapshotted before actual parent/shared4 source restoration",
+      "sha256": "03bbbbb849d9fbbdcdf9d08231471bb98b1cb5adc63c734fb75fa581e5de0dd8"
+    },
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V199_INDEPENDENT_ROLLBACK_NEXT_SOURCE_BLOCKER.json",
+    "revision2_delta": "Only actor import of next.restore_source and unconditional common restore before rollback nextproof, plus a targeted retained HOST ordering regression. next199.py, its exact ledger equality and all independent model/KV/reference gates are unchanged.",
+    "sha256": "9647dad77432ed861187e972caed00af5ef6d9c493c78097f5dadb14fa1d2cfa"
+  },
+  "reviewed_source_files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v199-root-execution/GUARD_INPUTS199.json": "57a7953ad7c3805f7162b0da0a73a2c89e173da71721f0854b7936f3c10b222f",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v199-root-execution/guard199.py": "7dc4395d5d6fbe5ea69b3bd774e33e8711f445a768d0719c46cac7489159f94a",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v199-root-execution/launch199.sh": "07a4097c226ebf99a99f85208956bab84aec17fbf4c8309d5ce1e4f1bb852aea",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v199-root-execution/startup199.sh": "f87a9db9f1df056a9d0329dacc0bc26910af01c853812f956e6dccab0faa30bc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/FIXTURE_INPUT199.json": "d86523f99d673015ade3db81e99a046bf99a6bae7fb4024a5792fb8fddaa9f21",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/INPUTS199.json": "4dc1ae4197e7d9c1a346fe3494f3cc57d777a0551b56c372b4005e6bce0bba96",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/PROJECTIONS199.json": "549a4e97b3578fb0c8653219b2c82fa38785c68bab233431f5154a9aca7954bf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/SCOPE199.txt": "722925ad2432a246a1e498b88b33066c2d8a316ad2e71e49ac69806128b9b729",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/actor199.py": "499ed420dd0687ba7f5f988770c624e97f1cd74dd842ca5c82064b6cd45ba87b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/audit199.py": "913ebb1763aeabdb5ba33cff3bffb1182d7690651a3c4a880b850a389206e11f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/base199.py": "ef359a21779209e97b64255bd48a8a51504d86aa545844e0d458636a964c9225",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/budget199.py": "0d9be6d2ceb7567bea6944cdfc55096ca1a9d9cb25a6189a5705cc9f7930a7e3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/check199.py": "6e93450d22e0b4776df20a5151d9529d9ba292dfadbb96059ef3e41683cbde83",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/component199.py": "7e4aca304a3e935251d71e4fc0a81a331565a5ce597897341867b924695dafc6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/config199.py": "7eed2bd90250f35cadd07d47d7648db8dc5dc44e2efd571f761b9c8630991c98",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/draft199.py": "29cf1513b3bfc5f83b72c80ad480aed327dac37f4f487e6272618401f82633ed",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/epoch199.py": "e0058d0d15ea2236a423324f57172baa185c7174ba1ce30a6c965ba3d127156a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/extension199.py": "84632b7f17d0f4be0aa3771e45229136d4a98b797781493d73cd1e5b9da04dcd",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/fast199.generated.py": "a034be29a52a8cb112e7ac7bf659b11c96ff4a57c42b4ddfdeed75edaf3821c9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/host_full199.py": "a36c19a0ba1d8b1ba015d717cb81da8bf4f374f14bc82c3c9e4722381da700f5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/live199.py": "a47a7b8697af151fa5918ed5e891a54228e3f540a08c7b54f7f471286b9c5118",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/next199.py": "389d6cc7b919c95f9baa25bb3e96359f278fad6e1681aa9a703ecb86e3b9c825",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/observe199.py": "73bd72ac9389b41f0bf0de674052ed8f8993211fe0d5901e49e7941e0da33da1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/progress199.py": "53e7e9d19a8f830cd850763603f6b0b12959dc19ba218ce1458aa158c8c5f321",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/protocol199.py": "26d1a3344b31b860292b6825ece477368da4adac2d5a2121cd8d27a43c21629b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/provider199.py": "0ca10fe91b9b54d493e4b2d8acd5f5ca3087d62f150b25c871caf1c8655932a3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/runtime199.py": "ca2608ca5d07be318c2df79ad7d47a01613a412dbae2a4e44e9d07fb3a84651d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/scope199.py": "f4b1702b707a6a31f6400a69f8e5726b7699051da98cce773c117da7d4145fa2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/source199.py": "4fa9830d7a6eb0b79e8784ef20329b029b9eb5244a5c168afbaba0000d980e69",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/source_epoch.py": "d2f1cc32888e58855eeb3773e50518577d9019110f179c185056753edaeb1a15",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/target199.py": "f6905b1ecf371fdcb89672ea85e1aa6ad0b6937e02badc5c60be80a85b475e47",
+    "/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199/test_full199.py": "66be4ebce56174b1c85e40fbf0126edf565aa959ccb8804a83c40924b2614376"
+  },
+  "schema": "V199.independent-source-HOST-provenance-peer.revision2.v1",
+  "status": "passed_source_review"
+}

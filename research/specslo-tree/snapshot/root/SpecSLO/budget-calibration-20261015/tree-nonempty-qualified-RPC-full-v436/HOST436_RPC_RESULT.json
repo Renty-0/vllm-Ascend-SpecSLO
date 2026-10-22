@@ -1,0 +1,27 @@
+{
+  "status": "PASS_HOST436_ACTUAL_API_RECEIVER_BOUNDED_QUALIFICATION_VIEW",
+  "real_original6000s_timeout_reproduced": "PEARL timed out after 6000s during V209 causal80-N9-to15-allB4-empty-active32-full463; pending ranks: [0].",
+  "real_original_receiver_accepts6500s_with_qualification_view": true,
+  "actual_receiver_function_identity_preserved": true,
+  "original_engine_config_and_worker_config_and_production_timeout_unchanged": true,
+  "controlled_negatives": [
+    "bounded18000_deadline_preserved",
+    "worker_error_still_propagates",
+    "ordinary_generation_not_adapted"
+  ],
+  "explicit_HOST_clock_pipe_and_process_doubles": true,
+  "record": {
+    "original_parent_timeout_seconds": 6000,
+    "qualification_receive_timeout_seconds": 18000,
+    "original_engine_configuration_object_unchanged": true,
+    "original_receive_function_and_owned_connections_preserved": true,
+    "worker_configuration_changed": false,
+    "production_timeout_changed": false,
+    "outer_supervisor_total_limit_seconds": 18000
+  },
+  "Native_models_constructed": 0,
+  "NPU_used": false,
+  "NN_qualification": false,
+  "Raw": null,
+  "Goodput": null
+}

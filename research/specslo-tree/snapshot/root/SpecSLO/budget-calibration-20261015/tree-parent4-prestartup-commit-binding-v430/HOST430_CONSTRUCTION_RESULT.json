@@ -1,0 +1,13 @@
+{
+  "status": "PASS_HOST430_EXACT_WORKER_ORDER_CALLBACKS_AND_DIAGNOSTIC_DEPENDENCY_AUDIT",
+  "source_specific_v199_attribute_reads": [
+    "_v199_commit_states",
+    "_v199_diagnostic"
+  ],
+  "original419_case_target_and_protocol_bodies_retained": true,
+  "all_original_227_681_75_warm_twozero_seal_full463_ownAR_required": true,
+  "original_private_caps_and_owned_cleanup_retained": true,
+  "NPU_used": false,
+  "Native_models_constructed": 0,
+  "NN_qualification_inherited": false
+}

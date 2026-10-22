@@ -1,0 +1,10 @@
+{
+  "schema": "ROOT423.source-archive-receipt.v1",
+  "UTC": "2026-10-21T05:31:03.701639+00:00",
+  "freeze_sha256": "ebf13f6899ee749c2ed7c7132f097c692223e246a20cd4c5c7cfad5596861749",
+  "archive_sha256": "a46c14e2d6f2bb46682e951349ae3e5c35e2955dc1b5ff533814349b79531725",
+  "members": 4571,
+  "bytes": 39288448,
+  "source_only": true,
+  "NN_permission_inherited": false
+}

@@ -1,0 +1,87 @@
+{
+  "status": "BUILT_ACTUAL454_CONSERVATIVE_EXACT160_PROFILE_HOST_ONLY",
+  "profile": "/root/SpecSLO/budget-calibration-20261015/tree-M160-qualified-profile-whole-model-v455/mc2-profile-with-qualified160.json",
+  "profile_sha256": "cdef680f8ae1231d143d05162715564dc8c1b248b41eb961239c7d34df37635a",
+  "original_profile": "/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/mc2-profile.json",
+  "original_profile_sha256": "ad9e0648810ed697679ee84b8bbc2939ea14bfb687d0215d27f403ad5526db1c",
+  "original_rows": 48,
+  "added_rows": 2,
+  "additions": [
+    {
+      "M": 160,
+      "K": 3072,
+      "N": 5120,
+      "baseline_p95_ms": 0.15854964032769203,
+      "fused_p95_ms": 0.14735424891114235,
+      "p95_speedup": 1.075976033940499
+    },
+    {
+      "M": 160,
+      "K": 8576,
+      "N": 5120,
+      "baseline_p95_ms": 0.21463333163410425,
+      "fused_p95_ms": 0.20342313218861818,
+      "p95_speedup": 1.055107790962002
+    }
+  ],
+  "parent_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT454_TERMINAL_INDEPENDENT_REAL32_MC2_AUDIT_HOST.json",
+  "parent_audit_sha256": "8adbc9bc52ee56e63f09c6d5386be7754b07192fc0f6472b68f80f15994e1246",
+  "source_records": [
+    {
+      "layer": 0,
+      "projection": "attention",
+      "raw": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/attention/layer-0/m160/measurement.json",
+      "raw_sha256": "ce342254fc98e375c672715b7d62f7f7f39949c9a187a168728224d4eb4c6d8b",
+      "qualified_profile": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/attention/layer-0/m160/single-shape-qualified-profile.json",
+      "qualified_profile_sha256": "399e655966036bc2e6dce34ebcbfe7c2efc58a02e3548bdba0a27b057ab8b940"
+    },
+    {
+      "layer": 31,
+      "projection": "attention",
+      "raw": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/attention/layer-31/m160/measurement.json",
+      "raw_sha256": "0166a41a6874de8cd9b0047c1d6df69a3bd9eeb1af8f2c85f1264c7ea91cceb0",
+      "qualified_profile": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/attention/layer-31/m160/single-shape-qualified-profile.json",
+      "qualified_profile_sha256": "9e9466bdd20e6f1d53e97db6b4c55a66c557a95d48d0ee5e16298ed130fb1e8f"
+    },
+    {
+      "layer": 63,
+      "projection": "attention",
+      "raw": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/attention/layer-63/m160/measurement.json",
+      "raw_sha256": "ceb4e31665ee43363179cfc11b0898f77617d2797b9994e351ce041e95434044",
+      "qualified_profile": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/attention/layer-63/m160/single-shape-qualified-profile.json",
+      "qualified_profile_sha256": "e2a06dc4c22dad7435a17b9a3ead5babf2b1a39a9661ca4ca0290a1bc8ee9220"
+    },
+    {
+      "layer": 0,
+      "projection": "down",
+      "raw": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/down/layer-0/m160/measurement.json",
+      "raw_sha256": "ebbcd486e6d795729336936af292435b8063a484a4f2be207d79214a5afb1096",
+      "qualified_profile": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/down/layer-0/m160/single-shape-qualified-profile.json",
+      "qualified_profile_sha256": "1ad1c8e2a4ab277f07223fd2e8b9d8da44a549063f8bd7a723bd0d3c538c0c38"
+    },
+    {
+      "layer": 31,
+      "projection": "down",
+      "raw": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/down/layer-31/m160/measurement.json",
+      "raw_sha256": "2cc6143d4c7e7456d3228c8e0f84fbf62405f9422b9cdd2aea9482b60b5e0e62",
+      "qualified_profile": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/down/layer-31/m160/single-shape-qualified-profile.json",
+      "qualified_profile_sha256": "0c7664ca978a702864789a95dde3de956fb4da93b423e59ff0245b9db9946f15"
+    },
+    {
+      "layer": 63,
+      "projection": "down",
+      "raw": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/down/layer-63/m160/measurement.json",
+      "raw_sha256": "ce201822fefc684f71728772e586b80ff57f1dc2e7342549b5d79689c0415da3",
+      "qualified_profile": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M160-real32-native-epilogue-root-v454-six-layers-and1024-change-v1/live-M160454/down/layer-63/m160/single-shape-qualified-profile.json",
+      "qualified_profile_sha256": "3c1438ba3a2aa8aecb1658c488a751f6fdc3934e4706a73f20d9ba5606d5fbc9"
+    }
+  ],
+  "NPU_used": false,
+  "Native_profile_normalization_pending": true,
+  "new_profile_installed": false,
+  "whole_model_NN_pending": true,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "Git_pushes": 0
+}

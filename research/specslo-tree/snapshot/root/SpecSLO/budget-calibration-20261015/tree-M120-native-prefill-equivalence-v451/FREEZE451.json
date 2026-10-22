@@ -1,0 +1,26 @@
+{
+  "schema": "ROOT451.independent-Native-prefill-and16-AR.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/HOST451_CONSTRUCTION_RESULT.json": "63edee546f969ccf25cc5a2d79360e4f5528142093bed78544b449ee9b3529ed",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/HOST451_SETTINGS_RESULT.json": "14cef3645b92324886fa82379a977ce8bb6910a046e35bb05e415f057c86afba",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/PLAN451.json": "fdde33dbbcd7a8d8301dd792869ee33d6ba6a9188a171f55b0e0fff5d8cc118c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/audit451.py": "d6221a23b2c456abb7774bb73f4244f266920a56b6a9ecebe93463d743e01411",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/check451.py": "3b1d17433bcdc10fe066f2f82218298edd8b688550c23bb8fd382e22b6cb9caf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/check451_HOST.py": "00c97ce64a735199cd7ea3f075e47869df4a5c8aa0c0553ba0da78d71ab2ccca",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/check451_settings_HOST.py": "e0ba0651bdac2960fe0eabb4ac62e80cc1064f13106d6024a26cec7fcb069d75",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/forward451.py": "0de5cff0d81a39de1be7024bfff692735b0283060ab849298430212c360495f9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/guard451.py": "92190367d7c299ff9983066776f22d746437c11a72a87aaf5751a0cd7d4da9ff",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/host_env451.py": "9274aa9fd2ec0f6c064af6c3fb902d2e808c37dde41670d2134c03dd927debea",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/probe451.py": "ab61d94252fa299c08a1508eb2ce12fb8dd6cf07e84c86259680cf2a00fa6bf5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/runtime451.py": "570db8ef437b463b22722c8282ac8c2f4503760bd30815e900296dc4327d1b47",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451/startup451.sh": "83a5bc585c431cbcba298416f60180fac4d033f89a64b85663d303cbb8d4aca4"
+  },
+  "parent385_freeze": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+  "parent385_archive": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
+  "current450_freeze": "1f401de775125382cc1cfc7bc0e474192d42b01a7ddfa6064c7e1ab26c04ae00",
+  "current450_archive": "e78dd7bc591ae8818c081f219a4e120f33af58ba9dad834cdeb4b9b41c2068d1",
+  "NPU_run": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

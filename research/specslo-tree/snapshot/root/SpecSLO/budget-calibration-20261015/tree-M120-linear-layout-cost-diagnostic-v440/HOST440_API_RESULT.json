@@ -1,0 +1,13 @@
+{
+  "status": "PASS_HOST440_RETAINED_ACTUAL_BF16_GRAPH_EVENT_AND_MODEL_APIS",
+  "actual_torch_version": "2.10.0+cpu",
+  "actual_torch_npu_version": "2.10.0",
+  "actual_NZ_format": 29,
+  "original_gate_up_bias_attribute_exists": true,
+  "actual_graph_and_event_methods_present": true,
+  "NPU_used": false,
+  "model_constructors": 0,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

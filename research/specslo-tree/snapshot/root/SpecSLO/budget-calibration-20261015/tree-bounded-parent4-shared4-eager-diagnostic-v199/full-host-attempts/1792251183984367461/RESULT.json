@@ -1,0 +1,7 @@
+{
+  "status": "failed_preparation",
+  "tests_run": 0,
+  "model_constructed": false,
+  "NPU_used": false,
+  "reason": "runtime exact indentation anchor mismatch"
+}

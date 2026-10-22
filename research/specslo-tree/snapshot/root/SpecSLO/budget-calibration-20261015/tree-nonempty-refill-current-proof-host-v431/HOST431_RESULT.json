@@ -1,0 +1,35 @@
+{
+  "status": "PASS_HOST431_WHOLE_ACTUAL425_LIVE_INVERSE_AND_SAME_MODEL_PERMISSION_NEGATIVES",
+  "descriptor": {
+    "original_LIVE_sha256": "05ec02b7f95f901fb84363c111bb7d418d5f535b26b02ebe78ebfc3aeeeb4a4f",
+    "proposed_LIVE_sha256": "036b4a3aeae672a0396317aefe90893f259b36df868f711ea7c6b96c85357dec",
+    "complete_AST_inverse": true,
+    "unchanged_original_clock_calls": true,
+    "whole_original_decode_outside_admission_unchanged": true,
+    "global_active_limit": 64,
+    "maximum_nonempty_refill": 32,
+    "low_water": 32,
+    "minimum_refill": 8,
+    "actual427_NN_and_original425_scope_required": true,
+    "NN_launched": false,
+    "serving_installed": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "controlled_negatives": [
+    "changed_original_clock_body",
+    "absent_permission",
+    "forged_HOST_permission",
+    "HOST_has_no_actual425_issued_scope"
+  ],
+  "original_clock_calls_and_duration_broadcast_AST_identical": true,
+  "original_once_root_callback_AST_retained": true,
+  "full_parent4_dispatch_planner_and_target_backend_outside_admission_unchanged": true,
+  "current430_NPU_process_unchanged": true,
+  "Native_models_constructed": 0,
+  "NPU_used": false,
+  "NN427_executed": false,
+  "serving_installed": false,
+  "Raw": null,
+  "Goodput": null
+}

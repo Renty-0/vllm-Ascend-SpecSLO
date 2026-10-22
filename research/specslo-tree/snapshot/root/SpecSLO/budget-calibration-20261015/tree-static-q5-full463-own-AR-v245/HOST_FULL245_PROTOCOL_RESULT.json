@@ -1,0 +1,137 @@
+{
+  "status": "HOST_actual_Native_forward_static_projection_and_original_real_outputs_passed",
+  "post_Native_padding_metadata_identity_checked": true,
+  "actual_constructor_tree_width2_depth4": true,
+  "unique_pages": 160,
+  "cases": [
+    {
+      "N": 1,
+      "budgets": [
+        1
+      ],
+      "real_queries": 2,
+      "physical_segments": 16,
+      "root_only_padding": false
+    },
+    {
+      "N": 1,
+      "budgets": [
+        5
+      ],
+      "real_queries": 6,
+      "physical_segments": 16,
+      "root_only_padding": false
+    },
+    {
+      "N": 16,
+      "budgets": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3
+      ],
+      "real_queries": 79,
+      "physical_segments": 17,
+      "root_only_padding": true
+    },
+    {
+      "N": 16,
+      "budgets": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "real_queries": 80,
+      "physical_segments": 16,
+      "root_only_padding": false
+    },
+    {
+      "N": 16,
+      "budgets": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "real_queries": 32,
+      "physical_segments": 22,
+      "root_only_padding": false
+    },
+    {
+      "N": 8,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "real_queries": 48,
+      "physical_segments": 16,
+      "root_only_padding": false
+    }
+  ],
+  "original_real_positive_budget_guard_preserved": true,
+  "untyped_dummy_rejected": true,
+  "root_only_excluded_from_real_output_and_budget": true,
+  "original_Native_forward_executed": true,
+  "model_double": "CPU input/position identity arithmetic and explicit graph protocol double; no neural/attention/ACLGraph computation",
+  "isolated_FIA_device_predicate_stub": true,
+  "NPU_used": false,
+  "runtime_installed": false,
+  "neural_qualified": false,
+  "performance_qualified": false,
+  "static_own_reference_boundaries": [
+    0,
+    127,
+    128,
+    1505,
+    2555,
+    2559
+  ],
+  "actual_mask_hash_matches_independent_reconstruction": true,
+  "out_of_extent_reference_rejected": true,
+  "all_original_trace_defaults_preserved": true,
+  "original_runtime_projection_inverse_passed": true,
+  "full463_ran": false
+}

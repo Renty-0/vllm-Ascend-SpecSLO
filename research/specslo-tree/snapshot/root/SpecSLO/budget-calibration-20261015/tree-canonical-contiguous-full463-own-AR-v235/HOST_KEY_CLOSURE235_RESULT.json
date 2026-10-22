@@ -1,0 +1,99 @@
+{
+  "status": "HOST_all_2436_effective_geometries_covered_by_159_predeclared_cases",
+  "cases": 159,
+  "geometries": 2436,
+  "key_count": 17,
+  "keys": [
+    [
+      80,
+      16,
+      9
+    ],
+    [
+      80,
+      17,
+      9
+    ],
+    [
+      80,
+      17,
+      10
+    ],
+    [
+      80,
+      18,
+      9
+    ],
+    [
+      80,
+      18,
+      10
+    ],
+    [
+      80,
+      19,
+      10
+    ],
+    [
+      80,
+      20,
+      10
+    ],
+    [
+      80,
+      21,
+      10
+    ],
+    [
+      80,
+      22,
+      9
+    ],
+    [
+      80,
+      22,
+      10
+    ],
+    [
+      80,
+      23,
+      10
+    ],
+    [
+      80,
+      24,
+      10
+    ],
+    [
+      80,
+      25,
+      10
+    ],
+    [
+      80,
+      26,
+      10
+    ],
+    [
+      80,
+      27,
+      10
+    ],
+    [
+      80,
+      28,
+      10
+    ],
+    [
+      80,
+      29,
+      10
+    ]
+  ],
+  "runtime_installed": false,
+  "NPU_qualified": false,
+  "sources_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-contiguous-full463-own-AR-v235/mapper231.py": "9895a9867fada5c812880175768f4ebfb5ce02fc1713f11c44f6e9d570e6e7e2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-contiguous-full463-own-AR-v235/neural_oracle231.py": "d38038cf7b767bfe340c4a7c492cde92853c3ee41fb298bbff85ab4d433863c4"
+  }
+}

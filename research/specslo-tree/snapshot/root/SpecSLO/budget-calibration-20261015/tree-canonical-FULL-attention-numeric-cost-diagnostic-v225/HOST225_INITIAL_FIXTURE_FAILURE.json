@@ -1,0 +1,8 @@
+{
+  "UTC": "2026-10-18T02:51:52.267138+00:00",
+  "status": "failed_CPU_fixture_only",
+  "reason": "Test called direct FULL metadata pack without original query prerequisite allocating every intermediate logical page",
+  "correction": "CPU fixture now calls original ensure_capacity for each real frame slot as actual history225.query already does",
+  "prototype_metadata_or_neural_logic_changed": false,
+  "NPU_used": false
+}

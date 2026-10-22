@@ -1,0 +1,66 @@
+{
+  "UTC": "2026-10-22T13:27:45.439916+00:00",
+  "version": 457,
+  "status": "source_prepared_for_frozen_local_model_diagnostic",
+  "global_active_ceiling": 64,
+  "ordinary_prompt_prefill_unchanged": true,
+  "original_MC2_profile_unchanged": true,
+  "physical_small": {
+    "M": 80,
+    "S": 16,
+    "real_owners": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "query_tokens": 80
+  },
+  "physical_current": {
+    "M": 120,
+    "S": 24,
+    "query_tokens": 120
+  },
+  "eager_reference": "ordinary real attention/MLP MatMul+HCCL and residual/RMSNorm using the same M80 geometry; no model config or Native validation flag toggles",
+  "cross_M120": "retained separate observation; old378 and379 remain failures against M120 and are not relabeled as passes",
+  "correctness": [
+    "all hidden values",
+    "greedy tokens",
+    "all128 query KV arrays",
+    "all72 committed prefixes",
+    "all model parameter SHA and addresses"
+  ],
+  "repetitions": {
+    "balanced_windows": 9,
+    "replays_per_window": 20,
+    "modes": [
+      "control80",
+      "qualified80",
+      "current120"
+    ],
+    "last_timed_NN_rechecks": 27
+  },
+  "costs_only_after_all3_actual_initial_numerical_pass": true,
+  "all_graphs_and_static_buffers_held_until_exit": true,
+  "no_graph_reset_or_empty_cache": true,
+  "no_model_weight_serialization": true,
+  "Native_flags_assigned": false,
+  "future_serving_requires": "new adaptive80/120 same-physical independent tree/node controls; all old M120 controls retained; all3 complete independent own-AR and full463; no inherited permission from this frame",
+  "NPU_launched": false,
+  "full463": false,
+  "Raw": null,
+  "Goodput": null,
+  "Git_pushes": 0
+}

@@ -1,0 +1,26 @@
+{
+  "UTC": "2026-10-18T20:00:42.856226+00:00",
+  "tag": "dynamic-root-alternate-root-v282-B1to8-paired-full463-ownAR-v1",
+  "status": "stalled_full_generation5_all4_sealed_no_valid_performance",
+  "guard_session": 99729,
+  "guard_pid": 2387545,
+  "child_parent_pid": 2388178,
+  "workers": [
+    2389541,
+    2390069,
+    2390612,
+    2391015
+  ],
+  "fresh_target408_all3_passed": true,
+  "draft45_passed": true,
+  "followup20_passed": true,
+  "prewarm_and_twozero_passed": true,
+  "full463_completed": false,
+  "whole463_AR": false,
+  "Goodput": null,
+  "adopted": false,
+  "pyspy_attach": "all5 denied by kernel with Permission denied while copying Py_Version; no memory read",
+  "profiler_environment_install": false,
+  "source_code_edited": false,
+  "next": "cooperative guard-owned cleanup; new process-local faulthandler and stage/loop progress to diagnose actual full463 stall"
+}

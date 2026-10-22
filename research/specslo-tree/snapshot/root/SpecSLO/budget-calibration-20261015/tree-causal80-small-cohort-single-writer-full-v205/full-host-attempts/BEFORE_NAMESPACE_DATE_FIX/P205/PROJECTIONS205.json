@@ -1,0 +1,426 @@
+{
+  "HOST_7th_check": "real4process actual actor lambda sharedFS and common failure",
+  "guard_projection": [
+    {
+      "deltas": [],
+      "file": "GUARD_INPUTS205.json",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v202-root-execution/GUARD_INPUTS202.json",
+      "parent_sha256": "d1b4b15b8ab06b69faca5ac7802f40cfbafd3f872ca98b0edbcb502243c128f2"
+    },
+    {
+      "deltas": [
+        {
+          "end": 321,
+          "new": "single-wri",
+          "old": "ac",
+          "start": 319
+        },
+        {
+          "end": 324,
+          "new": "",
+          "old": "iv",
+          "start": 322
+        },
+        {
+          "end": 327,
+          "new": "r",
+          "old": "32",
+          "start": 325
+        },
+        {
+          "end": 2100,
+          "new": "7",
+          "old": "6",
+          "start": 2099
+        },
+        {
+          "end": 2307,
+          "new": "7",
+          "old": "6",
+          "start": 2306
+        }
+      ],
+      "file": "guard205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v202-root-execution/guard202.py",
+      "parent_sha256": "d21215f23e2c567bda36facb8fa6b3fa839be0bfa058bbc62a5e43001d64bdca"
+    },
+    {
+      "deltas": [
+        {
+          "end": 201,
+          "new": "single-wri",
+          "old": "ac",
+          "start": 199
+        },
+        {
+          "end": 204,
+          "new": "",
+          "old": "iv",
+          "start": 202
+        },
+        {
+          "end": 207,
+          "new": "r",
+          "old": "32",
+          "start": 205
+        }
+      ],
+      "file": "launch205.sh",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v202-root-execution/launch202.sh",
+      "parent_sha256": "64660c2cc706bbac47489ea547df9922d9adb87f555d3bf3ed886a26347d80c8"
+    },
+    {
+      "deltas": [
+        {
+          "end": 119,
+          "new": "single-wri",
+          "old": "ac",
+          "start": 117
+        },
+        {
+          "end": 122,
+          "new": "",
+          "old": "iv",
+          "start": 120
+        },
+        {
+          "end": 125,
+          "new": "r",
+          "old": "32",
+          "start": 123
+        }
+      ],
+      "file": "startup205.sh",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v202-root-execution/startup202.sh",
+      "parent_sha256": "fed218b88765474f6c2103b947a79203dd214bcf0a25f87be6b889f92bcdacff"
+    }
+  ],
+  "only_model_actor_delta": "shared output folder mkdir draft-leader-only inside original common stage",
+  "projection": [
+    {
+      "deltas": [
+        {
+          "end": 2797,
+          "new": "if e.rank==e.topology.draft_leader_rank else None",
+          "old": "",
+          "start": 2797
+        }
+      ],
+      "file": "actor205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/actor202.py",
+      "parent_sha256": "e512aa3a889b607679c865bfcf8821fc42faeabd2508c6218f575f890513e6e5"
+    },
+    {
+      "deltas": [],
+      "file": "audit205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/audit202.py",
+      "parent_sha256": "575f01a47968f1d6a34c8a8219dbbba3c916fc2436a5a2106e918f0000b01b60"
+    },
+    {
+      "deltas": [],
+      "file": "audit_usage205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/audit_usage202.py",
+      "parent_sha256": "18d6a1035093c85103926d5ee9f383a79a06af00dc0f6fabc89686728ad37a5b"
+    },
+    {
+      "deltas": [],
+      "file": "bank205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/bank202.py",
+      "parent_sha256": "6a6b8f2a3820dcb8a525d127115412220ba11f114d3fa53d743acd369a8fa313"
+    },
+    {
+      "deltas": [
+        {
+          "end": 5528,
+          "new": "\n\ndef require_source_parent(*,archive=False):\n import tarfile\n pin=read(P/'INPUTS205.json')['source_parent202'];root=Path(pin['path']);f=read(root/'FROZEN_SOURCE202.json')\n require(sha(root/'FROZEN_SOURCE202.json')==pin['freeze_sha256']and sha(root/'CPU_RESULT202.json')==pin['CPU_sha256'],'immutable202 REV3 source donor')\n expected={**f['files'],**f['external_files'],**f['retained_HOST_evidence'],**f['execution_guard_inputs'],**f['peer_reviews'],str(root/'CPU_RESULT202.json'):f['CPU_sha256'],str(root/'FROZEN_SOURCE202.json'):pin['freeze_sha256'],f['root_review']['path']:f['root_review']['sha256']}\n for path,h in expected.items():require(sha(path)==h,'exact202 source-donor byte '+path)\n if archive:\n  ar=pin['archive'];require(sha(ar['path'])==ar['sha256'],'source donor202 archive SHA in place')\n  with tarfile.open(ar['path'],'r:gz')as saved:\n   members=saved.getmembers();require(len(members)==len(expected)==ar['members']and len({m.name for m in members})==len(members),'exact202 source-donor archive inventory')\n   for m in members:require(m.isfile()and '/'+m.name in expected and hashlib.sha256(saved.extractfile(m).read()).hexdigest()==expected['/'+m.name],'exact202 regular source-donor member '+m.name)\n return dict(source_parent=str(root),members=len(expected),archive_verified_in_place=archive,recopied=False,production_parent_remains197=True,device_qualification_inherited=False)\n",
+          "old": "",
+          "start": 5528
+        }
+      ],
+      "file": "base205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/base202.py",
+      "parent_sha256": "2616f6d458df4f8f8f86bbf84034d4ba52f9043b0257f01634355a898dd26d8c"
+    },
+    {
+      "deltas": [
+        {
+          "end": 589,
+          "new": ",require_source_parent",
+          "old": "",
+          "start": 589
+        },
+        {
+          "end": 609,
+          "new": "_parent(archive=archive);require_source",
+          "old": "",
+          "start": 609
+        },
+        {
+          "end": 2932,
+          "new": "7",
+          "old": "6",
+          "start": 2931
+        }
+      ],
+      "file": "check205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/check202.py",
+      "parent_sha256": "ec19129e636e8368ca59a009d6b553aec56ef34d410d053389f6e5bfd352e143"
+    },
+    {
+      "deltas": [],
+      "file": "component205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/component202.py",
+      "parent_sha256": "e8b2672813d045c60d61b228ed79f88193af9e18dee9145f10c126cd4e7e6178"
+    },
+    {
+      "deltas": [],
+      "file": "config205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/config202.py",
+      "parent_sha256": "7eed2bd90250f35cadd07d47d7648db8dc5dc44e2efd571f761b9c8630991c98"
+    },
+    {
+      "deltas": [],
+      "file": "empty205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/empty202.py",
+      "parent_sha256": "920055fb335dd4fafcdbecc14c845920296b883c1696d42d10afca8c07757294"
+    },
+    {
+      "deltas": [],
+      "file": "extension205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/extension202.py",
+      "parent_sha256": "e597eff06ddb592120875909d608ad52a74b4d80a32a9771a88fe40ff00ed4dc"
+    },
+    {
+      "deltas": [
+        {
+          "end": 10,
+          "new": "even",
+          "old": "ix",
+          "start": 8
+        }
+      ],
+      "file": "host_full205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/host_full202.py",
+      "parent_sha256": "8fbbba0fd39d18ca31bdfdf88983a49b083bee57a3486e5ce0b9c72987b115d8"
+    },
+    {
+      "deltas": [],
+      "file": "mapper205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/mapper202.py",
+      "parent_sha256": "7f9fd107bccb382ed0b7a118d4f944af047cf1c11eefeffe64de62f7573739d7"
+    },
+    {
+      "deltas": [],
+      "file": "next4_205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/next4_202.py",
+      "parent_sha256": "65e8e64e8a9d515b9bfadf81e9667eb6ec76b383d78e91318ff11b0bf328d2ae"
+    },
+    {
+      "deltas": [],
+      "file": "prefill205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/prefill202.py",
+      "parent_sha256": "7ae3d13fc1af0dd72365510d16bb78663c369982c4b5bf247a7251b41efaeabf"
+    },
+    {
+      "deltas": [],
+      "file": "progress205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/progress202.py",
+      "parent_sha256": "e7e8430bcb0da99675408d0c359693518e4bc42c16588b248b52009609250e9f"
+    },
+    {
+      "deltas": [],
+      "file": "publication205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/publication202.py",
+      "parent_sha256": "f7ae7fe589219187c9aa508b12d3dc1020f30ac38a6f40124afb2b3d07a95ebb"
+    },
+    {
+      "deltas": [],
+      "file": "runtime205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/runtime202.py",
+      "parent_sha256": "3493aff812e4baaf319112bdb066b97677a4725fc2721eeab1cc6ca6a481b61e"
+    },
+    {
+      "deltas": [],
+      "file": "scope205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/scope202.py",
+      "parent_sha256": "dd98c8c15fdda2c24ebcd25b204a1aa122f38d4dd617da81cb9c28d75c2f5b08"
+    },
+    {
+      "deltas": [],
+      "file": "source205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/source202.py",
+      "parent_sha256": "23fecc5192c8f679344b5abe76aab8e5ca792f139474eb7c6806c66bb5cc4639"
+    },
+    {
+      "deltas": [],
+      "file": "subset205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/subset202.py",
+      "parent_sha256": "817ec829e4802c9acebd834bd5e37d262d0396d561a4428659119a497b50ee57"
+    },
+    {
+      "deltas": [],
+      "file": "target205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/target202.py",
+      "parent_sha256": "1e84d67a34ddefcef3b50dc3d8f1d7afbfb733dbe015595c10fad06d222c4e55"
+    },
+    {
+      "deltas": [
+        {
+          "end": 6,
+          "new": "even",
+          "old": "ix",
+          "start": 4
+        },
+        {
+          "end": 16627,
+          "new": "B",
+          "old": "P",
+          "start": 16626
+        },
+        {
+          "end": 16629,
+          "new": "tree-causal80-small-cohort-active32-full-v202/",
+          "old": "",
+          "start": 16629
+        },
+        {
+          "end": 16675,
+          "new": "2",
+          "old": "5",
+          "start": 16674
+        },
+        {
+          "end": 16685,
+          "new": "2",
+          "old": "5",
+          "start": 16684
+        },
+        {
+          "end": 25829,
+          "new": "\n def test_actual_single_writer_shared_FS_and_common_failure(self):\n  import multiprocessing,tempfile,queue\n  parent=B/'tree-causal80-small-cohort-active32-full-v202/actor202.py'\n  def output_lambda(path):\n   tree=ast.parse(path.read_text())\n   calls=[n for n in ast.walk(tree)if isinstance(n,ast.Call)and isinstance(n.func,ast.Name)and n.func.id=='stage'\n    and n.args and isinstance(n.args[0],ast.Constant)and str(n.args[0].value).endswith('/output')]\n   self.assertEqual(len(calls),1);self.assertIsInstance(calls[0].args[1],ast.Lambda)\n   return copy.deepcopy(calls[0].args[1])\n  old=output_lambda(parent);new=output_lambda(P/'actor205.py')\n  # Actual AST inverse: only the writer predicate wraps the original mkdir.\n  self.assertIsInstance(new.body,ast.IfExp)\n  self.assertEqual(ast.dump(new.body.body,include_attributes=False),ast.dump(old.body,include_attributes=False))\n  ctx=multiprocessing.get_context('fork');results=[]\n  for scenario,node,preexisting in(('old-four-writers',old,False),('new-single-writer',new,False),('new-existing-dir',new,True)):\n   with tempfile.TemporaryDirectory(prefix='V205-HOST-shared-FS-')as root:\n    folder=Path(root)/'same-output'\n    if preexisting:folder.mkdir()\n    barrier=ctx.Barrier(4);errors=ctx.Array('i',[0]*4,lock=True);out=ctx.Queue()\n    def worker(rank):\n     error=None\n     try:\n      e=NS(rank=rank,topology=NS(draft_leader_rank=0))\n      callback=eval(compile(ast.fix_missing_locations(ast.Expression(copy.deepcopy(node))),'actual-actor-output-lambda-HOST','eval'),dict(folder=folder,e=e))\n      barrier.wait(timeout=10)\n      try:callback()\n      except BaseException as ex:error=type(ex).__name__+': '+str(ex)\n      errors[rank]=int(error is not None);barrier.wait(timeout=10)\n      out.put(dict(rank=rank,local_error=error,common_reject=any(errors[:]),folder_exists=folder.is_dir()))\n     except BaseException as ex:out.put(dict(rank=rank,carrier_error=repr(ex)))\n    processes=[ctx.Process(target=worker,args=(rank,))for rank in range(4)]\n    try:\n     for process in processes:process.start()\n     packets=[out.get(timeout=20)for _ in range(4)]\n     for process in processes:process.join(timeout=10)\n     self.assertTrue(all(not process.is_alive()and process.exitcode==0 for process in processes))\n    finally:\n     for process in processes:\n      if process.is_alive():process.terminate();process.join(timeout=5)\n     out.close();out.join_thread()\n    packets.sort(key=lambda v:v['rank']);self.assertEqual([r['rank']for r in packets],list(range(4)))\n    self.assertFalse(any('carrier_error'in r for r in packets));self.assertTrue(all(r['folder_exists']for r in packets))\n    failures=[r for r in packets if r['local_error']is not None]\n    if scenario=='old-four-writers':\n     self.assertEqual(len(failures),3);self.assertTrue(all(r['local_error'].startswith('FileExistsError:')for r in failures));self.assertTrue(all(r['common_reject']for r in packets))\n    elif scenario=='new-single-writer':self.assertEqual(failures,[]);self.assertTrue(all(not r['common_reject']for r in packets))\n    else:\n     self.assertEqual([r['rank']for r in failures],[0]);self.assertTrue(failures[0]['local_error'].startswith('FileExistsError:'));self.assertTrue(all(r['common_reject']for r in packets))\n    results.append(dict(scenario=scenario,actual_processes=4,packets=packets))\n  DETAILS['actual_single_writer']=dict(actual_old_and_new_actor_mkdir_lambdas_AST_executed=True,real_four_process_shared_temporary_FS=True,\n   original_stage_call_and_all4_boundary_unchanged=True,old_three_FileExistsErrors=True,new_all4_pass=True,\n   preexisting_leader_FileExistsError_and_all4_common_reject=True,processes_closed=True,NPU_stage_fence_not_executed_or_claimed=True,\n   model_math_claimed=False,cases=results)\n",
+          "old": "",
+          "start": 25829
+        }
+      ],
+      "file": "test_full205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/test_full202.py",
+      "parent_sha256": "364d103c97dde564e2e7edcf3e7f9cb5bdee47038bb626199a15b47f16608789"
+    },
+    {
+      "deltas": [],
+      "file": "trace205.py",
+      "namespace": [
+        "202",
+        "205"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/trace202.py",
+      "parent_sha256": "0ee222b3ae659241cc66d25e152c007c021c3fcbd5455966ddce828fe19a1e39"
+    }
+  ],
+  "sole_production_parent197": true,
+  "source_donor202_immutable": true
+}

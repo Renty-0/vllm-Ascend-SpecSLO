@@ -1,0 +1,9 @@
+{
+  "files": [
+    "guard190.py",
+    "launch190.sh",
+    "startup190.sh",
+    "GUARD_INPUTS190.json"
+  ],
+  "schema": "V190.fixed-private-guard-inputs.v1"
+}

@@ -1,0 +1,10 @@
+{
+  "status": "PASS_HOST437_ORIGINAL436_WORKER_NEURAL_CALLBACKS_AND_BOUNDS_RETAINED",
+  "all_original227_681_75_plus6_warm_twozero_seal_full463_all3ownAR_required": true,
+  "unchanged_NN_qualification_functions_by_identity": true,
+  "unchanged_live_decode_source_projection": true,
+  "original_parent_qualification_wait_and_worker_timeout_unchanged": true,
+  "global_active_limit": 64,
+  "NPU_used": false,
+  "Native_constructor_calls": 0
+}

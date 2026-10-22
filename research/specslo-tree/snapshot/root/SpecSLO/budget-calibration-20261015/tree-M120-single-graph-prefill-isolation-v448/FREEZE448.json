@@ -1,0 +1,24 @@
+{
+  "schema": "ROOT448.single-static-graph-isolation.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/HOST448_CONSTRUCTION_RESULT.json": "9e9e92b24847d920c7142e54939114175daf39c2814990c1e475e2fd4eda802e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/PLAN448.json": "7c625797b2dfd3cc0bd88bc5f1928bca4a6be9cfee0b4a101be9bf9311d7b2d2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/audit448.py": "f2bb677dacd4e263ccfde491e1a4b57985a321d368af45bbf6930bd802bfff72",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/check448.py": "9af4ddd8a330ac09c4c2aa99f4ab38578beb266409ec6808c049b3f5532981bf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/check448_HOST.py": "8cbb15b5ebc271013f9c42584e821e2c3e5a5df62883216c142ac296ee7c6c32",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/forward448.py": "3e21a33e929857efd9bb0cf730442b6f95a28b60b1d0b09bd66e110cdac3ff60",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/guard448.py": "9a7edc3a4815a05bfbddff7e5f6c72069fc9419ffb5e38c3f7b848b55dd1a252",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/host_env448.py": "71bbeafdedc09134b5b062e5f5d18b2fef8abf9b2ec98e64bb57ca9f88669982",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/probe448.py": "8e3fd86e50a48260d1d0f64faa61280365df7a6956a9e663f4fc47de094d1398",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/runtime448.py": "e01070aa6f0565cb7146b668c1e95878d6cb9b583236e71523a945f3f676b9c4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448/startup448.sh": "ae65e156a895550c3892bc3d0a1c1f2fc3c5632b9a62268628b53c8bd5f6be05"
+  },
+  "parent385_freeze": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+  "parent385_archive": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
+  "current447_freeze": "e7c99bc4cb5543a9781d6556149c94052f9d46e52b10358300ec51a78a2b42ed",
+  "current447_archive": "a36b8bdd89ca7c9caed48bf046c6435920467a8d789a4c422953f7c823925f0a",
+  "NPU_run": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

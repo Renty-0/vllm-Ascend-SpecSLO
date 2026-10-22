@@ -1,0 +1,70 @@
+{
+  "binding165.py": {
+    "additional_exact_changes": [],
+    "base_transform": "replace source166->binding165, then all literal 166->165 (private paths/module/schema/markers only)",
+    "output_sha256": "8ab06e8c1e1b6842fc10fb689fef7b2fbe3824d5db72ebf6ba1f9b2508299728",
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/source166.py",
+    "source_sha256": "586441b854b9f474752a740a988ccb98c6cae188fddb068e09dc33322a25d2a8"
+  },
+  "progress165.py": {
+    "additional_exact_changes": [],
+    "base_transform": "replace source166->binding165, then all literal 166->165 (private paths/module/schema/markers only)",
+    "output_sha256": "bc52e9f40a73f205d32daead205c82c0b6c17326e14535ba5944491e03a4d6f0",
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/progress166.py",
+    "source_sha256": "aba7b3060cbe99d1308d501733d6fe6fa5ca181dbf6022ced3edbccd54968b42"
+  },
+  "runtime165.py": {
+    "additional_exact_changes": [
+      [
+        "default='32,24,16'",
+        "default='64'",
+        1
+      ],
+      [
+        "from window160 import parse_windows",
+        "from controls165 import parse_windows",
+        1
+      ],
+      [
+        "dict(rank=rank,error=error,formal_Goodput=False)",
+        "dict(rank=rank,error=error,formal_Goodput=False,partial_component=getattr(engine,'_v165_partial',{}),partial_actor=getattr(engine,'_v151_partial',{}))",
+        1
+      ]
+    ],
+    "base_transform": "replace source166->binding165, then all literal 166->165 (private paths/module/schema/markers only)",
+    "output_sha256": "fcdfac68599bed4b0d193704789f4ae1dcf05a88c6e2faf487729cee98498992",
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/runtime166.py",
+    "source_sha256": "cbdd12eb3b3f61985ab97b944e24891d5b783d3dc84e572e6d28e9b9b612cc85"
+  },
+  "scope165.py": {
+    "additional_exact_changes": [
+      [
+        "actual_current_B4_component=True",
+        "actual_current_shared4_union_component=True",
+        1
+      ]
+    ],
+    "base_transform": "replace source166->binding165, then all literal 166->165 (private paths/module/schema/markers only)",
+    "output_sha256": "ca3e5e444f761cf1952647c6a20c40578a593d6e883a3f1f04f16685e187b923",
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/scope166.py",
+    "source_sha256": "cbd4c4730aa5087aa461efbd300f03523aa9d44db4479fe1f94fa73b02de54d5"
+  },
+  "trace165.py": {
+    "additional_exact_changes": [
+      [
+        "from window160 import adapt_source,window\nfrom probe160 import trace_source",
+        "from controls165 import adapt_source,window\n\ndef trace_source(active_window):\n ns=dict(globals())\n functions(ACTIVE/'probe160.py',ns,names=('trace_source',))\n return ns['trace_source'](active_window)",
+        1
+      ],
+      [
+        "from window160 import DEFAULT_WINDOWS,windows",
+        "from controls165 import DEFAULT_WINDOWS,windows",
+        1
+      ]
+    ],
+    "base_transform": "replace source166->binding165, then all literal 166->165 (private paths/module/schema/markers only)",
+    "output_sha256": "10990018acfe16d704a5f6183cff3626dc9c7712507e45c4eae6dcccfd072416",
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/trace166.py",
+    "source_sha256": "513115459784b610d6f74ed5a86cad8dd08c8a14be33d58b810b325d8e6c3e5d"
+  }
+}

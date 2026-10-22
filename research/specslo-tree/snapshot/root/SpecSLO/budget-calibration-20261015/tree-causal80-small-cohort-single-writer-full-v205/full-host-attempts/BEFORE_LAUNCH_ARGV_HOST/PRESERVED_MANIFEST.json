@@ -1,0 +1,150 @@
+{
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/close_v205_inputs.py": {
+      "sha256": "d688545fd65c9530f40770c41e77e96aa670043e9bd5d52d05d752a597395214",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/D/close_v205_inputs.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/cold_guard_source_v205_HOST.py": {
+      "sha256": "7eaebd113aa2e46975b3415015a6ffa1874fe96fc4cfe937d4c03f21589fbfe7",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/D/cold_guard_source_v205_HOST.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/GUARD_INPUTS205.json": {
+      "sha256": "fc37cf545fca519252f3df55e2c916bfa3eff77894bc85479154cf35e05e848e",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/guard/GUARD_INPUTS205.json"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/guard205.py": {
+      "sha256": "44a2f069b5276b8dfaeaa0bc7be7854bbc63210d4561f446d29b69f88d8e1331",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/guard/guard205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/launch205.sh": {
+      "sha256": "c0efbee9fb87707b827af90a5ac6fa2ac7a9767bddea2e79d23013a01ac8d55c",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/guard/launch205.sh"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/startup205.sh": {
+      "sha256": "be62cd7351a69f96920f13588944d0aaa1f09930784664f280e93405789e188d",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/guard/startup205.sh"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/CPU_RESULT205.json": {
+      "sha256": "5eda394018dc2490e9e428b5cf9513e5b97d2810842751a27f3f6df2f4c27611",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/CPU_RESULT205.json"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/HOST_ATTEMPT205_1792256314747606489.json": {
+      "sha256": "864dbe1ae0ab8c7465b07b0bc183b8691ed1631d911d57b005fbc3a84c6b9deb",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/HOST_ATTEMPT205_1792256314747606489.json"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/HOST_ATTEMPT205_1792256475900226852.json": {
+      "sha256": "5eda394018dc2490e9e428b5cf9513e5b97d2810842751a27f3f6df2f4c27611",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/HOST_ATTEMPT205_1792256475900226852.json"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/INPUTS205.json": {
+      "sha256": "a74a2687fe072ab2704ecd377e4288d810a381d1477b66e77607318811111942",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/INPUTS205.json"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/PREPARED_HOST205.json": {
+      "sha256": "30e0d5f10fe8f1ef98e657e28e00a5320994569c1d2792434d8ed250fc864f2c",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/PREPARED_HOST205.json"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/PROJECTIONS205.json": {
+      "sha256": "1da5e4b57e89f58d3857e97e24f406fc15b76e688695078c526de3063663086a",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/PROJECTIONS205.json"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/SCOPE205.txt": {
+      "sha256": "abc01b080b5f8a42b4631a956c6a684e1311e0abbb094ec2bd1707dd04620605",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/SCOPE205.txt"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/actor205.py": {
+      "sha256": "2c4e40b1b51235f1d243fc1287e444e3ea3c00f15895d0730f53b777b5f7634c",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/actor205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/audit205.py": {
+      "sha256": "2943d7661fe2dc3575c745a212a95434dc6b89e6ad34c19f120794c68fe8914b",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/audit205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/audit_usage205.py": {
+      "sha256": "99a23282ee1708f2b29c635526cd742c71fa27bae67ec4270ed19b3bd4e497fb",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/audit_usage205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/bank205.py": {
+      "sha256": "a110ded7ce2a29dc23629d127b2b70e4526f100a43177417b383318cf285e38f",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/bank205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/base205.py": {
+      "sha256": "4764df0c36360a0d81cfb7a215473b7606a2c4583984ceb7a321555b596a5adc",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/base205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/check205.py": {
+      "sha256": "f8a62c3eeba1b2698bc5d8a1846952faadf18e894dc7bb668bc87df8148f0591",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/check205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/component205.py": {
+      "sha256": "9b7f97d96568f1bf25d2eb5be889631e0f7aa28070c9197fd84bc4b06b5808a2",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/component205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/config205.py": {
+      "sha256": "7eed2bd90250f35cadd07d47d7648db8dc5dc44e2efd571f761b9c8630991c98",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/config205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/empty205.py": {
+      "sha256": "fbb9b4abaca1b75e108a24d8b29f19c8d7cbd82430d2f3f283510268cd6f72ea",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/empty205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/extension205.py": {
+      "sha256": "373587a7b737f76c9e7e0892393dc440133166da9cb77122e2634165598a1cce",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/extension205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/host_full205.py": {
+      "sha256": "55c923989adf1880c3598994f4e6cd1f2fa6fdd8bf96331e62c93ab209341860",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/host_full205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/mapper205.py": {
+      "sha256": "e8f912b3e2f0068d76189afa9dcdd6354a14e0e06a66a7b1f408308696871550",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/mapper205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/next4_205.py": {
+      "sha256": "1c3999b8d042343ad69c129850cf037dbfb2eef5bbe151bc776de04df8d4bbb0",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/next4_205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/prefill205.py": {
+      "sha256": "4ba5aac7b7bfd094adb9131a670566ef1952b4b9d1f77e449f0ae16dd66745e1",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/prefill205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/progress205.py": {
+      "sha256": "6d9947398eb80450909ddacd28b3f244ddf548f073a7dc15ddfdcb9164b9bea2",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/progress205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/publication205.py": {
+      "sha256": "a11d4fc0d4a375b365d4039a04a351e3cf357e388d36a1c889f61d98b8c65570",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/publication205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/runtime205.py": {
+      "sha256": "f1a92f67df3e4bcaa11c1c83a434312f94f04016524c847aaed7196f6f959ae9",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/runtime205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/scope205.py": {
+      "sha256": "f61e7b7e8b281c65551441b5fedf0436b0c0337271d6705ea978db6eddecc798",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/scope205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/source205.py": {
+      "sha256": "c44cea72c9a9e08d59c0edac680633e714a1c3896e1b0986b6b978b03e768235",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/source205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/subset205.py": {
+      "sha256": "26eb067dc6a2e418349fe773242b2cbc64f7b919d22f289bde810356bb677418",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/subset205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/target205.py": {
+      "sha256": "159607a15a7f0bc60f9c1fb2579057da0271770e6f8e469cbbe6234e38923952",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/target205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/test_full205.py": {
+      "sha256": "3ba45d7404b98a57ab9ec0f87eda7098eb7b30215e334481468ef4a8b65eb095",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/test_full205.py"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/trace205.py": {
+      "sha256": "059d5e7d80006dea0f0775158397a7c931e4a7c792d5feba3cdd002236a79cea",
+      "snapshot": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_LAUNCH_ARGV_HOST/P205/trace205.py"
+    }
+  },
+  "reason": "ROOT requested actual inherited launch_argv plus four fixed shell-path checks; no mathematical source changes",
+  "second_HOST7_success_retained": true
+}

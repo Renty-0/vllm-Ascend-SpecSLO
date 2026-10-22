@@ -1,0 +1,15 @@
+{
+  "status": "PASS_HOST421_ACTUAL_CPU_READY_PARENTS_PREFIX_EPOCH_AND_TICKET_IDENTITY",
+  "CPU_cases": 128,
+  "actual_original_controller_and_CPU_tree_plans": true,
+  "normal_B4_only": true,
+  "promoted_B4_and_branch_B5_excluded": true,
+  "original_parent3_route_preserved": true,
+  "no_controller_mutations": true,
+  "stale_prefix_and_ticket_identity_rejected": true,
+  "NPU_used": false,
+  "serving_installed": false,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

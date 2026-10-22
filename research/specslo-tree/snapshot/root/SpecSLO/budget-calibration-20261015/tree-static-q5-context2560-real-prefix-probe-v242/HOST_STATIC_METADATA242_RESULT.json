@@ -1,0 +1,21 @@
+{
+  "status": "HOST_passed",
+  "cases": 5,
+  "checked_query_rows": 400,
+  "anchors": [
+    0,
+    127,
+    128,
+    1505,
+    2555
+  ],
+  "extent2560_boundary_passed": true,
+  "unsupported_live_extents_rejected": [
+    2561,
+    4096
+  ],
+  "invalid_zero_pages_rejected": 3,
+  "NPU_initialized": false,
+  "model_calls": 0,
+  "source_sha256": "4c33efdec274cb2934d7a672324e4348893c4723bb67448b86105ada391f7dc8"
+}

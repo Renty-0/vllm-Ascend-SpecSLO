@@ -1,0 +1,13 @@
+{
+  "status": "source_only_not_scheduled",
+  "purpose": "Separate original FULL9 constant M80 from q1 canonicalization; fresh model before all captures",
+  "main_path": "M80 FULL9 with original exact request-level KV lengths and q partitions",
+  "eager_ablations": "same six M/Q controls; q1 eager only, never captured in this process",
+  "absolute_cost": "already qualified same FULL9 graph only, zero new captures",
+  "original_sampler_unchanged": true,
+  "production_installed": false,
+  "neural_qualified": false,
+  "performance_qualified": false,
+  "adopted": false,
+  "eager_only_layer0_module_taps": "read-only first-query clones; all hooks removed after each ablation; no hooks during graph capture or timing"
+}

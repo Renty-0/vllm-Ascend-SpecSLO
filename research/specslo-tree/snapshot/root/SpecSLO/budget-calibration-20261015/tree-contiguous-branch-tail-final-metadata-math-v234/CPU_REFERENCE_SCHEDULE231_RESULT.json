@@ -1,0 +1,19 @@
+{
+  "status": "passed_CPU_original_tree_ancestry_oracle",
+  "cases": 512,
+  "independent_candidate_query_paths": 18240,
+  "reference_frames": 2384,
+  "original_tree_ancestry_checked": true,
+  "spine_and_side_owners_separate": true,
+  "candidate_KV_copied": false,
+  "all_physical_slots_unique_per_frame": true,
+  "inputs_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/check_reference_schedule231_CPU.py": "8c65e478e28bfe83a8849752c6152970135df91b1f81385107e6574582550aae",
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/reference_schedule231.py": "7f3de5ab96c90788392910522945252051c6b425b8db99220fe716862667d844",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/tree.py": "692b2d225d1fedffb84eee7afca7030609a3b4f29d1796cddde448780b5b911a"
+  },
+  "NPU_used": false,
+  "runtime_installed": false,
+  "neural_qualified": false,
+  "performance_qualified": false
+}

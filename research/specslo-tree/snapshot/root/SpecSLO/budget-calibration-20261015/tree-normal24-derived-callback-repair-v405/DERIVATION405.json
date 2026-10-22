@@ -1,0 +1,12 @@
+{
+  "status": "PREPARING_EXACT_DERIVED_CALLBACK_HOST_REPAIR",
+  "source402_freeze": "ea6d0ba1012f45ccf13fb4b248aaa341e4b9de204cdeb39ce720b56841a2ee5d",
+  "old_terminal_failure": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT402_TERMINAL_PREWARM_FAILURE.json",
+  "global_active_limit": 64,
+  "normal_work_limit": 24,
+  "neural_bodies_changed": false,
+  "old_model_qualification_inherited": false,
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null
+}

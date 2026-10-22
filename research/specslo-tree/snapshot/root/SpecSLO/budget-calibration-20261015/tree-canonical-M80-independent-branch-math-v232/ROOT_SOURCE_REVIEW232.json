@@ -1,0 +1,41 @@
+{
+  "status": "source_prepared_CPU_proofs_copied_device_unrun",
+  "independent_target_math_cases": 151,
+  "NN_prefixes": 48,
+  "real_candidate_N": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "model_rows": 80,
+  "physical_segments": [
+    14,
+    15,
+    16,
+    17,
+    18,
+    22
+  ],
+  "new_root_only_dummy_for_Q79": true,
+  "real_candidate_budgets_unchanged": true,
+  "original_Native_capture_and_matcher_retained": true,
+  "original_sampler_unchanged": true,
+  "original_startup201_44_114_not_run": true,
+  "no_serving_workload": true,
+  "no_Goodput_or_latency_measurement": true,
+  "production_qualified": false,
+  "adopted": false
+}

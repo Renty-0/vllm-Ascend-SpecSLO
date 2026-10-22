@@ -1,0 +1,8 @@
+{
+  "status": "passed",
+  "read_only_output_bitwise_equal": true,
+  "all_hooks_removed_success_and_exception": true,
+  "Torch_CPU": true,
+  "NPU_used": false,
+  "neural_qualified": false
+}

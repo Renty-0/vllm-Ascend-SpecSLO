@@ -1,0 +1,414 @@
+{
+  "UTC": "2026-10-22T19:56:51.875591+00:00",
+  "status": "HOST462_V2_SECOND_LIFECYCLE_PASS100_ACTUAL_NATIVE_COUNTER_RECORDS_ZERO",
+  "each_rank_cases": 25,
+  "ranks": 4,
+  "native_counter_count": 21,
+  "all_native_deltas_zero": true,
+  "source_records": [
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R0-M28.json.gz",
+      "SHA256": "3f300ff1af9cc000d71c2a887be017a4f67a7531deda6c7242c2de519db04b16"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R1-M28.json.gz",
+      "SHA256": "adf169a6f025a1a80fe655d24e013570ac34457bc2699c03300faee461178b28"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R10-M28.json.gz",
+      "SHA256": "65e802b4bcbca22d24faa5a0fc5661ff3c2017520212f5ccf8cf473f862d3451"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R11-M28.json.gz",
+      "SHA256": "c341d7a4e797c49b948e3e2174a92e797fbdbf32ccbd3b20ea10500650388235"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R12-M28.json.gz",
+      "SHA256": "c7c24919950d0654f10550cee6c66c5866feff420ccda8fa4340a053a044a766"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R13-M28.json.gz",
+      "SHA256": "ae76cb593789b0c85dcd93a6c368c17393ccb39abd46d7eb3e5c321e1bb51613"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R14-M28.json.gz",
+      "SHA256": "59513530df938849646da3998e06727465568b4b5e6581bb540884e35dafa0f5"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R15-M28.json.gz",
+      "SHA256": "4b7451cfe1dbed419c6a4375e09b6299fc402bbc72e25ae018423ce72b8e958c"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R16-M28.json.gz",
+      "SHA256": "7dbafd57a01933857d3547c0295f5b0c0658facd18eb5066e6b18a03e14146d0"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R17-M28.json.gz",
+      "SHA256": "faf8826fec784e9c2f8b588b0f31cde532aaf7abcaa05daa91610a61c5c2b181"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R18-M28.json.gz",
+      "SHA256": "afc58f16c54450e640b20f3970e5630f134baa17cb7fbecf0871c4265adea24d"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R19-M28.json.gz",
+      "SHA256": "3a598858af2d5837ea6ef192eac792db9cf95ebd3007a5362d0ce61b7b777a79"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R2-M28.json.gz",
+      "SHA256": "8ea7953dd4522c67f0d394e6c2a9d48a7fa96eb691cb44aa3f64eda30ca51544"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R20-M28.json.gz",
+      "SHA256": "975811cbd4afccad772f0216a395fece463f0f100a959b1253c24fca6269e400"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R21-M28.json.gz",
+      "SHA256": "ab5784aff56239fc56f7a8c986318d13353d128a9e6811e579750bc215fe62f3"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R22-M28.json.gz",
+      "SHA256": "9802815203b87a01bff95386b035d2fb9b4ff24725ee86d779dcd35bcd222d91"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R23-M28.json.gz",
+      "SHA256": "9563a5ebfd474f86f107beff64f984403b2dddc7693a777383ef625b83a655a3"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R24-M28.json.gz",
+      "SHA256": "eaed5ee8d6bbc003eeb55309dede6620303b3f7215d7ea99094f68c97e69797c"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R3-M28.json.gz",
+      "SHA256": "98173bbfc0e9280034186226339a4f57ee0c21e35a849e2aa3d6e52eb591f1b1"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R4-M28.json.gz",
+      "SHA256": "f54aa3afb79c9f956c363693216aaa5083092cbfe389fc8bec51d4ebb39fa54e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R5-M28.json.gz",
+      "SHA256": "a1afe6053534728dfa7afcfcc456927a000df930d35e2af7f7d9ce05ac9d287e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R6-M28.json.gz",
+      "SHA256": "f70833d4293a8ec5bb569865acb51aac2011ce67b1afc050261902b4ab6c9ad3"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R7-M28.json.gz",
+      "SHA256": "e12238ed03968fcfe210c711531d67052c1f492cc96acd0d2520ebe6ac0cae11"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R8-M28.json.gz",
+      "SHA256": "0f6d92ca6bc70fdda4b176ee1f4f8bc643d15f23d61b94776256296b3c4ad141"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank0-pass1-N24-parent24-P4-E4-B4-R9-M28.json.gz",
+      "SHA256": "dd35d2f9162951ae42b0317d80b61e86972358e39feec623af5419c836dd662e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R0-M28.json.gz",
+      "SHA256": "24f9beff5c6df74a17a3636f6a873a4619cd497b2b3f67df2c4cdad0caeae185"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R1-M28.json.gz",
+      "SHA256": "cc4c18e511c93dadb48fe1df3b6fa363ac4a56394477d64e4ef240fd3ff5d8fb"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R10-M28.json.gz",
+      "SHA256": "dee9c4ee1f09d54e756677a8f01f550ee875ab598ed78050520f743b60b8511b"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R11-M28.json.gz",
+      "SHA256": "2d93bdb587f0039add4e27ef6dcadf1eef4d65a16f1084836b84c5c41964fcd6"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R12-M28.json.gz",
+      "SHA256": "4c7bd6baed20c1595adbd120e9efc00a80624801cd434f34089728cff51377c7"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R13-M28.json.gz",
+      "SHA256": "0f4f89f5c795d931fe1a95ea7bca8d7ee9dbec4affc856f495ffc00e835b2e40"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R14-M28.json.gz",
+      "SHA256": "1e746b189039c476190bfcd213351c22e0a50d70338ddc79b9842f994d0c282c"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R15-M28.json.gz",
+      "SHA256": "1e549f1c8b9fb2136e95ffaac950303b3206c08aced8132239bb93621c4df0ed"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R16-M28.json.gz",
+      "SHA256": "7d2b49e483b372ce1f175feeefe28d06efa71b953622f3ae6dfbcb3b79f635f9"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R17-M28.json.gz",
+      "SHA256": "a63dc96e3a3b33121dea636bb79e8b5b3aafab14ddbfce9cd174c7cf7871be04"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R18-M28.json.gz",
+      "SHA256": "b080442f347ebb0e0d4e3e382929da823c1741b2bb33e114a44bc8df965cb5af"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R19-M28.json.gz",
+      "SHA256": "3d493454e8710d0459bcfcc070bb8fd2ad506f210ca12dbdb41d36efffd7a175"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R2-M28.json.gz",
+      "SHA256": "30b1a8468640f5f4982eed35e0f6f73e965d2e1f1596d6a268bc265574335af8"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R20-M28.json.gz",
+      "SHA256": "efdaf3d65ece997f3e5fe674280e0ca3a9aca47d9e5838a14759b4d5d759765c"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R21-M28.json.gz",
+      "SHA256": "913f72a4d0be80c63a1d132291c5e1023c13c7f121abe06cd8e26d2b500693c7"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R22-M28.json.gz",
+      "SHA256": "a7099829057b6d2cf89343701a5eb14e9b9be1ab2f2fd957d511abff7bf2651e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R23-M28.json.gz",
+      "SHA256": "6dbe82c276b0a0083ef57b8029d8fa184ade652af972df0428834952166dd390"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R24-M28.json.gz",
+      "SHA256": "e191f83f3bfc9b38874a0b13d6aeb5be40c88665c1fe57df07f5d4e33eb6f872"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R3-M28.json.gz",
+      "SHA256": "0d076a49955939d69f95d7670b644c126c75cbd22fee51c7b536c03da451548d"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R4-M28.json.gz",
+      "SHA256": "fe5d763270519b3d53d8cd7e60771584ba21f604eb5f0e76ba63cf80b2fc1429"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R5-M28.json.gz",
+      "SHA256": "f7ed2f89073eae66858c8bed1e01105d7d658738da14ffb23a3d8294d3a384f4"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R6-M28.json.gz",
+      "SHA256": "2b7afd8bcfd81b75a8bfd2856a24f659625f9879fecc9bcbac1dffd065b8c796"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R7-M28.json.gz",
+      "SHA256": "e88441f0618081a017fd1aafaf0d41018af5d04988795d3edee32a80439d6720"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R8-M28.json.gz",
+      "SHA256": "aec43973893dd193cb12fd93b7824374fd614a95ca717e9b948807191dc4fc4e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank1-pass1-N24-parent24-P4-E4-B4-R9-M28.json.gz",
+      "SHA256": "aec2aab4865b019ac962ae6e1e729372175ed3dfcc3a10bc43a793a66732aae2"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R0-M28.json.gz",
+      "SHA256": "0a03454ced636a5d8aba38c84788f3260539a019b9d9d8e42bad2691630a12cd"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R1-M28.json.gz",
+      "SHA256": "6e45e667d690e18cbe5f49a3c8dc7667f3677b95427a1b3414f434787ae2726c"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R10-M28.json.gz",
+      "SHA256": "b6fcc53a4901915db743f55bd7202fa32a58e7aca28c701929fbb7f006cc5d43"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R11-M28.json.gz",
+      "SHA256": "e26565c5697bf052709144b0be16597ab2be3f13cefa2c4a038bf58437628776"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R12-M28.json.gz",
+      "SHA256": "0efc3b082069ac567f2df322158331b7576dfa7264a5b340238e4484551bf73b"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R13-M28.json.gz",
+      "SHA256": "d5a6b58eea0b325733267a437514393790f494bfde92c8e35c091ea17740e0d3"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R14-M28.json.gz",
+      "SHA256": "41f555c6ecab1bd2b3c83bb881ad4ff2ef415034c2573d599409420f7e604553"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R15-M28.json.gz",
+      "SHA256": "e72e07af340fd687078f70622465247e9c0ea9b81178b5f88956033090adbbf4"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R16-M28.json.gz",
+      "SHA256": "65760df21dc625d570b854e2a3f7b39b940a3f62d5edcb68931680fa81b9ae9b"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R17-M28.json.gz",
+      "SHA256": "490bb49b84ca9f803937becd7a82ad62ccb6a1bf6bae4b7eec93a42f3f37423e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R18-M28.json.gz",
+      "SHA256": "ee2c23a31fa43228773f9b4b064ae9164024e3dc1fd3c3a9a20a5799b1a32bbd"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R19-M28.json.gz",
+      "SHA256": "4fd4ce0d4a7d0e2d484c711821d1f44e83abd7a6b9af0d2db38b95d557a31241"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R2-M28.json.gz",
+      "SHA256": "b7366d19997d230d877fe7c703beb7f89b46763a2a6e218319c2758d2fb004a8"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R20-M28.json.gz",
+      "SHA256": "89bcc2258920c48d30de736918d10804d1575d91c6a3de1db5010b32819f378f"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R21-M28.json.gz",
+      "SHA256": "2993a18daa17727e818044417a2fa2a107a1cb034cf409f8989533ac0b78bca5"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R22-M28.json.gz",
+      "SHA256": "63955a36ef8be2eac26fb62c268269dc6ad712160d67315e8f1f5f74244bc6c4"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R23-M28.json.gz",
+      "SHA256": "2fb94c7b6032972ebfd0f65e3d7a2d11568b454ab83d1743327a9c80fb5187b5"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R24-M28.json.gz",
+      "SHA256": "040d3f7c4a32ee205bcf01cb21723d43ea6b4ca93593d90cfc1ee7d3956024c4"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R3-M28.json.gz",
+      "SHA256": "430db0138683c597653fb2b95714ec7ca0d65a26398cc53bd12db0ec36be43cb"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R4-M28.json.gz",
+      "SHA256": "a21bee76d851153981d460602b8b30fd3a56d61637debead847ca9e5092580de"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R5-M28.json.gz",
+      "SHA256": "072e9dabe1016a77158e2d6a8a00a7aaadc9846554d51c789bf6283109c361f6"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R6-M28.json.gz",
+      "SHA256": "3c070016677ec22b342238fd6bbe380cc418c58a8adaf897595d6e0bbf96e014"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R7-M28.json.gz",
+      "SHA256": "559318f6a375bebc8797e0c73195550116f1ce8d24734f57a83d00e9afd7c0e4"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R8-M28.json.gz",
+      "SHA256": "0086bbf8ceefbfe3164fe875f0f325a7226a5dbfb1f6a9b31244fdb15cb00356"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank2-pass1-N24-parent24-P4-E4-B4-R9-M28.json.gz",
+      "SHA256": "6f934ee23ceb011d78280d091e944a5ad63f7d293026851dccdaa617f4a08507"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R0-M28.json.gz",
+      "SHA256": "0cb35fd333b3e3df2ba0d2616ce5b93a3a471ebefd664db0f339b45b347945d2"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R1-M28.json.gz",
+      "SHA256": "f89d7dd73e65ec295c3fc0668d00e56bd3efc076a18fbed78628a15ccf22bcda"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R10-M28.json.gz",
+      "SHA256": "222f7b858331a7054fb1b7b42c3b8b73f0048de0c81bb7298a350f961ef0e56c"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R11-M28.json.gz",
+      "SHA256": "01eecaa06a0d784abacaf35c03c1213f99d47d391d3e570206a34f1850b83fc5"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R12-M28.json.gz",
+      "SHA256": "e516ac9f259b79daa36c74d2d5ae164821d00d2cc7c2772e371477abaad84ebf"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R13-M28.json.gz",
+      "SHA256": "f4146cb65fcb39ee41ee264d18a57a8898f1469484e065a7b207ea0f7e514f4a"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R14-M28.json.gz",
+      "SHA256": "4d3e0abc489f06f774191c479628d8cabf3c314e66875c5b35e20e9ff4fc9244"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R15-M28.json.gz",
+      "SHA256": "e18d7652c49bd970473015606fe1085e158e5c39195c3f3937d7b5aad676697e"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R16-M28.json.gz",
+      "SHA256": "34609eb0bae367bb74ed87dde54aafff757e97567eefb5a80b0b96f5f84a2183"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R17-M28.json.gz",
+      "SHA256": "ddc8a6aa8fc7d2258790d97f50ffc2afb5c79ddd9c42b0ecc9a5aab3358514ba"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R18-M28.json.gz",
+      "SHA256": "6b151a747116852ea612c0123cbbb6f032177bd049d4669921f318dac5a85c89"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R19-M28.json.gz",
+      "SHA256": "85c1856e070e30efa634846c37682e7f2b8e4db6474d6496222a22a55b75b432"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R2-M28.json.gz",
+      "SHA256": "66f2db41fce1e68a70f39d0a9112757fcad4dd30615958aa6f929f6762b34a59"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R20-M28.json.gz",
+      "SHA256": "45e2f3507b931e2949bb9ae24156643e1805c2686fb91ac2c43c67604b03c893"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R21-M28.json.gz",
+      "SHA256": "36f179b14d145c11f5cf6604407479e77ed1f0191e5b4f1c88714d94fa1e8c17"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R22-M28.json.gz",
+      "SHA256": "4faa97625141fa7b8f77ae450874b1be7cfd240917411f7b281ef83fa84d46c9"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R23-M28.json.gz",
+      "SHA256": "acec18ec929176404074e504e21533dc88d1ebdea25258d0390c6ef619ee0b55"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R24-M28.json.gz",
+      "SHA256": "70b3474297dcc5bf9f89065304170b1d122e1204eb1ba4a7772b4b7bff2194c6"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R3-M28.json.gz",
+      "SHA256": "7425aa14ce0331cdf0c37aa09240aeb8683934a56edf3665257cb7c60216867a"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R4-M28.json.gz",
+      "SHA256": "fb73883c9bdf11c1192943a577c71af3d590b5f5b2608cf02e93311f5c310d05"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R5-M28.json.gz",
+      "SHA256": "f2c6e3e85558298cf64d04690fdd28044f6bf51efb79587f7786a817528716ff"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R6-M28.json.gz",
+      "SHA256": "130bc31d8a993e0768c2c4147a8ff260b78b956f1e9e8c04c899d630ae819fd5"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R7-M28.json.gz",
+      "SHA256": "836228213949a2e558eeb4a1a208c606d214eb5329cde66dd1d7cef38703e40a"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R8-M28.json.gz",
+      "SHA256": "0f8da5d9fb58e2464ff849f8f827a3ad7b1fb30761bd1a40bae28a83a843be44"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/parent4-current-component425/bounded199/rank3-pass1-N24-parent24-P4-E4-B4-R9-M28.json.gz",
+      "SHA256": "52a5202ffce6117789b2b12e808a47060f6c47a1d37df260f4d4c1761db2af45"
+    }
+  ],
+  "full463": false,
+  "whole_AR_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

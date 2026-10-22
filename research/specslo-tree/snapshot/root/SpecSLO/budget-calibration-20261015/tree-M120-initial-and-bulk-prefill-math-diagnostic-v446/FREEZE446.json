@@ -1,0 +1,25 @@
+{
+  "schema": "ROOT446.initial-and-bulk-known-prefill-diagnostic.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/prepare_ROOT446_initial_bulk_HOST.py": "4211eb3d11c08939324a48fd591af10bb888a9c9636472c5c723f94bd83ac991",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/HOST446_CONSTRUCTION_RESULT.json": "6383afbd93710f4dd96823c4be82274885a32863f92869034bdd9489df1cf2d4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/PLAN446.json": "e0dc29a4d4ea3db3425e67d56fe22fe4fb190a6b0efaa7f1d78333a4b26a467b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/audit446.py": "40c03012da4ad196e6b2ec82ef6a3d9764c58ffd91bb9475e213bd2cd5428903",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/check446.py": "fdb95183a6d9e4ce7fe898f3ffeb099b4d089e749b754d2563fef9399d57dd17",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/check446_HOST.py": "2d7fe8c98fdba99dbdabedafb2e2f3f441133bda338ff968ced5bffe5e16461a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/forward446.py": "7a16e300164a72d52bc7bb9db5375f4e23022b3298eddb28b5e5bdd46123dc50",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/guard446.py": "a470a0aaf7f322eae29257f5a61f926f17147b928dbebcd873c5b4d29eb47246",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/host_env446.py": "7e288976e47c5af50698bff7e73ce96e24e737c43df23532d8597c977a158ec7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/probe446.py": "1ae89eab49599aa02d31a066257e384fa3ff0bc5decf36a45910c35f60749ea1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/runtime446.py": "6264adefd08d3d3b658408e10273462e22b1cb0769981fe17189f810b1340f2f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446/startup446.sh": "9a1deb0697d1a9d645159ae5bbba1eadef673ef4581fb65542c3c0423f89acfa"
+  },
+  "parent385_freeze": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+  "parent385_archive": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
+  "current445_freeze": "3fece48e7ed37ae80ebac4d9744e3a46cbd50e03fbb8da1c8f3fee47a6afd8db",
+  "current445_archive": "dc84c9c7f099cabf01bc706b6f5de1791dfa914e1ebbae22b43d1c08ec88eb69",
+  "NPU_run": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,19 @@
+{
+  "NPU_used": false,
+  "ROOT_review": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V160_ACTIVE_WINDOW_SOURCE_REVIEW.json",
+    "sha256": "4376b23dd01e49287dfc98d579b5d812a3429b7954459f15374e2cbfdc608526"
+  },
+  "Torch_imported": false,
+  "actual_core_require_ready_passed": true,
+  "actual_device_qualification": false,
+  "archive": {
+    "members": 42,
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-active-window32-16-local-v160/PREPARED_SOURCE_ARCHIVE160.tar.gz",
+    "sha256": "8c72c7305a6692fc02ad90a82ac444c189913b608aa8cc7000dcb2b8c9c44388"
+  },
+  "freeze_sha256": "1fcce8a2aa79f7c928cb12b1a0885c6888ab6e0a24b73f3587b5f9e46a6988c0",
+  "independent_tar_regular_member_SHA_verified": true,
+  "schema": "ROOT.V160.prepared-source-HOST-audit.v1",
+  "status": "passed"
+}

@@ -1,0 +1,17 @@
+{
+  "status": "PASS_HOST386_ORIGINAL199_READY_PREPARE_ORIGINS_AND_ACTUAL_RUNTIME",
+  "NPU_used": false,
+  "source_gate_mocked_only_for_unfrozen_worker_construction": true,
+  "actual_original199_require_ready_passed": true,
+  "parent199_identity": {
+    "CPU_sha256": "266e42c1b3611e4611d30ef983f7f11c6b02c0accefc95e837f7dad7eead1d06",
+    "freeze_sha256": "7c13009f99dae6de89341dd52967d519b858bef52bd30c15ab382bd850b935e8"
+  },
+  "actual_original_prepare_install_and_origins_passed": true,
+  "Torch_imported": true,
+  "model_constructed": false,
+  "models_qualified": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

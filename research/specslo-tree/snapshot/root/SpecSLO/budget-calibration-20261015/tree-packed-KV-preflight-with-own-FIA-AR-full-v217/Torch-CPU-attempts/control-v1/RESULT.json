@@ -1,0 +1,232 @@
+{
+  "schema": "ROOT217.actual-Torch-CPU-mapping-control.v1",
+  "UTC": "2026-10-17T23:54:09.220701+00:00",
+  "status": "passed",
+  "cases": 28,
+  "rows": [
+    {
+      "dtype": "torch.int32",
+      "N": 1,
+      "Q": 5,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 1,
+      "Q": 5,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 2,
+      "Q": 10,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 2,
+      "Q": 10,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 8,
+      "Q": 40,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 8,
+      "Q": 40,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 9,
+      "Q": 45,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 9,
+      "Q": 45,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 16,
+      "Q": 80,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 16,
+      "Q": 80,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 24,
+      "Q": 120,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 24,
+      "Q": 120,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 32,
+      "Q": 128,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int32",
+      "N": 32,
+      "Q": 128,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 1,
+      "Q": 5,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 1,
+      "Q": 5,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 2,
+      "Q": 10,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 2,
+      "Q": 10,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 8,
+      "Q": 40,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 8,
+      "Q": 40,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 9,
+      "Q": 45,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 9,
+      "Q": 45,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 16,
+      "Q": 80,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 16,
+      "Q": 80,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 24,
+      "Q": 120,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 24,
+      "Q": 120,
+      "strided": true,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 32,
+      "Q": 128,
+      "strided": false,
+      "passed": true
+    },
+    {
+      "dtype": "torch.int64",
+      "N": 32,
+      "Q": 128,
+      "strided": true,
+      "passed": true
+    }
+  ],
+  "negative_cases": [
+    {
+      "value": -1,
+      "both_rejected": true,
+      "message": "SpecRhythm target proposal 100 KV mapping contains an out-of-bounds physical slot"
+    },
+    {
+      "value": 69632,
+      "both_rejected": true,
+      "message": "SpecRhythm target proposal 100 KV mapping contains an out-of-bounds physical slot"
+    },
+    {
+      "value": 1099511627776,
+      "both_rejected": true,
+      "message": "SpecRhythm target proposal 100 KV mapping contains an out-of-bounds physical slot"
+    }
+  ],
+  "Torch_imported": true,
+  "Torch_npu_imported": false,
+  "NPU_used": false,
+  "model_constructed": false,
+  "original_and_optimized_same_values_and_pending_views": true,
+  "source_sha256": {
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py": "05d47ed6dc48e368010ca145a0b859aaffe596f246e0b28eb7b07d2d51a50cc9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/canonical_eager.py": "21a28417fb77271ce7f96cb45222d737fd8fd608c76fdb1aed89a52a42b608a3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/slot_preflight217.py": "4e07a94ea8251867808b340f5b19a479e54657db97c47b659060a68a7dc857bc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/cpu_slot_preflight217.py": "6a17f9ed426cd5452222b5790b895eaa35147e0124cc4b4abde8ceaac0282f8b"
+  }
+}

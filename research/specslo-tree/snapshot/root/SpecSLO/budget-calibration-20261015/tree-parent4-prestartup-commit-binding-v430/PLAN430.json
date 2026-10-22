@@ -1,0 +1,16 @@
+{
+  "UTC": "2026-10-21T09:03:28.632991+00:00",
+  "change": "Restore exactly runtime199 pre-startup commit function capture/bind in unchanged428 full worker.",
+  "old428_failure": "_v199_commit_states missing before first parent commit after227+681",
+  "original425_backend_and_all428_metadata_419math_bodies_unchanged": true,
+  "all_original_components_plus227_plus681_plus75_required_fresh": true,
+  "warm_twozero_seal_full463_all3_own_AR_required": true,
+  "global_active_limit": 64,
+  "normal_target_limit": 24,
+  "NN_launched": false,
+  "NN_permission_inherited": false,
+  "new_refill426_427_429_installed": false,
+  "Raw": null,
+  "Goodput": null,
+  "github_commit_after_effective_improvement_only": true
+}

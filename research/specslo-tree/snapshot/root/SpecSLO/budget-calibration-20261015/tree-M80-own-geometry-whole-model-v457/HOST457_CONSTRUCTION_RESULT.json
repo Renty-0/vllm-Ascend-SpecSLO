@@ -1,0 +1,20 @@
+{
+  "UTC": "2026-10-22T13:26:07.031256+00:00",
+  "status": "PASS_HOST457_ACTUAL385_NAMESPACE_SOURCE_PARSER_AND_SETTINGS",
+  "parent_source_files": 5025,
+  "verified_parent_and_archives": 5155,
+  "parent_verification_seconds": 3.434212393127382,
+  "changed_parent_SHA_rejected": true,
+  "actual385_runtime_globals_identical": 9,
+  "actual_main_parser_exercised": true,
+  "actual_worker_predicates_exercised": 5,
+  "startup_numerical_exports_unchanged": true,
+  "configuration_profile_weight_or_Native_flag_assignments": false,
+  "cross_M120_discrepancy_preserved": true,
+  "all27_post_checks_read_last_timed_replay": true,
+  "NPU_used": false,
+  "actual_model_constructors": 0,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,49 @@
+{
+  "status": "passed",
+  "cases": 3,
+  "rows": [
+    {
+      "initial_alive": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "result": {
+        "closed": true,
+        "all_exited": true
+      },
+      "detail": {
+        "original_API_exit_called": true,
+        "additional_grace_seconds": 1,
+        "waited_for_owned_children": false,
+        "elapsed_total_seconds": 1.1620111763477325e-05,
+        "external_processes_touched": false,
+        "measurement_clock_changed": false
+      }
+    },
+    {
+      "initial_alive": [
+        true,
+        false,
+        true,
+        false
+      ],
+      "result": {
+        "closed": true,
+        "all_exited": true
+      },
+      "detail": {
+        "original_API_exit_called": true,
+        "additional_grace_seconds": 1,
+        "waited_for_owned_children": true,
+        "elapsed_total_seconds": 1.0079704225063324e-05,
+        "external_processes_touched": false,
+        "measurement_clock_changed": false
+      }
+    }
+  ],
+  "Torch_imported": false,
+  "NPU_used": false,
+  "only_fake_owned_children": true
+}

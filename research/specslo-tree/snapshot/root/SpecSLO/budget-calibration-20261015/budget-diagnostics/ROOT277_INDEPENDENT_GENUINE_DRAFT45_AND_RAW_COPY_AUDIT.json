@@ -1,0 +1,37 @@
+{
+  "status": "PASS_independent_genuine_draft45_and_rawbyte1024_audit",
+  "tag": "genuine-private-draft-root-v277-observed-primary4-alt1to3-45-ownprefix-v1",
+  "receipt_sha256": "5fc570a48dd646013c690552ce83b13879c81f72448a403ef9ae007f47113771",
+  "rank0_report_sha256": "f93ef11edd2cda085b9f4349c0d4e9cb4e192c69e369222f8e71b615b7f67b75",
+  "actual_independent_prefixes": 24,
+  "genuine_primary_plus_alternate_cases": 45,
+  "N": [
+    1,
+    2,
+    4,
+    8,
+    12
+  ],
+  "additional_alternate_steps": [
+    1,
+    2,
+    3
+  ],
+  "selected_B": [
+    6,
+    7,
+    8
+  ],
+  "actual_28layer_56KV_and_hidden_bitwise_alternate": true,
+  "original_primary_top2_allhidden_and56KV_checked": true,
+  "raw16_payload_graph_replays": 6,
+  "canonical_primary_cache_and_ledger_and_tables_protected": true,
+  "frozen_sources_and_archive_verified": true,
+  "original_environment_pre_post_verified": true,
+  "owned_cleanup_all4idle_at_terminal": true,
+  "performance_qualified": false,
+  "empirical_g_determined": false,
+  "whole463_AR": false,
+  "Goodput": null,
+  "adopted": false
+}

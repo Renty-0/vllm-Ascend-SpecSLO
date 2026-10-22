@@ -1,0 +1,36 @@
+{
+  "UTC": "2026-10-18T15:07:28.427472+00:00",
+  "status": "HOST_actual_4Dto3D_and_zero_copy_2D_alias_equivalence_passed",
+  "rows": [
+    {
+      "width": 256,
+      "rank3_shape": [
+        4096,
+        2,
+        128
+      ],
+      "rank2_shape": [
+        4096,
+        256
+      ],
+      "same_storage_alias": true,
+      "full_snapshot_outputs_equal": true
+    },
+    {
+      "width": 384,
+      "rank3_shape": [
+        4096,
+        3,
+        128
+      ],
+      "rank2_shape": [
+        4096,
+        384
+      ],
+      "same_storage_alias": true,
+      "full_snapshot_outputs_equal": true
+    }
+  ],
+  "NPU_used": false,
+  "neural_qualified": false
+}

@@ -1,0 +1,146 @@
+{
+  "projection": [
+    {
+      "deltas": [],
+      "file": "source199.py",
+      "namespace": [
+        "197",
+        "199"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/source197.py",
+      "parent_sha256": "afa0133d3df983bd1e5015bd0a8af6c0faa33b25404ed68376c3aac2549c2954"
+    },
+    {
+      "deltas": [],
+      "file": "progress199.py",
+      "namespace": [
+        "197",
+        "199"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/progress197.py",
+      "parent_sha256": "580274b5e8a8c37386b9f5a5b7883d538f50cebf2dcdac449f8b3d2b0308c8ef"
+    },
+    {
+      "deltas": [],
+      "file": "config199.py",
+      "namespace": [
+        "197",
+        "199"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/config197.py",
+      "parent_sha256": "7eed2bd90250f35cadd07d47d7648db8dc5dc44e2efd571f761b9c8630991c98"
+    },
+    {
+      "deltas": [],
+      "file": "check199.py",
+      "namespace": [
+        "197",
+        "199"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/check197.py",
+      "parent_sha256": "94b27f06b2af8d50e4b193356509a4545a33be8cfb38f2608ff59c212d3ef05f"
+    },
+    {
+      "deltas": [],
+      "file": "host_full199.py",
+      "namespace": [
+        "197",
+        "199"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/host_full197.py",
+      "parent_sha256": "4ed7c66977905d6516383bc5ff5b594acab1f703c6c252f5699e2f67e3f11480"
+    },
+    {
+      "deltas": [
+        {
+          "end": 306,
+          "new": "bound",
+          "old": "",
+          "start": 306
+        },
+        {
+          "end": 308,
+          "new": "d-",
+          "old": "m",
+          "start": 307
+        },
+        {
+          "end": 309,
+          "new": "aren",
+          "old": "",
+          "start": 309
+        },
+        {
+          "end": 311,
+          "new": "4",
+          "old": "y",
+          "start": 310
+        },
+        {
+          "end": 312,
+          "new": "child4-sh",
+          "old": "",
+          "start": 312
+        },
+        {
+          "end": 314,
+          "new": "red4-diagnos",
+          "old": "c",
+          "start": 313
+        },
+        {
+          "end": 319,
+          "new": "",
+          "old": "ve-",
+          "start": 316
+        },
+        {
+          "end": 351,
+          "new": "",
+          "old": "ohort-causal80-active32-full463",
+          "start": 320
+        },
+        {
+          "end": 4264,
+          "new": "\nV151=B/'tree-normal4-parent3-shared4-eager-v151'\nV152=B/'tree-union-shared4-protocol-local-v152'\nV159=B/'tree-live-shared4-union-v159'\nV161=B/'tree-union-own-epoch-metadata-fix-local-v161'\nV179=B/'tree-linear-parent4-child3-bank-binding-full-v179'\nfor root in (V151,V152,V159,V161,B/'tree-natural-positive-union-discovery-local-v154',B/'tree-repair-frontier-fusion-local-v149'):\n if str(root) not in sys.path:sys.path.append(str(root))\n",
+          "old": "",
+          "start": 4264
+        }
+      ],
+      "file": "base199.py",
+      "namespace": [
+        "197",
+        "199"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/base197.py",
+      "parent_sha256": "7a8ee69d1516b2e83e6c1e81caf94709b1f3a4fcd118cfa0a83e91fd2d1f44e7"
+    },
+    {
+      "deltas": [],
+      "file": "provider199.py",
+      "namespace": [
+        "179",
+        "199"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-bank-binding-full-v179/provider179.py",
+      "parent_sha256": "413d76170a6a72f3863b6a1f9ad57a105606b7a8ed2b17b03b7fb8a32aae4f08"
+    },
+    {
+      "deltas": [
+        {
+          "end": 2525,
+          "new": ".to(metadata.context_lens.device)",
+          "old": "",
+          "start": 2525
+        }
+      ],
+      "file": "observe199.py",
+      "namespace": [
+        "179",
+        "199"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-bank-binding-full-v179/observer179.py",
+      "parent_sha256": "b21bb614d610285cbb8c210ef2c2fe4174ccaed5f39880ad3a8ef4a96a394088"
+    }
+  ]
+}

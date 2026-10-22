@@ -1,0 +1,20 @@
+{
+  "schema": "ROOT461.retained-CANN-Python-path-source.v1",
+  "UTC": "2026-10-22T15:09:35.432693+00:00",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT460_TERMINAL_TBE_STARTUP_FAILURE_HOST.json": "491f0c7ae96d7dbed2133d7722b0d1ddc656800aed2a43101e6bbeb506ce281b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-retained-CANN-path-full-v461/HOST461_ENVIRONMENT_RESULT.json": "76c7320f9cd9f09b2881191e8d27a24a96794f9c89eb93eb7d79f1128d4759da",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-retained-CANN-path-full-v461/PLAN461.json": "19e786d62959cdaedab888276f7e1f05c8c0a8d288e74a449e3d36f51b2c3d97",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-retained-CANN-path-full-v461/check461.py": "546b180e584eec90d7266cf770b545179205ab804fc5a86b25eacd7268526270",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-retained-CANN-path-full-v461/check461_environment_HOST.py": "2d75344adfe7a3ecff0093777563c4ad5597bf5bd70818916d0979a2928f32b1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-retained-CANN-path-full-v461/guard461.py": "e87af60e3421a464a9e3c99876c9ab975f9822c4b3524c21dc7f6037a4965a1d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-retained-CANN-path-full-v461/launch461.sh": "752edd07fe4adf78538b9e9fcfa739a94d1a1a6001ba750eb0e7621ff8bddca5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-retained-CANN-path-full-v461/runtime461.py": "b6507222f0d72536829e19655153326d3c0701a424dd934ca15a68cd02ac4407",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-retained-CANN-path-full-v461/startup461.sh": "4403fa12067c73ba7406b21eafad6bd3f654ebedf894fa2ce54f019ed118ba75"
+  },
+  "parent460_freeze": "89475ed7a4beebdb9ac7029d3b847e38d9327415852bc63782a3372dbc48bcb8",
+  "parent460_archive": "44ed9bdbe55fcf839b05d98ad81299aa8236050f46a74a53fcf69cc4be553a6a",
+  "all_numerical_parent_code_unchanged": true,
+  "NN_permission_inherited": false,
+  "global_active_limit": 64
+}

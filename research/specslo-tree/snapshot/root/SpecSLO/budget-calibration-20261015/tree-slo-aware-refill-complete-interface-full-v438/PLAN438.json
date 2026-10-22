@@ -1,0 +1,35 @@
+{
+  "schema": "ROOT438.current-SLO-refill-and-complete-interface.v1",
+  "parent437_trace_observation": {
+    "Raw": 720.9631138457082,
+    "Goodput": 303.64537192205853,
+    "attained": 195,
+    "requests": 463,
+    "adopted": false,
+    "supervisor_complete": false
+  },
+  "reason": "Unconditional nonempty refills increased strict TPOT; missing report export prevented final supervision.",
+  "new_policy": {
+    "strict_TPOT_threshold_ms": 40.0,
+    "strict_active_low_water": 16,
+    "otherwise_low_water": 32,
+    "minimum_nonempty": 8,
+    "maximum_nonempty": 32,
+    "empty_admission_limit": 64,
+    "global_active_limit": 64,
+    "no_future_arrival_or_outcome_peeking": true
+  },
+  "neural_callbacks_identity_preserved": true,
+  "exact_original433_preflight_snapshot_export_restored": true,
+  "complete_actual_worker_extension_interface_checked_before_NPU": true,
+  "original227_681_75_plus6_warm_twozero_seal_full463_all3ownAR_fresh_required": true,
+  "Native_flags_assigned": false,
+  "NN_permission_inherited": false,
+  "private_tag_MiB": 256,
+  "aggregate_private_MiB": 3584,
+  "runtime_seconds": 18000,
+  "Raw": null,
+  "Goodput": null,
+  "new_Git_commits": 0,
+  "new_Git_pushes": 0
+}

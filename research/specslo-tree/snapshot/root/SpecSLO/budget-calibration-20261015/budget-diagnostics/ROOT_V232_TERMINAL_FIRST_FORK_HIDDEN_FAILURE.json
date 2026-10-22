@@ -1,0 +1,132 @@
+{
+  "schema": "ROOT232.failed-independent-branch-node-math.v1",
+  "UTC": "2026-10-18T04:34:12.038386+00:00",
+  "status": "failed_first_true_fork_independent_hidden_gate",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M80-independent-root-v232-151-neural-cases-v1.json",
+  "receipt_sha256": "1e86f217132badced1174459afd3fc0b1dfb50de1b33769c3e0bc25c971e192c",
+  "completed_positive_cases": [
+    {
+      "case": {
+        "name": "N1-all1-anchor0",
+        "N": 1,
+        "budgets": [
+          1
+        ],
+        "anchor": 0,
+        "M": 80,
+        "S": 16,
+        "padding": [
+          6,
+          6,
+          6,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "plan_family": "causal",
+        "query_count": 2,
+        "fixture_budget_reduction": null
+      },
+      "heads": [
+        4583,
+        271
+      ],
+      "all_three_targets_agree": true
+    },
+    {
+      "case": {
+        "name": "N1-all4-anchor0",
+        "N": 1,
+        "budgets": [
+          4
+        ],
+        "anchor": 0,
+        "M": 80,
+        "S": 16,
+        "padding": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "plan_family": "causal",
+        "query_count": 5,
+        "fixture_budget_reduction": null
+      },
+      "heads": [
+        4583,
+        271,
+        229,
+        22597,
+        198
+      ],
+      "all_three_targets_agree": true
+    }
+  ],
+  "completed_positive_count": 2,
+  "planned_neural_cases": 151,
+  "failed_case": "N1-fork5-anchor0",
+  "original_greedy_heads_equal_before_failed_hidden_gate": true,
+  "failed_case_query_KV_gate_not_reached": true,
+  "detailed_hidden_delta_not_retained": true,
+  "initial_bank_report_not_retained": true,
+  "all48_prefixes_final_protection_not_reached": true,
+  "root_cause_not_proven": true,
+  "next_hypothesis": "contiguous logical branch KV view with per-layer BF16 tail copy; compare old layout explicitly and retain per-node diagnostics",
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-independent-root-v232-151-neural-cases-v1/rank1-canonical-case001.json": "a70d16c06de75c4d0597db298ff530b44be8500b4c35531b6a3aabcdbd10c342",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-independent-root-v232-151-neural-cases-v1/rank2-canonical-case001.json": "a5d10f5d8ba6b1bcacf84c582ab853cf256ed0726d65155402a9b6a3b6680661",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-independent-root-v232-151-neural-cases-v1/rank3-canonical-case001.json": "a226ec1d69d089ba5aeda73ec436d26b6a7034353780925b873311d3344d62ae",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-independent-root-v232-151-neural-cases-v1/rank1-canonical-case002.json": "d0f002e89917652e5161b3c742f958f91c2486d4f8ef9b0e98450a3bd23fed74",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-independent-root-v232-151-neural-cases-v1/rank2-canonical-case002.json": "e10a09985ab98fbaab62a30839112a776669240e13805d13722833be49fba534",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-independent-root-v232-151-neural-cases-v1/rank3-canonical-case002.json": "82cbb501a22be741cdd3540dc8cf738482d0309fc7a5366255059e6d51396c80",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-independent-root-v232-151-neural-cases-v1/rank0-last-error.json": "9311fd2a9b6c2efd04fab54d54d6316022e091dde19387d75727d2490801cba5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-independent-root-v232-151-neural-cases-v1/rank1-last-error.json": "e1e85c01652bfa4bb0d2b51689f23975ccf7f15651fa11e1d061a25c3963683a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-independent-root-v232-151-neural-cases-v1/rank2-last-error.json": "70c4102b0ffb4c18e5ae71ed124aa08e5d93680bc9250bfa01dc4f62d6b4ecd0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/M80-independent-root-v232-151-neural-cases-v1/rank3-last-error.json": "56fb45e1a3eadb0a31a8133370682286896aad90bce5ee07d0ff5ca0bf2a49a0"
+  },
+  "pre_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "all_four_idle": true,
+  "owned_remaining": [],
+  "original_Native_matcher_not_relaxed": true,
+  "whole_workload_AR_qualified": false,
+  "formal_Goodput": false,
+  "adopted": false
+}

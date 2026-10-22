@@ -1,0 +1,658 @@
+{
+  "status": "passed",
+  "cases": 60,
+  "negative_cases": [
+    "not_FULL",
+    "missing_partition",
+    "query_exceeds_mask",
+    "invalid_context"
+  ],
+  "details": [
+    {
+      "position": 0,
+      "selected": [
+        0
+      ],
+      "q": 2
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1
+      ],
+      "q": 3
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1,
+        2
+      ],
+      "q": 4
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "q": 5
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "q": 6
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "q": 7
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "q": 8
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "q": 9
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "q": 6
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "q": 6
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        6
+      ],
+      "q": 6
+    },
+    {
+      "position": 0,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        7
+      ],
+      "q": 6
+    },
+    {
+      "position": 127,
+      "selected": [
+        0
+      ],
+      "q": 2
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1
+      ],
+      "q": 3
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1,
+        2
+      ],
+      "q": 4
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "q": 5
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "q": 6
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "q": 7
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "q": 8
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "q": 9
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "q": 6
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "q": 6
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        6
+      ],
+      "q": 6
+    },
+    {
+      "position": 127,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        7
+      ],
+      "q": 6
+    },
+    {
+      "position": 128,
+      "selected": [
+        0
+      ],
+      "q": 2
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1
+      ],
+      "q": 3
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1,
+        2
+      ],
+      "q": 4
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "q": 5
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "q": 6
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "q": 7
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "q": 8
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "q": 9
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "q": 6
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "q": 6
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        6
+      ],
+      "q": 6
+    },
+    {
+      "position": 128,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        7
+      ],
+      "q": 6
+    },
+    {
+      "position": 511,
+      "selected": [
+        0
+      ],
+      "q": 2
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1
+      ],
+      "q": 3
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1,
+        2
+      ],
+      "q": 4
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "q": 5
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "q": 6
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "q": 7
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "q": 8
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "q": 9
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "q": 6
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "q": 6
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        6
+      ],
+      "q": 6
+    },
+    {
+      "position": 511,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        7
+      ],
+      "q": 6
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0
+      ],
+      "q": 2
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1
+      ],
+      "q": 3
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1,
+        2
+      ],
+      "q": 4
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "q": 5
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "q": 6
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "q": 7
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "q": 8
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "q": 9
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "q": 6
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        5
+      ],
+      "q": 6
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        6
+      ],
+      "q": 6
+    },
+    {
+      "position": 4000,
+      "selected": [
+        0,
+        1,
+        2,
+        3,
+        7
+      ],
+      "q": 6
+    }
+  ],
+  "original_Native_mask_validator_passed": true,
+  "original_linear_and_all_four_side_anchor_masks_preserved": true,
+  "Torch_CPU": true,
+  "NPU_used": false,
+  "neural_qualified": false,
+  "performance_qualified": false
+}

@@ -1,0 +1,21 @@
+{
+  "status": "PASS_HOST430_REAL_PRESTARTUP_CAPTURE_INSTALL_AND_ORIGINAL419_COMMIT_ENTRY",
+  "binding": {
+    "original_commit_source_sha256": "0bf5dcd4f06dc4c6f18d98a4caeabd10fc519686aa510f9697f8da33a4a208b3",
+    "same_prestartup_protocol_and_original_commit_identity": true,
+    "exactly_original_runtime199_capture_and_engine_binding": true,
+    "Native_flags_assigned": false,
+    "NN_permission_granted": false
+  },
+  "controlled_negatives": [
+    "old428_missing_original_binding",
+    "different_commit_function_identity"
+  ],
+  "original428_factory_and_tail_observer_installed": true,
+  "original419_commit_code_unchanged": true,
+  "positive_stopped_before_first_Native_stage": true,
+  "only_uninitialized_Python_engine_object_used": true,
+  "Native_models_constructed": 0,
+  "NPU_used": false,
+  "NN_qualification_inherited": false
+}

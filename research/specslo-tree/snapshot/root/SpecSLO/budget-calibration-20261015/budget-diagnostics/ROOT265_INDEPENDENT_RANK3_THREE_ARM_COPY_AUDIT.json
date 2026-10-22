@@ -1,0 +1,129 @@
+{
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-native-rank3-KV-copy-cost-v265/actual/native-rank3-KV-root-v265-three-arm-copy-v1/receipt.json",
+  "receipt_sha256": "85a916e1e8e46b412b26631b2a51d30bc392a049818758a0d4398799b4a3f65b",
+  "measured_source": "/root/SpecSLO/budget-calibration-20261015/tree-native-rank3-KV-copy-cost-v265/actual/native-rank3-KV-root-v265-three-arm-copy-v1/paired-copy.json",
+  "measured_sha256": "7e7d526ab125b14d5be9c31a3de7db96fad21e41321c30cd90bbd540a40f798b",
+  "actual_guard_complete": true,
+  "all_frozen_sources_unchanged": true,
+  "original10496_15_212_pre_and_post_passed": true,
+  "all_four_idle": true,
+  "neural_qualified": false,
+  "Goodput": null,
+  "status": "independent_actual_rank3_three_arm_KV_copy_audit_passed",
+  "complete_cache_comparisons": 344,
+  "raw_bit_changed_restored_replays": 6,
+  "paired_rounds_per_case": 80,
+  "timings": [
+    {
+      "width": 256,
+      "case": "N1-fork5-anchor0",
+      "nonidentity": 99,
+      "paired_calls": 80,
+      "median_ms": {
+        "original": 0.20114891231060028,
+        "view2d": 0.20110397599637508,
+        "fused": 0.18942379392683506
+      }
+    },
+    {
+      "width": 256,
+      "case": "N8-fork5-anchor0",
+      "nonidentity": 998,
+      "paired_calls": 80,
+      "median_ms": {
+        "original": 0.19832421094179153,
+        "view2d": 0.19767414778470993,
+        "fused": 0.18666405230760574
+      }
+    },
+    {
+      "width": 256,
+      "case": "N12-fork5-anchor0",
+      "nonidentity": 1514,
+      "paired_calls": 80,
+      "median_ms": {
+        "original": 0.2001388929784298,
+        "view2d": 0.199104193598032,
+        "fused": 0.18977909348905087
+      }
+    },
+    {
+      "width": 256,
+      "case": "N16-mixed-anchor0",
+      "nonidentity": 387,
+      "paired_calls": 80,
+      "median_ms": {
+        "original": 0.19851396791636944,
+        "view2d": 0.19708415493369102,
+        "fused": 0.18752389587461948
+      }
+    },
+    {
+      "width": 256,
+      "case": "N23-fork5-anchor0",
+      "nonidentity": 99,
+      "paired_calls": 80,
+      "median_ms": {
+        "original": 0.19871885888278484,
+        "view2d": 0.19761919975280762,
+        "fused": 0.1867541577666998
+      }
+    },
+    {
+      "width": 384,
+      "case": "N1-fork5-anchor0",
+      "nonidentity": 99,
+      "paired_calls": 80,
+      "median_ms": {
+        "original": 0.2196000423282385,
+        "view2d": 0.22239401005208492,
+        "fused": 0.18846848979592323
+      }
+    },
+    {
+      "width": 384,
+      "case": "N8-fork5-anchor0",
+      "nonidentity": 998,
+      "paired_calls": 80,
+      "median_ms": {
+        "original": 0.21824892610311508,
+        "view2d": 0.22093881852924824,
+        "fused": 0.18881424330174923
+      }
+    },
+    {
+      "width": 384,
+      "case": "N12-fork5-anchor0",
+      "nonidentity": 1514,
+      "paired_calls": 80,
+      "median_ms": {
+        "original": 0.21790922619402409,
+        "view2d": 0.22019888274371624,
+        "fused": 0.18949899822473526
+      }
+    },
+    {
+      "width": 384,
+      "case": "N16-mixed-anchor0",
+      "nonidentity": 387,
+      "paired_calls": 80,
+      "median_ms": {
+        "original": 0.2189150545746088,
+        "view2d": 0.22070412524044514,
+        "fused": 0.1888391561806202
+      }
+    },
+    {
+      "width": 384,
+      "case": "N23-fork5-anchor0",
+      "nonidentity": 99,
+      "paired_calls": 80,
+      "median_ms": {
+        "original": 0.218838918954134,
+        "view2d": 0.22110925056040287,
+        "fused": 0.18709921278059483
+      }
+    }
+  ],
+  "conclusion": "Fused copy wins these synthetic paired cases; full same-instance math and all463 ownAR still required"
+}

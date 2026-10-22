@@ -1,0 +1,13 @@
+{
+  "schema": "ROOT422.HOST-light-allocation-probe.v1",
+  "parent420_unchanged": true,
+  "policy_copy": "shallow copy; only Counter copied, exact original gain reads base/observed",
+  "actual_gain_and_allocation_unchanged": true,
+  "admission_ages_updated_once": true,
+  "history_not_copied_or_mutated": true,
+  "global_active_limit_required": 64,
+  "NPU_permission": false,
+  "serving_installed": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,90 @@
+{
+  "UTC": "2026-10-22T19:59:01.580972+00:00",
+  "status": "HOST_PREFILL_COST_PROPOSAL_PREDECLARED_BEFORE462_FULL_TRACE",
+  "fit": "ordinary least squares on438 refill ordinals0..9 only",
+  "formula": "1.10 * (max(0, intercept_ms) + slope_ms_per_prompt_query * uncached_queries)",
+  "intercept_ms": 31.1820130301752,
+  "slope_ms_per_prompt_query": 0.13797625060353721,
+  "safety_multiplier": 1.1,
+  "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_OBSERVED438_PREFILL_PAUSE_COMPONENT_HOST.json",
+  "source_SHA256": "017e9c1cea105df4a8c3d90a23e6e20eac86382f47e439c21bbbc9ecdf0f3dba",
+  "raw_trace_SHA256": "42d897e4982c829b19c0ccc38ae6d4f64c24c205ab5b74ea9043af2f2de9ad07",
+  "training_ordinals": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "old_later_ordinals_descriptive_check": [
+    {
+      "ordinal": 10,
+      "actual_ms": 1944.7135291993618,
+      "predicted_upper_ms": 2144.2606338126047,
+      "underprediction_ms": 0
+    },
+    {
+      "ordinal": 11,
+      "actual_ms": 1741.4653240703046,
+      "predicted_upper_ms": 1894.896156096832,
+      "underprediction_ms": 0
+    },
+    {
+      "ordinal": 12,
+      "actual_ms": 1666.1653462797403,
+      "predicted_upper_ms": 1835.4007968365863,
+      "underprediction_ms": 0
+    },
+    {
+      "ordinal": 13,
+      "actual_ms": 842.599340248853,
+      "predicted_upper_ms": 911.7049895461463,
+      "underprediction_ms": 0
+    },
+    {
+      "ordinal": 14,
+      "actual_ms": 3109.3627931550145,
+      "predicted_upper_ms": 3378.63756458703,
+      "underprediction_ms": 0
+    },
+    {
+      "ordinal": 15,
+      "actual_ms": 4165.040937252343,
+      "predicted_upper_ms": 4475.0520423829785,
+      "underprediction_ms": 0
+    },
+    {
+      "ordinal": 16,
+      "actual_ms": 2204.5738850720227,
+      "predicted_upper_ms": 2362.0561453902883,
+      "underprediction_ms": 0
+    },
+    {
+      "ordinal": 17,
+      "actual_ms": 1663.4630938060582,
+      "predicted_upper_ms": 1823.5624345348033,
+      "underprediction_ms": 0
+    },
+    {
+      "ordinal": 18,
+      "actual_ms": 1681.6320712678134,
+      "predicted_upper_ms": 1821.134052524181,
+      "underprediction_ms": 0
+    }
+  ],
+  "old_later_data_already_inspected_by_analyst": true,
+  "old_later_check_is_independent_heldout": false,
+  "prospective_validation_tag": "adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2",
+  "current462_full_trace_exists": false,
+  "prospective_validation": "After462 is terminal, evaluate this fixed formula on every retained actual prefill. Do not alter this file/model after observing those values; save validation as a separate result.",
+  "current_serving_source_changed": false,
+  "NPU_used": false,
+  "NN_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

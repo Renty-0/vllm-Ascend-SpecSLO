@@ -1,0 +1,54 @@
+{
+  "schema": "ROOT217.actual-HOST-tool-results.v1",
+  "UTC": "2026-10-17T23:55:39.379889+00:00",
+  "status": "passed",
+  "Torch_imported": false,
+  "NPU_used": false,
+  "suites": [
+    {
+      "actual_exec_session": 49931,
+      "exit_code": 0,
+      "tests_run": 6,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 58.139
+    },
+    {
+      "actual_exec_session": 87803,
+      "exit_code": 0,
+      "tests_run": 15,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 3.694
+    }
+  ],
+  "total_tests": 21,
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/host_slot_preflight217.py": "0198f0f5bf759ff6d8b1a40c303bcb1dcf05d2b67feef011895a3b949e877b39",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/cpu_slot_preflight217.py": "6a17f9ed426cd5452222b5790b895eaa35147e0124cc4b4abde8ceaac0282f8b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/extension217.py": "6d7a9e39e2da531bb527d4009cd8e2159a7ad576384afb925a03b25e509bf409",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/check217.py": "8cd39327b5e58f405e251e02d28b669b8fcac56cd159844ed51aae509d5d419a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/reference217.py": "bb63ac04a588658b403f5f0b0fcd1c274fe5c61debb30c5db83478e5700c36fe",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/launch217.sh": "e1ad26448a50e3b1aae25dc07a626f329bc69c12ddfaad829a1ba265c1b29c97",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/startup217.sh": "a4fadb725ae09db1f93c8143ba1d3416e3d16434a1eee47b3c76d9a6c9f08b1b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/guard217.py": "b94739403d0ec803df35e0983f7fc79af08d0f355e28632032d17999e3aea29e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/slot_preflight217.py": "4e07a94ea8251867808b340f5b19a479e54657db97c47b659060a68a7dc857bc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/host217.py": "87674974518683f814a6bf10dbce4dd0b7f82799f8d599922216897657a1659b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/cost217.py": "47c23d82f67dceb9f236cf04addd96d6c5f0b3520557c5f879926aa2202bbdc5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/audit_reference217.py": "dd2fa58a4fb15f6c3819668eee55d18f01ae5b60ffee8c1c44b17fd0dccbf91b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/runtime217.py": "3f4e589d8a53ead5ad2e849a0f7ddadaf7eb02d4ea6c5a92906a0f02faab38c6"
+  },
+  "controlled_Torch_CPU": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/Torch-CPU-attempts/control-v1/RESULT.json",
+    "sha256": "48075b118f9963bc76a33fe1e29a72636227a1212154295a00cfba4a9e307ce4",
+    "cases": 28,
+    "negative_cases": 3,
+    "Torch_imported": true,
+    "Torch_npu_imported": false,
+    "NPU_used": false,
+    "model_constructed": false
+  },
+  "source_peer_review": false,
+  "device_shadow_comparison_pending": true,
+  "new_Goodput": null
+}

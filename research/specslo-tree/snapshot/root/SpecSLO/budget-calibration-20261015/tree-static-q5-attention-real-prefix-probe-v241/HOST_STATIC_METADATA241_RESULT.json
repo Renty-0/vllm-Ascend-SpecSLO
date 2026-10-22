@@ -1,0 +1,17 @@
+{
+  "status": "HOST_passed",
+  "cases": 5,
+  "checked_query_rows": 400,
+  "invalid_zero_page_cases": 3,
+  "unsupported_partition_rejected": true,
+  "NPU_initialized": false,
+  "model_calls": 0,
+  "anchors": [
+    0,
+    127,
+    128,
+    1505,
+    4091
+  ],
+  "source_sha256": "5ab469e995340088c0754b6ef209987c9b2e92fb3312caefc463e4526b1dc40d"
+}

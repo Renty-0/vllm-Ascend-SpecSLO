@@ -1,0 +1,24 @@
+{
+  "status": "UNFROZEN_ADDITIVE_REFERENCE_SELECTOR_FIX",
+  "parent425_frozen": true,
+  "parent425_device_qualified": false,
+  "production425_unchanged": true,
+  "changes": [
+    "Independent metadata390 state selector376\u2192actual425, entire function inverse",
+    "Exact391 target proof code and419 cases in fresh namespaces with own reference; no original module mutation",
+    "Exact425 runtime with extension routing and supplemental retained reference marker"
+  ],
+  "all_original_227_681_and75_NNrequired": true,
+  "global_active_limit": 64,
+  "normal_work_limit": 24,
+  "target": {
+    "M": 120,
+    "S": 24,
+    "C": 96
+  },
+  "new_refill426_or427_installed": false,
+  "private_caps_unchanged": true,
+  "NN_launched": false,
+  "Raw": null,
+  "Goodput": null
+}

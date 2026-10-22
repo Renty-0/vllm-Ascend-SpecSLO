@@ -1,0 +1,34 @@
+{
+  "schema": "ROOT436.conditional-nonempty-refill-full-proposal.v1",
+  "parent434_implementation_unchanged": true,
+  "global_active_limit": 64,
+  "normal_single_target_limit": 24,
+  "nonempty_refill": {
+    "low_water32": true,
+    "minimum8": true,
+    "maximum32": true,
+    "incumbent_original_time_charge_preserved": true,
+    "total_reserved_pages544": true
+  },
+  "fresh_current_NN_required": [
+    "all original components",
+    "227+681 target math",
+    "all75 parent4 lifecycle",
+    "extra6 original427 real32-incumbent prefill before original218 shadow close",
+    "warm/twozero/seal/full463/all3ownAR"
+  ],
+  "parent_only_qualification_receive18000": true,
+  "original_worker_and_generation_timeout6000": true,
+  "source_only_HOST_qualified": true,
+  "NN_permission": false,
+  "NN_launched": false,
+  "current435_unchanged": true,
+  "launch_after435_terminal_independent_review": true,
+  "private_tag_MiB": 256,
+  "aggregate_private_MiB": 3584,
+  "runtime_seconds": 18000,
+  "Raw": null,
+  "Goodput": null,
+  "new_Git_commits": 0,
+  "new_Git_pushes": 0
+}

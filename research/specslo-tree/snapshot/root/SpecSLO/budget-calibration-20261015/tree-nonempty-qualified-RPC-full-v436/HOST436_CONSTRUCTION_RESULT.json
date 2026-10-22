@@ -1,0 +1,9 @@
+{
+  "status": "PASS_HOST436_WHOLE_NUMERICAL_WORKER_UNCHANGED_PARENT_RECEIVE_ONLY",
+  "all_original227_681_75_and_warm_twozero_seal_full463_ownAR_required": true,
+  "original434_neural_worker_AST_except_source_routing_identical": true,
+  "parent_only_qualification_timeout_view": true,
+  "global_active_limit": 64,
+  "NPU_used": false,
+  "Native_models_constructed": 0
+}

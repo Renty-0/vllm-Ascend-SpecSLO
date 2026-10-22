@@ -1,0 +1,22 @@
+{
+  "schema": "ROOT427.HOST-extra-incumbent-proof-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-prefill-incumbent-KV-protocol-host-v427/HOST427_CLEAN_STARTUP_RUN.json": "314e2b0fff0a92cca0b64170d9208a6258346a31f0d1ecd570ccfddada6e2d18",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-prefill-incumbent-KV-protocol-host-v427/incumbents427.py": "d381ea5b9bb1e66671f1fda2f9911be2e353fce069e29329620d89ca112e3f7d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-prefill-incumbent-KV-protocol-host-v427/check427_HOST.py": "3b21354a00ee39532e306acde942588135c2ce083c9f8e39d766859703ef0024",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-prefill-incumbent-KV-protocol-host-v427/PLAN427.json": "040b30e9ade857eda18d7a5baa40648c868ad40be614f29bddf63dabefafc058",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-prefill-incumbent-KV-protocol-host-v427/HOST427-check427_HOST.py.log": "e734f62ebc760c009eafa3d4b30cbbd0d240e541f891289c21275daca89abd3f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-prefill-incumbent-KV-protocol-host-v427/HOST427_RESULT.json": "aa936318a31635e61dd9b7a1e4e943d766aa87b15ab7c652cbbe524ef386a416",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT427_actual_CPU_HOST.py": "0e14a17ca7d91afdb75239022104161e02a98b003626a311afdb5dc59f71c34d"
+  },
+  "existing_inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/FREEZE425.json": "3f504d53ba5501e3cb20e2a72afff6415ad8a119f61502524bf76c3e8568d4b9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/prefill209.py": "83f962d64e0389c913b13cc4d8f09a5842eba9088c4b6bc8ab98dcc48bfb78d2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/normal24-global64-derived-controls-root-v405-full463-ownAR-v1/windows/window64/full463/rank1-full463-actual-trace.json.gz": "e870de970d59d2bb1faa64276fb5ff4fc92c822fd5c7d49a0daf83e8cdbab894"
+  },
+  "NN_executed": false,
+  "production_permission": false,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

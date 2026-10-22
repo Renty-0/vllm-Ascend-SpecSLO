@@ -1,0 +1,53 @@
+{
+  "schema": "ROOT432.HOST-full-composition-source-only-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/check432_composition_HOST.py": "6a8f420f817479a0e9ebcd2a433753f204df51b51db20be2a858b865ae4c277c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/runtime432.py": "19dfdfe141eca816c5809a90439486a0403e0c011ab0dca19859054d1f2ab142",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/admission_audit432.py": "cdea33580a55c1ca22df43f6f7707787b7f38f3e1f733ee4cc7d0293638f6c1d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/trace432.py": "695e0a165b3249a03e8eb5bf7ee3728b18e6738914af36d6780d9079c038bce2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/HOST432_CLEAN_STARTUP_RUN.json": "92841910fb668d00fbea22a526c086f189259d0f14971964560de9b4ad9457f3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/HOST432-check432_composition_HOST.py.log": "b969a0a89ca0736ce9f7e7bf12475eae60cb9f3621cb11c0649b5a816f96a4e8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/check432.py": "b653485dc7576edf9fe9dccd96442aa920362d050cfb112d0e581bcf514ff6c5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/scope432.py": "af1d91f5c494fb46bbc194dbc8a77a69a718fa81083ccbaa9087050f96c7015d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/HOST432_COMPOSITION_PRE433_REBASE.json": "4886dc844bd282e77ffbbfbad0f50f7f8013a3a7afcaccfe0ab43f6297f3df16",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/extension432.py": "d3a720061e48dffb6db3ac0a65afb21a11e658841ec6fb5c3d056cd4f2837ae3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/HOST432_COMPOSITION_RESULT.json": "9b81174d88d727d01cae77ab380db48d7c6735a8692437aeca571042783572d5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/audit432.py": "a805bacf322b84338264a5374a288354a11449adfaccaca32eb6e3826041b019",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/PLAN432.json": "cdee4ef2ef2b4150a3b1ee566532c57a5eab29de945957cc2899e97f02a89e88",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT432_actual_CPU_HOST.py": "46cea8fff95a7ced9b5860ed5f5743b67347865bd022539a06b888adef893961"
+  },
+  "parents": {
+    "tree-parent4-preflight-component-lifetime-v433": [
+      433,
+      "67560bc431ed7fd44aad19c49e060e4049227f128570a43d433dc5e491330a27",
+      "a75a6cb9553036bbfd56d15a4019baf8bb17fd7f95f73b300f2b70eece7ac730"
+    ],
+    "tree-nonempty-wholeprompt-refill-resource-host-v426": [
+      426,
+      "7753e8949156edfde65a7ce7c7b558b9843f3cbd438b18ca341f047678073600",
+      "01319b786998c9d6184775e8f8e438500545898322b196f4f1580303955e5869"
+    ],
+    "tree-nonempty-prefill-incumbent-KV-protocol-host-v427": [
+      427,
+      "77a9c38924ffa43b578b0efda077a15ddc7f5120cc7794450941aaca2ef39b36",
+      "740d69e47f531b2264b5e4da85a58d937fdee06af815bf5fe6721461e24e2f83"
+    ],
+    "tree-nonempty-refill-accounting-witness-host-v429": [
+      429,
+      "8a0eacfe0088ef64f31448fefb07e4ae1d65ab33fe49d3486743dde84a2f866a",
+      "393b0d77b715891884b14fae27607b3abe8ea84edde029c90675da9e25343e86"
+    ],
+    "tree-nonempty-refill-current-proof-host-v431": [
+      431,
+      "e02fb5f54b9e92687cfdeba2ab92e7f53ca33a6844e4d5dc2c6e940f027dad28",
+      "0ebf7517148ca1eb60910f8ab100ea77afa459e6a2947f1e2506bc06fb1ce7af"
+    ]
+  },
+  "NN_launched": false,
+  "NN_permission_granted": false,
+  "serving_installed": false,
+  "global_active_limit": 64,
+  "production_launcher_present": false,
+  "Raw": null,
+  "Goodput": null
+}

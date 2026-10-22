@@ -1,0 +1,875 @@
+{
+  "status": "HOST_original_B5to8_paired_counterfactual_and_censoring_proved",
+  "original_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py",
+  "original_source_SHA": "05d47ed6dc48e368010ca145a0b859aaffe596f246e0b28eb7b07d2d51a50cc9",
+  "counts": {
+    "primary_counterfactual_verdicts": 75168,
+    "counterfactual_verdicts": 79488,
+    "original_prediction_worlds": 25056,
+    "B5-anchor0-side0": 324,
+    "B5-anchor0-side1": 108,
+    "B5-anchor1-side0": 396,
+    "B5-anchor1-side1": 36,
+    "B5-anchor2-side0": 420,
+    "B5-anchor2-side1": 12,
+    "B5-anchor3-side0": 428,
+    "B5-anchor3-side1": 4,
+    "B6-anchor0-side0": 972,
+    "B6-anchor0-side2": 108,
+    "B6-anchor0-side1": 216,
+    "B6-anchor1-side0": 1188,
+    "B6-anchor1-side2": 36,
+    "B6-anchor1-side1": 72,
+    "B6-anchor2-side0": 1260,
+    "B6-anchor2-side2": 12,
+    "B6-anchor2-side1": 24,
+    "B7-anchor0-side0": 2916,
+    "B7-anchor0-side3": 108,
+    "B7-anchor0-side2": 216,
+    "B7-anchor0-side1": 648,
+    "B7-anchor1-side0": 3564,
+    "B7-anchor1-side3": 36,
+    "B7-anchor1-side2": 72,
+    "B7-anchor1-side1": 216,
+    "B8-anchor0-side0": 8748,
+    "B8-anchor0-side4": 108,
+    "B8-anchor0-side3": 216,
+    "B8-anchor0-side2": 648,
+    "B8-anchor0-side1": 1944
+  },
+  "witnesses": {
+    "5:0:0": {
+      "B": 5,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "same_prefix_B4": 5,
+      "accepted_side_nodes": 0
+    },
+    "5:0:1": {
+      "B": 5,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1
+      ],
+      "accepted": [
+        4,
+        -1,
+        -1,
+        -1
+      ],
+      "outputs": [
+        50,
+        99,
+        -1,
+        -1,
+        -1
+      ],
+      "same_prefix_B4": 1,
+      "accepted_side_nodes": 1
+    },
+    "5:1:0": {
+      "B": 5,
+      "anchor": 1,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        0
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "same_prefix_B4": 5,
+      "accepted_side_nodes": 0
+    },
+    "5:1:1": {
+      "B": 5,
+      "anchor": 1,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        0
+      ],
+      "accepted": [
+        0,
+        4,
+        -1,
+        -1
+      ],
+      "outputs": [
+        10,
+        50,
+        99,
+        -1,
+        -1
+      ],
+      "same_prefix_B4": 2,
+      "accepted_side_nodes": 1
+    },
+    "5:2:0": {
+      "B": 5,
+      "anchor": 2,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        1
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "same_prefix_B4": 5,
+      "accepted_side_nodes": 0
+    },
+    "5:2:1": {
+      "B": 5,
+      "anchor": 2,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        1
+      ],
+      "accepted": [
+        0,
+        1,
+        4,
+        -1
+      ],
+      "outputs": [
+        10,
+        20,
+        50,
+        99,
+        -1
+      ],
+      "same_prefix_B4": 3,
+      "accepted_side_nodes": 1
+    },
+    "5:3:0": {
+      "B": 5,
+      "anchor": 3,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        2
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "same_prefix_B4": 5,
+      "accepted_side_nodes": 0
+    },
+    "5:3:1": {
+      "B": 5,
+      "anchor": 3,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        2
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        4
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        50,
+        99
+      ],
+      "same_prefix_B4": 4,
+      "accepted_side_nodes": 1
+    },
+    "6:0:0": {
+      "B": 6,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "same_prefix_B4": 5,
+      "accepted_side_nodes": 0
+    },
+    "6:0:2": {
+      "B": 6,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4
+      ],
+      "accepted": [
+        4,
+        5,
+        -1,
+        -1
+      ],
+      "outputs": [
+        50,
+        60,
+        99,
+        -1,
+        -1
+      ],
+      "same_prefix_B4": 1,
+      "accepted_side_nodes": 2
+    },
+    "6:0:1": {
+      "B": 6,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4
+      ],
+      "accepted": [
+        4,
+        -1,
+        -1,
+        -1
+      ],
+      "outputs": [
+        50,
+        99,
+        -1,
+        -1,
+        -1
+      ],
+      "same_prefix_B4": 1,
+      "accepted_side_nodes": 1
+    },
+    "6:1:0": {
+      "B": 6,
+      "anchor": 1,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        0,
+        4
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "same_prefix_B4": 5,
+      "accepted_side_nodes": 0
+    },
+    "6:1:2": {
+      "B": 6,
+      "anchor": 1,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        0,
+        4
+      ],
+      "accepted": [
+        0,
+        4,
+        5,
+        -1
+      ],
+      "outputs": [
+        10,
+        50,
+        60,
+        99,
+        -1
+      ],
+      "same_prefix_B4": 2,
+      "accepted_side_nodes": 2
+    },
+    "6:1:1": {
+      "B": 6,
+      "anchor": 1,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        0,
+        4
+      ],
+      "accepted": [
+        0,
+        4,
+        -1,
+        -1
+      ],
+      "outputs": [
+        10,
+        50,
+        99,
+        -1,
+        -1
+      ],
+      "same_prefix_B4": 2,
+      "accepted_side_nodes": 1
+    },
+    "6:2:0": {
+      "B": 6,
+      "anchor": 2,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        1,
+        4
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "same_prefix_B4": 5,
+      "accepted_side_nodes": 0
+    },
+    "6:2:2": {
+      "B": 6,
+      "anchor": 2,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        1,
+        4
+      ],
+      "accepted": [
+        0,
+        1,
+        4,
+        5
+      ],
+      "outputs": [
+        10,
+        20,
+        50,
+        60,
+        99
+      ],
+      "same_prefix_B4": 3,
+      "accepted_side_nodes": 2
+    },
+    "6:2:1": {
+      "B": 6,
+      "anchor": 2,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        1,
+        4
+      ],
+      "accepted": [
+        0,
+        1,
+        4,
+        -1
+      ],
+      "outputs": [
+        10,
+        20,
+        50,
+        99,
+        -1
+      ],
+      "same_prefix_B4": 3,
+      "accepted_side_nodes": 1
+    },
+    "7:0:0": {
+      "B": 7,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4,
+        5
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "same_prefix_B4": 5,
+      "accepted_side_nodes": 0
+    },
+    "7:0:3": {
+      "B": 7,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4,
+        5
+      ],
+      "accepted": [
+        4,
+        5,
+        6,
+        -1
+      ],
+      "outputs": [
+        50,
+        60,
+        70,
+        99,
+        -1
+      ],
+      "same_prefix_B4": 1,
+      "accepted_side_nodes": 3
+    },
+    "7:0:2": {
+      "B": 7,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4,
+        5
+      ],
+      "accepted": [
+        4,
+        5,
+        -1,
+        -1
+      ],
+      "outputs": [
+        50,
+        60,
+        99,
+        -1,
+        -1
+      ],
+      "same_prefix_B4": 1,
+      "accepted_side_nodes": 2
+    },
+    "7:0:1": {
+      "B": 7,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4,
+        5
+      ],
+      "accepted": [
+        4,
+        -1,
+        -1,
+        -1
+      ],
+      "outputs": [
+        50,
+        99,
+        -1,
+        -1,
+        -1
+      ],
+      "same_prefix_B4": 1,
+      "accepted_side_nodes": 1
+    },
+    "7:1:0": {
+      "B": 7,
+      "anchor": 1,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        0,
+        4,
+        5
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "same_prefix_B4": 5,
+      "accepted_side_nodes": 0
+    },
+    "7:1:3": {
+      "B": 7,
+      "anchor": 1,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        0,
+        4,
+        5
+      ],
+      "accepted": [
+        0,
+        4,
+        5,
+        6
+      ],
+      "outputs": [
+        10,
+        50,
+        60,
+        70,
+        99
+      ],
+      "same_prefix_B4": 2,
+      "accepted_side_nodes": 3
+    },
+    "7:1:2": {
+      "B": 7,
+      "anchor": 1,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        0,
+        4,
+        5
+      ],
+      "accepted": [
+        0,
+        4,
+        5,
+        -1
+      ],
+      "outputs": [
+        10,
+        50,
+        60,
+        99,
+        -1
+      ],
+      "same_prefix_B4": 2,
+      "accepted_side_nodes": 2
+    },
+    "7:1:1": {
+      "B": 7,
+      "anchor": 1,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        0,
+        4,
+        5
+      ],
+      "accepted": [
+        0,
+        4,
+        -1,
+        -1
+      ],
+      "outputs": [
+        10,
+        50,
+        99,
+        -1,
+        -1
+      ],
+      "same_prefix_B4": 2,
+      "accepted_side_nodes": 1
+    },
+    "8:0:0": {
+      "B": 8,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4,
+        5,
+        6
+      ],
+      "accepted": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "outputs": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "same_prefix_B4": 5,
+      "accepted_side_nodes": 0
+    },
+    "8:0:4": {
+      "B": 8,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4,
+        5,
+        6
+      ],
+      "accepted": [
+        4,
+        5,
+        6,
+        7
+      ],
+      "outputs": [
+        50,
+        60,
+        70,
+        80,
+        99
+      ],
+      "same_prefix_B4": 1,
+      "accepted_side_nodes": 4
+    },
+    "8:0:3": {
+      "B": 8,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4,
+        5,
+        6
+      ],
+      "accepted": [
+        4,
+        5,
+        6,
+        -1
+      ],
+      "outputs": [
+        50,
+        60,
+        70,
+        99,
+        -1
+      ],
+      "same_prefix_B4": 1,
+      "accepted_side_nodes": 3
+    },
+    "8:0:2": {
+      "B": 8,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4,
+        5,
+        6
+      ],
+      "accepted": [
+        4,
+        5,
+        -1,
+        -1
+      ],
+      "outputs": [
+        50,
+        60,
+        99,
+        -1,
+        -1
+      ],
+      "same_prefix_B4": 1,
+      "accepted_side_nodes": 2
+    },
+    "8:0:1": {
+      "B": 8,
+      "anchor": 0,
+      "parents": [
+        -1,
+        0,
+        1,
+        2,
+        -1,
+        4,
+        5,
+        6
+      ],
+      "accepted": [
+        4,
+        -1,
+        -1,
+        -1
+      ],
+      "outputs": [
+        50,
+        99,
+        -1,
+        -1,
+        -1
+      ],
+      "same_prefix_B4": 1,
+      "accepted_side_nodes": 1
+    }
+  },
+  "identity": "g_B = same-prefix g4 + number of accepted alternate nodes; g_m = g4 + min(accepted alternate nodes,m-4) for4<m<=B",
+  "exact_original_verifier_body": true,
+  "all_qualified_anchors": true,
+  "right_censoring_preserved": true,
+  "terminal_horizon_excluded": true,
+  "actual_generation_reset_and_stale_rejection": true,
+  "root_predictor_excludes_other_anchor_samples": true,
+  "HOST_policy_fixture_not_empirical": true,
+  "NPU_used": false,
+  "empirical_g_determined": false,
+  "production_installed": false,
+  "Goodput": null,
+  "adopted": false
+}

@@ -1,0 +1,17 @@
+{
+  "status": "PASS_HOST425_ACTUAL_DERIVED_CONTROL_PAID_E4_AND_FALLBACK_BINDING",
+  "HOST_cases": 160,
+  "supported": 128,
+  "fallbacks": 32,
+  "actual_original_controls_and_controller": true,
+  "original_gain_and_states_preserved": true,
+  "one_age_finish_per_call": true,
+  "same_actual_parent_objects_and_rows": true,
+  "explicit_device_permission_double_only_for_HOST": true,
+  "real_permission_restored_and_unissued": true,
+  "Native_models_constructed": 0,
+  "NPU_used": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

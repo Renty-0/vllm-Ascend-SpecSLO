@@ -1,0 +1,13 @@
+{
+  "status": "source_prepared_device_unrun",
+  "same155_strict_neural_cases": true,
+  "repair": "no-copy State metadata and original-layout negative-control metadata explicitly use the same final mask capacity9 as Native forward; copy mode remains10",
+  "actual_Native_forward_CPU_metadata_identity_test_required": true,
+  "old233_failure_preserved": true,
+  "original_Native_tolerance_and_ABI_gate_unchanged": true,
+  "original_sampler_unchanged": true,
+  "weights_changed": false,
+  "production_qualified": false,
+  "performance_qualified": false,
+  "adopted": false
+}

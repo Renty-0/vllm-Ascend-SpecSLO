@@ -1,0 +1,3457 @@
+{
+  "schema": "ROOT218.postfull-independent-FIA80-AR.v1",
+  "rank": 3,
+  "completed": true,
+  "backend": "original target TP3 BF16 causal FIA Q80/S16; only first query per owner consumed",
+  "source_artifact": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/HOST-loop-attempts/1792283040187622853/synthetic-fixture/windows/window32/full463/rank3-full463-actual-trace.json.gz",
+  "source_artifact_sha256": "709fef773f4370b7fc61f4ca4e7337c39f6aaca9e58f2454aa7390939586fc98",
+  "candidate_result_artifact": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/HOST-loop-attempts/1792283040187622853/synthetic-fixture/windows/window32/full463/rank1-full463-actual-trace.json.gz",
+    "bytes": 1281928,
+    "sha256": "3daf44fbce7f6d3a5da7a172f2e3671121eea4fe92b4fe83c34f4a10fee7fe5e"
+  },
+  "candidate_result_owner_rank": 1,
+  "same_prefill_cohorts": true,
+  "reference_trajectories_generated": 463,
+  "reference_only_prompt_plus_own_outputs": true,
+  "candidate_KV_or_tokens_seeded": false,
+  "performance_clock_already_finished": true,
+  "cohorts": [
+    {
+      "ordinal": 0,
+      "owners": 1,
+      "steps": 255,
+      "exact_reference_sha256": "ba80866a65213988a2fc7db0503d89c36e9ec64ac8e7ce71d6fd7cd96ddcc213",
+      "actual_unique_pages": 19
+    },
+    {
+      "ordinal": 1,
+      "owners": 17,
+      "steps": 510,
+      "exact_reference_sha256": "75ff8572da3713fb0b4a71e30a24da9596f398a244a50d4a4e5355e393ad51f9",
+      "actual_unique_pages": 126
+    },
+    {
+      "ordinal": 2,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "221514450c0ee8a38b8dd840064de7eeffc90106ed78ac88009a21a64b1835ba",
+      "actual_unique_pages": 183
+    },
+    {
+      "ordinal": 3,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "0f0c090302f837d4c352becf0692d51d2df700ffe70464a64dbe0b6b10327cb7",
+      "actual_unique_pages": 174
+    },
+    {
+      "ordinal": 4,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "9de27e88315789934fe5f16bf4bbb11e1768e7e3b56ca62af844301b700162a2",
+      "actual_unique_pages": 161
+    },
+    {
+      "ordinal": 5,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "864f01dd46ad3b0368ea96474c8d95a0cf8da8892fd13760dd3769653857eb8f",
+      "actual_unique_pages": 155
+    },
+    {
+      "ordinal": 6,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "54012afc480ab75ab2edab2ca311ca122f52cc4ac2c5b5ff575514c8b142f77e",
+      "actual_unique_pages": 165
+    },
+    {
+      "ordinal": 7,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "298baa3cb2d9528ba161ae1412bb371c551dbaeda96627868c623ba374d68929",
+      "actual_unique_pages": 175
+    },
+    {
+      "ordinal": 8,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "8bad2014755125514253385ca7119d7277edc526687542b5ed613bae25936d41",
+      "actual_unique_pages": 159
+    },
+    {
+      "ordinal": 9,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "93a41df79a3ce108aa378404f275c094629f8ea5a4ce757f155485208354dfe5",
+      "actual_unique_pages": 204
+    },
+    {
+      "ordinal": 10,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "b00f6d61e92057f3a555e7d11a4697a655873f8f6649464c5c9dfeb57ebbf45a",
+      "actual_unique_pages": 187
+    },
+    {
+      "ordinal": 11,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "333676d51c0853aac9fd0bb275fbb6b701b31d9de42de19872c32d15a32f215a",
+      "actual_unique_pages": 142
+    },
+    {
+      "ordinal": 12,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "db58a75894afd86095ffaece9d17803cfab7cb944edccf7d3f34fcf0ec57d519",
+      "actual_unique_pages": 261
+    },
+    {
+      "ordinal": 13,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "3d4df184046d7febd088bf182c7b2eccae35e7dbeefeee10ded72914b8fc67d1",
+      "actual_unique_pages": 303
+    },
+    {
+      "ordinal": 14,
+      "owners": 32,
+      "steps": 510,
+      "exact_reference_sha256": "5fea904123a711d59c2366e318279bb2cef158d0128d2a1596086eb8f2d304a1",
+      "actual_unique_pages": 354
+    },
+    {
+      "ordinal": 15,
+      "owners": 29,
+      "steps": 510,
+      "exact_reference_sha256": "58e527d9cc922a42458bb42789b88dc49ba6895861103161b4f03d2d3f521c3e",
+      "actual_unique_pages": 298
+    }
+  ],
+  "comparison": {
+    "requests": 463,
+    "equal_requests": 463,
+    "mismatching_requests": 0,
+    "rows": [
+      {
+        "request_id": "rps4p0-seed0-000000",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000001",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000004",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000006",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000009",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000011",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000012",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000015",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000017",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000002",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000003",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000007",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000008",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000013",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000014",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000005",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000010",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000016",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000020",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000022",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000023",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000026",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000027",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000030",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000031",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000032",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000033",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000034",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000035",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000036",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000037",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000038",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000040",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000041",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000043",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000044",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000045",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000046",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000048",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000051",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000052",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000053",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000018",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000025",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000039",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000047",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000050",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000019",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000021",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000024",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000055",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000056",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000057",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000059",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000061",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000062",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000064",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000065",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000066",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000067",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000069",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000070",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000071",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000073",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000074",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000075",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000076",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000077",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000081",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000082",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000083",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000087",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000091",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000092",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000058",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000063",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000068",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000072",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000080",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000084",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000086",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000088",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000094",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000095",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000097",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000098",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000099",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000101",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000102",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000103",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000104",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000105",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000106",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000107",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000108",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000110",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000111",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000114",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000120",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000121",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000122",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000123",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000125",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000126",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000129",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000131",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000132",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000134",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000136",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000137",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000089",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000090",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000096",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000113",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000140",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000141",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000142",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000145",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000147",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000149",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000150",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000151",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000152",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000155",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000156",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000158",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000160",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000161",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000164",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000168",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000169",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000170",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000171",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000172",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000174",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000175",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000176",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000178",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000179",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000181",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000183",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000115",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000118",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000119",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000124",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000128",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000185",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000186",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000187",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000188",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000189",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000190",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000193",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000195",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000196",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000200",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000201",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000203",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000206",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000208",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000209",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000210",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000212",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000213",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000214",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000216",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000217",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000218",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000219",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000220",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000223",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000225",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000130",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000135",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000144",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000148",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000157",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000159",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000228",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000230",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000231",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000233",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000234",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000236",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000237",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000238",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000240",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000242",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000243",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000244",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000246",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000251",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000254",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000256",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000258",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000259",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000261",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000262",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000263",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000264",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000267",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000268",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000269",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000163",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000165",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000167",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000173",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000197",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000202",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000204",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000272",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000273",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000276",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000278",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000279",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000280",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000281",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000282",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000284",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000286",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000287",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000288",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000289",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000290",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000292",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000294",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000297",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000298",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000299",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000300",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000301",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000302",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000309",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000312",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000314",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000315",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000316",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000317",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000318",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000222",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000226",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000229",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000319",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000324",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000326",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000328",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000329",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000330",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000332",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000333",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000337",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000342",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000344",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000346",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000347",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000349",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000350",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000352",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000353",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000355",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000239",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000241",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000250",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000260",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000271",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000274",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000283",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000285",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000291",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000293",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000295",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000296",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000303",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000304",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000360",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000361",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000362",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000363",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000364",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000367",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000368",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000369",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000370",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000372",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000375",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000376",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000378",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000380",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000381",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000382",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000384",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000387",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000388",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000392",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000395",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000396",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000400",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000305",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000306",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000307",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000308",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000310",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000320",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000321",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000322",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000323",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000402",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000404",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000405",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000407",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000408",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000409",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000410",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000411",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000412",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000415",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000416",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000418",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000419",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000420",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000421",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000424",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000425",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000426",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000427",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000429",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000431",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000434",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000436",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000437",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000438",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000439",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000441",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000442",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000443",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000444",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000445",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000448",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000449",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000451",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000453",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000454",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000460",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000462",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000327",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000331",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000335",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000339",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000341",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000343",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000345",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000351",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000358",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000359",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000377",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000389",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000390",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000391",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000394",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000397",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000398",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000401",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000403",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000414",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000423",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000430",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000432",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000433",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000435",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000447",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000456",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000457",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000459",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000028",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000029",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000042",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000049",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000054",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000060",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000078",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000079",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000085",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000093",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000100",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000109",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000112",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000116",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000117",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000127",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000133",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000138",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000139",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000143",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000146",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000153",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000154",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000162",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000166",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000177",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000180",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000182",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000184",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000191",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000192",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000194",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000198",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000199",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000205",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000207",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000211",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000215",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000221",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000224",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000227",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000232",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000235",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000245",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000247",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000248",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000249",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000252",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000253",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000255",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000257",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000265",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000266",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000270",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000275",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000277",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000311",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000313",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000325",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000334",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000336",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000338",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000340",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000348",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000354",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000356",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000357",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000365",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000366",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000371",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000373",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000374",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000379",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000383",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000385",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000386",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000393",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000399",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000406",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000413",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000417",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000422",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000428",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000440",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000446",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000450",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000452",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000455",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000458",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      },
+      {
+        "request_id": "rps4p0-seed0-000461",
+        "equal": true,
+        "first_mismatch_zero_based": null,
+        "candidate_token": null,
+        "reference_token": null
+      }
+    ],
+    "exact_all_tokens_equal": true
+  },
+  "Native": {
+    "before": {
+      "aclgraph_captures": 0,
+      "aclgraph_capture_attempts": 0,
+      "aclgraph_runtime_validation_replays": 0,
+      "aclgraph_failed_captures": 0,
+      "aclgraph_capacity_fallbacks": 0,
+      "aclgraph_shape_fallbacks": 0,
+      "aclgraph_generic_eager_fallback_calls": 0,
+      "aclgraph_generic_disabled_entry_calls": 0,
+      "aclgraph_generic_unclassified_calls": 0,
+      "aclgraph_generic_runtime_validation_calls": 0,
+      "aclgraph_generic_runtime_validation_failures": 0,
+      "aclgraph_draft_eager_fallback_calls": 0,
+      "aclgraph_draft_disabled_entry_calls": 0,
+      "aclgraph_draft_unclassified_calls": 0,
+      "aclgraph_draft_runtime_validation_calls": 0,
+      "aclgraph_draft_runtime_validation_failures": 0,
+      "aclgraph_target_eager_fallback_calls": 0,
+      "aclgraph_target_disabled_entry_calls": 0,
+      "aclgraph_target_unclassified_calls": 0,
+      "aclgraph_target_runtime_validation_calls": 0,
+      "aclgraph_target_runtime_validation_failures": 0
+    },
+    "after": {
+      "aclgraph_captures": 0,
+      "aclgraph_capture_attempts": 0,
+      "aclgraph_runtime_validation_replays": 0,
+      "aclgraph_failed_captures": 0,
+      "aclgraph_capacity_fallbacks": 0,
+      "aclgraph_shape_fallbacks": 0,
+      "aclgraph_generic_eager_fallback_calls": 0,
+      "aclgraph_generic_disabled_entry_calls": 0,
+      "aclgraph_generic_unclassified_calls": 0,
+      "aclgraph_generic_runtime_validation_calls": 0,
+      "aclgraph_generic_runtime_validation_failures": 0,
+      "aclgraph_draft_eager_fallback_calls": 0,
+      "aclgraph_draft_disabled_entry_calls": 0,
+      "aclgraph_draft_unclassified_calls": 0,
+      "aclgraph_draft_runtime_validation_calls": 0,
+      "aclgraph_draft_runtime_validation_failures": 0,
+      "aclgraph_target_eager_fallback_calls": 0,
+      "aclgraph_target_disabled_entry_calls": 0,
+      "aclgraph_target_unclassified_calls": 0,
+      "aclgraph_target_runtime_validation_calls": 0,
+      "aclgraph_target_runtime_validation_failures": 0
+    },
+    "delta": {
+      "aclgraph_captures": 0,
+      "aclgraph_capture_attempts": 0,
+      "aclgraph_runtime_validation_replays": 0,
+      "aclgraph_failed_captures": 0,
+      "aclgraph_capacity_fallbacks": 0,
+      "aclgraph_shape_fallbacks": 0,
+      "aclgraph_generic_eager_fallback_calls": 0,
+      "aclgraph_generic_disabled_entry_calls": 0,
+      "aclgraph_generic_unclassified_calls": 0,
+      "aclgraph_generic_runtime_validation_calls": 0,
+      "aclgraph_generic_runtime_validation_failures": 0,
+      "aclgraph_draft_eager_fallback_calls": 0,
+      "aclgraph_draft_disabled_entry_calls": 0,
+      "aclgraph_draft_unclassified_calls": 0,
+      "aclgraph_draft_runtime_validation_calls": 0,
+      "aclgraph_draft_runtime_validation_failures": 0,
+      "aclgraph_target_eager_fallback_calls": 0,
+      "aclgraph_target_disabled_entry_calls": 0,
+      "aclgraph_target_unclassified_calls": 0,
+      "aclgraph_target_runtime_validation_calls": 0,
+      "aclgraph_target_runtime_validation_failures": 0
+    }
+  },
+  "cache_released": true,
+  "cross_backend_PA_or_official_AR_equivalence_claimed": false,
+  "formal_Goodput": false,
+  "adopted": false
+}

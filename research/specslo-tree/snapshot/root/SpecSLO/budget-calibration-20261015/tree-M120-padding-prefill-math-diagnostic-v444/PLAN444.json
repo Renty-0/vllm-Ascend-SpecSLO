@@ -1,0 +1,29 @@
+{
+  "schema": "ROOT444.padding-prefill-diagnostic.v1",
+  "decode_owners": 16,
+  "known_prefill_owners": 8,
+  "independently_prefilled_reference_owners": 8,
+  "prefill_chunk_lengths": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "maximum_new_prompt_queries": 40,
+  "physical_M": 120,
+  "physical_S": 24,
+  "actual_protected_prefixes": 72,
+  "model_parameter_swaps": false,
+  "Native_flags_assigned": false,
+  "full463": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "caps": {
+    "seconds": 3600,
+    "tag_MiB": 192,
+    "aggregate_MiB": 3584
+  },
+  "Git_pushes": 0
+}

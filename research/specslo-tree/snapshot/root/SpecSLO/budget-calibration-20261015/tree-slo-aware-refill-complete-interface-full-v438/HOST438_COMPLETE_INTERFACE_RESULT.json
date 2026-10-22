@@ -1,0 +1,28 @@
+{
+  "status": "PASS_HOST438_COMPLETE_ACTUAL_WORKER_EXTENSION_API_AND_SIGNATURES",
+  "referenced_attributes": [
+    "after_install",
+    "bucket_snapshot",
+    "cache_snapshot",
+    "install_entry",
+    "loaded_origins",
+    "metadata_snapshot",
+    "postfull_AR",
+    "preflight_snapshot",
+    "prepare_install",
+    "qualify_component",
+    "refill_snapshot",
+    "snapshot",
+    "source_binding"
+  ],
+  "all_actual_call_signatures_bound": 14,
+  "previous_missing_export_reproduced": true,
+  "exact_original433_snapshot_exported": true,
+  "all_original437_NN_callbacks_identity_preserved": true,
+  "global_active_limit": 64,
+  "all75_plus6_and_original_math_full463_AR_still_fresh_required": true,
+  "NPU_used": false,
+  "Native_constructor_calls": 0,
+  "Raw": null,
+  "Goodput": null
+}

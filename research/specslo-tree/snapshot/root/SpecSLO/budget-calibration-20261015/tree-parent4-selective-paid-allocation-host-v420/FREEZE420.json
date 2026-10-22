@@ -1,0 +1,16 @@
+{
+  "schema": "ROOT420.HOST-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-paid-allocation-host-v420/check420_HOST.py": "54b32854bc4f288248fa17b68d7cedfc377efac47e0019c06096f8f6321be84e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-paid-allocation-host-v420/shape420.py": "aabb5137258892fa612906352abc7c99efc580285a9b4c97a6551f20795812d6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-paid-allocation-host-v420/HOST420_RESULT.json": "12b36df6b50965fad83992b730f22b09f9d25f447cd1fd3ee9834d1b0ce664f0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-paid-allocation-host-v420/PLAN420.json": "d976f7d0b5341599fbbc68af579fa1485877367b878e7728f0c8103445c1ee1a"
+  },
+  "existing_inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-SLO-mixed-protocol-v419/FREEZE419.json": "56dd68d6eb08960596c028da80ec732082df58e496725ace8a93c238e50dd037",
+    "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/shape405.py": "f0b3bd1cd4bd235758a54be7856791019e50c7f541e28a96c4324c0b68f1f18e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/admission405.py": "d25a7adde5092dda661d22b1f191fbb62fe8501c3c067491d0ac436fc689d1a5"
+  },
+  "NN_qualified": false,
+  "production_permission": false
+}

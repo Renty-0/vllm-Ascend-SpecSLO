@@ -1,0 +1,39 @@
+{
+  "schema": "ROOT218.actual-source-HOST-CPU-ready.v1",
+  "UTC": "2026-10-18T00:25:09.415804+00:00",
+  "status": "passed",
+  "HOST": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/HOST-attempts/1792282930846859550/RESULT.json",
+    "sha256": "09292b624d9cf7d25d39f5e1f5d61c235282b607dabb5accda0d879f4daa7d54"
+  },
+  "HOST_tests": 28,
+  "Torch_CPU": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/Torch-CPU-attempts/control-v1/RESULT.json",
+    "sha256": "872fe53a8fea3bf05e385681afe8e9803063b27ffa511b849d9274f8d8521c7d"
+  },
+  "Torch_CPU_cases": 28,
+  "synthetic_HOST_loop": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/HOST-loop-attempts/1792283040187622853/RESULT.json",
+    "sha256": "412626e03c7df1de6b7f448e50a420df1379d2df4e0540b193c6a45bd9fb5d40"
+  },
+  "synthetic_loop_does_not_qualify_NPU": true,
+  "real_failed216_role_inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/cost-aware-N9to16-root-v216-full463-AR-v1/windows/window32/full463/rank0-full463-actual-trace.json.gz": "21354eab705697bd9c704047746ab391011eb5ced051b1db95aecf7a3727d132",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/cost-aware-N9to16-root-v216-full463-AR-v1/windows/window32/full463/rank1-full463-actual-trace.json.gz": "3daf44fbce7f6d3a5da7a172f2e3671121eea4fe92b4fe83c34f4a10fee7fe5e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/cost-aware-N9to16-root-v216-full463-AR-v1/windows/window32/full463/rank2-full463-actual-trace.json.gz": "ac0d7f7f00ef7452b13c3b8a2a2ed427dd0bc5bbad79a5a2087f1a62e78a2052",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/cost-aware-N9to16-root-v216-full463-AR-v1/windows/window32/full463/rank3-full463-actual-trace.json.gz": "709fef773f4370b7fc61f4ca4e7337c39f6aaca9e58f2454aa7390939586fc98"
+  },
+  "known216_failure": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V216_AR_ROLE_FAILURE_AND_NEXT_SOURCE_PLAN.json",
+    "sha256": "c9cc8fd52df2a6fadb9e304e892382d23d0566d6803f6dce3d1496be449aeb4b"
+  },
+  "actual216_terminal_failure_audit": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V216_INDEPENDENT_TERMINAL_FAILURE_AUDIT_V3_PY311.json",
+    "sha256": "2e06d11d2d22c3a92ad049f7534d0b72e8bf5214a0f6bc66f381d5b14563411a"
+  },
+  "no_existing_frozen_source_or_raw_modified": true,
+  "NPU_used": false,
+  "Goodput": null,
+  "adopted": false,
+  "source_peer_review": false
+}

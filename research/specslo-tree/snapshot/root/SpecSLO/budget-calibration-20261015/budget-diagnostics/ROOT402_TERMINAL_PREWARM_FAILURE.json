@@ -1,0 +1,37 @@
+{
+  "status": "FAILED_PREWARM_TYPED_CALLBACK_PROVENANCE_NO_PERFORMANCE",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-normal24-global64-root-v402-full463-ownAR-v1.json",
+  "receipt_sha256": "26b96f7fc71932ea326bcdadc225662af77a943ff39f3a2ebb8f4a3c91234cc6",
+  "fresh_math_case_counts": {
+    "canonical-independent-node-math": {
+      "1": 227,
+      "2": 227,
+      "3": 227
+    },
+    "target-uniform-KV-bucket-math402/mixed": {
+      "1": 227,
+      "2": 227,
+      "3": 227
+    },
+    "target-uniform-KV-bucket-math402/mid": {
+      "1": 227,
+      "2": 227,
+      "3": 227
+    },
+    "target-uniform-KV-bucket-math402/short": {
+      "1": 227,
+      "2": 227,
+      "3": 227
+    }
+  },
+  "full463_completed": false,
+  "Raw": null,
+  "Goodput": null,
+  "own_AR_completed": false,
+  "source_and_environment_unchanged": true,
+  "owned_remaining": [],
+  "all4_NPU_idle": true,
+  "diagnosed_source_mismatch": "mapper173.controls_class recompiles CandidateControls through base173.functions at source173.py::candidate_controls_v132.py. ROOT402 assumed the base148 file name. HOST402 used base-only callback_factory and did not exercise this derived callback.",
+  "root_cause_verification": "actual inherited production controls class source and original clone compiler path read; repaired real derived callback HOST regression required",
+  "no_new_model_or_performance_qualification": true
+}

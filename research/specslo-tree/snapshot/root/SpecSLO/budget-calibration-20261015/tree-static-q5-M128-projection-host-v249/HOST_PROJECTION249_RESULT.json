@@ -1,0 +1,16 @@
+{
+  "status": "HOST_actual_M128_tree_visibility_and_Native_ABI_passed",
+  "supported_histograms": 74345,
+  "explicitly_unsupported_histograms": 42517,
+  "actual_tree_cases": 220,
+  "branch_copy_cases": 164,
+  "identity_cases": 50,
+  "root_only_dummy_cases": 50,
+  "all128_rows_bijective": true,
+  "all_real_ancestral_visible_KV_and_write_slots_preserved": true,
+  "optimized_transform_equals_independent_naive": true,
+  "private_zero_page_never_overwritten_by_branch_copy": true,
+  "NPU_used": false,
+  "neural_qualified": false,
+  "production_installed": false
+}

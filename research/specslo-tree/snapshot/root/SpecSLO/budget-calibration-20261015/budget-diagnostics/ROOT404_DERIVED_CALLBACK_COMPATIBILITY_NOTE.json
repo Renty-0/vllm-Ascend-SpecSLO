@@ -1,0 +1,9 @@
+{
+  "status": "HOST404_BASE_CALLBACK_SCOPE_CORRECTION",
+  "frozen404_source_unchanged": true,
+  "original404_status": "HOST-only; base CandidateControls callback source tested, actual derived constructor callback not tested",
+  "production_defect_seen_in402": "mapper173 recompiles callback and installation creates private function namespaces",
+  "not_a_model_failure": true,
+  "no404_NPU_or_LIVE_run": true,
+  "followup405": "actual ControlsClass constructor/select, real engine-owned callback and policy identity; no Native/NPU constructor"
+}

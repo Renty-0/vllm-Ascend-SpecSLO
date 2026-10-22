@@ -1,0 +1,23 @@
+{
+  "status": "passed",
+  "frames": 427,
+  "full_causal_masks_and_padding_verified": true,
+  "original_bucket_logic_used": true,
+  "adjacent_context_bucket_checks": [
+    {
+      "case": "request129-common-incremental-history",
+      "bucket": 1024,
+      "same_bucket": true
+    },
+    {
+      "case": "request34-common-incremental-history",
+      "bucket": 512,
+      "same_bucket": true
+    }
+  ],
+  "Torch_CPU": true,
+  "isolated_FIA_device_predicate_stub": true,
+  "NPU_used": false,
+  "neural_qualified": false,
+  "performance_qualified": false
+}

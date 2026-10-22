@@ -1,0 +1,11 @@
+{
+  "status": "source_only_unqualified",
+  "main_four_contexts_unchanged": true,
+  "ablation": "six eager-only variants separate model rows M40/M80 from query partition q5/q1; no new q5 graph captured",
+  "cost": "absolute existing q1 graph only; prebuilt adjacent contexts; require zero additional captures and unchanged Native gates",
+  "source228_failed_cost_preserved": true,
+  "original_sampler_unchanged": true,
+  "production_installed": false,
+  "performance_qualified": false,
+  "adopted": false
+}

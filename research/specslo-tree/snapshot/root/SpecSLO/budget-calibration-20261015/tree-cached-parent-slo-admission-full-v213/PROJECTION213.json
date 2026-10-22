@@ -1,0 +1,362 @@
+{
+  "source_only_donor211_result_not_read": true,
+  "donor211_freeze_sha256": "36543d7cb41c947141c78f6e11bc70d5b054c573edd9c0086fcb1002eed4d526",
+  "projection": [
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211/check211.py",
+      "source_sha256": "3d19960e9a9451e78fb551b7133225537951e455213aa4fb996dfe161fae6139",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213/check213.py",
+      "namespace_old": "211",
+      "namespace_new": "213",
+      "path_old": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211",
+      "path_new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213",
+      "deltas": []
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211/extension211.py",
+      "source_sha256": "cbd763909f8814f445a43c3f67e7d1b67506eeb155a6f40d772a93a666288f1c",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213/extension213.py",
+      "namespace_old": "211",
+      "namespace_new": "213",
+      "path_old": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211",
+      "path_new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213",
+      "deltas": [
+        {
+          "start": 1665,
+          "end": 1665,
+          "old": "",
+          "new": "import os\n    require(os.environ.get(\"VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION\")==\"1\", \"explicit original SLO admission1\")\n    "
+        },
+        {
+          "start": 1772,
+          "end": 1772,
+          "old": "",
+          "new": "and-SLO-ad"
+        },
+        {
+          "start": 1773,
+          "end": 1779,
+          "old": "apper-",
+          "new": "issi"
+        },
+        {
+          "start": 1781,
+          "end": 1783,
+          "old": "ly",
+          "new": "1"
+        },
+        {
+          "start": 1784,
+          "end": 1784,
+          "old": "",
+          "new": ",SLO_AWARE_ADMISSION=True"
+        }
+      ]
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211/guard211.py",
+      "source_sha256": "e74997b898d8814076257ef1589d11aa59603fe570acaa1d01d278331d7f1bfc",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213/guard213.py",
+      "namespace_old": "211",
+      "namespace_new": "213",
+      "path_old": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211",
+      "path_new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213",
+      "deltas": [
+        {
+          "start": 2111,
+          "end": 2111,
+          "old": "",
+          "new": "cached ma"
+        },
+        {
+          "start": 2112,
+          "end": 2112,
+          "old": "",
+          "new": "pe"
+        },
+        {
+          "start": 2113,
+          "end": 2116,
+          "old": "eva",
+          "new": " from211 p"
+        },
+        {
+          "start": 2117,
+          "end": 2122,
+          "old": "idate",
+          "new": "us"
+        },
+        {
+          "start": 2132,
+          "end": 2132,
+          "old": "",
+          "new": "SLO-aware-ad"
+        },
+        {
+          "start": 2133,
+          "end": 2133,
+          "old": "",
+          "new": "ission1 from203; unch"
+        },
+        {
+          "start": 2134,
+          "end": 2136,
+          "old": "pp",
+          "new": "ng"
+        },
+        {
+          "start": 2137,
+          "end": 2138,
+          "old": "r",
+          "new": "d"
+        },
+        {
+          "start": 2139,
+          "end": 2139,
+          "old": "",
+          "new": "clients/"
+        },
+        {
+          "start": 2142,
+          "end": 2142,
+          "old": "",
+          "new": "el/b"
+        },
+        {
+          "start": 2143,
+          "end": 2158,
+          "old": "le once; exact ",
+          "new": ""
+        },
+        {
+          "start": 2159,
+          "end": 2194,
+          "old": "ispatcher body with private cached ",
+          "new": ""
+        },
+        {
+          "start": 2197,
+          "end": 2200,
+          "old": "ter",
+          "new": "/clock"
+        },
+        {
+          "start": 3225,
+          "end": 3225,
+          "old": "",
+          "new": "and-SLO-ad"
+        },
+        {
+          "start": 3226,
+          "end": 3226,
+          "old": "",
+          "new": "ission1' "
+        },
+        {
+          "start": 3227,
+          "end": 3229,
+          "old": "pp",
+          "new": "nd r['ov"
+        },
+        {
+          "start": 3231,
+          "end": 3234,
+          "old": "-on",
+          "new": ""
+        },
+        {
+          "start": 3235,
+          "end": 3235,
+          "old": "",
+          "new": "a"
+        },
+        {
+          "start": 3237,
+          "end": 3237,
+          "old": "",
+          "new": "]['SLO_AWARE_ADMISSION']is True"
+        },
+        {
+          "start": 3657,
+          "end": 3657,
+          "old": "",
+          "new": "trace=json.loads(gzip.decompress((Path(directory)/'windows/window32/full463'/f'rank{rank}-full463-actual-trace.json.gz').read_bytes()))\n        require(trace['decode_counters']['spec_rhythm_slo_aware_admission_enabled']==1\n            and trace['decode_counters']['spec_rhythm_target_slo_first_enabled']==0,\n            'actual all4 full463 Native SLO-aware admission1 and targetSLO-first0')\n        "
+        },
+        {
+          "start": 3823,
+          "end": 3823,
+          "old": "",
+          "new": "e,SLO_AWARE_ADMISSION=Tru"
+        },
+        {
+          "start": 4151,
+          "end": 4151,
+          "old": "",
+          "new": "and_"
+        },
+        {
+          "start": 4152,
+          "end": 4152,
+          "old": "",
+          "new": "rigi"
+        },
+        {
+          "start": 4153,
+          "end": 4153,
+          "old": "",
+          "new": "a"
+        },
+        {
+          "start": 4154,
+          "end": 4155,
+          "old": "y",
+          "new": ""
+        },
+        {
+          "start": 4156,
+          "end": 4162,
+          "old": "execut",
+          "new": "SLO_admiss"
+        },
+        {
+          "start": 4165,
+          "end": 4165,
+          "old": "",
+          "new": "1"
+        },
+        {
+          "start": 4971,
+          "end": 4976,
+          "old": "only ",
+          "new": ""
+        },
+        {
+          "start": 4990,
+          "end": 4990,
+          "old": "",
+          "new": "plus original SLO-aware-ad"
+        },
+        {
+          "start": 4991,
+          "end": 4991,
+          "old": "",
+          "new": "issi"
+        },
+        {
+          "start": 4992,
+          "end": 5007,
+          "old": "dule getter cha",
+          "new": ""
+        },
+        {
+          "start": 5008,
+          "end": 5011,
+          "old": "ges",
+          "new": "1"
+        }
+      ]
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211/host211.py",
+      "source_sha256": "4385a2baef333acb9f07975338f4495b7b27d801b7d24f0e44475fbbe9041b40",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213/host213.py",
+      "namespace_old": "211",
+      "namespace_new": "213",
+      "path_old": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211",
+      "path_new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213",
+      "deltas": [
+        {
+          "start": 153,
+          "end": 153,
+          "old": "",
+          "new": ",copy,math,gzip"
+        },
+        {
+          "start": 5431,
+          "end": 5431,
+          "old": "",
+          "new": "and-SLO-ad"
+        },
+        {
+          "start": 5432,
+          "end": 5438,
+          "old": "apper-",
+          "new": "issi"
+        },
+        {
+          "start": 5440,
+          "end": 5442,
+          "old": "ly",
+          "new": "1"
+        },
+        {
+          "start": 5443,
+          "end": 5443,
+          "old": "",
+          "new": ",SLO_AWARE_ADMISSION=True"
+        },
+        {
+          "start": 5951,
+          "end": 5951,
+          "old": "",
+          "new": "    folder=p/'windows/window32/full463';folder.mkdir(parents=True,exist_ok=True)\n                    trace=dict(decode_counters=dict(spec_rhythm_slo_aware_admission_enabled=1,spec_rhythm_target_slo_first_enabled=0))\n                    (folder/f'rank{rank}-full463-actual-trace.json.gz').write_bytes(gzip.compress(json.dumps(trace).encode()))\n                "
+        },
+        {
+          "start": 6259,
+          "end": 6259,
+          "old": "",
+          "new": "        r['ROOT213_cached_parent_dispatch']['initial_parent_source_checks']=1\n                r['overlay']['SLO_AWARE_ADMISSION']=False\n                (p/'rank3-local-diagnostic.json').write_text(json.dumps(r))\n                with self.assertRaises(RuntimeError):guard213.actual_audit(p)\n                r['overlay']['SLO_AWARE_ADMISSION']=True\n                (p/'rank3-local-diagnostic.json').write_text(json.dumps(r))\n                trace['decode_counters']['spec_rhythm_slo_aware_admission_enabled']=0\n                (folder/'rank3-full463-actual-trace.json.gz').write_bytes(gzip.compress(json.dumps(trace).encode()))\n                with self.assertRaises(RuntimeError):guard213.actual_audit(p)\n        "
+        },
+        {
+          "start": 6291,
+          "end": 6291,
+          "old": "",
+          "new": "\n\n    def test_original_admission_policy_and_exact_enabled_flag(self):\n        native=Path('/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py')\n        names={'order_spec_rhythm_admission_candidates','order_spec_rhythm_admission_params'}\n        nodes=[copy.deepcopy(n)for n in ast.parse(native.read_text()).body if isinstance(n,ast.FunctionDef)and n.name in names]\n        self.assertEqual({n.name for n in nodes},names)\n        for node in nodes:\n            node.returns=None\n            for arg in (*node.args.posonlyargs,*node.args.args,*node.args.kwonlyargs):arg.annotation=None\n        namespace=dict(math=math)\n        exec(compile(ast.fix_missing_locations(ast.Module(body=nodes,type_ignores=[])),'<unaltered-original-admission>','exec'),namespace)\n        params=[types.SimpleNamespace(slo_tpot_ms=s,arrival_ts=a)for s,a in[(50,2.),(150,0.),(40,3.),(40,1.)]]\n        before=[(p.slo_tpot_ms,p.arrival_ts)for p in params];order=namespace['order_spec_rhythm_admission_params']\n        self.assertEqual(order(range(4),request_params=params,enabled=False),(0,1,2,3))\n        self.assertEqual(order(range(4),request_params=params,enabled=True),(3,2,0,1))\n        self.assertEqual(before,[(p.slo_tpot_ms,p.arrival_ts)for p in params])\n        startup=(P/'startup213.sh').read_text();self.assertEqual(startup.count('VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION=1'),1)\n        self.assertNotIn('VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION=0',startup)"
+        }
+      ]
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211/launch211.sh",
+      "source_sha256": "d71f21701be75ca01878fe203fc1164f5aa35dd49594614b51acc959c4fb3b15",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213/launch213.sh",
+      "namespace_old": "211",
+      "namespace_new": "213",
+      "path_old": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211",
+      "path_new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213",
+      "deltas": []
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211/runtime211.py",
+      "source_sha256": "0ba15533f80eb965eca8ea6bcabf6b240b95fa6685c116619577d08c7b4e159d",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213/runtime213.py",
+      "namespace_old": "211",
+      "namespace_new": "213",
+      "path_old": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211",
+      "path_new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213",
+      "deltas": []
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211/startup211.sh",
+      "source_sha256": "91bc8ce557f998c62d36d08e76b2ff4339f7a035cdece5361d4f9c0fd8c7eca1",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213/startup213.sh",
+      "namespace_old": "211",
+      "namespace_new": "213",
+      "path_old": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-dispatch-full-v211",
+      "path_new": "/root/SpecSLO/budget-calibration-20261015/tree-cached-parent-slo-admission-full-v213",
+      "deltas": [
+        {
+          "start": 2617,
+          "end": 2618,
+          "old": "0",
+          "new": "1"
+        }
+      ]
+    }
+  ],
+  "source_peer_review": false,
+  "production_deltas": [
+    "cached original209 parent module; exact dispatcher body",
+    "original Native SLO_AWARE_ADMISSION=1"
+  ],
+  "other_model_budget_arrival_clock_changed": false
+}

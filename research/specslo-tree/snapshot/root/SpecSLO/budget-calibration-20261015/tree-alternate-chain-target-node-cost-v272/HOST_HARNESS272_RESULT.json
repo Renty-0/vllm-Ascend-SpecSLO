@@ -1,0 +1,12 @@
+{
+  "status": "HOST_real_cold_trace_and_None_draft_bank_regressions_passed",
+  "actual_historical_numeric_cases": 227,
+  "actual_historical_dispatches": 231,
+  "actual_original_changed_restored_extra_dispatches": 4,
+  "damaged_cold_sequences_rejected": 3,
+  "draft_None_bank_full_control_stages": 1155,
+  "draft_no_neural_timing_claim": true,
+  "role_control_fixture_not_measured_NPU_data": true,
+  "NPU_used": false,
+  "Goodput": null
+}

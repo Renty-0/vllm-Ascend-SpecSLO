@@ -1,0 +1,8 @@
+{
+  "status": "HOST_registered_fault_signal_stack_and_child_liveness_passed",
+  "stack_read_back": true,
+  "child_not_terminated_by_signal": true,
+  "environment_changed": false,
+  "NPU_used": false,
+  "bytes": 98
+}

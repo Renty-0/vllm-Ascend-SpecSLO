@@ -1,0 +1,171 @@
+{
+  "status": "HOST_paired_B5_gain_estimator_and_original_verdict_witnesses_passed",
+  "examples_from_original_verdict": 8,
+  "HOST_fixture_observations": 240,
+  "original_other_budget_predictor_implementation_preserved": true,
+  "confounded_raw_B5_below_B4_does_not_create_false_negative_side_gain": true,
+  "terminal_horizon_observations_excluded": true,
+  "malformed_original_verdicts_rejected": true,
+  "original_fresh_gain_boundary_preserved": true,
+  "stale_generation_rejected": true,
+  "state": {
+    "by_class": {
+      "tight": {
+        "samples": 0,
+        "side_hits": 0,
+        "sum_B4": 0,
+        "sum_B5": 0,
+        "terminal_skipped": 0
+      },
+      "normal": {
+        "samples": 0,
+        "side_hits": 0,
+        "sum_B4": 0,
+        "sum_B5": 0,
+        "terminal_skipped": 0
+      },
+      "loose": {
+        "samples": 0,
+        "side_hits": 0,
+        "sum_B4": 0,
+        "sum_B5": 0,
+        "terminal_skipped": 0
+      }
+    },
+    "by_class_anchor": {},
+    "prior_samples": 12,
+    "generation": 2,
+    "by_generation": {
+      "1": {
+        "by_class": {
+          "tight": {
+            "samples": 80,
+            "side_hits": 40,
+            "sum_B4": 300,
+            "sum_B5": 340,
+            "terminal_skipped": 32
+          },
+          "normal": {
+            "samples": 80,
+            "side_hits": 40,
+            "sum_B4": 300,
+            "sum_B5": 340,
+            "terminal_skipped": 32
+          },
+          "loose": {
+            "samples": 80,
+            "side_hits": 40,
+            "sum_B4": 300,
+            "sum_B5": 340,
+            "terminal_skipped": 32
+          }
+        },
+        "by_class_anchor": {
+          "tight:-1": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 60,
+            "sum_B5": 70
+          },
+          "tight:0": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 70,
+            "sum_B5": 80
+          },
+          "tight:1": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 80,
+            "sum_B5": 90
+          },
+          "tight:2": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 90,
+            "sum_B5": 100
+          },
+          "normal:-1": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 60,
+            "sum_B5": 70
+          },
+          "normal:0": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 70,
+            "sum_B5": 80
+          },
+          "normal:1": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 80,
+            "sum_B5": 90
+          },
+          "normal:2": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 90,
+            "sum_B5": 100
+          },
+          "loose:-1": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 60,
+            "sum_B5": 70
+          },
+          "loose:0": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 70,
+            "sum_B5": 80
+          },
+          "loose:1": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 80,
+            "sum_B5": 90
+          },
+          "loose:2": {
+            "samples": 20,
+            "side_hits": 10,
+            "sum_B4": 90,
+            "sum_B5": 100
+          }
+        }
+      },
+      "2": {
+        "by_class": {
+          "tight": {
+            "samples": 0,
+            "side_hits": 0,
+            "sum_B4": 0,
+            "sum_B5": 0,
+            "terminal_skipped": 0
+          },
+          "normal": {
+            "samples": 0,
+            "side_hits": 0,
+            "sum_B4": 0,
+            "sum_B5": 0,
+            "terminal_skipped": 0
+          },
+          "loose": {
+            "samples": 0,
+            "side_hits": 0,
+            "sum_B4": 0,
+            "sum_B5": 0,
+            "terminal_skipped": 0
+          }
+        },
+        "by_class_anchor": {}
+      }
+    }
+  },
+  "NPU_used": false,
+  "production_installed": false,
+  "neural_qualified": false,
+  "empirical_branch_probability_measured": false,
+  "Goodput": null
+}

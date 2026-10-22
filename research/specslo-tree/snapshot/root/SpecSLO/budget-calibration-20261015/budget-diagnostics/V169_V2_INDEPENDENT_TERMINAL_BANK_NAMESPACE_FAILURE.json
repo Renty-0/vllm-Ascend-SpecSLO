@@ -1,0 +1,240 @@
+{
+  "NPU_used": false,
+  "Torch_imported": false,
+  "actual_rank_errors": [
+    {
+      "bytes": 3066,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/rank0-last-error.json",
+      "sha256": "18e8af5a59fccfef7802a8907285d88cf27552fe71ade865b5e28a4658084486"
+    },
+    {
+      "bytes": 3066,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/rank1-last-error.json",
+      "sha256": "dfd4ce6019e5d11e988e349cca0203b76c59053ff9201ff2e70310f4e086d947"
+    },
+    {
+      "bytes": 3066,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/rank2-last-error.json",
+      "sha256": "a2b64ae06d2bd84ceba5950e34ed0eb9c27ac7bb867085026610316d61ddceb8"
+    },
+    {
+      "bytes": 3066,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/rank3-last-error.json",
+      "sha256": "38af4350428048d883e3b451c90cac6801d26f6e1dcb088544166c2fd2de51bc"
+    }
+  ],
+  "adopted": false,
+  "candidate": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169",
+  "failure": {
+    "MC2_original_startup_receipts_complete": true,
+    "P3_representative_numerical_complete": false,
+    "P4_numerical_complete": false,
+    "all4_original_stage4_propagated": true,
+    "completed_json_present": false,
+    "consume_or_next_complete": false,
+    "error": "NameError: name 'hashlib' is not defined",
+    "full463_complete": false,
+    "natural_positive_complete": false,
+    "path": "bank169 compiles all original bank_v149 function/class AST into globals; bank169 imports ast/copy but omits original module hashlib binding. Bank.__init__ -> tensor_hash(actual cache_block_tables) is first actual use.",
+    "rank0_only_local_exception": true,
+    "stage": "first P3 representative N1-E1-R1 / allocate-independent-real-banks",
+    "storage177_rename_failure_recurred": false,
+    "supervisor_generic_completed_within7200_rejection_is_not_timeout": true
+  },
+  "formal_Goodput": false,
+  "frozen_source_modified": false,
+  "limitations": [
+    "Retained original startup inventory completed in this engine. This does not confer any P3 union/P4 current component, protocol, production or Goodput qualification.",
+    "The error is a HOST isolated-AST module-global binding failure, before the first P3 bank finished constructing; no evidence supports a model numerical failure.",
+    "Only completed169v2 artifacts were read. No new NPU query/model/suite/installation/frozen-source change was performed.",
+    "Original frozen169/177 and prior failures remain immutable. Any fix requires new source identity and current engine startup/component/zero/seal/full gates."
+  ],
+  "log": {
+    "bytes": 393710,
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/local-parent4-v169-full463-v2-overlay177.log",
+    "sha256": "1fdaff7b39c84e8f37b3b77e2b91714fad2b142e875451a6cc2c0046e91c8fba"
+  },
+  "new_suite_run": false,
+  "overlay_receipt": {
+    "bytes": 1218,
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v177-root-safe-storage-overlay/receipt-overlay-169-parent4-v169-full463-v2-overlay177.json",
+    "sha256": "48ad6ebce3f004c7e3c28c10268bad16d2bda9ae1c8d6cc9a8ce81f8ce625ecb"
+  },
+  "receipt": {
+    "bytes": 519261,
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/receipt-parent4-v169-full463-v2-overlay177.json",
+    "sha256": "27781c9fb0e36854a1ceb7044e0951c3e3676404685f78098a98cd1cccace69a"
+  },
+  "schema": "V169.independent-terminal-source-namespace-failure.v1",
+  "source": {
+    "all_current_bytes_exact": true,
+    "archive": {
+      "bytes": 8573865,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/PREPARED_SOURCE_ARCHIVE169.tar.gz",
+      "sha256": "c86d27ad7bf8f52605c1a7d5b9f529b317fd3923017eb31554197d4b9122fe77"
+    },
+    "bank_adapter": {
+      "bytes": 1657,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/bank169.py",
+      "sha256": "41859573ac10bb9e805927d6aab365cdb67356fa1650ab79289bbbae08076a6d"
+    },
+    "bank_original": {
+      "bytes": 10067,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-repair-frontier-fusion-local-v149/bank_v149.py",
+      "sha256": "793a50c0a205adf2c1a7a3e73db965862af669d3bdc7a6fda3df0bd1b98e5b44"
+    },
+    "freeze": {
+      "bytes": 53758,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/FROZEN_SOURCE169.json",
+      "sha256": "2deebe5404ce6c69c5e3928e980e39013cef6ef8fe5152ce74ea353690582fdf"
+    },
+    "overlay_archive": {
+      "bytes": 58280,
+      "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v177-root-safe-storage-overlay/PREPARED_OVERLAY177.tar.gz",
+      "sha256": "4b999369e64c9eb57817d1ce5a129da12dd47c5342d47df9439bc3d6cdf9ab2c"
+    },
+    "overlay_before_after_equal": true,
+    "overlay_freeze": {
+      "bytes": 3696,
+      "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v177-root-safe-storage-overlay/FROZEN_OVERLAY177.json",
+      "sha256": "7787e359fdf8f8841c14bba1ebf648327a4eec60bee022c8d3deccc746295a68"
+    },
+    "overlay_inputs_verified": 19,
+    "selected_pins_verified": 299,
+    "sources_unchanged": true
+  },
+  "startup_receipts": [
+    {
+      "bytes": 1552,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/MC2-preflight-rank0.json",
+      "sha256": "68e8af39d616665970801861deb22cd0527097920ca8e19c08ec92186f9836b1"
+    },
+    {
+      "bytes": 5283,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/finite-draft-rank0.json",
+      "sha256": "f05769d25506d195979a4ad124999fba4592c14c79ce742e59ed7e38b3e650c5"
+    },
+    {
+      "bytes": 39468,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/MC2-preflight-rank1.json",
+      "sha256": "71129dc99803ebefd6b2729406a7eca4dd5070fb698da857b4287be560a49146"
+    },
+    {
+      "bytes": 457,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/prefill-rank1.json",
+      "sha256": "2a9065e2412141d490dc7a1ba9a50c559c94a9fccd3f7cdf906470900ed50db2"
+    },
+    {
+      "bytes": 5630,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/finite-target-rank1.json",
+      "sha256": "7cb9ead1ba9c897a43fb9653356683015e42d54cec206d5331a51641a3fe05ef"
+    },
+    {
+      "bytes": 39468,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/MC2-preflight-rank2.json",
+      "sha256": "5d4455024f99abb80f40486576709ab7e7d40ced08da4421e772fbc6451f7995"
+    },
+    {
+      "bytes": 457,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/prefill-rank2.json",
+      "sha256": "3b6d607607b49afda906a65f47ed021418486c88837eb6bc1fd948a18eeb8990"
+    },
+    {
+      "bytes": 5630,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/finite-target-rank2.json",
+      "sha256": "7cb9ead1ba9c897a43fb9653356683015e42d54cec206d5331a51641a3fe05ef"
+    },
+    {
+      "bytes": 39468,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/MC2-preflight-rank3.json",
+      "sha256": "80d8df44125164faffdf62a227df23db96a981d0aa0f14f8140a44151ae1fa32"
+    },
+    {
+      "bytes": 457,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/prefill-rank3.json",
+      "sha256": "d097e5a4b5e9303d291af806f7841c56d99a9c3b3dc39ffea4425b94b2866270"
+    },
+    {
+      "bytes": 5630,
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/startup-progress/finite-target-rank3.json",
+      "sha256": "7cb9ead1ba9c897a43fb9653356683015e42d54cec206d5331a51641a3fe05ef"
+    }
+  ],
+  "status": "classified_failed_current_component_unqualified",
+  "tag": "parent4-v169-full463-v2-overlay177",
+  "terminal": {
+    "all_workers_closed": true,
+    "baseline_prepost": [
+      {
+        "actual_result": {
+          "baseline_id": "nano-pearl-ascend-v1",
+          "checked_external_files": 15,
+          "checked_frozen_files": 10496,
+          "checked_packages": 212,
+          "errors": [],
+          "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+          "status": "pass"
+        },
+        "argv": [
+          "bash",
+          "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh",
+          "python",
+          "-B",
+          "/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/verify_lock.py",
+          "/root/data/specslo-baselines/nano-pearl-ascend-v1/lock.json"
+        ],
+        "exit_code": 0,
+        "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/parent4-v169-full463-v2-overlay177-pre-verifier.log",
+        "sha256": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a"
+      },
+      {
+        "actual_result": {
+          "baseline_id": "nano-pearl-ascend-v1",
+          "checked_external_files": 15,
+          "checked_frozen_files": 10496,
+          "checked_packages": 212,
+          "errors": [],
+          "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+          "status": "pass"
+        },
+        "argv": [
+          "bash",
+          "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh",
+          "python",
+          "-B",
+          "/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/verify_lock.py",
+          "/root/data/specslo-baselines/nano-pearl-ascend-v1/lock.json"
+        ],
+        "exit_code": 0,
+        "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/parent4-v169-full463-v2-overlay177-post-verifier.log",
+        "sha256": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a"
+      }
+    ],
+    "child_exit_code": 1,
+    "deadline_expired": false,
+    "deadline_seconds": 7200,
+    "elapsed_seconds": 822.8772682379931,
+    "limits": {
+      "actual_tag_bytes": 268435456,
+      "aggregate_private_bytes": 536870912,
+      "child_execution_seconds": 7200
+    },
+    "own_ROOT_lock": {
+      "nonblocking_exclusive": true,
+      "path": "/root/SpecSLO/budget-calibration-20261015/.ROOT_NPU_EXECUTION.lock",
+      "scope": "this supervisor lifetime; no outer flock"
+    },
+    "owned_remaining": [],
+    "private_storage_final": {
+      "actual_tag_bytes": 1459873,
+      "aggregate_private_bytes": 13180028
+    },
+    "retained_four_idle": true,
+    "status": "failed"
+  },
+  "worker_exit": {
+    "bytes": 33,
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/actual/parent4-v169-full463-v2-overlay177/worker-exit.json",
+    "sha256": "49fadbf83d8113c6e0b0ce4a2004d114d4b411cb3ecb3a488058bb5250a767c2"
+  }
+}

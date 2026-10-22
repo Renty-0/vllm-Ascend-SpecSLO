@@ -1,0 +1,35 @@
+{
+  "P154": "/root/SpecSLO/budget-calibration-20261015/tree-natural-positive-union-discovery-local-v154",
+  "P154_actual_failure": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-natural-positive-union-discovery-local-v154/receipt-natural-positive-union36-shared4-v154-local-v1.json",
+    "sha256": "a31ef5bbe58c825a7419bda8db47aa1e84331660210f23c6a000e9ea3507e508"
+  },
+  "P154_archive_SHA256": "27f2176c2749ea9fb49bc02c6fba6fc845dc4f86f5ce4b3024705098d59e787b",
+  "P154_freeze_SHA256": "fa9073ff64aaf431d52bbf8cd12295220f7d2e3a6e3f9e1907bd2ef53e41b5c6",
+  "P154_guard": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution",
+  "P157_failure_retained": "/root/SpecSLO/budget-calibration-20261015/tree-padding-reader-dependency-fix-local-v157/actual/natural-positive-union36-readerfix-v157-local-v1",
+  "actor_delta": "single raw CPU gate-preview report assignment after actual gate_rows before any own-union model stage; no predicate/model/Native changes",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/draft-repair-frontier-fusion-v149-source/check_host.py": "6abf5ca0aa50ae7837b232e8551e092a8ed33a6bca1bbddae26d1aaf4ccca603",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/draft-repair-frontier-fusion-v149-source/repair_frontier_fusion.py": "e95a375a6c6b333d06e82dadf7580da6937298d2152e8270b9478a3e81932da1",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution/common_guard.py": "1eba623426b4f61a40bc248202dfe55b91858d6c0933c9b600ecc94f64bd7ece",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution/launch_v154.sh": "c14b69efe572f2113a334b372754c24918eaa763bffe06329d1b61eda36be916",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution/supervise_v154.py": "5eddfd356c8367fb5515badee8b1f1d35ab269c427fb0d5662adf925d6998f7f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-natural-positive-union-discovery-local-v154/CPU_RESULT154.json": "562ea284e40396faed0889a54efaa77efebfed4bbc8352ec7ee2551c11b58053",
+    "/root/SpecSLO/budget-calibration-20261015/tree-natural-positive-union-discovery-local-v154/FROZEN_SOURCE154.json": "fa9073ff64aaf431d52bbf8cd12295220f7d2e3a6e3f9e1907bd2ef53e41b5c6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-natural-positive-union-discovery-local-v154/PREPARED_SOURCE_ARCHIVE_V154.tar.gz": "27f2176c2749ea9fb49bc02c6fba6fc845dc4f86f5ce4b3024705098d59e787b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-natural-positive-union-discovery-local-v154/actor154.py": "5fd5b2d3e7d435b0ac7c64163cd164a53b9fb6d14ccca1f4c3c1a38387684fc7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-natural-positive-union-discovery-local-v154/runtime154.py": "503e31cbb611983c1206052c36681a1a4f79dc2791281d0d58751145777e988d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-natural-positive-union-discovery-local-v154/source154.py": "4a4dfbadc44a907a90a93eab42e519062fcc4dd0382d37bdafa1516bff4b5d5b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-eager01-cost-v107/padding_reference.py": "669bc5d3e4714e9cb330a79183960bd9dd24711c61b6c279992c7ac3ab1cf719",
+    "/root/SpecSLO/budget-calibration-20261015/tree-union-shared4-protocol-local-v152/draft152.py": "7f1a5d5e6e931cb2561545c9abfd6ad746666c106e3e6fdcefeb40e128d8d696",
+    "/root/SpecSLO/budget-calibration-20261015/tree-union-shared4-protocol-local-v152/runtime152.py": "e7ec803cacb537cae969b77a9804e4784674d168826b62535e40f5314f284cab",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_cache.py": "3936d6ba88e7e7f26e5a06d03893fe1c4df97a7fd88199d55fd8004e0c1d5ad4",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py": "05d47ed6dc48e368010ca145a0b859aaffe596f246e0b28eb7b07d2d51a50cc9",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_graph.py": "a29c1d18e1588af8c94bb1b598af2da19ffef7c4630e87844befe086a69f3bf8",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_model.py": "e0d9efe4572c7e87ad860b014ef146394ca44f53ac8d87d12edfed2b572422a1"
+  },
+  "metadata_delta": "own actual allocation exact raw physical metadata, fresh independent pages semantic metadata; no model/KV/protocol change",
+  "original_numeric_or_positive_qualification_inherited": false,
+  "schema": "V161.own-epoch-exact-metadata.v1"
+}

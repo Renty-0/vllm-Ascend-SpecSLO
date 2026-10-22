@@ -1,0 +1,111 @@
+{
+  "status": "CPU_Native_allocator_metadata_forward_protocol_passed",
+  "unique_pages": 160,
+  "cases": [
+    {
+      "N": 16,
+      "budgets": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        3
+      ],
+      "real_queries": 79,
+      "physical_segments": 17,
+      "root_only_padding": true
+    },
+    {
+      "N": 16,
+      "budgets": [
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4,
+        4
+      ],
+      "real_queries": 80,
+      "physical_segments": 16,
+      "root_only_padding": false
+    },
+    {
+      "N": 16,
+      "budgets": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "real_queries": 32,
+      "physical_segments": 22,
+      "root_only_padding": false
+    },
+    {
+      "N": 15,
+      "budgets": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        3,
+        1,
+        1
+      ],
+      "real_queries": 80,
+      "physical_segments": 15,
+      "root_only_padding": false
+    }
+  ],
+  "original_real_positive_budget_guard_preserved": true,
+  "untyped_dummy_rejected": true,
+  "root_only_excluded_from_real_output_and_budget": true,
+  "original_Native_forward_executed": true,
+  "model_double": "CPU arange arithmetic; no neural/attention computation",
+  "isolated_FIA_device_predicate_stub": true,
+  "NPU_used": false,
+  "runtime_installed": false,
+  "neural_qualified": false,
+  "performance_qualified": false
+}

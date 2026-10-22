@@ -1,0 +1,50 @@
+{
+  "NPU_used": false,
+  "Torch_imported": false,
+  "actual_or_receipt_read": false,
+  "candidate_imported": false,
+  "checks": [
+    {
+      "epoch": 204,
+      "frozen_current_source_bytes_match": true,
+      "model_or_guard_executed": false
+    },
+    {
+      "epoch": 206,
+      "frozen_current_source_bytes_match": true,
+      "model_or_guard_executed": false
+    }
+  ],
+  "device_queried": false,
+  "findings": [
+    {
+      "analogue_found": false,
+      "consumer": "audit_component204.py:31/47 role branches; future terminal HOST audit:277/282 explicit None mutual exclusion",
+      "epoch": 204,
+      "producer": "actor204.py:62-64 puts draft=None on target and heads/target/reference=None on draft"
+    },
+    {
+      "analogue_found": false,
+      "consumer": "audit206.check_row:79/89 separates draft/target; explicit None gate:87; future raw8 only rank0 and target math branch separate",
+      "epoch": 206,
+      "producer": "actor206.summary/cost_case writes work and next on all roles; work.draft_proof is rank-specific; target/reference/heads None on draft"
+    }
+  ],
+  "limitations": [
+    "No claim that all runtime blockers are absent.",
+    "No model qualification or permission to launch is issued by this narrow source scan."
+  ],
+  "reviewed_files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_v204_terminal_HOST.py": "6ed13db379ae1cd1e49c9712418b60023b49c608881915f34478ce9bcb767cd9",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/audit_v206_terminal_HOST.py": "d2a6e8715de2c569fa2835605f40ca573d636f83218d2cf16a54b034aedbe9ea",
+    "/root/SpecSLO/budget-calibration-20261015/tree-b4-joint-subtree-single-writer-diagnostic-v206/actor206.py": "c491a69f5b21cf648824cd6632692cf49d1cf7e46a828b61a72a15a1a1fa55da",
+    "/root/SpecSLO/budget-calibration-20261015/tree-b4-joint-subtree-single-writer-diagnostic-v206/audit206.py": "f78457c6933ca2985e10e779412956eb4d4e43c8affe103ca635bf49361bbfa8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-normal-b4-final-kv5-single-writer-full-v204/actor204.py": "88c864db3a8cc4a4c95000ae7bb4788d9b7f052bd1c2a419a3d003298f6e78a2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-normal-b4-final-kv5-single-writer-full-v204/audit204.py": "ffa951683d048398089a19fa40a0a943268f643bb0429e9524537fcfb448970d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-normal-b4-final-kv5-single-writer-full-v204/audit_component204.py": "b405130f92d176d1d051169c69fd1256b3d26751dd46968aa13ccb2a45346631"
+  },
+  "schema": "V204.V206.role-null-scoped-source-scan.v1",
+  "scope": "Only role-null accesses in retained component/full auditors and their producer schemas; not renewed complete source/numerical qualification.",
+  "status": "passed_scoped_source_review",
+  "tests_or_suites_run": false
+}

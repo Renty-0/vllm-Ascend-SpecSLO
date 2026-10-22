@@ -1,0 +1,10 @@
+{
+  "status": "PASS_HOST425_OLD423_OBSERVER_FAILURE_REPRODUCED",
+  "actual_original_Fast_RootSeed_and_tail_observer_used": true,
+  "explicit_CPU_model_double": true,
+  "original_snapshot_failure": "No original captured per-step hidden buffers for this exact tail key",
+  "reason": "Original installer function globals remained in copied private base module, while observer replaced canonical execute_top2.",
+  "Native_models_constructed": 0,
+  "NPU_used": false,
+  "NN_math_qualified": false
+}

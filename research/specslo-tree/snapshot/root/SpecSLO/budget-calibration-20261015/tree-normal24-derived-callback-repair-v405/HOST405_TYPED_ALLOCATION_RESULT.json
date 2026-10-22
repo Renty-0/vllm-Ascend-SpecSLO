@@ -1,0 +1,27 @@
+{
+  "status": "PASS_HOST405_ACTUAL_TYPED_ALLOCATOR_AND_CLASS_AGE_ADMISSION24",
+  "actual_original_typed_callback_source_used": true,
+  "exact_at_most24_plan_counter_age_cases": 587,
+  "actual_class_priority_deferred_age_cases": 213,
+  "per_role96_global192_paid_limits_retained": true,
+  "original_model_and_online_observations_not_changed": true,
+  "original_phase_generation_authoritative": true,
+  "independent_retained_admission_audit_and_corruption_control": true,
+  "admission": {
+    "original_sha256": "f1049e73dd0f3cd026f97e3209c7afb66080d7277f337f34744186c16e6bfda8",
+    "projected_sha256": "476cd9d182e10f2298cba6ff798dbbaa9505f19cce541a103a97b423d90a7ad3",
+    "active_owner_limit": 64,
+    "normal_work_policy_limit": 24,
+    "eager_hardware_limit": 32,
+    "same_class_age_owner_order": true,
+    "original_native_home_or_KV_mapping_changed": false
+  },
+  "global_active_limit": 64,
+  "production_runtime_installed": false,
+  "NPU_used": false,
+  "models_constructed": 0,
+  "model_qualification": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

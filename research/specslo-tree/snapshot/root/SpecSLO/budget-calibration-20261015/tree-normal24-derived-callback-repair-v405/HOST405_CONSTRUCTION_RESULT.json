@@ -1,0 +1,33 @@
+{
+  "status": "PASS_HOST405_ACTUAL_SANITIZED_STARTUP_CALLBACK_CONSTRUCTION",
+  "NPU_used": false,
+  "model_constructors_called": 0,
+  "exact_startup_PYTHONPATH": true,
+  "imported_origins": {
+    "projection247": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/projection247.py",
+    "projection255": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+    "window405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/window405.py",
+    "empty405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/empty405.py",
+    "reference405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/reference405.py",
+    "audit_reference405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/audit_reference405.py",
+    "audit_base405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/audit_base405.py",
+    "runtime405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/runtime405.py",
+    "trace405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/trace405.py",
+    "scope405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/scope405.py",
+    "audit405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/audit405.py",
+    "extension405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/extension405.py",
+    "bucket405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/bucket405.py",
+    "oracle405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/oracle405.py",
+    "qualify405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/qualify405.py",
+    "guard405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/guard405.py",
+    "shape405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/shape405.py",
+    "admission405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/admission405.py",
+    "audit_normal405": "/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405/audit_normal405.py"
+  },
+  "configured_max_num_seqs": 64,
+  "effective_active_ceiling": 64,
+  "original_owned_verifier_and_cleanup_retained": true,
+  "original227_and_additional681_and_all463_ownAR_required": true,
+  "neural_qualification_inherited": false,
+  "deadline_seconds": 10800
+}

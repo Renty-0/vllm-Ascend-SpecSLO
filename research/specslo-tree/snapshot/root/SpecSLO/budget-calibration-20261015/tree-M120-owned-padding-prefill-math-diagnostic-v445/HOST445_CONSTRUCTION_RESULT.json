@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST445_ORIGINAL_LIFECYCLE_AND_Q5_PREFILL_OWNERSHIP",
+  "actual_N16_case_projection": true,
+  "original72_prefix_checks_retained": true,
+  "all5_lengths_and4_negative_metadata_cases": true,
+  "unchanged_physical_M120_S24": true,
+  "NPU_used": false,
+  "model_constructors": 0,
+  "Native_flags_assigned": false,
+  "Raw": null,
+  "Goodput": null
+}

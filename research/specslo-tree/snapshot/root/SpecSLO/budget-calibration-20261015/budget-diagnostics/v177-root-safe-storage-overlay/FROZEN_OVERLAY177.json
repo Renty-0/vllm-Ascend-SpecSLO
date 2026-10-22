@@ -1,0 +1,29 @@
+{
+  "schema": "ROOT.V177.frozen-storage-only-overlay.v1",
+  "ROOT_source_reviewed": true,
+  "root_review": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V177_STORAGE_OVERLAY_SOURCE_REVIEW.json",
+    "sha256": "5c436fbdb8bcc7968a4999419c880e6c2f9283750dfd9835bdd7d724447e90f7"
+  },
+  "inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution/common_guard.py": "1eba623426b4f61a40bc248202dfe55b91858d6c0933c9b600ecc94f64bd7ece",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution/supervise_v154.py": "5eddfd356c8367fb5515badee8b1f1d35ab269c427fb0d5662adf925d6998f7f",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v169-root-execution/guard169.py": "54ffe50a54493ab85ad866e08588c91ddb7c017e1fc47ad83356d9647d31afd6",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v171-root-execution/guard171.py": "8d98821d54336ce507b18acd32fd69b9ec35342101ef8918a098752bdb012b6c",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v173-root-execution/guard173.py": "4add7f5199b7c28cb55b06ab2d05ae663e3c7e2edcf5eaca343f8c81ceed63fa",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v174-root-execution/guard174.py": "bf0ddb2bb12fc25dcfecbb901856890a5c9b9288a42848219991ac7f40065fb6",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v175-root-execution/guard175.py": "6f2df400f2692b740792834398064b8073697326eb2e05718c5dd804a38dd273",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v177-root-safe-storage-overlay/CPU_RESULT177.json": "35e0ee3c36239f049970748ede3d1206c47c4492b51c43fef475cdfeeba9730e",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v177-root-safe-storage-overlay/REGISTRY177.json": "dfa17ef393bdf82d7a34658fde68038ad6b872e2529e087dde66ee82820811b7",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v177-root-safe-storage-overlay/run177.py": "60c1fa664739c99ebd89ab3485e80b86b9a72b2de2869d3e62b265c99bfcb8cb",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v177-root-safe-storage-overlay/safe_storage177.py": "6c266fc48a78305bd2b8df8a6acd61bdedb74f5a7a5893e68bb211fc1f459f0c",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v177-root-safe-storage-overlay/test177.py": "8e4307a18aa4909597236af005a7ff02668a47906e389d7d7f2a0f1cdc7f17ed",
+    "/root/SpecSLO/budget-calibration-20261015/tree-active16-metrics-fixed-full-v175/FROZEN_SOURCE175.json": "168796dc2404390010fb48d0215df9a806c117dfc809614a2f544fc7a4d7bbd1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/FROZEN_SOURCE173.json": "8c1eb029b6e3613b20a4799082051afd2e62689be64d10aee3cf958963ba1646",
+    "/root/SpecSLO/budget-calibration-20261015/tree-linear-parent4-child3-local-v169/FROZEN_SOURCE169.json": "2deebe5404ce6c69c5e3928e980e39013cef6ef8fe5152ce74ea353690582fdf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-normal-cap5-real16-bankfix-full-v174/FROZEN_SOURCE174.json": "6f8ee037679df25c4122521cfeef3ae90df4a96dae80d85fe2419ea608ddf1e4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-normal128-eager64-global192-full-v171/FROZEN_SOURCE171.json": "ef0538fe4d0647045e57fa40edc7cc151bc3c0bc626c404373fa6da9f950a0f5",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V177_INDEPENDENT_STORAGE_OVERLAY_SOURCE_REVIEW.json": "3b1181d456de24c3a0c4f9808a3c02e2504940235a939644a61aaa35c156abe2",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V177_STORAGE_OVERLAY_SOURCE_REVIEW.json": "5c436fbdb8bcc7968a4999419c880e6c2f9283750dfd9835bdd7d724447e90f7"
+  }
+}

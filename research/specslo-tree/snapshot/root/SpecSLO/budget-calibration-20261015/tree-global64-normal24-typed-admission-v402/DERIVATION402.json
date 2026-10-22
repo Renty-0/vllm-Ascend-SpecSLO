@@ -1,0 +1,138 @@
+{
+  "status": "HOST_PASS_PREPARED_FOR_FRESH_FULL_QUALIFICATION",
+  "cloned": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit398.py",
+      "source_sha256": "8cae5bda6ddc039a45796b86a44ea3590ddaac6a7baf987b828b26985cf545e6"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit_base402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit_base398.py",
+      "source_sha256": "ed8e5a519acef7a3331b49b36ed4a55d319f293e374ff5e6b06924d0e82ba08b"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/audit_reference402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit_reference398.py",
+      "source_sha256": "8608b0868e541e28561f58a37b46b23aa9c2049a8b717f72787c4187da14ae70"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/bucket402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/bucket398.py",
+      "source_sha256": "e3502595b9345ef710bc3786e28628fbd4c7f75e53a8769cdf5daedec835b705"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398.py",
+      "source_sha256": "f5d4f4e271c2c1b46dfe7f9b77d10cffc6044f3e3442ba5b5f98eb5976715278"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_HOST.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_HOST.py",
+      "source_sha256": "e0ea1bfd8cf544628b6ac74191f95ce1846b6785e0de7ee3109c31bbd3847d57"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_capacity_HOST.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_capacity_HOST.py",
+      "source_sha256": "d4248ad300f59cc4f7b700956c77bdcb1b808e9431d0d69bd25c9d8a9850e1b3"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_construction_HOST.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_construction_HOST.py",
+      "source_sha256": "0a453c66e0cb227149d36815ba3b67f00b7d2c6b2a4a715f131b3e82882aebb3"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_live_binding_HOST.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_live_binding_HOST.py",
+      "source_sha256": "34a086882c518ce9964b22a606b5028633fc33c58601cc6045de26c9a5ade3f3"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check402_packing_HOST.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check398_packing_HOST.py",
+      "source_sha256": "8b2a45e27c7f3dee5a6cf7ba0aded2543806aea7fe83d493ac08270045df9aed"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/check_scope402_HOST.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/check_scope398_HOST.py",
+      "source_sha256": "d558b678181d9a85ebdbea6b25e63e1af6b999bd5f770f950337a2c5cbb40417"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/dispatch402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/dispatch398.py",
+      "source_sha256": "0dea04e1a47c5751b8d4a9009d663ee3d042103955d610ffbe4d40ffbe8e07c2"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/empty402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/empty398.py",
+      "source_sha256": "a1cc5bb823147e16a6d67612d3a0f20985e0778d22f2f60150cc572e5d3da7a7"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/extension402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/extension398.py",
+      "source_sha256": "f20b44c088f55370bee12ace7c3e6266b561b512e5f33cc79e88fbfb29508094"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/generation402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/generation398.py",
+      "source_sha256": "9fea580022aed3d2c0261d57dc3f88c53d6bb68830071c51fe4379d708553bbd"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/guard402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/guard398.py",
+      "source_sha256": "0afd77f0bd698ac3dce7b46d6e53f291743adbbdde414ca1cf4e3b086f76ebb2"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/launch402.sh": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/launch398.sh",
+      "source_sha256": "710d376503730f465e1b6d299ad8a3362113e942ba5b2938f31656a6807e0c18"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/oracle402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/oracle398.py",
+      "source_sha256": "5e4561152967ee84869d127f3774b35fc450b93def553e7c9cad33d6272687f1"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/packing402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/packing398.py",
+      "source_sha256": "ea666a7e508870ea7781637de42490be7e1f849238099555479cc32c0d6f14ba"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/prefixes402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/prefixes398.py",
+      "source_sha256": "2f32ac7f81b23b7834da4a5dcacde9717efb3e012cf6881507b624c2ba33fa75"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/projection402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/projection398.py",
+      "source_sha256": "a63d369c1549041a47bd75f582570af4c879275fc5c57f87bcf93bc4e710e20b"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/qualify402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/qualify398.py",
+      "source_sha256": "f15302d02d432c133ba83ce7b6af1ba1a9efb6564c054e9e7c2bbcd78482a2bb"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/reference402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/reference398.py",
+      "source_sha256": "4365ea0c0fcb7273c9271d5e25481067e827113a25ac5c635e6bcb616a88e3ea"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/runtime402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/runtime398.py",
+      "source_sha256": "2fef0c7696f906242b1b3663e1cb5cdcfd2c83ee7605ef2e185cccab5102f35a"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/scope402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/scope398.py",
+      "source_sha256": "223265b4d19c4ae9bb9e48d0cc8a045a0d854a22c0d1675f5a9438f2f92ecb2d"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/startup402.sh": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/startup398.sh",
+      "source_sha256": "01536a829bcbce342792bdf148261ab0a87e3e6605a2e2b6aec186fcdaba7a65"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/trace402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/trace398.py",
+      "source_sha256": "4737ccd7c395eb7f5c049ca4d874325d1723bc96a5f3b983946957368be9fef1"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-global64-normal24-typed-admission-v402/window402.py": {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/window398.py",
+      "source_sha256": "50ae391a1eb1e61d5cae900570933d119ee077988847023cead4c3bde1698d85"
+    }
+  },
+  "baseline398_source_freeze_sha256": "dfb6cfd44d2f524d7ad28892ec055d50d1035910fb71dbbc5486dc060cb5e73d",
+  "global_active_limit": 64,
+  "target_limit": 24,
+  "normal_work_policy_limit": 24,
+  "draft_neural_math_changed": false,
+  "typed_gain_model_changed": false,
+  "normal_admission_changed": true,
+  "model_qualification": false,
+  "pending": [
+    "extended normal admission terminal audit",
+    "all actual HOST startup/source bindings",
+    "fresh freeze/archive",
+    "new full463 independent own-AR and actual metrics"
+  ],
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null,
+  "actual_normal402_audit_added": true,
+  "actual_engine_and_shaper_LIVE_binding_HOST_passed": true,
+  "explicit_old_allocator_unchanged_claim_removed": true,
+  "current_typed_source_findings": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT402_CURRENT_TYPED_POLICY_FINDINGS.json"
+}

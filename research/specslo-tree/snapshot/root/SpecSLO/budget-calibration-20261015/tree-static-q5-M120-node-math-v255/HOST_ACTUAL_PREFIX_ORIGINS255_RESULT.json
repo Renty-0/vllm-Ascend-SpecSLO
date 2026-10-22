@@ -1,0 +1,18 @@
+{
+  "status": "HOST_actual_candidate_and_reference_prefix_origins_passed",
+  "cases": 227,
+  "checked_real_cache_writes": 13081,
+  "checked_reference_positions": 74655,
+  "actual_first_two_prefixes": [
+    1505,
+    2555
+  ],
+  "old_fixed127_overwrite_detected": true,
+  "all_real_reference_visible_positions_below2560": true,
+  "nonreal_future_positions_past_extent": 1853,
+  "NPU_initialized": false,
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/oracle255.py": "6bd675f99cc01239c6be9cc560c053fa4bdf0475621eaf4eeabc4475a771b1a9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/reference_schedule255.py": "f0415e0472ce5187706aa33d7ab38992c2ac204184880d3aeb7df98cb8971d0f"
+  }
+}

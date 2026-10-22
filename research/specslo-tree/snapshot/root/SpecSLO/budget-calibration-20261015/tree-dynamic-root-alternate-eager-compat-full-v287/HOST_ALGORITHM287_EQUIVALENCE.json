@@ -1,0 +1,15 @@
+{
+  "status": "HOST_parent284_renamed_algorithm_only_original_eager3_compatibility_changed",
+  "UTC": "2026-10-18T21:09:49.725543+00:00",
+  "changed_original_modules": [
+    "plans284.py"
+  ],
+  "normal_candidate_selection_unchanged": true,
+  "model_and_target_math_unchanged": true,
+  "normal_and_eager_budget_allocators_unchanged": true,
+  "regression": "actual Native original eager constructor with 8 normal grants plus eager3 at five prefix boundaries; old code fails and new exact chain pack succeeds",
+  "extra_test": "check_eager287_HOST.py",
+  "fixture_bytes_unchanged": true,
+  "NPU_used": false,
+  "Goodput": null
+}

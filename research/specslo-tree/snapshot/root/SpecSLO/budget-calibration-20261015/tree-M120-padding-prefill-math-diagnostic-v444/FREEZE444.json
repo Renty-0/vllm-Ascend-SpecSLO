@@ -1,0 +1,26 @@
+{
+  "schema": "ROOT444.fixed120-padding-prefill-diagnostic.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/prepare_ROOT444_mixed_padding_HOST.py": "ef1fb12f22b235ce622df294615fb1ac43c4dc617b5e8ef4419de5d3f036ec5a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/HOST444_CONSTRUCTION_RESULT.json": "afb4b68a17ff20a27e9f1a962b72faa8a3f7b5782cc267046732a01964f92d5f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/PLAN444.json": "4a90bb83a15d11890b93c3d81a419e8f5dff4feec1ce186c0fb7bb438efdde62",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/audit444.py": "e857ac3a8e01b2ff34e2fac574575f7b4cd6e74b9011a172796e9894d43fc63e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/check444.py": "6511015705a71308569a091f7ecdc18beed95288a1340e943c6c8dc3d23b4560",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/check444_HOST.py": "63deed08f79dee359d39bd023416423749da8f8c16e610f4df66153b7343037f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/forward444.py": "127a7d70293cf01f3ea1f23c4cbbb0d4f0acc984c51efb6907b508a24d50e231",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/guard444.py": "7b8ef8139237a8f0b32f4f1e2b7d66824abafe768eb298bfb5e7ad4fd297625f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/host_env444.py": "461b925f24fd3b6db76fe897c55eae2184c8c0359e57272c9de1f0a1913688d7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/layout444.py": "9c8af39c8cacc62f5aa8121f945692394b8a0b3b3d81509c4f2b44f7548dd49c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/probe444.py": "a9a310e589c2ebb44da0eed27d1bc63a2640aa8220c330a7d07924967662b422",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/runtime444.py": "6f3b6b0561b6bf9b2e5cf5c9c7c8c4767bee718c81830a8365f48a1ba8b6429c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444/startup444.sh": "f5face339273f16fd74675955952ecccbe6ef2d49f75925d970dd6223f3686c1"
+  },
+  "parent385_freeze": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+  "parent385_archive": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
+  "current441_freeze": "5819985a78cec1901fd2afc32c58065085a144d25d879810bee211288fd84709",
+  "current441_archive": "0c90d64172a1fce194483d615dc26d44b6a15da46e2829eade5552eda4e0b472",
+  "NPU_run": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

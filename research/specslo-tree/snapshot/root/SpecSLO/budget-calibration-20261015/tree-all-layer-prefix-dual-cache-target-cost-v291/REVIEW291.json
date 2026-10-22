@@ -1,0 +1,21 @@
+{
+  "UTC": "2026-10-18T22:37:28.093670+00:00",
+  "schema": "ROOT291.span-prefix-dual-write-target-NN.v1",
+  "actual_geometry": "unchangedM120/S24/uniformq5/KV2560, C96 andprimary+sidegroups24",
+  "operator": "one768-program all64-layer contiguous committed-prefix memcpy, per-layer raw dual cache write replaces Native reshape-and-cache; original attention retained",
+  "actual_operator295_fresh_proof": true,
+  "NN_math_qualification_inherited": false,
+  "source_prefix_maps": "actual Native HOST schedules and physical row bijection; no device metadata D2H",
+  "original_cache_addresses_retained": true,
+  "no_float_arithmetic_in_new_KV_operators": true,
+  "independent_math": "fresh72 own prefixes and408 target cases, bitwise hidden/all128KV/greedy, graph/eager, committed prefixes protected",
+  "actual_predeclared_cold_families": 6,
+  "extra_changed_restored_dispatches": 12,
+  "paired_component_cost": "11 N/fork configurations, B4..8,20rotated rounds; math mustfinish first",
+  "BF16_models_and_original_sampler": true,
+  "quantization": false,
+  "no_full_workload_or_serving_scope": true,
+  "whole463_AR": false,
+  "Goodput": null,
+  "adopted": false
+}

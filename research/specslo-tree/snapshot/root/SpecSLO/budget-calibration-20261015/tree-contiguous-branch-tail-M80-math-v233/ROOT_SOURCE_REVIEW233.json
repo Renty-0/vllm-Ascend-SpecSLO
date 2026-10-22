@@ -1,0 +1,13 @@
+{
+  "status": "source_prepared_device_unrun",
+  "cases": 155,
+  "branch_KV_copy": "constant1792 unique copy destinations, original BF16 cache; contiguous logical prefix+ancestry per side query",
+  "graph_contract": "linear original FULL9; side queries split into their own FULL segment, mask query capacity10 distinguishes copy graph from no-copy graph",
+  "reference": "independently prefilled own spine/side KV, q1 eager reference; copy state disabled for reference",
+  "negative_control": "original layout on first failed N1-fork5-anchor0 retained separately; never counted as a passed case",
+  "original_sampler_unchanged": true,
+  "original_Native_matcher_unchanged": true,
+  "no_production_qualification": true,
+  "no_performance_claim": true,
+  "adopted": false
+}

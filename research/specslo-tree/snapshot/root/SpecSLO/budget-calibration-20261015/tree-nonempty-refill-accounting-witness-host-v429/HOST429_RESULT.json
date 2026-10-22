@@ -1,0 +1,131 @@
+{
+  "status": "PASS_HOST429_ACTUAL_CPU_REFILL_WITNESSES_AND_NEGATIVES",
+  "actual_admission_CPU_cases": 360,
+  "nonempty_positive_cases": 139,
+  "nonempty_deferred_cases": 161,
+  "empty_positive_cases": 58,
+  "repeated_admission_without_duplicate_publication": 360,
+  "controlled_negatives": [
+    {
+      "kind": "missing_charge",
+      "rejected": true,
+      "message": "HOST429 accounting witness: each original incumbent charged the exact original elapsed value"
+    },
+    {
+      "kind": "double_charge",
+      "rejected": true,
+      "message": "HOST429 accounting witness: each original incumbent charged the exact original elapsed value"
+    },
+    {
+      "kind": "stale_ticket",
+      "rejected": true,
+      "message": "HOST429 accounting witness: incumbent committed tokens, epochs, homes and original ready tickets retained"
+    },
+    {
+      "kind": "old_token_write",
+      "rejected": true,
+      "message": "HOST429 accounting witness: incumbent committed tokens, epochs, homes and original ready tickets retained"
+    },
+    {
+      "kind": "future_arrival",
+      "rejected": true,
+      "message": "HOST429 accounting witness: no future arrival admitted"
+    }
+  ],
+  "source": {
+    "original_425_function_sha256": "30f4da9a7adb617034f365b55d536356782e6aa9c4dba96c2b5a3ea410038c40",
+    "resource_426_function_sha256": "191ed365c08f45477bf925a9ab068372fb7b8923414a335cd99e6528d4358ab9",
+    "proposed_429_function_sha256": "14f4a9c93dca07d548de0092b9b44c7ac91ef7f89e8d974db6b3844c871477a4",
+    "entire_AST_inverse": true,
+    "original_clocks_and_publication_unchanged": true,
+    "existing_duration_broadcast_reused": true,
+    "new_clock_calls": 0,
+    "new_collective_calls": 0,
+    "global_active_limit": 64,
+    "scratch_pages": 64,
+    "total_pages": 544,
+    "low_water": 32,
+    "minimum_nonempty_refill": 8,
+    "maximum_nonempty_refill": 32,
+    "NPU_executed": false,
+    "NN_incumbent_KV_qualified": false,
+    "serving_installed": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "actual_CPU_two_admission_groups_with_synthetic_final_drain": {
+    "cohorts": [
+      {
+        "ordinal": 0,
+        "owners": [
+          0,
+          3,
+          6,
+          1,
+          4,
+          7,
+          2,
+          5
+        ],
+        "incumbent_count": 0,
+        "reserved_pages": 88,
+        "prefill_ms": 30.00000000000003
+      },
+      {
+        "ordinal": 1,
+        "owners": [
+          9,
+          12,
+          15,
+          10,
+          13,
+          8,
+          11,
+          14
+        ],
+        "incumbent_count": 8,
+        "reserved_pages": 112,
+        "prefill_ms": 30.00000000000003
+      }
+    ],
+    "cohort_count": 2,
+    "all_arrivals_retained": true,
+    "nonempty_cohorts": 1,
+    "source_clocks_unchanged": true,
+    "exact_original_incumbent_prefill_charge": true,
+    "no_extra_root_hold_or_callback": true,
+    "no_per_prefill_duration_inference": true,
+    "NN_qualification_inferred": false,
+    "serving_permission": false
+  },
+  "controlled_trace_negatives": [
+    {
+      "kind": "missing_old_charge",
+      "rejected": true,
+      "error": "HOST429 accounting witness: all actual incumbents charged the full original prefill duration exactly once"
+    },
+    {
+      "kind": "wrong_old_membership",
+      "rejected": true,
+      "error": "HOST429 accounting witness: independently reconstructed active owners, helper order and global64"
+    },
+    {
+      "kind": "wrong_root",
+      "rejected": true,
+      "error": "HOST429 accounting witness: unchanged original immediate single root callback in helper order"
+    },
+    {
+      "kind": "future_arrival",
+      "rejected": true,
+      "error": "HOST429 accounting witness: every request has arrived"
+    }
+  ],
+  "original_CPU_states_controller_and_admission_priority": true,
+  "original_426_model_IO_clock_broadcast_doubles_explicit": true,
+  "NPU_used": false,
+  "Native_models_constructed": 0,
+  "NN_incumbent_KV_qualified": false,
+  "serving_installed": false,
+  "Raw": null,
+  "Goodput": null
+}

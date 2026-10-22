@@ -1,0 +1,12 @@
+{
+  "schema": "ROOT257.live-target-SLO-first-policy-candidate.v1",
+  "model_backend_unchanged": "M120/S24/KV2560, all original BF16 weights and sampler",
+  "original_startup_global_environment_TARGET0_unchanged": true,
+  "actual_live_build_plan_target_slo_first": true,
+  "actual_live_counter1_required": true,
+  "same_N24_C96_active48_global192": true,
+  "all_original_and_fresh227_gates_required": true,
+  "full463_ownAR_required": true,
+  "performance_qualified": false,
+  "adopted": false
+}

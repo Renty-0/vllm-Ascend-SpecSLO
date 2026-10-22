@@ -1,0 +1,26 @@
+{
+  "status": "HOST_PASS_READY_FOR_FRESH_FULL_FREEZE",
+  "global_active_limit": 64,
+  "normal_work_policy_limit": 24,
+  "target": {
+    "N": 24,
+    "C": 96,
+    "M": 120,
+    "S": 24
+  },
+  "repair": "engine stores actual selected Controls instance; adapter checks its exact callback object, code, filename and original policy; frozen private split-shape code preserved",
+  "neural_bodies_changed": false,
+  "old402_mathematical_qualification_inherited": false,
+  "additional_wide405_module": "HOST-only, not installed in normal24 serving",
+  "required": [
+    "fresh original201/44/114 components",
+    "fresh227+681",
+    "warm/twozero/seal",
+    "full463",
+    "all3 independent ownAR",
+    "source/environment/cleanup"
+  ],
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null
+}

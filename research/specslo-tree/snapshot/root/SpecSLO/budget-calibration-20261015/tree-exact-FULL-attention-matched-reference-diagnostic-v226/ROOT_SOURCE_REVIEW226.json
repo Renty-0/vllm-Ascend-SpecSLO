@@ -1,0 +1,10 @@
+{
+  "status": "source_prepared_HOST_CPU_pending",
+  "no_frozen_files_edited": true,
+  "repaired_comparator": "identical exact metadata; original unmodified Native matcher; bitwise hidden/KV separately reported",
+  "completed_cases_saved_before_later_phases": true,
+  "original_sampler_unchanged": true,
+  "neural_qualified": false,
+  "performance_qualified": false,
+  "adopted": false
+}

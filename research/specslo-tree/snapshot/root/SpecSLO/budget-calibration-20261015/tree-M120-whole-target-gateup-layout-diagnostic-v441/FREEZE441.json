@@ -1,0 +1,25 @@
+{
+  "schema": "ROOT441.whole-target-gateup-layout-diagnostic.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/HOST441_CONSTRUCTION_RESULT.json": "271e3d1279ac93acf58de883f98bf5e0dff006488d01d9faab54c8dec53662ea",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/PLAN441.json": "fdf3a59145a42fbfa4400ca10fcfd9895fcf67d93cb8837b13912df09273d51d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/audit441.py": "79963cae640deb79a5908c02da555f4715b96e98b057b131af7e0614569c28e2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/check441.py": "a16ea0455f741a148c8274be9d7d82f699c8fc67a88228ef34cb85a65cefbdc8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/check441_HOST.py": "8205580a93f06af9185c8e6e71027a65c7497db90656d1f0e38a677368dd8ea0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/forward441.py": "e48a111f1bc7120a41d42e1a1a3da25f4f1e08d157335791f6161b454b488a1b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/guard441.py": "e95d497a0ab4763fc5789c3bcf37e23548733b49a74f9452712d4222cefd5abb",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/host_env441.py": "b64382c4c502b31e10457693a7d5d84a4d6581ddbf380071bcdf9ab1059aeb6e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/probe441.py": "7fef4999f92fbf0490897df9e15bcdf5fcec97ada2e76a20e783dcf4ec28bc1f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/runtime441.py": "79c4f3cc40d1fa5981ba6439cce901d77bb10fce861ae9200a1628a4056fc155",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441/startup441.sh": "99306f0c12bbb38b82aad537840e5aa46e965f95f392f1e80a28aed3fb1e0a18",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/prepare_ROOT441_whole_target_HOST.py": "eb6d121304913f961ba2a6b93c75b96cc96ca14ef7b928a34bb5d69108fc04d6"
+  },
+  "parent385_freeze": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+  "parent385_archive": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
+  "current440_freeze": "bf6b9b0d2704ff7c3973b028bc71f6f5b5ac8481db8bd3f62571f00ab745a3ad",
+  "current440_archive": "6a46a565f534cf5b7f345e77f1487cfa0d6297be1c1c81492e359d21de491c1e",
+  "NPU_run": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

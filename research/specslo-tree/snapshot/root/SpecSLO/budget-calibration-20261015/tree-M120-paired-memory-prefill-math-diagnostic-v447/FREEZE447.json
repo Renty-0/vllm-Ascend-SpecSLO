@@ -1,0 +1,27 @@
+{
+  "schema": "ROOT447.bounded-pair-known-prefill-diagnostic.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/prepare_ROOT447_paired_memory_HOST.py": "1b4d562655ace242806d1dd4b0c6720ea5a4a79d4ead5beae5de57fd10fb6c05",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/transform_ROOT447_paired_forward_HOST.py": "319280e221152dffd68c71df4cb1656e18f397d3e8992f360b9cd00332dd3cd9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/HOST447_CONSTRUCTION_RESULT.json": "8e83eaacc8dd4d363f752eda3626b23b9c459d44ba5fd509bd64b6832f43dd85",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/PLAN447.json": "bea1808f299aecd0fcef7a161fa38297edd5d0b2e0b32eb32d3d055d2c8ec1df",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/audit447.py": "a52aa5cf14ad0cbf055357e77fa936e5161e9d6e40206c68957099ae4fd5dc68",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/check447.py": "8cead6e42891686b0260881eb0c92f0410c5d3d340b1e0f04fd7d99e4aad169b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/check447_HOST.py": "53265cb71d28ae4bf02a012d2e5b0803052484836549aaa80af6d33ccb4f829c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/forward447.py": "2b2ca636a5f731a6d1f9755aecd7a29c612710f455da8201f5e46f28c87e03bf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/guard447.py": "e39d2c13e406086dc7eb547e8b66a14b6513d53a2c25eb7801a322e0fe3ab0f2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/host_env447.py": "594189b16bdd9ce27dda671b404fb5866353e7520481a544b6dd77e0fbccead7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/parent447.py": "0beddeaab95452be10b090c2b3cae0d125565ab7397281121781457a389a9b20",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/probe447.py": "63d75c33f535b41839f7d66492294fc6e81973d4af61092d82649a8db66746df",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/runtime447.py": "c860f9020381dadec6671d95691f3e6c578da01fa4035e94efc0e351530a87e9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447/startup447.sh": "7d17a641831e6b3f409cdfbfa3f9d69ff3063cca1808155be37f868993d3db4f"
+  },
+  "parent385_freeze": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+  "parent385_archive": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
+  "current446_freeze": "b5ab08de22a892d6d8ecc71e62e91781de246a81292659e17272484cff490eb3",
+  "current446_archive": "073c18e842b9e7acccf62e5904c541082b974225452f6cc23e36d9c93083f74a",
+  "NPU_run": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,33 @@
+{
+  "UTC": "2026-10-18T20:06:18.647700+00:00",
+  "schema": "ROOT284.genuine-root-alternate-paired-dynamic-B-full.v1",
+  "actual_LIVE_B_domain": [
+    1,
+    8
+  ],
+  "normal_C": 96,
+  "future_C": 96,
+  "global_C": 192,
+  "target_primary_plus_side_groups": 24,
+  "physical_M": 120,
+  "physical_S": 24,
+  "KV_extent": 2560,
+  "active_admission_cap": 48,
+  "branch_pool": "primary4 plus genuine root alternate4; retained prefix B1..8; B6..8 add three actual draft NN steps",
+  "draft_work_accounting": "selected candidates and raw NN queries are distinct; extra padded queries, calls and unselected raw decisions retained",
+  "gain": "original primary gain and actual same-prefix counterfactual shadow plus censored alternate survival; reset each original generation",
+  "target_copy": "exact original263 raw-byte kernel with validated prefix grid and grid in actual280 replay-first capture key",
+  "single_duplicate_HOST_contract_check_removed": true,
+  "one_complete_anti_alias_bounds_contract_still_before_index_H2D": true,
+  "fresh_current_target408_and72_own_prefixes_required": true,
+  "fresh_current_draft45_and_postbranch20_required": true,
+  "original_warm_twozero_seal_full463_and_independent_ownAR_required": true,
+  "original463_arrivals_SLO_BF16_sampler_unchanged": true,
+  "prior_numeric_scope_inherited": false,
+  "full_Goodput_measured": false,
+  "adopted": false,
+  "diagnostic_only": true,
+  "algorithm_parent282_unchanged": true,
+  "inprocess_stack_signal_registered": true,
+  "bounded_online_state_snapshots": true
+}

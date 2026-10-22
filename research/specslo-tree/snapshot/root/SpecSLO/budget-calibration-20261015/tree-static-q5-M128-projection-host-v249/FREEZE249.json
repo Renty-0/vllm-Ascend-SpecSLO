@@ -1,0 +1,23 @@
+{
+  "UTC": "2026-10-18T10:12:02.411028+00:00",
+  "scope": "HOST physicalM128 tree visibility and metadata only; no neural qualification inherited",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-projection-host-v249/projection249.py": "f75cde96b72e9a31704653a1ec8e7b319b135c62cd939a944b781088d7a7001a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-projection-host-v249/padding249.py": "c122081df2a2766a3cf800b7f0a5fa1b68b5bcbc453e80831fd0700d202183fd",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-projection-host-v249/branch_tail249.py": "ab15275d81d129eb9ed609bdc135ac487978a8b61f47ea7a9c0f476a98edcab5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-projection-host-v249/mapper249.py": "f24041e2e46246c4f442bcf7deda13226540668456b0663b89801097b7c3a0c5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-projection-host-v249/check_projection249_HOST.py": "fd22bf5d12d789256e4eef85d031895aa4cec4686ff6bb6e840ae2b1029a656b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-projection-host-v249/HOST_PROJECTION249_RESULT.json": "591a75f11426a4e7733e7f0a2bd46c7b863de5bcacdbf567a96313ec16cc5d70",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/projection247.py": "a61db62e22d16432a9e0956508293f81abf8038bc2f3197fa86f38015940b88d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/FREEZE247.json": "5f9ba8b4a0ce3c9e35119c6952399f33732cf38360ad49d2e3618a53558fd4c4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-contiguous-full463-own-AR-v235/branch_tail231.py": "f10608c0906ceaed4419dc7d3f9b276c5af23911da3013bb77636f37d12bb988",
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-contiguous-full463-own-AR-v235/padding231.py": "9fe28553213f3bbe77ddae95b507c9a99aec87b62b70cd835124c752bcb76fe3"
+  },
+  "HOST_actual_tree_cases": 220,
+  "physical_rows": 128,
+  "q5_groups": 25,
+  "nonreal_tail_queries": 3,
+  "max_real_requests": 24,
+  "max_retained_candidates": 96,
+  "max_primary_side_groups": 25
+}

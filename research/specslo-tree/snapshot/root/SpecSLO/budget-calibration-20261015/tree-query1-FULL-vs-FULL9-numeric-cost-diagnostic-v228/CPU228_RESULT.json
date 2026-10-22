@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "frames": 427,
+  "exact_per_query_FULL_causal_and_branch_masks_verified": true,
+  "actual_runtime_uses_exact_KV_lengths": true,
+  "bucket_helper_not_used": true,
+  "Torch_CPU": true,
+  "isolated_FIA_device_predicate_stub": true,
+  "NPU_used": false,
+  "neural_qualified": false,
+  "performance_qualified": false
+}

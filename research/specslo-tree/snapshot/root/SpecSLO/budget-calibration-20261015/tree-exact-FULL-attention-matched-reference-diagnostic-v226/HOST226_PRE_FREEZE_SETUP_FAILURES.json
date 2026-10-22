@@ -1,0 +1,8 @@
+{
+  "failures": [
+    "First CPU invocation inherited automatic torch_npu backend loading; rerun with TORCH_DEVICE_BACKEND_AUTOLOAD=0.",
+    "Copy constructor changed fixture numeric literals by broad version replacement; strict original-fixture comparison rejected it. Restored byte-identical original fixture before any freeze or NPU launch."
+  ],
+  "original_inputs_replaced_with_exact_source": true,
+  "NPU_started": false
+}

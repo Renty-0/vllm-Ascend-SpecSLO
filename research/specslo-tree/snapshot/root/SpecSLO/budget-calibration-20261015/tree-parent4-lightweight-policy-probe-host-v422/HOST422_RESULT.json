@@ -1,0 +1,41 @@
+{
+  "status": "PASS_HOST422_ORIGINAL_G_NEED_PRIORITY_EXACT_PAID_N24_E4_PROPOSALS",
+  "copy_cost": {
+    "retained_history_rows": 1019,
+    "retained_history_json_bytes": 1822799,
+    "median_CPU_ms": {
+      "deepcopy": 211.13284299999998,
+      "light": 1.6415175
+    },
+    "no_history_mutation": true,
+    "scope": "HOST copy primitive only; no NPU or serving latency"
+  },
+  "source_projection": {
+    "original_proposal_sha256": "5366f4383eb20047cdd7e4bd3307db294b21c175a97bbb0bd2ed95fe331e8524",
+    "projected_proposal_sha256": "2a0c5207717ae8e70b7baa91b7a84b8255ad2b63064f8efd266ec91b7f04e415",
+    "entire_proposal_source_inverse": true,
+    "only_probe_counter_is_copied": true,
+    "original_gain_and_budget_allocation_unchanged": true,
+    "NPU_used": false,
+    "serving_installed": false,
+    "Raw": null,
+    "Goodput": null
+  },
+  "HOST_cases": 800,
+  "supported_proposals": 439,
+  "unchanged_original_fallbacks": 361,
+  "same_original_g_and_online_observations": true,
+  "one_normal_age_finish_per_call": true,
+  "readonly_probe_does_not_change_real_policy": true,
+  "private_E4_class_only": true,
+  "public_production_cap3_class_unchanged": true,
+  "global_active_limit_required": 64,
+  "normal_candidates": 96,
+  "future_candidates": 16,
+  "total_candidates": 112,
+  "NPU_used": false,
+  "serving_installed": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

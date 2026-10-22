@@ -1,0 +1,20 @@
+{
+  "UTC": "2026-10-21T10:53:21.228824+00:00",
+  "scope": "Conditional future full model experiment for frozen432 nonempty wholeprompt refill",
+  "current433_unchanged": true,
+  "launch_only_after_current433_terminal_and_result_review": true,
+  "fresh_original227_681_75_plus_extra427_NN6_required": true,
+  "original218_shadow_close_after_all_components": true,
+  "warm_twozero_seal_full463_all3ownAR_required": true,
+  "global_active_limit": 64,
+  "normal_target_limit": 24,
+  "low_water": 32,
+  "min_refill": 8,
+  "max_nonempty_refill": 32,
+  "original_all_incumbent_prefill_time_charge_retained": true,
+  "NN_launched": false,
+  "NN_permission_inherited": false,
+  "Raw": null,
+  "Goodput": null,
+  "github_commit_after_effective_improvement_only": true
+}

@@ -1,0 +1,16 @@
+{
+  "UTC": "2026-10-21T09:12:04.263353+00:00",
+  "scope": "HOST-only actual426 admission with direct old-request accounting and publication witnesses",
+  "actual_CPU_cases": 360,
+  "controlled_accounting_negatives": 5,
+  "controlled_trace_negatives": 4,
+  "actual_CPU_positive_nonempty": 139,
+  "NN_required_next": "Fresh actual original427 32-incumbent KV and ledger isolation plus current75 original lifecycle and all original math/warm/twozero/seal/full463/all3ownAR; new nonempty scope and strict raw-witness audit",
+  "current_NPU430_unchanged": true,
+  "NN_launched": false,
+  "serving_installed": false,
+  "new_clock_calls": 0,
+  "new_collective_calls": 0,
+  "Raw": null,
+  "Goodput": null
+}

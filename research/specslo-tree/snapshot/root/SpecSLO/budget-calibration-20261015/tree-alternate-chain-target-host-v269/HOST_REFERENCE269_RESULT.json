@@ -1,0 +1,13 @@
+{
+  "status": "HOST_all1252_independent_reference_histories_match_original_tree_ancestors",
+  "cases": 1252,
+  "labeled_nodes": 83632,
+  "frames": 5960,
+  "independent_histories": 21468,
+  "every_real_candidate_node_covered_exactly_once": true,
+  "duplicate_shared_prefixes_computed_independently": true,
+  "no_candidate_KV_or_hidden_inputs": true,
+  "NPU_used": false,
+  "neural_qualified": false,
+  "Goodput": null
+}

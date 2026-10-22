@@ -1,0 +1,49 @@
+{
+  "schema": "ROOT230.terminal-M80-FULL9-bounded-result.v1",
+  "UTC": "2026-10-18T03:46:23.349281+00:00",
+  "status": "complete_bounded_goal_unmet",
+  "guard_session": 68797,
+  "guard_session_closed": true,
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M80-FULL9-root-v230-four-contexts-layer0-existing-cost-v1.json",
+  "receipt_sha256": "7b0b870551fedb7f51c556748c3258897bb87df48bbafceb8e635becc67cb85c",
+  "independent_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V230_INDEPENDENT_NUMERIC_AND_ISOLATION_AUDIT.json",
+  "independent_audit_sha256": "d657485e2e3847d0d609550e832d55613c3d3b2318403d4e87124060e7821d27",
+  "four_controlled_contexts_hidden_and_query_KV_equal": true,
+  "two_controlled_histories_complete_common_prefix_KV_equal": true,
+  "all_three_targets_agree": true,
+  "original_sampler_unchanged": true,
+  "FP32_tie_observer_installed": false,
+  "existing_FULL9_M80_graph_absolute_cost": [
+    {
+      "rank": 1,
+      "medians": {
+        "host_wall_ms_per_call": 36.565772141329944,
+        "device_ms_per_call": 36.529108683268234
+      }
+    },
+    {
+      "rank": 2,
+      "medians": {
+        "host_wall_ms_per_call": 36.56394876694928,
+        "device_ms_per_call": 36.53112920125325
+      }
+    },
+    {
+      "rank": 3,
+      "medians": {
+        "host_wall_ms_per_call": 36.56807716470212,
+        "device_ms_per_call": 36.535649617513016
+      }
+    }
+  ],
+  "selected_fresh_prefix_M_effect_observed": true,
+  "specific_operator_root_cause_not_proven": true,
+  "layer0_observations": "First differing captured module: qkv_proj in old85 case, gate_up_proj in new148 case. Module input/intervening fused operations not all observed; no exact root-cause attribution.",
+  "next": "Implement ROOT231 constant M80 FULL9 mapping, original startup/component retained, additional same-M independent branch-path neural reference and current-engine scope, then full463+ownAR.",
+  "independent_whole463_AR_qualified": false,
+  "formal_Goodput": false,
+  "adopted": false,
+  "all_four_idle": true,
+  "owned_remaining": [],
+  "goal_unmet": true
+}

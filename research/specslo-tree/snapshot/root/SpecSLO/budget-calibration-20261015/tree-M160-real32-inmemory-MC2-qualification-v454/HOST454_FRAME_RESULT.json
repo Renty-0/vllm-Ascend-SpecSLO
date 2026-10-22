@@ -1,0 +1,21 @@
+{
+  "status": "PASS_HOST454_TRUE32_SLOT_BINDING_WITH_ORIGINAL_FIXTURE",
+  "real_owners": 32,
+  "real_queries": 160,
+  "all_query_slots_unique": true,
+  "additional_owners": [
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "original_triplet_prefixes_used": true,
+  "NPU_used": false,
+  "real_model_capture_executed": false,
+  "Raw": null,
+  "Goodput": null
+}

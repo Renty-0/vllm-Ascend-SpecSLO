@@ -1,0 +1,123 @@
+{
+  "NPU_used": false,
+  "model_KV_qualification": false,
+  "new_HOST": "actual generated prefix_ready/guard/source and NativePrefixCache; original IndexError negative",
+  "old_HOST_tests_retained_not_rerun": 7,
+  "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167",
+  "parent_freeze_sha256": "d4e2f1754e73ee0f4100e9003849879f438b6a69dd1a9b667514bb679f6ca35c",
+  "projected_sources": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/actor173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/actor167.py",
+      "parent_sha256": "28f6ca108936629b6f37a63da93e8bacd4f5ba21b93fec71c3d38944e9b21a07",
+      "sha256": "2dbe8dad281f103bbfefe1f84a59ea547d13be4d2693a8217dafcc8794cb2f01"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/adapters173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/adapters167.py",
+      "parent_sha256": "ce66e642a683932de0887e5020092263c73c76ab2947ff66a6a8f154044aceba",
+      "sha256": "20296826254e0335c17f8382c6cab4c8ba75f834897807d30a3dca4edde98156"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/audit173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/audit167.py",
+      "parent_sha256": "d6f3a6747ed40c87dbf225e916ba941add593fe4f4ea2a0f00017144bd33c5d8",
+      "sha256": "2269191721a63ff9939f49174694ad9526ab0002ab983a40d3c687e5445930b1"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/audit80173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/audit80167.py",
+      "parent_sha256": "034d7128543bc843887bcdb5d8dbd493a0e6c66f88ef92deb4fc71da86ad1abd",
+      "sha256": "e782f49624100d019c4a6ffaa0a635c19674526564d7e9b3afbc5b35b45f10f4"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/bank173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "one bank i%32 to i%16 adaptation",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/bank167.py",
+      "parent_sha256": "d24b8a327a09aacc443d6c40f81295533ddacb4b8c696c61717f4dec08025c64",
+      "sha256": "4ff21b5ed44f9437ade249d149b9a56fbbbe5475a65b60df8c39863769f3e3df"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/base173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/base167.py",
+      "parent_sha256": "97ba2cfa50c949306ab9bac253c41d2cb5d4f2a099cd8bbbd28d1c80ffe83b7c",
+      "sha256": "f0615be5215479f0c9358e664a9fee6c62e71201ab5fd6cd5ac3d2d2d77b7188"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/component173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/component167.py",
+      "parent_sha256": "03edfe66a21aebda4624936c799297a341d754af2ca3b1f2ec39364d00cee6bd",
+      "sha256": "d8c8c704185cd4ce83dd858a6fe8245a410c7874ed5391170a14bcd5f018bade"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/draft173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/draft167.py",
+      "parent_sha256": "ff34231dc7fa38c50399720b67a84573df970af9c3168b1fd8ecb5d5c8e7b99b",
+      "sha256": "5745daa78a27f7741c9185d899d7d04e7af651dacfc277dadbcf6522799c992a"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/extension173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/extension167.py",
+      "parent_sha256": "46d160ba2b51a88a7ec95069f1345824445b34cb0c2d59fda2ae3add2658609b",
+      "sha256": "7e939c093e4007bec9dd740f6269d2f23398d2167357c13aa16c96c584ca352a"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/mapper173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/mapper167.py",
+      "parent_sha256": "ab8c3b7cc66b6997e618e0e5408e33b96bf15165e293925189f4f769b9596eaf",
+      "sha256": "03f85371acedc1c7c78d552851366a76393a980b0971f6b0d1bc7953cd40f071"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/progress173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/progress167.py",
+      "parent_sha256": "dab1032ecf362cb05df5a3e96ff92118d6172fb2b2b84ead7c96d5766dba1707",
+      "sha256": "70f69aa9850a5a8cb3dc9c48a1ba8bef9b1a51e99bccb54e1bce9dcd96ae1348"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/runtime173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/runtime167.py",
+      "parent_sha256": "36048feff5454a9c365c3252f8a0e59640ea90df98ac4b9133374561473b6c12",
+      "sha256": "a6b632865288bfd329724d10d1c79beb56f711fa40adff37477e1a76aeca31ad"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/scope173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/scope167.py",
+      "parent_sha256": "f881dd846e6b81809f0e305ed372e69c58fa63078157dd03f8219f3eb2297c4c",
+      "sha256": "00844c6b97aa64f93529e638bb152f5b309bbf896048d255608bc54635d5240b"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/source173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/source167.py",
+      "parent_sha256": "536ac7adfd498e74ab4bca035f705ffcc4e416a5c98a55b28a7f8bd20f378ea1",
+      "sha256": "35d618726a42b6f3fdbe708e20ce5ac4ce83e9e04ddbc16023bea62a63448f42"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/target173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/target167.py",
+      "parent_sha256": "565c73dcc6ff1ef661ccc8f5024e0b2a4dd6bde4fd1892066ab54fb79d218b3c",
+      "sha256": "a7b0a24e25e28caef1f71b62a571cfff025210aaa3340bfa91cdbcd845a36657"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173/trace173.py": {
+      "inverse_exact": true,
+      "mathematical_delta": "private epoch namespace only",
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-active32-full-v167/trace167.py",
+      "parent_sha256": "72e8b023334e0f26c4441d025fbea11672ff8db04401bdf8afed1807f12dd01b",
+      "sha256": "a08c7a003238cf7a3bf7a9d1513f7b804c1a824e78afaac270ed70c4e114c8c4"
+    }
+  },
+  "schema": "V173.frozen-parent-private-projection.v1"
+}

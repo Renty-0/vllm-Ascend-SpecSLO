@@ -1,0 +1,12 @@
+{
+  "status": "PASS_HOST434_FROZEN432_CALLBACKS_AND_ORIGINAL_OWNED_SUPERVISOR",
+  "exact_frozen432_component_scope_trace_and_audit_routing": true,
+  "original_models_arrivals_SLO_g_policy_targetM120_S24_and_Native_gates_retained": true,
+  "fresh_extra427_NN6_and_original75_required": true,
+  "original_elapsed_charges_and_full463_all3ownAR_required": true,
+  "original_private_caps_and_owned_cleanup_retained": true,
+  "Native_models_constructed": 0,
+  "NPU_used": false,
+  "NN_launched": false,
+  "NN_permission_inherited": false
+}

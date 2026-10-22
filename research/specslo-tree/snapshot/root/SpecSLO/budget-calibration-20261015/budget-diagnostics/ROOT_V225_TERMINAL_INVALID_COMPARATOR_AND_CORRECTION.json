@@ -1,0 +1,35 @@
+{
+  "schema": "ROOT225.invalid-comparator-terminal-correction.v1",
+  "UTC": "2026-10-18T03:10:47.348238+00:00",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-canonical-FULL-root-v225-four-contexts-body-cost-v1.json",
+  "receipt_sha256": "6f3eb66e3b3e88be391f3634aeac48be1717e0aa9411f05bada2b820d4cd7b6b",
+  "status": "failed_invalid_comparison_setup",
+  "root_cause": "diagnostic eager-only bucket helper compared against actual exact-length FULL graph",
+  "runtime_source_exact_length": true,
+  "bucket_helper_not_called_by_actual_FULL_path": true,
+  "failed_evidence_preserved": true,
+  "current_FULL_cpu_updates_not_skipped_by_bucket": true,
+  "performance_qualification": false,
+  "adopted": false,
+  "pre_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "owned_remaining": [],
+  "all_four_idle": true,
+  "correction": "Retire the earlier claim that current FULL buckets adjacent contexts or thereby skips attention task updates."
+}

@@ -1,0 +1,14 @@
+{
+  "status": "PASS_HOST421_ACTUAL_RUNTIME_CPU_PARENT_BINDING",
+  "results": [
+    {
+      "script": "check421_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-ready-source-binding-host-v421/HOST421-check421_HOST.py.log"
+    }
+  ],
+  "NPU_used": false,
+  "model_constructors": 0,
+  "existing_runtime_and_only_existing_freeze_environment_fields": true,
+  "scope": "actual CPU tree/controller check only; Native models and NPU initialization blocked"
+}

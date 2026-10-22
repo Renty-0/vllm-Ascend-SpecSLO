@@ -1,0 +1,396 @@
+{
+  "CPU": {
+    "log": {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/1792256566555567576/unittest.log",
+      "sha256": "a7ab94fc26c40b6cfb110d8cc3923e79271b3ddd9d84cd22ec2a43ccc2cbe5ce"
+    },
+    "outer_elapsed_seconds": 16.987202404998243,
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/CPU_RESULT205.json",
+    "sha256": "a560a56c807c3600e231e230b80869768731c92772e47f707f4b7fb2520b3c78",
+    "tests_run": 7
+  },
+  "HOST_provenance": {
+    "HOST_model_math_claimed": false,
+    "current_same_run_tests": 7,
+    "launcher_paths": {
+      "argv": [
+        "/usr/bin/env",
+        "-i",
+        "HOME=/root",
+        "USER=root",
+        "LOGNAME=root",
+        "SHELL=/bin/bash",
+        "LANG=C.UTF-8",
+        "PATH=/root/miniconda3/envs/vllm-hust-dev/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin",
+        "/bin/bash",
+        "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/launch205.sh",
+        "--action",
+        "causal80-N9-to15-allB4-empty-active32-full463",
+        "--tag",
+        "HOST205"
+      ],
+      "launch_startup_runtime_map_paths_exist": true,
+      "no_subprocess_launched": true,
+      "original_launch_argv_AST_executed": true
+    },
+    "original_common_stage_preserved_by_exact_actor_source_inverse": true,
+    "original_stage4_executed_by_seventh_HOST": false,
+    "outer_elapsed_seconds": 16.987202404998243,
+    "peer_reran_tests": false,
+    "single_writer": {
+      "NPU_stage_fence_not_executed_or_claimed": true,
+      "actual_old_and_new_actor_mkdir_lambdas_AST_executed": true,
+      "cases": [
+        {
+          "actual_processes": 4,
+          "packets": [
+            {
+              "common_reject": true,
+              "folder_exists": true,
+              "local_error": "FileExistsError: [Errno 17] File exists: '/tmp/V205-HOST-shared-FS-8n5ob7bt/same-output'",
+              "rank": 0
+            },
+            {
+              "common_reject": true,
+              "folder_exists": true,
+              "local_error": "FileExistsError: [Errno 17] File exists: '/tmp/V205-HOST-shared-FS-8n5ob7bt/same-output'",
+              "rank": 1
+            },
+            {
+              "common_reject": true,
+              "folder_exists": true,
+              "local_error": "FileExistsError: [Errno 17] File exists: '/tmp/V205-HOST-shared-FS-8n5ob7bt/same-output'",
+              "rank": 2
+            },
+            {
+              "common_reject": true,
+              "folder_exists": true,
+              "local_error": null,
+              "rank": 3
+            }
+          ],
+          "scenario": "old-four-writers"
+        },
+        {
+          "actual_processes": 4,
+          "packets": [
+            {
+              "common_reject": false,
+              "folder_exists": true,
+              "local_error": null,
+              "rank": 0
+            },
+            {
+              "common_reject": false,
+              "folder_exists": true,
+              "local_error": null,
+              "rank": 1
+            },
+            {
+              "common_reject": false,
+              "folder_exists": true,
+              "local_error": null,
+              "rank": 2
+            },
+            {
+              "common_reject": false,
+              "folder_exists": true,
+              "local_error": null,
+              "rank": 3
+            }
+          ],
+          "scenario": "new-single-writer"
+        },
+        {
+          "actual_processes": 4,
+          "packets": [
+            {
+              "common_reject": true,
+              "folder_exists": true,
+              "local_error": "FileExistsError: [Errno 17] File exists: '/tmp/V205-HOST-shared-FS-zad3tn8d/same-output'",
+              "rank": 0
+            },
+            {
+              "common_reject": true,
+              "folder_exists": true,
+              "local_error": null,
+              "rank": 1
+            },
+            {
+              "common_reject": true,
+              "folder_exists": true,
+              "local_error": null,
+              "rank": 2
+            },
+            {
+              "common_reject": true,
+              "folder_exists": true,
+              "local_error": null,
+              "rank": 3
+            }
+          ],
+          "scenario": "new-existing-dir"
+        }
+      ],
+      "model_math_claimed": false,
+      "new_all4_pass": true,
+      "old_three_FileExistsErrors": true,
+      "original_stage_call_and_all4_boundary_unchanged": true,
+      "preexisting_leader_FileExistsError_and_all4_common_reject": true,
+      "processes_closed": true,
+      "real_four_process_shared_temporary_FS": true
+    },
+    "source_before_after_equal": true,
+    "tests_log": {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/1792256566555567576/unittest.log",
+      "sha256": "a7ab94fc26c40b6cfb110d8cc3923e79271b3ddd9d84cd22ec2a43ccc2cbe5ce"
+    }
+  },
+  "NPU_used": false,
+  "Torch_imported": false,
+  "UTC": "2026-10-17T17:11:24.882515+00:00",
+  "adopted": false,
+  "blocking_findings_remaining": [],
+  "candidate": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205",
+  "candidate_imported": false,
+  "cold_guard": {
+    "elapsed_seconds": 12.625265516806394,
+    "parent_archives_verified_in_place": true,
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V205_COLD_ACTUAL_GUARD_SOURCE_STATE_HOST_RESULT.json",
+    "sha256": "bb25f482dbe2d5577a38687805c9e2eea7483ff6b87aef03d46c57f619e5322f"
+  },
+  "counts": {
+    "AST": 24,
+    "HOST_attempts": 3,
+    "READY_all_pins": 968,
+    "auxiliary": 3,
+    "bash_n": 2,
+    "guard": 4,
+    "guard_flat_before_peer": 965,
+    "local": 26,
+    "readonly": 760,
+    "retained_HOST_evidence": 174,
+    "retained_HOST_files": 170,
+    "whole_guard_projections": 4,
+    "whole_private_projections": 23
+  },
+  "current203_actual_or_receipt_read": false,
+  "date_hash_proof": {
+    "actual_original_launch_argv": [
+      "/usr/bin/env",
+      "-i",
+      "HOME=/root",
+      "USER=root",
+      "LOGNAME=root",
+      "SHELL=/bin/bash",
+      "LANG=C.UTF-8",
+      "PATH=/root/miniconda3/envs/vllm-hust-dev/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin",
+      "/bin/bash",
+      "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/launch205.sh",
+      "--action",
+      "causal80-N9-to15-allB4-empty-active32-full463",
+      "--tag",
+      "HOST205"
+    ],
+    "author_source_audit": {
+      "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V205_NAMESPACE_DATE_HASH_AND_ACTOR_INVERSE_SOURCE_AUDIT.json",
+      "sha256": "6a4902b85c57a2fa7e88a430985de37e12d39baa31539ea1d7b0ce28b0f67712"
+    },
+    "four_paths": [
+      {
+        "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/launch205.sh",
+        "sha256": "c0efbee9fb87707b827af90a5ac6fa2ac7a9767bddea2e79d23013a01ac8d55c"
+      },
+      {
+        "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/startup205.sh",
+        "sha256": "be62cd7351a69f96920f13588944d0aaa1f09930784664f280e93405789e188d"
+      },
+      {
+        "path": "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh",
+        "sha256": "107a11a58764eabe4f8b6e5d752d9234cf67f9e898d81a8619e47e684e83af7c"
+      },
+      {
+        "path": "/root/SpecSLO/budget-calibration-20261015/serial-v1/map-current.py",
+        "sha256": "300e4e9894af7f7275a718bc9f549d1c62c880a5e7b1665f7d1268c6f2097975"
+      }
+    ],
+    "independent_current_SHA_verified": true,
+    "independent_production_numeric_constants": [
+      "actor205.py",
+      "audit205.py",
+      "audit_usage205.py",
+      "bank205.py",
+      "component205.py",
+      "config205.py",
+      "empty205.py",
+      "extension205.py",
+      "mapper205.py",
+      "next4_205.py",
+      "prefill205.py",
+      "progress205.py",
+      "publication205.py",
+      "runtime205.py",
+      "scope205.py",
+      "source205.py",
+      "subset205.py",
+      "target205.py",
+      "trace205.py"
+    ],
+    "preserved_failed_cold": {
+      "cold_error": {
+        "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_NAMESPACE_DATE_FIX/cold-failure.txt",
+        "sha256": "885bd1dc45497c99acbb0bff04ede6129184de1e91a8f0b21e71e4ce6507c5de"
+      },
+      "manifest": {
+        "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_NAMESPACE_DATE_FIX/PRESERVED_MANIFEST.json",
+        "sha256": "c6a84a8be9a8d53eef13b6105ee603f3308c63405e325946bc3dc6414fa86a0a"
+      },
+      "retained_file_count": 37,
+      "saved_bad_date_source": {
+        "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/full-host-attempts/BEFORE_NAMESPACE_DATE_FIX/D/cold_guard_source_v205_HOST.py",
+        "sha256": "9a2c2f304ece33860930411d985d46703ffa1e0b5d30a9f548dae968536834b9"
+      }
+    },
+    "runtime_source": {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/runtime205.py",
+      "sha256": "f1a92f67df3e4bcaa11c1c83a434312f94f04016524c847aaed7196f6f959ae9"
+    }
+  },
+  "device_queries": false,
+  "formal_Goodput": false,
+  "freeze_binding": {
+    "READY_all_pins": 968,
+    "ROOT_instruction": "Exact guardian reviewed_inputs is965 plus requiredpeer; three auxiliary cold/static/script proofs are separately identified. ROOT may explicitly bind their full descriptors as review evidence rather than substituting968 into the guardian flat map. ROOT still performs actual prepare/prepared before launch.",
+    "auxiliary_evidence": {
+      "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V205_COLD_ACTUAL_GUARD_SOURCE_STATE_HOST_RESULT.json": "bb25f482dbe2d5577a38687805c9e2eea7483ff6b87aef03d46c57f619e5322f",
+      "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V205_NAMESPACE_DATE_HASH_AND_ACTOR_INVERSE_SOURCE_AUDIT.json": "6a4902b85c57a2fa7e88a430985de37e12d39baa31539ea1d7b0ce28b0f67712",
+      "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/cold_guard_source_v205_HOST.py": "7eaebd113aa2e46975b3415015a6ffa1874fe96fc4cfe937d4c03f21589fbfe7"
+    },
+    "guard_reviewed_inputs_before_peer": 965
+  },
+  "freeze_created": false,
+  "guard_directory": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution",
+  "guard_imported": false,
+  "limitations": [
+    "No205 model or numerical work has run. Same Native80key identities do not authorize newrealN usage without current independent math/protocol/zero checks. No GP or latency is predicted.",
+    "Real FS/seventhHOST covers actual lambda race and common-outcome carrier only. Original stage4/NPU-fence execution is not claimed; unchanged whole actor source and frozen original stages provide the retained contract, which actual run must still satisfy.",
+    "The original frozen production target layout rejects B4 truefork carriers; generic Native full9 HOST passthrough is not new productionB4fork permission. Existing trueB5 branch domain is retained.",
+    "Finite sameM representative source histories and structural guards are not whole463 canonical AR or allprompt/alltuple equivalence. Hidden/logit/KV values cannot be regenerated by a later HOST auditor from saved markers.",
+    "Inherited cost_measured scope field is an execution-report label; current source-only work has no operator/full cost evidence. Current dictionary counts are verified only by future actual gates, not source expectations.",
+    "No candidate/guard import, current203 actual/receipt access, model/device/old-suite execution or source edit occurred. Only actual original launch_argv pure AST was evaluated; no model launcher shell or model child subprocess was invoked. Two bash -n syntax subprocesses were used."
+  ],
+  "mechanical_evidence": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V205_INDEPENDENT_STATIC_MECHANICAL_EVIDENCE.json",
+    "sha256": "fcfd1c91abdcc5f8c836954f3dc41c049ec969dd5f596378f93d5a27cc63cd0a"
+  },
+  "models_launched": false,
+  "ready": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V205_SINGLE_WRITER_SEVEN_N_FROM_FROZEN202_SOURCE_AND_GUARD_READY_FOR_ROOT_REVIEW.json",
+    "sha256": "737be8d457bab4228acd3d1dfe473f34b8c8fa6632967712d9789a9a7d16d1b0"
+  },
+  "reviewed_findings": [
+    "Both actual actor lambdas are extracted from the source, and new AST wraps exactly old mkdir in the existing draft_leader_rank election. Every rank still invokes the same original common stage at the same position before fixture/inventory/math. Nonleader callback returnsNone; original stage then synchronizes/gathers. A preexisting directory remains a hard error at leader and therefore common failure; no exist_ok=True or source gate bypass was introduced.",
+    "The new seventh HOST uses four real forked stdlib processes and one shared temporary filesystem. Actual old/new lambda execution gives3 localFileExists errors/all4 commonreject for old, zero/all4pass for new, and leader-onlyFileExists/all4reject for preexisting directory. Its common error outcome is an explicit Barrier/shared-array carrier; it does not execute original stage4 body or an NPU fence. Original stage4 source/call/location remain unchanged by whole actor inverse. This differs from204 HOST test06 and is not labelled device/collective qualification.",
+    "Twenty-three private source modules plus four guard files are reconstructed exactly from frozen202 REV3 plus explicit deltas. Production numeric constants and mathematical bodies are unchanged; mapper205 is exact namespace202 REV3, including narrow allB4 causal eligibility and actual installed control.mapper/control.engine/mode candidate guard. Restored original128/S38 and uninstalled-delegate frame identities stay original; persistent permission alone cannot force80 validation.",
+    "Sole production197 current engine components still run before new seven-N usage: original201/44/114 startup, full527 variableB4/M80 original protocol and sameM/KV, multiowner N2/N32 root and legal natural next1/16. Source202 is explicitly a read-only759member donor, never its model results or permission. New actual usage must freshly qualify all N9..15 in this engine before current issuer; no oldbool or source ready grants math.",
+    "Real firstN actual plans remain allB4 linear/Q5N. Candidate80/S16 uses16-N genuine independently leased dummy5 chains, actual realcountN, full16 fresh draft then selected-only publication. Independent reference keeps owner16+i and disjoint source histories/pages/scratch. Allphysical80 hidden/head and128targetqueryKV includingdummy,56draftKV/ledger/source/finite protections, original BONUS integer verifier/consensus/compaction/commit/finish and own full16 next remain strict.",
+    "Each of seven Ns retains three fresh traces/four cycles+ownnext, two entire21zero replay sweeps1176 scalars, no new Native keys/profile/flags, exact current G80/H80 entry identity/realrow/disabled state, and actual same-key changedlength/TTU witness checks. Old128 originalgreedy plus own sameM128 control and complete realQ cross-M raw classification are preserved; scope uses combined parent+newusage equality, not parent-only labels.",
+    "The original full active32/config64/storage527/budgets96/96/global192/B/g/trueB5/arrival463/output256/empty-active/coalesce1-0/Native charged and workerpublication clocks are exactly unchanged. Full path still requires actual newusage issuer, bounded prewarm then warm65/twozero/seal/full463. New202source reuse does not claim wholeAR, numerical equivalence across M or performance benefit.",
+    "The date corruption was confined to initial private shell/cold-source projection and was caught before a model launch. The saved first cold script inserts the nonexistent20561015 root and fails importbase205, consistent with retained ModuleNotFoundError. Current two shells retain only20261015 date roots; actual launcher argv AST reconstruction and launch/startup/runtime.sh/map-current.py paths match retained currentHOST packet and exist. INPUTS source SHA maps were generated by actual hashing/JSON merging, not string substitution; all760readonly hashes were independently verified.",
+    "Current7 tests are same-run/source-before-after equal, not stitched from earlier6. All3 actualHOST attempts and170 retained logs/source snapshots remain, including first bad-date source/CPU/guard/cold-failure snapshots. Cold archiveTrue binds exact source donor202 current759 selected bytes/tar plus original197/173/P148/P160 source archives in place, no oldtar binary selected/copied.",
+    "Source namespace/guard paths and current7checker agree. ROOT source review+peer+fresh freeze/archive remain mandatory before launcher. Guard retains selfROOTlock/cards2,5,6,7/original10496/15/212 prepost/owned group cleanup/7200s/256MiBtag512MiBaggregate and frozen177 scoped mutable.tmp race handling. No changes weaken on-device common-stage/math/Native qualification failures."
+  ],
+  "schema": "V205.independent-single-writer-seven-real-N-source-peer.v1",
+  "scope": "Independent source-only peer of immutable202 REV3 derivation plus only the real actor output-directory singlewriter fix; sole production parent stays197. No current203 actual/receipt read, candidate/guard import, old/current test-suite rerun, backend/model/device access, source edit, freeze or launch.",
+  "single_execution_delta": {
+    "exist_ok_false_preserved": true,
+    "line": 39,
+    "new": "lambda:folder.mkdir(exist_ok=False)if e.rank==e.topology.draft_leader_rank else None",
+    "old": "lambda:folder.mkdir(exist_ok=False)",
+    "old_output_reuse_allowed": false,
+    "original_common_stage_call_and_location_unchanged": true,
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/actor205.py",
+    "whole_actor_reverse_to202_namespace_exact": true
+  },
+  "source202_independent_peer": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V202_INDEPENDENT_SOURCE_PEER_REVIEW.json",
+    "sha256": "c53766092cb2a67d47dae24479fc2311765b06b8e79d7e3329e28bed82229b8c"
+  },
+  "source_anchors": {
+    "actor205.py": {
+      "inventory": 19,
+      "run": 31,
+      "same_inventory": 23,
+      "subset": 9
+    },
+    "base205.py": {
+      "checked": 21,
+      "functions": 23,
+      "inherited_module": 36,
+      "parent_archive": 41,
+      "parent_module": 67,
+      "parent_ready": 31,
+      "read": 20,
+      "require": 13,
+      "require_production_parent": 74,
+      "require_source_parent": 88,
+      "sha": 15
+    },
+    "check205.py": {
+      "external_files": 7,
+      "local_files": 5,
+      "require_parent": 11,
+      "require_ready": 38
+    },
+    "component205.py": {
+      "run": 3
+    },
+    "mapper205.py": {
+      "active": 20,
+      "check_frame": 52,
+      "controls_class": 33,
+      "current": 8,
+      "dispatch": 25,
+      "expected_geometry": 92,
+      "install_pad": 69,
+      "issue": 84,
+      "qualification_geometry": 43
+    },
+    "scope205.py": {
+      "StandaloneScope": 6,
+      "issue": 22,
+      "report": 27
+    },
+    "target205.py": {
+      "commit_reference": 72,
+      "frame": 11,
+      "old_control": 93,
+      "original_call": 35,
+      "reference": 63
+    },
+    "test_full205.py": {
+      "Tests": 25,
+      "Vector": 10,
+      "native_predicate": 21,
+      "plan": 17
+    }
+  },
+  "source_donor202": {
+    "actual_or_receipt_read": false,
+    "archive": {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/PREPARED_SOURCE_ARCHIVE202.tar.gz",
+      "sha256": "94c06118f650d9445203cc75ea2fa8147df172cb67bf72fb26df475a1c28aef5"
+    },
+    "exact_current_pins": 759,
+    "exact_regular_members": 759,
+    "freeze": {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-active32-full-v202/FROZEN_SOURCE202.json",
+      "sha256": "1b4912eb5abc53ca6ca9ffbabb8993fd11d780827dd2bf31baff4e4aa9e3ee82"
+    },
+    "source_only_not_numerical_qualification": true
+  },
+  "source_edited": false,
+  "status": "passed_source_review",
+  "suites_rerun": false,
+  "whole_AR_qualified": false
+}

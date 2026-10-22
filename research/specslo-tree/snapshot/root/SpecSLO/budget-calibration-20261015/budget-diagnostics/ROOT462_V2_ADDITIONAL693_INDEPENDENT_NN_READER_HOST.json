@@ -1,0 +1,241 @@
+{
+  "UTC": "2026-10-22T17:44:46.368051+00:00",
+  "status": "PASS_HOST462_V2_ALL693_ACTUAL_SAME_PROCESS_OWN_PHYSICAL_NN_RECORDS",
+  "tag": "adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2",
+  "original_source_freeze": "9f79697914d74f79cc94fe4605c8f20665c44ee2f6b33fe99b59b73d7b4e2280",
+  "own_frozen_files": 10,
+  "cases_each_target": 693,
+  "independent_prefills_each_target": 216,
+  "all3_predictions_agree": true,
+  "all_hidden_and_all128_KV_bitwise_equal": true,
+  "all_graph_eager_KV_equal": true,
+  "all_parameter_SHA_unchanged": true,
+  "Native_flags_assigned": false,
+  "summaries": [
+    {
+      "rank": 1,
+      "bank": "mixed",
+      "cases": 231,
+      "actual_dispatch": {
+        "positive_node_cases": 231,
+        "actual_graph_dispatches": 235,
+        "actual_cold_families": [
+          [
+            80,
+            10
+          ],
+          [
+            80,
+            11
+          ]
+        ],
+        "original_changed_input_restore_extra_dispatches": 4,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false,
+        "all_four_physical_families_reconstructed": true,
+        "independent_reference_FULL120": true
+      },
+      "independent_prefills": 72,
+      "all72_prefixes_unchanged": true
+    },
+    {
+      "rank": 1,
+      "bank": "mid",
+      "cases": 231,
+      "actual_dispatch": {
+        "positive_node_cases": 231,
+        "actual_graph_dispatches": 231,
+        "actual_cold_families": [],
+        "original_changed_input_restore_extra_dispatches": 0,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false,
+        "all_four_physical_families_reconstructed": true,
+        "independent_reference_FULL120": true
+      },
+      "independent_prefills": 72,
+      "all72_prefixes_unchanged": true
+    },
+    {
+      "rank": 1,
+      "bank": "short",
+      "cases": 231,
+      "actual_dispatch": {
+        "positive_node_cases": 231,
+        "actual_graph_dispatches": 231,
+        "actual_cold_families": [],
+        "original_changed_input_restore_extra_dispatches": 0,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false,
+        "all_four_physical_families_reconstructed": true,
+        "independent_reference_FULL120": true
+      },
+      "independent_prefills": 72,
+      "all72_prefixes_unchanged": true
+    },
+    {
+      "rank": 2,
+      "bank": "mixed",
+      "cases": 231,
+      "actual_dispatch": {
+        "positive_node_cases": 231,
+        "actual_graph_dispatches": 235,
+        "actual_cold_families": [
+          [
+            80,
+            10
+          ],
+          [
+            80,
+            11
+          ]
+        ],
+        "original_changed_input_restore_extra_dispatches": 4,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false,
+        "all_four_physical_families_reconstructed": true,
+        "independent_reference_FULL120": true
+      },
+      "independent_prefills": 72,
+      "all72_prefixes_unchanged": true
+    },
+    {
+      "rank": 2,
+      "bank": "mid",
+      "cases": 231,
+      "actual_dispatch": {
+        "positive_node_cases": 231,
+        "actual_graph_dispatches": 231,
+        "actual_cold_families": [],
+        "original_changed_input_restore_extra_dispatches": 0,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false,
+        "all_four_physical_families_reconstructed": true,
+        "independent_reference_FULL120": true
+      },
+      "independent_prefills": 72,
+      "all72_prefixes_unchanged": true
+    },
+    {
+      "rank": 2,
+      "bank": "short",
+      "cases": 231,
+      "actual_dispatch": {
+        "positive_node_cases": 231,
+        "actual_graph_dispatches": 231,
+        "actual_cold_families": [],
+        "original_changed_input_restore_extra_dispatches": 0,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false,
+        "all_four_physical_families_reconstructed": true,
+        "independent_reference_FULL120": true
+      },
+      "independent_prefills": 72,
+      "all72_prefixes_unchanged": true
+    },
+    {
+      "rank": 3,
+      "bank": "mixed",
+      "cases": 231,
+      "actual_dispatch": {
+        "positive_node_cases": 231,
+        "actual_graph_dispatches": 235,
+        "actual_cold_families": [
+          [
+            80,
+            10
+          ],
+          [
+            80,
+            11
+          ]
+        ],
+        "original_changed_input_restore_extra_dispatches": 4,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false,
+        "all_four_physical_families_reconstructed": true,
+        "independent_reference_FULL120": true
+      },
+      "independent_prefills": 72,
+      "all72_prefixes_unchanged": true
+    },
+    {
+      "rank": 3,
+      "bank": "mid",
+      "cases": 231,
+      "actual_dispatch": {
+        "positive_node_cases": 231,
+        "actual_graph_dispatches": 231,
+        "actual_cold_families": [],
+        "original_changed_input_restore_extra_dispatches": 0,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false,
+        "all_four_physical_families_reconstructed": true,
+        "independent_reference_FULL120": true
+      },
+      "independent_prefills": 72,
+      "all72_prefixes_unchanged": true
+    },
+    {
+      "rank": 3,
+      "bank": "short",
+      "cases": 231,
+      "actual_dispatch": {
+        "positive_node_cases": 231,
+        "actual_graph_dispatches": 231,
+        "actual_cold_families": [],
+        "original_changed_input_restore_extra_dispatches": 0,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false,
+        "all_four_physical_families_reconstructed": true,
+        "independent_reference_FULL120": true
+      },
+      "independent_prefills": 72,
+      "all72_prefixes_unchanged": true
+    }
+  ],
+  "actual_evidence_SHA256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/rank0-proof460.json": "ff24921b69132b4b216f6a06292f5b4667957ad96726589c65adc3591650f08a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/mixed/rank0-proof460.json": "a0875cf7b7a1ee68d8d07d4780d94d851d35182cc5eeace15ba2e3b4f5c9e153",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/mid/rank0-proof460.json": "0bd95ebb5dd0106b6213d135c8610edd104f4d0a7aa96c9a01120eee9cd9699d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/short/rank0-proof460.json": "7d1e53d27567cf8d8ae6a655db87f794cb58fd853c1c6d40438345f4de3593f6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/rank1-proof460.json": "a971487a0b7baccf2cd98cc001be45c1488243b776741bb064e17b0db3d3888b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/mixed/rank1-proof460.json": "a306d65746318a2e17a25b71b9fb381de6c2e7e6b8ac621edaac35fb8b30e23f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/mid/rank1-proof460.json": "f43c779bce3d5257fd84a9562d485bf316ed78156cd64e7f5fda9b459d05e7e0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/short/rank1-proof460.json": "7087684a960e1a4c1ebc1b9176cf04b8ea9135868deff5de7256cb349884bd28",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/rank2-proof460.json": "26504307ac27ffc090f76ff1c9326eabe7f7bfac6d9ea5b05a97f8b275c94e9e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/mixed/rank2-proof460.json": "0c0d1d6250721068e89625c489a85f638db0d0840a20ad22612cbd72f2a68f20",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/mid/rank2-proof460.json": "98fe2086ec35be931f55d0a9d40d929ca5bd569b6113cb8bbdbc6fc3c4477191",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/short/rank2-proof460.json": "9cacb0184760f45905644099b5a1e006de33f3fda90acd84d04aff9a2f2d3887",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/rank3-proof460.json": "260159f2e8ad7f7a4ce8d331e950e19b1f38cb58ea423a159c4c1e80273c7e94",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/mixed/rank3-proof460.json": "f801433d326df9b3bd0413b9fb44eaadb6a0392bf45e7492eba6d66604279e59",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/mid/rank3-proof460.json": "36da26bf15e3b9c1da2f09e5b81568b50f19600ad43a5d1585ab46f9dac2645f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2/adaptive-own-physical-node-math460/short/rank3-proof460.json": "9392a1fe04096ec552ad10130f205fa4d882e3345bf6c9e080c352108f0a40a1"
+  },
+  "old75_plus6_still_required": true,
+  "full463": false,
+  "whole_workload_AR_qualified": false,
+  "Raw": null,
+  "Goodput": null,
+  "current_NPU_process_unchanged": true,
+  "HOST_NPU_used": false,
+  "HOST_model_constructors": 0,
+  "production_permission": false
+}

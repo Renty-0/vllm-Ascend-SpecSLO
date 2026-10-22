@@ -1,0 +1,25 @@
+{
+  "UTC": "2026-10-22T15:09:13.738559+00:00",
+  "status": "PASS_HOST461_ACTUAL_RETAINED_RUNTIME_TBE_PATH_AND_STARTUP_INVERSE",
+  "actual_environment_probes": [
+    {
+      "version": 460,
+      "tbe_origin": null
+    },
+    {
+      "version": 461,
+      "tbe_origin": "/root/data/specslo-cann-runtime/cann-9.0.0/python/site-packages/tbe/__init__.py"
+    }
+  ],
+  "old_failure_reproduced": true,
+  "new_installed_tbe_resolves": true,
+  "entire_numerical_parent460_unchanged": true,
+  "original_full_limits_unchanged": true,
+  "package_installs": 0,
+  "package_upgrades": 0,
+  "NPU_used": false,
+  "Native_constructor_calls": 0,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

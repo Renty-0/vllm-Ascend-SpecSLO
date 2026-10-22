@@ -1,0 +1,30 @@
+{
+  "schema": "ROOT454.genuine32-M160-original-native-epilogue-qualifier.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/HOST454_CONSTRUCTION_RESULT.json": "d7e711de5dcd7c346c19271a9587cf80ceccd35cb7702e29583c69ae444122bb",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/HOST454_FRAME_RESULT.json": "53a8bdfe62d006652aacb8c197540119deed0780667d96564d02421b2f903dff",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/HOST454_SETTINGS_RESULT.json": "e465d8cc39f5296b223fa473db0d67760fd8566797aeec3226312a8d8585d2bd",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/PLAN454.json": "755e97af2db6d3bc406bbf005e1c3cb1301afe11aeea89cd032572a030a0e3f2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/RECORDER454_PROVENANCE.json": "3e4eb5cac39b41ecc58bc7828095ac06cce327a652ec4d2d48b65b9076e1004b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/audit454.py": "eb1c9a11a6393c49f872f665ed86c0a05a84c3c444b2932c678ef7ee7451b3bf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/check454.py": "401c6fbcf428dbccc33d09f866fdbf836782b6d3addf28ded548e0663df28b76",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/check454_HOST.py": "75e7eb57cba7dfd9878ef8976f0f3d03384fd5e0a5bd6b6df8f8d9f7d7eb2b35",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/check454_settings_HOST.py": "5c1760a5a19b1f5afc3df95a18e5c3fa3baba4d3d9fd3df9506d2f41bd135186",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/frame454.py": "b7fa404517000026c46d7a6a475272d42b9e628b10f0ef5ed1da6fad9a4b585e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/guard454.py": "d993eb1d7b216af8e8e6d4e364d1714be72b910756440948a585769ff0b94354",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/host_env454.py": "f23db07736c87d39451022d2228d409b528019240e5d4eb68c4ed8ee3a8191c9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/probe454.py": "1e21679e24cb59e1211554b83c0dbe120858b30c55868a9f5e7d0888e2c2eab4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/qualify454.py": "9a9a4b15b24e18be97188f312c147c8c7a542d432ae9bf0e2c0aefd6bb71bd51",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/recorder454.py": "1be55b65670e47f47048cb304572b171e6015dde685806ecb2144d842fea756a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/runtime454.py": "a52c4a29f9799ebd83dee2c08918fc59af942fe66559be4c8a680ca721b2c655",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454/startup454.sh": "64ccfee88d6b9bfb36d0fe5d225cb47a545fcbec7077f708eaccf763c43ee0ec"
+  },
+  "parent385_freeze": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+  "parent385_archive": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
+  "current453_freeze": "40284d76c73ac3a7c67edb73eebdfe1c8feb17279bba6efb7e97340a0008dedd",
+  "current453_archive": "58a28d70c50f56f33710fad4c7200183cec9f725ceba7f6da8723e0c0663ddff",
+  "NPU_run": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

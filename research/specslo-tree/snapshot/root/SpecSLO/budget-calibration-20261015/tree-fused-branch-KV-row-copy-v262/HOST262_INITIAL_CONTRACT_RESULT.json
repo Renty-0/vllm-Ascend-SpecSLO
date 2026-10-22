@@ -1,0 +1,16 @@
+{
+  "UTC": "2026-10-18T14:20:30.784656+00:00",
+  "status": "HOST_contract_initial_valid_and_negative_cases_passed",
+  "valid": {
+    "pairs": 1792,
+    "nonidentity": 128,
+    "identity": 1664,
+    "rows": 69632,
+    "in_place_snapshot_copy_equivalence": true
+  },
+  "negative_cases": 4,
+  "source_compiled_only": true,
+  "actual_NPU_used": false,
+  "unfrozen": true,
+  "production_installed": false
+}

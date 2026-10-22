@@ -1,0 +1,82 @@
+{
+  "status": "HOST_only_source_prepared_not_runtime_installed",
+  "geometry_cases": 890,
+  "rejected_Q79": 0,
+  "negative_cases": [
+    "N17",
+    "Q81",
+    "false_family",
+    "duplicate_priority",
+    "over_budget"
+  ],
+  "physical_keys": [
+    [
+      80,
+      14,
+      "full9"
+    ],
+    [
+      80,
+      15,
+      "full9"
+    ],
+    [
+      80,
+      16,
+      "full9"
+    ],
+    [
+      80,
+      17,
+      "full9"
+    ],
+    [
+      80,
+      18,
+      "full9"
+    ],
+    [
+      80,
+      22,
+      "full9"
+    ]
+  ],
+  "additional_physical_keys": [
+    [
+      80,
+      15,
+      "full9"
+    ],
+    [
+      80,
+      18,
+      "full9"
+    ],
+    [
+      80,
+      22,
+      "full9"
+    ]
+  ],
+  "additional_Native_greedy_and_hidden_keys": 6,
+  "historical_unused_priority_repair_checked": true,
+  "root_only_Q79_padding_geometry_checked": true,
+  "original_input_budgets_not_mutated": true,
+  "files_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/check_mapper231_HOST.py": "ac18cf2273fd79d0305ab8ecf7c843f57235c8d169be7e28697f92188a94f39f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/mapper231.py": "9895a9867fada5c812880175768f4ebfb5ce02fc1713f11c44f6e9d570e6e7e2"
+  },
+  "pending": [
+    "Bind query limit80 before the existing original budget allocator; preserve actual priority order and grant accounting.",
+    "Bind the typed physical root-only dummy guard; real budgets remain positive and unchanged.",
+    "Keep original startup201/44/114 and component/multiowner/7N protocol qualification untouched.",
+    "Add independently computed same-M80 math/branch/next-KV qualification and current-engine scope for the canonical physical keys.",
+    "Use FULL9 constant M80 in production and postfull own-AR, with the original sampler.",
+    "Rerun warm plus two complete zero65 traces, natural seal, original full463, and full independent AR."
+  ],
+  "NPU_used": false,
+  "runtime_installed": false,
+  "neural_qualified": false,
+  "performance_qualified": false,
+  "adopted": false
+}

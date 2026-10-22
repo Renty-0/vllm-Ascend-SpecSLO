@@ -1,0 +1,28 @@
+{
+  "UTC": "2026-10-22T15:08:31.113755+00:00",
+  "status": "CONFIRMED_ROOT460_TARGET_CONSTRUCTOR_CANN_PYTHONPATH_FAILURE",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-adaptive-own-history-global64-root-v460-fresh693-full463-ownAR-v1.json",
+  "receipt_sha256": "9fb5aaf1a0f606ce4e9018a5a458dda4f7360d24fef53858058d15eebd100cc2",
+  "source_unchanged": true,
+  "original_failure_retained": true,
+  "all4idle": true,
+  "owned_remaining": [],
+  "target_constructor_errors": [
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v460-fresh693-full463-ownAR-v1/rank1-last-error.json",
+      "SHA256": "b96aac2ed8f718a25451f8d80f2fdce36c4bba4bec6d19c7502ce23d71720843"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v460-fresh693-full463-ownAR-v1/rank2-last-error.json",
+      "SHA256": "7201c890204449da30ce29289baaff90e273af540b3f2091ca7d39b8d064fdce"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/adaptive-own-history-global64-root-v460-fresh693-full463-ownAR-v1/rank3-last-error.json",
+      "SHA256": "ea4b4133bcab77a31ea04a0b77d050a5c0c74a7c371d65c6c13aaef036d082f6"
+    }
+  ],
+  "full463": false,
+  "Raw": null,
+  "Goodput": null,
+  "installed_or_updated_packages": false
+}

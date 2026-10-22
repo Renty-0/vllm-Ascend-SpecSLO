@@ -1,0 +1,56 @@
+{
+  "base173.py": {
+    "parent": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/base166.py",
+    "parent_sha256": "4c3b7891c7870ae6334b4b30ef1aa1bfa7fe64984f3e02957b2acf60887e33ea",
+    "base_replace": "166->173",
+    "derived_pre_extension_sha256": "becd391e23737aa8487529513389b54712e519653aefd48058f96e6fbd6b745f"
+  },
+  "source173.py": {
+    "parent": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/source166.py",
+    "parent_sha256": "586441b854b9f474752a740a988ccb98c6cae188fddb068e09dc33322a25d2a8",
+    "base_replace": "166->173",
+    "derived_pre_extension_sha256": "536ac7adfd498e74ab4bca035f705ffcc4e416a5c98a55b28a7f8bd20f378ea1"
+  },
+  "progress173.py": {
+    "parent": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/progress166.py",
+    "parent_sha256": "aba7b3060cbe99d1308d501733d6fe6fa5ca181dbf6022ced3edbccd54968b42",
+    "base_replace": "166->173",
+    "derived_pre_extension_sha256": "dab1032ecf362cb05df5a3e96ff92118d6172fb2b2b84ead7c96d5766dba1707"
+  },
+  "runtime173.py": {
+    "parent": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/runtime166.py",
+    "parent_sha256": "cbdd12eb3b3f61985ab97b944e24891d5b783d3dc84e572e6d28e9b9b612cc85",
+    "base_replace": "166->173",
+    "derived_pre_extension_sha256": "36048feff5454a9c365c3252f8a0e59640ea90df98ac4b9133374561473b6c12"
+  },
+  "trace173.py": {
+    "parent": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/trace166.py",
+    "parent_sha256": "513115459784b610d6f74ed5a86cad8dd08c8a14be33d58b810b325d8e6c3e5d",
+    "base_replace": "166->173",
+    "derived_pre_extension_sha256": "72e8b023334e0f26c4441d025fbea11732ff8db04401bdf8afed1807f12dd01b"
+  },
+  "scope173.py": {
+    "parent": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/scope166.py",
+    "parent_sha256": "cbd4c4730aa5087aa461efbd300f03523aa9d44db4479fe1f94fa73b02de54d5",
+    "base_replace": "166->173",
+    "derived_pre_extension_sha256": "3df67edd9d11d13aabdac0029f7bdd22ddf6825422399b97a54fd502d555471b"
+  },
+  "component173.py": {
+    "parent": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/component166.py",
+    "parent_sha256": "c3ea615563a66d71dd0e278b2ad4d725b542cdf28e113d6a2fae50c4fd27979c",
+    "base_replace": "166->173",
+    "derived_pre_extension_sha256": "2fd0c077c8e148788b809e0e91fcc529c617db8556856d7fa963444d01482a40"
+  },
+  "audit173.py": {
+    "parent": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/audit166.py",
+    "parent_sha256": "23546ed94ada1c04faae19877b4e1346ae2c8cbaf2178b8bf8063821f72fdd55",
+    "base_replace": "166->173",
+    "derived_pre_extension_sha256": "b07cb5cedaff85958b48681c4f2afa922c6557199b2769d718259b6151397686"
+  },
+  "check173.py": {
+    "parent": "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/check166.py",
+    "parent_sha256": "dbb95aa814aec78808137a9a72f0f5f5f07cd3a405fb2627b554a38ad36715ff",
+    "base_replace": "166->173",
+    "derived_pre_extension_sha256": "272f9e77823096120f3a1ff0d34e889aeab467eabfbde52d7e9f9e0d2c363cc3"
+  }
+}

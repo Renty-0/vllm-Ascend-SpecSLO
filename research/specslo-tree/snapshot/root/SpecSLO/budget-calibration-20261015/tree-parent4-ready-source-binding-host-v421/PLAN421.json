@@ -1,0 +1,13 @@
+{
+  "schema": "ROOT421.HOST-normal-B4-ready-parent-binding.v1",
+  "global_active_limit_required": 64,
+  "only_normal_B4": true,
+  "promoted_B4_grandchildren_not_qualified": true,
+  "B5_side_branch_excluded": true,
+  "B3_original_route_preserved": true,
+  "requires_current_same_engine419_proof_before_any_NPU_invocation": true,
+  "HOST_only": true,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,18 @@
+{
+  "status": "PASS_HOST437_ACTUAL_CPU_ADMISSION_TO_TRACE_RETENTION_AND_STRICT_BOOLEAN_REGRESSION",
+  "actual_CPU_admission_to_saved_trace_cases": 4,
+  "old_bug_reproduced": 4,
+  "controlled_missing_wrong_type_or_generation_negatives": 16,
+  "actual431_before_finish_code_identity_retained": true,
+  "only_production_semantic_delta": "bool(rows) instead of rows as strict-True predicate",
+  "production_permission_checks_retained_and_HOST_fixture_rejected": true,
+  "complete_original_trace_AST_inverse": true,
+  "complete_original_snapshot_AST_inverse": true,
+  "isolated_HOST_permission_double_only": true,
+  "production_modules_monkeypatched": false,
+  "NPU_used": false,
+  "Native_constructor_calls": 0,
+  "NN_permission_issued": false,
+  "Raw": null,
+  "Goodput": null
+}

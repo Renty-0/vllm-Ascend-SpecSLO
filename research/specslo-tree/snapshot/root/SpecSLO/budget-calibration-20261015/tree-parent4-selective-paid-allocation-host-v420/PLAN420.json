@@ -1,0 +1,29 @@
+{
+  "schema": "ROOT420.HOST-selective-original-g-paid-E4-proposal.v1",
+  "global_active_limit_required": 64,
+  "normal_work_admission": 24,
+  "exact_proposed_work": {
+    "normalN": 24,
+    "normal_B": 4,
+    "futureN": 4,
+    "future_B": 4,
+    "normal_candidates": 96,
+    "future_candidates": 16,
+    "total": 112
+  },
+  "g_model_unchanged": true,
+  "probe_policy_is_private_copy": true,
+  "private_cap4_only": true,
+  "original_fallback_for_other_shapes": true,
+  "new_NPU_permission": false,
+  "required_before_serving": [
+    "same-engine419 all natural mixed/commit/rollback/twozero proof",
+    "actual ready parent/spine/path binding",
+    "all original full components 227+681",
+    "fresh warm/seal/twozero full463 and all3 ownAR"
+  ],
+  "NPU_used": false,
+  "installed": false,
+  "Raw": null,
+  "Goodput": null
+}

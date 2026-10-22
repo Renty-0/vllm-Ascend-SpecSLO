@@ -1,0 +1,18 @@
+{
+  "status": "HOST_actual_candidate_and_reference_prefix_origins_passed",
+  "cases": 111,
+  "checked_real_cache_writes": 3510,
+  "checked_reference_positions": 20100,
+  "actual_first_two_prefixes": [
+    1505,
+    2555
+  ],
+  "old_fixed127_overwrite_detected": true,
+  "all_real_reference_visible_positions_below2560": true,
+  "nonreal_future_positions_past_extent": 740,
+  "NPU_initialized": false,
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-long-prefix-origins-node-math-v246/oracle246.py": "ef99b10cf16596ddb37741df8086d95ef76cbdfeb62be004b1730a745180debc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-long-prefix-origins-node-math-v246/reference_schedule246.py": "4fb1bf3838f0c3fe7b539afce4837d42b8d2affb8d9f9df145dc4725fde2580a"
+  }
+}

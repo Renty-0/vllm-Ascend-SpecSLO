@@ -1,0 +1,70 @@
+{
+  "schema": "ROOT215.postfull-AR-source-only.v1",
+  "donor": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-budget-full-v214",
+  "donor_freeze_sha256": "52252f8f00d1413e3340952bb94c302ff65023f38f06f413df1ebf3125c2a714",
+  "projection": [
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-budget-full-v214/check214.py",
+      "sha256": "b106874f1b808b78ef98d54aa7c7e2705f455eddadcaada15beb7e99003791d0",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-with-own-FIA-AR-full-v215/check215.py",
+      "new_sha256": "90dfbf7f8b5e26855bc67a924209525aec627f7744764cf8ee12f7ead0d695f1",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-budget-full-v214/cost214.py",
+      "sha256": "434544b71aaa03e06d0795a8766e4434970cb7ea78843d89597598535a809e5a",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-with-own-FIA-AR-full-v215/cost215.py",
+      "new_sha256": "5d77e4708156133b8255eb641337329c69126274fe5853e76ae87f4fc5d83b27",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-budget-full-v214/extension214.py",
+      "sha256": "269d878f4e452378779cfe32823b00c4772b54641b6116a34846179350ddf52b",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-with-own-FIA-AR-full-v215/extension215.py",
+      "new_sha256": "2adc5fabb27550816ece0fcd34e23049fbd14b3a316a8570f760563d3c3d7511",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -63,3 +63,8 @@\n \n \n from pathlib import Path\n+\n+\n+def postfull_AR(engine,native,stage,windows,output):\n+    from reference215 import run\n+    return run(engine,native,stage,windows,output)\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-budget-full-v214/guard214.py",
+      "sha256": "fe6fcb6bce6f7d1e60067a54b450f9c6f8f7aabcacf118516e7385a91aa941b6",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-with-own-FIA-AR-full-v215/guard215.py",
+      "new_sha256": "f4de2ac51d72ac234ee5bc6f3dd31d2220a570f2d3886130961ece65f8d532f9",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -2,6 +2,7 @@\n import argparse,ast,copy,datetime,fcntl,gzip,hashlib,importlib.util,json,os,re,resource,signal,subprocess,sys,tarfile,time,traceback\n from pathlib import Path\n from check215 import P as HERE,B,DONOR,require,ready,read,sha\n+from audit_reference215 import audit as reference_audit\n if str(DONOR)not in sys.path:sys.path.insert(1,str(DONOR))\n LOCK=B/'.ROOT_NPU_EXECUTION.lock';MAX_SECONDS=7200\n MAX_TAG_BYTES=256*1024**2;MAX_AGGREGATE_BYTES=512*1024**2\n@@ -66,9 +67,12 @@\n         from cost215 import audit_snapshot\n         audit_snapshot(cache, trace['source_generation'])\n         require(r['overlay']['cost_aware_mixed16_budget']is True,'actual cost-aware overlay')\n+        reference=reference_audit(directory) if rank==0 else reference\n+        require(r['postfull_independent_FIA_AR']['completed']is True\n+            and r['postfull_independent_FIA_AR']==read(Path(directory)/'postfull-independent-FIA-AR'/f'rank{rank}-summary.json'),'complete exact postfull own-FIA reference')\n         snapshots.append(cache)\n     return actual,status,dict(arithmetic,ROOT215_cached_dispatch_snapshots=snapshots,\n-        changed_model_or_arrival_or_clock=False,budget_grants_may_change=True,SLO_AWARE_ADMISSION=True)\n+        changed_model_or_arrival_or_clock=False,budget_grants_may_change=True,SLO_AWARE_ADMISSION=True,postfull_independent_FIA_AR=reference)\n \n \n def execution_namespace():\n@@ -76,7 +80,7 @@\n         storage=storage,launch_argv=launch_argv,actual_audit=actual_audit,\n         MAX_SECONDS=MAX_SECONDS,MAX_TAG_BYTES=MAX_TAG_BYTES,MAX_AGGREGATE_BYTES=MAX_AGGREGATE_BYTES,\n         SCOPE=dict(cache_and_original_SLO_admission1_overlay215=True,source_donor209=True,full463=True,\n-            original_budget_limits_and_arrivals=True,cost_aware_mixed16_budget=True,active_window=32,new_target_keys=0,\n+            original_budget_limits_and_arrivals=True,cost_aware_mixed16_budget=True,postfull_independent_FIA_AR=True,performance_clock_ends_before_reference=True,active_window=32,new_target_keys=0,\n             fixed_gamma_control_rerun=False,whole_workload_AR_qualified=False,formal_Goodput=False,adopted=False))\n     text=(B/'budget-diagnostics/v154-root-execution/supervise_v154.py').read_text()\n     changes=(('V154.root-owned-local-component-supervisor.v1','ROOT.V215.cached-parent-full-supervisor.v1'),\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-budget-full-v214/host214.py",
+      "sha256": "366ca47faf5f2be252f7c6e7d53c26b27d1e3aa6cd1730beeeef78c80ce5eb80",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-with-own-FIA-AR-full-v215/host215.py",
+      "new_sha256": "0676fb24b12092bd6635834b75618629a6e4920e12e92046c5fd1e6df1acb388",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -77,7 +77,8 @@\n                 self.assertEqual(row['owned_remaining'],[])\n \n     def test_terminal_audit_loads_actual_new_fields(self):\n-        old=guard215.donor_guard\n+        old=guard215.donor_guard;old_AR=guard215.reference_audit\n+        guard215.reference_audit=lambda directory:dict(HOST_stub_only=True)\n         try:\n             donor=types.SimpleNamespace(actual_audit=lambda p:({},'passed_full',{}))\n             guard215.donor_guard=lambda:donor\n@@ -87,8 +88,10 @@\n                     r=dict(overlay=dict(ROOT215_overlay='cached-parent-SLO-admission1-cost-aware-mixed16',SLO_AWARE_ADMISSION=True,cost_aware_mixed16_budget=True),\n                         ROOT215_cached_parent_dispatch=dict(initial_parent_source_checks=1,cached_parent_returns=20,canonical_mapper_or_base_module_mutated=False,cost_aware_mixed16_budget=dict(private_shape_bindings=1,by_generation={'5':dict(shape_calls=1)})),\n                         actual_helper_origins_before_constructor=dict(ROOT215_explicit_overlay_sources={'explicit':1}),\n-                        actual_helper_origins_after_constructor=dict(ROOT215_explicit_overlay_sources={'explicit':1}))\n+                        actual_helper_origins_after_constructor=dict(ROOT215_explicit_overlay_sources={'explicit':1}),postfull_independent_FIA_AR=dict(completed=True))\n                     (p/f'rank{rank}-local-diagnostic.json').write_text(json.dumps(r))\n+                    summary_folder=p/'postfull-independent-FIA-AR';summary_folder.mkdir(exist_ok=True)\n+                    (summary_folder/f'rank{rank}-summary.json').write_text(json.dumps(r['postfull_independent_FIA_AR']))\n                     folder=p/'windows/window32/full463';folder.mkdir(parents=True,exist_ok=True)\n                     trace=dict(source_generation=5,decode_counters=dict(spec_rhythm_slo_aware_admission_enabled=1,spec_rhythm_target_slo_first_enabled=0))\n                     (folder/f'rank{rank}-full463-actual-trace.json.gz').write_bytes(gzip.compress(json.dumps(trace).encode()))\n@@ -105,7 +108,7 @@\n                 trace['decode_counters']['spec_rhythm_slo_aware_admission_enabled']=0\n                 (folder/'rank3-full463-actual-trace.json.gz').write_bytes(gzip.compress(json.dumps(trace).encode()))\n                 with self.assertRaises(RuntimeError):guard215.actual_audit(p)\n-        finally:guard215.donor_guard=old\n+        finally:guard215.donor_guard=old;guard215.reference_audit=old_AR\n \n     def test_original_admission_policy_and_exact_enabled_flag(self):\n         native=Path('/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py')\n@@ -219,6 +222,45 @@\n         with self.assertRaises(RuntimeError):audit_snapshot(cache,5)\n \n \n+\n+\n+class ReferenceTests(unittest.TestCase):\n+    def test_actual_original_artifact_descriptor_and_bad_hash_rejection(self):\n+        from reference215 import retained_trace\n+        with tempfile.TemporaryDirectory()as directory:\n+            p=Path(directory)/'rank1-full463-actual-trace.json.gz'\n+            p.write_bytes(gzip.compress(json.dumps(dict(rank=1,scope_count=463)).encode()))\n+            info=dict(path=str(p),bytes=p.stat().st_size,sha256=hashlib.sha256(p.read_bytes()).hexdigest())\n+            windows=dict(traces=[dict(original_trace=dict(role='full463',scope_count=463,artifact=info))])\n+            artifact,value=retained_trace(windows);self.assertEqual(artifact,p);self.assertEqual(value['rank'],1)\n+            info['sha256']='0'*64\n+            with self.assertRaises(RuntimeError):retained_trace(windows)\n+\n+\n+    def test_reference_frame_only_own_frontier_and_causal_layout(self):\n+        from reference215 import frame\n+        prompts=[[10,11,12],[20]*130];outputs=[[40,41],[50]]\n+        x=frame(prompts,outputs,[1,0]);self.assertEqual(x['tokens'][:10],[50,0,0,0,0,41,0,0,0,0])\n+        self.assertEqual(x['positions'][:10],list(range(130,135))+list(range(4,9)))\n+        self.assertEqual(x['ids'][:10],[1]*5+[0]*5)\n+        self.assertEqual(x['sequence_lens'][:2],[135,9]);self.assertEqual(x['real_head_rows'],[0,5])\n+        self.assertEqual(x['tokens'][10:],[0]*70);self.assertEqual(x['ids'][10:15],[463]*5)\n+        alt=frame(prompts,outputs,[1,0],future=151643)\n+        self.assertEqual(alt['tokens'][::5],x['tokens'][::5])\n+        self.assertEqual(prompts,[[10,11,12],[20]*130]);self.assertEqual(outputs,[[40,41],[50]])\n+        with self.assertRaises(RuntimeError):frame(prompts,outputs,[])\n+        with self.assertRaises(RuntimeError):frame(prompts,outputs,[0,0])\n+        with self.assertRaises(RuntimeError):frame([[0]*4092],[[1,2]],[0])\n+\n+    def test_complete_exact_comparison_never_turns_mismatch_to_success(self):\n+        from reference215 import compare\n+        a={'a':[1]*256,'b':[2]*256};b={'a':[1]*256,'b':[2]*255+[3]}\n+        r=compare(a,b);self.assertFalse(r['exact_all_tokens_equal']);self.assertEqual(r['equal_requests'],1)\n+        self.assertEqual(r['rows'][1]['first_mismatch_zero_based'],255)\n+        with self.assertRaises(RuntimeError):compare(a,{'a':[1]*256})\n+        with self.assertRaises(RuntimeError):compare({'a':[1]*255},{'a':[1]*255})\n+\n+\n if __name__=='__main__':\n     result=unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.loadTestsFromModule(sys.modules[__name__]))\n     print(json.dumps(dict(status='passed'if result.wasSuccessful()else'failed',tests_run=result.testsRun,\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-budget-full-v214/launch214.sh",
+      "sha256": "c7ad1a2fbc65fad4d26805314c7b42226938504368a2c592af7fc704f73a4e5a",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-with-own-FIA-AR-full-v215/launch215.sh",
+      "new_sha256": "cf0ddd5cfea56a545618a1b532be780f78dd2d3cfa372c090aa136162babc5a8",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-budget-full-v214/runtime214.py",
+      "sha256": "8a7e2ced3e3b8f6e2e863973852ecad9130dcab4fee9b612f7aab6776a5dfef7",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-with-own-FIA-AR-full-v215/runtime215.py",
+      "new_sha256": "dad850e1461b74cd3a151d126f6ee1f1e7c0399ecd90612eacf6a36c635d8170",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -18,7 +18,7 @@\n         (\"require(extension_module=='extension209'\",\"require(extension_module=='extension215'\",1),\n         ('  require_ready(own_identity)','  from check215 import ready as own_source_ready\\n  own_source_ready()\\n  require_ready(own_identity)',1),\n         (' readiness=require_ready();spec=', ' from check215 import ready as own_source_ready\\n own_source_ready()\\n readiness=require_ready();spec=',1),\n-        (\"     report['Native_final']=\", \"     report['ROOT215_cached_parent_dispatch']=extension.cache_snapshot()\\n     report['Native_final']=\",1))\n+        (\"     report['Native_final']=\", \"     report['postfull_independent_FIA_AR']=extension.postfull_AR(engine,native,stage,report['windows'],output_directory)\\n     report['ROOT215_cached_parent_dispatch']=extension.cache_snapshot()\\n     report['Native_final']=\",1))\n     for before,after,count in changes:\n         require(text.count(before)==count,'exact runtime209 projection anchor '+before);text=text.replace(before,after)\n     names={'save','worker','main'}\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-budget-full-v214/startup214.sh",
+      "sha256": "83048cc362eae0ac8865a0ccde68c4a524c00190da04cfa131883d0bf42ff08c",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-with-own-FIA-AR-full-v215/startup215.sh",
+      "new_sha256": "6ceb5bfdc26709958d70aba2598a04b733d31ca60a6604b7c09e1cf8c1d176c0",
+      "patch_after_namespace_projection": ""
+    }
+  ],
+  "new_reference_module_sha256": "d62da15119848c34254bc7d596dbba4ef8a0979dbc1b49ad854033f8ed3bb90f",
+  "performance_code_delta_from214": false,
+  "reference_runs_after_original_full_clock": true,
+  "NPU_started": false,
+  "source_peer_review": false,
+  "independent_HOST_auditor_sha256": "34546d43db5b2320201f0c97236a4a50c93cbbb1339854c36faf3d1c6b905626",
+  "final_HOST_attempt": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-mixed16-with-own-FIA-AR-full-v215/HOST-attempts/1792278550668473516"
+}

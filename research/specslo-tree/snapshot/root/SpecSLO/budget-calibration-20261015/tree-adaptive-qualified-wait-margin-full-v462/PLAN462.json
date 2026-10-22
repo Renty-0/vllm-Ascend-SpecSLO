@@ -1,0 +1,20 @@
+{
+  "version": 462,
+  "status": "unfrozen_qualification_wait_margin_only",
+  "numerical_parent460_unchanged": true,
+  "retained_CANN_path_fix461_kept": true,
+  "global_active_limit": 64,
+  "actual_historical438_seconds": 16876.053659003228,
+  "additional459_standalone693_seconds": 2015.221570622176,
+  "qualification_supervisor_and_receive_wait_seconds": 21600,
+  "prior_wait_seconds": 18000,
+  "original_worker_and_production_timeouts_unchanged": true,
+  "all_original227_681_75_6_and_new693_required": true,
+  "complete463_and_all3_geometry_matched_own_AR_required": true,
+  "private_tag_MiB": 256,
+  "private_aggregate_MiB": 3584,
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null,
+  "package_changes": 0
+}

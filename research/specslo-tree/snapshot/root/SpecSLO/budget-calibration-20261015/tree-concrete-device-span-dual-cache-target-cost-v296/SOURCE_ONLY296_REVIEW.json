@@ -1,0 +1,31 @@
+{
+  "schema": "ROOT296.source-only-concrete-cache-device-fix.v1",
+  "copied_from": "/root/SpecSLO/budget-calibration-20261015/tree-all-layer-prefix-dual-cache-target-cost-v291",
+  "renamed_files": [
+    "FIXTURE296.json",
+    "runtime296.py",
+    "launch296.sh",
+    "startup296.sh",
+    "static_state296.py",
+    "check296_HOST.py",
+    "check296.py",
+    "audit_static_calls296.py",
+    "DECLARED296_CASES.json",
+    "check_split296_HOST.py",
+    "benchmark296.py",
+    "guard296.py",
+    "probes296.py",
+    "capture_key296.py",
+    "check_grid296_HOST.py",
+    "oracle296.py"
+  ],
+  "old_failure": "engine.device is torch.device(npu) without index; actual cache tensors have indexed devices",
+  "change": "Validate requested device against actual cache device and current NPU; pass concrete cache device to unchanged strict128-cache validator",
+  "all_kernel_bytes_unchanged": true,
+  "geometry_and_model_math_unchanged": true,
+  "previous_frozen_sources_unchanged": true,
+  "model_qualification_inherited": false,
+  "NPU_used": false,
+  "Goodput": null,
+  "adopted": false
+}

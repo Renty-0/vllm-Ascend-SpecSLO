@@ -1,0 +1,37 @@
+{
+  "schema": "ROOT453.exact451-body-correct-main-and-worker-action.v1",
+  "single_persistent_static_graph": true,
+  "all_original450_nine_same_physical_checks_retained": true,
+  "explicit_post_timing_decode_checks_added": true,
+  "ordinary_reference_owners": [
+    74,
+    75,
+    76,
+    77,
+    78
+  ],
+  "ordinary_initial_prompt_tokens": 40,
+  "ordinary_continuation_prefix_tokens": 127,
+  "ordinary_continuation_known_tokens": 40,
+  "ordinary_full_prompt_tokens": 167,
+  "independent_true_AR_tokens_per_family": 16,
+  "all_reference_model_calls_before_capture": true,
+  "no_KV_copied_from_candidate": true,
+  "all9_numerical_mismatches_retained": true,
+  "Native_flags_assigned": false,
+  "production_permission": false,
+  "full463": false,
+  "global_serving_ceiling_remains64": true,
+  "Raw": null,
+  "Goodput": null,
+  "Git_pushes": 0,
+  "limits": {
+    "seconds": 3600,
+    "tag_MiB": 192,
+    "aggregate_MiB": 3584
+  },
+  "numerical_body_changed": false,
+  "main_and_worker_action_literals_replaced": 2,
+  "actual_main_parser_HOST_required": true,
+  "actual_worker_predicate_HOST_required": true
+}

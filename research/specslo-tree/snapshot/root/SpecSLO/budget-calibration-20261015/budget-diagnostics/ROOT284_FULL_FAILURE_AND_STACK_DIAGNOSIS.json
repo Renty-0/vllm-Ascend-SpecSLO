@@ -1,0 +1,20 @@
+{
+  "UTC": "2026-10-18T21:07:58.168215+00:00",
+  "status": "rank0_HOST_topology_exception_then_mismatched_fatal_collectives",
+  "failure": {
+    "type": "builtins.ValueError",
+    "message": "ROOT284 exact primary4/root-alternate4 topology"
+  },
+  "round_count": 1477,
+  "source_generation": 5,
+  "snapshot_sha256": "1bb3940698687f3389f02ee869def7c98bd40e3e47a2ffadddeca50df50ee98c",
+  "snapshot_archive": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT284_STALLED_FULL_PARTIAL_GAIN_INPUT.json.gz",
+  "rank0_wait": "fatal all_gather_object",
+  "target_wait": "proposal broadcast",
+  "full463_completed": false,
+  "whole463_AR": false,
+  "Goodput": null,
+  "adopted": false,
+  "guard_pid": 2507699,
+  "cleanup": "cooperative SIGTERM to verified owning guard only"
+}

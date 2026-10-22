@@ -1,0 +1,28 @@
+{
+  "schema": "ROOT216.actual-AR-rank-result-None-failure.v1",
+  "UTC": "2026-10-18T00:18:36.508783+00:00",
+  "receipt": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-cost-aware-N9to16-root-v216-full463-AR-v1.json",
+    "sha256": "61b3b6d9e665a3bf97b4a051f3732943ed1820d7d769e9ce20bec2d60f8628f3"
+  },
+  "child_exit_code": 1,
+  "not_timeout": true,
+  "elapsed_seconds": 2221.2143794680014,
+  "root_cause": "reference candidate comprehension incorrectly iterates original generate_results=None on non-output ranks0/2/3; rank1 peer close is consequential. No first own-AR cohort completed.",
+  "completed_full_performance": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V216_COMPLETED_PERFORMANCE_PENDING_REFERENCE.json",
+    "Goodput": 631.7558377906479,
+    "Raw": 633.1232746689826,
+    "attained": 462,
+    "not_full_job_qualified": true
+  },
+  "owned_remaining": [],
+  "four_NPUs_idle": true,
+  "pre_post_verifier_passed": true,
+  "sources_unchanged": true,
+  "all_existing_source_immutable": true,
+  "ROOT217_unrun_blocked_by_same_defect": true,
+  "next": "Fresh218 clone of217 with explicit source-bound output-leader candidate comparison loading and synchronized stage; no cold-cohort policy change combined",
+  "whole_workload_AR_qualified": false,
+  "adopted": false
+}

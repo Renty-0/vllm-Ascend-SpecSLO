@@ -1,0 +1,66 @@
+{
+  "UTC": "2026-10-18T14:50:31.099679+00:00",
+  "status": "completed_compute_audited_supervisor_failed_cost_repair_bypass",
+  "epoch": 260,
+  "terminal_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT260_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+  "terminal_audit_sha256": "32f223dac5a6a1a8a331b52e4ee2ea687de7c79c9daec4a3ce5d0c82cba149f3",
+  "receipt_sha256": "c06b65499e2f5115137864da0b4f000ffa6711de565288a906beb630d8ead8ad",
+  "supervisor_status": "failed",
+  "all463_equal_on_all3targets": true,
+  "all227_node_cases_bitwise_passed": true,
+  "metrics": {
+    "requests": 463,
+    "attained": 286,
+    "output_tokens": 118528,
+    "good_tokens": 73216,
+    "Raw": 644.2367037061124,
+    "Goodput": 397.95182993509314,
+    "TPOT_paper_median_ms": 41.86277550797968,
+    "TPOT_paper_P90_ms": 50.84933671460021,
+    "TPOT_observed_median_ms": 42.026943255069796,
+    "TPOT_observed_P90_ms": 51.04874587818688
+  },
+  "by_class": {
+    "loose": {
+      "requests": 96,
+      "attained": 96,
+      "output_tokens": 24576,
+      "good_tokens": 24576,
+      "Raw": 133.57823662156972,
+      "Goodput": 133.57823662156972,
+      "TPOT_paper_median_ms": 50.75133629998163,
+      "TPOT_paper_P90_ms": 55.14297528043244,
+      "TPOT_observed_median_ms": 50.95036114821686,
+      "TPOT_observed_P90_ms": 55.35922224231649
+    },
+    "normal": {
+      "requests": 96,
+      "attained": 96,
+      "output_tokens": 24576,
+      "good_tokens": 24576,
+      "Raw": 133.57823662156972,
+      "Goodput": 133.57823662156972,
+      "TPOT_paper_median_ms": 33.90499096803978,
+      "TPOT_paper_P90_ms": 38.92090550471039,
+      "TPOT_observed_median_ms": 34.03795171693406,
+      "TPOT_observed_P90_ms": 39.07353650668965
+    },
+    "tight": {
+      "requests": 271,
+      "attained": 94,
+      "output_tokens": 69376,
+      "good_tokens": 24064,
+      "Raw": 377.0802304629729,
+      "Goodput": 130.79535669195369,
+      "TPOT_paper_median_ms": 41.56294330095989,
+      "TPOT_paper_P90_ms": 47.04173872960382,
+      "TPOT_observed_median_ms": 41.72593523547346,
+      "TPOT_observed_P90_ms": 47.22621613638658
+    }
+  },
+  "full_elapsed_seconds": 183.98206640221179,
+  "goal_achieved": false,
+  "adopted": false,
+  "unintended_change": "LIVE helper rebuilt bare split_shape allocator and bypassed actual cost218 cached solver; mixedB3/B4repair and fullgeneration shape-call records did notexecute.",
+  "fix_required": "Nextfull clone ACTUAL Type(shaper).shape globals shape andits shape_draft_work cost218 solver closure; substitute ONLY original_solver withnewcaps allocator, preserve real control/state/policy cells andactually execute repair_plan. Verify cost218.audit_snapshot inHOST andfull; neverpopulate countersinstead. Frozen260unchanged."
+}

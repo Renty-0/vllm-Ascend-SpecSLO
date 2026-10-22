@@ -1,0 +1,13 @@
+{
+  "status": "PASS_HOST450_COMPLETE_SOURCE_AND_SINGLE_STATIC_GRAPH_CONTRACT",
+  "actual_runtime_source_inverse": true,
+  "all9_current_cases_retained": true,
+  "exactly_one_diagnostic_graph": true,
+  "no_eager_model_body_after_capture": true,
+  "no_graph_reset_or_empty_cache_during_epoch": true,
+  "independent_references_before_capture": true,
+  "NPU_used": false,
+  "model_constructors": 0,
+  "Raw": null,
+  "Goodput": null
+}

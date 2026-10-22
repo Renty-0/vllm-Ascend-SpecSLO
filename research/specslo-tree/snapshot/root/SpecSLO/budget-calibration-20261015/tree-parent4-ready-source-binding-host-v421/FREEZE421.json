@@ -1,0 +1,18 @@
+{
+  "schema": "ROOT421.HOST-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-ready-source-binding-host-v421/HOST421-attempt1-unpacked-fixture.log": "13877d6d6e5e28d19a984e7f904acc8583985799a406bee8974cbf6e2a0ac849",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-ready-source-binding-host-v421/HOST421-check421_HOST.py.log": "fa4f9690c937032578d12226e13774a0b8ab7af3ec85402676e3f7d71a069dd8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-ready-source-binding-host-v421/HOST421_RESULT.json": "b01917bfe08d730642d273f899b370175a661e5e28058beb89565f7057bc9f94",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-ready-source-binding-host-v421/PLAN421.json": "71f04883353ff0f7ac5de971c45b8f7333bbe6012dbf8629b1ccea4786669277",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-ready-source-binding-host-v421/check421_HOST.py": "93e7a902952cc88c6014e9b63e6e0c666923c7b6ab1d71b2d3b80d957746b95b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-ready-source-binding-host-v421/parents421.py": "f076a5bb742dbde27eae43c85fdef0e46944edeb69f547305ad4532ba31c955b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-ready-source-binding-host-v421/HOST421_CLEAN_STARTUP_RUN.json": "e0ea534c03b93bb184f6c321d421e0527046bfe14e9d7101fd31d0065a2adc36",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT421_actual_CPU_HOST.py": "5ca800630862d81a0da2b09322af73daa9002d85034daf2ba5d350f71fa25043"
+  },
+  "existing_inputs": {
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/tree.py": "692b2d225d1fedffb84eee7afca7030609a3b4f29d1796cddde448780b5b911a",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/spec_rhythm.py": "8bedd1cc21452b190e8bb95f0cad03c3ab0487b32f28011fe8412f45375f175f"
+  },
+  "NPU_used": false
+}

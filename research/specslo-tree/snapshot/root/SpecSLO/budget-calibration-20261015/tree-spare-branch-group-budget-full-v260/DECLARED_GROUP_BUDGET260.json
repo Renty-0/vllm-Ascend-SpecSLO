@@ -1,0 +1,15 @@
+{
+  "schema": "ROOT260.spare-branch-group-budget.v1",
+  "same_model_backend": "M120/S24/KV2560, original BF16 weights, original greedy and own-AR",
+  "changed": "LIVE-only original typed allocator per-owner caps and whole-ticket physical group budget",
+  "original_scalar_gains_needs_priority_charges_and_publication_preserved": true,
+  "C96": true,
+  "global_draft192": true,
+  "active48": true,
+  "N_plus_B5_le24": true,
+  "original_startup_components_and_fresh227_required": true,
+  "full463_independent_ownAR_required": true,
+  "packet258_or_deferred259_installed": false,
+  "performance_qualified": false,
+  "adopted": false
+}

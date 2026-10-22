@@ -1,0 +1,42 @@
+{
+  "status": "PASS_HOST439_OBSERVED_ZERO_OR_POSITIVE_OVERFLOW_WITH_STRICT_HISTORIES",
+  "synthetic_inputs": true,
+  "valid_zero_overflow": true,
+  "valid_positive_overflow": true,
+  "rejected_controls": [
+    {
+      "kind": "different_rank_history",
+      "rejected": true,
+      "error": "ROOT439 actual normal history: identical complete rank histories"
+    },
+    {
+      "kind": "missing_overflow_record",
+      "rejected": true,
+      "error": "ROOT439 actual normal history: reported/retained overflow exactly equals actual raw-N tail"
+    },
+    {
+      "kind": "tail_does_not_match_counter",
+      "rejected": true,
+      "error": "ROOT439 actual normal history: reported/retained overflow exactly equals actual raw-N tail"
+    },
+    {
+      "kind": "bad_narrow_admission",
+      "rejected": true,
+      "error": "ROOT439 actual normal history: without raw overflow every narrow row is admitted unchanged"
+    },
+    {
+      "kind": "dropped_histogram_call",
+      "rejected": true,
+      "error": "ROOT439 actual normal history: all actual calls represented"
+    },
+    {
+      "kind": "claimed_old_audit_failed",
+      "rejected": true,
+      "error": "ROOT439 actual normal history: unchanged original detailed class/age/defer audit"
+    }
+  ],
+  "NPU_used": false,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,12 @@
+{
+  "schema": "ROOT217.metadata-only-source-review-after-HOST.v1",
+  "UTC": "2026-10-17T23:57:28.709576+00:00",
+  "path": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/guard217.py",
+  "before_sha256": "b94739403d0ec803df35e0983f7fc79af08d0f355e28632032d17999e3aea29e",
+  "after_sha256": "074baa461e1a4f53a5489876692da159abf110bda3e26c6acb159838668e5e3f",
+  "exact_old": "production_delta='same213 plus budget-cost repair: N9to16 mixed B3/B4 to allB4 only within original limits; clients/model/clock unchanged'",
+  "exact_new": "production_delta='same216 cost/ownAR plus direct packed targetKV preflight read with fresh actual original/new shadow gate; clients/model/clock unchanged'",
+  "runtime_operation_changed": false,
+  "cold_guard_check_required": true,
+  "NPU_used": false
+}

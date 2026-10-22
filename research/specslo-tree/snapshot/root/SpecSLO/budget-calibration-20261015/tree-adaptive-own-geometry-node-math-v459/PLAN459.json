@@ -1,0 +1,54 @@
+{
+  "UTC": "2026-10-22T13:55:20.886622+00:00",
+  "version": 459,
+  "status": "new_HOST_tested_protocol_pending_frozen_NPU_diagnostic",
+  "global_active_ceiling": 64,
+  "physical_M": [
+    80,
+    120
+  ],
+  "physical_S": [
+    16,
+    24
+  ],
+  "q_per_group": 5,
+  "budget_domain": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "cases_per_prefix_bank": 231,
+  "independent_prefix_banks": [
+    "mixed",
+    "mid",
+    "short"
+  ],
+  "total_node_cases_each_target": 693,
+  "independent_prefills_each_target": 216,
+  "reference": "Independent ordinary eager q5 spine and side paths at each case own M; original bank offsets24/48, no candidate KV copies",
+  "mathematical_comparators": "All original greedy/Native and bitwise hidden, all128 KV, graph-eager KV predicates kept bytecode-identical; original M120 comparison failures retained",
+  "draft_no_model_stage_enumeration": "All693 HOST symbolic schedules prove stage count and depth/chunk labels match original M120 enumeration",
+  "paired_costs": {
+    "arms": 6,
+    "modes": [
+      "fixed120",
+      "adaptive80_120"
+    ],
+    "rounds": 20,
+    "all_per_mode_actual_outputs_retained": true,
+    "mode_outputs_not_assumed_equal": true
+  },
+  "source": "actual complete original385 lifecycle, all parent source and archives verified, original profile and numerical startup settings retained",
+  "no_Native_validation_flag_assignment": true,
+  "all_weights_SHA_and_addresses_checked_before_after": true,
+  "serving_requires": "Fresh originalM120 gates plus adaptive same-M qualification and full463/all3 independent own-AR; this local diagnostic does not grant production permission",
+  "NPU_launched": false,
+  "full463": false,
+  "whole_workload_AR_qualified": false,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "Git_pushes": 0
+}

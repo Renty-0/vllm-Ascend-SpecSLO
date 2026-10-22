@@ -1,0 +1,32 @@
+{
+  "schema": "ROOT434.conditional-frozen432-full-runtime-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/extension434.py": "c9df2e68e6d6468787596b0efd8260f8ed1431c6a3888f26be845bcd3b76a799",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/PLAN434.json": "026508ecb9a5d40c9e13965f9a34f1081b1e59c04fc59a6e32872e0466f71dde",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/guard434.py": "c3edb262b9d39cd46befa5a03fcb0db6c174c73f88858fe13a78c0caa15d5c03",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/HOST434_CONSTRUCTION_RESULT.json": "7b8d83806e10d6df3f8a6e6388c12abc4de36986fff1437bf4b715af4ece0d78",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/check434_preconstructor_HOST.py": "8af656aaefb10df1a0e7fc24a4bb8ead13ac613815bcc7d686b8e442ef670c7f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/HOST434_CLEAN_STARTUP_RUN.json": "f442194ff79de11cbb3f49fa9855f4269e549cc62e668d713d3f6f1fde356fae",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/check434_construction_HOST.py": "a96827372830bb64fc25b6a1cfe2ef154728c837ff40ec973879b3eacfb683f0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/audit434.py": "1b0631791c6a719181b9379e8025d3cb1996a83de9648ce9b774a1e068b00341",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/runtime434.py": "84142b46b6ff8b4881e893cba56fbc96982cd08daadd8e07fd2d7bbfb479cc41",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/launch434.sh": "747f32894264f16bab14dc73b3dd32326071d2ec695233756e00367f7cf324ab",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/check434.py": "0d80ca8bd8fb0db90e46106cd7398537a2c61fa0952003e2be8df98ac14f9908",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/HOST434-check434_construction_HOST.py.log": "c2dd50303b57f01eb27fd0a4ae3d9e0214483d6952f705566ecdfb14d52e67d7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434/startup434.sh": "073eec9e514ac38ef52d02af17d944a13e0e33665c24e46eb4e390e85a20ad12",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT434_actual_CPU_HOST.py": "908ffe4b72715d578d61fec014ab1cc7d1aac12f4468fd227498ad00bcd5b459"
+  },
+  "composition432_freeze": "22d68cf40570cbe37df0980401274258fc14c833cf4b49a0c8cf13cd01f1c838",
+  "composition432_archive": "47eb4439875b7dec410be917478f58d44dcdf6d009046de5c48d2fba8442e36d",
+  "parent433_freeze": "67560bc431ed7fd44aad19c49e060e4049227f128570a43d433dc5e491330a27",
+  "parent433_archive": "a75a6cb9553036bbfd56d15a4019baf8bb17fd7f95f73b300f2b70eece7ac730",
+  "global_active_limit": 64,
+  "NN_permission_inherited": false,
+  "Native_flags_assigned": false,
+  "NN_launched": false,
+  "private_tag_MiB": 256,
+  "aggregate_private_MiB": 3584,
+  "runtime_seconds": 18000,
+  "Raw": null,
+  "Goodput": null
+}

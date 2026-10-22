@@ -1,0 +1,17 @@
+{
+  "UTC": "2026-10-18T21:33:11.707219+00:00",
+  "status": "HOST408_prepare_callback_checked_unfrozen_not_executed_on_NPU",
+  "backend": "row-prefix prototype currently implemented; choose row or span only after isolated293 results",
+  "descriptor_proof": "HOST-derived physical120 query slots exactly equal actual Native metadata at408 cases; prefix/alias buffers exact; no device metadata reads",
+  "same_Native_attention_Q5_masks_and_canonical_cache_slots": true,
+  "NPU_used": false,
+  "operator_qualification_inherited": false,
+  "Goodput": null,
+  "runtime_installed": false,
+  "pending": [
+    "isolated293 allbits/stride/graphs/paired timings",
+    "choose qualified fastestprefix method and bind frozen own source",
+    "fresh408 target NN and original all128cache matching",
+    "new original463 full and ownAR after controller/predictor integration"
+  ]
+}

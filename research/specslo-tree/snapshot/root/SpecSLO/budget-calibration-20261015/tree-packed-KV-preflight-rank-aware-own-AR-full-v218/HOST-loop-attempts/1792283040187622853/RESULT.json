@@ -1,0 +1,29 @@
+{
+  "schema": "ROOT218.synthetic-HOST-reference-control-flow.v1",
+  "UTC": "2026-10-18T00:24:12.493315+00:00",
+  "status": "passed",
+  "actual_reference_runner_roles": 4,
+  "simulated_requests_per_target": 463,
+  "simulated_target_steps_per_rank": 7905,
+  "wrong_comparison_artifact_rejected": true,
+  "original_role_None_traces_preserved": true,
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/host_reference_loop218.py": "3e050cd3cc7b3f4b2ba9fc86cacf0bb098f331941e89f09d0847d5b9eb219850",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/reference218.py": "a6f5d61739fba1cfe3e862a0c3a52eb14ea769541ce84c7145cb86a04b75d512",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/audit_reference218.py": "a97c77d87493df68bca5148a904675ea35d824c4a8541a84f2bf63da2f0fd23d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/candidate_comparison218.py": "406698b284d2882216f39133344994012d2b7a9c296feb1eea109c51db540864"
+  },
+  "original_actual_input_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/cost-aware-N9to16-root-v216-full463-AR-v1/windows/window32/full463/rank0-full463-actual-trace.json.gz": "21354eab705697bd9c704047746ab391011eb5ced051b1db95aecf7a3727d132",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/cost-aware-N9to16-root-v216-full463-AR-v1/windows/window32/full463/rank1-full463-actual-trace.json.gz": "3daf44fbce7f6d3a5da7a172f2e3671121eea4fe92b4fe83c34f4a10fee7fe5e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/cost-aware-N9to16-root-v216-full463-AR-v1/windows/window32/full463/rank2-full463-actual-trace.json.gz": "ac0d7f7f00ef7452b13c3b8a2a2ed427dd0bc5bbad79a5a2087f1a62e78a2052",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/cost-aware-N9to16-root-v216-full463-AR-v1/windows/window32/full463/rank3-full463-actual-trace.json.gz": "709fef773f4370b7fc61f4ca4e7337c39f6aaca9e58f2454aa7390939586fc98"
+  },
+  "synthetic_fixture_only": true,
+  "real_Torch_imported": false,
+  "NPU_used": false,
+  "model_constructed": false,
+  "neural_output_qualified": false,
+  "Goodput": null,
+  "adopted": false
+}

@@ -1,0 +1,31 @@
+{
+  "schema": "ROOT450.single-graph-valid-unchanged-numerical-settings.v1",
+  "physical_M": 120,
+  "physical_S": 24,
+  "diagnostic_graphs": 1,
+  "all9_initial_continuation_cases_retained": true,
+  "all_independent_eager_model_references_before_capture": true,
+  "static_input_position_slot_table_mask_buffers_updated_in_place": true,
+  "no_eager_model_body_after_capture": true,
+  "no_graph_reset_or_empty_cache_during_epoch": true,
+  "actual_page_inventory_before_after_activation_saved": true,
+  "all_allocated_pages_and_query_writes_checked_disjoint": true,
+  "actual_all3_numerical_gate_before_timing": true,
+  "failed_case_timing_claim": false,
+  "all72_original_prefixes_protected": true,
+  "all_weights_and_MC2_binding_unchanged": true,
+  "Native_flags_assigned": false,
+  "full463": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "caps": {
+    "seconds": 3600,
+    "tag_MiB": 192,
+    "aggregate_MiB": 3584
+  },
+  "Git_pushes": 0,
+  "all_VLLM_ASCEND_exports_match_valid448": true,
+  "only_source_routing_and_supervisor_scope_changed": true,
+  "actual_native_bucket_parser_test_required": true
+}

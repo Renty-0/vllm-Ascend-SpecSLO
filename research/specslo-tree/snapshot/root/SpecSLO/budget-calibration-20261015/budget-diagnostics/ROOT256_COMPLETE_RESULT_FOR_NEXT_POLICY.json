@@ -1,0 +1,63 @@
+{
+  "UTC": "2026-10-18T12:22:35.406531+00:00",
+  "status": "complete_independently_audited",
+  "epoch": 256,
+  "terminal_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT256_TERMINAL_INDEPENDENT_FULL_AUDIT.json",
+  "terminal_audit_sha256": "32f5802fa2a9fd8b3e2e6193d89245dc35fd5394bcb39088e5afe16b4934705a",
+  "receipt_sha256": "9d9b0e006c7a47b5dce2e300669f89957c9dddcdae8d6b4f3a0dde2826d48901",
+  "all463_equal_on_all3targets": true,
+  "metrics": {
+    "requests": 463,
+    "attained": 352,
+    "output_tokens": 118528,
+    "good_tokens": 90112,
+    "Raw": 678.6589698042123,
+    "Goodput": 515.956711384628,
+    "TPOT_paper_median_ms": 38.8365069138672,
+    "TPOT_paper_P90_ms": 46.67653870928916,
+    "TPOT_observed_median_ms": 38.9888069409804,
+    "TPOT_observed_P90_ms": 46.85958395912951
+  },
+  "by_class": {
+    "loose": {
+      "requests": 96,
+      "attained": 96,
+      "output_tokens": 24576,
+      "good_tokens": 24576,
+      "Raw": 140.71546674126216,
+      "Goodput": 140.71546674126216,
+      "TPOT_paper_median_ms": 46.08288379313308,
+      "TPOT_paper_P90_ms": 50.46659822437505,
+      "TPOT_observed_median_ms": 46.2636009844787,
+      "TPOT_observed_P90_ms": 50.664506452705936
+    },
+    "normal": {
+      "requests": 96,
+      "attained": 96,
+      "output_tokens": 24576,
+      "good_tokens": 24576,
+      "Raw": 140.71546674126216,
+      "Goodput": 140.71546674126216,
+      "TPOT_paper_median_ms": 32.924255307079875,
+      "TPOT_paper_P90_ms": 36.302705996604345,
+      "TPOT_observed_median_ms": 33.05337003377431,
+      "TPOT_observed_P90_ms": 36.44506954953221
+    },
+    "tight": {
+      "requests": 271,
+      "attained": 160,
+      "output_tokens": 69376,
+      "good_tokens": 40960,
+      "Raw": 397.228036321688,
+      "Goodput": 234.5257779021036,
+      "TPOT_paper_median_ms": 38.79468058585189,
+      "TPOT_paper_P90_ms": 43.86258557315159,
+      "TPOT_observed_median_ms": 38.94681658814935,
+      "TPOT_observed_P90_ms": 44.034595712654145
+    }
+  },
+  "full_elapsed_seconds": 174.65031079482287,
+  "goal_achieved": false,
+  "adopted": false,
+  "next": "ROOT257 LIVE-only target SLO-first scheduling, same M120/S24/KV2560 and budgets. It must repeat every original and fresh math gate plus full ownAR."
+}

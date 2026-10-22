@@ -1,0 +1,17 @@
+{
+  "UTC": "2026-10-18T20:03:15.312617+00:00",
+  "status": "source_only_unfrozen_unrun",
+  "parent": "/root/SpecSLO/budget-calibration-20261015/tree-dynamic-root-alternate-paired-prefix-grid-full-v282",
+  "algorithm_and_model_changes": false,
+  "change": "register SIGUSR1 after Native constructor; writes owned Python thread stacks only when explicitly requested; no locals and no NPU action",
+  "whole463_failure_reproducer": true,
+  "all_original_and_new_numerical_gates_retained": true,
+  "performance_if_any_signal_sent": false,
+  "goal_achieved": false,
+  "periodic_snapshot_every_verdict_rows": 256,
+  "all_records_private": true,
+  "formal_Goodput": false,
+  "diagnostic_only": true,
+  "aggregate_private_guard_MiB": 2048,
+  "per_tag_guard_MiB": 256
+}

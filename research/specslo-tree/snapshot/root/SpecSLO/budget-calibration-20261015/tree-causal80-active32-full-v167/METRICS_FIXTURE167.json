@@ -1,0 +1,11 @@
+{
+  "device_qualification_inherited": false,
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/actual/active32-24-16-v166-full463-v1/windows/window32/full463/rank0-full463-actual-trace.json.gz": "6fc61c75265abe482edef61a748dfa1d0c51df02e7a7536db744d68ec16dfded",
+    "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/actual/active32-24-16-v166-full463-v1/windows/window32/full463/rank1-full463-actual-trace.json.gz": "5760a56cd565666a873486ec94523a3667508d7ff2bf304883a154dc6c78fb83",
+    "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/actual/active32-24-16-v166-full463-v1/windows/window32/full463/rank2-full463-actual-trace.json.gz": "bb876f06d7841b9dac66be763c86c2a1d99dfc41493a8d5ecf1b11c4dfa510df",
+    "/root/SpecSLO/budget-calibration-20261015/tree-active-window-full-v166/actual/active32-24-16-v166-full463-v1/windows/window32/full463/rank3-full463-actual-trace.json.gz": "c6eb9e37d05afe82e9cb7c4751ed182bf84d76122ff9b20cecb55abcc4003378"
+  },
+  "parent_terminal_failed_after_inference": true,
+  "schema": "V167.actual-terminal-P166-retained-metrics-regression.v1"
+}

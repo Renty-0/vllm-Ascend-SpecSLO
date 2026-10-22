@@ -1,0 +1,57 @@
+{
+  "status": "partial270_all408_numeric_cases_retained_cost_stage_failed",
+  "UTC": "2026-10-18T17:08:49.488718+00:00",
+  "tag": "alternate-chain-root-v270-B1to8-408-node-math-paired-cost-v1",
+  "rows": [
+    {
+      "rank": 1,
+      "cases": 408,
+      "all_real_node_hidden_KV_greedy_matches": true
+    },
+    {
+      "rank": 2,
+      "cases": 408,
+      "all_real_node_hidden_KV_greedy_matches": true
+    },
+    {
+      "rank": 3,
+      "cases": 408,
+      "all_real_node_hidden_KV_greedy_matches": true
+    }
+  ],
+  "errors": {
+    "rank0-last-error.json": {
+      "rank": 0,
+      "error": "Traceback (most recent call last):\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-node-math-v270/runtime270.py\", line 58, in worker\n    report=run(engine,native,lambda label,fn:stage4(engine,label,fn),output,fixture)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-node-math-v270/probes270.py\", line 17, in run\n    costs=paired_cost(engine,native,stage,bank)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-node-math-v270/benchmark270.py\", line 21, in run\n    arms[budget]=(plans,bank['roots'][:n],rows,budgets)\n                        ~~~~~~~~~~~~~^^^^\nTypeError: 'NoneType' object is not subscriptable\n",
+      "performance": false
+    },
+    "rank1-last-error.json": {
+      "rank": 1,
+      "error": "Traceback (most recent call last):\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-node-math-v270/runtime270.py\", line 58, in worker\n    report=run(engine,native,lambda label,fn:stage4(engine,label,fn),output,fixture)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-node-math-v270/probes270.py\", line 15, in run\n    if not engine.is_draft and len(math_calls)!=408:raise RuntimeError('ROOT270 exactly388 actual math graphs')\n                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: ROOT270 exactly388 actual math graphs\n",
+      "performance": false
+    },
+    "rank2-last-error.json": {
+      "rank": 2,
+      "error": "Traceback (most recent call last):\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-node-math-v270/runtime270.py\", line 58, in worker\n    report=run(engine,native,lambda label,fn:stage4(engine,label,fn),output,fixture)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-node-math-v270/probes270.py\", line 15, in run\n    if not engine.is_draft and len(math_calls)!=408:raise RuntimeError('ROOT270 exactly388 actual math graphs')\n                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: ROOT270 exactly388 actual math graphs\n",
+      "performance": false
+    },
+    "rank3-last-error.json": {
+      "rank": 3,
+      "error": "Traceback (most recent call last):\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-node-math-v270/runtime270.py\", line 58, in worker\n    report=run(engine,native,lambda label,fn:stage4(engine,label,fn),output,fixture)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-node-math-v270/probes270.py\", line 15, in run\n    if not engine.is_draft and len(math_calls)!=408:raise RuntimeError('ROOT270 exactly388 actual math graphs')\n                                                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nRuntimeError: ROOT270 exactly388 actual math graphs\n",
+      "performance": false
+    }
+  },
+  "actual_timing_cases_completed": 0,
+  "Goodput": null,
+  "production_qualified": false,
+  "causes": [
+    "Incorrect post-math graph dispatch count assumption: original cold validation includes capture/change/restore extra calls; existing266 had227cases but231dispatches",
+    "Draft bank roots areNone because draft makes no target-neural claim; cost host setup incorrectly indexed them"
+  ],
+  "evidence_old266": {
+    "math_cases": 227,
+    "actual_graph_dispatches": 231
+  },
+  "next": "Fresh immutable272: reconstruct actual cold-call sequence with original auditor extended to sidechain lengths; handle None draft roots; checkpoint complete math before timing; rerun in fresh owned process",
+  "original_sources_unchanged": true
+}

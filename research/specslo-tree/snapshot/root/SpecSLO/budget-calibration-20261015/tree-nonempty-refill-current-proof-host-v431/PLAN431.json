@@ -1,0 +1,20 @@
+{
+  "UTC": "2026-10-21T09:53:16.766066+00:00",
+  "scope": "HOST-only whole LIVE admission rewrite and same-model NN proof binding",
+  "exact_frozen425_admission_AST_rewrite": true,
+  "all_decode_outside_admission_unchanged": true,
+  "original_clock_calls_and_publication_AST_retained": true,
+  "NN_permission_requires_actual427_old32_proof_and_original425_current_scope": true,
+  "actual_Native_CPU_allocator_and427_Bank_cases": 4,
+  "allocator_pages_without64scratch": [
+    55,
+    339,
+    55,
+    339
+  ],
+  "NN_launched": false,
+  "serving_installed": false,
+  "Raw": null,
+  "Goodput": null,
+  "current430_unchanged": true
+}

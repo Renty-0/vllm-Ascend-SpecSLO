@@ -1,0 +1,75 @@
+{
+  "UTC": "2026-10-18T11:23:09.067915+00:00",
+  "status": "bounded_all227_actual_cases_independently_audited",
+  "receipt_sha256": "72cc69ce864e711dd203b4915d1c1d79e9dbe96ab35694eddc4c5c32465fe5f2",
+  "source_members": 2375,
+  "all3_targets_all227_bitwise": true,
+  "all72_prefixes_unchanged": true,
+  "actual_case_node_evaluations_per_target": 13081,
+  "by_rank": [
+    {
+      "rank": 1,
+      "report_sha256": "a03b9de6e348fd5b5574be280f284862f3c95a9550facaa1b35a874a6b041a15",
+      "cases227": true,
+      "independent_prefixes72": true,
+      "all_bitwise": true,
+      "actual_graph_audit": {
+        "positive_node_cases": 227,
+        "actual_graph_dispatches": 231,
+        "actual_cold_families": [
+          10,
+          11
+        ],
+        "original_changed_input_restore_extra_dispatches": 4,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false
+      }
+    },
+    {
+      "rank": 2,
+      "report_sha256": "2474531cf9b0cb104360aab5b8b8cd729de6256e251284784915b10a5ea7e366",
+      "cases227": true,
+      "independent_prefixes72": true,
+      "all_bitwise": true,
+      "actual_graph_audit": {
+        "positive_node_cases": 227,
+        "actual_graph_dispatches": 231,
+        "actual_cold_families": [
+          10,
+          11
+        ],
+        "original_changed_input_restore_extra_dispatches": 4,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false
+      }
+    },
+    {
+      "rank": 3,
+      "report_sha256": "5fe000bcbd416ac659f66520c1eab107bd69597ae89cabb8644d5fe267eb68c9",
+      "cases227": true,
+      "independent_prefixes72": true,
+      "all_bitwise": true,
+      "actual_graph_audit": {
+        "positive_node_cases": 227,
+        "actual_graph_dispatches": 231,
+        "actual_cold_families": [
+          10,
+          11
+        ],
+        "original_changed_input_restore_extra_dispatches": 4,
+        "all_real_and_cold_calls_reconstructed": true,
+        "all120_row_permutations_exact": true,
+        "Native_flags_assigned": false,
+        "whole_workload_AR_qualified": false
+      }
+    }
+  ],
+  "whole_workload_AR_qualified": false,
+  "NPU_used": false,
+  "performance": false,
+  "adopted": false
+}

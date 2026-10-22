@@ -1,0 +1,421 @@
+{
+  "guard_projection": [
+    {
+      "deltas": [],
+      "file": "GUARD_INPUTS209.json",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/GUARD_INPUTS205.json",
+      "parent_sha256": "fc37cf545fca519252f3df55e2c916bfa3eff77894bc85479154cf35e05e848e"
+    },
+    {
+      "deltas": [
+        {
+          "end": 323,
+          "new": "ro",
+          "old": "sing",
+          "start": 319
+        },
+        {
+          "end": 326,
+          "new": "a",
+          "old": "",
+          "start": 326
+        },
+        {
+          "end": 327,
+          "new": "a",
+          "old": "",
+          "start": 327
+        },
+        {
+          "end": 328,
+          "new": "e-aud",
+          "old": "",
+          "start": 328
+        },
+        {
+          "end": 332,
+          "new": "",
+          "old": "er",
+          "start": 330
+        },
+        {
+          "end": 2105,
+          "new": "3",
+          "old": "7",
+          "start": 2104
+        },
+        {
+          "end": 2312,
+          "new": "3 retained-role/source",
+          "old": "7",
+          "start": 2311
+        }
+      ],
+      "file": "guard209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/guard205.py",
+      "parent_sha256": "44a2f069b5276b8dfaeaa0bc7be7854bbc63210d4561f446d29b69f88d8e1331"
+    },
+    {
+      "deltas": [
+        {
+          "end": 203,
+          "new": "ro",
+          "old": "sing",
+          "start": 199
+        },
+        {
+          "end": 206,
+          "new": "a",
+          "old": "",
+          "start": 206
+        },
+        {
+          "end": 207,
+          "new": "a",
+          "old": "",
+          "start": 207
+        },
+        {
+          "end": 208,
+          "new": "e-aud",
+          "old": "",
+          "start": 208
+        },
+        {
+          "end": 212,
+          "new": "",
+          "old": "er",
+          "start": 210
+        }
+      ],
+      "file": "launch209.sh",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/launch205.sh",
+      "parent_sha256": "c0efbee9fb87707b827af90a5ac6fa2ac7a9767bddea2e79d23013a01ac8d55c"
+    },
+    {
+      "deltas": [
+        {
+          "end": 121,
+          "new": "ro",
+          "old": "sing",
+          "start": 117
+        },
+        {
+          "end": 124,
+          "new": "a",
+          "old": "",
+          "start": 124
+        },
+        {
+          "end": 125,
+          "new": "a",
+          "old": "",
+          "start": 125
+        },
+        {
+          "end": 126,
+          "new": "e-aud",
+          "old": "",
+          "start": 126
+        },
+        {
+          "end": 130,
+          "new": "",
+          "old": "er",
+          "start": 128
+        }
+      ],
+      "file": "startup209.sh",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v205-root-execution/startup205.sh",
+      "parent_sha256": "be62cd7351a69f96920f13588944d0aaa1f09930784664f280e93405789e188d"
+    }
+  ],
+  "only_production_execution_delta": "None: all actual math/model/policy/clock functions are namespace exact; only role-aware retained audit and source/HOST identity change.",
+  "projection": [
+    {
+      "deltas": [],
+      "file": "actor209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/actor205.py",
+      "parent_sha256": "2c4e40b1b51235f1d243fc1287e444e3ea3c00f15895d0730f53b777b5f7634c"
+    },
+    {
+      "deltas": [],
+      "file": "audit209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/audit205.py",
+      "parent_sha256": "2943d7661fe2dc3575c745a212a95434dc6b89e6ad34c19f120794c68fe8914b"
+    },
+    {
+      "deltas": [
+        {
+          "end": 895,
+          "new": "and r['role']==('draft'if rank==0 else'target')",
+          "old": "",
+          "start": 895
+        },
+        {
+          "end": 2574,
+          "new": "",
+          "old": "and len(row['draft']['variable_num_draft_tokens'])==16",
+          "start": 2520
+        },
+        {
+          "end": 3138,
+          "new": "require(row['target']is row['reference']is row['crossM']is row['old_control']is None,'draft owns no target tensors or crossM proof')\n     ",
+          "old": "",
+          "start": 3138
+        },
+        {
+          "end": 3161,
+          "new": "type(d)is dict and len(d['variable_num_draft_tokens'])==16 and ",
+          "old": "",
+          "start": 3161
+        },
+        {
+          "end": 3421,
+          "new": "\n     require(row['draft']is None and all(type(row[k])is dict for k in('target','reference','crossM','old_control')),'target owns no draft proof and retains its own target/reference/crossM evidence')",
+          "old": "",
+          "start": 3421
+        },
+        {
+          "end": 6827,
+          "new": " d=nxt['draft_proof']\n   if rank==0:require(type(d)is dict and len(d['variable_num_draft_tokens'])==16 and d['raw_encoded_shape']==[16,4,2]and d['all_physical_hidden_original_matcher']and d['all28_query_KV_original_matcher']and d['exact_full8_encoded']and d['source_KV_copied']is False,'draft next retains its own complete full16 numerical proof')\n   else:require(d is None,'target next must not fabricate a draft numerical proof')\n  ",
+          "old": "",
+          "start": 6827
+        }
+      ],
+      "file": "audit_usage209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/audit_usage205.py",
+      "parent_sha256": "99a23282ee1708f2b29c635526cd742c71fa27bae67ec4270ed19b3bd4e497fb"
+    },
+    {
+      "deltas": [],
+      "file": "bank209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/bank205.py",
+      "parent_sha256": "a110ded7ce2a29dc23629d127b2b70e4526f100a43177417b383318cf285e38f"
+    },
+    {
+      "deltas": [
+        {
+          "end": 6928,
+          "new": "\n\ndef require_derivation205(*,archive=False):\n import tarfile\n pin=read(P/'INPUTS209.json')['source_donor205'];root=Path(pin['path']);f=read(root/'FROZEN_SOURCE205.json')\n require(sha(root/'FROZEN_SOURCE205.json')==pin['freeze_sha256']and sha(root/'CPU_RESULT205.json')==pin['CPU_sha256'],'immutable205 source/HOST donor only; failed model run grants no qualification')\n expected={**f['files'],**f['external_files'],**f['retained_HOST_evidence'],**f['execution_guard_inputs'],**f['peer_reviews'],str(root/'CPU_RESULT205.json'):f['CPU_sha256'],str(root/'FROZEN_SOURCE205.json'):pin['freeze_sha256'],f['root_review']['path']:f['root_review']['sha256']}\n for path,h in expected.items():require(sha(path)==h,'exact205 source donor '+path)\n if archive:\n  ar=pin['archive'];require(sha(ar['path'])==ar['sha256'],'original205 donor archive SHA in place')\n  with tarfile.open(ar['path'],'r:gz')as saved:\n   members=saved.getmembers();require(len(members)==len(expected)==ar['members']and len({m.name for m in members})==len(members),'exact205 regular source archive set')\n   for m in members:require(m.isfile()and '/'+m.name in expected and hashlib.sha256(saved.extractfile(m).read()).hexdigest()==expected['/'+m.name],'actual205 regular source member '+m.name)\n return dict(source_donor205=str(root),members=len(expected),archive_verified_in_place=archive,production_parent_remains197=True,device_qualification_inherited=False)\n",
+          "old": "",
+          "start": 6928
+        }
+      ],
+      "file": "base209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/base205.py",
+      "parent_sha256": "4764df0c36360a0d81cfb7a215473b7606a2c4583984ceb7a321555b596a5adc"
+    },
+    {
+      "deltas": [],
+      "file": "component209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/component205.py",
+      "parent_sha256": "9b7f97d96568f1bf25d2eb5be889631e0f7aa28070c9197fd84bc4b06b5808a2"
+    },
+    {
+      "deltas": [],
+      "file": "config209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/config205.py",
+      "parent_sha256": "7eed2bd90250f35cadd07d47d7648db8dc5dc44e2efd571f761b9c8630991c98"
+    },
+    {
+      "deltas": [],
+      "file": "empty209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/empty205.py",
+      "parent_sha256": "fbb9b4abaca1b75e108a24d8b29f19c8d7cbd82430d2f3f283510268cd6f72ea"
+    },
+    {
+      "deltas": [],
+      "file": "extension209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/extension205.py",
+      "parent_sha256": "373587a7b737f76c9e7e0892393dc440133166da9cb77122e2634165598a1cce"
+    },
+    {
+      "deltas": [],
+      "file": "mapper209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/mapper205.py",
+      "parent_sha256": "e8f912b3e2f0068d76189afa9dcdd6354a14e0e06a66a7b1f408308696871550"
+    },
+    {
+      "deltas": [],
+      "file": "next4_209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/next4_205.py",
+      "parent_sha256": "1c3999b8d042343ad69c129850cf037dbfb2eef5bbe151bc776de04df8d4bbb0"
+    },
+    {
+      "deltas": [],
+      "file": "prefill209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/prefill205.py",
+      "parent_sha256": "4ba5aac7b7bfd094adb9131a670566ef1952b4b9d1f77e449f0ae16dd66745e1"
+    },
+    {
+      "deltas": [],
+      "file": "progress209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/progress205.py",
+      "parent_sha256": "6d9947398eb80450909ddacd28b3f244ddf548f073a7dc15ddfdcb9164b9bea2"
+    },
+    {
+      "deltas": [],
+      "file": "publication209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/publication205.py",
+      "parent_sha256": "a11d4fc0d4a375b365d4039a04a351e3cf357e388d36a1c889f61d98b8c65570"
+    },
+    {
+      "deltas": [],
+      "file": "runtime209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/runtime205.py",
+      "parent_sha256": "f1a92f67df3e4bcaa11c1c83a434312f94f04016524c847aaed7196f6f959ae9"
+    },
+    {
+      "deltas": [],
+      "file": "scope209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/scope205.py",
+      "parent_sha256": "f61e7b7e8b281c65551441b5fedf0436b0c0337271d6705ea978db6eddecc798"
+    },
+    {
+      "deltas": [],
+      "file": "source209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/source205.py",
+      "parent_sha256": "c44cea72c9a9e08d59c0edac680633e714a1c3896e1b0986b6b978b03e768235"
+    },
+    {
+      "deltas": [],
+      "file": "subset209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/subset205.py",
+      "parent_sha256": "26eb067dc6a2e418349fe773242b2cbc64f7b919d22f289bde810356bb677418"
+    },
+    {
+      "deltas": [],
+      "file": "target209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/target205.py",
+      "parent_sha256": "159607a15a7f0bc60f9c1fb2579057da0271770e6f8e469cbbe6234e38923952"
+    },
+    {
+      "deltas": [],
+      "file": "trace209.py",
+      "namespace": [
+        "205",
+        "209"
+      ],
+      "namespace_preserves_python_NUMBER_and_64hex": true,
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-single-writer-full-v205/trace205.py",
+      "parent_sha256": "059d5e7d80006dea0f0775158397a7c931e4a7c792d5feba3cdd002236a79cea"
+    }
+  ],
+  "source_donor205_failure_retained": true
+}

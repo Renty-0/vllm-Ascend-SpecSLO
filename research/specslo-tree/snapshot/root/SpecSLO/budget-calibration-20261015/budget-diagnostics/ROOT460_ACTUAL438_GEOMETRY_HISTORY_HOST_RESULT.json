@@ -1,0 +1,23 @@
+{
+  "UTC": "2026-10-22T14:11:36.775254+00:00",
+  "status": "PASS_HOST460_ACTUAL438_PER_OUTPUT_GEOMETRY_RECONSTRUCTION",
+  "source_trace": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/slo-aware-refill-parent4-E4-global64-root-v438-fresh75-plus6-full463-ownAR-v1/windows/window64/full463/rank1-full463-actual-trace.json.gz",
+  "source_trace_sha256": "42d897e4982c829b19c0ccc38ae6d4f64c24c205ab5b74ea9043af2f2de9ad07",
+  "archive_read_in_place": true,
+  "files_restored": 0,
+  "actual_requests": 463,
+  "actual_target_calls": 2484,
+  "independent_prediction_positions": 118065,
+  "actual_frontier_and_publication_counts_agree": true,
+  "all_original_geometry120": true,
+  "corrupted_trace_controls_rejected": [
+    "nonadvancing_frontier",
+    "unsupported_M",
+    "publication_count_mismatch"
+  ],
+  "production_token_values_used_as_reference_inputs": false,
+  "NPU_used": false,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

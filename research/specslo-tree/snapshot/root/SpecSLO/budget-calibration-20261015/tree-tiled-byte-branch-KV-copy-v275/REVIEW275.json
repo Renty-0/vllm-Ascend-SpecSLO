@@ -1,0 +1,18 @@
+{
+  "UTC": "2026-10-18T17:33:27.758058+00:00",
+  "schema": "ROOT275.tiled-raw-byte-copy-review.v1",
+  "mechanism": "Same fixed1792 anti-alias maps and exact rawbyte memory copies; process16 independent rows per program,112 programs instead of1792",
+  "device_arms": [
+    "original rank3 fourgather/scatters",
+    "retained263 one-row fused rawbyte kernel",
+    "new275 sixteen-row fused rawbyte kernel"
+  ],
+  "gates": "All172 actual Native maps at widths256/384; wholecache K/V equal; all65536 raw16-bit payloads with changed/restored ACLGraph controls;80 rotated pairs per five maps per width",
+  "original10496_15_212_pre_post": true,
+  "owned_ROOT_lock": true,
+  "all4idle_pre_post": true,
+  "models_loaded": false,
+  "NN_qualified": false,
+  "Goodput": null,
+  "adopted": false
+}

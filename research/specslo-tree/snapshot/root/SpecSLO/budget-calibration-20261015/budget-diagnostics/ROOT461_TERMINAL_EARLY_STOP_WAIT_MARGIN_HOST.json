@@ -1,0 +1,15 @@
+{
+  "UTC": "2026-10-22T15:17:50.254539+00:00",
+  "status": "ROOT461_OWNED_EARLY_STOP_FOR_DECLARED_QUALIFICATION_WAIT_MARGIN",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-adaptive-own-history-global64-root-v461-retained-CANN-full463-ownAR-v1.json",
+  "receipt_sha256": "bb1e45ba737277ca8d5e04ea0328ad2d6df7444df5fc78e93847716c7b612a30",
+  "source_unchanged": true,
+  "original_failure_retained": true,
+  "all4idle": true,
+  "owned_remaining": [],
+  "full463": false,
+  "Raw": null,
+  "Goodput": null,
+  "qualification_check_removals": 0,
+  "reason": "Historical43816876seconds plus additional693 and geometry-matched AR can exceed18000seconds. New46221600sHOST-only wait; numerical code and production clocks unchanged."
+}

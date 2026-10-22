@@ -1,0 +1,22 @@
+{
+  "schema": "ROOT426.HOST-nonempty-refill-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-refill-resource-host-v426/HOST426-check426_HOST.py.log": "b367f9d0957ea3dde9813a4e21c2f1e51c378e3ccc0e699885bc6a8eee1398bc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-refill-resource-host-v426/PLAN426.json": "e6a96ca8a486a75c9ad0b5b693cd43222f59b825caba225d37f4feb823817297",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-refill-resource-host-v426/refill426.py": "910a654b9483cee9736f09ce22fbd140eb802efbecaf91ca26c0b52cb2180b7f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-refill-resource-host-v426/check426_HOST.py": "ebd5ac9b13d8229a0d610d4f6ee2b6a1b6f002727421bf73d6af2a1a2813cf2d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-refill-resource-host-v426/HOST426_CLEAN_STARTUP_RUN.json": "40fa66dd61145fae898ff4c5c0420e238a72ede2ec92ad2da894370862818574",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-refill-resource-host-v426/HOST426_RESULT.json": "65d331f73d223d1fbe6234856da1f6f442b2178b975c40a1cce8b5811d78bc4d",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT426_actual_CPU_HOST.py": "23f5f6688bcc40d8303618eb34d278e61971eae3a99e39535a3687e9c675befd"
+  },
+  "existing_inputs": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/FREEZE425.json": "3f504d53ba5501e3cb20e2a72afff6415ad8a119f61502524bf76c3e8568d4b9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/HOST425.generated-LIVE.py": "05ec02b7f95f901fb84363c111bb7d418d5f535b26b02ebe78ebfc3aeeeb4a4f",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py": "05d47ed6dc48e368010ca145a0b859aaffe596f246e0b28eb7b07d2d51a50cc9"
+  },
+  "NN_permission": false,
+  "serving_installed": false,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

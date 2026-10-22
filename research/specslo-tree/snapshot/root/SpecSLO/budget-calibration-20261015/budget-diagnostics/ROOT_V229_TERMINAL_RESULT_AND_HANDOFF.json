@@ -1,0 +1,70 @@
+{
+  "schema": "ROOT229.terminal-bounded-numeric-result-and-handoff.v1",
+  "UTC": "2026-10-18T03:32:02.159010+00:00",
+  "status": "complete_bounded_diagnostic_goal_unmet",
+  "guard_session": 35369,
+  "guard_session_closed": true,
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-query1-root-v229-four-contexts-eager-ablation-existing-cost-v1.json",
+  "receipt_sha256": "392502f9078db601e59f883dda00b031c19278ab5ec4690331fc8e7079975ef4",
+  "independent_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V229_INDEPENDENT_NUMERIC_AND_ISOLATION_AUDIT.json",
+  "independent_audit_sha256": "d14237b4c8c7128616a1ba1b1bc26da58fbae03d02a60236a9cded6848b889f4",
+  "four_controlled_contexts_hidden_and_query_KV_equal": true,
+  "two_controlled_histories_complete_common_prefix_KV_equal": true,
+  "all_three_targets_agree": true,
+  "selected_contexts_only": true,
+  "independent_whole463_AR_qualified": false,
+  "original_greedy_sampler_unchanged": true,
+  "FP32_tie_observer_installed": false,
+  "isolated_existing_q1_M80_body_cost": [
+    {
+      "rank": 1,
+      "medians": {
+        "host_wall_ms_per_call": 85.8167017577216,
+        "device_ms_per_call": 85.77931467692056
+      }
+    },
+    {
+      "rank": 2,
+      "medians": {
+        "host_wall_ms_per_call": 85.8100208764275,
+        "device_ms_per_call": 85.77423858642578
+      }
+    },
+    {
+      "rank": 3,
+      "medians": {
+        "host_wall_ms_per_call": 85.82238352391869,
+        "device_ms_per_call": 85.78622690836589
+      }
+    }
+  ],
+  "eager_ablation_findings": [
+    "For new148 context M40 gives678 and M80 gives279 even with q1 unchanged.",
+    "M40/M80 first different query KV is decoder layer1 in both selected fresh contexts.",
+    "At constant M80, original q5 FULL and q1 FULL eager hidden/query KV are bitwise equal in both selected fresh contexts."
+  ],
+  "next": "Qualify constant M80 FULL9 in a fresh model with no q1 graph capture; measure already-qualified same-family graph only; capture read-only layer0 eager module taps to localize M effect.",
+  "pre_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "all_four_idle": true,
+  "owned_remaining": [],
+  "formal_Goodput": false,
+  "adopted": false,
+  "goal_unmet": true
+}

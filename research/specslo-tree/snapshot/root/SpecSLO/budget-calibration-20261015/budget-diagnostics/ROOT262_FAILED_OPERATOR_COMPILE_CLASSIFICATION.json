@@ -1,0 +1,13 @@
+{
+  "UTC": "2026-10-18T14:45:31.566322+00:00",
+  "status": "failed_compile_before_any_qualified_operator_result",
+  "receipt_sha256": "8918af68bf3de02e10a50f953130b45898c7fda6d93e6bddf6f89ff22f102ad3",
+  "log_sha256": "576116919900262d21ef8aefa717c07ec476d6d110dc391520acbca1550989f7",
+  "failure": "BiShengHIR memory scope propagation failed; arith.bitcast unsupported root-alloc user, atfirst unsigned16 2-D copy compilation",
+  "actual_copy_equality_or_timing_result": false,
+  "models_loaded": false,
+  "all_four_idle": true,
+  "sources_unchanged": true,
+  "adopted": false,
+  "next": "New263 operator epoch using scalarinteger addresses to uint8 pointers andone-dimensional row program, following frozen primarybatch_memcpy style; do notedit262"
+}

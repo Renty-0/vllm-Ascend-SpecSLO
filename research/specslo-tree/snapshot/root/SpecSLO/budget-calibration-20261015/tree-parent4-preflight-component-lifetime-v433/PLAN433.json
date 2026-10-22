@@ -1,0 +1,16 @@
+{
+  "UTC": "2026-10-21T10:22:15.502845+00:00",
+  "change": "Move the exact original218 end_shadow call from original209 component end to after the full additional75 lifecycle component; no preflight installer/body/math/generation guard changed.",
+  "all_original_and_new_components_shadow_compared": true,
+  "original_close_called_once": true,
+  "original430_commit_binding_428_reference_425_factory_and_all_neural_paths_retained": true,
+  "all_original227_and681_and75_warm_twozero_seal_full463_all3ownAR_required_fresh": true,
+  "global_active_limit": 64,
+  "normal_target_limit": 24,
+  "NN_launched": false,
+  "NN_permission_inherited": false,
+  "new_refill426_427_429_431_432_installed": false,
+  "Raw": null,
+  "Goodput": null,
+  "github_commit_after_effective_improvement_only": true
+}

@@ -1,0 +1,16 @@
+{
+  "UTC": "2026-10-18T04:59:51.847961+00:00",
+  "status": "complete_155_independent_math_cases_not_full_qualification",
+  "cases_per_target": 155,
+  "all_three_target_heads_agree": true,
+  "all_targets_all_cases_hidden_bitwise_equal": true,
+  "all_targets_all_cases_KV_bitwise_equal": true,
+  "all48_independent_prefixes_protected": true,
+  "guard_session": 24784,
+  "guard_session_closed": true,
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-contiguous-branch-root-v234-155-neural-cases-v1.json",
+  "independent_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V234_INDEPENDENT_BRANCH_MATH_AUDIT.json",
+  "whole_workload_AR_qualified": false,
+  "performance": false,
+  "adopted": false
+}

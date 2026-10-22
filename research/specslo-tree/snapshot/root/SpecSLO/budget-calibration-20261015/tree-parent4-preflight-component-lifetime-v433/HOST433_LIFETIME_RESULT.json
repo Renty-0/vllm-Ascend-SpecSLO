@@ -1,0 +1,27 @@
+{
+  "status": "PASS_HOST433_UNCHANGED_ORIGINAL218_COMPONENT_LIFETIME_AND_PRODUCTION_GUARDS",
+  "old430_missing_generation_reproduced": "ROOT218 preflight: actual current generation for execution accounting",
+  "cases": [
+    {
+      "role": "target",
+      "actual_component_shadow_pairs": 10,
+      "original_bad_mapping_rejected": true,
+      "production_missing_generation_rejected": true,
+      "original_generation7_accounting_audit": true,
+      "original_close_called_once": true
+    },
+    {
+      "role": "draft",
+      "actual_component_shadow_pairs": 10,
+      "original_bad_mapping_rejected": true,
+      "production_missing_generation_rejected": true,
+      "original_generation7_accounting_audit": true,
+      "original_close_called_once": true
+    }
+  ],
+  "original_canonical_installer_and_original218_install_end_shadow_and_audit_used": true,
+  "explicit_original_HOST_integer_tensor_fixtures": true,
+  "NPU_used": false,
+  "actual_Native_models_constructed": 0,
+  "NN_qualification": false
+}

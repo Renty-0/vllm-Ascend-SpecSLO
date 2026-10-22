@@ -1,0 +1,37 @@
+{
+  "schema": "ROOT431.HOST-only-whole-LIVE-and-current-model-proof-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/HOST431-allocator-attempt1-readonly-derived-property.log": "0718633d5919455260c5b9b5cd3ebba4334ea18c1a2cad23903a2f9e4e11ecef",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/PLAN431.json": "30dd6d5a8c426d56983f319f57dff2dd56880b582ec58f201d8d2777cb53751a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/HOST431_CLEAN_STARTUP_RUN.json": "7ff4e1d78bab7257b1be9cec7b5b4d1a31caf8cc9a32251a15256ed3546accc0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/HOST431-check431_HOST.py.log": "e22d8e0be7b0e1e6e7418c73d96119fa07fd151701819beb1b30a509be397b60",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/check431_allocator_HOST.py": "689921394201a7814eb979f3b7ff1ed8c4e7b49079d8626f155ee6602efed680",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/projection431.py": "0027e6de6b750e561a9c2a6243b68608b5d141e3a26a691ba731e183de1ce418",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/HOST431_ALLOCATOR_RESULT.json": "abcd265906f97014d24448c7ebe8bed1f016d516edc30a5e723265b5b55c40cb",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/HOST431_RESULT.json": "9cf0cbecb7c809a5ec5e69272ee34b4b3fbe89e3401d4bf96f2a037d76d51e8a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/check431_HOST.py": "e2b4e413e796218415fd3b96a61bd597420da3f8d4f49f5bc4393ce170d72029",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/witness431.py": "93eb4d5d8f1801258965d39e7c3bd5b571c4eefe8bdf8321fc7cefc75b16ed97",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/HOST431-check431_allocator_HOST.py.log": "48dda74d94e30dc4b40280fef20076c0d0f952b38a25597b971dc4ac9a23d97b",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT431_actual_CPU_HOST.py": "6ce29ee526e591aba885e50331b181cb45d3ae4d64826fa3ed470f724624faf0"
+  },
+  "parents": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-accounting-witness-host-v429": {
+      "freeze_sha256": "8a0eacfe0088ef64f31448fefb07e4ae1d65ab33fe49d3486743dde84a2f866a",
+      "archive_sha256": "393b0d77b715891884b14fae27607b3abe8ea84edde029c90675da9e25343e86"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-prefill-incumbent-KV-protocol-host-v427": {
+      "freeze_sha256": "77a9c38924ffa43b578b0efda077a15ddc7f5120cc7794450941aaca2ef39b36",
+      "archive_sha256": "740d69e47f531b2264b5e4da85a58d937fdee06af815bf5fe6721461e24e2f83"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-parent4-prestartup-commit-binding-v430": {
+      "freeze_sha256": "7f62e8f127ea33a70bde2068399e7d4469fb5312149fd9e73ff2e206bf619424",
+      "archive_sha256": "d4450d7a20b5eb3ad710901b3246c5b56eae4365377b55f81b5b1dce5d7d1d4a"
+    }
+  },
+  "NN_launched": false,
+  "NN_permission_granted": false,
+  "serving_installed": false,
+  "global_active_limit": 64,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,8 @@
+{
+  "status": "PASS_HOST402_SCOPE_CALLBACK_AND_PROVENANCE_CORRUPTIONS",
+  "NPU_used": false,
+  "uses_HOST_doubles": true,
+  "original_scope_failure_retained": true,
+  "qualification_flag_assignments": false,
+  "production_qualified": false
+}

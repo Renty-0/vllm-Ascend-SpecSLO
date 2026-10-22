@@ -58,8 +58,8 @@
   ],
   "paused_after_current316": true,
   "additional_NPU_experiment_started_after316": false,
-  "latest_snapshot_files_verified": 4091,
-  "latest_snapshot_python_syntax_verified": 3011,
+  "latest_snapshot_files_verified": 6081,
+  "latest_snapshot_python_syntax_verified": 4106,
   "ROOT398_actual_global64_full_ownAR_all3": true,
   "ROOT398_actual_global64_Raw": 599.5623377435959,
   "ROOT398_actual_global64_Goodput": 214.96187487135404,
@@ -76,5 +76,54 @@
   "ROOT402_device_full_qualification": "not launched",
   "ROOT402_original_gain_model_and_paid_role_limits_unchanged": true,
   "ROOT401_base_shaper_HOST_not_installed_typed_callback": true,
-  "ROOT402_private_archival": "old394 and negative299; all archive hashes checked; current/best/control untouched"
+  "ROOT402_private_archival": "old394 and negative299; all archive hashes checked; current/best/control untouched",
+  "ROOT462_qualified_full_result": {
+    "status": "FULL462_GLOBAL64_COMPLETE_INDEPENDENTLY_AUDITED_SINGLE_RUN_GAIN",
+    "global_active_limit": 64,
+    "actual_active_peak": 48,
+    "Raw": 681.6589336606439,
+    "Goodput": 460.81910634078093,
+    "attained": 313,
+    "requests": 463,
+    "previous_global64_best_Goodput": 439.1622144545149,
+    "Goodput_ratio": 1.0493141057528506,
+    "target_ranks": 3,
+    "exact_requests_each_target": 463,
+    "exact_tokens_each_target": 118528,
+    "original_node_cases": 227,
+    "original_uniform_KV_cases": 681,
+    "additional_own_physical_cases": 693,
+    "lifecycle_cases": 75,
+    "incumbent_prefill_cases": 6,
+    "source_and_environment_checks_passed": true,
+    "source_freeze_SHA256": "9f79697914d74f79cc94fe4605c8f20665c44ee2f6b33fe99b59b73d7b4e2280",
+    "source_archive_SHA256": "cebb1af09f459d8e0a64b9a6b7561721f07e787cca5fb809fd09552e483bfbd9",
+    "final_matched_repeats": 0,
+    "performance_goal_achieved": false,
+    "format_ci": "Attempted; pre-commit is not installed. No environment install or upgrade performed.",
+    "snapshot_has_NPU_qualification": false,
+    "model_or_dataset_copied": false,
+    "raw_NPU_tensors_or_graph_caches_copied": false,
+    "original_byte_exact_full_backup": false
+  },
+  "ROOT462_snapshot_checks": {
+    "exact_source_files": 6081,
+    "python_AST_sources": 4106,
+    "bash_n_sources": 320,
+    "credential_pattern_hits": 0,
+    "compressed_evidence_hashes": 8,
+    "format_sh_ci_exit_code": 1,
+    "format_sh_ci_reason": "pre-commit is not installed; no dependency/environment installation performed",
+    "NPU_used_by_snapshot_checks": false,
+    "all3_full463_AR_already_independently_qualified": true,
+    "git_diff_cached_check": {
+      "exit_code": 2,
+      "reason": "Three original source trailing-whitespace lines are preserved to retain exact frozen source hashes; no functional change.",
+      "files": [
+        "budget-diagnostics/launch_ROOT454_real32_MC2.py",
+        "budget-diagnostics/launch_ROOT455_whole_model.py",
+        "tree-active64-whole-proposal-segment-limit-v398/runtime398.py"
+      ]
+    }
+  }
 }

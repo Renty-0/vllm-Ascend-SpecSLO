@@ -1,0 +1,32 @@
+{
+  "UTC": "2026-10-21T10:05:41.685715+00:00",
+  "status": "HOST_SOURCE_COMPOSITION_FROZEN_NO_PRODUCTION_LAUNCHER_OR_NN_PERMISSION",
+  "source": "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432",
+  "HOST_result": "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432/HOST432_COMPOSITION_RESULT.json",
+  "composition_HOST_passed": true,
+  "scope": "Full original430 plus actual427 extra NN proof and declared nonempty admission with actual same-generation duration/state witnesses",
+  "parent430_UNCHANGED": true,
+  "all_original_227_681_75_math_required": true,
+  "extra_NN427_cases": 6,
+  "old_incumbents": 32,
+  "new_owner_representative_N": [
+    2,
+    32
+  ],
+  "global_active_limit": 64,
+  "low_water": 32,
+  "min_refill": 8,
+  "max_nonempty_refill": 32,
+  "original_arrival_prefill_and_incumbent_charge_clocks_preserved": true,
+  "NN_launched": false,
+  "check432_and_launcher_missing": false,
+  "frozen": true,
+  "Raw": null,
+  "Goodput": null,
+  "next": "Read actual430 result first; if needed finalize own432 source gate+owned guard+fresh full startup prerequisites without editing frozen430. No E4 or original427 NN proof inherited from earlier process.",
+  "parent433_lifetime_source_frozen": "67560bc431ed7fd44aad19c49e060e4049227f128570a43d433dc5e491330a27",
+  "original218_shadow_comparisons_through_extra427_then_original_close": true,
+  "HOST_recheck_pending": false,
+  "source_gate_present": true,
+  "production_launcher_present": false
+}

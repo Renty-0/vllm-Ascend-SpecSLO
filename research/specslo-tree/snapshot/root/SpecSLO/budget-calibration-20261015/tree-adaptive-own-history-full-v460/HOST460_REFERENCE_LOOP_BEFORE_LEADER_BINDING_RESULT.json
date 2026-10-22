@@ -1,0 +1,18 @@
+{
+  "UTC": "2026-10-22T14:30:04.906697+00:00",
+  "status": "PASS_HOST460_SYMBOLIC_INDEPENDENT_AR_PARTITION_AND_CAUSALITY",
+  "HOST_fixture_only": true,
+  "simulated_owners": 6,
+  "independent_predictions": 1530,
+  "every_owner_position_predicted_once": true,
+  "all_reference_inputs_from_own_previous_outputs": true,
+  "exact_per_position_M_schedule_preserved": true,
+  "all_future_canary_controls_passed": true,
+  "draft_and_target_stage_labels_identical": true,
+  "original_full_AR_source_inverse_passed": true,
+  "actual_model_constructors": 0,
+  "NPU_used": false,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

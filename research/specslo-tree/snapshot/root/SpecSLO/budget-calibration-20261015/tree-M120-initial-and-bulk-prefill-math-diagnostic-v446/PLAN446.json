@@ -1,0 +1,43 @@
+{
+  "schema": "ROOT446.initial-and-bulk-known-prefill-diagnostic.v1",
+  "fresh_same_engine_parent445_reexecuted": true,
+  "physical_M": 120,
+  "physical_S": 24,
+  "decode_owners": 16,
+  "initial_candidate_reference": [
+    72,
+    73
+  ],
+  "continuation_candidate_reference": [
+    16,
+    40
+  ],
+  "initial_lengths": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    17,
+    40
+  ],
+  "continuation_lengths": [
+    17,
+    40
+  ],
+  "all72_original_prefixes_protected": true,
+  "all10_external_frames_retained": true,
+  "branch_copy_coexistence_qualified": false,
+  "draft_prefill_qualified": false,
+  "admission_qualified": false,
+  "full463": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "caps": {
+    "seconds": 3600,
+    "tag_MiB": 192,
+    "aggregate_MiB": 3584
+  },
+  "Git_pushes": 0
+}

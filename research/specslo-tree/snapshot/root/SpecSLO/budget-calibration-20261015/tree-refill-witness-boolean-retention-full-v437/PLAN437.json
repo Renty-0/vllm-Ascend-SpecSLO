@@ -1,0 +1,16 @@
+{
+  "schema": "ROOT437.actual-refill-witness-boolean-fix.v1",
+  "actual436_failure": "strict need(value is True) rejected a valid nonempty witness list",
+  "only_semantic_change": "type(rows) is list and rows -> type(rows) is list and bool(rows)",
+  "original436_all_neural_callbacks_identity_retained": true,
+  "global_active_limit": 64,
+  "fresh227_681_75_plus6_warm_twozero_seal_full463_all3ownAR_required": true,
+  "NN_permission_inherited": false,
+  "Native_flags_assigned": false,
+  "private_tag_MiB": 256,
+  "aggregate_private_MiB": 3584,
+  "runtime_seconds": 18000,
+  "Git_only_after_confirmed_effective_improvement": true,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,27 @@
+{
+  "status": "PASS_HOST425_PREINSTALL_ORIGINAL_ROOTSEED_AND_SINGLE_FAST_HOOKS",
+  "actual_original_RootSeed_and_FastV5_installers_called": true,
+  "explicit_class_doubles": true,
+  "Native_models_constructed": 0,
+  "original_runner_and_cache_wrapped_once": true,
+  "original_unsupported_topology_fallback_identity": true,
+  "unissued_or_forged_E4_permission_rejected_before_model": true,
+  "no_after_install_closure_mutation": true,
+  "source": {
+    "base_source_sha256": "95ba0a5923857c03690d40b32007fc6478e9d1d94c90aafdb68e4631908bc593",
+    "retained419_source_sha256": "16844549dc95c6ce1ba16051a334efdca6fbde97ff0dabf4dd8bea5ea267918a",
+    "original_E4_body_sha256": "3e5c5dfdb582cc9b63bd46c4183a2345137178301a3bb2c66e948eea0dcb440e",
+    "new_gated_E4_body_sha256": "fcbc6dbbdec20cf89773217ca317b580fef42422ce03cadf9072db25c32b2be2",
+    "entire_E4_body_inverse": true,
+    "original_top2_and_KV_helpers_unmodified": true,
+    "no_after_install_closure_mutation": true,
+    "original_install_and_runner_use_canonical_observer_globals": true,
+    "Native_flags_assigned": false
+  },
+  "actual_original_tail_observer_capture_eager_and_snapshot_called": true,
+  "CPU_model_double_only_for_observer_binding": true,
+  "current_production_permission": false,
+  "NPU_used": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,508 @@
+{
+  "status": "HOST_exhaustive_count_geometry_enumeration_only",
+  "effective_contract": {
+    "max_target_requests": 16,
+    "max_verification_candidates": 64,
+    "max_logical_queries": 80,
+    "min_B": 1,
+    "max_B": 5
+  },
+  "reachable_geometries": 2436,
+  "key_fields": [
+    "physical_queries",
+    "attention_segments",
+    "mask_query_capacity"
+  ],
+  "keys": [
+    {
+      "key": [
+        80,
+        16,
+        9
+      ],
+      "witness": {
+        "N": 1,
+        "candidates": 1,
+        "forks": 0,
+        "budgets": [
+          1
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        17,
+        9
+      ],
+      "witness": {
+        "N": 10,
+        "candidates": 10,
+        "forks": 0,
+        "budgets": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        17,
+        10
+      ],
+      "witness": {
+        "N": 1,
+        "candidates": 5,
+        "forks": 1,
+        "budgets": [
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        18,
+        9
+      ],
+      "witness": {
+        "N": 11,
+        "candidates": 11,
+        "forks": 0,
+        "budgets": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        18,
+        10
+      ],
+      "witness": {
+        "N": 2,
+        "candidates": 10,
+        "forks": 2,
+        "budgets": [
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        19,
+        10
+      ],
+      "witness": {
+        "N": 3,
+        "candidates": 15,
+        "forks": 3,
+        "budgets": [
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        20,
+        10
+      ],
+      "witness": {
+        "N": 4,
+        "candidates": 20,
+        "forks": 4,
+        "budgets": [
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        21,
+        10
+      ],
+      "witness": {
+        "N": 5,
+        "candidates": 25,
+        "forks": 5,
+        "budgets": [
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        22,
+        9
+      ],
+      "witness": {
+        "N": 12,
+        "candidates": 12,
+        "forks": 0,
+        "budgets": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        22,
+        10
+      ],
+      "witness": {
+        "N": 6,
+        "candidates": 30,
+        "forks": 6,
+        "budgets": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        23,
+        10
+      ],
+      "witness": {
+        "N": 7,
+        "candidates": 35,
+        "forks": 7,
+        "budgets": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        24,
+        10
+      ],
+      "witness": {
+        "N": 8,
+        "candidates": 40,
+        "forks": 8,
+        "budgets": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        25,
+        10
+      ],
+      "witness": {
+        "N": 9,
+        "candidates": 45,
+        "forks": 9,
+        "budgets": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        26,
+        10
+      ],
+      "witness": {
+        "N": 10,
+        "candidates": 50,
+        "forks": 10,
+        "budgets": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        27,
+        10
+      ],
+      "witness": {
+        "N": 11,
+        "candidates": 55,
+        "forks": 11,
+        "budgets": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        28,
+        10
+      ],
+      "witness": {
+        "N": 12,
+        "candidates": 60,
+        "forks": 12,
+        "budgets": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    },
+    {
+      "key": [
+        80,
+        29,
+        10
+      ],
+      "witness": {
+        "N": 16,
+        "candidates": 44,
+        "forks": 7,
+        "budgets": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    }
+  ],
+  "existing_155_case_keys": [
+    [
+      80,
+      16,
+      9
+    ],
+    [
+      80,
+      17,
+      9
+    ],
+    [
+      80,
+      17,
+      10
+    ],
+    [
+      80,
+      18,
+      9
+    ],
+    [
+      80,
+      18,
+      10
+    ],
+    [
+      80,
+      19,
+      10
+    ],
+    [
+      80,
+      20,
+      10
+    ],
+    [
+      80,
+      21,
+      10
+    ],
+    [
+      80,
+      22,
+      9
+    ],
+    [
+      80,
+      22,
+      10
+    ],
+    [
+      80,
+      23,
+      10
+    ],
+    [
+      80,
+      24,
+      10
+    ],
+    [
+      80,
+      25,
+      10
+    ],
+    [
+      80,
+      26,
+      10
+    ],
+    [
+      80,
+      27,
+      10
+    ],
+    [
+      80,
+      28,
+      10
+    ]
+  ],
+  "missing_keys": [
+    {
+      "key": [
+        80,
+        29,
+        10
+      ],
+      "witness": {
+        "N": 16,
+        "candidates": 44,
+        "forks": 7,
+        "budgets": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      }
+    }
+  ],
+  "all_four_fork_anchors_required_for_each_new_branch_key": true,
+  "other_graph_key_dimensions_and_dynamic_lengths_still_require_original_Native_validation": true,
+  "runtime_installed": false,
+  "NPU_qualified": false,
+  "performance_qualified": false,
+  "sources_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/enumerate_ROOT231_effective_key_domain_HOST.py": "16f03deb692c026b4445f76d510e5f6d82e4d7edec8ce4f3478b8853fc23f987",
+    "/root/SpecSLO/budget-calibration-20261015/tree-contiguous-branch-tail-final-metadata-math-v234/mapper231.py": "9895a9867fada5c812880175768f4ebfb5ce02fc1713f11c44f6e9d570e6e7e2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-contiguous-branch-tail-final-metadata-math-v234/neural_oracle231.py": "cd451d6bc96a52b88e2f08c3d9b85a8cec27bea823bb6a39b150a4bab0ab3079"
+  }
+}

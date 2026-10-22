@@ -1,0 +1,148 @@
+{
+  "status": "independent_synthetic267_audit_complete_NOT_qualified",
+  "receipt_sha256": "a868de4d65e3b72103cf15a0c8ba15be45b493e0b8fce788ecb925a6ce2cb301",
+  "measured_sha256": "622ec92503820775fa389ac03d75971949e22b65ca2641c5af36639b034fc82c",
+  "sources_unchanged": true,
+  "original_pre_post_verifiers_passed": true,
+  "all4idle": true,
+  "cases": 256,
+  "failed_required_invariance_cases": 128,
+  "pass_counts": {
+    "mixed_matches_same_bucket_homogeneous": 192,
+    "root_invariant_under_future_changes": 192,
+    "equal_positions_within_same_KV_bucket": 128
+  },
+  "failure_counts_by_prefix": {
+    "1505": 64,
+    "2555": 64
+  },
+  "max_abs_same_bucket_error": 6.103515625e-05,
+  "synthetic_costs": [
+    {
+      "heads": 24,
+      "KVheads": 3,
+      "prefix": 127,
+      "real": 23,
+      "capacity": 11,
+      "repeats": 64,
+      "paired_rounds": 80,
+      "all192_graph_outputs_match_eager": true,
+      "median_per_FIA_ms": {
+        "original2560": 0.12759256787830964,
+        "all4096": 0.17479048619861715,
+        "mixed_sentinel": 0.112159857962979
+      }
+    },
+    {
+      "heads": 24,
+      "KVheads": 3,
+      "prefix": 511,
+      "real": 23,
+      "capacity": 11,
+      "repeats": 64,
+      "paired_rounds": 80,
+      "all192_graph_outputs_match_eager": true,
+      "median_per_FIA_ms": {
+        "original2560": 0.12849117410951294,
+        "all4096": 0.17381436555297114,
+        "mixed_sentinel": 0.12046102710883133
+      }
+    },
+    {
+      "heads": 24,
+      "KVheads": 3,
+      "prefix": 1505,
+      "real": 23,
+      "capacity": 11,
+      "repeats": 64,
+      "paired_rounds": 80,
+      "all192_graph_outputs_match_eager": true,
+      "median_per_FIA_ms": {
+        "original2560": 0.1272547378903255,
+        "all4096": 0.17205495169037022,
+        "mixed_sentinel": 0.13225350630818866
+      }
+    },
+    {
+      "heads": 24,
+      "KVheads": 3,
+      "prefix": 2555,
+      "real": 23,
+      "capacity": 11,
+      "repeats": 64,
+      "paired_rounds": 80,
+      "all192_graph_outputs_match_eager": true,
+      "median_per_FIA_ms": {
+        "original2560": 0.1251353205589112,
+        "all4096": 0.17450412997277454,
+        "mixed_sentinel": 0.14823832680121996
+      }
+    },
+    {
+      "heads": 16,
+      "KVheads": 2,
+      "prefix": 127,
+      "real": 23,
+      "capacity": 11,
+      "repeats": 64,
+      "paired_rounds": 80,
+      "all192_graph_outputs_match_eager": true,
+      "median_per_FIA_ms": {
+        "original2560": 0.0963660204433836,
+        "all4096": 0.12808131214114837,
+        "mixed_sentinel": 0.09627204417483881
+      }
+    },
+    {
+      "heads": 16,
+      "KVheads": 2,
+      "prefix": 511,
+      "real": 23,
+      "capacity": 11,
+      "repeats": 64,
+      "paired_rounds": 80,
+      "all192_graph_outputs_match_eager": true,
+      "median_per_FIA_ms": {
+        "original2560": 0.09672313899500296,
+        "all4096": 0.12757144577335566,
+        "mixed_sentinel": 0.09974648855859414
+      }
+    },
+    {
+      "heads": 16,
+      "KVheads": 2,
+      "prefix": 1505,
+      "real": 23,
+      "capacity": 11,
+      "repeats": 64,
+      "paired_rounds": 80,
+      "all192_graph_outputs_match_eager": true,
+      "median_per_FIA_ms": {
+        "original2560": 0.09672243686509319,
+        "all4096": 0.1276723123737611,
+        "mixed_sentinel": 0.10687229587347247
+      }
+    },
+    {
+      "heads": 16,
+      "KVheads": 2,
+      "prefix": 2555,
+      "real": 23,
+      "capacity": 11,
+      "repeats": 64,
+      "paired_rounds": 80,
+      "all192_graph_outputs_match_eager": true,
+      "median_per_FIA_ms": {
+        "original2560": 0.09638570190872997,
+        "all4096": 0.1296207046834752,
+        "mixed_sentinel": 0.11649444786598906
+      }
+    }
+  ],
+  "conclusion": "Reject for production: fixed4096 sentinel does not establish same-bucket/future/position invariance on long contexts; short-context isolated FIA gains do not establish end-to-end gain and long-context cases are slower",
+  "neural_model_or_greedy_difference_claimed": false,
+  "NPU_used_by_auditor": false,
+  "neural_qualified": false,
+  "production_installed": false,
+  "Goodput": null
+}

@@ -1,0 +1,30 @@
+{
+  "status": "PASS_HOST428_REAL_CURRENT_STATE_METADATA_AND_OBSERVER",
+  "CPU_cases": 192,
+  "old_missing376_field_failure_reproduced": true,
+  "actual_current425_field_only": true,
+  "actual_native_packer_and_static_transform": true,
+  "original_target391_observer_body_used": true,
+  "changed_roots_only_checked": true,
+  "controlled_metadata_negatives": [
+    "context_lens",
+    "sequence_lens",
+    "input"
+  ],
+  "actual_false_flag_cannot_be_overridden_by_legacy_true": true,
+  "source": {
+    "original_source_sha256": "36d1cb9ff1c826f24bbc88d2a1966f481c4ad2186c51abd9e9e089fa361e9579",
+    "projected_source_sha256": "1dde0cf52881dc9feb6adc7ffdff2141f91b9d7127d4db6c7a86f998b11825e6",
+    "entire_source_inverse": true,
+    "actual_selector": "uniform_KV_bucket425_enabled",
+    "independent_inputs_geometry_and_math_unchanged": true,
+    "backend_callback_reinstalled": false,
+    "Native_flags_assigned": false
+  },
+  "NPU_used": false,
+  "Native_models_constructed": 0,
+  "NN_math_qualified": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

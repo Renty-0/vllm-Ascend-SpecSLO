@@ -1,0 +1,24 @@
+{
+  "schema": "ROOT449.truthful-single-graph-isolation-scope.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/HOST449_CONSTRUCTION_RESULT.json": "c274de71e9fad346f45006f1570c01faa1d0cd3d146b1aadfee39954eef31450",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/PLAN449.json": "c510e492561c3197bb4e7b3cefd33c7bc53a731ec9ae2177eb4374fb7d9c4d3e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/audit449.py": "03272dbccaf6e23a0336356d8ac8cca478dc5a362841bbf022775b9c3eba6a13",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/check449.py": "0c8c9c78d560ab5c380dd58a2818349a9588623bd060fedf7973cdbb05475f6e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/check449_HOST.py": "de759933387a6e0ecffd155198573c5e9f0cc3cb40008ebb4395bccb3380e1e5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/forward449.py": "3b9211f820aea6577f70b1a842cf596a649bb0d3921be89459ea270f4e0d42d5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/guard449.py": "e450678919e691262d237d1396682975088c3d81fd5cee77afee9366645798fe",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/host_env449.py": "83a4338036f7edc03b142e406cff7e9ebf9e18f6907ae572fbe7011d68456601",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/probe449.py": "2e9319489407f11d74fa28cdd071b4fc86434eeee1873ff48f5145003a0cb1a1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/runtime449.py": "84350b5dca3292978ce9f9c876b511aa6f5954f7d04666c3ee58449ea3ae312c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449/startup449.sh": "a43aea6111ff81778cb27701398ddf407edf46976e140f3569c0f37bca23dd7b"
+  },
+  "parent385_freeze": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+  "parent385_archive": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
+  "current448_freeze": "4611321dae535bc6db1f57680c3254504b1cd214e1cd52d5bcc0dbf28d1c1728",
+  "current448_archive": "65e7f4fed325fd3e3da3e42ebf19eff6b426b6e17fa6400e5c6ec59a7e8ad901",
+  "NPU_run": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

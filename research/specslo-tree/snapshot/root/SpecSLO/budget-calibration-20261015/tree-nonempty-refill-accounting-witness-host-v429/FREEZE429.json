@@ -1,0 +1,29 @@
+{
+  "schema": "ROOT429.HOST-only-accounting-witness-source-freeze.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-accounting-witness-host-v429/admission429.py": "f20f06be0fa986558fad70345cceaa5ad0a71260ea6d0ed9a0f9224a80f524d1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-accounting-witness-host-v429/audit429.py": "81d86be556895f233e016d6aec1d244f0c6fcbefe79a3933a195f04d86578b8e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-accounting-witness-host-v429/HOST429-check429_HOST.py.log": "420f285d859582df5a8ac8b3ebd683b44bf52215d307f42f4a93d7047fedd7fc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-accounting-witness-host-v429/HOST429_RESULT.json": "f1051c3ecbd5da31f49e7a91041fef87ca74c03ccb60dba33cf535be6905fa3a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-accounting-witness-host-v429/check429_HOST.py": "999b8b6af2ecd103bb739810417a8afd906e570bbde3485624ce992963796966",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-accounting-witness-host-v429/HOST429_CLEAN_STARTUP_RUN.json": "0922788926fb7f309c3855a93223ea990e81579ea5fad5d411c5cc680bccf694",
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-accounting-witness-host-v429/PLAN429.json": "41f74f6c53bca332c3d56b389696af3cd1c8d88e265e6a05eb5f28bffc47a180",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT429_actual_CPU_HOST.py": "23961d5a4be1b724ed9ee50609747fd3cd4d25aa24397c4ed74398ab8f6b52b8"
+  },
+  "parents": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-refill-resource-host-v426": {
+      "freeze_sha256": "7753e8949156edfde65a7ce7c7b558b9843f3cbd438b18ca341f047678073600",
+      "archive_sha256": "01319b786998c9d6184775e8f8e438500545898322b196f4f1580303955e5869"
+    },
+    "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-prefill-incumbent-KV-protocol-host-v427": {
+      "freeze_sha256": "77a9c38924ffa43b578b0efda077a15ddc7f5120cc7794450941aaca2ef39b36",
+      "archive_sha256": "740d69e47f531b2264b5e4da85a58d937fdee06af815bf5fe6721461e24e2f83"
+    }
+  },
+  "NN_permission": false,
+  "NN_launched": false,
+  "serving_installed": false,
+  "global_active_limit": 64,
+  "Raw": null,
+  "Goodput": null
+}

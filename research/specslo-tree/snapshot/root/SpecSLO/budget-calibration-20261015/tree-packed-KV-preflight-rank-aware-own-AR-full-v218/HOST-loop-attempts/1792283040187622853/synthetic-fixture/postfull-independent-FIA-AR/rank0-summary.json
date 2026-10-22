@@ -1,0 +1,209 @@
+{
+  "schema": "ROOT218.postfull-independent-FIA80-AR.v1",
+  "rank": 0,
+  "completed": true,
+  "backend": "original target TP3 BF16 causal FIA Q80/S16; only first query per owner consumed",
+  "source_artifact": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/HOST-loop-attempts/1792283040187622853/synthetic-fixture/windows/window32/full463/rank0-full463-actual-trace.json.gz",
+  "source_artifact_sha256": "21354eab705697bd9c704047746ab391011eb5ced051b1db95aecf7a3727d132",
+  "candidate_result_artifact": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/HOST-loop-attempts/1792283040187622853/synthetic-fixture/windows/window32/full463/rank1-full463-actual-trace.json.gz",
+    "bytes": 1281928,
+    "sha256": "3daf44fbce7f6d3a5da7a172f2e3671121eea4fe92b4fe83c34f4a10fee7fe5e"
+  },
+  "candidate_result_owner_rank": 1,
+  "same_prefill_cohorts": true,
+  "reference_trajectories_generated": 0,
+  "reference_only_prompt_plus_own_outputs": true,
+  "candidate_KV_or_tokens_seeded": false,
+  "performance_clock_already_finished": true,
+  "cohorts": [
+    {
+      "ordinal": 0,
+      "owners": 1,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 19
+    },
+    {
+      "ordinal": 1,
+      "owners": 17,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 126
+    },
+    {
+      "ordinal": 2,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 183
+    },
+    {
+      "ordinal": 3,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 174
+    },
+    {
+      "ordinal": 4,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 161
+    },
+    {
+      "ordinal": 5,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 155
+    },
+    {
+      "ordinal": 6,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 165
+    },
+    {
+      "ordinal": 7,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 175
+    },
+    {
+      "ordinal": 8,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 159
+    },
+    {
+      "ordinal": 9,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 204
+    },
+    {
+      "ordinal": 10,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 187
+    },
+    {
+      "ordinal": 11,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 142
+    },
+    {
+      "ordinal": 12,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 261
+    },
+    {
+      "ordinal": 13,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 303
+    },
+    {
+      "ordinal": 14,
+      "owners": 32,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 354
+    },
+    {
+      "ordinal": 15,
+      "owners": 29,
+      "steps": 0,
+      "exact_reference_sha256": null,
+      "actual_unique_pages": 298
+    }
+  ],
+  "comparison": null,
+  "Native": {
+    "before": {
+      "aclgraph_captures": 0,
+      "aclgraph_capture_attempts": 0,
+      "aclgraph_runtime_validation_replays": 0,
+      "aclgraph_failed_captures": 0,
+      "aclgraph_capacity_fallbacks": 0,
+      "aclgraph_shape_fallbacks": 0,
+      "aclgraph_generic_eager_fallback_calls": 0,
+      "aclgraph_generic_disabled_entry_calls": 0,
+      "aclgraph_generic_unclassified_calls": 0,
+      "aclgraph_generic_runtime_validation_calls": 0,
+      "aclgraph_generic_runtime_validation_failures": 0,
+      "aclgraph_draft_eager_fallback_calls": 0,
+      "aclgraph_draft_disabled_entry_calls": 0,
+      "aclgraph_draft_unclassified_calls": 0,
+      "aclgraph_draft_runtime_validation_calls": 0,
+      "aclgraph_draft_runtime_validation_failures": 0,
+      "aclgraph_target_eager_fallback_calls": 0,
+      "aclgraph_target_disabled_entry_calls": 0,
+      "aclgraph_target_unclassified_calls": 0,
+      "aclgraph_target_runtime_validation_calls": 0,
+      "aclgraph_target_runtime_validation_failures": 0
+    },
+    "after": {
+      "aclgraph_captures": 0,
+      "aclgraph_capture_attempts": 0,
+      "aclgraph_runtime_validation_replays": 0,
+      "aclgraph_failed_captures": 0,
+      "aclgraph_capacity_fallbacks": 0,
+      "aclgraph_shape_fallbacks": 0,
+      "aclgraph_generic_eager_fallback_calls": 0,
+      "aclgraph_generic_disabled_entry_calls": 0,
+      "aclgraph_generic_unclassified_calls": 0,
+      "aclgraph_generic_runtime_validation_calls": 0,
+      "aclgraph_generic_runtime_validation_failures": 0,
+      "aclgraph_draft_eager_fallback_calls": 0,
+      "aclgraph_draft_disabled_entry_calls": 0,
+      "aclgraph_draft_unclassified_calls": 0,
+      "aclgraph_draft_runtime_validation_calls": 0,
+      "aclgraph_draft_runtime_validation_failures": 0,
+      "aclgraph_target_eager_fallback_calls": 0,
+      "aclgraph_target_disabled_entry_calls": 0,
+      "aclgraph_target_unclassified_calls": 0,
+      "aclgraph_target_runtime_validation_calls": 0,
+      "aclgraph_target_runtime_validation_failures": 0
+    },
+    "delta": {
+      "aclgraph_captures": 0,
+      "aclgraph_capture_attempts": 0,
+      "aclgraph_runtime_validation_replays": 0,
+      "aclgraph_failed_captures": 0,
+      "aclgraph_capacity_fallbacks": 0,
+      "aclgraph_shape_fallbacks": 0,
+      "aclgraph_generic_eager_fallback_calls": 0,
+      "aclgraph_generic_disabled_entry_calls": 0,
+      "aclgraph_generic_unclassified_calls": 0,
+      "aclgraph_generic_runtime_validation_calls": 0,
+      "aclgraph_generic_runtime_validation_failures": 0,
+      "aclgraph_draft_eager_fallback_calls": 0,
+      "aclgraph_draft_disabled_entry_calls": 0,
+      "aclgraph_draft_unclassified_calls": 0,
+      "aclgraph_draft_runtime_validation_calls": 0,
+      "aclgraph_draft_runtime_validation_failures": 0,
+      "aclgraph_target_eager_fallback_calls": 0,
+      "aclgraph_target_disabled_entry_calls": 0,
+      "aclgraph_target_unclassified_calls": 0,
+      "aclgraph_target_runtime_validation_calls": 0,
+      "aclgraph_target_runtime_validation_failures": 0
+    }
+  },
+  "cache_released": true,
+  "cross_backend_PA_or_official_AR_equivalence_claimed": false,
+  "formal_Goodput": false,
+  "adopted": false
+}

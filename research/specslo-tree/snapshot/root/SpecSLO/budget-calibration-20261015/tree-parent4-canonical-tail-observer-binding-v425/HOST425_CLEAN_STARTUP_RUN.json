@@ -1,0 +1,33 @@
+{
+  "status": "PASS_HOST425_ACTUAL_RUNTIME_CLEAN_PACKING_AND_LIVE_BINDING",
+  "results": [
+    {
+      "script": "check425_old423_observer_regression_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/HOST425-check425_old423_observer_regression_HOST.py.log"
+    },
+    {
+      "script": "check425_factory_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/HOST425-check425_factory_HOST.py.log"
+    },
+    {
+      "script": "check425_live_binding_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/HOST425-check425_live_binding_HOST.py.log"
+    },
+    {
+      "script": "check425_construction_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/HOST425-check425_construction_HOST.py.log"
+    },
+    {
+      "script": "check425_paid_binding_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/HOST425-check425_paid_binding_HOST.py.log"
+    }
+  ],
+  "NPU_used": false,
+  "model_constructors": 0,
+  "existing_runtime_and_only_existing_freeze_environment_fields": true
+}

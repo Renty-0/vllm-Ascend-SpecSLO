@@ -1,0 +1,14 @@
+{
+  "UTC": "2026-10-18T22:48:34.250448+00:00",
+  "schema": "ROOT296.concrete-device-span-target-NN.v1",
+  "change": "Resolve current concrete NPU from actual cache tensor before unchanged strict all128-cache pointer/storage checks",
+  "kernel_and_attention_bodies_unchanged": true,
+  "unchanged_geometry": "M120/S24/uniformQ5/KV2560/C96",
+  "unchanged_fixture_and_408_case_declaration": true,
+  "numeric_scope": "408 actual NN cases on three targets; all128KV/hidden/greedy bitwise and72 own prefixes protected",
+  "cost_scope": "11 configurations, B4..8,20 rotated synchronous target pairs, after math passes",
+  "qualification_inherited": false,
+  "performance": false,
+  "Goodput": null,
+  "adopted": false
+}

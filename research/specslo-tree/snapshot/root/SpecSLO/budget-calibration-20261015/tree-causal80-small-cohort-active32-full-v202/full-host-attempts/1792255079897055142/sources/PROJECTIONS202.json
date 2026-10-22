@@ -1,0 +1,495 @@
+{
+  "all_parent_math_executed_current": true,
+  "guard_projection": [
+    {
+      "deltas": [],
+      "file": "GUARD_INPUTS202.json",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v197-root-execution/GUARD_INPUTS197.json",
+      "parent_sha256": "1b3430786c24858609a0b59f3ba577861df26e2a2a414a0e97f1cef10c1f09a9"
+    },
+    {
+      "deltas": [
+        {
+          "end": 317,
+          "new": "",
+          "old": "empty-active-cohort-",
+          "start": 297
+        },
+        {
+          "end": 325,
+          "new": "-small-cohort",
+          "old": "",
+          "start": 325
+        },
+        {
+          "end": 989,
+          "new": "0,existing_target_keys=",
+          "old": "",
+          "start": 989
+        },
+        {
+          "end": 1010,
+          "new": "[n",
+          "old": "16",
+          "start": 1008
+        },
+        {
+          "end": 1013,
+          "new": "5*n",
+          "old": "80",
+          "start": 1011
+        },
+        {
+          "end": 1022,
+          "new": "]for n in range(9,17)",
+          "old": "",
+          "start": 1022
+        },
+        {
+          "end": 2062,
+          "new": "5",
+          "old": "4",
+          "start": 2061
+        },
+        {
+          "end": 2269,
+          "new": "5",
+          "old": "4",
+          "start": 2268
+        },
+        {
+          "end": 3257,
+          "new": "from base202 import require_production_parent\n ",
+          "old": "",
+          "start": 3257
+        },
+        {
+          "end": 3307,
+          "new": "_parent(archive=True),P197=require_production",
+          "old": "",
+          "start": 3307
+        },
+        {
+          "end": 6877,
+          "new": "('passed_numerical_variant_full'if actual['numerical_variant_only']else",
+          "old": "",
+          "start": 6877
+        },
+        {
+          "end": 6890,
+          "new": ")",
+          "old": "",
+          "start": 6890
+        }
+      ],
+      "file": "guard202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v197-root-execution/guard197.py",
+      "parent_sha256": "f2d526641d919bb7b32b6eb69c1df8f7920d5fed4a5b23996b38d1144a6d64fc"
+    },
+    {
+      "deltas": [
+        {
+          "end": 197,
+          "new": "",
+          "old": "empty-active-cohort-",
+          "start": 177
+        },
+        {
+          "end": 205,
+          "new": "-small-cohort",
+          "old": "",
+          "start": 205
+        },
+        {
+          "end": 308,
+          "new": "",
+          "old": "empty-active-cohort-",
+          "start": 288
+        },
+        {
+          "end": 316,
+          "new": "-N9-to15-allB4-empty",
+          "old": "",
+          "start": 316
+        },
+        {
+          "end": 464,
+          "new": "",
+          "old": "empty-active-cohort-",
+          "start": 444
+        },
+        {
+          "end": 472,
+          "new": "-N9-to15-allB4-empty",
+          "old": "",
+          "start": 472
+        }
+      ],
+      "file": "launch202.sh",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v197-root-execution/launch197.sh",
+      "parent_sha256": "b801f650ab43fab8c7dbf0a96a8a4d1ac0b1853ff639708e4185fccaf654eb69"
+    },
+    {
+      "deltas": [
+        {
+          "end": 115,
+          "new": "",
+          "old": "empty-active-cohort-",
+          "start": 95
+        },
+        {
+          "end": 123,
+          "new": "-small-cohort",
+          "old": "",
+          "start": 123
+        },
+        {
+          "end": 226,
+          "new": "",
+          "old": "empty-active-cohort-",
+          "start": 206
+        },
+        {
+          "end": 234,
+          "new": "-N9-to15-allB4-empty",
+          "old": "",
+          "start": 234
+        }
+      ],
+      "file": "startup202.sh",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v197-root-execution/startup197.sh",
+      "parent_sha256": "40f4938877d09da6c189b3a6303020d7b7b17ef6de5b2d310c8807f0e1a461c5"
+    }
+  ],
+  "new_usage_only": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15
+  ],
+  "no_parent_globals_mutated": true,
+  "projection": [
+    {
+      "deltas": [
+        {
+          "end": 5127,
+          "new": "202",
+          "old": "173",
+          "start": 5124
+        },
+        {
+          "end": 9770,
+          "new": "from audit_usage202 import audit as usage_audit\n usage=usage_audit(Path(directory)/'causal80-seven-real-N-current-process')\n require(all(r['component']['usage']['audit']==usage for r in reports),'same actual seven-use evidence on all4')\n compatible=value['old_padding_behavior_equal']and usage['crossM_behavior_equal']\n ",
+          "old": "",
+          "start": 9770
+        },
+        {
+          "end": 9860,
+          "new": "seven_usage=usage,old_padding_behavior_equal=compatible,numerical_variant_only=not compatible,",
+          "old": "",
+          "start": 9860
+        }
+      ],
+      "file": "audit202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/audit197.py",
+      "parent_sha256": "e352db6384735d1bf3f1d80933250cd6101d27ee0b14930597a72b1551339241"
+    },
+    {
+      "deltas": [
+        {
+          "end": 326,
+          "new": "",
+          "old": "empty-active-cohort-",
+          "start": 306
+        },
+        {
+          "end": 334,
+          "new": "-N9-to15-allB4-empty",
+          "old": "",
+          "start": 334
+        },
+        {
+          "end": 4264,
+          "new": "\nP197=B/'tree-empty-active-cohort-causal80-active32-full-v197'\ndef require_production_parent(*,archive=False):\n import tarfile\n pin=read(P/'INPUTS202.json')['P197'];f=read(P197/'FROZEN_SOURCE197.json')\n require(sha(P197/'FROZEN_SOURCE197.json')==pin['freeze_sha256'],'sole frozen production parent197')\n expected={**f['files'],**f['external_files'],**f['retained_HOST_evidence'],**f['execution_guard_inputs'],**f['peer_reviews'],str(P197/'CPU_RESULT197.json'):f['CPU_sha256'],str(P197/'FROZEN_SOURCE197.json'):pin['freeze_sha256'],f['root_review']['path']:f['root_review']['sha256']}\n for p,h in expected.items():require(sha(p)==h,'immutable197 source/evidence '+p)\n if archive:\n  path=Path(pin['archive']['path']);require(sha(path)==pin['archive']['sha256'],'original197 archive in place')\n  with tarfile.open(path,'r:gz')as a:\n   members=a.getmembers();require(len(members)==len(expected)and len({m.name for m in members})==len(members),'197 exact regular archive inventory')\n   for m in members:require(m.isfile()and '/'+m.name in expected and hashlib.sha256(a.extractfile(m).read()).hexdigest()==expected['/'+m.name],'197 archive member '+m.name)\n return dict(production_parent=str(P197),archive_verified_in_place=archive,device_qualification_inherited=False)\n",
+          "old": "",
+          "start": 4264
+        }
+      ],
+      "file": "base202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/base197.py",
+      "parent_sha256": "7a8ee69d1516b2e83e6c1e81caf94709b1f3a4fcd118cfa0a83e91fd2d1f44e7"
+    },
+    {
+      "deltas": [
+        {
+          "end": 542,
+          "new": "\n from base202 import require_production_parent\n require_production_parent(archive=archive)",
+          "old": "",
+          "start": 542
+        },
+        {
+          "end": 2841,
+          "new": "5",
+          "old": "4",
+          "start": 2840
+        }
+      ],
+      "file": "check202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/check197.py",
+      "parent_sha256": "94b27f06b2af8d50e4b193356509a4545a33be8cfb38f2608ff59c212d3ef05f"
+    },
+    {
+      "deltas": [
+        {
+          "end": 412,
+          "new": "pa",
+          "old": "",
+          "start": 412
+        },
+        {
+          "end": 417,
+          "new": "n",
+          "old": "sul",
+          "start": 414
+        },
+        {
+          "end": 454,
+          "new": ")\n engine._v202_parent_component=parent\n from actor202 import run as usage\n own=usage(engine,native,stage,policy,output)\n from mapper202 import issue\n stage('issue-current-seven-N-usage',lambda:issue(engine,own))\n result=dict(parent,usage=own,old_padding_behavior_equal=proof['old_padding_behavior_equal']and own['audit']['crossM_behavior_equal'],numerical_variant_only=proof['numerical_variant_only']or own['audit']['numerical_variant_only']",
+          "old": "",
+          "start": 454
+        }
+      ],
+      "file": "component202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/component197.py",
+      "parent_sha256": "d3436c735f22ad8f31cd81562bd62d7fdcb33d2dc67416a630020c93858feb0f"
+    },
+    {
+      "deltas": [],
+      "file": "config202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/config197.py",
+      "parent_sha256": "7eed2bd90250f35cadd07d47d7648db8dc5dc44e2efd571f761b9c8630991c98"
+    },
+    {
+      "deltas": [],
+      "file": "empty202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/empty197.py",
+      "parent_sha256": "feba618d206287da4392f4a9199940d30be43eed8d4c33454c370a08a6e85bef"
+    },
+    {
+      "deltas": [
+        {
+          "end": 263,
+          "new": "from mapper202 import controls_class\n ",
+          "old": "",
+          "start": 263
+        },
+        {
+          "end": 331,
+          "new": "",
+          "old": "parent_module('mapper173').",
+          "start": 304
+        },
+        {
+          "end": 420,
+          "new": "\n from mapper202 import install_pad\n install_pad(native)",
+          "old": "",
+          "start": 420
+        },
+        {
+          "end": 553,
+          "new": "9",
+          "old": "",
+          "start": 553
+        },
+        {
+          "end": 555,
+          "new": "",
+          "old": "3",
+          "start": 554
+        },
+        {
+          "end": 556,
+          "new": ",new_usage_real_N=list(range(9,16)),new_target_keys=0,new_MC2_profile=False",
+          "old": "",
+          "start": 556
+        }
+      ],
+      "file": "extension202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/extension197.py",
+      "parent_sha256": "7d7044e95c34265ed5c0c1764e1c7e9ff45f2d3b35ccb2d32b21401d2f647560"
+    },
+    {
+      "deltas": [
+        {
+          "end": 11,
+          "new": "ive",
+          "old": "our",
+          "start": 8
+        }
+      ],
+      "file": "host_full202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/host_full197.py",
+      "parent_sha256": "4ed7c66977905d6516383bc5ff5b594acab1f703c6c252f5699e2f67e3f11480"
+    },
+    {
+      "deltas": [],
+      "file": "next4_202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/next4_197.py",
+      "parent_sha256": "3d1c39f626d82dce324e15afc882ffe35e8d79037cb165b1161cee514e4708a4"
+    },
+    {
+      "deltas": [],
+      "file": "prefill202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/prefill197.py",
+      "parent_sha256": "df246c0b8d207cc7c7b17d98ab69ad09095cb1a2c3adf75c49876bfc5fc3ae8f"
+    },
+    {
+      "deltas": [],
+      "file": "progress202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/progress197.py",
+      "parent_sha256": "580274b5e8a8c37386b9f5a5b7883d538f50cebf2dcdac449f8b3d2b0308c8ef"
+    },
+    {
+      "deltas": [],
+      "file": "publication202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/publication197.py",
+      "parent_sha256": "6a52449202825633b0cb146dd7d2d335f665c54eec3a2763bc002a781ff3161b"
+    },
+    {
+      "deltas": [],
+      "file": "runtime202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/runtime197.py",
+      "parent_sha256": "fac238515e5b389e2efce4f8a2babeae66fc9f426f53e304c6f16b1f22eddfdc"
+    },
+    {
+      "deltas": [
+        {
+          "end": 744,
+          "new": "')\n  from mapper202 import current\n  current(engine)\n  require(self.proof['usage']is getattr(engine,'_v202_actual_usage',None)and self.proof['usage']['audit']['math_independent_qualified']is True,'same current seven-use component",
+          "old": "",
+          "start": 744
+        },
+        {
+          "end": 1652,
+          "new": "current_M80_real_N=list(range(9,17)),new_usage_actual_N=list(range(9,16)),zero_new_keys=True,new_MC2_profile=False,\n  ",
+          "old": "",
+          "start": 1652
+        },
+        {
+          "end": 1731,
+          "new": ",\n  old_padding_behavior_equal=scope.proof['old_padding_behavior_equal'],numerical_variant_only=scope.proof['numerical_variant_only']",
+          "old": "",
+          "start": 1731
+        }
+      ],
+      "file": "scope202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/scope197.py",
+      "parent_sha256": "17101f654642869e4e85359fceb527c2594c7ef91e3a96b7d8946f2723035205"
+    },
+    {
+      "deltas": [],
+      "file": "source202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/source197.py",
+      "parent_sha256": "afa0133d3df983bd1e5015bd0a8af6c0faa33b25404ed68376c3aac2549c2954"
+    },
+    {
+      "deltas": [],
+      "file": "subset202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/subset197.py",
+      "parent_sha256": "593a2bf2c74b3c949da68595d10717094dd59933357e7ad786269171303b9ff4"
+    },
+    {
+      "deltas": [],
+      "file": "trace202.py",
+      "namespace": [
+        "197",
+        "202"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-empty-active-cohort-causal80-active32-full-v197/trace197.py",
+      "parent_sha256": "91ec50262e147db8b8ed8348650d28f293f1f74f252031819f9998431ba98bec"
+    }
+  ]
+}

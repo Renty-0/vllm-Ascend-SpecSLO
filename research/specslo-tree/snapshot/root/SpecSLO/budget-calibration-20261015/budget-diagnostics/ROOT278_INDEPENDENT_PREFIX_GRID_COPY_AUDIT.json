@@ -1,0 +1,129 @@
+{
+  "status": "PASS_operator_only_prefix_grid_copy",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-prefix-grid-byte-KV-copy-v278/actual/prefix-grid-copy-root-v278-original-row1-boundedgrid-v1/receipt.json",
+  "receipt_sha256": "be8c091c65d4d8c9bc02d0763bd17cd696f7ae87ed51dde47d6869eecde011f7",
+  "report_sha256": "c5a0f9838e0a73991fc204116e39cfc622a574e7d16f39a00cb16a13a15c4ea3",
+  "full_cache_map_cases": 344,
+  "same_exact263_kernel_binary": true,
+  "all_five_grid_buckets_in_actual_cases": true,
+  "raw16_graph_replays_fullgrid": 6,
+  "costs": [
+    {
+      "width": 256,
+      "case": "N1-fork5-anchor0",
+      "copy_grid": 128,
+      "median_ms": {
+        "original": 0.2118807751685381,
+        "row1": 0.1825159415602684,
+        "fused": 0.09057088755071163
+      },
+      "prefix_over_full_grid": 0.4962354892205639
+    },
+    {
+      "width": 256,
+      "case": "N8-fork5-anchor0",
+      "copy_grid": 1024,
+      "median_ms": {
+        "original": 0.21020136773586273,
+        "row1": 0.18168077804148197,
+        "fused": 0.12081046588718891
+      },
+      "prefix_over_full_grid": 0.6649600865293799
+    },
+    {
+      "width": 256,
+      "case": "N12-fork5-anchor0",
+      "copy_grid": 1792,
+      "median_ms": {
+        "original": 0.20973593927919865,
+        "row1": 0.182681018486619,
+        "fused": 0.1691109500825405
+      },
+      "prefix_over_full_grid": 0.9257171406394777
+    },
+    {
+      "width": 256,
+      "case": "N16-mixed-anchor0",
+      "copy_grid": 512,
+      "median_ms": {
+        "original": 0.2093908842653036,
+        "row1": 0.18242094665765762,
+        "fused": 0.09528547525405884
+      },
+      "prefix_over_full_grid": 0.522338453998254
+    },
+    {
+      "width": 256,
+      "case": "N23-fork5-anchor0",
+      "copy_grid": 128,
+      "median_ms": {
+        "original": 0.2104709856212139,
+        "row1": 0.18283119425177574,
+        "fused": 0.09271013550460339
+      },
+      "prefix_over_full_grid": 0.5070805115287538
+    },
+    {
+      "width": 384,
+      "case": "N1-fork5-anchor0",
+      "copy_grid": 128,
+      "median_ms": {
+        "original": 0.2267009112983942,
+        "row1": 0.1830661203712225,
+        "fused": 0.09237020276486874
+      },
+      "prefix_over_full_grid": 0.5045728973638591
+    },
+    {
+      "width": 384,
+      "case": "N8-fork5-anchor0",
+      "copy_grid": 1024,
+      "median_ms": {
+        "original": 0.22948137484490871,
+        "row1": 0.1878861803561449,
+        "fused": 0.12819049879908562
+      },
+      "prefix_over_full_grid": 0.6822774221930319
+    },
+    {
+      "width": 384,
+      "case": "N12-fork5-anchor0",
+      "copy_grid": 1792,
+      "median_ms": {
+        "original": 0.23011141456663609,
+        "row1": 0.1903260126709938,
+        "fused": 0.1773661933839321
+      },
+      "prefix_over_full_grid": 0.9319072621488445
+    },
+    {
+      "width": 384,
+      "case": "N16-mixed-anchor0",
+      "copy_grid": 512,
+      "median_ms": {
+        "original": 0.23096147924661636,
+        "row1": 0.1914510503411293,
+        "fused": 0.097975367680192
+      },
+      "prefix_over_full_grid": 0.5117515286837996
+    },
+    {
+      "width": 384,
+      "case": "N23-fork5-anchor0",
+      "copy_grid": 128,
+      "median_ms": {
+        "original": 0.23258174769580364,
+        "row1": 0.1905809622257948,
+        "fused": 0.09724567644298077
+      },
+      "prefix_over_full_grid": 0.5102591324298537
+    }
+  ],
+  "timing_scope": "Isolated three-arm rotated ACLGraph replay+synchronize; no host regression scripts ran during this cost window",
+  "sources_unchanged": true,
+  "original_environment_pre_post_passed": true,
+  "owned_cleanup_all4idle_at_terminal": true,
+  "whole_model_qualified": false,
+  "Goodput": null,
+  "adopted": false
+}

@@ -1,0 +1,273 @@
+{
+  "changes": [
+    {
+      "file": "mapper255.py",
+      "before": "128",
+      "after": "120",
+      "count": 4
+    },
+    {
+      "file": "padding255.py",
+      "before": "mapper249",
+      "after": "mapper255",
+      "count": 1
+    },
+    {
+      "file": "padding255.py",
+      "before": "128",
+      "after": "120",
+      "count": 3
+    },
+    {
+      "file": "projection255.py",
+      "before": "enumerate([5]*25+[3])",
+      "after": "enumerate([5]*24)",
+      "count": 1
+    },
+    {
+      "file": "projection255.py",
+      "before": "list(range(5,126,5))+[128]",
+      "after": "list(range(5,121,5))",
+      "count": 1
+    },
+    {
+      "file": "projection255.py",
+      "before": "tuple(range(5,126,5))+(128,)",
+      "after": "tuple(range(5,121,5))",
+      "count": 2
+    },
+    {
+      "file": "projection255.py",
+      "before": "mask[n:25,:,:5,0]=False;mask[25,:,:3,0]=False",
+      "after": "mask[n:24,:,:5,0]=False",
+      "count": 1
+    },
+    {
+      "file": "projection255.py",
+      "before": "(26,32)",
+      "after": "(24,32)",
+      "count": 1
+    },
+    {
+      "file": "projection255.py",
+      "before": "(26,1,mask_capacity,4096)",
+      "after": "(24,1,mask_capacity,4096)",
+      "count": 1
+    },
+    {
+      "file": "projection255.py",
+      "before": "(extent,)*26",
+      "after": "(extent,)*24",
+      "count": 1
+    },
+    {
+      "file": "projection255.py",
+      "before": "len(groups)>25",
+      "after": "len(groups)>24",
+      "count": 1
+    },
+    {
+      "file": "projection255.py",
+      "before": "128",
+      "after": "120",
+      "count": 11
+    },
+    {
+      "file": "branch_tail255.py",
+      "before": "padding249",
+      "after": "padding255",
+      "count": 1
+    },
+    {
+      "file": "branch_tail255.py",
+      "before": "!=128",
+      "after": "!=120",
+      "count": 2
+    },
+    {
+      "file": "branch_tail255.py",
+      "before": "range(128)",
+      "after": "range(120)",
+      "count": 1
+    },
+    {
+      "file": "branch_tail255.py",
+      "before": "physical_queries=128",
+      "after": "physical_queries=120",
+      "count": 2
+    },
+    {
+      "file": "branch_tail255.py",
+      "before": "dict(M=128",
+      "after": "dict(M=120",
+      "count": 1
+    },
+    {
+      "file": "static_state255.py",
+      "before": "branch_tail249",
+      "after": "branch_tail255",
+      "count": 2
+    },
+    {
+      "file": "static_state255.py",
+      "before": "projection249",
+      "after": "projection255",
+      "count": 1
+    },
+    {
+      "file": "static_state255.py",
+      "before": "M=128",
+      "after": "M=120",
+      "count": 2
+    },
+    {
+      "file": "static_state255.py",
+      "before": "attention_segments=26",
+      "after": "attention_segments=24",
+      "count": 1
+    },
+    {
+      "file": "static_state255.py",
+      "before": "fixed_q5_groups=25",
+      "after": "fixed_q5_groups=24",
+      "count": 1
+    },
+    {
+      "file": "frames255.py",
+      "before": "rows not in(80,128)",
+      "after": "rows!=120",
+      "count": 1
+    },
+    {
+      "file": "frames255.py",
+      "before": "q5groups=16 if rows==80 else 25",
+      "after": "q5groups=24",
+      "count": 1
+    },
+    {
+      "file": "frames255.py",
+      "before": "tuple(range(5,q5groups*5+1,5))+((128,)if rows==128 else())",
+      "after": "tuple(range(5,121,5))",
+      "count": 1
+    },
+    {
+      "file": "metadata255.py",
+      "before": "frames251",
+      "after": "frames255",
+      "count": 1
+    },
+    {
+      "file": "metadata255.py",
+      "before": "static_state251",
+      "after": "static_state255",
+      "count": 1
+    },
+    {
+      "file": "metadata255.py",
+      "before": "len(owners)!=25",
+      "after": "len(owners)!=24",
+      "count": 1
+    },
+    {
+      "file": "metadata255.py",
+      "before": "==128",
+      "after": "==120",
+      "count": 1
+    },
+    {
+      "file": "metadata255.py",
+      "before": "range(25)",
+      "after": "range(24)",
+      "count": 2
+    },
+    {
+      "file": "metadata255.py",
+      "before": "rows=128,reference=True,tail_tokens=frame['tokens'][125:]",
+      "after": "rows=120,reference=True",
+      "count": 1
+    },
+    {
+      "file": "metadata255.py",
+      "before": "(26,1,10,4096)",
+      "after": "(24,1,10,4096)",
+      "count": 1
+    },
+    {
+      "file": "metadata255.py",
+      "before": "(2560,)*26",
+      "after": "(2560,)*24",
+      "count": 1
+    },
+    {
+      "file": "reference_schedule255.py",
+      "before": "range(0,len(active),25)",
+      "after": "range(0,len(active),24)",
+      "count": 1
+    },
+    {
+      "file": "reference_schedule255.py",
+      "before": "active[begin:begin+25]",
+      "after": "active[begin:begin+24]",
+      "count": 1
+    },
+    {
+      "file": "reference_schedule255.py",
+      "before": "range(25-len(selected))",
+      "after": "range(24-len(selected))",
+      "count": 1
+    },
+    {
+      "file": "reference_schedule255.py",
+      "before": "            tokens.extend([0,future,future]);ids.extend([488]*3);positions.extend(range(3))\n",
+      "after": "",
+      "count": 1
+    },
+    {
+      "file": "reference_schedule255.py",
+      "before": "len(tokens)!=128",
+      "after": "len(tokens)!=120",
+      "count": 1
+    },
+    {
+      "file": "reference_schedule255.py",
+      "before": "chunk=begin//25",
+      "after": "chunk=begin//24",
+      "count": 1
+    },
+    {
+      "file": "reference_schedule255.py",
+      "before": "[positions[5*j+4]+1 for j in range(25)]+[3]",
+      "after": "[positions[5*j+4]+1 for j in range(24)]",
+      "count": 1
+    },
+    {
+      "file": "reference_schedule255.py",
+      "before": "list(range(5,126,5))+[128]",
+      "after": "list(range(5,121,5))",
+      "count": 1
+    },
+    {
+      "file": "baseline255.py",
+      "before": "oracle251",
+      "after": "oracle255",
+      "count": 2
+    },
+    {
+      "file": "baseline255.py",
+      "before": "reference_schedule251",
+      "after": "reference_schedule255",
+      "count": 1
+    },
+    {
+      "file": "baseline255.py",
+      "before": "128",
+      "after": "120",
+      "count": 1
+    }
+  ],
+  "M": 120,
+  "q5_groups": 24,
+  "no_nonreal_tail3": true,
+  "real_N24_C96_unchanged": true,
+  "production_qualification": false
+}

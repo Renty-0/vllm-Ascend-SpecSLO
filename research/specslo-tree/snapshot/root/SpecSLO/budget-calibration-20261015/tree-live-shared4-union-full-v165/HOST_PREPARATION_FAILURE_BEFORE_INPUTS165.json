@@ -1,0 +1,28 @@
+{
+  "cause": "manifest builder searched FROZEN*.json instead of P148/PREPARED_SOURCE_HASHES_V132.json; subsequent HOST invocation had no INPUTS165.json",
+  "device_model_torch_executed": false,
+  "errors": 3,
+  "evidence_scope": "tool output retained in conversation; this file is a factual reconstruction, not original raw stdout",
+  "failures": 0,
+  "passed": 1,
+  "raw_log_file_retained": false,
+  "schema": "V165.pre-manifest-preparation-attempt.v1",
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/bank165.py": "0e665ed4545cd8f95b06846cac4c670e90f9fa6e4c768b9ec76f866bff33ddca",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/base165.py": "2be25f9df34e1530faa8e5c5b4a88bb918698714bb9696e1d80106490ceb1e92",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/component165.py": "f54da79da70fe07a267c2ad176ea70b79faf55619cc07b1390c5ae956a2c2131",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/controls165.py": "d8ec0f1c6afd02b036f1fdfbd7ad9c33467dcda7050036891307d42110e2d765",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/draft165.py": "dc81677fd5551204934830723b9b5cb32862deb80d506f8f5fcb098ecb06aef8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/extension165.py": "1bbb09b37f25424bcb2a2180d36f239fdbd7a6dda9337ebdb805cb4b915bd754",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/natural165.py": "29725a3a14c29c5951d3bed9cac820b111ea817ca3f4bb8c11d14027b4ffb615",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/next165.py": "3e3a825c78922cdcfa328a1bc5f5ccae475102192454af2c2ddaade4b2bc3d73",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/protocol165.py": "5e68d5ed0705d73a74e1e54a0dccbd8b5ee953e1f360aaa7f723c22c8db057d3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/pure165.py": "e1b03169679500af0b259bf301f32126956af8dcfd6738c574c16312424e2338",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/source165.py": "3cff3c8a2f33ebb052c638f42d8676b789b83f6115632044fa03cbf5b227ec9a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/source_epoch.py": "da87887a4875ffcd48585a8991c468333831ae6de3fac4a27a0efd8c720ac8ff",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/target165.py": "4a59dbc2527547e7d8218935574d04a7059a03ea2b21f2979a7d7164e151bac5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-live-shared4-union-full-v165/test_host165.py": "e61d8e63c255b04c861c6b2f63d254be32eb9a42a20e6424b2482eb3a0a4451c"
+  },
+  "status": "failed_before_model",
+  "tests_run": 4
+}

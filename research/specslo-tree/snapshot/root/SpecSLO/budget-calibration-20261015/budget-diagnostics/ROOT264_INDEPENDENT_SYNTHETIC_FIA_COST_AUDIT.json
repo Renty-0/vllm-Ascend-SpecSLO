@@ -1,0 +1,102 @@
+{
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-FIA-fixed-q5-mask-capacity-cost-v264/actual/fixed-q5-FIA-root-v264-mask-capacity-cost-v1/receipt.json",
+  "receipt_sha256": "09cb9e4a7b1c278a8e3565c1ade0c66b62243145172e499f3662fd7937ad03cd",
+  "measured_source": "/root/SpecSLO/budget-calibration-20261015/tree-FIA-fixed-q5-mask-capacity-cost-v264/actual/fixed-q5-FIA-root-v264-mask-capacity-cost-v1/paired-FIA.json",
+  "measured_sha256": "1d9d348d8fbbf7eac4c338a9ca260581afe86639ac474b6408b37fa1b9ac64ae",
+  "actual_guard_complete": true,
+  "all_frozen_sources_unchanged": true,
+  "original10496_15_212_pre_and_post_passed": true,
+  "all_four_idle": true,
+  "neural_qualified": false,
+  "Goodput": null,
+  "status": "independent_synthetic_FIA_cost_audit_passed",
+  "rows": [
+    {
+      "prefix": 127,
+      "layout": "all24-spines",
+      "per_FIA_ms": {
+        "5": 0.12185105151729658,
+        "8": 0.12229144704178907,
+        "9": 0.12206730389152654,
+        "10": 0.121969871543115,
+        "11": 0.1218228462676052,
+        "12": 0.12185246305307373,
+        "16": 0.1220028570969589
+      },
+      "all_caps_bitwise_equal": true
+    },
+    {
+      "prefix": 127,
+      "layout": "12-spines-12-side-groups",
+      "per_FIA_ms": {
+        "5": 0.12250411236891523,
+        "8": 0.12293037434574217,
+        "9": 0.12525257625384256,
+        "10": 0.12503725884016603,
+        "11": 0.12493248505052179,
+        "12": 0.12466585394577123,
+        "16": 0.12503117613960057
+      },
+      "all_caps_bitwise_equal": true
+    },
+    {
+      "prefix": 1505,
+      "layout": "all24-spines",
+      "per_FIA_ms": {
+        "5": 0.12230949869262986,
+        "8": 0.12207737745484337,
+        "9": 0.12279145084903575,
+        "10": 0.12254363537067547,
+        "11": 0.11871124661411159,
+        "12": 0.11963312499574386,
+        "16": 0.11947992970817722
+      },
+      "all_caps_bitwise_equal": true
+    },
+    {
+      "prefix": 1505,
+      "layout": "12-spines-12-side-groups",
+      "per_FIA_ms": {
+        "5": 0.11971492858720012,
+        "8": 0.11946470476686954,
+        "9": 0.11869648369611241,
+        "10": 0.11879773228429258,
+        "11": 0.1190107905131299,
+        "12": 0.11959094990743324,
+        "16": 0.12213332229293883
+      },
+      "all_caps_bitwise_equal": true
+    },
+    {
+      "prefix": 2555,
+      "layout": "all24-spines",
+      "per_FIA_ms": {
+        "5": 0.12276560300961137,
+        "8": 0.12237856208230369,
+        "9": 0.12332880578469485,
+        "10": 0.12285762568353675,
+        "11": 0.12316122592892498,
+        "12": 0.12339842214714736,
+        "16": 0.1234494375239592
+      },
+      "all_caps_bitwise_equal": true
+    },
+    {
+      "prefix": 2555,
+      "layout": "12-spines-12-side-groups",
+      "per_FIA_ms": {
+        "5": 0.12378443716443144,
+        "8": 0.12370092008495703,
+        "9": 0.11915008508367464,
+        "10": 0.11902250480488874,
+        "11": 0.12086198330507614,
+        "12": 0.12076089114998467,
+        "16": 0.12019813948427327
+      },
+      "all_caps_bitwise_equal": true
+    }
+  ],
+  "arms": 42,
+  "paired_rounds_per_configuration": 80,
+  "conclusion": "No consistent large cap10/cap11 penalty; preserve original model graph capacities"
+}

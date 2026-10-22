@@ -1,0 +1,33 @@
+{
+  "status": "PASS_HOST423_ACTUAL_SANITIZED_STARTUP_CALLBACK_CONSTRUCTION",
+  "NPU_used": false,
+  "model_constructors_called": 0,
+  "exact_startup_PYTHONPATH": true,
+  "imported_origins": {
+    "projection247": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/projection247.py",
+    "projection255": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+    "window423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/window423.py",
+    "empty423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/empty423.py",
+    "reference423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/reference423.py",
+    "audit_reference423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/audit_reference423.py",
+    "audit_base423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/audit_base423.py",
+    "runtime423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/runtime423.py",
+    "trace423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/trace423.py",
+    "scope423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/scope423.py",
+    "audit423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/audit423.py",
+    "extension423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/extension423.py",
+    "bucket423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/bucket423.py",
+    "oracle423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/oracle423.py",
+    "qualify423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/qualify423.py",
+    "guard423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/guard423.py",
+    "shape423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/shape423.py",
+    "admission423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/admission423.py",
+    "audit_normal423": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-full-integration-v423/audit_normal423.py"
+  },
+  "configured_max_num_seqs": 64,
+  "effective_active_ceiling": 64,
+  "original_owned_verifier_and_cleanup_retained": true,
+  "original227_and_additional681_and_all463_ownAR_required": true,
+  "neural_qualification_inherited": false,
+  "deadline_seconds": 18000
+}

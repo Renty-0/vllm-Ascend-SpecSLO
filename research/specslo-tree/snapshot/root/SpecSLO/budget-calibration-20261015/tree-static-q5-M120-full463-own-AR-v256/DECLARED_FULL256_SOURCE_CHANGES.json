@@ -1,0 +1,175 @@
+{
+  "changes": [
+    {
+      "file": "audit_reference256.py",
+      "before": "len(positions)==128",
+      "after": "len(positions)==120",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "(26*10*4096)",
+      "after": "(24*10*4096)",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "range(26)",
+      "after": "range(24)",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "range(1,3 if group==25 else 5)",
+      "after": "range(1,5)",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "len(heads)==128",
+      "after": "len(heads)==120",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "range(25-len(selected))",
+      "after": "range(24-len(selected))",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "                    positions.extend(range(3));ids.extend([488]*3);lengths.append(3)\n",
+      "after": "",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "list(range(5,126,5))+[128]",
+      "after": "list(range(5,121,5))",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "[2560]*26",
+      "after": "[2560]*24",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "selected+list(range(463,463+25-len(selected)))+[488]",
+      "after": "selected+list(range(463,463+24-len(selected)))",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "M128_S26",
+      "after": "M120_S24",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "[26,1,10,4096]",
+      "after": "[24,1,10,4096]",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "zero,3 if index==25 else 5",
+      "after": "zero,5",
+      "count": 1
+    },
+    {
+      "file": "audit_reference256.py",
+      "before": "queries in(3,5)",
+      "after": "queries==5",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "data['ids'][:125:5]",
+      "after": "data['ids'][:120:5]",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "(128,)",
+      "after": "(120,)",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "(2560,)*26",
+      "after": "(2560,)*24",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "(26,32)",
+      "after": "(24,32)",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "(26,1,10,4096)",
+      "after": "(24,1,10,4096)",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "len(values)==128",
+      "after": "len(values)==120",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "M128_S26",
+      "after": "M120_S24",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "M128/S26",
+      "after": "M120/S24",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "used+9",
+      "after": "used+8",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "list(range(5,126,5))+[128]",
+      "after": "list(range(5,121,5))",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "len(data['tokens'])!=128",
+      "after": "len(data['tokens'])!=120",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "len(data['sequence_lens'])!=26",
+      "after": "len(data['sequence_lens'])!=24",
+      "count": 1
+    },
+    {
+      "file": "reference256.py",
+      "before": "    data['tokens'].extend([0,future,future]);data['ids'].extend([488]*3)\n    data['positions'].extend(range(3));data['sequence_lens'].append(3)\n",
+      "after": "",
+      "count": 1
+    }
+  ],
+  "implementation": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255",
+  "original_configured_target_N32_C96_Q128_unchanged": true,
+  "effective_N24_C96_unchanged": true,
+  "actual_M120_S24": true,
+  "active48_and_page_reservation_unchanged": true,
+  "all_original_startup_and_component_gates": true,
+  "new_same_instance227_and72_independent_prefixes_required": true,
+  "full463_ownAR_required": true,
+  "NPU_qualification_inherited": false
+}

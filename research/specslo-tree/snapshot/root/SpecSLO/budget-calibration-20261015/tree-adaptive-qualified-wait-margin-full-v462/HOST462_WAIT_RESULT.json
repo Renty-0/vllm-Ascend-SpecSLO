@@ -1,0 +1,15 @@
+{
+  "status": "PASS_HOST462_ORIGINAL_RECEIVER_ONLY_WAIT_VIEW_AND_NUMERICAL_WORKER_INVERSE",
+  "CPU_fixture_only": true,
+  "original_config_object_retained": true,
+  "original_worker_timeout_seconds": 6000,
+  "qualification_only_wait_seconds": 21600,
+  "unrelated_operation_rejected": true,
+  "actual_numerical_worker_source_identical": true,
+  "full_supervisor_limits_checked": true,
+  "all_NN_gates_still_required": true,
+  "NPU_used": false,
+  "Native_constructor_calls": 0,
+  "Raw": null,
+  "Goodput": null
+}

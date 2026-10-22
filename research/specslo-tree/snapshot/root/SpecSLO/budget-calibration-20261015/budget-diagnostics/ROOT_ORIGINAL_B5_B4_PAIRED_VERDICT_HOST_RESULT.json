@@ -1,0 +1,255 @@
+{
+  "status": "HOST_original_greedy_B5_vs_B4_counterfactual_proved",
+  "original_source": "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py",
+  "original_source_sha256": "05d47ed6dc48e368010ca145a0b859aaffe596f246e0b28eb7b07d2d51a50cc9",
+  "counts": {
+    "cases": 1728,
+    "main_or_rejection": 1568,
+    "side_selected": 160
+  },
+  "examples": {
+    "(-1, 0)": {
+      "parent": -1,
+      "predictions": [
+        10,
+        20,
+        30,
+        40,
+        99,
+        99
+      ],
+      "tree_output": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "chain_output": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "tree_path": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "(-1, 1)": {
+      "parent": -1,
+      "predictions": [
+        50,
+        20,
+        30,
+        40,
+        99,
+        99
+      ],
+      "tree_output": [
+        50,
+        99
+      ],
+      "chain_output": [
+        50
+      ],
+      "tree_path": [
+        4,
+        -1,
+        -1,
+        -1
+      ]
+    },
+    "(0, 0)": {
+      "parent": 0,
+      "predictions": [
+        10,
+        20,
+        30,
+        40,
+        99,
+        99
+      ],
+      "tree_output": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "chain_output": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "tree_path": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "(0, 1)": {
+      "parent": 0,
+      "predictions": [
+        10,
+        50,
+        30,
+        40,
+        99,
+        99
+      ],
+      "tree_output": [
+        10,
+        50,
+        99
+      ],
+      "chain_output": [
+        10,
+        50
+      ],
+      "tree_path": [
+        0,
+        4,
+        -1,
+        -1
+      ]
+    },
+    "(1, 0)": {
+      "parent": 1,
+      "predictions": [
+        10,
+        20,
+        30,
+        40,
+        99,
+        99
+      ],
+      "tree_output": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "chain_output": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "tree_path": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "(1, 1)": {
+      "parent": 1,
+      "predictions": [
+        10,
+        20,
+        50,
+        40,
+        99,
+        99
+      ],
+      "tree_output": [
+        10,
+        20,
+        50,
+        99
+      ],
+      "chain_output": [
+        10,
+        20,
+        50
+      ],
+      "tree_path": [
+        0,
+        1,
+        4,
+        -1
+      ]
+    },
+    "(2, 0)": {
+      "parent": 2,
+      "predictions": [
+        10,
+        20,
+        30,
+        40,
+        99,
+        99
+      ],
+      "tree_output": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "chain_output": [
+        10,
+        20,
+        30,
+        40,
+        99
+      ],
+      "tree_path": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "(2, 1)": {
+      "parent": 2,
+      "predictions": [
+        10,
+        20,
+        30,
+        50,
+        99,
+        99
+      ],
+      "tree_output": [
+        10,
+        20,
+        30,
+        50,
+        99
+      ],
+      "chain_output": [
+        10,
+        20,
+        30,
+        50
+      ],
+      "tree_path": [
+        0,
+        1,
+        2,
+        4
+      ]
+    }
+  },
+  "all_original_function_bodies_unchanged": true,
+  "result": "For this exact spine4+side-leaf tree, untruncated B5 delivered = same-prefix B4 delivered +1 iff side node4 is accepted; otherwise equal. B4 output is always a prefix of B5 output.",
+  "limitations": [
+    "Not a measurement of neural branch acceptance probability",
+    "Same main-node target predictions are assumed; actual neural equality needs independent qualification",
+    "Terminal clipping can remove the extra delivered token; exclude terminal horizon from g estimation",
+    "No serving gain or throughput prediction"
+  ],
+  "NPU_used": false,
+  "neural_qualified": false,
+  "Goodput": null
+}

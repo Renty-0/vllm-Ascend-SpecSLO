@@ -1,0 +1,17 @@
+{
+  "status": "PASS_HOST455_ACTUAL_CONFIG_FACTORY_PARSER_WORKER_AND_UNFUSED_REFERENCE_SOURCE",
+  "actual_runtime_source_inverse": true,
+  "actual_config_factory_routed_before_constructor": true,
+  "actual_main_parser_accepted": true,
+  "actual_worker_guard_checked": true,
+  "original_Native_profile_loader_CPU_passed": true,
+  "only_config_field_changed": "mc2_profile",
+  "max_num_seqs": 64,
+  "all3_graph_inputs_outputs_held": true,
+  "all_actual_timed_replay_outputs_checked": true,
+  "model_constructors": 0,
+  "NPU_used": false,
+  "NN_qualification": false,
+  "Raw": null,
+  "Goodput": null
+}

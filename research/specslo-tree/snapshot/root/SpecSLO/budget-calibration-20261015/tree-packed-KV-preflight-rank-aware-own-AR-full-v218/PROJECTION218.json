@@ -1,0 +1,103 @@
+{
+  "schema": "ROOT218.rank-aware-own-AR-source-projection.v1",
+  "donor": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217",
+  "donor_freeze_sha256": "ab4d19898a4c086117998cc5ee8f84957292af79302873964541e3aa897ec7b7",
+  "projection": [
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/audit_reference217.py",
+      "source_sha256": "dd2fa58a4fb15f6c3819668eee55d18f01ae5b60ffee8c1c44b17fd0dccbf91b",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/audit_reference218.py",
+      "new_sha256": "a97c77d87493df68bca5148a904675ea35d824c4a8541a84f2bf63da2f0fd23d",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -19,6 +19,12 @@\n def audit(directory):\n     directory=Path(directory);folder=directory/'postfull-independent-FIA-AR'\n     summaries=[read(folder/f'rank{r}-summary.json')for r in range(4)]\n+    leader_path=directory/'windows/window32/full463/rank1-full463-actual-trace.json.gz'\n+    leader_bytes=leader_path.read_bytes();leader=read(leader_path)\n+    leader_info=dict(path=str(leader_path),bytes=len(leader_bytes),sha256=hashlib.sha256(leader_bytes).hexdigest())\n+    need(leader['rank']==1 and type(leader['generate_results'])is list and len(leader['generate_results'])==463,'actual original output-leader-only results')\n+    candidate={r['request_id']:r['completion_token_ids']for r in leader['generate_results']}\n+    need(len(candidate)==463 and set(candidate)=={r['request_id']for r in leader['requests']}and all(len(v)==256 for v in candidate.values()),'complete unique original output-leader results')\n     comparisons=[];all_reference=[];metadata_cases=0;canary_cases=0\n     for rank,summary in enumerate(summaries):\n         need(summary['rank']==rank and summary['completed']is True\n@@ -32,7 +38,12 @@\n         need(str(raw)==summary['source_artifact']\n              and hashlib.sha256(raw.read_bytes()).hexdigest()==summary['source_artifact_sha256'],\n              'exact own completed candidate source bytes')\n-        trace=read(raw);groups=[r['sequence_ids']for r in trace['standalone_prefill_calls']]\n+        trace=read(raw)\n+        need(summary['candidate_result_artifact']==leader_info and summary['candidate_result_owner_rank']==1,'exact original output-leader comparison artifact')\n+        for key in('scope_count','manifest_sha256','prefix_sha256','requests','tokenized_inputs','source_generation','standalone_prefill_calls'):\n+            need(trace[key]==leader[key],'independent all-rank input/cohort identity '+key)\n+        need((trace['generate_results']is None)if rank!=1 else(trace['generate_results']==leader['generate_results']),'preserve original only-output-leader result materialization')\n+        groups=[r['sequence_ids']for r in trace['standalone_prefill_calls']]\n         need(sorted(i for group in groups for i in group)==list(range(463)), 'all463 prefill owners once')\n         reference={};total_steps=0\n         for ordinal,owners in enumerate(groups):\n@@ -98,7 +109,6 @@\n         need(set(d['before'])==set(d['after'])==set(d['delta']) and len(d['delta'])==21\n              and all(d['after'][k]-d['before'][k]==d['delta'][k]==0 for k in d['delta']), 'all actual21 original graph discovery/failure counters zero')\n         if rank:\n-            candidate={r['request_id']:r['completion_token_ids']for r in trace['generate_results']}\n             need(reference.keys()==candidate.keys()and len(reference)==463,'all independent463 trajectories')\n             rows=[]\n             for rid,tokens in reference.items():\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/check217.py",
+      "source_sha256": "8cd39327b5e58f405e251e02d28b669b8fcac56cd159844ed51aae509d5d419a",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/check218.py",
+      "new_sha256": "fbcf77816318f5b9b5dd9b12ff41fc03d3e10762b445593221e77d416d9952cc",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/cost217.py",
+      "source_sha256": "47c23d82f67dceb9f236cf04addd96d6c5f0b3520557c5f879926aa2202bbdc5",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/cost218.py",
+      "new_sha256": "ac23801fbc6e04cca4c4bc38b54c4b981495084d9b6da58310d3d84bccb4d806",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/cpu_slot_preflight217.py",
+      "source_sha256": "6a17f9ed426cd5452222b5790b895eaa35147e0124cc4b4abde8ceaac0282f8b",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/cpu_slot_preflight218.py",
+      "new_sha256": "fff9d986fc59b1c6b9629bf185c54744fa62ceb3487c2c9d579f94387dbdaece",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/extension217.py",
+      "source_sha256": "6d7a9e39e2da531bb527d4009cd8e2159a7ad576384afb925a03b25e509bf409",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/extension218.py",
+      "new_sha256": "8c4e1b459305cc9cbc5557198e60aeef318fa2f0ba7723ba327e3a59018c0f3d",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/guard217.py",
+      "source_sha256": "074baa461e1a4f53a5489876692da159abf110bda3e26c6acb159838668e5e3f",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/guard218.py",
+      "new_sha256": "7e14cbad5dd1d19b959bec0a2c4fdd4a2e29b6fe0cd41ba0b5b3ef92a8442ef9",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -34,7 +34,7 @@\n     require(all(f['files'].get(p)==h for p,h in old_sources.items()),'all canonical209 frozen source/evidence retained')\n     return f,sources,dict(own_freeze_sha256=EXPECTED_FREEZE,own_archive_sha256=EXPECTED_ARCHIVE,\n         original209_dependency=dependency,source_peer_review=False,canonical209_source_unchanged=True,\n-        device_qualification_inherited=False,production_delta='same216 cost/ownAR plus direct packed targetKV preflight read with fresh actual original/new shadow gate; clients/model/clock unchanged')\n+        device_qualification_inherited=False,production_delta='same217 packed preflight plus rank-aware original output-leader comparison artifact and synchronized own-AR load; clients/model/clock unchanged')\n \n \n def storage(tag=None):\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/host217.py",
+      "source_sha256": "87674974518683f814a6bf10dbce4dd0b7f82799f8d599922216897657a1659b",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/host218.py",
+      "new_sha256": "1549b1402896cacdc35a9457d057c19aace600e64a624338fcc0177464fe1366",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/host_slot_preflight217.py",
+      "source_sha256": "0198f0f5bf759ff6d8b1a40c303bcb1dcf05d2b67feef011895a3b949e877b39",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/host_slot_preflight218.py",
+      "new_sha256": "05d0b46554be34aceaddca0e68ee5e915d95ef1ebb111ce8ea5b3bdaccc90fdb",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/launch217.sh",
+      "source_sha256": "e1ad26448a50e3b1aae25dc07a626f329bc69c12ddfaad829a1ba265c1b29c97",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/launch218.sh",
+      "new_sha256": "982de321140225ef75a56fe5472a15d0dd0a487fe3003d4e41265f7b60dca99b",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/reference217.py",
+      "source_sha256": "bb63ac04a588658b403f5f0b0fcd1c274fe5c61debb30c5db83478e5700c36fe",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/reference218.py",
+      "new_sha256": "a6f5d61739fba1cfe3e862a0c3a52eb14ea769541ce84c7145cb86a04b75d512",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -90,7 +90,9 @@\n     stage('AR218/create-private-reference-output',lambda:folder.mkdir(exist_ok=False)if engine.rank==engine.topology.draft_leader_rank else None)\n     artifact,trace=stage('AR218/own-completed-trace',lambda:retained_trace(windows))\n     prompts=trace['tokenized_inputs'];requests=trace['requests']\n-    candidate={r['request_id']:r['completion_token_ids']for r in trace['generate_results']}\n+    from candidate_comparison218 import load_candidate\n+    candidate,candidate_artifact=stage('AR218/retained-output-leader-comparison-only',\n+        lambda:load_candidate(artifact,trace,engine.topology.target_leader_rank))\n     groups=[r['sequence_ids']for r in trace['standalone_prefill_calls']]\n     need(sorted(i for group in groups for i in group)==list(range(463))\n          and all(0<len(group)<=32 for group in groups),'same original prefill groups and order, all463 once')\n@@ -148,6 +150,7 @@\n     result=dict(schema='ROOT218.postfull-independent-FIA80-AR.v1',rank=engine.rank,\n         completed=True,backend='original target TP3 BF16 causal FIA Q80/S16; only first query per owner consumed',\n         source_artifact=str(artifact),source_artifact_sha256=hashlib.sha256(artifact.read_bytes()).hexdigest(),\n+        candidate_result_artifact=candidate_artifact,candidate_result_owner_rank=1,\n         same_prefill_cohorts=True,reference_trajectories_generated=0 if engine.is_draft else len(reference),\n         reference_only_prompt_plus_own_outputs=True,candidate_KV_or_tokens_seeded=False,\n         performance_clock_already_finished=True,cohorts=cohort_summaries,\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/runtime217.py",
+      "source_sha256": "3f4e589d8a53ead5ad2e849a0f7ddadaf7eb02d4ea6c5a92906a0f02faab38c6",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/runtime218.py",
+      "new_sha256": "929c1880af4afac83325f45060f160487e79324bb700357f8f564574e68a9830",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/slot_preflight217.py",
+      "source_sha256": "4e07a94ea8251867808b340f5b19a479e54657db97c47b659060a68a7dc857bc",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/slot_preflight218.py",
+      "new_sha256": "9362162d1f00231dbb6a331b3c82c22bc93fb43cdd9216fa3523c00ce97530c2",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/startup217.sh",
+      "source_sha256": "a4fadb725ae09db1f93c8143ba1d3416e3d16434a1eee47b3c76d9a6c9f08b1b",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218/startup218.sh",
+      "new_sha256": "a3133c482d9e527372e5e4587b623a39c2cd84a0ab0bc2391439ebdfe6b49823",
+      "patch_after_namespace_projection": ""
+    }
+  ],
+  "original_Native_result_ownership_preserved": true,
+  "candidate_tokens_are_comparison_only_never_reference_inputs": true,
+  "cold_first_cohort_policy_added": false,
+  "NPU_started": false,
+  "source_peer_review": false
+}

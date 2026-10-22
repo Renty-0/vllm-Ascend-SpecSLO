@@ -1,0 +1,30 @@
+{
+  "status": "PASS_HOST398_ACTUAL_SANITIZED_STARTUP_CALLBACK_CONSTRUCTION",
+  "NPU_used": false,
+  "model_constructors_called": 0,
+  "exact_startup_PYTHONPATH": true,
+  "imported_origins": {
+    "projection247": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/projection247.py",
+    "projection255": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+    "window398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/window398.py",
+    "empty398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/empty398.py",
+    "reference398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/reference398.py",
+    "audit_reference398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit_reference398.py",
+    "audit_base398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit_base398.py",
+    "runtime398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/runtime398.py",
+    "trace398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/trace398.py",
+    "scope398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/scope398.py",
+    "audit398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/audit398.py",
+    "extension398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/extension398.py",
+    "bucket398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/bucket398.py",
+    "oracle398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/oracle398.py",
+    "qualify398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/qualify398.py",
+    "guard398": "/root/SpecSLO/budget-calibration-20261015/tree-active64-whole-proposal-segment-limit-v398/guard398.py"
+  },
+  "configured_max_num_seqs": 64,
+  "effective_active_ceiling": 64,
+  "original_owned_verifier_and_cleanup_retained": true,
+  "original227_and_additional681_and_all463_ownAR_required": true,
+  "neural_qualification_inherited": false,
+  "deadline_seconds": 10800
+}

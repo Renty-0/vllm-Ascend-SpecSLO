@@ -1,0 +1,33 @@
+{
+  "schema": "ROOT437.frozen436-strict-boolean-retention-only.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/prepare_ROOT437_retention_fix.py": "f389d19e29a8f7d0a5042c5e3634e0b60e6a02e3b1391fdb29d17504bece37bf",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT437_actual_CPU_HOST.py": "f355b28a83b7c706bab7c75a8a30fe92a056439388ab9b706e332879ca47d83d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/HOST437-check437_construction_HOST.py.log": "aeda9eb0afc023f46acb408ace9c2294f636ff656a0d9e5cf5bff2f86426c6e5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/HOST437-check437_retention_HOST.py.log": "cce6e0cca509cc5321e0e68c6c07ad0892bc77511df3a0ab59f044ac5f18ea9b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/HOST437_CONSTRUCTION_RESULT.json": "890675387f2496c1ab08f025fb4e56c43f962a0bcb002bedbc2efc5153a751ea",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/HOST437_RETENTION_RESULT.json": "3e6d24161a3a551c587df21f7f071459247c336f4ba53199bf070621f3032bbb",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/PLAN437.json": "897b6b718b26368720f506403805f034ee890b58530783475ac6c10c42454dbf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/audit437.py": "abd7e1b0eaa3364431a7f647f9f142c6fbeb9a45eacb6b7452fa7d7f0558c8b4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/check437.py": "4a5e05707929f6d0fe00d1e0ae735cbae273603ffad94a31e287cdbe1fd69f76",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/check437_construction_HOST.py": "f7720db8454379292d71cded6dbaaa3ff3b89d1be1e21231f71a0bd27a2c79ef",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/check437_retention_HOST.py": "8037a4efc0426386581c4d0ec0093650436e25f7d3ed8d4cb739e84b4b954ed0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/extension437.py": "afdce6a94d8f319897ca206a35e6a65852af84527b6447edd027d6dfe931d1e2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/guard437.py": "134bfc9071bbf3014744ef869146389483b544aec5359fe10ea4dec2093f23fe",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/launch437.sh": "2493c14cf07687924c35ce9c49b7b9f50da32a7046e0cb73695add95ff728594",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/runtime437.py": "123cf44b2ac21a9f92310b44e0a640cdd2986ff85827855b6b4c1970b2c07e61",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/startup437.sh": "37d9c44b5289962f0d94ad2b66af5f75ef56f728da9c98c31e6b3f4fa45e13c1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/trace437.py": "d19fccc88983bc52e40bf5868c9ff33a26b99e5391c3abb196cad6b979065603",
+    "/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437/witness437.py": "0876b10e3cb227d8bb5394da047ff9bccf74cc3da0f226f5c08d8b4b6d42d63b"
+  },
+  "parent436_freeze": "4390b843830383905243d8dfb9aa37328a2c4a0076184cb171605b6cca39e5a3",
+  "parent436_archive": "e9d88c023243b1eb67cc410979b126eb9acf047f3bcad0ea1aa4f6ef2144ddc9",
+  "global_active_limit": 64,
+  "NN_permission_inherited": false,
+  "Native_flags_assigned": false,
+  "private_tag_MiB": 256,
+  "aggregate_private_MiB": 3584,
+  "runtime_seconds": 18000,
+  "Raw": null,
+  "Goodput": null
+}

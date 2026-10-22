@@ -1,0 +1,18 @@
+{
+  "status": "PASS_HOST438_ACTUAL_RUNTIME_CLEAN_PACKING_AND_LIVE_BINDING",
+  "results": [
+    {
+      "script": "check438_policy_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-slo-aware-refill-complete-interface-full-v438/HOST438-check438_policy_HOST.py.log"
+    },
+    {
+      "script": "check438_interface_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-slo-aware-refill-complete-interface-full-v438/HOST438-check438_interface_HOST.py.log"
+    }
+  ],
+  "NPU_used": false,
+  "model_constructors": 0,
+  "existing_runtime_and_only_existing_freeze_environment_fields": true
+}

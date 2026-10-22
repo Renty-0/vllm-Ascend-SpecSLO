@@ -1,0 +1,16 @@
+{
+  "status": "PASS_HOST431_ACTUAL_CLEAN_RUNTIME_WHOLE_LIVE_SCOPE_AND_ALLOCATOR_CHECKS",
+  "results": [
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/HOST431_RESULT.json",
+      "sha256": "9cf0cbecb7c809a5ec5e69272ee34b4b3fbe89e3401d4bf96f2a037d76d51e8a"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431/HOST431_ALLOCATOR_RESULT.json",
+      "sha256": "abcd265906f97014d24448c7ebe8bed1f016d516edc30a5e723265b5b55c40cb"
+    }
+  ],
+  "separate_actual_clean_runtime_invocations": true,
+  "NPU_used": false,
+  "Native_models_constructed": 0
+}

@@ -1,0 +1,94 @@
+{
+  "status": "HOST_epoch_identifier_rename_preserves_mathematical_constants",
+  "checks": [
+    {
+      "file": "reference_schedule257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "frames257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "empty257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "runtime257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "trace257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "scope257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "extension257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "static_state257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "audit257.py",
+      "integer_constant_changes": {
+        "1": 1
+      }
+    },
+    {
+      "file": "audit_reference257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "reference257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "check_full257_HOST.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "window257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "check_admission257_HOST.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "oracle257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "check257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "guard257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "metadata257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "audit_static_calls257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "baseline257.py",
+      "integer_constant_changes": {}
+    },
+    {
+      "file": "bank257.py",
+      "integer_constant_changes": {}
+    }
+  ],
+  "only_extra_integer_is_actual_policy_counter1_audit": true,
+  "physical_M120_KV2560_output256_preserved": true,
+  "NPU_used": false
+}

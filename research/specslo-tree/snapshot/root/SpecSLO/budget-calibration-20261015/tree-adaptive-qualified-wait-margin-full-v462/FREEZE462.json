@@ -1,0 +1,22 @@
+{
+  "schema": "ROOT462.original-numerical-worker-and-qualified-wait-source.v1",
+  "UTC": "2026-10-22T15:18:49.579901+00:00",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT461_TERMINAL_EARLY_STOP_WAIT_MARGIN_HOST.json": "98962a0ed021f878726bf6d292d985537f9e9e4ad98df8c82bd1b9633df694f1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-qualified-wait-margin-full-v462/HOST462_WAIT_RESULT.json": "41de67f4a9283848886fce58a1c525043ad1bbcb650fe7e417822388feb537f2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-qualified-wait-margin-full-v462/PLAN462.json": "efb6371ce7aaf5be18a63370ceaff3174b9e8827dd1acce4dda769c22c4a4253",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-qualified-wait-margin-full-v462/check462.py": "e11f42708fe26ce1f8e96e98c7c736b72147f1091bc2ef3028999257d6c95581",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-qualified-wait-margin-full-v462/check462_wait_HOST.py": "9d72614e2c990a1f61626c34d1eaf84993cfa1acff2597610f94c77e375cb7df",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-qualified-wait-margin-full-v462/guard462.py": "5cd44e02185a27677629f0892516f0963ad10575155f1fb60bd335b75629a07b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-qualified-wait-margin-full-v462/launch462.sh": "5ac648c40e44fcf6def3d58e921c837eb307d15f0d7c846151687c228b5dc800",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-qualified-wait-margin-full-v462/runtime462.py": "3b01fa05f569b51b86b6adecd228c15bd278695c9815dee059e5609fbb1c1140",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-qualified-wait-margin-full-v462/startup462.sh": "87a9f1fd5d5636053c79f3bd486b2107e47fcb544f17a4948ad99548e6823e95",
+    "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-qualified-wait-margin-full-v462/wait462.py": "cd5993c9b401ac4cf7c76fd2de0b4438526062754f3f74538f25685bcbacbef2"
+  },
+  "parent461_freeze": "ec113f2b8231fb1ec0dcf310ae2bf6b9ecccab0624dfcf25608319f9299ea568",
+  "parent461_archive": "fd7a531429b415d28446f53d6a6a12d7c294473ea5136bde0786c02cff89a4b7",
+  "global_active_limit": 64,
+  "qualification_only_wait_seconds": 21600,
+  "original_numerical_worker_unchanged": true,
+  "NN_permission_inherited": false
+}

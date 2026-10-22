@@ -1,0 +1,31 @@
+{
+  "status": "PASS_HOST395_EXACT_SANITIZED_STARTUP_AND_ORIGINAL391_BINDINGS",
+  "NPU_used": false,
+  "model_constructors_called": 0,
+  "constructors_blocked_in_HOST": true,
+  "actual_startup_dependency_gap_reproduced_by_missing_original_directory": true,
+  "repaired_projection247_import": true,
+  "configured_max_num_seqs": 64,
+  "original391_runtime_and_target_functions_preserved": true,
+  "original391_SOURCE_SHA256": "eaec65e83b8c94b9ed897733eb37474a9df489c4a6577c12f299c72229d342d3",
+  "origins": {
+    "projection247": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/projection247.py",
+    "projection243": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-projection-host-v243/projection243.py",
+    "projection249": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-projection-host-v249/projection249.py",
+    "projection255": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+    "metadata390": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-best376-target-binding-host-v390/metadata390.py",
+    "target391": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/target391.py",
+    "binding391": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/binding391.py",
+    "runtime391": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/runtime391.py",
+    "runtime395": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395/runtime395.py",
+    "actor391": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/actor391.py",
+    "component391": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/component391.py",
+    "extension391": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/extension391.py",
+    "audit391": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391/audit391.py",
+    "guard395": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395/guard395.py",
+    "observer392": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-frontier-observer-before-capture-host-v392/observer392.py"
+  },
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

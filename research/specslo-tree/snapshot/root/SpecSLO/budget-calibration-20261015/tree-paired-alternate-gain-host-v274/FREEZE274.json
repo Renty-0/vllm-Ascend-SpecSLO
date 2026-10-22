@@ -1,0 +1,24 @@
+{
+  "schema": "ROOT274.HOST-only-same-prefix-alternate-gain.v1",
+  "UTC": "2026-10-18T17:33:53.084334+00:00",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-side-gain-policy-host-v268/paired268.py": "dbe63702b06de3d42cfcb03d24bb18b764ea381399b04e02d4518d2acdcc596c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-side-gain-policy-host-v268/check268_HOST.py": "b563119ab693b43858041de4f2ca0692b812554531b223fdd824968c6ef5b0b5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-side-gain-policy-host-v268/HOST268_RESULT.json": "466b6db3da7a2d854d816177748cdb83c8123fc6aea463f1e44714ea207007a5",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/check_original_B5_vs_B4_paired_verdict_HOST.py": "36491ef7c970d783e309edf8aef5184f677ba5ade9ff6c457f722a2708387cc2",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_ORIGINAL_B5_B4_PAIRED_VERDICT_HOST_RESULT.json": "9937b6de7b96599f1d2fff5a319195f2dca1e1f5a4e7aadaa806eb3196815537",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/budget_policy.py": "1637090cb3c8f997be5ae36bce3e1ae840100cdb2e3407c67e5016b9e1cbd4f5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/tree-gain-model.json": "26640a1b13eddefda05ff1dd51782f6695abbba793d986508a9eaaa03398d7d8",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py": "05d47ed6dc48e368010ca145a0b859aaffe596f246e0b28eb7b07d2d51a50cc9",
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-side-gain-policy-host-v268/FREEZE268.json": "b36022db2efe4da31fad2d93575d05595b36c6f07a3fd2862b9494856099f10c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-alternate-gain-host-v274/check274_HOST.py": "70b8b7de63cc4e0bf357750a2145a55d98963fb2cf03765145ce8fe4aae62fbd",
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-alternate-gain-host-v274/HOST274_SECOND_PROOF_BEFORE_PRIMARY_OBSERVER.json": "ea4d26e43a21ccf54287d4ab1ce4e25b06510785ae3222d08eaa5f343c411f81",
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-alternate-gain-host-v274/HOST274_RESULT.json": "ea4d26e43a21ccf54287d4ab1ce4e25b06510785ae3222d08eaa5f343c411f81",
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-alternate-gain-host-v274/paired274.py": "501a65982e009ea2ab5bbb8d30a03fd0c43e11e2cf7e974516a871aea1af204d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-alternate-gain-host-v274/HOST274_FIRST_PROOF_BEFORE_SHADOW123.json": "ac2d3d267747c220c9eb92430b124f6761f18f0f0a21480ddc1451d165ccad5b"
+  },
+  "NN_used": false,
+  "empirical_g_determined": false,
+  "production_installed": false,
+  "Goodput": null
+}

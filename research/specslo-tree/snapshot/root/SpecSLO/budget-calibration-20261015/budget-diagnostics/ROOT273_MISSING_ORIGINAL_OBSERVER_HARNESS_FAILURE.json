@@ -1,0 +1,15 @@
+{
+  "UTC": "2026-10-18T17:49:33.569350+00:00",
+  "status": "failed_harness_no_neural_qualification",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-genuine-private-draft-root-v273-primary4-alternate1to3-45-ownprefix-v1.json",
+  "receipt_sha256": "ded78bc80012cc15ce9bd55f5345406ffe171e28410d6c767d75c99c7c052479",
+  "case_completed": 0,
+  "phase": "first N1 alternate1 numeric case",
+  "reason": "Bounded runtime omitted original tail_hidden_observer.install before Native constructor; actual_draft_observer cannot obtain captured step hidden",
+  "repair_epoch": 277,
+  "frozen273_edited": false,
+  "owned_cleanup": true,
+  "all4idle": true,
+  "Goodput": null,
+  "adopted": false
+}

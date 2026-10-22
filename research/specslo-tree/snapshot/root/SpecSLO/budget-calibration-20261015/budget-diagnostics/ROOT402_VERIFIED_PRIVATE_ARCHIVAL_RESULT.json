@@ -1,0 +1,67 @@
+{
+  "status": "COMPLETE_VERIFIED_PRIVATE_ARCHIVAL",
+  "runs": [
+    {
+      "schema": "ROOT402.verified-private-terminal-evidence-archive.v1",
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/best376-active64-root-v394-full463-ownAR-v1",
+      "source_terminal_status": "failed",
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-best376-active64-root-v394-full463-ownAR-v1.json",
+      "receipt_sha256": "7d950d91fe7c4e1c898703daf9bd12de10cb610dcf25b60929cd7362f2252737",
+      "archive": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/best376-active64-root-v394-full463-ownAR-v1.tar.gz",
+      "archive_sha256": "45bbf4fa808646c039d58d0747247118ffd79e5d23fc5847559ef75266747ce1",
+      "original_file_count": 4358,
+      "original_file_bytes": 93860358,
+      "archive_bytes": 15222254,
+      "all_archive_members_size_and_SHA_verified": true,
+      "original_files_rehashed_before_removal": true,
+      "intersection_with_all_current_FREEZE_file_paths": 0,
+      "public_storage_used": false,
+      "model_or_dataset_moved": false,
+      "current_running_and_best376_and_control398_untouched": true,
+      "restore_base": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209",
+      "restore_argv": [
+        "tar",
+        "-xzf",
+        "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/best376-active64-root-v394-full463-ownAR-v1.tar.gz",
+        "-C",
+        "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209"
+      ],
+      "full_index": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/best376-active64-root-v394-full463-ownAR-v1.index.json.gz",
+      "full_index_sha256": "f094e98cd021f81dbf99f58e90c9a4c0de971e81266c02bcdbd60755eefecda4",
+      "retained_small_error_files": []
+    },
+    {
+      "schema": "ROOT402.verified-private-terminal-evidence-archive.v1",
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/capacity-risk-span-root-v299-B1to8-full463-ownAR-v1",
+      "source_terminal_status": "complete",
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-capacity-risk-span-root-v299-B1to8-full463-ownAR-v1.json",
+      "receipt_sha256": "7ee6dacee938a8ac2c29b3cb448461eefb480e3dcf5c54203587c6b662acd8da",
+      "archive": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/capacity-risk-span-root-v299-B1to8-full463-ownAR-v1.tar.gz",
+      "archive_sha256": "e6d23c100b1010e0e3ea8f8a3b667cac5cdbbf53bac94a4defc23c6b987d6c4f",
+      "original_file_count": 2472,
+      "original_file_bytes": 146949187,
+      "archive_bytes": 22034629,
+      "all_archive_members_size_and_SHA_verified": true,
+      "original_files_rehashed_before_removal": true,
+      "intersection_with_all_current_FREEZE_file_paths": 0,
+      "public_storage_used": false,
+      "model_or_dataset_moved": false,
+      "current_running_and_best376_and_control398_untouched": true,
+      "restore_base": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209",
+      "restore_argv": [
+        "tar",
+        "-xzf",
+        "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/capacity-risk-span-root-v299-B1to8-full463-ownAR-v1.tar.gz",
+        "-C",
+        "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209"
+      ],
+      "full_index": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/private-evidence-archives/capacity-risk-span-root-v299-B1to8-full463-ownAR-v1.index.json.gz",
+      "full_index_sha256": "244a27159adbb84aa11f387545c7fa0a93190a6e1fbf4f29fadf6538fb962649",
+      "retained_small_error_files": []
+    }
+  ],
+  "current_NPU_job_changed": false,
+  "source_frozen_paths_modified": false,
+  "models_or_datasets_moved": false,
+  "public_storage_used": false
+}

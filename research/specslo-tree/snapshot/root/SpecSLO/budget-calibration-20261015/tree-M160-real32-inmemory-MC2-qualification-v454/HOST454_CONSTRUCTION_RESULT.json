@@ -1,0 +1,15 @@
+{
+  "status": "PASS_HOST454_ACTUAL_PARSER_WORKER_GUARD_FRAME_AND_GROUP_ROUTING",
+  "actual_runtime_source_inverse": true,
+  "actual_main_parser_accepted": true,
+  "actual_worker_action_checked": true,
+  "target_only_broadcast_src_translation_checked": true,
+  "live_loader_identity_and_wrong_path_checked": true,
+  "input_source": "genuine32 separately prefilled model owners required at NPU time",
+  "unchanged_original_qualifier_required": true,
+  "model_constructors": 0,
+  "NPU_used": false,
+  "NN_qualification": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,85 @@
+{
+  "schema": "ROOT217.packed-preflight-source-projection.v1",
+  "donor": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216",
+  "donor_freeze_sha256": "80416aecc96a38ca7c238001337cdfdb260864a979964feac0ff6215872e677a",
+  "projection": [
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216/audit_reference216.py",
+      "source_sha256": "c74c408fbd5029beb2d4ed54588fe77d10c3ee3a0fc40721ca48ca96c2c4672d",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/audit_reference217.py",
+      "new_sha256": "dd2fa58a4fb15f6c3819668eee55d18f01ae5b60ffee8c1c44b17fd0dccbf91b",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216/check216.py",
+      "source_sha256": "edac5183399d561808bae3a4b3470c9da2b73db674c7c1ab702591b887cfda32",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/check217.py",
+      "new_sha256": "8cd39327b5e58f405e251e02d28b669b8fcac56cd159844ed51aae509d5d419a",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216/cost216.py",
+      "source_sha256": "c5c763ba68f4bed5f46fc0dfb218a3a9f61bb26a3f45feb3ac77fb9a33d5cfbf",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/cost217.py",
+      "new_sha256": "47c23d82f67dceb9f236cf04addd96d6c5f0b3520557c5f879926aa2202bbdc5",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216/extension216.py",
+      "source_sha256": "d52f89699c5a0f92e7584f188119d9dffc24d04136e249f151c04621bc22bdf2",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/extension217.py",
+      "new_sha256": "6d7a9e39e2da531bb527d4009cd8e2159a7ad576384afb925a03b25e509bf409",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -40,8 +40,10 @@\n     import os\n     require(os.environ.get(\"VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION\")==\"1\", \"explicit original SLO admission1\")\n     result=extension209.after_install(native,graph,live)\n+    from slot_preflight217 import install\n+    install(native)\n     return dict(result,ROOT217_overlay='cached-parent-SLO-admission1-cost-aware-N9to16',SLO_AWARE_ADMISSION=True,cached_source_precheck=True,cost_aware_N9to16_budget=True,\n-                new_model_or_graph=False,budget_grants_may_change=True,source_epoch209_immutable=True)\n+                new_model_or_graph=False,budget_grants_may_change=True,packed_target_KV_preflight=True,source_epoch209_immutable=True)\n \n \n def loaded_origins():\n@@ -53,7 +55,10 @@\n \n def qualify_component(engine,native,stage,policy,output):\n     import extension209\n-    return extension209.qualify_component(engine,native,stage,policy,output)\n+    value=extension209.qualify_component(engine,native,stage,policy,output)\n+    from slot_preflight217 import end_shadow\n+    stage('ROOT217/complete-actual-preflight-shadow',lambda:end_shadow(engine))\n+    return value\n \n \n def cache_snapshot():\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216/guard216.py",
+      "source_sha256": "c40f1556ffdf1afba3b5fc63cb07e45b44178350990db6ede3a24d9d2d02eaf4",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/guard217.py",
+      "new_sha256": "074baa461e1a4f53a5489876692da159abf110bda3e26c6acb159838668e5e3f",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -34,7 +34,7 @@\n     require(all(f['files'].get(p)==h for p,h in old_sources.items()),'all canonical209 frozen source/evidence retained')\n     return f,sources,dict(own_freeze_sha256=EXPECTED_FREEZE,own_archive_sha256=EXPECTED_ARCHIVE,\n         original209_dependency=dependency,source_peer_review=False,canonical209_source_unchanged=True,\n-        device_qualification_inherited=False,production_delta='same213 plus budget-cost repair: N9to16 mixed B3/B4 to allB4 only within original limits; clients/model/clock unchanged')\n+        device_qualification_inherited=False,production_delta='same216 cost/ownAR plus direct packed targetKV preflight read with fresh actual original/new shadow gate; clients/model/clock unchanged')\n \n \n def storage(tag=None):\n@@ -70,6 +70,9 @@\n         reference=reference_audit(directory) if rank==0 else reference\n         require(r['postfull_independent_FIA_AR']['completed']is True\n             and r['postfull_independent_FIA_AR']==read(Path(directory)/'postfull-independent-FIA-AR'/f'rank{rank}-summary.json'),'complete exact postfull own-FIA reference')\n+        from slot_preflight217 import audit_snapshot\n+        audit_snapshot(r['ROOT217_slot_preflight'],rank,trace)\n+        require(r['overlay']['packed_target_KV_preflight']is True,'explicit actual direct packed target preflight overlay')\n         snapshots.append(cache)\n     return actual,status,dict(arithmetic,ROOT217_cached_dispatch_snapshots=snapshots,\n         changed_model_or_arrival_or_clock=False,budget_grants_may_change=True,SLO_AWARE_ADMISSION=True,postfull_independent_FIA_AR=reference)\n@@ -80,7 +83,7 @@\n         storage=storage,launch_argv=launch_argv,actual_audit=actual_audit,\n         MAX_SECONDS=MAX_SECONDS,MAX_TAG_BYTES=MAX_TAG_BYTES,MAX_AGGREGATE_BYTES=MAX_AGGREGATE_BYTES,\n         SCOPE=dict(cache_and_original_SLO_admission1_overlay217=True,source_donor209=True,full463=True,\n-            original_budget_limits_and_arrivals=True,cost_aware_N9to16_budget=True,postfull_independent_FIA_AR=True,performance_clock_ends_before_reference=True,active_window=32,new_target_keys=0,\n+            original_budget_limits_and_arrivals=True,cost_aware_N9to16_budget=True,packed_target_KV_preflight=True,postfull_independent_FIA_AR=True,performance_clock_ends_before_reference=True,active_window=32,new_target_keys=0,\n             fixed_gamma_control_rerun=False,whole_workload_AR_qualified=False,formal_Goodput=False,adopted=False))\n     text=(B/'budget-diagnostics/v154-root-execution/supervise_v154.py').read_text()\n     changes=(('V154.root-owned-local-component-supervisor.v1','ROOT.V217.cached-parent-full-supervisor.v1'),\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216/host216.py",
+      "source_sha256": "5bc3b3269540e7673d49b4cb8f17b2a61c2800f42ac06eedf533bad311ca3d42",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/host217.py",
+      "new_sha256": "87674974518683f814a6bf10dbce4dd0b7f82799f8d599922216897657a1659b",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -85,15 +85,15 @@\n             with tempfile.TemporaryDirectory()as directory:\n                 p=Path(directory)\n                 for rank in range(4):\n-                    r=dict(overlay=dict(ROOT217_overlay='cached-parent-SLO-admission1-cost-aware-N9to16',SLO_AWARE_ADMISSION=True,cost_aware_N9to16_budget=True),\n+                    r=dict(overlay=dict(ROOT217_overlay='cached-parent-SLO-admission1-cost-aware-N9to16',SLO_AWARE_ADMISSION=True,cost_aware_N9to16_budget=True,packed_target_KV_preflight=True),\n                         ROOT217_cached_parent_dispatch=dict(initial_parent_source_checks=1,cached_parent_returns=20,canonical_mapper_or_base_module_mutated=False,cost_aware_N9to16_budget=dict(private_shape_bindings=1,by_generation={'5':dict(shape_calls=1)},original_cost_table=[dict(N=n,Q=q,M=m,S=ss)for(n,q),(m,ss)in sorted(__import__('cost217').original_cost_table().items())])),\n                         actual_helper_origins_before_constructor=dict(ROOT217_explicit_overlay_sources={'explicit':1}),\n-                        actual_helper_origins_after_constructor=dict(ROOT217_explicit_overlay_sources={'explicit':1}),postfull_independent_FIA_AR=dict(completed=True))\n+                        actual_helper_origins_after_constructor=dict(ROOT217_explicit_overlay_sources={'explicit':1}),postfull_independent_FIA_AR=dict(completed=True),ROOT217_slot_preflight=dict(shadow=False,qualified=True,shadow_pairs=1,shadow_draft_pairs=int(rank==0),shadow_target_pairs=int(rank!=0),by_generation={'5':dict(calls=1,direct_packed_target_calls=int(rank!=0),unchanged_other_calls=int(rank==0))}))\n                     (p/f'rank{rank}-local-diagnostic.json').write_text(json.dumps(r))\n                     summary_folder=p/'postfull-independent-FIA-AR';summary_folder.mkdir(exist_ok=True)\n                     (summary_folder/f'rank{rank}-summary.json').write_text(json.dumps(r['postfull_independent_FIA_AR']))\n                     folder=p/'windows/window32/full463';folder.mkdir(parents=True,exist_ok=True)\n-                    trace=dict(source_generation=5,decode_counters=dict(spec_rhythm_slo_aware_admission_enabled=1,spec_rhythm_target_slo_first_enabled=0))\n+                    trace=dict(source_generation=5,normal_target_calls=[{}],decode_counters=dict(spec_rhythm_slo_aware_admission_enabled=1,spec_rhythm_target_slo_first_enabled=0))\n                     (folder/f'rank{rank}-full463-actual-trace.json.gz').write_bytes(gzip.compress(json.dumps(trace).encode()))\n                 self.assertEqual(guard217.actual_audit(p)[1],'passed_full')\n                 r['ROOT217_cached_parent_dispatch']['initial_parent_source_checks']=0\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216/launch216.sh",
+      "source_sha256": "98a50cf0e24c01f8325850cf0aee3a2e1bf461a45df5e6faa638f211537d3c0d",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/launch217.sh",
+      "new_sha256": "e1ad26448a50e3b1aae25dc07a626f329bc69c12ddfaad829a1ba265c1b29c97",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216/reference216.py",
+      "source_sha256": "c1864bba78c065202421556ff2c43e958604b7d681c3ff87a4f973c78ddca132",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/reference217.py",
+      "new_sha256": "bb63ac04a588658b403f5f0b0fcd1c274fe5c61debb30c5db83478e5700c36fe",
+      "patch_after_namespace_projection": ""
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216/runtime216.py",
+      "source_sha256": "ad601b0eaede5b5d5327f952ada4c5035edaf1bcc0959f5bb507214825c7718b",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/runtime217.py",
+      "new_sha256": "3f4e589d8a53ead5ad2e849a0f7ddadaf7eb02d4ea6c5a92906a0f02faab38c6",
+      "patch_after_namespace_projection": "--- \n+++ \n@@ -18,7 +18,7 @@\n         (\"require(extension_module=='extension209'\",\"require(extension_module=='extension217'\",1),\n         ('  require_ready(own_identity)','  from check217 import ready as own_source_ready\\n  own_source_ready()\\n  require_ready(own_identity)',1),\n         (' readiness=require_ready();spec=', ' from check217 import ready as own_source_ready\\n own_source_ready()\\n readiness=require_ready();spec=',1),\n-        (\"     report['Native_final']=\", \"     report['postfull_independent_FIA_AR']=extension.postfull_AR(engine,native,stage,report['windows'],output_directory)\\n     report['ROOT217_cached_parent_dispatch']=extension.cache_snapshot()\\n     report['Native_final']=\",1))\n+        (\"     report['Native_final']=\", \"     report['postfull_independent_FIA_AR']=extension.postfull_AR(engine,native,stage,report['windows'],output_directory)\\n     report['ROOT217_slot_preflight']=__import__('slot_preflight217').snapshot()\\n     report['ROOT217_cached_parent_dispatch']=extension.cache_snapshot()\\n     report['Native_final']=\",1))\n     for before,after,count in changes:\n         require(text.count(before)==count,'exact runtime209 projection anchor '+before);text=text.replace(before,after)\n     names={'save','worker','main'}\n"
+    },
+    {
+      "source": "/root/SpecSLO/budget-calibration-20261015/tree-cost-aware-N9to16-with-own-FIA-AR-full-v216/startup216.sh",
+      "source_sha256": "539053862353141532b146658381766c48d4ee104857a32194a9c7fd52d6c6c2",
+      "new": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/startup217.sh",
+      "new_sha256": "a4fadb725ae09db1f93c8143ba1d3416e3d16434a1eee47b3c76d9a6c9f08b1b",
+      "patch_after_namespace_projection": ""
+    }
+  ],
+  "NPU_started": false,
+  "source_peer_review": false,
+  "new_modules": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/host_slot_preflight217.py": "0198f0f5bf759ff6d8b1a40c303bcb1dcf05d2b67feef011895a3b949e877b39",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/cpu_slot_preflight217.py": "6a17f9ed426cd5452222b5790b895eaa35147e0124cc4b4abde8ceaac0282f8b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/slot_preflight217.py": "4e07a94ea8251867808b340f5b19a479e54657db97c47b659060a68a7dc857bc"
+  },
+  "metadata_only_after_HOST": "/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-with-own-FIA-AR-full-v217/METADATA_ONLY_AFTER_HOST217.json"
+}

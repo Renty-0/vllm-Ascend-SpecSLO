@@ -1,0 +1,43 @@
+{
+  "schema": "ROOT233.prepadding-metadata-recording-failure.v1",
+  "UTC": "2026-10-18T04:43:43.299334+00:00",
+  "status": "failed_saved_metadata_ABI_before_first_case_math",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-contiguous-branch-root-v233-155-neural-cases-v1.json",
+  "receipt_sha256": "1d878a606c7c9acb9cfebbec2389769f515a5b0ae08a48ba29c367b7ba61b015",
+  "completed_positive_cases": 0,
+  "planned_cases": 155,
+  "branch_repair_not_yet_device_tested": true,
+  "setup_error": "State.last retained pre-Native-padding mask while Native target forward pads to configured width9; original-order ABI assertion correctly stopped.",
+  "correction": "Apply identical mask padding9 before recording no-copy State metadata and original-layout negative-control metadata. Branch family stays10. Keep original ABI assertion.",
+  "CPU_confirmation": "CPU_METADATA_STATE231_RESULT.json executes actual original forward with projected typed dummy guard and constructor width2/depth4; requires identity of recorded and actual final model metadata.",
+  "errors_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/contiguous-branch-root-v233-155-neural-cases-v1/rank0-last-error.json": "8943b7e7e41e622227731fbcf83cbed2fbf3abdcdcf2846a105ba31efc7b3415",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/contiguous-branch-root-v233-155-neural-cases-v1/rank1-last-error.json": "aa75695c047319229b029dd12f03314cc8f1a8e8e0785761df3b0083e5b4959e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/contiguous-branch-root-v233-155-neural-cases-v1/rank2-last-error.json": "01fd11cafb92e86dabcc2ec4ccca4fe602dbe3e7c3267e218473e19a17332b2e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/contiguous-branch-root-v233-155-neural-cases-v1/rank3-last-error.json": "0630698482176c64e59e51ac7ca559c4295802986634f4193c1a8420e2fc3945"
+  },
+  "pre_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "all_four_idle": true,
+  "owned_remaining": [],
+  "original_Native_ABI_and_tolerances_unchanged": true,
+  "formal_Goodput": false,
+  "whole_workload_AR_qualified": false,
+  "adopted": false
+}

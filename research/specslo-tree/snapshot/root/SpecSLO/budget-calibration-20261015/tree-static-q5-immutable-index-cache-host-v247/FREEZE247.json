@@ -1,0 +1,17 @@
+{
+  "UTC": "2026-10-18T09:27:18.168987+00:00",
+  "scope": "immutable-index candidate and metadata-only NPU cost probe; no model/decoder qualification",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/probe247.py": "06c31c4a38d000be2c317d8eac930b98a2e1028de59620c6f8c7b8d4d2778b7d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/guard247.py": "632c5cdf55b8a54c36b9a86741a94ce69fa088b0a62acca8fe4c75824372465c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/check_projection247_HOST.py": "b7f0c1688965360922ab16066554045e8c44ed644ccd2f99b19f50e8c31bf26d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/projection247.py": "a61db62e22d16432a9e0956508293f81abf8038bc2f3197fa86f38015940b88d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/HOST_CACHED_PROJECTION247_RESULT.json": "ccb0f19a8b8dc41944f5d1ecd02e459b264a9abc4efa418cd3415ccb49e1533b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-projection-host-v243/projection243.py": "f6f596f704d55cf672e8b05c265d6de707ec8a0485daf41c4040de9de817390e",
+    "/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh": "107a11a58764eabe4f8b6e5d752d9234cf67f9e898d81a8619e47e684e83af7c",
+    "/root/SpecSLO/budget-calibration-20261015/serial-v1/map-current.py": "300e4e9894af7f7275a718bc9f549d1c62c880a5e7b1665f7d1268c6f2097975",
+    "/root/SpecSLO/resume-20261012/run_baseline_calibration-v1.py": "74a8bd124213428c97874568db1537d49cc8f24c4131865bbaed47fa87540209"
+  },
+  "HOST_comparisons": 334,
+  "NPU_used": false
+}

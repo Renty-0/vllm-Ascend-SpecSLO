@@ -1,0 +1,33 @@
+{
+  "status": "PASS_HOST425_ACTUAL_SANITIZED_STARTUP_CALLBACK_CONSTRUCTION",
+  "NPU_used": false,
+  "model_constructors_called": 0,
+  "exact_startup_PYTHONPATH": true,
+  "imported_origins": {
+    "projection247": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/projection247.py",
+    "projection255": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255/projection255.py",
+    "window425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/window425.py",
+    "empty425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/empty425.py",
+    "reference425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/reference425.py",
+    "audit_reference425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/audit_reference425.py",
+    "audit_base425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/audit_base425.py",
+    "runtime425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/runtime425.py",
+    "trace425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/trace425.py",
+    "scope425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/scope425.py",
+    "audit425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/audit425.py",
+    "extension425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/extension425.py",
+    "bucket425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/bucket425.py",
+    "oracle425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/oracle425.py",
+    "qualify425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/qualify425.py",
+    "guard425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/guard425.py",
+    "shape425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/shape425.py",
+    "admission425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/admission425.py",
+    "audit_normal425": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425/audit_normal425.py"
+  },
+  "configured_max_num_seqs": 64,
+  "effective_active_ceiling": 64,
+  "original_owned_verifier_and_cleanup_retained": true,
+  "original227_and_additional681_and_all463_ownAR_required": true,
+  "neural_qualification_inherited": false,
+  "deadline_seconds": 18000
+}

@@ -1,0 +1,24 @@
+{
+  "UTC": "2026-10-22T13:55:22.248589+00:00",
+  "status": "PASS_HOST459_SYMBOLIC693_REFERENCE_SOURCE_AND_ACTUAL_LIFECYCLE",
+  "symbolic_schedules": 693,
+  "family_counts": {
+    "80": 336,
+    "120": 357
+  },
+  "original231_tree_cases_preserved": true,
+  "original_greedy_Native_and_all_bitwise_comparator_code_identical": true,
+  "all_original_bank_offsets24_48_preserved": true,
+  "all_independent_reference_nodes_exactly_once": true,
+  "draft_stage_enumeration_matches_all_cases": true,
+  "reference_body_full_AST_inverse_passed": true,
+  "original_numerical_startup_exports_equal": true,
+  "actual_main_parser_exercised": true,
+  "actual_worker_predicates_exercised": 4,
+  "actual_owned_supervisor_constructed": true,
+  "model_constructors": 0,
+  "NPU_used": false,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

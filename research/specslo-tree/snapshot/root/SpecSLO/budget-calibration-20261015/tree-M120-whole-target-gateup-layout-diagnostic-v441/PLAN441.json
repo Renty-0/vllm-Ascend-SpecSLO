@@ -1,0 +1,20 @@
+{
+  "schema": "ROOT441.whole-target-gateup-layout-diagnostic.v1",
+  "scope": "same real M120/S24 target frame, current ND gate-up versus NZ gate-up across all64 layers; hidden and actual query KV plus device costs",
+  "original_source_files_changed": false,
+  "Native_flags_assigned": false,
+  "transient_diagnostic_gateup_parameter_layout_swaps": true,
+  "all_original_parameter_storages_restored_before_exit": true,
+  "down_projection_and_MC2_static_weight_bindings_unchanged": true,
+  "model_or_communication_profile_permanently_installed": false,
+  "full463": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "original_caps": {
+    "seconds": 3600,
+    "tag_MiB": 192,
+    "aggregate_MiB": 3584
+  },
+  "Git_pushes": 0
+}

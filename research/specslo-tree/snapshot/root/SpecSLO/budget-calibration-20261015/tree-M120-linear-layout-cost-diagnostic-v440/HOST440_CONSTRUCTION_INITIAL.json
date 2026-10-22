@@ -1,0 +1,27 @@
+{
+  "status": "PASS_HOST440_ACTUAL_FROZEN_PARENT_LIFECYCLE_AND_LOCAL_OPERATOR_DIAGNOSTIC_CONSTRUCTION",
+  "original385_whole_worker_and_main_inverse": true,
+  "actual_probe_signature_bound": true,
+  "actual_genuine_capture_neural_call_unchanged": true,
+  "genuine_extra_gate_up_capture_explicit": true,
+  "actual_supervisor_callbacks_own": true,
+  "runtime_seconds": 3600,
+  "tag_MiB": 192,
+  "aggregate_MiB": 3584,
+  "no_model_or_communication_profile_installed": true,
+  "no_production_permission": true,
+  "NPU_used": false,
+  "model_constructors": 0,
+  "Raw": null,
+  "Goodput": null,
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/linear440.py": "316f8f5cbdbc225ea096268fb45165a1dbf58e7c065e20dd36ab69f960d772c3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/probe440.py": "0c89180ec21b19f0e1cd86cf4b948c0aefe178bbda63189190b67d092ef2b0d8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/host_env440.py": "e5cbcd8c0dbe73d95cd3f24d3ff47e61cb4ba920f27904703dda64da596cc5e0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/check440.py": "ba85b2c045a92ff328955038050ba579332cf95d48cbdc7afa64fe04caa8375b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/check440_HOST.py": "ce81e0268e862c41f72e681e21e0b82fd1a8a2d3ca82a605277dcdc25f46e885",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/guard440.py": "b1d7ccdc82423583bcff6acbd04df94776a0641e9bf85551b929c3d9d6fb67af",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/runtime440.py": "49af7a1dd3f5659fff9f0cd2f89676b67f456fe1391ec11ea7a459ccb78847ae",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/audit440.py": "922651299b1805041df827140500fc27699a8edde947f3a451727b334b3a5e7d"
+  }
+}

@@ -1,0 +1,2914 @@
+{
+  "production_parent": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-real16-bankfix-full-v173",
+  "projection": [
+    {
+      "deltas": [
+        {
+          "end": 8973,
+          "new": "emp",
+          "old": "",
+          "start": 8973
+        },
+        {
+          "end": 8988,
+          "new": "y",
+          "old": "race_admission",
+          "start": 8974
+        },
+        {
+          "end": 9011,
+          "new": "",
+          "old": "s",
+          "start": 9010
+        },
+        {
+          "end": 9302,
+          "new": "decisions=[]\n from audit_production_v101 import load_artifact\n for i,env in enumerate(reports[1]['windows']['traces']):\n  traces=[load_artifact(r['windows']['traces'][i]['original_trace']['artifact'],directory)for r in reports]\n  for t in traces[1:]:require(t['standalone_prefill_calls']==traces[0]['standalone_prefill_calls'],'same all4 genuine prefill owner batches')\n  decisions.append(dict(window=env['window'],role=env['role'],actual_empty_cohorts=audit_trace(traces[1])))\n ",
+          "old": "",
+          "start": 9302
+        },
+        {
+          "end": 9361,
+          "new": "empty_",
+          "old": "",
+          "start": 9361
+        },
+        {
+          "end": 9362,
+          "new": "ctive_cohorts=",
+          "old": "",
+          "start": 9362
+        },
+        {
+          "end": 9364,
+          "new": "ec",
+          "old": "m",
+          "start": 9363
+        },
+        {
+          "end": 9366,
+          "new": "",
+          "old": "s",
+          "start": 9365
+        },
+        {
+          "end": 9379,
+          "new": "s,whole",
+          "old": "197=audit",
+          "start": 9370
+        },
+        {
+          "end": 9403,
+          "new": "AR",
+          "old": "traces(reports),minimum",
+          "start": 9380
+        },
+        {
+          "end": 9406,
+          "new": "",
+          "old": "re",
+          "start": 9404
+        },
+        {
+          "end": 9408,
+          "new": "alifi",
+          "old": "",
+          "start": 9408
+        },
+        {
+          "end": 9409,
+          "new": "d=Fal",
+          "old": "",
+          "start": 9409
+        },
+        {
+          "end": 9431,
+          "new": "",
+          "old": "ts_is_not_maximum=Tru",
+          "start": 9410
+        }
+      ],
+      "file": "audit197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/audit190.py",
+      "parent_sha256": "9793ee68dc0b8fe1d8dace9475948db0a0fa3681e81b5413281635516cdca9da"
+    },
+    {
+      "deltas": [
+        {
+          "end": 307,
+          "new": "empty-",
+          "old": "v",
+          "start": 306
+        },
+        {
+          "end": 313,
+          "new": "tive",
+          "old": "ancy",
+          "start": 309
+        },
+        {
+          "end": 329,
+          "new": "",
+          "old": "prefill-",
+          "start": 321
+        },
+        {
+          "end": 333,
+          "new": "usal80",
+          "old": "p4",
+          "start": 331
+        },
+        {
+          "end": 493,
+          "new": "",
+          "old": "CORE185=B/'tree-vacancy-cohort-prefill-full-v185'\n",
+          "start": 443
+        },
+        {
+          "end": 530,
+          "new": "",
+          "old": ",CORE185",
+          "start": 522
+        },
+        {
+          "end": 4661,
+          "new": "",
+          "old": "\ndef core_module(name):\n import importlib\n require(name in ('cohort185','source_patch185','lifecycle185'),'three readonly admission modules only')\n module=importlib.import_module(name);path=CORE185/(name+'.py')\n require(Path(vars(module)['__file__']).resolve()==path,'exact readonly185 admission source '+name)\n checked(path);return module\n",
+          "start": 4321
+        }
+      ],
+      "file": "base197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/base190.py",
+      "parent_sha256": "208e7158f8c55d16f653fd22b2e8197f61075c3686b6feac54ec97789b1ae27a"
+    },
+    {
+      "deltas": [],
+      "file": "check197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/check190.py",
+      "parent_sha256": "c8f8ac3afd6e45a6de8eb976e9205f7395f2237c3a75ffddf22357082bff97fc"
+    },
+    {
+      "deltas": [],
+      "file": "component197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/component190.py",
+      "parent_sha256": "256542b35281d856caf278b8d4a34785f56f557201682e16e5e4d664ba36f42f"
+    },
+    {
+      "deltas": [
+        {
+          "end": 4,
+          "new": "Exact origi",
+          "old": "O",
+          "start": 3
+        },
+        {
+          "end": 5,
+          "new": "a",
+          "old": "",
+          "start": 5
+        },
+        {
+          "end": 17,
+          "new": "173",
+          "old": "y two fresh",
+          "start": 6
+        },
+        {
+          "end": 29,
+          "new": ";",
+          "old": "",
+          "start": 29
+        },
+        {
+          "end": 31,
+          "new": "no adm",
+          "old": "f",
+          "start": 30
+        },
+        {
+          "end": 32,
+          "new": "ssion/coal",
+          "old": "",
+          "start": 32
+        },
+        {
+          "end": 35,
+          "new": "",
+          "old": "ld",
+          "start": 33
+        },
+        {
+          "end": 51,
+          "new": "c",
+          "old": " differ from th",
+          "start": 36
+        },
+        {
+          "end": 144,
+          "new": "",
+          "old": "immutable parent.\"\"\"\nfrom dataclasses import replace\nfrom base197 import require\n\ndef make_",
+          "start": 53
+        },
+        {
+          "end": 153,
+          "new": "uration mutation.\"\"\"",
+          "old": "():",
+          "start": 150
+        },
+        {
+          "end": 155,
+          "new": "",
+          "old": " ",
+          "start": 154
+        },
+        {
+          "end": 210,
+          "new": "",
+          "old": " as original",
+          "start": 198
+        },
+        {
+          "end": 483,
+          "new": "",
+          "old": " value=original()\n require(value.spec_rhythm_prefill_coalesce_min_requests==1 and value.spec_rhythm_prefill_coalesce_max_wait_ms==0,'exact parent1/0 config')\n return replace(value,spec_rhythm_prefill_coalesce_min_requests=4,spec_rhythm_prefill_coalesce_max_wait_ms=150.0)\n",
+          "start": 211
+        }
+      ],
+      "file": "config197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/config190.py",
+      "parent_sha256": "faa30c2393b2a82d3514cc59036739361352e668c42545394ba96345ea44df90"
+    },
+    {
+      "deltas": [
+        {
+          "end": 8,
+          "new": "",
+          "old": "rigi",
+          "start": 4
+        },
+        {
+          "end": 10,
+          "new": "",
+          "old": "a",
+          "start": 9
+        },
+        {
+          "end": 11,
+          "new": "y",
+          "old": "",
+          "start": 11
+        },
+        {
+          "end": 23,
+          "new": "produc",
+          "old": "installa",
+          "start": 15
+        },
+        {
+          "end": 28,
+          "new": "p",
+          "old": "",
+          "start": 28
+        },
+        {
+          "end": 32,
+          "new": "",
+          "old": "nd ",
+          "start": 29
+        },
+        {
+          "end": 34,
+          "new": "nt; new empty-",
+          "old": "",
+          "start": 34
+        },
+        {
+          "end": 43,
+          "new": "ctive",
+          "old": "donly185",
+          "start": 35
+        },
+        {
+          "end": 54,
+          "new": "source an",
+          "old": "",
+          "start": 54
+        },
+        {
+          "end": 62,
+          "new": "",
+          "old": "ecision",
+          "start": 55
+        },
+        {
+          "end": 65,
+          "new": "ur",
+          "old": "o",
+          "start": 64
+        },
+        {
+          "end": 67,
+          "new": "nt math",
+          "old": "",
+          "start": 67
+        },
+        {
+          "end": 235,
+          "new": "",
+          "old": ",core_module\n for name in ('cohort185','lifecycle185','source_patch185'):core_module(name)",
+          "start": 145
+        },
+        {
+          "end": 502,
+          "new": "ret",
+          "old": "val",
+          "start": 499
+        },
+        {
+          "end": 505,
+          "new": "rn dict(",
+          "old": "e=",
+          "start": 503
+        },
+        {
+          "end": 569,
+          "new": ",empty_active_",
+          "old": "\n ",
+          "start": 567
+        },
+        {
+          "end": 573,
+          "new": "fill_only=T",
+          "old": "tu",
+          "start": 571
+        },
+        {
+          "end": 584,
+          "new": "",
+          "old": "n dict(val",
+          "start": 574
+        },
+        {
+          "end": 674,
+          "new": "",
+          "old": "vacancy_cohort197=dict(minimum_requests=4,maximum_wait_ms=150.,maximum_requests=32),\n  ",
+          "start": 587
+        },
+        {
+          "end": 704,
+          "new": "new_hot_",
+          "old": "",
+          "start": 704
+        },
+        {
+          "end": 711,
+          "new": "ollectiv",
+          "old": "ap4_pr",
+          "start": 705
+        },
+        {
+          "end": 718,
+          "new": "",
+          "old": "erved",
+          "start": 713
+        },
+        {
+          "end": 751,
+          "new": "0",
+          "old": "True,prefill_only_candidate=True",
+          "start": 719
+        },
+        {
+          "end": 814,
+          "new": "",
+          "old": "_module,core",
+          "start": 802
+        },
+        {
+          "end": 1032,
+          "new": "",
+          "old": "\n core={}\n for name in ('cohort185','lifecycle185','source_patch185'):\n  module=core_module(name)",
+          "start": 935
+        },
+        {
+          "end": 1097,
+          "new": "",
+          "old": "p=Path(vars(module)['__file__']).resolve();core[str(p)]=sha(p)\n ",
+          "start": 1033
+        },
+        {
+          "end": 1553,
+          "new": "",
+          "old": "readonly185_decision_core=core,",
+          "start": 1522
+        }
+      ],
+      "file": "extension197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/extension190.py",
+      "parent_sha256": "fdedafc6876cd97a5316131b3ec7157e7ba3df5b9a1dda772dbb4065c7a6e299"
+    },
+    {
+      "deltas": [
+        {
+          "end": 448,
+          "new": "",
+          "old": "\n# HOST-only utilities: no production import path or model qualification.\nfor root in (B/'tree-uniform-b3-three-bucket-full-v180',):\n if str(root) not in sys.path:sys.path.append(str(root))",
+          "start": 259
+        },
+        {
+          "end": 2193,
+          "new": "Fals",
+          "old": "Tru",
+          "start": 2190
+        }
+      ],
+      "file": "host_full197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/host_full190.py",
+      "parent_sha256": "210d37b8831b2c82b11815983a32cef93fabe9749a5a4ad5c536557583720de9"
+    },
+    {
+      "deltas": [
+        {
+          "end": 597,
+          "new": "1",
+          "old": "2",
+          "start": 596
+        },
+        {
+          "end": 599,
+          "new": "16",
+          "old": "4",
+          "start": 598
+        },
+        {
+          "end": 627,
+          "new": " and len(case['ids'])==n",
+          "old": "",
+          "start": 627
+        },
+        {
+          "end": 637,
+          "new": "",
+          "old": "t",
+          "start": 636
+        },
+        {
+          "end": 639,
+          "new": "",
+          "old": "u",
+          "start": 638
+        },
+        {
+          "end": 645,
+          "new": "",
+          "old": " norm",
+          "start": 640
+        },
+        {
+          "end": 649,
+          "new": "-planner",
+          "old": "B4",
+          "start": 647
+        },
+        {
+          "end": 652,
+          "new": "1",
+          "old": "2",
+          "start": 651
+        },
+        {
+          "end": 653,
+          "new": "16 B",
+          "old": "",
+          "start": 653
+        },
+        {
+          "end": 664,
+          "new": "ubs",
+          "old": "cop",
+          "start": 661
+        },
+        {
+          "end": 665,
+          "new": "t",
+          "old": "",
+          "start": 665
+        },
+        {
+          "end": 682,
+          "new": "zip(cas",
+          "old": "",
+          "start": 682
+        },
+        {
+          "end": 692,
+          "new": "['ids'],",
+          "old": "numerate(",
+          "start": 683
+        },
+        {
+          "end": 707,
+          "new": ",strict=True",
+          "old": "",
+          "start": 707
+        },
+        {
+          "end": 873,
+          "new": "c",
+          "old": "r",
+          "start": 872
+        },
+        {
+          "end": 876,
+          "new": "s",
+          "old": "ng",
+          "start": 874
+        },
+        {
+          "end": 880,
+          "new": "['ids']",
+          "old": "(n)",
+          "start": 877
+        },
+        {
+          "end": 1197,
+          "new": "bank.reference_",
+          "old": "",
+          "start": 1197
+        },
+        {
+          "end": 1200,
+          "new": "ds[i]",
+          "old": "+n",
+          "start": 1198
+        },
+        {
+          "end": 1979,
+          "new": "1",
+          "old": "2",
+          "start": 1978
+        },
+        {
+          "end": 1981,
+          "new": "16",
+          "old": "4",
+          "start": 1980
+        },
+        {
+          "end": 2041,
+          "new": "actual planner subset",
+          "old": "N2/4",
+          "start": 2037
+        },
+        {
+          "end": 2082,
+          "new": "bank.reference_",
+          "old": "",
+          "start": 2082
+        },
+        {
+          "end": 2084,
+          "new": "ds.i",
+          "old": "-",
+          "start": 2083
+        },
+        {
+          "end": 2085,
+          "new": "dex(i)",
+          "old": "",
+          "start": 2085
+        },
+        {
+          "end": 5420,
+          "new": "bank.",
+          "old": "",
+          "start": 5420
+        },
+        {
+          "end": 5421,
+          "new": "ds[i]",
+          "old": "",
+          "start": 5421
+        },
+        {
+          "end": 5456,
+          "new": "bank.",
+          "old": "",
+          "start": 5456
+        },
+        {
+          "end": 5457,
+          "new": "ds[i]",
+          "old": "",
+          "start": 5457
+        },
+        {
+          "end": 7670,
+          "new": "bank.",
+          "old": "",
+          "start": 7670
+        },
+        {
+          "end": 7671,
+          "new": "ds[i]",
+          "old": "",
+          "start": 7671
+        },
+        {
+          "end": 7686,
+          "new": "bank.reference_",
+          "old": "",
+          "start": 7686
+        },
+        {
+          "end": 7689,
+          "new": "ds[i]",
+          "old": "+n",
+          "start": 7687
+        },
+        {
+          "end": 8612,
+          "new": "b",
+          "old": "r",
+          "start": 8611
+        },
+        {
+          "end": 8615,
+          "new": "k.r",
+          "old": "g",
+          "start": 8614
+        },
+        {
+          "end": 8617,
+          "new": "fere",
+          "old": "(",
+          "start": 8616
+        },
+        {
+          "end": 8623,
+          "new": "ce_ids",
+          "old": ",2*n)",
+          "start": 8618
+        }
+      ],
+      "file": "next4_197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/next4_190.py",
+      "parent_sha256": "e3e6454a7457793ad5b3feb86a445ba16eb3eb2613bba5ad51fb2a7ab51e40b4"
+    },
+    {
+      "deltas": [
+        {
+          "end": 674,
+          "new": "dict(request_id=r['request_id'",
+          "old": "",
+          "start": 674
+        },
+        {
+          "end": 676,
+          "new": ",token_ids=list(t),",
+          "old": ";",
+          "start": 675
+        },
+        {
+          "end": 683,
+          "new": "",
+          "old": "s",
+          "start": 682
+        },
+        {
+          "end": 685,
+          "new": "l",
+          "old": "s",
+          "start": 684
+        },
+        {
+          "end": 686,
+          "new": "n(",
+          "old": "",
+          "start": 686
+        },
+        {
+          "end": 688,
+          "new": "",
+          "old": "(",
+          "start": 687
+        },
+        {
+          "end": 690,
+          "new": ",original_prompt=r['prompt'])",
+          "old": "\n",
+          "start": 689
+        },
+        {
+          "end": 698,
+          "new": "",
+          "old": "ow",
+          "start": 696
+        },
+        {
+          "end": 705,
+          "new": "",
+          "old": "okens",
+          "start": 700
+        },
+        {
+          "end": 849,
+          "new": "",
+          "old": ":\n  if len(tokens) in lengths:continue\n  lengths.add(len(tokens));result.append(dict(request_id=row['request_id'",
+          "start": 737
+        },
+        {
+          "end": 950,
+          "new": "",
+          "old": ",token_ids=list(tokens),length=len(tokens),original_prompt=row['prompt']))\n  if len(result)==5:break",
+          "start": 850
+        },
+        {
+          "end": 973,
+          "new": "6",
+          "old": "",
+          "start": 973
+        },
+        {
+          "end": 985,
+          "new": "",
+          "old": "all(0<",
+          "start": 979
+        },
+        {
+          "end": 990,
+          "new": "{v",
+          "old": "r",
+          "start": 989
+        },
+        {
+          "end": 995,
+          "new": "l",
+          "old": "tok",
+          "start": 992
+        },
+        {
+          "end": 1001,
+          "new": "gth",
+          "old": "_ids",
+          "start": 997
+        },
+        {
+          "end": 1011,
+          "new": "",
+          "old": ")<=2301 ",
+          "start": 1003
+        },
+        {
+          "end": 1015,
+          "new": "v in ",
+          "old": "",
+          "start": 1015
+        },
+        {
+          "end": 1016,
+          "new": "esult[:32]})>1 and max(v['length']for v",
+          "old": "",
+          "start": 1016
+        },
+        {
+          "end": 1027,
+          "new": "<=2301",
+          "old": "",
+          "start": 1027
+        },
+        {
+          "end": 1030,
+          "new": "real m",
+          "old": "f",
+          "start": 1029
+        },
+        {
+          "end": 1032,
+          "new": "x",
+          "old": "v",
+          "start": 1031
+        },
+        {
+          "end": 1044,
+          "new": "",
+          "old": " genuinely ",
+          "start": 1033
+        },
+        {
+          "end": 1052,
+          "new": "",
+          "old": "istinct",
+          "start": 1045
+        },
+        {
+          "end": 1068,
+          "new": "",
+          "old": " complete",
+          "start": 1059
+        },
+        {
+          "end": 1084,
+          "new": " owner",
+          "old": "",
+          "start": 1084
+        },
+        {
+          "end": 1205,
+          "new": "ids=list(range(n));self.reference_ids=list(range(n,2*n));self.",
+          "old": "",
+          "start": 1205
+        },
+        {
+          "end": 1309,
+          "new": "-1",
+          "old": "4",
+          "start": 1308
+        },
+        {
+          "end": 8963,
+          "new": "Pl",
+          "old": "E",
+          "start": 8962
+        },
+        {
+          "end": 8966,
+          "new": "nner-generated subset",
+          "old": "ch",
+          "start": 8964
+        },
+        {
+          "end": 8971,
+          "new": "n",
+          "old": "rac",
+          "start": 8968
+        },
+        {
+          "end": 8972,
+          "new": "y: wid",
+          "old": "",
+          "start": 8972
+        },
+        {
+          "end": 8980,
+          "new": "ll",
+          "old": "x",
+          "start": 8979
+        },
+        {
+          "end": 8983,
+          "new": "doe",
+          "old": "wa",
+          "start": 8981
+        },
+        {
+          "end": 8985,
+          "new": "not enlarge target/draft s",
+          "old": "",
+          "start": 8985
+        },
+        {
+          "end": 8988,
+          "new": "",
+          "old": "m",
+          "start": 8987
+        },
+        {
+          "end": 8991,
+          "new": "",
+          "old": "ut",
+          "start": 8989
+        },
+        {
+          "end": 8993,
+          "new": ".\n",
+          "old": "d",
+          "start": 8992
+        },
+        {
+          "end": 8999,
+          "new": "subset197 ",
+          "old": "",
+          "start": 8999
+        },
+        {
+          "end": 9000,
+          "new": "mpor",
+          "old": "",
+          "start": 9000
+        },
+        {
+          "end": 9001,
+          "new": " prepare,guard_re",
+          "old": "",
+          "start": 9001
+        },
+        {
+          "end": 9002,
+          "new": "t,finish\n",
+          "old": "",
+          "start": 9002
+        },
+        {
+          "end": 9005,
+          "new": "selected=la",
+          "old": "ow",
+          "start": 9003
+        },
+        {
+          "end": 9012,
+          "new": "e('",
+          "old": " full ",
+          "start": 9006
+        },
+        {
+          "end": 9020,
+          "new": "-planner-next-subset',lambda:prepare(engine,native,bank))\n",
+          "old": "",
+          "start": 9020
+        },
+        {
+          "end": 9026,
+          "new": "",
+          "old": "mp",
+          "start": 9024
+        },
+        {
+          "end": 9031,
+          "new": "",
+          "old": ". Th",
+          "start": 9027
+        },
+        {
+          "end": 9033,
+          "new": "cted_rest=la",
+          "old": " ",
+          "start": 9032
+        },
+        {
+          "end": 9036,
+          "new": "('pro",
+          "old": "x",
+          "start": 9035
+        },
+        {
+          "end": 9042,
+          "new": "",
+          "old": "\n # r",
+          "start": 9037
+        },
+        {
+          "end": 9043,
+          "new": "ct-",
+          "old": "",
+          "start": 9043
+        },
+        {
+          "end": 9053,
+          "new": "l-",
+          "old": " B4 chai",
+          "start": 9045
+        },
+        {
+          "end": 9056,
+          "new": "",
+          "old": " c",
+          "start": 9054
+        },
+        {
+          "end": 9061,
+          "new": "elected-owner-prefix",
+          "old": "um",
+          "start": 9059
+        },
+        {
+          "end": 9064,
+          "new": "',lambda:guard_res",
+          "old": " ",
+          "start": 9063
+        },
+        {
+          "end": 9066,
+          "new": "(",
+          "old": "h",
+          "start": 9065
+        },
+        {
+          "end": 9071,
+          "new": "n",
+          "old": " ori",
+          "start": 9067
+        },
+        {
+          "end": 9074,
+          "new": "e,b",
+          "old": "",
+          "start": 9074
+        },
+        {
+          "end": 9075,
+          "new": "nk,se",
+          "old": "",
+          "start": 9075
+        },
+        {
+          "end": 9084,
+          "new": "ect",
+          "old": " publish",
+          "start": 9076
+        },
+        {
+          "end": 9114,
+          "new": "))",
+          "old": " root on candidate/ref rows.",
+          "start": 9086
+        },
+        {
+          "end": 9172,
+          "new": "selected",
+          "old": "bank",
+          "start": 9168
+        },
+        {
+          "end": 9180,
+          "new": "selected.",
+          "old": "",
+          "start": 9180
+        },
+        {
+          "end": 9194,
+          "new": "selected.",
+          "old": "",
+          "start": 9194
+        },
+        {
+          "end": 9200,
+          "new": "selected.",
+          "old": "",
+          "start": 9200
+        },
+        {
+          "end": 9201,
+          "new": ",ids=selected.ids",
+          "old": "",
+          "start": 9201
+        },
+        {
+          "end": 9226,
+          "new": "\n planning=lane('original-ready-ticket-target-admission',lambda:finish(engine,native,bank,selected,work,protected_rest))\n",
+          "old": "",
+          "start": 9226
+        },
+        {
+          "end": 10253,
+          "new": ",planner=planning",
+          "old": "",
+          "start": 10253
+        },
+        {
+          "end": 11453,
+          "new": "32",
+          "old": "4",
+          "start": 11452
+        },
+        {
+          "end": 12129,
+          "new": "32",
+          "old": "4",
+          "start": 12128
+        },
+        {
+          "end": 13517,
+          "new": "32",
+          "old": "4",
+          "start": 13516
+        },
+        {
+          "end": 13530,
+          "new": "32",
+          "old": "4",
+          "start": 13529
+        },
+        {
+          "end": 13596,
+          "new": "32",
+          "old": "4",
+          "start": 13595
+        },
+        {
+          "end": 13840,
+          "new": ">1",
+          "old": "==n",
+          "start": 13837
+        },
+        {
+          "end": 15481,
+          "new": "pn=1 if n==2 else 16;planning=nextrow['planner'];require(len(planning['actual_next_owners'])==pn and planning['target_max16']is True and planning['N32_target_scope_added']is False and planning['untouched_owner_KV_protected']is True,'actual original home planner and protected remaining owners');",
+          "old": "",
+          "start": 15481
+        },
+        {
+          "end": 15527,
+          "new": "p",
+          "old": "",
+          "start": 15527
+        },
+        {
+          "end": 15555,
+          "new": "p",
+          "old": "",
+          "start": 15555
+        },
+        {
+          "end": 15989,
+          "new": "p",
+          "old": "",
+          "start": 15989
+        },
+        {
+          "end": 15995,
+          "new": "",
+          "old": "ist(r",
+          "start": 15990
+        },
+        {
+          "end": 15997,
+          "new": "nin",
+          "old": "",
+          "start": 15997
+        },
+        {
+          "end": 15998,
+          "new": "['actual_r",
+          "old": "",
+          "start": 15998
+        },
+        {
+          "end": 16000,
+          "new": "fere",
+          "old": "(",
+          "start": 15999
+        },
+        {
+          "end": 16004,
+          "new": "ce_ow",
+          "old": ",2*",
+          "start": 16001
+        },
+        {
+          "end": 16007,
+          "new": "ers']",
+          "old": "))",
+          "start": 16005
+        },
+        {
+          "end": 17063,
+          "new": "32",
+          "old": "4",
+          "start": 17062
+        }
+      ],
+      "file": "prefill197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/prefill190.py",
+      "parent_sha256": "824e6c626226d6571648848df271beaf99e5055f1a23c49e896c3e5c3959a79d"
+    },
+    {
+      "deltas": [],
+      "file": "progress197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/progress190.py",
+      "parent_sha256": "550d8c79cf6889270691582ae0f1d486762cac5a4afe17a9cdb8d4dc5f1fdb17"
+    },
+    {
+      "deltas": [
+        {
+          "end": 2930,
+          "new": "bank.runtime_states=states;bank.publication_active=tuple(active)\n  ",
+          "old": "",
+          "start": 2930
+        }
+      ],
+      "file": "publication197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/publication190.py",
+      "parent_sha256": "2607c04761405665c5c6f6942d773792f14de32d25576d57f939a8535ee7b3c4"
+    },
+    {
+      "deltas": [],
+      "file": "runtime197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/runtime190.py",
+      "parent_sha256": "ef1a148accef02e9ee03becd60d24a3014e4bf299d43edfe9d810ad63e3a5c45"
+    },
+    {
+      "deltas": [
+        {
+          "end": 1569,
+          "new": "32",
+          "old": "4",
+          "start": 1568
+        },
+        {
+          "end": 1651,
+          "new": "e",
+          "old": "",
+          "start": 1651
+        },
+        {
+          "end": 1652,
+          "new": "pty_active_only=True,active_w",
+          "old": "",
+          "start": 1652
+        },
+        {
+          "end": 1659,
+          "new": "dow32=T",
+          "old": "imum_",
+          "start": 1654
+        },
+        {
+          "end": 1662,
+          "new": "",
+          "old": "eq",
+          "start": 1660
+        },
+        {
+          "end": 1664,
+          "new": ",con",
+          "old": "",
+          "start": 1664
+        },
+        {
+          "end": 1666,
+          "new": "ructor_coale",
+          "old": "",
+          "start": 1666
+        },
+        {
+          "end": 1671,
+          "new": "ce_unch",
+          "old": "=4,m",
+          "start": 1667
+        },
+        {
+          "end": 1693,
+          "new": "",
+          "old": "ximum_wait_ms=150.,mi",
+          "start": 1672
+        },
+        {
+          "end": 1713,
+          "new": "ged",
+          "old": "imum_is_not_maximum",
+          "start": 1694
+        }
+      ],
+      "file": "scope197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/scope190.py",
+      "parent_sha256": "f02eec516701cdfc98a01ba53301abe6398bbcf4381eccdc5d91c11852ecfbc3"
+    },
+    {
+      "deltas": [],
+      "file": "source197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/source190.py",
+      "parent_sha256": "77c915ad0b526fbaa4891111695bc38738f47d3310e3eafd82bdc7ff93dc42c6"
+    },
+    {
+      "deltas": [
+        {
+          "end": 7,
+          "new": "New",
+          "old": "Four",
+          "start": 3
+        },
+        {
+          "end": 13,
+          "new": "sch",
+          "old": "bound",
+          "start": 8
+        },
+        {
+          "end": 19,
+          "new": "u",
+          "old": " rea",
+          "start": 15
+        },
+        {
+          "end": 21,
+          "new": "ing/",
+          "old": "-",
+          "start": 20
+        },
+        {
+          "end": 27,
+          "new": "/allocator/planner",
+          "old": "",
+          "start": 27
+        },
+        {
+          "end": 34,
+          "new": "",
+          "old": "c",
+          "start": 33
+        },
+        {
+          "end": 43,
+          "new": "ly;",
+          "old": "tracts,",
+          "start": 36
+        },
+        {
+          "end": 49,
+          "new": "o",
+          "old": "ever",
+          "start": 45
+        },
+        {
+          "end": 74,
+          "new": "s",
+          "old": "al evidence",
+          "start": 63
+        },
+        {
+          "end": 131,
+          "new": "",
+          "old": "dataclasses,dis,gzip,importlib.util,",
+          "start": 95
+        },
+        {
+          "end": 141,
+          "new": "",
+          "old": "math,",
+          "start": 136
+        },
+        {
+          "end": 158,
+          "new": "",
+          "old": ",tempfile,time",
+          "start": 144
+        },
+        {
+          "end": 244,
+          "new": "",
+          "old": "types import SimpleNamespace as NS\nfrom ",
+          "start": 204
+        },
+        {
+          "end": 268,
+          "new": "",
+          "old": "P173,",
+          "start": 263
+        },
+        {
+          "end": 277,
+          "new": "",
+          "old": "sha,",
+          "start": 273
+        },
+        {
+          "end": 283,
+          "new": "q",
+          "old": "ad,f",
+          "start": 279
+        },
+        {
+          "end": 287,
+          "new": "",
+          "old": "nct",
+          "start": 284
+        },
+        {
+          "end": 294,
+          "new": "r",
+          "old": "ons,ch",
+          "start": 288
+        },
+        {
+          "end": 301,
+          "new": "\nimp",
+          "old": "cked,c",
+          "start": 295
+        },
+        {
+          "end": 303,
+          "new": "t ",
+          "old": "",
+          "start": 303
+        },
+        {
+          "end": 305,
+          "new": "",
+          "old": "_",
+          "start": 304
+        },
+        {
+          "end": 312,
+          "new": "",
+          "old": "odule,",
+          "start": 306
+        },
+        {
+          "end": 317,
+          "new": "",
+          "old": "aren",
+          "start": 313
+        },
+        {
+          "end": 325,
+          "new": "y197",
+          "old": "_module",
+          "start": 318
+        },
+        {
+          "end": 343,
+          "new": "\ndef original_source():\n import live_decode_patch\n from window160 import adapt_source\n return adapt_source(live_decode_patch.build_live_runtime(),32)\n\ndef rhythm():\n import importlib.util\n path",
+          "old": "NATIVE",
+          "start": 337
+        },
+        {
+          "end": 453,
+          "new": "/spec_rhythm.py",
+          "old": "",
+          "start": 453
+        },
+        {
+          "end": 457,
+          "new": " sourc",
+          "old": "d",
+          "start": 456
+        },
+        {
+          "end": 472,
+          "new": "=",
+          "old": "f definitions(",
+          "start": 458
+        },
+        {
+          "end": 524,
+          "new": "",
+          "old": ",names,namespace):\n unit=ast.parse(checked(path)",
+          "start": 476
+        },
+        {
+          "end": 538,
+          "new": ".replace('from vllm_asce",
+          "old": ");",
+          "start": 536
+        },
+        {
+          "end": 539,
+          "new": "d.spec_dec",
+          "old": "",
+          "start": 539
+        },
+        {
+          "end": 542,
+          "new": ".pearl.roofline import ProfiledRoofline','cla",
+          "old": "",
+          "start": 542
+        },
+        {
+          "end": 543,
+          "new": "s ProfiledRoofline: pass')\n module=types.ModuleType('_v197_actual_HOST_rhythm');sys.modules[module.__name__]=module\n exec(compile(source,str(path)+'::HOST-import-only-roofline-stub','exec'),vars(module));return module\n\nclass Tests(unittest.TestCase):\n def test_actual_generated_whole_inverse_and_admission_clock_publication(self):\n  before=original_source();after=empty197.patch(before);self.assertTrue(empty197.assert_inverse(before,after))\n  with self.assertRaises(RuntimeError):empty197.patch(after)\n  with self.assertRaises(RuntimeError):empty197.unpatch(before)\n  fn=empty197.admission(ast.parse(after));self.assertIn('receive_live_admissions',ast.unparse(fn.body[0]));self.assertEqual(ast.unparse(fn.body[1]),'if active:\\n    return closed')\n  # Run actual original admission function (no mathematical model carrier).\n  code=ast.Module(body",
+          "old": "",
+          "start": 543
+        },
+        {
+          "end": 559,
+          "new": "fn)],type_ignores=[]);node=code.body[0]\n  # Original annotations are not needed by this HOST call; actual body is exact.\n  node.returns=None\n  for a in (*node.args.args,*node.args.kwonlyargs):a.annotation=None\n  class Tensor:\n   def __init__(self,",
+          "old": "",
+          "start": 559
+        },
+        {
+          "end": 561,
+          "new": ":self.v=v\n   def cpu(self):return self\n   def item(self):return self.v[0]\n  class State:\n   def __init__(self,i):self.token_ids=[10+i]*3;self.prompt_length=3;self.committed_length=3\n   @property\n   def committed_completion_token_ids(self):return self.token_ids[self.prompt_length:]\n  n=463;local=[State(i)for i in range(n)];draft=[State(i)for i in range(n)];target=local\n  clock=[0.];seen=[];receives=[];publ=[];pref=[]\n  states={i:types.SimpleNamespace(home_batch_id=i%2,arrival_wait_ms=0.,decode_elapsed_ms=0.,decode_start_elapsed_ms=None,delivered_tokens=0,add_decode_time=lambda t:None)for i in range(n)}\n  params=[types.SimpleNamespace(arrival_ts=i*.25)for i in range(n)]\n  def sample(prompts,ss,ids):\n   self.assertFalse(ns['active']);pref.append(list(ids));return [100+i for i in ids]\n  engine=types.SimpleNamespace(rank=1,topology=types.SimpleNamespace(target_leader_rank=1),config=types.SimpleNamespace(spec_rhythm_online_prefill=True,spec_rhythm_kv_ready_arrivals=False,max_num_batched_tokens=6),\n   _prefill_and_sample_target_batch=sample,_deliver_committed_tokens=lambda i,p,s:publ.append(i),eos_token_ids=set())\n  hooks=types.SimpleNamespace(reset_for_original_admission_fallback=lambda **kw:None,reserved_slots=lambda:0,filter_pending_candidates=lambda ids:ids,reserve_at_original_admission=lambda **kw:False)\n  ns=dict(_v75_hooks=hooks,cache_activated=set(),cache_released=set(),self=engine,active=[],pending_admission=list(range(n)),initial_batch_size=32,\n   receive_live_admissions=lambda **kw:receives.append(kw)or False,prefill_coalescing=False,\n   request_params=params,has_slo_constraints=True,envs=types.SimpleNamespace(VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION=False),\n   local_states=local,draft_states=draft,target_states=target,states=states,prefetched=set(),\n   torch=types.SimpleNamespace(tensor=lambda v,**kw:seen.append('arrival/prefill-clock')or Tensor(v),float64=object()),time=types.SimpleNamespace(time=lambda:clock[0],perf_counter=lambda:clock[0]),\n   _dt_cpu_broadcast=lambda *a,**kw:None,order_spec_rhythm_admission_params=lambda ids,**kw:list(ids),\n   activate_online_cache=lambda ids:None,release_online_cache=lambda ids:None,_finished=lambda *a:False,completed={},finished_decode_elapsed={},counters={'spec_rhythm_prefill_batches':0,'spec_rhythm_prefill_requests':0,'spec_rhythm_prefill_singleton_batches':0,'spec_rhythm_prefill_pair_batches':0,'spec_rhythm_prefill_multi_batches':0,'spec_rhythm_peak_active_requests':0})\n  exec(compile(ast.fix_missing_locations(code),'V197::actual-generated-admission-HOST','exec'),ns)\n  # Future arrivals do not prefill, and no ready publication is held once empty.\n  clock[0]=-1;ns['admit_available']();self.assertEqual(pref,[])\n  clock[0]=0;ns['admit_available']();self.assertEqual(pref,[[0]]);self.assertEqual(publ,[0])\n  counts=(len(seen),len(pref),len(publ));clock[0]=1000\n  ns['admit_available']();self.assertEqual((len(seen),len(pref),len(publ)),counts)\n  self.assertEqual(len(receives),3) # live receive remains before the active guard.\n  ns['active'].clear()\n  while ns['pending_admission']:\n   old=len(pref);ns['admit_available']();self.assertEqual(len(pref),old+1)\n   self.assertEqual(len(pref[-1]),min(2,463-len(publ)+len(pref[-1])))\n   ns['active'].clear() # explicit HOST completion carrier, not model evidence.\n  self.assertEqual(publ,list(range(463)));self.assertEqual(sum(map(len,pref)),463)\n  self.assertTrue(all(len(v)<=2",
+          "old": "",
+          "start": 561
+        },
+        {
+          "end": 571,
+          "new": "pref)) # original token b",
+          "old": "",
+          "start": 571
+        },
+        {
+          "end": 572,
+          "new": "dget, not min4.\n  DETAILS['actual_generated_admission']=dict(receive_before_guard=True,full_decode_AST_inverse=True,fi",
+          "old": "",
+          "start": 572
+        },
+        {
+          "end": 575,
+          "new": "e463_no_drop=True,token_budget_small_batch_max2=True,publication_immediate_before_return=True,no_clock_call_while_active=True)\n\n def test_actual_native_allocator_bank32_and_original_planner_subset(self):\n  import prefill197,subset197,next4_197\n  path=Path('/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_cache.py');ns={};exec(compile(path.read_text(),str(path),'exec'),ns)\n  rh=rhythm();pages=[]\n  for n in (2,32):\n   cache=ns['NativePrefixCache'](544,32,128)\n   class Engine:\n    is_draft=True;cache_allocation=None;cache_block_tables=None\n    def _allocate_cache(self,prompts,**kw):self.cache_allocation=cache.allocate(prompts,False,sequence_capacity=527);self.cache_block_tables=self.cache_allocation.block_tables\n    def _activate_cache_sequence(self,i,p,**kw):cache.activate_sequence(i,p,enable_prefix_caching=False)\n    def _ensure_cache_capacity(self,ids,pos):cache.ensure_capacity(ids,pos)\n   e=Engine();rows=[dict(request_id=str(i),token_ids=[i+1]*v,length=v,original_prompt='HOST')for i,v in enumerate(([127,129,257,59,265,86,300,511]*9)[:65])]\n   bank=prefill197.Bank(e,rows,n);guard=bank.guard();self.assertEqual(len(guard['pages']),len(set(guard['pages'])));self.assertLessEqual(len(guard['pages']),544)\n   for owner in range(2*n):\n    p=bank.prompts[owner%n]\n    self.assertTrue(all(bank.engine.cache_allocation.block_tables[owner][j//128]>=0 for j in range(len(p)+4)))\n   bank.contexts=[p+[100+i]for i,p in enumerate(bank.prompts)];bank.reference_contexts=copy.deepcopy(bank.contexts)\n   bank.runtime_states={i:rh.SpecRhythmRuntimeState(i,i%2,max_gamma=5,output_token_budget=256)for i in range(n)};bank.publication_active=tuple(range(n))\n   selected=subset197.prepare(e,rh,bank);wanted=1 if n==2 else 16\n   self.assertEqual(selected.n,wanted);self.assertEqual(selected.ids,list(range(0,n,2)));self.assertEqual(selected.reference_ids,[i+n for i in selected.ids])\n   wp=next4_197.work_plan(dict(N=wanted,budgets=[4]*wanted,ids=selected.ids),100)\n   self.assertEqual(sum(wp.normal_budgets.values()),4*wanted);self.assertEqual(tuple(wp.normal_budgets),tuple(selected.ids))\n   for i in selected.ids:selected.controller.publish([selected.controller.new_ticket(i,gamma=4,eager=False)])\n   target=selected.controller.build_plan(bank.publication_active,**selected.kwargs)\n   self.assertEqual(tuple(target.target_request_indices),tuple(selected.ids));self.assertLessEqual(len(target.target_request_indices),16)\n   pages.append(dict(N=n,actual_pages=len(guard['pages']),nextN=wanted,ids=selected.ids,refs=selected.reference_ids,target_ids=list(target.target_request_indices)))\n  DETAILS['actual_bank_and_planner']=pages\n\n def test_actual_production_gate_source_and_parent_single_constructor(self):\n  import subset197,next4_197\n  self.assertEqual(next4_197.reference_entries(types.SimpleNamespace(n=1,reference_ids=[32],reference_contexts=[[1,2,3]],reference_ledger={32:dict(safe_before=2,tokens={})})),[(32,2,2,[3])])\n  with self.assertRaises(RuntimeError):next4_197.work_plan(dict(N=32,budgets=[4]*32,ids=list(range(32))),1)\n  runtime=ast.parse((P/'runtime197.py').read_text());fn=next(n for n in runtime",
+          "old": "",
+          "start": 575
+        },
+        {
+          "end": 610,
+          "new": "n",
+          "old": "v,(ast.ClassDef",
+          "start": 595
+        },
+        {
+          "end": 629,
+          "new": "",
+          "old": ") ",
+          "start": 627
+        },
+        {
+          "end": 634,
+          "new": "n",
+          "old": "v",
+          "start": 633
+        },
+        {
+          "end": 646,
+          "new": "=='work",
+          "old": " in nam",
+          "start": 639
+        },
+        {
+          "end": 649,
+          "new": "r')",
+          "old": "s]",
+          "start": 647
+        },
+        {
+          "end": 651,
+          "new": " self.",
+          "old": "",
+          "start": 651
+        },
+        {
+          "end": 657,
+          "new": "Equal(sum(isinstance(n,ast.Call)and",
+          "old": "",
+          "start": 657
+        },
+        {
+          "end": 660,
+          "new": "ast",
+          "old": "{v",
+          "start": 658
+        },
+        {
+          "end": 661,
+          "new": "unparse(n.func)=='",
+          "old": "",
+          "start": 661
+        },
+        {
+          "end": 663,
+          "new": "tive.NativePearlEngine'for n in ast.walk(fn)),1)\n  self.assertEqual(su",
+          "old": "",
+          "start": 663
+        },
+        {
+          "end": 664,
+          "new": "(isinstance(n,ast.Call)and ast.unparse(n.func)=='capture_original_protocol_before_startup'for n in ast.walk(fn)),1)\n  self.assertIn(\"parent_module('component173').run\",(P/'component197.py').read_text())\n  self.assertNotIn('replace(', (P/'config197.py').read_text());self.assertIn('from startup_config_v132 import make_config',(P/'config197.py').read_text())\n  self.assertIn('import ast,copy,gzip,json,math,statistics',(P/'trace197.py').read_text());self.assertIn('inherited_module,sha',(P/'trace197.py').read_text())\n  DETAILS['source_gates']=dict(original_single_capture_constructor=True,parent173_only=True,N32_new_target_rejected=True,no_config_delta=True,metrics_sha_binding=True)\n\n def test_actual_guard_row_and_storage_scope(self):\n  G=B/'budget-diagnostics/v197-root-execution';tree=ast.parse((G/'guard197.py').read_text())\n  scope=next(n.valu",
+          "old": "",
+          "start": 664
+        },
+        {
+          "end": 671,
+          "new": "n in tree.body if isinstance(n,ast.Assign)and any(isinstance(t,ast.Name)and t.id=='SCOPE'for t",
+          "old": "v",
+          "start": 670
+        },
+        {
+          "end": 684,
+          "new": ".targ",
+          "old": "odes}==s",
+          "start": 676
+        },
+        {
+          "end": 691,
+          "new": "",
+          "old": "(name",
+          "start": 686
+        },
+        {
+          "end": 695,
+          "new": ");ns={};",
+          "old": "\n ",
+          "start": 693
+        },
+        {
+          "end": 759,
+          "new": "Assign(ta",
+          "old": "Impo",
+          "start": 755
+        },
+        {
+          "end": 760,
+          "new": "ge",
+          "old": "",
+          "start": 760
+        },
+        {
+          "end": 790,
+          "new": "",
+          "old": "From(module='__future__',name",
+          "start": 761
+        },
+        {
+          "end": 804,
+          "new": "N",
+          "old": "alias(n",
+          "start": 797
+        },
+        {
+          "end": 807,
+          "new": "(id",
+          "old": "",
+          "start": 807
+        },
+        {
+          "end": 809,
+          "new": "SCOPE',ctx=",
+          "old": "",
+          "start": 809
+        },
+        {
+          "end": 812,
+          "new": "st.St",
+          "old": "nn",
+          "start": 810
+        },
+        {
+          "end": 821,
+          "new": "re()",
+          "old": "tations'",
+          "start": 813
+        },
+        {
+          "end": 824,
+          "new": "va",
+          "old": "",
+          "start": 824
+        },
+        {
+          "end": 825,
+          "new": "u",
+          "old": "",
+          "start": 825
+        },
+        {
+          "end": 827,
+          "new": "=scop",
+          "old": "v",
+          "start": 826
+        },
+        {
+          "end": 831,
+          "new": "",
+          "old": "l=0",
+          "start": 828
+        },
+        {
+          "end": 839,
+          "new": "",
+          "old": ",*nodes",
+          "start": 832
+        },
+        {
+          "end": 869,
+          "new": "",
+          "old": "str(path)+",
+          "start": 859
+        },
+        {
+          "end": 870,
+          "new": "HOST",
+          "old": "",
+          "start": 870
+        },
+        {
+          "end": 885,
+          "new": "scop",
+          "old": "HOST-d",
+          "start": 879
+        },
+        {
+          "end": 895,
+          "new": "",
+          "old": "finitions",
+          "start": 886
+        },
+        {
+          "end": 909,
+          "new": "",
+          "old": "ame",
+          "start": 906
+        },
+        {
+          "end": 1139,
+          "new": "",
+          "old": "pace)\n return namespace\nclass Tests(unittest.TestCase):\n def test01_actual_config_builder_control_source_binding_and_inverse(self):\n  import check197,config197,trace197,extension197\n  source_patch197=core_module('source_patch185'",
+          "start": 910
+        },
+        {
+          "end": 1157,
+          "new": "I",
+          "old": "Fal",
+          "start": 1154
+        },
+        {
+          "end": 1159,
+          "new": "",
+          "old": "e",
+          "start": 1158
+        },
+        {
+          "end": 1181,
+          "new": "",
+          "old": "check197.require_pare",
+          "start": 1160
+        },
+        {
+          "end": 1185,
+          "new": "s",
+          "old": "t()",
+          "start": 1182
+        },
+        {
+          "end": 1217,
+          "new": "SCOPE",
+          "old": "device_qualification_inherited",
+          "start": 1187
+        },
+        {
+          "end": 1227,
+          "new": "['emp",
+          "old": ")\n  # Ac",
+          "start": 1219
+        },
+        {
+          "end": 1229,
+          "new": "y_",
+          "old": "u",
+          "start": 1228
+        },
+        {
+          "end": 1246,
+          "new": "",
+          "old": "l new config fun",
+          "start": 1230
+        },
+        {
+          "end": 1261,
+          "new": "v",
+          "old": "on calls an ",
+          "start": 1249
+        },
+        {
+          "end": 1301,
+          "new": "_",
+          "old": "xplicit HOST constructor boundary;\n  # ",
+          "start": 1262
+        },
+        {
+          "end": 1308,
+          "new": "'],Tru",
+          "old": " th",
+          "start": 1305
+        },
+        {
+          "end": 1396,
+          "new": "",
+          "old": " two reviewed config fields can change.\n  module=types.ModuleType('startup_config_v132'",
+          "start": 1309
+        },
+        {
+          "end": 1940,
+          "new": "",
+          "old": "fields=dict(spec_rhythm_prefill_coalesce_min_requests=1,spec_rhythm_prefill_coalesce_max_wait_ms=0.,max_num_seqs=64,max_num_queued_seqs=463,num_kvcache_blocks=544)\n  Config=dataclasses.make_dataclass('Config',[(k,type(v)) for k,v in fields.items()]);original=Config(**fields);module.make_config=lambda:original\n  previous=sys.modules.get(module.__name__);sys.modules[module.__name__]=module\n  try:value=config197.make_config()\n  finally:\n   if previous is None:sys.modules.pop(module.__name__)\n   else:sys.modules[module.__name__]=previous\n  ",
+          "start": 1398
+        },
+        {
+          "end": 1962,
+          "new": "ns['SCOPE']['activ",
+          "old": "{k:(g",
+          "start": 1957
+        },
+        {
+          "end": 1973,
+          "new": "_w",
+          "old": "tattr(orig",
+          "start": 1963
+        },
+        {
+          "end": 2000,
+          "new": "d",
+          "old": "al,k),getattr(value,k)) f",
+          "start": 1975
+        },
+        {
+          "end": 2013,
+          "new": "w",
+          "old": "r k in field",
+          "start": 2001
+        },
+        {
+          "end": 2094,
+          "new": "",
+          "old": " if getattr(original,k)!=getattr(value,k)},dict(spec_rhythm_prefill_coalesce_min",
+          "start": 2014
+        },
+        {
+          "end": 2106,
+          "new": "ed']",
+          "old": "s=(1",
+          "start": 2102
+        },
+        {
+          "end": 2161,
+          "new": "[32]",
+          "old": "4),spec_rhythm_prefill_coalesce_max_wait_ms=(0.,150.))",
+          "start": 2107
+        },
+        {
+          "end": 2169,
+          "new": "#",
+          "old": "from",
+          "start": 2165
+        },
+        {
+          "end": 2216,
+          "new": "O",
+          "old": "host_source_patch185 import actual_builder\n  o",
+          "start": 2170
+        },
+        {
+          "end": 2224,
+          "new": " supervisor body is ",
+          "old": "_",
+          "start": 2223
+        },
+        {
+          "end": 2231,
+          "new": "-inherited; statically check ex",
+          "old": "=",
+          "start": 2230
+        },
+        {
+          "end": 2234,
+          "new": " so",
+          "old": "",
+          "start": 2234
+        },
+        {
+          "end": 2243,
+          "new": "rc",
+          "old": "al_build",
+          "start": 2235
+        },
+        {
+          "end": 2247,
+          "new": "",
+          "old": "r()",
+          "start": 2244
+        },
+        {
+          "end": 2252,
+          "new": "# argumen",
+          "old": "wi",
+          "start": 2250
+        },
+        {
+          "end": 2253,
+          "new": " c",
+          "old": "",
+          "start": 2253
+        },
+        {
+          "end": 2254,
+          "new": "anges",
+          "old": "",
+          "start": 2254
+        },
+        {
+          "end": 2255,
+          "new": "and177 frozen mu",
+          "old": "",
+          "start": 2255
+        },
+        {
+          "end": 2261,
+          "new": "ab",
+          "old": "empfi",
+          "start": 2256
+        },
+        {
+          "end": 2266,
+          "new": "t",
+          "old": "Te",
+          "start": 2264
+        },
+        {
+          "end": 2269,
+          "new": " ",
+          "old": "o",
+          "start": 2268
+        },
+        {
+          "end": 2276,
+          "new": "c",
+          "old": "ryDir",
+          "start": 2271
+        },
+        {
+          "end": 2292,
+          "new": " ",
+          "old": "ctory(dir=P,pre",
+          "start": 2277
+        },
+        {
+          "end": 2313,
+          "new": "",
+          "old": "='HOST-entry197-')",
+          "start": 2295
+        },
+        {
+          "end": 2361,
+          "new": "b",
+          "old": "as out:\n   entry,Controls=extension197.prepare_",
+          "start": 2314
+        },
+        {
+          "end": 2384,
+          "new": "",
+          "old": "stall(out)\n   expecte",
+          "start": 2363
+        },
+        {
+          "end": 2472,
+          "new": "",
+          "old": "=parent_module('mapper173').controls_class()\n   import marshal\n   methods={k:v for k,v ",
+          "start": 2385
+        },
+        {
+          "end": 2489,
+          "new": "g",
+          "old": " vars(Controls)",
+          "start": 2474
+        },
+        {
+          "end": 2534,
+          "new": "",
+          "old": "items() if isinstance(v,types.FunctionType)}",
+          "start": 2490
+        },
+        {
+          "end": 2698,
+          "new": "",
+          "old": "   self.assertTrue(methods)\n   for name,method in methods.items():self.assertEqual(marshal.dumps(method.__code__),marshal.dumps(getattr(expected,name).__code__))\n ",
+          "start": 2535
+        },
+        {
+          "end": 2712,
+          "new": "n('",
+          "old": "",
+          "start": 2712
+        },
+        {
+          "end": 2713,
+          "new": "afe_storage177.py',",
+          "old": "",
+          "start": 2713
+        },
+        {
+          "end": 2734,
+          "new": "G/'",
+          "old": "Controls.__init__.__",
+          "start": 2714
+        },
+        {
+          "end": 2757,
+          "new": "u",
+          "old": "lobals__['dispatch'],p",
+          "start": 2735
+        },
+        {
+          "end": 2765,
+          "new": "",
+          "old": "ent_mo",
+          "start": 2759
+        },
+        {
+          "end": 3450,
+          "new": "",
+          "old": "ule('mapper173').dispatch)\n   fn,state=trace197.make_trace(32,entry=entry,output=out)\n   # Real install closure prepares the actual new source, then the immutable\n   # installer correctly rejects this unauthorized HOST/no-model call.\n   actual_trace=next(c.cell_contents for c in fn.__closure__ if isinstance(c.cell_contents,types.FunctionType))\n   installer=actual_trace.__globals__['install']\n   with self.assertRaises(Exception):installer(NS(),lambda e:None)\n   self.assertTrue(source_patch197.assert_inverse(original_source,state['source']))\n   self.assertEqual(source_patch197.unpatch(state['source']),ast.unparse(ast.parse(original_source))+'\\n')\n  runtime=ast.parse((P/'runtime",
+          "start": 2766
+        },
+        {
+          "end": 3561,
+          "new": "",
+          "old": "main=next(v for v in runtime.body if isinstance(v,ast.FunctionDef) and v.name=='main')\n  ",
+          "start": 3472
+        },
+        {
+          "end": 3574,
+          "new": "In(\"live_roots=(P/'act",
+          "old": "Eq",
+          "start": 3572
+        },
+        {
+          "end": 3577,
+          "new": "',)\",",
+          "old": "",
+          "start": 3577
+        },
+        {
+          "end": 3579,
+          "new": "G/'g",
+          "old": "s",
+          "start": 3578
+        },
+        {
+          "end": 3616,
+          "new": "",
+          "old": "m(isinstance(v,ast.Call) and ast.unp",
+          "start": 3580
+        },
+        {
+          "end": 3757,
+          "new": "",
+          "old": "se(v.func)=='capture_original_protocol_before_startup' for v in ast.walk(runtime)),1)\n  self.assertTrue(any(isinstance(v,ast.ImportFrom) an",
+          "start": 3618
+        },
+        {
+          "end": 3776,
+          "new": "",
+          "old": " v.module=='config",
+          "start": 3758
+        },
+        {
+          "end": 3779,
+          "new": ".py",
+          "old": "",
+          "start": 3779
+        },
+        {
+          "end": 3783,
+          "new": ").",
+          "old": " fo",
+          "start": 3780
+        },
+        {
+          "end": 3790,
+          "new": "e",
+          "old": " v in ",
+          "start": 3784
+        },
+        {
+          "end": 3792,
+          "new": "d_",
+          "old": "s",
+          "start": 3791
+        },
+        {
+          "end": 3798,
+          "new": "ext",
+          "old": ".walk",
+          "start": 3793
+        },
+        {
+          "end": 3804,
+          "new": "",
+          "old": "main)",
+          "start": 3799
+        },
+        {
+          "end": 3822,
+          "new": "n",
+          "old": "s",
+          "start": 3821
+        },
+        {
+          "end": 3851,
+          "new": "\"f",
+          "old": "trace197.metrics.__globals__",
+          "start": 3823
+        },
+        {
+          "end": 3868,
+          "new": "ROO",
+          "old": "sha'],sha)\n  DE",
+          "start": 3853
+        },
+        {
+          "end": 3975,
+          "new": "",
+          "old": "AILS['config_source']=dict(actual_config_only_4_150=True,actual_original_control_class=True,actual_dynamic",
+          "start": 3869
+        },
+        {
+          "end": 3983,
+          "new": "rev",
+          "old": "",
+          "start": 3983
+        },
+        {
+          "end": 3986,
+          "new": "",
+          "old": "nv",
+          "start": 3984
+        },
+        {
+          "end": 3988,
+          "new": "wed'] i",
+          "old": "r",
+          "start": 3987
+        },
+        {
+          "end": 3991,
+          "new": " ",
+          "old": "e=",
+          "start": 3989
+        },
+        {
+          "end": 3995,
+          "new": "\"",
+          "old": "",
+          "start": 3995
+        },
+        {
+          "end": 4092,
+          "new": "",
+          "old": "no_model_or_permission=True)\n def test02_real_NativeCache_bank_allpages_and_original_publication",
+          "start": 3996
+        },
+        {
+          "end": 4393,
+          "new": "G/'",
+          "old": "self):\n  from test_host180 import engine,torch_carrier\n  from prefill197 import Bank,packed,capture_begin\n  rows=[dict(request_id=str(i),token_ids=[100+i]*n,length=n) for i,n in enumerate((59,130,257,385,173))]\n  for n in (2,4):\n   with torch_carrier():\n    e=engine();bank=Bank(e,rows,n);lease=bank.",
+          "start": 4093
+        },
+        {
+          "end": 4398,
+          "new": "197.py').read_text",
+          "old": "",
+          "start": 4398
+        },
+        {
+          "end": 4400,
+          "new": ")",
+          "old": "",
+          "start": 4400
+        },
+        {
+          "end": 4403,
+          "new": "",
+          "old": "  ",
+          "start": 4401
+        },
+        {
+          "end": 4638,
+          "new": "I",
+          "old": "Equal(lease['candidate_owners'],list(range(n)));self.assertEqual(lease['reference_owners'],list(range(n,2*n)))\n    for ref in (False,True):\n     tokens,ids,positions,last=packed(bank,reference=ref)\n     self.assertEqual(le",
+          "start": 4416
+        },
+        {
+          "end": 4647,
+          "new": "'SOURCE_PEER'",
+          "old": "tokens)",
+          "start": 4640
+        },
+        {
+          "end": 4651,
+          "new": "",
+          "old": "sum",
+          "start": 4648
+        },
+        {
+          "end": 4658,
+          "new": "G/",
+          "old": "len(r[",
+          "start": 4652
+        },
+        {
+          "end": 4935,
+          "new": "",
+          "old": "token_ids']) for r in rows[:n]));self.assertEqual(len(last),n)\n     for owner,pos in zip(ids,positions,strict=True):self.assertGreaterEqual(e.cache_allocation.block_tables[owner][pos//128],0)\n    self.assertEqual(e.cache_allocation.num_cached_tokens[:2*n],[0]*(2*n))\n    bank.",
+          "start": 4659
+        },
+        {
+          "end": 4940,
+          "new": "197.py').read_text",
+          "old": "",
+          "start": 4940
+        },
+        {
+          "end": 4960,
+          "new": "",
+          "old": ";e._release_cache(",
+          "start": 4942
+        },
+        {
+          "end": 4974,
+          "new": "the ",
+          "old": "",
+          "start": 4974
+        },
+        {
+          "end": 4982,
+          "new": "inherited supervisor receipt constructor, before any\n  # child/device oper",
+          "old": "N",
+          "start": 4981
+        },
+        {
+          "end": 4986,
+          "new": "on; catches duplicat",
+          "old": "v",
+          "start": 4985
+        },
+        {
+          "end": 4989,
+          "new": "**SCOPE keys or schem",
+          "old": "d",
+          "start": 4988
+        },
+        {
+          "end": 4994,
+          "new": " ",
+          "old": "tacl",
+          "start": 4990
+        },
+        {
+          "end": 4999,
+          "new": "umptio",
+          "old": " a",
+          "start": 4997
+        },
+        {
+          "end": 5037,
+          "new": "",
+          "old": "d callback method, not logical mirror",
+          "start": 5000
+        },
+        {
+          "end": 5046,
+          "new": "",
+          "old": "ns=d",
+          "start": 5042
+        },
+        {
+          "end": 5048,
+          "new": "mpor",
+          "old": "c",
+          "start": 5047
+        },
+        {
+          "end": 5050,
+          "new": " ",
+          "old": "(",
+          "start": 5049
+        },
+        {
+          "end": 5069,
+          "new": "",
+          "old": "aclass=dataclass",
+          "start": 5053
+        },
+        {
+          "end": 5120,
+          "new": "",
+          "old": "s.dataclass,replace=dataclasses.replace,math=math,",
+          "start": 5070
+        },
+        {
+          "end": 5130,
+          "new": "",
+          "old": "=time)",
+          "start": 5124
+        },
+        {
+          "end": 5136,
+          "new": "orig",
+          "old": "def",
+          "start": 5133
+        },
+        {
+          "end": 5138,
+          "new": "al=B/'budget-d",
+          "old": "",
+          "start": 5138
+        },
+        {
+          "end": 5139,
+          "new": "agnostics/v154-root-execu",
+          "old": "",
+          "start": 5139
+        },
+        {
+          "end": 5143,
+          "new": "/",
+          "old": "",
+          "start": 5143
+        },
+        {
+          "end": 5156,
+          "new": "uperv",
+          "old": "(NATIVE/'nat",
+          "start": 5144
+        },
+        {
+          "end": 5158,
+          "new": "s",
+          "old": "v",
+          "start": 5157
+        },
+        {
+          "end": 5166,
+          "new": "v154",
+          "old": "engine",
+          "start": 5160
+        },
+        {
+          "end": 5584,
+          "new": "",
+          "old": ",{'PearlPipelineState','NativeSamplingParams','_truncate_completion','_finished'},ns)\n  module=types.ModuleType('vllm_ascend.spec_decode.pearl.spec_rhythm');nsstate=definitions(NATIVE/'spec_rhythm.py',{'SpecRhythmRuntimeState','_clamp'},dict(dataclass=dataclasses.dataclass))\n  module.SpecRhythmRuntimeState=nsstate['SpecRhythmRuntimeState'];old=sys.modules.get(module.__name__);sys.modules[module.__name__]=module",
+          "start": 5170
+        },
+        {
+          "end": 5621,
+          "new": "or",
+          "old": "checked(NATIVE/'nat",
+          "start": 5602
+        },
+        {
+          "end": 5627,
+          "new": "",
+          "old": "ve_en",
+          "start": 5622
+        },
+        {
+          "end": 5636,
+          "new": "al",
+          "old": "e.py')",
+          "start": 5630
+        },
+        {
+          "end": 5650,
+          "new": "exe",
+          "old": "",
+          "start": 5650
+        },
+        {
+          "end": 5653,
+          "new": "ute",
+          "old": "ls",
+          "start": 5651
+        },
+        {
+          "end": 5660,
+          "new": "n",
+          "old": "v",
+          "start": 5659
+        },
+        {
+          "end": 5666,
+          "new": "n",
+          "old": "v",
+          "start": 5665
+        },
+        {
+          "end": 5711,
+          "new": "",
+          "old": "v,ast.ClassDef) a",
+          "start": 5694
+        },
+        {
+          "end": 5808,
+          "new": "",
+          "old": "d v.name=='NativePearlEngine')\n  callback=copy.deepcopy(next(v for v in cls.body if isinstance(v",
+          "start": 5712
+        },
+        {
+          "end": 5826,
+          "new": "",
+          "old": " ",
+          "start": 5825
+        },
+        {
+          "end": 5831,
+          "new": "n",
+          "old": "v",
+          "start": 5830
+        },
+        {
+          "end": 5839,
+          "new": "execute",
+          "old": "",
+          "start": 5839
+        },
+        {
+          "end": 5840,
+          "new": "locke",
+          "old": "",
+          "start": 5840
+        },
+        {
+          "end": 5841,
+          "new": "')\n  row=n",
+          "old": "",
+          "start": 5841
+        },
+        {
+          "end": 5842,
+          "new": "xt(n for n in ast.wa",
+          "old": "",
+          "start": 5842
+        },
+        {
+          "end": 5843,
+          "new": "k(execute)if isinstance(n,ast.Assign)and any(isinstance(t,ast.Name)and t.id=='row'for t in n.targets))\n  values=dict(ns,datetime=datetime,tag='HOST-only-safe-tag',ACTION='empty-act",
+          "old": "",
+          "start": 5843
+        },
+        {
+          "end": 5848,
+          "new": "-",
+          "old": "r_",
+          "start": 5846
+        },
+        {
+          "end": 5852,
+          "new": "hort-causal80-act",
+          "old": "mm",
+          "start": 5850
+        },
+        {
+          "end": 5855,
+          "new": "v",
+          "old": "tt",
+          "start": 5853
+        },
+        {
+          "end": 5856,
+          "new": "32-full463',rea",
+          "old": "",
+          "start": 5856
+        },
+        {
+          "end": 5857,
+          "new": "iness={'HOST':True},LOCK=B/'.ROOT",
+          "old": "",
+          "start": 5857
+        },
+        {
+          "end": 5859,
+          "new": "NPU_EXECUTION.l",
+          "old": "t",
+          "start": 5858
+        },
+        {
+          "end": 5860,
+          "new": "c",
+          "old": "",
+          "start": 5860
+        },
+        {
+          "end": 5864,
+          "new": "",
+          "old": "ens",
+          "start": 5861
+        },
+        {
+          "end": 5866,
+          "new": ",MAX_SECONDS=7200,MAX_TAG_BYTES=256*1024**2,MAX_AGGREGATE_BYTES=512*1024**2",
+          "old": ")",
+          "start": 5865
+        },
+        {
+          "end": 5934,
+          "new": "row",
+          "old": "callback",
+          "start": 5926
+        },
+        {
+          "end": 5955,
+          "new": "V197::",
+          "old": "",
+          "start": 5955
+        },
+        {
+          "end": 5963,
+          "new": "-inheri",
+          "old": "Na",
+          "start": 5961
+        },
+        {
+          "end": 5964,
+          "new": "ed-rece",
+          "old": "",
+          "start": 5964
+        },
+        {
+          "end": 5973,
+          "new": "pt-",
+          "old": "veCallba",
+          "start": 5965
+        },
+        {
+          "end": 5978,
+          "new": "onstructor",
+          "old": "k197",
+          "start": 5974
+        },
+        {
+          "end": 6002,
+          "new": "val",
+          "old": "ns)\n  import p",
+          "start": 5988
+        },
+        {
+          "end": 6180,
+          "new": "",
+          "old": "blication197\n  try:\n   for rank in range(4):\n    e=NS(is_draft=rank==0,rank=rank,topology=NS(target_leader_rank=1),eos_token_ids=frozenset())\n    e._deliver_committed_tokens=typ",
+          "start": 6003
+        },
+        {
+          "end": 6887,
+          "new": "",
+          "old": ".MethodType(ns['_deliver_committed_tokens'],e)\n    bank=NS(n=4,prompts=[r['token_ids'] for r in rows[:4]])\n    proof=publication197.publish(e,NS(**{k:ns[k] for k in ('PearlPipelineState','NativeSamplingParams','_finished')}),bank,[501,502,503,504])\n    self.assertEqual(len(proof['callbacks']),4 if rank==1 else 0);self.assertEqual(bank.contexts,bank.reference_contexts)\n    self.assertEqual([v[-1] for v in bank.contexts],[501,502,503,504]);self.assertNotIn('_token_commit_callback',vars(e))\n  finally:\n   if old is None:sys.modules.pop(module.__name__)\n   else:sys.modules[module.__name__]=old\n  model=NS(forward=lambda *a:'original');e=NS(model=model);before=model.forward;saved,restore=capture_begin(e",
+          "start": 6182
+        },
+        {
+          "end": 6907,
+          "new": "",
+          "old": "Not",
+          "start": 6904
+        },
+        {
+          "end": 7078,
+          "new": "",
+          "old": "model.forward,before);restore();self.assertIs(model.forward,before)\n  import subprocess,os\n  child=subprocess.run([sys.executable,'-B',str(P/'host_next4_child197.py')],en",
+          "start": 6908
+        },
+        {
+          "end": 7260,
+          "new": "",
+          "old": "={**os.environ,'TORCH_DEVICE_BACKEND_AUTOLOAD':'0','OMP_NUM_THREADS':'1','OPENBLAS_NUM_THREADS':'1','MKL_NUM_THREADS':'1'},capture_output=True,text=True,timeout=90)\n  self.assertEqu",
+          "start": 7079
+        },
+        {
+          "end": 7887,
+          "new": "",
+          "old": "(child.returncode,0,child.stdout+'\\n'+child.stderr)\n  DETAILS['actual_next4_control']=json.loads(child.stdout.strip().splitlines()[-1])\n  DETAILS['bank_publication']=dict(actual_NativePrefixCache=True,all_queried_pages_independent=True,actual_Native_logical_classes_and_callback=True,all4_publication_executed=True,capture_restore_identity=True,model_numerical_qualification=False)\n def test03_actual_closed_admission_replay_and_real_metrics_fixture(self):\n  VacancyCohort=core_module('cohort185').VacancyCohort\n  from trace_admission197 import audit_record\n  p=VacancyCohort();p.begin(1)\n  common=dict(remaining_count=30,req",
+          "start": 7262
+        },
+        {
+          "end": 7902,
+          "new": "['r",
+          "old": "t_limit=32,n",
+          "start": 7890
+        },
+        {
+          "end": 7911,
+          "new": "']['",
+          "old": "=100.,r",
+          "start": 7904
+        },
+        {
+          "end": 7914,
+          "new": "mpt",
+          "old": "ad",
+          "start": 7912
+        },
+        {
+          "end": 7935,
+          "new": "",
+          "old": "arrival_times=[1.],",
+          "start": 7916
+        },
+        {
+          "end": 7992,
+          "new": "",
+          "old": "request_count=31,ready_ids=[40])\n  p.decide(**comm",
+          "start": 7942
+        },
+        {
+          "end": 8007,
+          "new": "ly",
+          "old": ");common['now",
+          "start": 7994
+        },
+        {
+          "end": 8059,
+          "new": "",
+          "old": "=100.2;p.decide(**common)\n  common.update(now=101.",
+          "start": 8009
+        },
+        {
+          "end": 8269,
+          "new": "",
+          "old": "ready_ids=list(range(50,58)),ready_arrival_times=[1.]*8,active_request_count=24)\n  p.decide(**common);p.close()\n  record=dict(generation=1,events=copy.deepcopy(p.events),status='complete',partial=False,closed=",
+          "start": 8060
+        },
+        {
+          "end": 8353,
+          "new": "",
+          "old": ",pending_episode=None,episode_count=p.episode_count)\n  value=audit_record(record",
+          "start": 8273
+        },
+        {
+          "end": 9021,
+          "new": "",
+          "old": "['cohort_size_histogram'],{'1':1,'8':1})\n  bad=copy.deepcopy(record);bad['events'][0]['waited_ms']=150.\n  with self.assertRaises(RuntimeError):audit_record(bad)\n  import trace197\n  from base197 import ACTIVE\n  fixtures=sorted(k for k in read(P/'INPUTS197.json')['files'] if 'tree-active-window-full-v166/actual/' in k and k.endswith('full463-actual-trace.json.gz'))\n  self.assertEqual(len(fixtures),4);results=[]\n  for path in fixtures:\n   root=B/'tree-active-window-full-v166';ns=dict(vars(trace197),P=root)\n   functions(ACTIVE/'metrics160.py',ns,names=('_percentiles','full_metrics'))\n   info=dict(path=path,sha256=sha(path));results.append(n",
+          "start": 8377
+        },
+        {
+          "end": 10507,
+          "new": "",
+          "old": "'full_metrics'](info))\n   if results[-1] is not None:\n    self.assertEqual(results[-1]['Native_paper']['attained'],191);self.assertAlmostEqual(results[-1]['Native_paper']['Goodput'],244.0908068587041)\n    self.assertAlmostEqual(results[-1]['raw_tokens_per_second'],591.6965632229319)\n   badns=dict(ns);badns.pop('sha')\n   # Real function compiled from same original producer, with the old missing\n   # global, reproduces its actual NameError before any file rewrite.\n   oldfn=types.FunctionType(ns['full_metrics'].__code__,badns)\n   with self.assertRaises(NameError):oldfn(info)\n  self.assertEqual(sum(v is not None for v in results),1)\n  DETAILS['trace_metrics']=dict(actual_four_completed166_artifacts=True,original_GP=244.0908068587041,old_missing_sha_NameError=True,original_clock_formula_unchanged=True,minimum4_releases_actual8=True)\n def test04_actual_guard_CLI_rows_and_safe_storage_race(self):\n  import runtime197,base197\n  G=B/'budget-diagnostics/v197-root-execution';q=G/'guard197.py';spec=importlib.util.spec_from_file_location('_V197_HOST_guard',q);guard=importlib.util.module_from_spec(spec);spec.loader.exec_module(guard)\n  self.assertEqual((guard.MAX_SECONDS,guard.MAX_TAG_BYTES,guard.MAX_AGGREGATE_BYTES),(7200,256*1024**2,512*1024**2))\n  for path,name,target,extra in [(q,'prepare_only','f',dict(state=dict(local={},external={},evidence={},parent_archive={}),root={},peers={})),(checked(B/'budget-diagnostics/v154-root-execution/supervise_v154.py'),'execute_locked',",
+          "start": 9023
+        },
+        {
+          "end": 11027,
+          "new": "",
+          "old": ",dict(tag='HOST197',readiness={}))]:\n   fn=next(n for n in ast.parse(path.read_text()).body if isinstance(n,ast.FunctionDef) and n.name==name);node=next(n for n in fn.body if isinstance(n,ast.Assign) and any(isinstance(t,ast.Name) and t.id==target for t in n.targets))\n   ns={**vars(guard),**extra,'sha':lambda p:'0'*64 if Path(p)==guard.CPU else sha(p)}\n   exec(compile(ast.fix_missing_locations(ast.Module(body=[copy.deepcopy(node)],type_ignores=[])),'actual197-guardrow','exec'),ns)\n   self.assertEqual(ns[target",
+          "start": 10512
+        },
+        {
+          "end": 11820,
+          "new": "",
+          "old": "vacancy_min_requests'],4);self.assertFalse(ns[target]['formal_Goodput'])\n   bad=copy.deepcopy(node);bad.value.keywords.insert(0,ast.keyword(arg='vacancy_min_requests',value=ast.Constant(4)))\n   with self.assertRaises(TypeError):exec(compile(ast.fix_missing_locations(ast.Module(body=[bad],type_ignores=[])),'actual197-badrow','exec'),dict(ns))\n  fn=next(n for n in ast.parse((P/'runtime197.py').read_text()).body if isinstance(n,ast.FunctionDef) and n.name=='main');nodes=[]\n  for node in fn.body:\n   if isinstance(node,ast.ImportFrom) and node.module=='check197':break\n   nodes.append(copy.deepcopy(node))\n  code=compile(ast.fix_missing_locations(ast.Module(body=nodes,type_ignores=[])),'actual197-CLI','exec');old=sys.argv\n  try:\n   sys.argv=['runtime197.py','--action',base197.ACTION,'--",
+          "start": 11030
+        },
+        {
+          "end": 11824,
+          "new": "]",
+          "old": "",
+          "start": 11824
+        },
+        {
+          "end": 11836,
+          "new": "-o",
+          "old": "197'];",
+          "start": 11830
+        },
+        {
+          "end": 12027,
+          "new": "",
+          "old": "s=dict(vars(runtime197));exec(code,ns);self.assertEqual(ns['windows'],(32,))\n   sys.argv+=['--windows','16']\n   with self.assertRaises(RuntimeError):exec(code,dict(vars(runtime197)))\n  final",
+          "start": 11837
+        },
+        {
+          "end": 12030,
+          "new": "-",
+          "old": ":",
+          "start": 12029
+        },
+        {
+          "end": 12034,
+          "new": "",
+          "old": "ys.",
+          "start": 12031
+        },
+        {
+          "end": 12045,
+          "new": "",
+          "old": "rgv=old\n  ",
+          "start": 12035
+        },
+        {
+          "end": 12051,
+          "new": "",
+          "old": "or sh",
+          "start": 12046
+        },
+        {
+          "end": 12076,
+          "new": "-",
+          "old": "ll in ('launch197.sh','s",
+          "start": 12052
+        },
+        {
+          "end": 12088,
+          "new": "g",
+          "old": "rtup197.sh",
+          "start": 12078
+        },
+        {
+          "end": 12784,
+          "new": "",
+          "old": "):self.assertIn(base197.ACTION,(G/shell).read_text())\n  from unittest.mock import patch\n  actual=P/'actual';actual.mkdir(exist_ok=True)\n  with tempfile.TemporaryDirectory(dir=actual,prefix='HOST-race197-') as temp:\n   root=Path(temp);kept=root/'kept.json';kept.write_bytes(b'123');tmp=root/'writing.tmp';tmp.write_bytes(b'x');original=Path.stat\n   def race(p,*a,**kw):\n    if p==tmp and kw.get('follow_symlinks',True):\n     try:p.unlink()\n     except FileNotFoundError:pass\n    return original(p,*a,**kw)\n   with patch.object(Path,'stat',race):self.assertEqual(guard.bytes_under(root),3)\n   link=root/'bad.tmp';link.symlink_to(kept)\n   with self.assertRaises(RuntimeError):guard.bytes_under(root",
+          "start": 12089
+        },
+        {
+          "end": 12814,
+          "new": "origin",
+          "old": "actu",
+          "start": 12810
+        },
+        {
+          "end": 12819,
+          "new": "s",
+          "old": "pr",
+          "start": 12817
+        },
+        {
+          "end": 12824,
+          "new": "lflock",
+          "old": "pare",
+          "start": 12820
+        },
+        {
+          "end": 12829,
+          "new": "ownedcleanup_sou",
+          "old": "",
+          "start": 12829
+        },
+        {
+          "end": 12831,
+          "new": "",
+          "old": "e",
+          "start": 12830
+        },
+        {
+          "end": 12865,
+          "new": "",
+          "old": "ipt_constructors=True,duplicates",
+          "start": 12833
+        },
+        {
+          "end": 12871,
+          "new": "",
+          "old": "jec",
+          "start": 12868
+        },
+        {
+          "end": 12872,
+          "new": "ain",
+          "old": "",
+          "start": 12872
+        },
+        {
+          "end": 12881,
+          "new": "frozen177_s",
+          "old": "a",
+          "start": 12880
+        },
+        {
+          "end": 12886,
+          "new": "oped",
+          "old": "tual",
+          "start": 12882
+        },
+        {
+          "end": 12905,
+          "new": "",
+          "old": "CLI32_only=True,de",
+          "start": 12887
+        },
+        {
+          "end": 12925,
+          "new": "",
+          "old": "rministic_atomic_t",
+          "start": 12907
+        },
+        {
+          "end": 12932,
+          "new": "_fix",
+          "old": "",
+          "start": 12932
+        },
+        {
+          "end": 12945,
+          "new": "ROOT_freeze",
+          "old": "symlink",
+          "start": 12938
+        },
+        {
+          "end": 12952,
+          "new": "quir",
+          "old": "ject",
+          "start": 12948
+        }
+      ],
+      "file": "test_full197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/test_full190.py",
+      "parent_sha256": "a20cafa478738290492775f2b51782ac68461113c68ca251dcbe28d559930cc9"
+    },
+    {
+      "deltas": [
+        {
+          "end": 1089,
+          "new": "",
+          "old": "bas",
+          "start": 1086
+        },
+        {
+          "end": 1090,
+          "new": "mpty",
+          "old": "",
+          "start": 1090
+        },
+        {
+          "end": 1101,
+          "new": "pat",
+          "old": "",
+          "start": 1101
+        },
+        {
+          "end": 1112,
+          "new": "h",
+          "old": "ore_module",
+          "start": 1102
+        },
+        {
+          "end": 1162,
+          "new": "",
+          "old": "core_module('source_patch185').",
+          "start": 1131
+        },
+        {
+          "end": 2416,
+          "new": "",
+          "old": "from trace_admission197 import wrap\n ",
+          "start": 2379
+        },
+        {
+          "end": 2428,
+          "new": "",
+          "old": "wrap(",
+          "start": 2423
+        },
+        {
+          "end": 2444,
+          "new": "",
+          "old": ")",
+          "start": 2443
+        }
+      ],
+      "file": "trace197.py",
+      "namespace": [
+        "190",
+        "197"
+      ],
+      "parent": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190/trace190.py",
+      "parent_sha256": "f05166c4b31cd94ba9263c4646a91ae672600eef9e0c06f3b3c2d394af1f1ef9"
+    }
+  ],
+  "readonly_multiowner_math_source": "/root/SpecSLO/budget-calibration-20261015/tree-vacancy-cohort-prefill-cap4-active32-full-v190",
+  "schema": "V197.thin-private-source-projection.v1"
+}

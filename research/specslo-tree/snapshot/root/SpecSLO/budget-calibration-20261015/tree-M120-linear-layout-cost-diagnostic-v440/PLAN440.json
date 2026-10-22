@@ -1,0 +1,19 @@
+{
+  "schema": "ROOT440.actual-layer0-local-linear-layout-and-pad-cost-diagnostic.v1",
+  "source_parent385_unchanged": true,
+  "current438_full_source_and_original_private_caps_preserved": true,
+  "scope": "one real M120 whole-target frame solely for capturing real layer0 inputs; three local projection types, four layout/padding variants, nine balanced graph/device-event samples",
+  "retained_environment": "existing Native Py3.11/CANN9.0/torch-npu2.10, public-backed Qwen3 models",
+  "model_weights_not_modified": true,
+  "no_NN_production_permission": true,
+  "no_communication_profile_installed": true,
+  "no_full463_or_goodput_claim": true,
+  "Native_flags_assigned": false,
+  "original_genuine72_prefix_protection_retained": true,
+  "private_tag_MiB": 192,
+  "aggregate_MiB": 3584,
+  "maximum_seconds": 3600,
+  "Git_pushes": 0,
+  "Raw": null,
+  "Goodput": null
+}

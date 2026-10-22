@@ -1,0 +1,31 @@
+{
+  "status": "PASS_HOST460_ACTUAL_FULL_WORKER_API_SOURCE_PROJECTIONS_AND_NEGATIVE_CONTROLS",
+  "referenced_attributes": [
+    "after_install",
+    "bucket_snapshot",
+    "cache_snapshot",
+    "install_entry",
+    "loaded_origins",
+    "metadata_snapshot",
+    "postfull_AR",
+    "preflight_snapshot",
+    "prepare_install",
+    "qualify_component",
+    "refill_snapshot",
+    "snapshot",
+    "source_binding"
+  ],
+  "all_actual_call_signatures_bound": 14,
+  "exact_original_preflight_snapshot_exported": true,
+  "all_full_source_projections_constructed": true,
+  "original_full_supervisor_limits_retained": true,
+  "invalid_physical_record_rejected": true,
+  "absent_current_model_proof_rejected": true,
+  "global_active_limit": 64,
+  "current693_and_original227_681_75_6_and_full463_own_AR_still_required": true,
+  "Native_constructor_calls": 0,
+  "NPU_used": false,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

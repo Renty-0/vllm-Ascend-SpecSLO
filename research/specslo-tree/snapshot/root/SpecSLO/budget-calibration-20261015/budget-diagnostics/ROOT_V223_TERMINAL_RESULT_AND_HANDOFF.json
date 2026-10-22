@@ -1,0 +1,42 @@
+{
+  "UTC": "2026-10-18T02:04:29.269203+00:00",
+  "status": "complete_uninstalled_observer_three_selected_differences_resolved",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-BF16-tie-FP32-root-v223-three-cases-v1.json",
+  "receipt_sha256": "69457ec3a73454099c34e47202481c2a3f1dfa26f83a1d55da561f526563d9a4",
+  "independent_arithmetic": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V223_INDEPENDENT_TIE_OBSERVATION_AND_COST_ARITHMETIC.json",
+  "all_four_idle": true,
+  "sources_unchanged": true,
+  "owned_remaining": [],
+  "pre_post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "guard_session": 1443,
+  "guard_session_closed": true,
+  "query_winners": [
+    30,
+    1817,
+    7196
+  ],
+  "head_extra_ms_ranges": {
+    "M40": [
+      0.41608152389526354,
+      0.41618201732635496
+    ],
+    "M80": [
+      0.5110019922256468,
+      0.5212689638137817
+    ]
+  },
+  "new_policy_installed": false,
+  "whole463_output_fixed": false,
+  "full_Goodput": null,
+  "formal_Goodput": false,
+  "adopted": false,
+  "next": "ROOT224 explicit target maximum-tie policy for both complete tree and independent own-AR; fresh original gates required"
+}

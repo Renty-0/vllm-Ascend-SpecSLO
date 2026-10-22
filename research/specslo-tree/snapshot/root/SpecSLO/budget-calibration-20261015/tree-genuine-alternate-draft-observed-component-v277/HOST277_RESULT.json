@@ -1,0 +1,32 @@
+{
+  "status": "HOST_private_draft_geometry_and_original_metadata_passed",
+  "symbolic_cases": 680,
+  "original_PA_metadata_cases": 75,
+  "raw_copy_kernel_body_reused": true,
+  "new_specialization_width": 1024,
+  "declared_N": [
+    1,
+    2,
+    4,
+    8,
+    12
+  ],
+  "declared_steps": [
+    1,
+    2,
+    3
+  ],
+  "declared_variants": [
+    0,
+    1,
+    0
+  ],
+  "actual_NN_cases_required": 45,
+  "actual_prefix_count": 24,
+  "original_freeze_inputs_edited": false,
+  "NPU_used": false,
+  "neural_qualified": false,
+  "whole_workload_AR_qualified": false,
+  "Goodput": null,
+  "adopted": false
+}

@@ -1,0 +1,18 @@
+{
+  "status": "PASS_HOST433_ACTUAL_RUNTIME_CLEAN_PACKING_AND_LIVE_BINDING",
+  "results": [
+    {
+      "script": "check433_lifetime_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-preflight-component-lifetime-v433/HOST433-check433_lifetime_HOST.py.log"
+    },
+    {
+      "script": "check433_construction_HOST.py",
+      "exit_code": 0,
+      "log": "/root/SpecSLO/budget-calibration-20261015/tree-parent4-preflight-component-lifetime-v433/HOST433-check433_construction_HOST.py.log"
+    }
+  ],
+  "NPU_used": false,
+  "model_constructors": 0,
+  "existing_runtime_and_only_existing_freeze_environment_fields": true
+}

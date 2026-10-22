@@ -1,0 +1,13 @@
+{
+  "status": "PASS_HOST447_COMPLETE_ORIGINAL_LIFECYCLE_INITIAL_AND_BULK_ROW_BOUNDS",
+  "actual_source_inverse": true,
+  "all14_initial_continuation_span_cases": true,
+  "all4_negative_cases": true,
+  "original72_prefix_protection_preserved": true,
+  "fresh445_scope_reexecuted_in_current_engine": true,
+  "at_most2_bulk_diagnostic_graphs_explicitly_retained": true,
+  "NPU_used": false,
+  "model_constructors": 0,
+  "Raw": null,
+  "Goodput": null
+}

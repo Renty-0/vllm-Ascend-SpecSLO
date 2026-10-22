@@ -1,0 +1,38 @@
+{
+  "evidence/ROOT462_V2_FINAL_COMMON_CLOCK_HOST.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_V2_FINAL_COMMON_CLOCK_HOST.json",
+    "sha256": "6e889ba84ae5f81b9e6b4e39f53465773d23955b994727f679f10951d4552aca"
+  },
+  "evidence/ROOT462_V2_ADDITIONAL693_INDEPENDENT_NN_READER_HOST.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_V2_ADDITIONAL693_INDEPENDENT_NN_READER_HOST.json",
+    "sha256": "6fb4d82dc192b86b6871e9544bd4bfefb25f2cfa9f28c13a87e3e89a8be9d11b"
+  },
+  "evidence/ROOT462_V2_ACTUAL_PREFILL_PAUSE_COMPONENT_HOST.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_V2_ACTUAL_PREFILL_PAUSE_COMPONENT_HOST.json",
+    "sha256": "ff9c8bdc5e5468336bd405d71638eff75652842fd6a6f7ddf9ea031d019499cf"
+  },
+  "evidence/ROOT462_V2_PROSPECTIVE_PREFILL_COST_VALIDATION_HOST.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_V2_PROSPECTIVE_PREFILL_COST_VALIDATION_HOST.json",
+    "sha256": "f93cf93f742e52803b18b81a97c584a4adf2c9efd8c42a96dd423180bce8ced6"
+  },
+  "evidence/ROOT462_PROSPECTIVE_PREFILL_COST_MODEL_HOST.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_PROSPECTIVE_PREFILL_COST_MODEL_HOST.json",
+    "sha256": "f0d54b1e692f02d5b7ead5aec9ca2973cc98827254f5830698124771519ad8fc"
+  },
+  "evidence/ROOT462_V2_SECOND_LIFECYCLE_PASS_COUNTER_AUDIT_HOST.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_V2_SECOND_LIFECYCLE_PASS_COUNTER_AUDIT_HOST.json",
+    "sha256": "1a2a2e418bb1d013be784f1757d2dfa4d62e0a1fee946f9d549d8b99fbb70f42"
+  },
+  "evidence/terminal-independent-audit.json.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_V2_TERMINAL_FULL_AUDIT_HOST.json",
+    "sha256": "e169584b2f5f429abf273d0a8679925ebaeb6e611da8708c284787c45f7a13a7",
+    "uncompressed_sha256": "47f8448cb881b5879e4abbce132c82789fa6c1060ad2bb4ae77aea549f721e65",
+    "compression": "gzip"
+  },
+  "evidence/terminal-supervisor-receipt.json.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-adaptive-own-history-global64-root-v462-qualified-wait-full463-ownAR-v2.json",
+    "sha256": "39108fb1e8a39edbcf94ac3e9ac5361a6d9577c398ebeaf4a14aacae47a33ab1",
+    "uncompressed_sha256": "a0f376b07c88def09eccd7d34f0b16ecbc6b0424ed6ebf1faab37365088b16ca",
+    "compression": "gzip"
+  }
+}

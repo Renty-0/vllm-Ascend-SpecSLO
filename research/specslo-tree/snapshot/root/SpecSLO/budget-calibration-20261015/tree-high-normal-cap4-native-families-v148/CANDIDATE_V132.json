@@ -1,0 +1,133 @@
+{
+  "schema": "V132.pending-single-candidate.v1",
+  "production_mode": "standalone-whole-prompt-no-new-reservation",
+  "controls": {
+    "target_cpu_context_clean": true,
+    "draft_cpu_context_clean": true
+  },
+  "draft_selected_limit": 192,
+  "normal_selected_limit": 96,
+  "future_eager_selected_limit": 96,
+  "eager_cap": 3,
+  "reserve": 32,
+  "parent_B": [
+    3
+  ],
+  "only_exactB3_eager_published": true,
+  "component_actual_evidence": {
+    "target_context": {
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-cpu-context-cost-v110/receipt-FULL96-CPUcontext-v1.json",
+      "receipt_sha256": "132cd14304395a422c467ab3edfe02298ddc3f50de66d52377893b71b4236b5a",
+      "external_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V110_ACTUAL_FULL96-CPUcontext-v1_AUDIT.json",
+      "external_audit_sha256": "17b02a707ba29b2b056c8499eb24554858f347581cc01ae1d7030e9d45f2941f"
+    },
+    "draft_context": {
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-draft-cpu-context-fixture-v136/receipt-draft-CPUcontext-valid-fixture-v136-1.json",
+      "receipt_sha256": "b63d389b03a2e183ffafd984d5362147cdc0c7b87c57ca6c04fbb5732ac5d870",
+      "external_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V136_ACTUAL_DRAFT_CPU_CONTEXT_AUDIT.json",
+      "external_audit_sha256": "a8b8b0080d4f2176d510754e8f4e352949225445ef3f0551c8972d06fac29287"
+    },
+    "parent_B3_eager": {
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-short-parent-eager-v134/receipt-parent3-child3-global192-v1.json",
+      "receipt_sha256": "46d0d7e3a8220389ba0b041893665ecb636e0306944901839a1fd8eec3f25321",
+      "external_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V134_ACTUAL_SHORT_PARENT_PROTOCOL_AUDIT.json",
+      "external_audit_sha256": "da0fe26b00cf2bd0652de468e64aba5c8abaa1b612626013a06c173a1d913b8a"
+    },
+    "mapper_six_partitions": {
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-qualified44-cost-stagefix-v120/receipt-existing44-realpartition-stagefix-cost-v1.json",
+      "receipt_sha256": "783c0087f30e937b25303e97e616562c3020e0d4664a7afef4c4ea89dfaa04b0",
+      "external_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V120_ACTUAL_INDEPENDENT_MAPPER_COST_AUDIT_ATTEMPT1.json",
+      "external_audit_sha256": "0a3ae788a45b2a17ff5ee9e7d41150bc189dfa529eca31016d076abf01c01235"
+    },
+    "mapper_four_large_partitions": null,
+    "variable_B4_local": {
+      "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-variable-B4-local-qualification-v144/receipt-variable-B4-local-v144-1.json",
+      "receipt_sha256": "798a77d9b1cd3b256910b47213539a53cac3564eb3b32d6f6099a7eb84c96a2b",
+      "external_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_V144_ACTUAL_VARIABLE_B4_AUDIT.json",
+      "external_audit_sha256": "e5d979e4405bb72bed2caa1adf08c2e8f2d710393e81e02640c773eee58d284f"
+    }
+  },
+  "actual_components_adopted": true,
+  "actual_full_pipeline_qualified": false,
+  "global_factory_equivalence_proved": false,
+  "eager_actual_shared_steps": 3,
+  "eager_deferred_when_normal_B_gt3": true,
+  "normal_N_threshold": 8,
+  "normal_N_gt8_cap": 4,
+  "normal_N_le8_cap": 5,
+  "mapper_extra_large_partitions_enabled": false,
+  "parent_B3_component_scope": {
+    "actual_sequential_component_qualified": true,
+    "actual_shared_steps": 3,
+    "selected192_endpoint": true,
+    "observed_target_promotions_all_four_cases": 0,
+    "controlled_valid_promotions": [
+      1,
+      1,
+      1,
+      32
+    ],
+    "child_followup_independent_history_passed": true,
+    "actual_online_admission_or_rolling_gain_proved": false,
+    "online_simultaneous_owner_alignment_proved": false,
+    "shared4step_eager_qualified": false
+  },
+  "pending_component_receipts": {},
+  "rejected_optional_mapper_four": {
+    "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-qualified44-largeB3-cost-v135/receipt-existing44-largeB3-four-partitions-v135-1.json",
+    "receipt_sha256": "d23a73a6e075997d1a31e8f34d3e38029ab1706a4f159d985f9476bd4f89a224",
+    "external_audit": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/V135_ACTUAL_INDEPENDENT_MAPPER_COST_AUDIT_ATTEMPT1.json",
+    "external_audit_sha256": "0398d5309f8b8ae6979e9c4025e732d9279e2a978b76524d05c053ff8339bcc1",
+    "adopted": false,
+    "reason": "All four cross-M controls changed one real-query token: owner10/sourceindex15/query3/position133/input65 old7628 new8298, canonical and reverse, all3 target ranks. Same-M qualification alone does not justify cross-M adoption."
+  },
+  "draft_context_component_scope": {
+    "component_fixed_prefix_bitexact": true,
+    "component_all28_layer_query_KV_tensors": 56,
+    "component_natural_FTF_keys": 6,
+    "component_two_zero_traces": true,
+    "component_sealed": true,
+    "component_cost_calls": 30,
+    "component_dynamic_TTU_qualified": false,
+    "component_actual_task_update_skipped_replays": 1,
+    "component_actual_task_update_tasks": 0,
+    "global_factory_equivalence_proved": false,
+    "full_actual_caller_factory_source_guard": "factory_scope_v132.collect exact33Native/38local source census, 45 omitted-device factory sites closed for selected actual callers only",
+    "full_pipeline_actual_qualified": false
+  },
+  "preparation_epoch": "V148",
+  "parent_failure": "V138 full463 raw normal row count exceeded typed32 before allocation; exact failing N/E not retained",
+  "normal_admission_rule": "V140.normal-class-priority-defer-age-owner-order.v1",
+  "normal_admission_scope": {
+    "raw_max": 64,
+    "admitted_max": 32,
+    "eager_max": 32,
+    "work_max": 64,
+    "overflow_order": [
+      "original typed class priority",
+      "defer-age descending",
+      "original typed owner ID ascending"
+    ],
+    "actual_work_order": "original raw normal order",
+    "reset": "existing untimed phase-before stage each generation",
+    "next_cycle_service_guaranteed": false,
+    "actual_device_or_full463_qualified": false
+  },
+  "failure_only_partial_evidence": true,
+  "actual_gain_state_phase_snapshot": true,
+  "variable_B4_full_process_scope": {
+    "prior_V144_local_scope_qualified": true,
+    "prior_scope_storage": 96,
+    "current_full527_process_component_qualified": false,
+    "own_full_process_component_required": true,
+    "exploration_commits": 8,
+    "protocol_zero_replay_commits": 16,
+    "next_draft_probes": 6,
+    "component_seal": false,
+    "current_full_two65zero_required": true,
+    "new_target_hidden_keys": 2,
+    "new_draft_keys": 0,
+    "initial_root_teacher_forced": true,
+    "natural_missing_suffix_forced": false
+  }
+}

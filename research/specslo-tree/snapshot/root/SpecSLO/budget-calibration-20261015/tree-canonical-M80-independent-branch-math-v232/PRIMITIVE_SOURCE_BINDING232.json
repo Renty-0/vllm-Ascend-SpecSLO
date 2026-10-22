@@ -1,0 +1,39 @@
+{
+  "status": "copied_source_identity_checked",
+  "helpers": {
+    "mapper231.py": {
+      "original": "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/mapper231.py",
+      "sha256": "9895a9867fada5c812880175768f4ebfb5ce02fc1713f11c44f6e9d570e6e7e2"
+    },
+    "padding231.py": {
+      "original": "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/padding231.py",
+      "sha256": "9fe28553213f3bbe77ddae95b507c9a99aec87b62b70cd835124c752bcb76fe3"
+    },
+    "root_padding_forward231.py": {
+      "original": "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/root_padding_forward231.py",
+      "sha256": "0c90e15693f5568b911da0c98c2f496fa7495add365d8d98e23676b223c2aecf"
+    },
+    "metadata231.py": {
+      "original": "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/metadata231.py",
+      "sha256": "0e2b042375f76c9b82a6e76734e1760a9fbabf1c67fb5d8c66d9817be8598c97"
+    },
+    "query1_reference231.py": {
+      "original": "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/query1_reference231.py",
+      "sha256": "b0f7e05e34a9bd7eca09c277d8396d9286e217c1362a7f316409c8427861b967"
+    },
+    "reference_schedule231.py": {
+      "original": "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/reference_schedule231.py",
+      "sha256": "7f3de5ab96c90788392910522945252051c6b425b8db99220fe716862667d844"
+    },
+    "bank231.py": {
+      "original": "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/bank231.py",
+      "sha256": "661fd1423fadf0cd86745999cfa6e3a56674c99946cc49979cfa89f7420d84ce"
+    },
+    "neural_oracle231.py": {
+      "original": "/root/SpecSLO/budget-calibration-20261015/tree-canonical-M80-FULL9-full463-own-AR-v231/neural_oracle231.py",
+      "sha256": "17f092d4ac76e1c3744f48cc8cb8ded8d200c819b07a5c179a7c8b9a01b32115"
+    }
+  },
+  "source_originals_need_not_be_mutable_runtime_dependencies": true,
+  "actual_runtime_uses_copied_private232_files": true
+}

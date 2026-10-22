@@ -1,0 +1,15 @@
+{
+  "version": 461,
+  "status": "unfrozen_startup_path_fix_only",
+  "numerical_source": "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-own-history-full-v460",
+  "numerical_source_frozen_unchanged": true,
+  "global_active_limit": 64,
+  "change": "Append inherited runtime PYTHONPATH after literal experiment source paths. Preserve CANN tbe and dependent Python packages installed in the retained runtime.",
+  "no_installs": true,
+  "no_upgrades": true,
+  "all_original460_mathematical_gates_and_full463_ownAR_required": true,
+  "failed460_receipt_retained": true,
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null
+}

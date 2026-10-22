@@ -1,0 +1,26 @@
+{
+  "status": "HOST_ONLY_NO_NN_LAUNCHER",
+  "goal": "Check bounded nonempty whole-prompt refill as a future Raw direction; current425 continues unchanged.",
+  "source_parent425": "3f504d53ba5501e3cb20e2a72afff6415ad8a119f61502524bf76c3e8568d4b9",
+  "low_water_values": [
+    16,
+    24,
+    32,
+    48
+  ],
+  "min_refill_values": [
+    2,
+    8,
+    16,
+    32
+  ],
+  "max_nonempty_refill32": true,
+  "global_active_limit": 64,
+  "total_page_pool": 544,
+  "scratch_page_reservation": 64,
+  "original_clocks_and_first_token_publication_preserved": true,
+  "NN_scope_issued": false,
+  "Native_flags_assigned": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,13 @@
+{
+  "status": "source_only_unqualified",
+  "hypothesis": "M80 and one-query FULL exact lengths",
+  "original227_frozen_unrun": true,
+  "reason_for_new_namespace": "ROOT226 generic causal cost graph failed original validation; do not repeat it",
+  "body_cost_comparison": "original q5 FULL9 versus canonical q1 FULL1, exact lengths, M80 both, ABBA",
+  "original_Native_validation_retained": true,
+  "same_original_four_fixtures": true,
+  "original_sampler_unchanged": true,
+  "production_installed": false,
+  "performance_qualified": false,
+  "adopted": false
+}

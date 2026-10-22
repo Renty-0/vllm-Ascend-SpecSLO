@@ -1,0 +1,8 @@
+{
+  "status": "PASS_HOST387_COMPLETE386_ARCHIVE_AND_ACTUAL_SUPERVISOR",
+  "complete386_sources": 4247,
+  "NPU_used": false,
+  "model_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

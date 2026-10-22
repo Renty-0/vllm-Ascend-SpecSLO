@@ -1,0 +1,22 @@
+{
+  "status": "HOST_all227_final_physical_metadata_exact",
+  "cases": 227,
+  "values_dtypes_strides_aliases_mapping_and_copy_geometry_equal": true,
+  "original_HOST_and_branch_and_projection_full_AST_inverses": true,
+  "proof": {
+    "original_source_sha256": "5d5a09c963ded98396378ddc7d5bfad81736bf49102c9507ad8d3ff9dd77eb44",
+    "entire_original_validation_and_fallback_AST_inverse": true,
+    "original_default_signature": true,
+    "mathematical_metadata_unchanged_intended": true,
+    "dynamic_tensor_data_cached": false,
+    "neural_qualified": false,
+    "performance_qualified": false,
+    "raw_mask_upload_deferred": true,
+    "all_original_validation_preserved": true,
+    "packet_source_sha256": "c5e6c487f53886eaf6eb75465f7bbc5b8c5d8f0fd0bdae315924d8e280090d74"
+  },
+  "dynamic_masks_fresh": true,
+  "actual_NPU_used": false,
+  "neural_qualified": false,
+  "performance_qualified": false
+}

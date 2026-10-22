@@ -1,0 +1,50 @@
+{
+  "status": "IMPLEMENTED_UNFROZEN_HOST_PASS_AWAITING_FINAL_CHECK",
+  "base405_unchanged": true,
+  "global_active_limit": 64,
+  "normal_work_limit": 24,
+  "target": {
+    "M": 120,
+    "S": 24,
+    "C": 96,
+    "N_max": 24
+  },
+  "new_mode": {
+    "parent_B": 4,
+    "child_B": 4,
+    "normal_N": 24,
+    "eager_N": 4,
+    "normal_C": 96,
+    "eager_C": 16,
+    "total_C": 112
+  },
+  "existing_B3_fallback": true,
+  "normal_B5_tree_path_retained": true,
+  "requirements": [
+    "exact original fallback and new E4 callback source identities",
+    "all original base numerical checks and227+681",
+    "fresh current-engine full419 all75 protocol cases on existing target state without reinstall",
+    "fresh warm/twozero/seal/full463 and all3 ownAR"
+  ],
+  "source_optimization_requires_fresh_NN_permission": true,
+  "prior424_results_not_inherited": true,
+  "NPU_launched": false,
+  "Raw": null,
+  "Goodput": null,
+  "direction": "Selective ordinary ready parentB4\u2192E4 alongside24normalB4; original g/need/priority plus global64",
+  "fixed_target": {
+    "M": 120,
+    "S": 24,
+    "C": 96
+  },
+  "new_paid_shape": {
+    "normal": 24,
+    "eager": 4,
+    "B": 4,
+    "total_candidates": 112
+  },
+  "NN_gate": "all original components+227+681+fresh same-current75 cases then warm/twozero/seal/full463/all3ownAR",
+  "unchanged_private_tag_cap_MiB": 256,
+  "deadline_seconds": 18000,
+  "github_submission": "only after confirmed effective correct full performance improvement"
+}

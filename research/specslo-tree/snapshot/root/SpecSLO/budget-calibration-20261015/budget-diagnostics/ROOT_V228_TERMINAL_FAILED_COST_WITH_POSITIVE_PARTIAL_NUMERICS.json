@@ -1,0 +1,113 @@
+{
+  "schema": "ROOT228.completed-numerics-failed-cost.v1",
+  "UTC": "2026-10-18T03:25:45.366103+00:00",
+  "status": "failed_new_q5_FULL_cost_graph_original_validation",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1.json",
+  "receipt_sha256": "2f104c7204cbfe7bfb5fd67342c75d18f9025f20406a4ed7e3587ac00b55917a",
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank1-fresh-complete-case1.json": "cdab0f4ba52461adf880665f1d884567d5da1c4d97595c396ddfed3bd6bf8b39",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank2-fresh-complete-case1.json": "342f731b0bc664584763f2c18eb2ceecab89ed6ed75e55c8af71a0fd1c40efd8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank3-fresh-complete-case1.json": "07ae9a1dd64fc19abba67ed5a018da4213f1a45922708958dce1417770aa057f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank1-fresh-complete-case2.json": "c322a7cacf9a533a4889993708b45a771f6b7f1eac91678ec4822344a2703d23",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank2-fresh-complete-case2.json": "28abaa9af29e2b1c1b5debf720575f3c98709ed426abccebd3430d258043eac2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank3-fresh-complete-case2.json": "ab97a8af7aca68ad796b4a66edce8e1363a587d8a5331cd9a177b02505aa15eb",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank1-history-complete-case1.json": "9f9169aac63d544e0d760a17747ea6cc44cdc4c1476b9bcb3a63aa9261a48e9a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank2-history-complete-case1.json": "8a1e0845da2e201c5817b693066ddf3aeadb784dbaf515f641c1f52f68ba2136",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank3-history-complete-case1.json": "b3d43ec62e3807e3a42cced6bc0ae6d917708b6a8cb523bd6b6ff44eb68a0b6a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank1-history-case2-reference-complete-before-cost.json": "49b464732371d96645ce6512cd79f81029b5ba165cad5e0e0b99d0d3ba0f27f3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank2-history-case2-reference-complete-before-cost.json": "4786c2cbfeab79f32a887a2aa6ba2a085754feda4d9e9dfb3d11350790c40b1e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/query1-FULL-root-v228-four-contexts-vs-FULL9-cost-v1/rank3-history-case2-reference-complete-before-cost.json": "f7d2fa7522b6ce0dac8253e7601372dd813e3ba9e05f6fd160722fac8f28ae87"
+  },
+  "completed_cases": [
+    {
+      "case": "full-vs-causal",
+      "all_three_targets_agree": true,
+      "detail": {
+        "tokens": [
+          [
+            30,
+            30
+          ],
+          [
+            30,
+            30
+          ],
+          [
+            30,
+            30
+          ]
+        ],
+        "hidden_and_KV_all_variants_equal": true
+      }
+    },
+    {
+      "case": "current224-request0-new-difference148-fresh-common-prefix",
+      "all_three_targets_agree": true,
+      "detail": {
+        "tokens": [
+          [
+            279,
+            279
+          ],
+          [
+            279,
+            279
+          ],
+          [
+            279,
+            279
+          ]
+        ],
+        "hidden_and_KV_all_variants_equal": true
+      }
+    },
+    {
+      "case": "request129-common-incremental-history",
+      "all_three_targets_agree": true,
+      "detail": {
+        "tokens": [
+          [
+            1817,
+            1817
+          ],
+          [
+            1817,
+            1817
+          ]
+        ],
+        "hidden_query_KV_and_complete_common_prefix_all_equal": true
+      }
+    }
+  ],
+  "last_reference_only": {
+    "token": 7196,
+    "eager_graph_exact": true,
+    "candidate_comparison_not_retained": true
+  },
+  "complete_four_context_claim": false,
+  "body_cost_unavailable": true,
+  "original_execution_status_preserved": "failed",
+  "original_validation_not_bypassed": true,
+  "pre_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "post_verifier": {
+    "baseline_id": "nano-pearl-ascend-v1",
+    "status": "pass",
+    "checked_frozen_files": 10496,
+    "checked_external_files": 15,
+    "checked_packages": 212,
+    "public_model_check": "resolved path/size/mtime match previously SHA-verified public files",
+    "errors": []
+  },
+  "owned_remaining": [],
+  "all_four_idle": true,
+  "formal_Goodput": false,
+  "adopted": false
+}

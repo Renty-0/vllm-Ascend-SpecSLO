@@ -1,0 +1,17 @@
+{
+  "status": "HOST_cached_projection_equals_original_with_live_changes",
+  "supported_cases": 111,
+  "changed_restored_and_stride_comparisons": 334,
+  "verified_fresh_dynamic_mask_and_table_tensors": 666,
+  "cache_hits": 610,
+  "cache_misses": 57,
+  "bounded_entries": 57,
+  "eviction_negative_control": true,
+  "original_source_sha256": "f6f596f704d55cf672e8b05c265d6de707ec8a0485daf41c4040de9de817390e",
+  "candidate_source_sha256": "a61db62e22d16432a9e0956508293f81abf8038bc2f3197fa86f38015940b88d",
+  "fixture_proof_sha256": "0400b1b3fd37f9468d14bbd272f002133ac549e92067c80097d3c22f47187231",
+  "NPU_used": false,
+  "neural_qualification": false,
+  "performance_qualification": false,
+  "production_installed": false
+}

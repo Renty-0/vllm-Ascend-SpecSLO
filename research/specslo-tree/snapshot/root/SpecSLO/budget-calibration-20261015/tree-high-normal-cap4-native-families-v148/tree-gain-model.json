@@ -1,0 +1,37 @@
+{
+  "curves": {
+    "chat": {
+      "1": 1.9166666666666667,
+      "2": 2.5833333333333335,
+      "3": 3.25,
+      "4": 3.8333333333333335,
+      "5": 4.083333333333333
+    },
+    "coding": {
+      "1": 1.9166666666666667,
+      "2": 2.75,
+      "3": 3.3333333333333335,
+      "4": 3.8333333333333335,
+      "5": 3.9166666666666665
+    },
+    "summarization": {
+      "1": 1.6666666666666667,
+      "2": 2.1666666666666665,
+      "3": 2.5,
+      "4": 2.6666666666666665,
+      "5": 3
+    }
+  },
+  "tree_depth": 4,
+  "tree_width": 2,
+  "max_actual_nodes": 5,
+  "primary_backbone": 4,
+  "branch_policy": "maximum_joint_secondary_probability_single_terminal_side",
+  "source_pilot_model": "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-side-prototype-v15/adaptive-side-gain-v1-raw-gain-model.json",
+  "source_pilot_model_sha256": "4e7fa7cf840530ff5332aca7eabf92750feb9b2bbd81f8a5cbd6bc946bd82647",
+  "source_receipt": "/root/SpecSLO/budget-calibration-20261015/tree-adaptive-side-prototype-v15/cost-receipt-adaptive-side-gain-v1.json",
+  "heldout_validated": false,
+  "pilot_only": true,
+  "scope": "B1..5 identical actual topology to depth7 pilot, online depth4 target costs require end-to-end remeasurement",
+  "whole_workload_AR_equality_qualified": false
+}

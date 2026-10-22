@@ -1,0 +1,113 @@
+{
+  "UTC": "2026-10-22T13:41:32.482304+00:00",
+  "status": "PASS_HOST458_RECONCILED457_FULL_NUMERICAL_AND_DEVICE_COST_RECORDS",
+  "original_supervisor_status": "failed",
+  "original_failure": "auditor compared raw profile file SHA against Native canonical normalized-profile SHA",
+  "original_receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M80-own-geometry-root-v457-unfused-fullmodel-and120-cost-v1.json",
+  "original_receipt_sha256": "066d6b293d5f58b0471cb682a70c907760002312f8a8dbfb2dc0199941d4e072",
+  "original_receipt_not_rewritten": true,
+  "original_auditor": "/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457/audit457.py",
+  "original_auditor_sha256": "aae8653809219ce13cde799cb8298bd711ab04314e1a91fd862827fd629fcd9f",
+  "only_audit_delta": "compare the reported Native canonical profile digest with the independently normalized Native digest; every other old predicate retained",
+  "actual_Native_digest_proof": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT458_ACTUAL_NATIVE_ORIGINAL_PROFILE_DIGEST_HOST.json",
+  "actual_Native_digest_proof_sha256": "c01f0decfbaa7ebfceac7cd7d6a078ec219cd2334cce03e22148171a4e1a8b71",
+  "file_sha256": "ad9e0648810ed697679ee84b8bbc2939ea14bfb687d0215d27f403ad5526db1c",
+  "normalized_profile_sha256": "67feca4c924ce95b252812d2db606a65a43942c472c429a71d12e5270442deb7",
+  "source_members": 5172,
+  "source_freeze": "6046ff35cab90a252560b2be0bb757b3395174c8fa5b6e33a4225afbb0966228",
+  "source_archive": "e89132e0e60825586ce0bcd94bcf9fdb2f62ca92af45352de40c3541bfbd63d4",
+  "all3_eager_and_graph_math_exact": true,
+  "actual_whole_model_costs": {
+    "paired_max_rank_samples_ms": {
+      "control80": [
+        41.54127502441406,
+        41.416064453125,
+        41.4138671875,
+        41.419046020507814,
+        41.45073547363281,
+        41.45526123046875,
+        41.457846069335936,
+        41.42567749023438,
+        41.413934326171876
+      ],
+      "qualified80": [
+        40.282467651367185,
+        40.268505859375,
+        40.28514404296875,
+        40.280294799804686,
+        40.28232421875,
+        40.27525939941406,
+        40.28465576171875,
+        40.279196166992186,
+        40.276727294921876
+      ],
+      "current120": [
+        46.04701538085938,
+        46.04193115234375,
+        46.04365844726563,
+        46.05965881347656,
+        46.03177490234375,
+        46.054830932617186,
+        46.07456665039062,
+        46.050534057617185,
+        46.043731689453125
+      ]
+    },
+    "p50_ms": {
+      "control80": 41.42567749023438,
+      "qualified80": 40.280294799804686,
+      "current120": 46.04701538085938
+    },
+    "qualified80_over_unfused80_speedup": 1.0284353105190096,
+    "current120_over_qualified80_frame_speedup": 1.143164805762113,
+    "fully_occupied_request_rate80_over120": 0.7621098705080754
+  },
+  "cross_M120_observations": [
+    {
+      "scope": "same first16 request inputs; different physical M80 versus M120; observation only",
+      "hidden_exact": false,
+      "hidden_max_abs": 8.9375,
+      "greedy_equal": false,
+      "different_greedy_rows": [
+        16,
+        59
+      ],
+      "all128_query_KV_exact": false
+    },
+    {
+      "scope": "same first16 request inputs; different physical M80 versus M120; observation only",
+      "hidden_exact": false,
+      "hidden_max_abs": 8.9375,
+      "greedy_equal": false,
+      "different_greedy_rows": [
+        16,
+        59
+      ],
+      "all128_query_KV_exact": false
+    },
+    {
+      "scope": "same first16 request inputs; different physical M80 versus M120; observation only",
+      "hidden_exact": false,
+      "hidden_max_abs": 8.9375,
+      "greedy_equal": false,
+      "different_greedy_rows": [
+        16,
+        59
+      ],
+      "all128_query_KV_exact": false
+    }
+  ],
+  "all72_committed_prefixes_protected": true,
+  "all_model_parameter_SHA_unchanged": true,
+  "all4idle": true,
+  "owned_remaining": [],
+  "NPU_reexecuted": false,
+  "NN_permission_issued": false,
+  "whole_workload_AR_qualified": false,
+  "full463": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "Git_pushes": 0
+}

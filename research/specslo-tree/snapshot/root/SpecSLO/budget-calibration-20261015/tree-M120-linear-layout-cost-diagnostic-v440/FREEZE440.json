@@ -1,0 +1,30 @@
+{
+  "schema": "ROOT440.actual-layer0-local-linear-layout-and-pad-cost-diagnostic.v1",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/HOST440-check440_API_HOST.py.log": "21996614789ca719f7b735957f40a1d206d6065ea7d96493e543251d8c234950",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/HOST440_API_RESULT.json": "6db7758417e09bf8d422c2708e05a60fc81e3e3b764d4d2a2915ecb5f1cd2949",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/HOST440_CLEAN_STARTUP_RUN.json": "b18090a188b2ea009410b85ad8d1b3d2d988f22b8778324c4f692e5a476fd795",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/HOST440_CONSTRUCTION_INITIAL.json": "d005e79f4ca4d7a7a9569ceb1578a0c6cbdcc518c591446d3596fed8e40c05c4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/HOST440_CONSTRUCTION_RESULT.json": "428bb126e7718c3cc673632148dd926dea88b500a65f22aaecf86093b597eae6",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/PLAN440.json": "1f4d84e3d38ee4325f050c8714f426a445f4c3516c4fd5c6f00c04422293e0b8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/audit440.py": "ff5ce9774934c743d468c6493eac75af65c3a60fb69b75bab0b7109afa76f7ee",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/check440.py": "ba85b2c045a92ff328955038050ba579332cf95d48cbdc7afa64fe04caa8375b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/check440_API_HOST.py": "d51c0d4da5007b04c0812b2b60bc3be6b1dfcdf23e00cc09de6e96ac3ba9b31a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/check440_HOST.py": "1b7fbdca1a7367d9a9d6f3d6b2286b421befdc4ff259e99cb174ace832ff9288",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/guard440.py": "b1d7ccdc82423583bcff6acbd04df94776a0641e9bf85551b929c3d9d6fb67af",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/host_env440.py": "e5cbcd8c0dbe73d95cd3f24d3ff47e61cb4ba920f27904703dda64da596cc5e0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/linear440.py": "316f8f5cbdbc225ea096268fb45165a1dbf58e7c065e20dd36ab69f960d772c3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/probe440.py": "0c89180ec21b19f0e1cd86cf4b948c0aefe178bbda63189190b67d092ef2b0d8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/runtime440.py": "49af7a1dd3f5659fff9f0cd2f89676b67f456fe1391ec11ea7a459ccb78847ae",
+    "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/startup440.sh": "0dfc84fbaec67ca9c921f22d802ee6c3aac07e5400257918eadb787e9670a555",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/run_ROOT440_actual_CPU_API_HOST.py": "ac6116b7c9a1a857d95f70607e49b4f8346279814a19bc08c7f7af97f5a76720"
+  },
+  "parent385_freeze": "e62fc5f7740fa493906a7889a8af1baf2fd118696e8a271b5b5c493a7f892a1f",
+  "parent385_archive": "0f310f5d96ab4efabba1529dc70c40b3e33206c4e0aab8b204d113e2f3dfb64d",
+  "current438_freeze": "95460e17ad93cfe1aa521ceb200e8f2c7999c13176012e811cf2f5117d44bc40",
+  "current438_archive": "129ce5c270dd1d34fd2b7b79d6063f9c42aa5baedbfc8ce6d5944900be27800d",
+  "NPU_run": false,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null
+}

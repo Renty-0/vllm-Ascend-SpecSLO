@@ -1,0 +1,18 @@
+{
+  "status": "PASS_independent_genuine_branch_followup20_and_raw_copy_audit",
+  "tag": "genuine-branch-followup-root-v283-reject0-accept1to4-20-ownprefix-v1",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-genuine-branch-followup-root-v283-reject0-accept1to4-20-ownprefix-v1.json",
+  "receipt_sha256": "3ea8f17ab5cc0b7c8ace2cffa7210a1579b54f8a200565909c77995d1cd427a9",
+  "frozen_sources_and_archive_verified": true,
+  "original_environment_pre_post_verified": true,
+  "owned_cleanup_complete": true,
+  "all4_idle_at_terminal": true,
+  "actual_neural_controls": 20,
+  "all56KV_hidden_exact_top2_and_prefix_protection": true,
+  "raw65536payloads6replays": true,
+  "teacher_forced_controls_only": true,
+  "actual_target_g_measured": false,
+  "whole463_AR": false,
+  "Goodput": null,
+  "adopted": false
+}

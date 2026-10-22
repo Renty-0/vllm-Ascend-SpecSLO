@@ -1,0 +1,68 @@
+{
+  "UTC": "2026-10-22T13:19:49.034063+00:00",
+  "status": "PASS_HOST455_SOURCE_AND_WHOLE_MODEL_RECORD_AUDIT",
+  "source_members": 5025,
+  "freeze": "ad040025cafaf5d2f6b1e22d5a7952154cd9bab579b8bfa64896ff82c280809f",
+  "archive": "64a6236daac945c331ac9275cf12f4e382e88ff21f186bdc1c8821349ff974f5",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-M160-qualified-profile-root-v455-unfused-fullmodel-and120-cost-v1.json",
+  "receipt_sha256": "18cacccfb5fd9116b429f7c7cdf3633e1287143d0adb5f62c7181fb0c8566cd1",
+  "original_supervisor_status": "complete",
+  "all3_eager_and_graph_math_exact": true,
+  "actual_whole_model_costs": {
+    "paired_max_rank_samples_ms": {
+      "control160": [
+        60.89747924804688,
+        60.939727783203125,
+        60.9475341796875,
+        60.92384033203125,
+        60.947265625,
+        60.905078125,
+        60.92535400390625,
+        60.967645263671876,
+        60.944921875
+      ],
+      "qualified160": [
+        61.64005126953125,
+        61.5955078125,
+        61.61324462890625,
+        61.59519653320312,
+        61.598681640625,
+        61.6323486328125,
+        61.62235107421875,
+        61.61851806640625,
+        61.64137573242188
+      ],
+      "current120": [
+        46.16033935546875,
+        46.16080932617187,
+        46.14317932128906,
+        46.155975341796875,
+        46.15625915527344,
+        46.135955810546875,
+        46.13701171875,
+        46.162478637695315,
+        46.134866333007814
+      ]
+    },
+    "p50_ms": {
+      "control160": 60.939727783203125,
+      "qualified160": 61.61851806640625,
+      "current120": 46.155975341796875
+    },
+    "qualified160_over_unfused160_speedup": 0.9889839888315458,
+    "fully_occupied_request_rate160_over120": 0.9987468440803158
+  },
+  "scope": "actual_constructor_profile160_unfused_whole_model_and_current120_device_cost_only",
+  "ordinary_prompt_prefill_unchanged": true,
+  "model_parameters_SHA_unchanged": true,
+  "all72_committed_prefixes_protected": true,
+  "all4idle": true,
+  "owned_remaining": [],
+  "full463": false,
+  "whole_workload_AR_qualified": false,
+  "production_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "adopted": false,
+  "Git_pushes": 0
+}

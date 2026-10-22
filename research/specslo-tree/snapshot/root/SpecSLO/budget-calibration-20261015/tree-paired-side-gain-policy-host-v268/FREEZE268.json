@@ -1,0 +1,16 @@
+{
+  "status": "HOST_only_source_freeze_no_NPU_or_production_qualification",
+  "UTC": "2026-10-18T16:04:02.165278+00:00",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-side-gain-policy-host-v268/paired268.py": "dbe63702b06de3d42cfcb03d24bb18b764ea381399b04e02d4518d2acdcc596c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-side-gain-policy-host-v268/check268_HOST.py": "b563119ab693b43858041de4f2ca0692b812554531b223fdd824968c6ef5b0b5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-paired-side-gain-policy-host-v268/HOST268_RESULT.json": "466b6db3da7a2d854d816177748cdb83c8123fc6aea463f1e44714ea207007a5",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/check_original_B5_vs_B4_paired_verdict_HOST.py": "36491ef7c970d783e309edf8aef5184f677ba5ade9ff6c457f722a2708387cc2",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT_ORIGINAL_B5_B4_PAIRED_VERDICT_HOST_RESULT.json": "9937b6de7b96599f1d2fff5a319195f2dca1e1f5a4e7aadaa806eb3196815537",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/budget_policy.py": "1637090cb3c8f997be5ae36bce3e1ae840100cdb2e3407c67e5016b9e1cbd4f5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/tree-gain-model.json": "26640a1b13eddefda05ff1dd51782f6695abbba793d986508a9eaaa03398d7d8",
+    "/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust/vllm_ascend/spec_decode/pearl/native_engine.py": "05d47ed6dc48e368010ca145a0b859aaffe596f246e0b28eb7b07d2d51a50cc9"
+  },
+  "empirical_g_measured": false,
+  "Goodput": null
+}

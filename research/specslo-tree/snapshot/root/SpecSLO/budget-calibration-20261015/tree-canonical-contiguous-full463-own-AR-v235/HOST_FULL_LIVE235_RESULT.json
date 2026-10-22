@@ -1,0 +1,17 @@
+{
+  "status": "HOST_original_runtime_and_full_LIVE_generation_inverse_passed",
+  "runtime_changes": 11,
+  "generation": {
+    "original_source_sha256": "3563e547a9e49cdb00ce362c83965aa721bd329a0bb45a97edda32832db7a561",
+    "canonical_source_sha256": "26fbf59ed47bdc44bdd5f6386b39ea0466def2427532680b47ecc30eaf0eada4",
+    "effective_target_requests": 16,
+    "effective_verification_candidates": 64,
+    "real_query_bound": 80,
+    "constructor_configuration_unchanged": true,
+    "original_admission_and_sampling_clocks_unchanged": true,
+    "global_selected_draft_limit": 192,
+    "Native_qualification_flags_assigned": false
+  },
+  "NPU_used": false,
+  "runtime_installed": false
+}

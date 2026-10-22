@@ -1,0 +1,34 @@
+{
+  "status": "HOST_LIVE_paired_observe_generation_and_draft_merge_ABI_passed",
+  "actual_policy_cases": 132,
+  "terminal_excluded": true,
+  "original_actual_budget_observe_once": true,
+  "request_histograms_independently_checked": true,
+  "stale_generation_rejected": true,
+  "ABI": [
+    {
+      "N": 1,
+      "owners": 1,
+      "physical": 1,
+      "actual_extra_queries": 3,
+      "selected_B_preserved": true
+    },
+    {
+      "N": 8,
+      "owners": 3,
+      "physical": 4,
+      "actual_extra_queries": 12,
+      "selected_B_preserved": true
+    },
+    {
+      "N": 16,
+      "owners": 12,
+      "physical": 16,
+      "actual_extra_queries": 48,
+      "selected_B_preserved": true
+    }
+  ],
+  "NPU_used": false,
+  "empirical_g_measured": false,
+  "Goodput": null
+}

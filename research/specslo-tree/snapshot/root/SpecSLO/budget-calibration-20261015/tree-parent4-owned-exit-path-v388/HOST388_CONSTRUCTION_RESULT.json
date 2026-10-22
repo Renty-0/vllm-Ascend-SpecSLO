@@ -1,0 +1,10 @@
+{
+  "status": "PASS_HOST388_REAL_SPAWN_EXIT_IMPORT_AND_SUPERVISOR",
+  "NPU_used": false,
+  "actual_parent_and_spawn_exit_import": "/root/SpecSLO/budget-calibration-20261015/tree-contiguous-branch-tail-final-metadata-math-v234/shutdown234.py",
+  "model_constructed": false,
+  "source_gate_delta_only": true,
+  "models_qualified": false,
+  "Raw": null,
+  "Goodput": null
+}

@@ -1,0 +1,80 @@
+{
+  "status": "HOST_actual_Native_maps_and_all65536_raw_input_words_coverage_passed",
+  "map_count": 10,
+  "maps": [
+    {
+      "name": "p0-N1-B5",
+      "grid": 128,
+      "prefix_copies": 0,
+      "aliases": 2
+    },
+    {
+      "name": "p0-N1-B8",
+      "grid": 128,
+      "prefix_copies": 0,
+      "aliases": 5
+    },
+    {
+      "name": "p127-N1-B8",
+      "grid": 256,
+      "prefix_copies": 127,
+      "aliases": 5
+    },
+    {
+      "name": "p128-N1-B8",
+      "grid": 128,
+      "prefix_copies": 0,
+      "aliases": 5
+    },
+    {
+      "name": "p1505-N1-B8",
+      "grid": 128,
+      "prefix_copies": 97,
+      "aliases": 5
+    },
+    {
+      "name": "p2555-N1-B8",
+      "grid": 128,
+      "prefix_copies": 123,
+      "aliases": 5
+    },
+    {
+      "name": "p127-N12-B8,8,8,8,8,8,8,8,8,8,8,8",
+      "grid": 1792,
+      "prefix_copies": 1524,
+      "aliases": 60
+    },
+    {
+      "name": "p128-N16-B8,8,8,8,8,8,8,8,4,4,4,4,4,4,4,4",
+      "grid": 1024,
+      "prefix_copies": 889,
+      "aliases": 40
+    },
+    {
+      "name": "p127-N20-B5,5,5,5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+      "grid": 1024,
+      "prefix_copies": 508,
+      "aliases": 8
+    },
+    {
+      "name": "p2555-N23-B5,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
+      "grid": 128,
+      "prefix_copies": 123,
+      "aliases": 2
+    }
+  ],
+  "raw16_input_coverage": {
+    "256": 65536,
+    "384": 65536
+  },
+  "both_strided_and_contiguous_probe_declared": true,
+  "duplicate_padding_writers_have_identical_input_words": true,
+  "all_maps_within_captured_grid": true,
+  "NPU_used": false,
+  "kernel_compiled": false,
+  "models_loaded": false,
+  "Goodput": null,
+  "prefix_programs": 768,
+  "coreDim_limit": 65535,
+  "all_launch_grids_within_hardware_limit": true
+}

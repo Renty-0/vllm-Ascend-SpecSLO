@@ -1,0 +1,241 @@
+{
+  "UTC": "2026-10-22T21:25:36.203996+00:00",
+  "status": "HOST462_PREFILL_COST_PROSPECTIVE_VALIDATION_COMPLETE",
+  "model": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_PROSPECTIVE_PREFILL_COST_MODEL_HOST.json",
+  "original_model_SHA256": "f0d54b1e692f02d5b7ead5aec9ca2973cc98827254f5830698124771519ad8fc",
+  "analysis": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_V2_ACTUAL_PREFILL_PAUSE_COMPONENT_HOST.json",
+  "analysis_SHA256": "ff9c8bdc5e5468336bd405d71638eff75652842fd6a6f7ddf9ea031d019499cf",
+  "actual_trace_SHA256": "722f051fcf79ab5f7e4d2e1c0adf2766a5d764ead03e2f7e02ee3fbaf51dda3c",
+  "panels": [
+    {
+      "ordinal": 0,
+      "incumbents": 0,
+      "admitted": 1,
+      "prompt_queries": 86,
+      "actual_ms": 53.863804787397385,
+      "predicted_with_margin_ms": 47.35276764028735,
+      "underestimated": true,
+      "underestimate_ms": 6.511037147110038,
+      "actual_over_prediction": 1.1375006672592143
+    },
+    {
+      "ordinal": 1,
+      "incumbents": 1,
+      "admitted": 8,
+      "prompt_queries": 3930,
+      "actual_ms": 573.7235168926418,
+      "predicted_with_margin_ms": 630.7715456922841,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9095583350434252
+    },
+    {
+      "ordinal": 2,
+      "incumbents": 9,
+      "admitted": 8,
+      "prompt_queries": 4398,
+      "actual_ms": 637.6595222391188,
+      "predicted_with_margin_ms": 701.8017195029851,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9086035336173134
+    },
+    {
+      "ordinal": 3,
+      "incumbents": 16,
+      "admitted": 14,
+      "prompt_queries": 7674,
+      "actual_ms": 1119.273133110255,
+      "predicted_with_margin_ms": 1199.012936177892,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9334954605895875
+    },
+    {
+      "ordinal": 4,
+      "incumbents": 16,
+      "admitted": 24,
+      "prompt_queries": 8669,
+      "actual_ms": 1235.9834923408926,
+      "predicted_with_margin_ms": 1350.0279424634634,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9155243780254887
+    },
+    {
+      "ordinal": 5,
+      "incumbents": 16,
+      "admitted": 32,
+      "prompt_queries": 11434,
+      "actual_ms": 1624.4190428406,
+      "predicted_with_margin_ms": 1769.6827086741218,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9179154177630203
+    },
+    {
+      "ordinal": 6,
+      "incumbents": 15,
+      "admitted": 32,
+      "prompt_queries": 10694,
+      "actual_ms": 1518.8855309970677,
+      "predicted_with_margin_ms": 1657.3700406828425,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9164432164897112
+    },
+    {
+      "ordinal": 7,
+      "incumbents": 16,
+      "admitted": 32,
+      "prompt_queries": 7005,
+      "actual_ms": 986.7208949290216,
+      "predicted_with_margin_ms": 1097.4762133587487,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.8990818050709561
+    },
+    {
+      "ordinal": 8,
+      "incumbents": 16,
+      "admitted": 32,
+      "prompt_queries": 9152,
+      "actual_ms": 1302.081366069615,
+      "predicted_with_margin_ms": 1423.3347244091226,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9148103701398529
+    },
+    {
+      "ordinal": 9,
+      "incumbents": 16,
+      "admitted": 32,
+      "prompt_queries": 11245,
+      "actual_ms": 1593.6904749833047,
+      "predicted_with_margin_ms": 1740.9974461736465,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9153893237959124
+    },
+    {
+      "ordinal": 10,
+      "incumbents": 16,
+      "admitted": 32,
+      "prompt_queries": 8222,
+      "actual_ms": 1149.2885728366673,
+      "predicted_with_margin_ms": 1282.1850200417043,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.8963515833302167
+    },
+    {
+      "ordinal": 11,
+      "incumbents": 15,
+      "admitted": 32,
+      "prompt_queries": 12351,
+      "actual_ms": 1710.1606377400458,
+      "predicted_with_margin_ms": 1908.8593526579098,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.8959070951763971
+    },
+    {
+      "ordinal": 12,
+      "incumbents": 16,
+      "admitted": 32,
+      "prompt_queries": 12360,
+      "actual_ms": 1715.1921642944217,
+      "predicted_with_margin_ms": 1910.225317538885,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.8979004458512035
+    },
+    {
+      "ordinal": 13,
+      "incumbents": 16,
+      "admitted": 32,
+      "prompt_queries": 13445,
+      "actual_ms": 1950.4296551458538,
+      "predicted_with_margin_ms": 2074.8999726342067,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9400114130175005
+    },
+    {
+      "ordinal": 14,
+      "incumbents": 16,
+      "admitted": 32,
+      "prompt_queries": 6395,
+      "actual_ms": 933.7112940847874,
+      "predicted_with_margin_ms": 1004.8941492037753,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9291638276773833
+    },
+    {
+      "ordinal": 15,
+      "incumbents": 16,
+      "admitted": 32,
+      "prompt_queries": 22365,
+      "actual_ms": 3151.217164937407,
+      "predicted_with_margin_ms": 3428.722943556114,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9190643912654864
+    },
+    {
+      "ordinal": 16,
+      "incumbents": 19,
+      "admitted": 29,
+      "prompt_queries": 29915,
+      "actual_ms": 4313.967312686145,
+      "predicted_with_margin_ms": 4574.6157048184905,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.943022887833441
+    },
+    {
+      "ordinal": 17,
+      "incumbents": 31,
+      "admitted": 16,
+      "prompt_queries": 12737,
+      "actual_ms": 1865.0731383822858,
+      "predicted_with_margin_ms": 1967.4440686641717,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.947967552464456
+    },
+    {
+      "ordinal": 18,
+      "incumbents": 32,
+      "admitted": 11,
+      "prompt_queries": 11773,
+      "actual_ms": 1682.5909451581538,
+      "predicted_with_margin_ms": 1821.134052524181,
+      "underestimated": false,
+      "underestimate_ms": 0,
+      "actual_over_prediction": 0.9239248164219434
+    }
+  ],
+  "summaries": {
+    "all": {
+      "calls": 19,
+      "underestimated": 1,
+      "maximum_underestimate_ms": 6.511037147110038,
+      "median_actual_over_prediction": 0.9164432164897112,
+      "maximum_actual_over_prediction": 1.1375006672592143
+    },
+    "with_incumbents": {
+      "calls": 18,
+      "underestimated": 0,
+      "maximum_underestimate_ms": 0,
+      "median_actual_over_prediction": 0.9159837972575999,
+      "maximum_actual_over_prediction": 0.947967552464456
+    }
+  },
+  "model_refitted": false,
+  "NPU_used": false,
+  "serving_policy_installed": false,
+  "interpretation": "Report every underprediction. This evaluates a cost estimate on a subsequent run and does not prove a hard runtime bound or any alternative-policy Goodput.",
+  "reader_SHA256": "f6b449617f1540720a280c3f6d865f836458a949fdfb1b819be91c1b1b066665"
+}

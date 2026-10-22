@@ -1,0 +1,8 @@
+{
+  "status": "HOST_periodic_bounded_snapshot_and_state_preservation_passed",
+  "no_tensor_or_device_operations": true,
+  "actual_write_bytes": 381,
+  "every256_rows": true,
+  "atomic_replace": true,
+  "original_policy_counts_unchanged": true
+}
