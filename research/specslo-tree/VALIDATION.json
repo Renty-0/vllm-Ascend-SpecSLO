@@ -125,5 +125,82 @@
         "tree-active64-whole-proposal-segment-limit-v398/runtime398.py"
       ]
     }
+  },
+  "ROOT470_qualified_full_result": {
+    "status": "QUALIFIED_GLOBAL64_FULL463_SINGLE_RUN_CHECKPOINT",
+    "global_active_limit": 64,
+    "actual_active_peak": 49,
+    "physical_cards": [
+      0,
+      1,
+      2,
+      7
+    ],
+    "Raw": 647.0337820400514,
+    "Goodput": 521.2604766758946,
+    "attained": 373,
+    "requests": 463,
+    "attainment": 0.8056155507559395,
+    "by_class": {
+      "loose": {
+        "requests": 96,
+        "attained": 96,
+        "output_tokens": 24576,
+        "good_tokens": 24576,
+        "Raw": 134.15819238843397,
+        "Goodput": 134.15819238843397,
+        "TPOT_paper_median_ms": 55.06201888965734,
+        "TPOT_paper_P90_ms": 68.28261502778332,
+        "TPOT_observed_median_ms": 55.277948375499136,
+        "TPOT_observed_P90_ms": 68.55038998867659
+      },
+      "normal": {
+        "requests": 96,
+        "attained": 96,
+        "output_tokens": 24576,
+        "good_tokens": 24576,
+        "Raw": 134.15819238843397,
+        "Goodput": 134.15819238843397,
+        "TPOT_paper_median_ms": 34.12749422204797,
+        "TPOT_paper_P90_ms": 38.69073333044071,
+        "TPOT_observed_median_ms": 34.26132753272267,
+        "TPOT_observed_P90_ms": 38.84246169644244
+      },
+      "tight": {
+        "requests": 271,
+        "attained": 181,
+        "output_tokens": 69376,
+        "good_tokens": 46336,
+        "Raw": 378.71739726318344,
+        "Goodput": 252.94409189902657,
+        "TPOT_paper_median_ms": 37.80652086425107,
+        "TPOT_paper_P90_ms": 43.028715776017634,
+        "TPOT_observed_median_ms": 37.954781730385385,
+        "TPOT_observed_P90_ms": 43.19745583788437
+      }
+    },
+    "TPOT_paper_denominator": 256,
+    "TPOT_observed_denominator": 255,
+    "supplemental_observed_attained": 370,
+    "supplemental_observed_attainment": 0.7991360691144709,
+    "previous_saved_v462_Goodput": 460.8191,
+    "over_previous_saved_v462": 1.1311607454549835,
+    "fixed_gamma4_historical_Goodput": 501.63560407964184,
+    "over_historical_fixed_gamma4": 1.0391217697401258,
+    "official_MC2_historical_Goodput": 429.8442987424407,
+    "over_historical_official_MC2": 1.2126727705843778,
+    "required_Goodput": 644.766448113661,
+    "final_matched_runs": 0,
+    "performance_goal_achieved": false,
+    "exact_requests_each_target": 463,
+    "exact_tokens_each_target": 118528,
+    "target_ranks": 3,
+    "source_freeze_SHA256": "fb5de98a8cee36649ba528f790d36d873c6d32b8279d903e37e1d99e34c19387",
+    "source_archive_SHA256": "3e7fad4fcf852ef84a71393a208c63a1f4526300cffb8c0fc0e7c4a01b6439d3",
+    "source_closure_members": 5344,
+    "snapshot_has_NPU_qualification": false,
+    "models_datasets_raw_tensors_graph_caches_uploaded": false,
+    "format_ci": "Attempted bash format.sh ci: pre-commit is not installed; no environment or dependency installation performed. Snapshot hash and Python syntax verification required separately.",
+    "current_new_candidates_included": false
   }
 }

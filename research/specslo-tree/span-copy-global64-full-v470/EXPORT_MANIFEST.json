@@ -1,0 +1,17 @@
+{
+  "evidence/terminal-independent-audit.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT470_TERMINAL_FULL_AUDIT_HOST.json",
+    "sha256": "9a667ea9e3db14e8922fa004d59701ae757e7d0871df60bf2a568efccad3556e",
+    "uncompressed_sha256": "9a667ea9e3db14e8922fa004d59701ae757e7d0871df60bf2a568efccad3556e"
+  },
+  "evidence/common-publication-metrics.json": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT470_CLOSED_COMMON_READER_CHECK_HOST.json",
+    "sha256": "de0258d6c0b88d704e44ad8c5d6bc4ff0b621bb4688fa32791ea9340126d8965",
+    "uncompressed_sha256": "de0258d6c0b88d704e44ad8c5d6bc4ff0b621bb4688fa32791ea9340126d8965"
+  },
+  "evidence/terminal-supervisor-receipt.json.gz": {
+    "source": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-span-KV-copy-current-component0127-root-v470-full463-ownAR-v1.json",
+    "sha256": "dc223762424f57bcfad3c86bc84d78d271c993980a5621c6f04ef24ce2f4a1fc",
+    "uncompressed_sha256": "dea96586b6e9debbbaf4f27df63e7f66f4802bc9b2d6ea17cd8197dd14cb6917"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "status": "PASS_HOST_SPAN_COPY_MAPPING_AND_ORIGINAL_COUPLED_LIFECYCLE",
+  "full_snapshot_cases": 55,
+  "unsafe_mappings_rejected": [
+    "alias",
+    "duplicate",
+    "bounds",
+    "capacity"
+  ],
+  "actual_original_proof_and_timing_routed": true,
+  "old_copy_evidence_rejected": true,
+  "NPU_used": false,
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/audit_span.py": "f7d153d9d26d0941cd037a1d407458d494577b80a0b432a16c5eba396384761d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/probe_span.py": "38ace662e274d9b8fc7473732bec90497c24009078a8d8cf8ff2e231111e19bc",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/host_env_span.py": "dd71cf71ed9baee2428be999fa9d03ed06572fc91f0ada5296ac65885a1e3cd7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/freeze_span_HOST.py": "dd45a1c1becfcb7bbc984d8668ecfebf83c809a000741db38a62da3152867c3b",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/runtime_span.py": "47403a7411ed327d8cd22a4d979537ee9e1c6a3c1c5b51fe4a474f84001db700",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/check_span_HOST.py": "ccbebecfb2e5cc0aac9076411394c96a7db29b3b0f905600c1591649c5c078c3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/span_kernel.py": "dfae7e744d1aafdf53ee66da95728384072e961a05bf2001c2be0980d154fe18",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/guard_span.py": "73b7772ee42a0a33cff1e90c0560e1d9f6a8198cf0ce8e36384b6a31136a7809",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/span_fixture.py": "970ba829ce4a5ddb582a8aa2d36316654332106f58a0ed62dc155b238a6fc33a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/span_install.py": "61a913045e82fb39917ebfd4b7bb7867a759526b8875daddbf3327a15c57b6c0",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/check_span.py": "473402c42df1d77cf834a8809e7100b0d6c7e4dcef27459dc58da8e48880ebb7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next/spans.py": "fe417acf0a11878d923a737eef56d10a287ba8f34e1465bc41bcde8675f3786a"
+  }
+}

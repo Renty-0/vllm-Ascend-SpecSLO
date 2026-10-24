@@ -1,0 +1,51 @@
+{
+  "status": "PASS_HOST463_FULL_INTERFACE_AND_ADMISSION_AUDIT_CONTROLS",
+  "unchanged_numerical_callbacks": [
+    "prepare_install",
+    "install_entry",
+    "after_install",
+    "qualify_component",
+    "cache_snapshot",
+    "bucket_snapshot",
+    "metadata_snapshot",
+    "refill_snapshot",
+    "preflight_snapshot",
+    "postfull_AR",
+    "snapshot"
+  ],
+  "all_original_trace_code_objects_retained": true,
+  "complete_worker_main_source_inverse": true,
+  "actual_wait462_route_retained": true,
+  "rejected_controls": [
+    "missing_decision",
+    "predicted_cost",
+    "future",
+    "arrival_clock",
+    "credit",
+    "prompt_queries",
+    "nonprefix",
+    "global_limit",
+    "generation",
+    "model_hash"
+  ],
+  "prediction_underestimates_retained": true,
+  "synthetic_witnesses_only": true,
+  "NPU_used": false,
+  "NN_permission": false,
+  "full463": false,
+  "Raw": null,
+  "Goodput": null,
+  "sources": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/admission463.py": "0c3171c626e36651990715833be9eebc6d875716257e48322a143930e6c8ebc2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/audit463.py": "ef8c3d0d08637e5af5b3585928809c263fc351fb753292175ffa17cbd7400568",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/check463.py": "8ed3c0926ac6e2faf17c3884dcfb1a2e14242f8782f71acb1e69896dd0b88a32",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/check463_integration_HOST.py": "ba62e1a9cba3d96e60d5579e3539339ccd232b143b2ad4c3da202a7a6582bd08",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/check463_policy_HOST.py": "008d9f607b749f39ba1fbf982319cff3ffc223b09e1bd82052400f019b7940cf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/extension463.py": "f69f219cbf5a8b5e90a8d0d6e6c44967cd7cb6b4949b5132aa980c0ee7d8906d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/generation463.py": "59c5c614800e77dcd95496078c8387d2ce5c4c011365e8e1a37cef33f66cf2c4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/guard463.py": "d4e144ca19c97ea2d59b064f8c8f05b35035b41e6341e5ed2e13507fc5ddd031",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/runtime463.py": "4405a6b33b494b20f45e223b383a79c5279e8cac980c05d61785d65d96aa2723",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/trace463.py": "d39eec3c3375ac2cf6de888a0a6a3481cce6df969a712ec5655b9b8a069f35a8",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/witness463.py": "49844f4169b3013e9a3ce24af04e9a6fe38d933a16c6ee945f116a540564e2e2"
+  }
+}

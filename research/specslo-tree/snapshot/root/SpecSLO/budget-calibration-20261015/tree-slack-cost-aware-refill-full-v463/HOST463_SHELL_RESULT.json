@@ -1,0 +1,15 @@
+{
+  "status": "PASS_HOST463_EXACT_SHELL_ROUTING_INVERSE",
+  "entire_inverse": {
+    "startup": true,
+    "launch": true
+  },
+  "existing_CANN_Python_path_preserved": true,
+  "all_existing_environment_settings_unchanged": true,
+  "only_new_source_auth_variable": "SPECSLO_V463_ROOT_FREEZE_SHA",
+  "NPU_used": false,
+  "sources": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/startup463.sh": "afb53c5167a50e185adf11783db30679ac7acef078bbc56fc1f10454aa0e32ba",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/launch463.sh": "f91a214791de16d53306b888ea268571d4c5ea021e9f6a5b7556049e573b62b1"
+  }
+}

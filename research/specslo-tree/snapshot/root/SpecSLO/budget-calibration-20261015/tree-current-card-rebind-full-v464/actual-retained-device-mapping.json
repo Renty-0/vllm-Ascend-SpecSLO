@@ -1,0 +1,26 @@
+{
+  "devices": [
+    {
+      "user": 0,
+      "logical": 0,
+      "physical": 0
+    },
+    {
+      "user": 1,
+      "logical": 1,
+      "physical": 1
+    },
+    {
+      "user": 2,
+      "logical": 2,
+      "physical": 2
+    },
+    {
+      "user": 3,
+      "logical": 3,
+      "physical": 7
+    }
+  ],
+  "ACL_library": "/root/data/specslo-cann-runtime/cann-9.0.0/lib64/libascendcl.so",
+  "acl_set_device_called": false
+}

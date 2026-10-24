@@ -1,0 +1,24 @@
+{
+  "status": "PASS_HOST464_ONLY_DEVICE_CONTROL_REBIND",
+  "sources": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/PLAN464.json": "54c1e8092d37b65e5b68db44672edbee8825955820fc0314ecd940721bc6086d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/startup464.sh": "120051731440a33ea3753a440ae2cfe0c642d0abaace26361516fbdbf24fa5be",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/guard464.py": "daae0226ffb389d96f15e995809c8e82f36e6997b51713db6d3fca17b0b6bba3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/map464.py": "5c617b8cb818db4fafee86ac86c343942e484e60f3a1fa870cadeb27fb859215",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/actual-retained-device-mapping.json": "5cecaa261633fd52b72725bbc7844b7277bff56745010fb3fbb8fbb52f21a9ea",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/environment464.sh": "2540e90a6066d78a6afeca1f9e1dedf1bf320eb81914ff55b3f3d0172c2c8ae5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/check464.py": "db6e1222b8be5667e9fbdd8bff258def73898cd69a312386be1334d73f066fca",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/check_HOST464.py": "99234512f5ba62211b5b9f0b07d85e346b226c8d367ac510f79949da68f98f30",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/launch464.sh": "ae4341d4a1c9b57ad449f0ae91784c151272ac1c80f556afb2d6787968c9a88e"
+  },
+  "original463_runtime_source_SHA256": "99d657802e17d2ce9ed0b6714ef5697f074ab4c799991d92bbe597f04f0dc6d0",
+  "supervisor_executable_bytecode_identical": true,
+  "original463_actual_audit_same_object": true,
+  "original_ownership_cleanup_bytecode_identical": true,
+  "all_original_scope_checks_retained": true,
+  "complete_shell_inverse": true,
+  "negative_controls": 2,
+  "model_imported": false,
+  "NPU_model_used": false,
+  "NN_permission": false
+}

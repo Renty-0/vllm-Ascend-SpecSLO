@@ -1,0 +1,40 @@
+{
+  "status": "INTERRUPTED_PROCESS_ABSENT_AFTER_CONTAINER_RESTART_NO_PERFORMANCE",
+  "UTC": "2026-10-23T07:37:18.325148+00:00",
+  "original_receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-credit-cost-aware-refill-global64-root-v463-full463-ownAR-v1.json",
+  "original_receipt_sha256": "fffa1ab883f036d3d40a41fb59838f5ea846fa245d2f3f96cbb0b45ade732f3e",
+  "original_receipt_status": "running",
+  "original_receipt_not_rewritten": true,
+  "original_child_pid": 1226921,
+  "original_child_absent": true,
+  "old_session_handle_missing": true,
+  "current_pid1": "    PID     ELAPSED COMMAND\n      1       07:23 ./coder agent\n",
+  "current_physical_cards": [
+    0,
+    1,
+    2,
+    7
+  ],
+  "previous_physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "current_npu_smi": "+------------------------------------------------------------------------------------------------------------------+\n| npu-smi 26.0.rc1                            Version: 26.0.rc1                                                    |\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU   Name                | Health        | Power(W)             Temp(C)                 Hugepages-Usage(page)   |\n| Chip                      | Bus-Id        | AICore(%)            Memory-Usage(MB)        HBM-Usage(MB)           |\n+===========================+===============+======================================================================+\n| 0     910B2               | OK            | 90.0                 43                      0    / 0                |\n| 0                         | 0000:C1:00.0  | 0                    0    / 0                3433 / 65536            |\n+===========================+===============+======================================================================+\n| 1     910B2               | OK            | 101.2                42                      0    / 0                |\n| 0                         | 0000:01:00.0  | 0                    0    / 0                3437 / 65536            |\n+===========================+===============+======================================================================+\n| 2     910B2               | OK            | 95.7                 41                      0    / 0                |\n| 0                         | 0000:C2:00.0  | 0                    0    / 0                3421 / 65536            |\n+===========================+===============+======================================================================+\n| 7     910B2               | OK            | 99.2                 41                      0    / 0                |\n| 0                         | 0000:42:00.0  | 0                    0    / 0                3424 / 65536            |\n+===========================+===============+======================================================================+\n+---------------------------+---------------+----------------------------------------------------------------------+\n| NPU     Chip              | Process id    | Process name       | Process memory(MB)    | Process id in container |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 0                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 1                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 2                                                                              |\n+===========================+===============+======================================================================+\n| No running processes found in NPU 7                                                                              |\n+===========================+===============+======================================================================+\n",
+  "current_devices_idle": true,
+  "source_members_revalidated": 5265,
+  "original_frozen_source_unchanged": true,
+  "last_heartbeat_UTC": "2026-10-22T22:39:34.067613+00:00",
+  "original227_case_records": [
+    114,
+    114,
+    114
+  ],
+  "completed_record_exists": false,
+  "full_trace_files": 0,
+  "Raw": null,
+  "Goodput": null,
+  "NN_permission": false,
+  "restart_requires_full_fresh_qualification": true
+}

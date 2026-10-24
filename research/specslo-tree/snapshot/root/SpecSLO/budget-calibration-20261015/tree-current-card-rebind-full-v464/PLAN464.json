@@ -1,0 +1,49 @@
+{
+  "schema": "ROOT464.current-device-rebind-plan.v1",
+  "UTC": "2026-10-23T07:40:07.728686+00:00",
+  "algorithm_source463": "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463",
+  "algorithm_source_freeze": "d27c7eb676ad7268ad7911c455e86177b3691b7e8b21cc4c28799c5f04de19a5",
+  "change": "Only physical-card mapping and retained-environment verifier launcher for the restarted container; exact463 model/runtime/algorithm source reused.",
+  "previous_physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "physical_cards": [
+    0,
+    1,
+    2,
+    7
+  ],
+  "global_active_limit": 64,
+  "original_fresh_gates": [
+    "startup_components",
+    "canonical227",
+    "uniform681",
+    "adaptive693",
+    "lifecycle75",
+    "incumbent6",
+    "warm",
+    "two_zero",
+    "seal",
+    "full463",
+    "all3_independent_own_AR",
+    "source_environment_before_after",
+    "owned_cleanup"
+  ],
+  "same463_models_BF16_request_arrivals_SLO": true,
+  "NN_permission_inherited": false,
+  "Raw": null,
+  "Goodput": null,
+  "goal_Goodput_floor": 644.766448113661,
+  "SLO_required_minimum": 371,
+  "requests": 463,
+  "final_matched_runs_required_on_current_cards": 9,
+  "prior_other_cards_not_matched_repeats": true,
+  "storage": {
+    "tag_MiB": 256,
+    "aggregate_MiB": 3584,
+    "public_only_models_datasets": true
+  }
+}

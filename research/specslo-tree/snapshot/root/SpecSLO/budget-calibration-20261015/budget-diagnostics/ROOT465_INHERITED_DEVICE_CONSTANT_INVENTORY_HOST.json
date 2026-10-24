@@ -1,0 +1,190 @@
+{
+  "source_members": 5279,
+  "occurrences": [
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/v154-root-execution/supervise_v154.py",
+      "line": 102,
+      "text": "  errors=[],readiness=readiness,child=None,physical_cards=[2,5,6,7],"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/serial-v1/map-current.py",
+      "line": 24,
+      "text": "    assert rows == [{'user': i, 'logical': i, 'physical': x} for i, x in enumerate([2, 5, 6, 7])], rows"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-deferred-FULL-mask-host-projection-v259/guard259.py",
+      "line": 50,
+      "text": "        physical_cards=[2,5,6,7],models_loaded=False,neural_qualified=False,Goodput=None,errors=[])"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-deferred-FULL-mask-host-projection-v259/guard259.py",
+      "line": 54,
+      "text": "    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h);h.PHYSICAL=(2,5,6,7)"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/guard262.py",
+      "line": 50,
+      "text": "        physical_cards=[2,5,6,7],models_loaded=False,neural_qualified=False,Goodput=None,errors=[])"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262/guard262.py",
+      "line": 54,
+      "text": "    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h);h.PHYSICAL=(2,5,6,7)"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-fused-byte-branch-KV-copy-v263/guard263.py",
+      "line": 50,
+      "text": "        physical_cards=[2,5,6,7],models_loaded=False,neural_qualified=False,Goodput=None,errors=[])"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-fused-byte-branch-KV-copy-v263/guard263.py",
+      "line": 54,
+      "text": "    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h);h.PHYSICAL=(2,5,6,7)"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/actor_v146.py",
+      "line": 71,
+      "text": "  actual_source_origins=s('source-origins',assert_origins),physical_cards=[2,5,6,7],physical_rank_card=[2,5,6,7][engine.rank])"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148/actor_v146.py",
+      "line": 80,
+      "text": "  require(os.environ.get('SPECSLO_VISIBLE_DEVICES')=='2,5,6,7' and os.environ.get('ASCEND_RT_VISIBLE_DEVICES')=='0,1,2,3'"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-large-mixed-prompt-local-v147/supervise_v147.py",
+      "line": 14,
+      "text": " module.PHYSICAL=(2,5,6,7);return module"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-large-mixed-prompt-local-v147/supervise_v147.py",
+      "line": 44,
+      "text": "  tag=args.tag,action=ACTION,errors=[],readiness=readiness,physical_cards=[2,5,6,7],"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-native-rank3-KV-copy-cost-v265/guard265.py",
+      "line": 50,
+      "text": "        physical_cards=[2,5,6,7],models_loaded=False,neural_qualified=False,Goodput=None,errors=[])"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-native-rank3-KV-copy-cost-v265/guard265.py",
+      "line": 54,
+      "text": "    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h);h.PHYSICAL=(2,5,6,7)"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-packed-FULL-host-vector-metadata-v258/guard258.py",
+      "line": 50,
+      "text": "        physical_cards=[2,5,6,7],models_loaded=False,neural_qualified=False,Goodput=None,errors=[])"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-packed-FULL-host-vector-metadata-v258/guard258.py",
+      "line": 54,
+      "text": "    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h);h.PHYSICAL=(2,5,6,7)"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-prefix-grid-byte-KV-copy-v278/guard278.py",
+      "line": 50,
+      "text": "        physical_cards=[2,5,6,7],models_loaded=False,neural_qualified=False,Goodput=None,errors=[])"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-prefix-grid-byte-KV-copy-v278/guard278.py",
+      "line": 54,
+      "text": "    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h);h.PHYSICAL=(2,5,6,7)"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-safe-grid-span-dual-cache-probe-v295/guard295.py",
+      "line": 50,
+      "text": "        physical_cards=[2,5,6,7],models_loaded=False,neural_qualified=False,Goodput=None,errors=[])"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-safe-grid-span-dual-cache-probe-v295/guard295.py",
+      "line": 54,
+      "text": "    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h);h.PHYSICAL=(2,5,6,7)"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/guard247.py",
+      "line": 49,
+      "text": "        physical_cards=[2,5,6,7],models_loaded=False,neural_qualified=False,Goodput=None,errors=[])"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247/guard247.py",
+      "line": 53,
+      "text": "    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h);h.PHYSICAL=(2,5,6,7)"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-tiled-byte-branch-KV-copy-v275/guard275.py",
+      "line": 50,
+      "text": "        physical_cards=[2,5,6,7],models_loaded=False,neural_qualified=False,Goodput=None,errors=[])"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-tiled-byte-branch-KV-copy-v275/guard275.py",
+      "line": 54,
+      "text": "    h=importlib.util.module_from_spec(spec);spec.loader.exec_module(h);h.PHYSICAL=(2,5,6,7)"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-Q5-bucket-completion-and-paired-mode-cost-v361/check_runtime361_HOST.py",
+      "line": 36,
+      "text": "    assert 'map-current.py 2,5,6,7' in startup"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/audit440.py",
+      "line": 10,
+      "text": "        if r['rank']!=rank or r['TP_world_size']!=3 or r['physical_cards']!=[2,5,6,7]or r['production_permission']is not False or r['Native_flags_assigned']is not False or r['Raw']is not None or r['Goodput']is not None:raise RuntimeError('ROOT440 actual scope, no production qualification')"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440/linear440.py",
+      "line": 68,
+      "text": "        TP_world_size=3,roles=results,physical_cards=[2,5,6,7],"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/check_HOST464.py",
+      "line": 28,
+      "text": "        ('enumerate([2, 5, 6, 7])', 'enumerate([0, 1, 2, 7])'),"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/check_HOST464.py",
+      "line": 31,
+      "text": "        ('${SPECSLO_VISIBLE_DEVICES:-2,5,6,7}', '${SPECSLO_VISIBLE_DEVICES:-0,1,2,7}'),"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/check_HOST464.py",
+      "line": 43,
+      "text": "        (str(B / 'serial-v1/map-current.py') + ' 2,5,6,7', str(P / 'map464.py') + ' 0,1,2,7'),"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/check_HOST464.py",
+      "line": 54,
+      "text": "        ((2, 5, 6, 7), (0, 1, 2, 7)),"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/check_HOST464.py",
+      "line": 69,
+      "text": "    assert old_helpers['helper']().PHYSICAL == (2, 5, 6, 7)"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/check_HOST464.py",
+      "line": 71,
+      "text": "    for changes in [(('absent-control', 0),), (((2, 5, 6, 7), (0, 1, 2, 7)), ((2, 5, 6, 7), (0, 1, 2, 7)))]:"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/freeze464_HOST.py",
+      "line": 50,
+      "text": "        physical_cards=[0, 1, 2, 7], previous_physical_cards=[2, 5, 6, 7],"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/guard464.py",
+      "line": 82,
+      "text": "        if value.PHYSICAL != (2, 5, 6, 7):"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/guard464.py",
+      "line": 105,
+      "text": "        ((2, 5, 6, 7), PHYSICAL),"
+    },
+    {
+      "path": "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/guard464.py",
+      "line": 107,
+      "text": "    ns['SCOPE'].update(current_physical_cards=list(PHYSICAL), previous_physical_cards=[2, 5, 6, 7],"
+    }
+  ]
+}

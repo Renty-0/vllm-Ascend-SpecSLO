@@ -1,0 +1,7 @@
+{
+  "freeze_sha256": "dd2c7d8d77913036e1210c3ff1b7f8defec1a39be0fff979ab15633ad8135c68",
+  "archive_sha256": "96100e756189905a16715d85bed7b19dbbb50fd4d8254334a2e856ee250220c6",
+  "own_members": 128,
+  "NPU_launched": false,
+  "NN_permission": false
+}

@@ -1,0 +1,56 @@
+{
+  "UTC": "2026-10-24T02:53:09.462068+00:00",
+  "status": "complete_original_supervisor_and_three_independent_AR",
+  "tag": "span-KV-copy-current-component0127-root-v470-full463-ownAR-v1",
+  "receipt": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/receipt-span-KV-copy-current-component0127-root-v470-full463-ownAR-v1.json",
+  "receipt_sha256": "dea96586b6e9debbbaf4f27df63e7f66f4802bc9b2d6ea17cd8197dd14cb6917",
+  "sources_unchanged": true,
+  "devices_after_all_idle": true,
+  "original_supervisor_audit_passed": true,
+  "AR": [
+    {
+      "rank": 1,
+      "requests": 463,
+      "equal_requests": 463,
+      "mismatches": 0,
+      "summary": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/span-KV-copy-current-component0127-root-v470-full463-ownAR-v1/postfull-independent-FIA-AR/rank1-summary.json",
+      "sha256": "729c714f82ad1c836eac1f4f100722c40dc7cb9e5e21231060b3a5816de7ff2a"
+    },
+    {
+      "rank": 2,
+      "requests": 463,
+      "equal_requests": 463,
+      "mismatches": 0,
+      "summary": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/span-KV-copy-current-component0127-root-v470-full463-ownAR-v1/postfull-independent-FIA-AR/rank2-summary.json",
+      "sha256": "f7a57cfd26950ac66ced26d6fd89b3e40896bf42c20744059bd7c2acd8114cc9"
+    },
+    {
+      "rank": 3,
+      "requests": 463,
+      "equal_requests": 463,
+      "mismatches": 0,
+      "summary": "/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209/actual/span-KV-copy-current-component0127-root-v470-full463-ownAR-v1/postfull-independent-FIA-AR/rank3-summary.json",
+      "sha256": "fe5bf0728f361aa1fcff96f176bcea6d552247801f96793266a2abeda77095dc"
+    }
+  ],
+  "Raw": 647.0337820400514,
+  "Goodput": 521.2604766758946,
+  "attained": 373,
+  "requests": 463,
+  "attainment": 0.8056155507559395,
+  "global_active_limit": 64,
+  "actual_active_peak": 49,
+  "physical_cards": [
+    0,
+    1,
+    2,
+    7
+  ],
+  "fixed_gamma4_historical_floor": 501.63560407964184,
+  "official_MC2_strong_floor": 429.8442987424407,
+  "required_Goodput": 644.766448113661,
+  "final_matched_runs": 0,
+  "goal_complete": false,
+  "no_Git_push": true,
+  "performance_conclusion": "Single full run; lower Raw/Goodput than same-architecture466 diagnostic, no positive performance adoption"
+}

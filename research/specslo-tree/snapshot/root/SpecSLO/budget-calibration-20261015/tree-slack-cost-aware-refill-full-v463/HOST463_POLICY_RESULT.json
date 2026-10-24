@@ -1,0 +1,35 @@
+{
+  "status": "PASS_HOST463_CREDIT_COST_PREFIX_POLICY_AND_WHOLE_LIVE_PROJECTION",
+  "closed_form_cases": 5760,
+  "rejected_controls": [
+    "future",
+    "duplicate",
+    "nonfinite_elapsed",
+    "no_delivered_root",
+    "wrong_generation",
+    "HOST_cannot_supply_same_model_NN_permission"
+  ],
+  "whole_LIVE_AST_inverse": true,
+  "original_arrival_prefill_broadcast_clocks_unchanged": true,
+  "selector_precedes_home_cache_or_pending_mutations": true,
+  "preserves_original_priority_prefix": true,
+  "constrained_cohort_maximum": 32,
+  "global64_reachable_for_sufficient_loose_credit": true,
+  "fixed_model": {
+    "path": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT462_PROSPECTIVE_PREFILL_COST_MODEL_HOST.json",
+    "SHA256": "f0d54b1e692f02d5b7ead5aec9ca2973cc98827254f5830698124771519ad8fc",
+    "NN_permission": false
+  },
+  "model_imports": 0,
+  "NPU_used": false,
+  "NN_permission": false,
+  "full463": false,
+  "Raw": null,
+  "Goodput": null,
+  "sources": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/admission463.py": "0c3171c626e36651990715833be9eebc6d875716257e48322a143930e6c8ebc2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/generation463.py": "59c5c614800e77dcd95496078c8387d2ce5c4c011365e8e1a37cef33f66cf2c4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/witness463.py": "49844f4169b3013e9a3ce24af04e9a6fe38d933a16c6ee945f116a540564e2e2",
+    "/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463/check463_policy_HOST.py": "008d9f607b749f39ba1fbf982319cff3ffc223b09e1bd82052400f019b7940cf"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "ROOT465.current-inner-device-binding.v1",
+  "physical_cards": [
+    0,
+    1,
+    2,
+    7
+  ],
+  "global_active_limit": 64,
+  "algorithm": "original463 credit-cost-aware refill",
+  "numerical_callbacks": "original460",
+  "original_component_math_unchanged": true,
+  "only_changes": [
+    "actor physical metadata",
+    "actor required physical visibility",
+    "private qualifier source routing",
+    "source ownership"
+  ],
+  "all_original_gates_required": true,
+  "NN_permission": false
+}

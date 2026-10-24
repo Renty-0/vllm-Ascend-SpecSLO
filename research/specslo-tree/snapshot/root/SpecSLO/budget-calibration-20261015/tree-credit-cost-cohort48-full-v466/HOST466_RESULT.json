@@ -1,0 +1,57 @@
+{
+  "UTC": "2026-10-23T13:18:35.657638+00:00",
+  "status": "PASS_HOST466_COHORT48_GLOBAL64_AND_ACTUAL_TERMINAL_INTERFACES",
+  "independent_policy_cases": 1000,
+  "actual_witness_audits_and_negative_controls": 282,
+  "actual_terminal_interfaces": {
+    "actual_audit_import": "audit466",
+    "actual_audit_signature": "(directory, windows)",
+    "actual_main_audit_call": "audit(output, windows)",
+    "signature_error": null,
+    "actual_completed_fields": [
+      "action",
+      "replies",
+      "audit",
+      "qualification_rpc_wait",
+      "formal_Goodput",
+      "adopted"
+    ],
+    "actual_guard_reader_completed_reads": [
+      "completed.json"
+    ],
+    "synthetic_guard_reader_error": null,
+    "both_interfaces_pass": true,
+    "synthetic_data_not_runtime_or_neural_evidence": true
+  },
+  "complete_worker_source_inverse": true,
+  "original_clocks_preserved": true,
+  "original_numerical_callbacks_identical": true,
+  "global_active_limit": 64,
+  "maximum_new_cohort": 48,
+  "physical_cards": [
+    0,
+    1,
+    2,
+    7
+  ],
+  "maximum_empty_cohort": 48,
+  "maximum_nonempty_cohort": 32,
+  "actual_LIVE_vacancy_expression_cases": 2145,
+  "NPU_used": false,
+  "NN_permission": false,
+  "performance_result": null,
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/generation466.py": "fe9d75bd1c73c241b42685c70a14debf0cf06ee3c2d7202d666c4ed2bdecd4ad",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/startup466.sh": "4b49a9a1f21110164c1f220cfaaee0f62497f83557daa6230e80db788eadae89",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/extension466.py": "4570140a74514adacff4c1fb591fdeb845fe8ee656cc400a0ae297e833392afe",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/freeze466_HOST.py": "d7b0091101b8d3c32902b7cb79f779d9227a4f0338953a4bbb634671f3e5f6c7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/runtime466.py": "10cb2c6af9592651868776a0bc7753ef514aa87657ad6428170552c89c75d43c",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/guard466.py": "f5828889fb56da86265be61e8f29fcdc33b1ccf6984e402159a4fababe181769",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/audit466.py": "93e875768b7943137d45ee7d098ab6f9aadab49a1d07084796c3b7fa7a644e39",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/trace466.py": "af2afc14e13a43680fd7271e566787669cebb12fff8ba977e0f351381b6684c7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/check466.py": "3eb98fd4a5624611d7302eb3c93a78ae52738ff4aa4b37811aec8b4a46e1c193",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/admission466.py": "aca0d286a3504ead7e27577116bd64bc2a352ada3133be9b65515ba8488d5bab",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/launch466.sh": "dabc25e1b8757b45ea710b2c788764480514911bcffe92c008765c8f3f769b95",
+    "/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466/check_HOST466.py": "3c57fab79a2d83331b108972a825d7b9625ee93a96ee98a2407da0c8eaff7bf7"
+  }
+}

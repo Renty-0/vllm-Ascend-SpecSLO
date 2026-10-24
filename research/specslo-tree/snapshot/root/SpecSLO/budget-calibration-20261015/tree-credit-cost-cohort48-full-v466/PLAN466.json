@@ -1,0 +1,45 @@
+{
+  "UTC": "2026-10-23T11:09:18.556348+00:00",
+  "status": "HOST_PREPARED_NOT_FROZEN_NOT_LAUNCHED",
+  "hypothesis": "Larger empty-active cohorts may improve actual batch occupancy and Raw. Nonempty prompt interruptions retain the previous32-request bound.",
+  "only_algorithm_change": "Empty-active new-arrival cohort cap32 to48; original nonempty cap32, all incumbent credit/cost limits and global active64 remain.",
+  "global_active_limit": 64,
+  "maximum_new_cohort": 48,
+  "physical_cards": [
+    0,
+    1,
+    2,
+    7
+  ],
+  "original463_workload_arrivals_SLOs_and_clocks_unchanged": true,
+  "original_dynamic_B1_to5_and_target_M80_M120_unchanged": true,
+  "terminal_interfaces_corrected": [
+    "main audit(directory,windows) and parent window forwarding",
+    "guard completed.audit field"
+  ],
+  "selection_condition": "Decide after full465 real publication, Raw/Goodput, own-AR results; no automatic launch. Keep target-barrier optimization separate.",
+  "risks": [
+    "Larger prefill can interrupt incumbent requests for longer.",
+    "Fixed cost fit may underestimate larger cohorts; retain all actual underestimates.",
+    "48 is a cohort cap, not the global batch ceiling and not a promise of actual occupancy."
+  ],
+  "required": "Fresh full original465 numerical lifecycle,463-request full serving,all3 own AR,unaltered source,owned cleanup and real terminal receipt.",
+  "NPU_launched": false,
+  "NN_permission": false,
+  "Raw": null,
+  "Goodput": null,
+  "maximum_empty_cohort": 48,
+  "maximum_nonempty_cohort": 32,
+  "empty_ceiling_opportunity_gate_HOST": {
+    "evidence": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT465_RETAINED462_EMPTY_COHORT_CAP_OPPORTUNITY_HOST.json",
+    "historical462_empty_cohorts": [
+      1
+    ],
+    "full_NPU_run_justified_by_history": false,
+    "require_new465_opportunity_before_launch": true,
+    "current465_evidence": "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT465_FULL_EMPTY_COHORT_CAP_OPPORTUNITY_HOST.json",
+    "current465_empty32_saturated_calls": 9,
+    "full_NPU_run_justified_by_current465_opportunity": true,
+    "terminal_cleanup_still_required": true
+  }
+}

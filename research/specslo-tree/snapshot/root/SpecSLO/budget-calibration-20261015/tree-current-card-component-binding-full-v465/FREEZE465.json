@@ -1,0 +1,38 @@
+{
+  "schema": "ROOT465.current-card-source.v1",
+  "UTC": "2026-10-23T08:13:26.878372+00:00",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT464_CURRENT_CARDS_RETAINED_ENV_VERIFIER.log": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT464_TERMINAL_DEVICE_ASSERTION_FAILURE_HOST.json": "c8eb00e65ccd89e104386044a8134f67340abf5fa370214878d74b05d0ea07ac",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT465_INHERITED_DEVICE_CONSTANT_INVENTORY_HOST.json": "fb2c61e8be78712768940b2280041fb3a33aaae936232f367e9881b342035195",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/HOST465_RESULT.json": "0fed3b37978e9c403ca810975999a7674c59944bc2485bfb1478750a10e81e5a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/PLAN465.json": "002216fc2fcab8acf8946f29282651874f9b028e084dcce258158491a49cf939",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/base_component465.py": "9b19ba1d8f15a442e1eb4bdac284bebccf1b3fcb5d7f2547c80580e1ddd8aa10",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/check465.py": "c14e91834a46948383b24a486ca4aca9a2338c31461f17f9090dbd3f1ab0a664",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/check_HOST465.py": "5bb5bd79fecdf0fc812a9428eebbc9661b78656708343f5c4424b5f386636b37",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/extension465.py": "da705ec8e2c5344900b0ecc45748e9e31c7a2dd64f99d4e546daf011dcaa00ad",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/freeze465_HOST.py": "79dc53f1207f46f739af352cabb42bef348d6c956fafd0d9a0ee0f608258174f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/guard465.py": "9768bc9180d04697819242b5ec869a62c61f07245d71005714696fc0055b0ba7",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/launch465.sh": "85a696e9a99b1584b7c78703178f15459010e81cd40755a974cd0d954016edce",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/runtime465.py": "bdd2605035a8e942cd5353e857c92a019aeba37e09da5e378c60979249334f74",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465/startup465.sh": "4506dd3566fb491cfab1a31ec48d17d014a36ba76ba2d056a4b9b676310f4fea"
+  },
+  "parent464_freeze": "aadc2090b2cb5ffc22243ab19fdbc007481b79a08c7b5c1b806867e3835c12b1",
+  "parent464_archive": "c1e891ef13827d0439f0f56728612b25e0ea00ff194bed87d386026b6a004ae3",
+  "physical_cards": [
+    0,
+    1,
+    2,
+    7
+  ],
+  "previous_physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "global_active_limit": 64,
+  "original463_algorithm_unchanged": true,
+  "NN_permission_inherited": false,
+  "every_original_and_additional_gate_required": true
+}

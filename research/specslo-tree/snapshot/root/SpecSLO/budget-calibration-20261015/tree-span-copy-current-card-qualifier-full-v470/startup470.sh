@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+set -euo pipefail
+task_root=/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209
+if [[ $# -ne 4 || $1 != --action || $3 != --tag ||
+      $2 != causal80-N9-to15-allB4-empty-active32-full463 ||
+      ! $4 =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+  echo 'invalid local diagnostic action/tag' >&2; exit 2
+fi
+action=$2
+tag=$4
+frozen=/root/data/specslo-baselines/nano-pearl-ascend-v1
+repo=$frozen/source/vllm-ascend-hust
+vendor=$frozen/runtime/mc2-vendor
+python=/root/miniconda3/envs/vllm-hust-dev/bin/python
+export PYTHONDONTWRITEBYTECODE=1
+export TRITON_CACHE_DIR=/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326/triton-cache
+"$python" -B "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/check470.py"
+"$python" -B "$task_root/check209.py"
+export PYTHONPATH=/root/SpecSLO/budget-calibration-20261015/tree-branch-KV-span-copy-HOST-next:/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470:/root/SpecSLO/budget-calibration-20261015/tree-credit-cost-cohort48-full-v466:/root/SpecSLO/budget-calibration-20261015/tree-current-card-component-binding-full-v465:/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464:/root/SpecSLO/budget-calibration-20261015/tree-slack-cost-aware-refill-full-v463:/root/SpecSLO/budget-calibration-20261015/tree-adaptive-qualified-wait-margin-full-v462:/root/SpecSLO/budget-calibration-20261015/tree-adaptive-retained-CANN-path-full-v461:/root/SpecSLO/budget-calibration-20261015/tree-adaptive-own-history-full-v460:/root/SpecSLO/budget-calibration-20261015/tree-observed-normal-history-audit-host-v439:/root/SpecSLO/budget-calibration-20261015/tree-adaptive-own-geometry-node-math-v459:/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378:/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377:/root/SpecSLO/budget-calibration-20261015/tree-M80-own-geometry-whole-model-v457:/root/SpecSLO/budget-calibration-20261015/tree-M160-qualified-profile-whole-model-v455:/root/SpecSLO/budget-calibration-20261015/tree-M160-real32-inmemory-MC2-qualification-v454:/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-action-routing-v453:/root/SpecSLO/budget-calibration-20261015/tree-M120-native-prefill-equivalence-v451:/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-config-v450:/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-scope-v449:/root/SpecSLO/budget-calibration-20261015/tree-M120-single-graph-prefill-isolation-v448:/root/SpecSLO/budget-calibration-20261015/tree-M120-paired-memory-prefill-math-diagnostic-v447:/root/SpecSLO/budget-calibration-20261015/tree-M120-initial-and-bulk-prefill-math-diagnostic-v446:/root/SpecSLO/budget-calibration-20261015/tree-M120-owned-padding-prefill-math-diagnostic-v445:/root/SpecSLO/budget-calibration-20261015/tree-M120-padding-prefill-math-diagnostic-v444:/root/SpecSLO/budget-calibration-20261015/tree-M120-whole-target-gateup-layout-diagnostic-v441:/root/SpecSLO/budget-calibration-20261015/tree-M120-linear-layout-cost-diagnostic-v440:/root/SpecSLO/budget-calibration-20261015/tree-slo-aware-refill-complete-interface-full-v438:/root/SpecSLO/budget-calibration-20261015/tree-refill-witness-boolean-retention-full-v437:/root/SpecSLO/budget-calibration-20261015/tree-nonempty-qualified-RPC-full-v436:/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-current-model-full-v434:/root/SpecSLO/budget-calibration-20261015/tree-nonempty-current-incumbent-full-proposal-v432:/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-current-proof-host-v431:/root/SpecSLO/budget-calibration-20261015/tree-nonempty-refill-accounting-witness-host-v429:/root/SpecSLO/budget-calibration-20261015/tree-nonempty-prefill-incumbent-KV-protocol-host-v427:/root/SpecSLO/budget-calibration-20261015/tree-nonempty-wholeprompt-refill-resource-host-v426:/root/SpecSLO/budget-calibration-20261015/tree-parent4-preflight-component-lifetime-v433:/root/SpecSLO/budget-calibration-20261015/tree-parent4-prestartup-commit-binding-v430:/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-state-metadata-binding-v428:/root/SpecSLO/budget-calibration-20261015/tree-parent4-canonical-tail-observer-binding-v425:/root/SpecSLO/budget-calibration-20261015/tree-normal24-derived-callback-repair-v405:/root/SpecSLO/budget-calibration-20261015/tree-parent4-normal24-SLO-mixed-protocol-v419:/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-import-repair-v395:/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-full463-own-AR-v256:/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-full463-own-AR-v251:/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M128-projection-host-v249:/root/SpecSLO/budget-calibration-20261015/tree-static-q5-immutable-index-cache-host-v247:/root/SpecSLO/budget-calibration-20261015/tree-static-q5-long-prefix-origins-node-math-v246:/root/SpecSLO/budget-calibration-20261015/tree-static-q5-projection-host-v243:/root/SpecSLO/budget-calibration-20261015/tree-canonical-contiguous-full463-own-AR-v235:/root/SpecSLO/budget-calibration-20261015/tree-parent4-frontier-observer-before-capture-host-v392:/root/SpecSLO/budget-calibration-20261015/tree-parent4-current-M120-target-protocol-v391:/root/SpecSLO/budget-calibration-20261015/tree-parent4-best376-target-binding-host-v390:/root/SpecSLO/budget-calibration-20261015/tree-parent4-owned-exit-path-v388:/root/SpecSLO/budget-calibration-20261015/tree-contiguous-branch-tail-final-metadata-math-v234:/root/SpecSLO/budget-calibration-20261015/tree-parent4-child4-original-bounded-v386:/root/SpecSLO/budget-calibration-20261015/tree-bounded-parent4-shared4-eager-diagnostic-v199:/root/SpecSLO/budget-calibration-20261015/tree-real-M120-deferred-chain-profile-v385:/root/SpecSLO/budget-calibration-20261015/tree-hybrid-native-method-dedent-v384:/root/SpecSLO/budget-calibration-20261015/tree-M80-attention-GEMM120-target-v382:/root/SpecSLO/budget-calibration-20261015/tree-GEMM120-original-annotation-flags-v381:/root/SpecSLO/budget-calibration-20261015/tree-M80-original-GEMM120-controls-v380:/root/SpecSLO/budget-calibration-20261015/tree-adaptive80-first-layer-divergence-v379:/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-math-cost-v378:/root/SpecSLO/budget-calibration-20261015/tree-adaptive-M80-M120-target-host-v377:/root/SpecSLO/budget-calibration-20261015/tree-best257-uniform-KV-buckets-full-v376:/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-SLO-first-full463-own-AR-v257:/root/SpecSLO/budget-calibration-20261015/tree-Q5-bucket-completion-and-paired-mode-cost-v361:/root/SpecSLO/budget-calibration-20261015/tree-single-prepare-target-math-cost-v311:/root/SpecSLO/budget-calibration-20261015/tree-Q5-bucket-causal-inner1-target-math-cost-v341:/root/SpecSLO/budget-calibration-20261015/tree-Q4-closure-aware-host-builder-adapter-v339:/root/SpecSLO/budget-calibration-20261015/tree-Q5-uniform-KV-bucket-branch-math-cost-v344:/root/SpecSLO/budget-calibration-20261015/tree-Q4-actual-host-builder-adapter-v338:/root/SpecSLO/budget-calibration-20261015/tree-Q4-original-output-root-adapter-v337:/root/SpecSLO/budget-calibration-20261015/tree-Q4-linear-target-math-cost-v336:/root/SpecSLO/budget-calibration-20261015/tree-M160-S32-N32-target-math-cost-v326:/root/SpecSLO/budget-calibration-20261015/tree-M165-raw-reference-api-v318:/root/SpecSLO/budget-calibration-20261015/tree-M165-N32-independent-target-math-cost-v317:/root/SpecSLO/budget-calibration-20261015/tree-M165-single-prepare-host-v313:/root/SpecSLO/budget-calibration-20261015/tree-uniform-q5-M165-S33-C128-host-v285:/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-prepare-host-v305:/root/SpecSLO/budget-calibration-20261015/tree-single-validated-prefix-descriptors-host-v304:/root/SpecSLO/budget-calibration-20261015/tree-concrete-device-span-dual-cache-target-cost-v296:/root/SpecSLO/budget-calibration-20261015/tree-contiguous-prefix-span-copy-host-v292:/root/SpecSLO/budget-calibration-20261015/tree-prefix-precopy-dual-cachewrite-host-v288:/root/SpecSLO/budget-calibration-20261015/tree-prefix-grid-byte-KV-copy-v278:/root/SpecSLO/budget-calibration-20261015/tree-alternate-chain-target-host-v269:/root/SpecSLO/budget-calibration-20261015/tree-fused-byte-branch-KV-copy-v263:/root/SpecSLO/budget-calibration-20261015/tree-fused-branch-KV-row-copy-v262:/root/SpecSLO/budget-calibration-20261015/tree-static-q5-M120-node-math-v255:/root/SpecSLO/budget-calibration-20261015/tree-packed-KV-preflight-rank-aware-own-AR-full-v218:/root/SpecSLO/budget-calibration-20261015/tree-causal80-small-cohort-role-aware-audit-full-v209:/root/SpecSLO/budget-calibration-20261015/tree-active-window32-16-local-v160:/root/SpecSLO/budget-calibration-20261015/tree-high-normal-cap4-native-families-v148:/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-ascend-hust:/root/data/specslo-baselines/nano-pearl-ascend-v1/source/vllm-hust::/root/SpecSLO/budget-calibration-20261015/tree-parent4-selective-paid-allocation-host-v420:/root/SpecSLO/budget-calibration-20261015/tree-parent4-ready-source-binding-host-v421:/root/SpecSLO/budget-calibration-20261015/tree-parent4-lightweight-policy-probe-host-v422:${PYTHONPATH:-}
+export ASCEND_RT_VISIBLE_DEVICES
+ASCEND_RT_VISIBLE_DEVICES=$("$python" -B /root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/map464.py 0,1,2,7)
+export TASK_QUEUE_ENABLE=1 HCCL_OP_EXPANSION_MODE=AIV HCCL_DETERMINISTIC=true
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
+export PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+export ASCEND_CUSTOM_OPP_PATH=$vendor:$repo/vllm_ascend/_cann_ops_custom/vendors/custom_transformer
+export LD_LIBRARY_PATH=$vendor/op_api/lib:$repo/vllm_ascend:$repo/vllm_ascend/lib64:$repo/build/temp.linux-aarch64-cpython-311:${LD_LIBRARY_PATH:-}
+export VLLM_ASCEND_PEARL_DRAFT_NZ_MODE=-1
+export VLLM_ASCEND_PEARL_TARGET_NZ_MODE=14 VLLM_ASCEND_PEARL_TARGET_LARGE_M_NZ_MIN_ROWS=161
+export VLLM_ASCEND_PEARL_TARGET_REPLICATE_INPUT_EMBEDDING=0
+export VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE=1
+export VLLM_ASCEND_PEARL_DRAFT_STEP_MAJOR_PA_TASK_UPDATE=0
+export VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS=2
+export VLLM_ASCEND_PEARL_DRAFT_PA_CONTIGUOUS_PARTITION=0
+export VLLM_ASCEND_PEARL_DRAFT_GRAPH_UPDATE_STREAM_PRIORITY=0
+export VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE=1
+export VLLM_ASCEND_PEARL_TARGET_FIA_TASK_EVENT_GROUP_SIZE=1
+export VLLM_ASCEND_PEARL_TARGET_FIA_TASK_PREFIX_EVENT_GROUP_SIZE=0
+export VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS=2
+export VLLM_ASCEND_PEARL_TARGET_GRAPH_UPDATE_STREAM_PRIORITY=0
+export VLLM_ASCEND_PEARL_SHARED_GRAPH_POOL=1 VLLM_ASCEND_PEARL_MC2_DOWN_PROJ=1
+export VLLM_ASCEND_SPECRHYTHM_TREE_GRAPH=1
+export VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION=1 VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST=0
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_PREFILL=1 VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH=0
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PREFILL_ONLY=0
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_MAX_TOKENS=645
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_BUCKETS=64,128,192,256,320,384,448,512
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_VERIFY_CAPACITIES=8,16,24,32
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PROMPT_CAPACITY=4
+export VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_MAX_CAPACITY=32
+export VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_REQUEST_BUCKET=1
+export VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION=1 VLLM_ASCEND_SPECRHYTHM_GLOO_ACCOUNTING=1
+export VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL=1 VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_HOST_CONTINUATION=1
+export VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO=1 VLLM_ASCEND_SPECRHYTHM_DRAIN_PADDING_REPAIR=1
+export VLLM_ASCEND_SPECRHYTHM_LINEAR_ACCEPTANCE_ONLY=1
+export VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_TARGET_SUBMIT=1
+export VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT=0
+export VLLM_ASCEND_SPECRHYTHM_MIXED_DRAFT_PREFILL=0 VLLM_ASCEND_SPECRHYTHM_OVERLAP_DRAFT_PREFILL=0
+export VLLM_ASCEND_SPECRHYTHM_PREFETCH_AHEAD=0
+export VLLM_ASCEND_SPECSLO_DRAFT_DEVICE_PAGED_ATTENTION=0
+unset VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE
+unset VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE
+unset VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS
+unset VLLM_ASCEND_PEARL_NPU_PROFILE_DIR VLLM_ASCEND_PEARL_NPU_PROFILE_RANK
+unset VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY
+cd "$task_root"
+exec "$python" -B -u "$repo/examples/run_with_vllm_ascend_extension.py" \
+  --extension "$repo/vllm_ascend/vllm_ascend_C.cpython-311-aarch64-linux-gnu.so" \
+  --required-op allreduce_add_rmsnorm_chained \
+  "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/runtime470.py" --action "$action" --tag "$tag"

@@ -1,0 +1,37 @@
+{
+  "schema": "ROOT464.current-card-source.v1",
+  "UTC": "2026-10-23T07:41:47.035094+00:00",
+  "files": {
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT463_INTERRUPTED_RESTART_20261023_HOST.json": "a5c299cea026ee51c9127b4d4904026324605b42f27e0845eb94af943b9e521e",
+    "/root/SpecSLO/budget-calibration-20261015/budget-diagnostics/ROOT464_CURRENT_CARDS_RETAINED_ENV_VERIFIER.log": "03bc04b5e19adebe26e50d1b0780ad5cb06a5393ab1d9eda3f52a7e296e1689a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/HOST464_RESULT.json": "24e2bd6935ca34eb661be27336be9ac1fc25f2826b221831c4028fd8e19ee1cf",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/PLAN464.json": "54c1e8092d37b65e5b68db44672edbee8825955820fc0314ecd940721bc6086d",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/actual-retained-device-mapping.json": "5cecaa261633fd52b72725bbc7844b7277bff56745010fb3fbb8fbb52f21a9ea",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/check464.py": "db6e1222b8be5667e9fbdd8bff258def73898cd69a312386be1334d73f066fca",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/check_HOST464.py": "99234512f5ba62211b5b9f0b07d85e346b226c8d367ac510f79949da68f98f30",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/environment464.sh": "2540e90a6066d78a6afeca1f9e1dedf1bf320eb81914ff55b3f3d0172c2c8ae5",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/freeze464_HOST.py": "eda1ab51d95b6e69ebe3fdea2e8e49c83fb266de91a541ca5f4ae54d6c71afb1",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/guard464.py": "daae0226ffb389d96f15e995809c8e82f36e6997b51713db6d3fca17b0b6bba3",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/launch464.sh": "ae4341d4a1c9b57ad449f0ae91784c151272ac1c80f556afb2d6787968c9a88e",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/map464.py": "5c617b8cb818db4fafee86ac86c343942e484e60f3a1fa870cadeb27fb859215",
+    "/root/SpecSLO/budget-calibration-20261015/tree-current-card-rebind-full-v464/startup464.sh": "120051731440a33ea3753a440ae2cfe0c642d0abaace26361516fbdbf24fa5be"
+  },
+  "parent463_freeze": "d27c7eb676ad7268ad7911c455e86177b3691b7e8b21cc4c28799c5f04de19a5",
+  "parent463_archive": "e312cdeaf16066b101b565e67e0a1258eb4cfa6683632af6d279527f741a630c",
+  "physical_cards": [
+    0,
+    1,
+    2,
+    7
+  ],
+  "previous_physical_cards": [
+    2,
+    5,
+    6,
+    7
+  ],
+  "global_active_limit": 64,
+  "original463_algorithm_unchanged": true,
+  "NN_permission_inherited": false,
+  "every_original_and_additional_gate_required": true
+}

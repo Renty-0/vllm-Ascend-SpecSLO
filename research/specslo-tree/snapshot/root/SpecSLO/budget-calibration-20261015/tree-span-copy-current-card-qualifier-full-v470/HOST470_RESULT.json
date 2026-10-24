@@ -1,0 +1,42 @@
+{
+  "status": "PASS_HOST470_ORIGINAL_QUALIFIERS_AND_DEEPEST_TERMINAL_ABI",
+  "UTC": "2026-10-23T21:45:43.164318+00:00",
+  "terminal_interfaces": {
+    "actual_deepest_current_import_called": true,
+    "original_three_tuple_retained": true,
+    "real466_slot_cache_AR_reports_read": true,
+    "current470_payload_HOST_fixture_only": true,
+    "negative_cases": 9
+  },
+  "actual_current_card_actor": {
+    "positive": 4,
+    "negative": 20,
+    "actual_compiled_actor": true,
+    "complete_source_inverse": true
+  },
+  "unchanged_original_227_681_693_and_AR": true,
+  "original_LIVE_and_clocks_unchanged": true,
+  "fresh_copy_install_before_node_math": true,
+  "NPU_used": false,
+  "NN_permission": false,
+  "global_active_limit": 64,
+  "physical_cards": [
+    0,
+    1,
+    2,
+    7
+  ],
+  "source_sha256": {
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/check470.py": "459573624bb103c06197546e90977ffcf8729a1b3c621793ecc0d8f758724c97",
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/freeze470_HOST.py": "a017dfc09d14413e56eae383024f237c77c522346438955f0073cbe77b18dc8f",
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/audit470.py": "5f700a464995d72fb0c2393a6378dada412e9dc65f68229eb1a82c65aa41570a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/install470.py": "c6c2d277b78d5b27e396cf7f7844e77dcfbaff564dd7ebfb02780b42ed0a4e5a",
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/extension470.py": "08700abdc2093fca401b09947ef93644bc4c59fa7728a126f2813bf9c05d6caa",
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/launch470.sh": "d11fd190a649607e417eed2c029b14ab6b80b7041216e756fd858872708baa62",
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/actor_check.py": "c3dec076e240863c15f877fbf9dc86e84c3c1fc9d8e70b5548faa1d0165c3e06",
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/guard470.py": "ca0d433b97b4a3202ad6a22effae6e1c42fa17601e7a97bb133f3f0011264cb4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/check_HOST470.py": "40d9c3011daf08e4659c9dcf81bc2ad39059e3a0400868112c8838bfa71c4921",
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/runtime470.py": "d5da3d1d83a9766814843f3d7c2696f3956491910807baba447cef23377f9ea4",
+    "/root/SpecSLO/budget-calibration-20261015/tree-span-copy-current-card-qualifier-full-v470/startup470.sh": "2112a78fef5d9e6a8ca041b052749b52f1b32483b352e63210054f5634da8d76"
+  }
+}
