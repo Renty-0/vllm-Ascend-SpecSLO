@@ -1,0 +1,69 @@
+{
+  "status": "pass",
+  "mode": "auto",
+  "errors": [],
+  "scope": "Workload, arrival offsets, graph/MC2 predicates and original named mechanism counters. Does not establish whole-workload cross-mode token equality or rolling-only causal attribution.",
+  "result": "/root/SpecSLO/specslo-b64-kv640-coarse-20261113/results/runs/candidate-on-loose-tight10-kv640-coarse4-b64-r2/result.json",
+  "result_sha256": "da971dad85903c8f2bdd27c932ead38da08cf43aa291d7bd4c048257be8e4f3c",
+  "raw": 751.8904747802709,
+  "paper_goodput": 641.461636151635,
+  "attained_requests": 395,
+  "max_prescribed_arrival_offset_error_seconds": 1.2778188818174385e-07,
+  "arrival_comparison_origin": "First prescribed request arrival; original native result offsets use that origin",
+  "output_token_hash": "a9e38062122bc464a78983725c36667965f9c3c87ffd0e793a511ff703d58c64",
+  "protocol": [
+    {
+      "rank": 0,
+      "worker_spec_rhythm_serial_protocol": 0,
+      "worker_spec_rhythm_single_batch_overlap_protocol": 0,
+      "worker_spec_rhythm_dual_batch_overlap_protocol": 1,
+      "worker_spec_rhythm_eager_enabled": 1,
+      "worker_spec_rhythm_effective_eager_cap": 4,
+      "worker_spec_rhythm_priority_enabled": 1,
+      "submission_cycles": 2726,
+      "eager_proposals": 21033,
+      "eager_promoted": 9209,
+      "eager_invalidated": 11824
+    },
+    {
+      "rank": 1,
+      "worker_spec_rhythm_serial_protocol": 0,
+      "worker_spec_rhythm_single_batch_overlap_protocol": 0,
+      "worker_spec_rhythm_dual_batch_overlap_protocol": 1,
+      "worker_spec_rhythm_eager_enabled": 1,
+      "worker_spec_rhythm_effective_eager_cap": 4,
+      "worker_spec_rhythm_priority_enabled": 1,
+      "submission_cycles": 2726,
+      "eager_proposals": 21033,
+      "eager_promoted": 9209,
+      "eager_invalidated": 11824
+    },
+    {
+      "rank": 2,
+      "worker_spec_rhythm_serial_protocol": 0,
+      "worker_spec_rhythm_single_batch_overlap_protocol": 0,
+      "worker_spec_rhythm_dual_batch_overlap_protocol": 1,
+      "worker_spec_rhythm_eager_enabled": 1,
+      "worker_spec_rhythm_effective_eager_cap": 4,
+      "worker_spec_rhythm_priority_enabled": 1,
+      "submission_cycles": 2726,
+      "eager_proposals": 21033,
+      "eager_promoted": 9209,
+      "eager_invalidated": 11824
+    },
+    {
+      "rank": 3,
+      "worker_spec_rhythm_serial_protocol": 0,
+      "worker_spec_rhythm_single_batch_overlap_protocol": 0,
+      "worker_spec_rhythm_dual_batch_overlap_protocol": 1,
+      "worker_spec_rhythm_eager_enabled": 1,
+      "worker_spec_rhythm_effective_eager_cap": 4,
+      "worker_spec_rhythm_priority_enabled": 1,
+      "submission_cycles": 2726,
+      "eager_proposals": 21033,
+      "eager_promoted": 9209,
+      "eager_invalidated": 11824
+    }
+  ],
+  "confound": "Historical main production auto mode retains merged homes, cross-bucket rolling and idle residual eager; allocator expandable_segments:True is recorded separately from frozen v1."
+}

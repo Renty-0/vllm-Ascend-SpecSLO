@@ -1,0 +1,1354 @@
+diff --git a/csrc/build_aclnn.sh b/csrc/build_aclnn.sh
+index 70f6afd4..c048e516 100755
+--- a/csrc/build_aclnn.sh
++++ b/csrc/build_aclnn.sh
+@@ -102,6 +102,7 @@ elif [[ "$SOC_VERSION" =~ ^ascend910b ]]; then
+         "lightning_indexer"
+         "sparse_flash_attention"
+         "matmul_allreduce_add_rmsnorm"
++        "allreduce_add_rmsnorm"
+         "moe_init_routing_custom"
+         "moe_gating_top_k"
+         "moe_gating_top_k_hash"
+diff --git a/csrc/cmake/func.cmake b/csrc/cmake/func.cmake
+index 0cff0e37..35bea553 100644
+--- a/csrc/cmake/func.cmake
++++ b/csrc/cmake/func.cmake
+@@ -479,6 +479,7 @@ function(add_bin_compile_target)
+     endforeach()
+ 
+     set(_ops_target_list)
++    set(_ops_build_flags)
+     set(compile_scripts)
+     file(GLOB scripts_list ${GEN_OUT_DIR}/*.sh)
+     list(APPEND compile_scripts ${scripts_list})
+@@ -617,6 +618,7 @@ function(add_bin_compile_target)
+         if (_compile_flag)
+             set(_BUILD_COMMAND)
+             set(_BUILD_FLAG ${GEN_OUT_DIR}/${OP_TARGET_NAME}_${op_index}.done)
++            list(APPEND _ops_build_flags ${_BUILD_FLAG})
+             if (ENABLE_OPS_HOST OR ENABLE_HOST_TILING)
+                 list(APPEND _BUILD_COMMAND export ASCEND_CUSTOM_OPP_PATH=${CUSTOM_DIR} &&)
+             endif ()
+@@ -657,6 +659,7 @@ function(add_bin_compile_target)
+ 
+         add_custom_command(OUTPUT ${BINARY_INFO_CONFIG_FILE}
+                 COMMAND ${HI_PYTHON} ${ASCENDC_CMAKE_UTIL_DIR}/ascendc_ops_config.py -p ${BIN_OUT_DIR} -s ${BINARY_COMPUTE_UNIT}
++                DEPENDS ${_ops_build_flags} ${ASCENDC_CMAKE_UTIL_DIR}/ascendc_ops_config.py
+         )
+ 
+         add_custom_target(${OPS_CONFIG_TARGET}
+diff --git a/examples/benchmark_nano_pearl_speculative.py b/examples/benchmark_nano_pearl_speculative.py
+index 3649e21e..997383b9 100644
+--- a/examples/benchmark_nano_pearl_speculative.py
++++ b/examples/benchmark_nano_pearl_speculative.py
+@@ -820,6 +820,10 @@ def main(argv: Sequence[str] | None = None) -> None:
+                 else:
+                     engine.bench_generate(args.num_pearl_steps)
+                 warmup_runs_executed += 1
++                print(
++                    f"Graph qualification replay {warmup_runs_executed}/{warmup_run_limit} complete",
++                    flush=True,
++                )
+                 if args.require_no_graph_fallback and warmup_runs_executed >= minimum_warmup_runs:
+                     qualification_deltas = _worker_aclgraph_deltas(
+                         graph_metrics_before_warmup,
+diff --git a/examples/check_specslo_fia_ancestor_reference.py b/examples/check_specslo_fia_ancestor_reference.py
+index 76676b66..e2790477 100644
+--- a/examples/check_specslo_fia_ancestor_reference.py
++++ b/examples/check_specslo_fia_ancestor_reference.py
+@@ -124,14 +124,17 @@ def oracle_metadata(specs, block_tables, block_size, max_model_len, *, device="c
+     envelope = torch.ones((len(specs), 1, max(mask.shape[0] for mask in masks), max_model_len), dtype=torch.bool)
+     for request, mask in enumerate(masks):
+         envelope[request, 0, : mask.shape[0]] = mask
++    # NPU FULL-tree FIA consumes request-major page tables and the 4-D mask.
++    # Its dense CPU reference retains token-major tables and the 2-D mask.
++    npu_fia = torch.device(device).type == "npu"
+     metadata = NativeAttentionMetadata(
+         slot_mapping=torch.tensor(slots, dtype=torch.int32, device=device),
+         context_lens=torch.tensor(contexts, dtype=torch.int32),
+-        block_tables=torch.tensor(token_tables, dtype=torch.int32, device=device),
++        block_tables=torch.tensor(request_tables if npu_fia else token_tables, dtype=torch.int32, device=device),
+         actual_seq_lengths_q=tuple(cumulative),
+         sequence_lens=tuple(sequence_lengths),
+         request_block_tables=torch.tensor(request_tables, dtype=torch.int32, device=device),
+-        attention_mask=torch.cat(masks).to(device),
++        attention_mask=None if npu_fia else torch.cat(masks).to(device),
+         tree_attention_mask=envelope.to(device),
+         use_fused_infer_attention=True,
+         tree_attention=True,
+@@ -310,8 +313,15 @@ def _run_case(engine, args, layout, filler, prefix_cases=None):
+     from examples.check_specslo_tree_numerics import _logit_report
+ 
+     specs, production, oracle = _scenario(engine, args, layout, filler, prefix_cases)
++
++    def metadata_tensor_equal(key):
++        actual, reference = getattr(production[2], key), getattr(oracle[2], key)
++        if actual is None or reference is None:
++            return actual is reference
++        return torch.equal(actual, reference)
++
+     metadata_equal = all(
+-        torch.equal(getattr(production[2], key), getattr(oracle[2], key))
++        metadata_tensor_equal(key)
+         for key in (
+             "slot_mapping",
+             "context_lens",
+diff --git a/tests/ut/device_allocator/test_cpu_binding.py b/tests/ut/device_allocator/test_cpu_binding.py
+index 952b4314..21f5a6cf 100644
+--- a/tests/ut/device_allocator/test_cpu_binding.py
++++ b/tests/ut/device_allocator/test_cpu_binding.py
+@@ -221,6 +221,7 @@ class TestDeviceInfo(unittest.TestCase):
+     @patch("vllm_ascend.cpu_binding.execute_command")
+     def test_parse_topo_affinity_skips_affinity_header_and_non_npu_rows(self, mock_execute_command):
+         device_info = object.__new__(DeviceInfo)
++        device_info.npu_map_info = {"0": {"0": "0"}}
+         mock_execute_command.return_value = (
+             "HEADER\nNPU Chip Affinity\nnot-an-npu row\nNPU0 x x x 2-3",
+             0,
+@@ -228,6 +229,28 @@ class TestDeviceInfo(unittest.TestCase):
+ 
+         self.assertEqual(device_info.parse_topo_affinity(), {0: [2, 3]})
+ 
++    @patch("vllm_ascend.cpu_binding.execute_command")
++    def test_parse_topo_affinity_maps_disjoint_physical_ids_to_container_ids(self, mock_execute_command):
++        device_info = object.__new__(DeviceInfo)
++        device_info.npu_map_info = {
++            "0": {"0": "0"},
++            "3": {"0": "1"},
++            "4": {"0": "2"},
++            "7": {"0": "3"},
++        }
++        mock_execute_command.return_value = (
++            "NPU0 X HCCS HCCS HCCS 144-145\n"
++            "NPU3 HCCS X HCCS HCCS 0-1\n"
++            "NPU4 HCCS HCCS X HCCS 96-97\n"
++            "NPU7 HCCS HCCS HCCS X 48-49\n"
++            "NPU9 NA NA NA NA 24-25\n",
++            0,
++        )
++        self.assertEqual(
++            device_info.parse_topo_affinity(),
++            {0: [144, 145], 1: [0, 1], 2: [96, 97], 3: [48, 49]},
++        )
++
+     @patch("vllm_ascend.cpu_binding.execute_command")
+     def test_parse_topo_affinity_skips_topo_matrix_without_cpu_affinity(self, mock_execute_command):
+         device_info = object.__new__(DeviceInfo)
+diff --git a/tests/ut/spec_decode/test_mixed_width_layout.py b/tests/ut/spec_decode/test_mixed_width_layout.py
+new file mode 100644
+index 00000000..3cc8dfde
+--- /dev/null
++++ b/tests/ut/spec_decode/test_mixed_width_layout.py
+@@ -0,0 +1,56 @@
++"""Causal KV routing checks for selective target-verification envelopes."""
++
++import pytest
++import torch
++
++from vllm_ascend.spec_decode.pearl.mixed_width_layout import (
++    plan_selective_verify_layout,
++    route_selective_verify_envelope,
++)
++from vllm_ascend.spec_decode.pearl.mixed_width_ops import pack_selective_target_queries
++
++
++def test_mixed_width_rows_and_padding_have_disjoint_causal_slots():
++    layout = plan_selective_verify_layout((4, 2, 4), capacities=(4,), token_buckets=(16,))
++    envelope = route_selective_verify_envelope(
++        layout,
++        (10, 11, 12),
++        (100, 250, 400),
++        scratch_sequence_id=99,
++    )
++    assert layout.real_query_tokens == 10
++    assert layout.query_lengths == (4, 2, 4, 1, 5)
++    assert envelope.token_sequence_ids[:10] == (10,) * 4 + (11,) * 2 + (12,) * 4
++    assert envelope.positions[:10] == (100, 101, 102, 103, 250, 251, 400, 401, 402, 403)
++    assert envelope.token_sequence_ids[10:] == (99,) * 6
++    assert envelope.positions[10:] == tuple(range(6))
++    assert len(set(zip(envelope.token_sequence_ids, envelope.positions))) == layout.token_bucket
++
++
++def test_same_graph_shape_can_route_different_width_patterns_without_aliasing():
++    first = plan_selective_verify_layout((4, 2, 4), capacities=(4,), token_buckets=(16,))
++    second = plan_selective_verify_layout((2, 4, 4), capacities=(4,), token_buckets=(16,))
++    assert first.graph_key == second.graph_key
++    assert first.query_lengths != second.query_lengths
++    for layout in (first, second):
++        envelope = route_selective_verify_envelope(layout, (1, 2, 3), (7, 10, 5), scratch_sequence_id=100)
++        assert len(set(zip(envelope.token_sequence_ids, envelope.positions))) == 16
++
++
++def test_invalid_capacity_or_overlapping_sequence_ids_are_rejected():
++    with pytest.raises(ValueError, match="capacity"):
++        plan_selective_verify_layout((4, 2, 4), capacities=(2,))
++    with pytest.raises(ValueError, match="token buckets"):
++        plan_selective_verify_layout((4, 2, 4), capacities=(4,), token_buckets=(8,))
++    layout = plan_selective_verify_layout((2, 4), capacities=(2,), token_buckets=(8,))
++    with pytest.raises(ValueError, match="unique"):
++        route_selective_verify_envelope(layout, (1, 1), (0, 0), scratch_sequence_id=99)
++
++
++def test_selective_query_and_verdict_labels_follow_the_same_causal_rows():
++    roots = torch.tensor([7, 8, 9], dtype=torch.long)
++    proposals = torch.tensor([[10, 11, 12, 13], [20, 21, 22, 23], [30, 31, 32, 33]])
++    query, labels = pack_selective_target_queries(roots, proposals, (4, 2, 4))
++    assert query.tolist() == [7, 10, 11, 12, 8, 20, 9, 30, 31, 32]
++    assert labels.tolist() == [10, 11, 12, 13, 20, 21, 30, 31, 32, 33]
++    assert len(query) == len(labels) == 10
+diff --git a/tests/ut/spec_decode/test_pearl_native.py b/tests/ut/spec_decode/test_pearl_native.py
+index 32053286..83459bf6 100644
+--- a/tests/ut/spec_decode/test_pearl_native.py
++++ b/tests/ut/spec_decode/test_pearl_native.py
+@@ -2712,6 +2712,33 @@ def test_full_window_state_transition_matches_target_and_draft_committed_prefix(
+     assert target.pending_window_size == draft.pending_window_size == 0
+ 
+ 
++@pytest.mark.parametrize("accepted", [0, 1, 2])
++def test_selective_full_window_discards_unverified_draft_and_eager_suffix(accepted):
++    prefix = [10, 11, 12]
++    full_proposal = [20, 21, 22, 23]
++    staged_eager = [30, 31, 32, 33]
++    correction = None if accepted == 2 else 90 + accepted
++    target = PearlPipelineState(prefix.copy(), prompt_length=2)
++    draft = target.clone()
++    draft.token_ids.extend([*full_proposal, *staged_eager])
++
++    target.apply_target_full_window_verification(
++        proposal_token_ids=full_proposal[:2],
++        accepted=accepted,
++        correction_token_id=correction,
++    )
++    draft.apply_draft_selective_full_window_verification(
++        full_proposal_token_ids=full_proposal,
++        verification_width=2,
++        accepted=accepted,
++        correction_token_id=correction,
++        staged_eager_token_ids=staged_eager,
++    )
++    assert draft.token_ids == target.token_ids
++    assert draft.committed_length == target.committed_length
++    assert draft.verified_draft_tokens == target.verified_draft_tokens == 2
++
++
+ def test_full_window_draft_full_accept_without_eager_ends_at_committed_frontier():
+     state = PearlPipelineState([1, 2, 3], prompt_length=2)
+     proposal = torch.tensor([4, 5, 6, 7])
+diff --git a/tests/ut/spec_decode/test_spec_rhythm_linear_service.py b/tests/ut/spec_decode/test_spec_rhythm_linear_service.py
+index 10dc3858..7f9482b2 100644
+--- a/tests/ut/spec_decode/test_spec_rhythm_linear_service.py
++++ b/tests/ut/spec_decode/test_spec_rhythm_linear_service.py
+@@ -1044,8 +1044,9 @@ def test_token_chunk_prefill_config_fails_closed():
+         "spec_rhythm_prefill_token_chunk_size": 8,
+     }
+ 
+-    with pytest.raises(ValueError, match="prefix caching"):
+-        native.NativePearlConfig(**common)
++    cached = native.NativePearlConfig(**common)
++    assert cached.enable_prefix_caching is True
++    assert cached.spec_rhythm_prefill_token_chunk_size == 8
+     with pytest.raises(ValueError, match="online prefill"):
+         native.NativePearlConfig(
+             **{
+diff --git a/tests/ut/spec_decode/test_spec_rhythm_tree_loop.py b/tests/ut/spec_decode/test_spec_rhythm_tree_loop.py
+index 0b9603fb..137be0e2 100644
+--- a/tests/ut/spec_decode/test_spec_rhythm_tree_loop.py
++++ b/tests/ut/spec_decode/test_spec_rhythm_tree_loop.py
+@@ -507,6 +507,41 @@ def test_tree_loop_accepts_unknown_request_during_active_decode(monkeypatch):
+     assert results[0]["spec_rhythm"]["spec_rhythm_live_admitted_requests"] == 1
+ 
+ 
++@pytest.mark.parametrize("admit_after_abort", [False, True])
++def test_tree_loop_aborts_last_active_request_before_scheduling_and_accepts_later_work(monkeypatch, admit_after_abort):
++    harness = _TreeLoopHarness(monkeypatch, requests=1, capacity=2, max_tokens=4, online_prefill=True)
++    harness.engine.graph_runner = SimpleNamespace(set_expected_fia_batch_size=Mock())
++    replacement = native.NativeSamplingParams(
++        temperature=0, max_tokens=4, ignore_eos=True, request_id="after-abort", slo_tpot_ms=50.0
++    )
++    polls = []
++
++    def poll_admission(block):
++        polls.append(block)
++        if len(polls) == 1:
++            return not admit_after_abort, (), ("request-0",)
++        if admit_after_abort and len(polls) == 2:
++            assert block, "an empty live epoch must wait for work before scheduling"
++            return False, [([777, 778], replacement)], ()
++        return bool(block), (), ()
++
++    harness.engine._request_admission_callback = poll_admission
++    results = harness.run()
++
++    assert len(results) == 1 + int(admit_after_abort)
++    assert harness.target_states[0].aborted and harness.draft_states[0].aborted
++    assert len(results[0]["completion_token_ids"]) == 1  # Only the prefill token was committed.
++    assert results[0]["spec_rhythm"]["spec_rhythm_aborted_requests"] == 1
++    assert all(snapshot and 0 not in snapshot for snapshot in harness.active_snapshots)
++    if admit_after_abort:
++        assert results[1]["request_id"] == "after-abort"
++        assert len(results[1]["completion_token_ids"]) == 4
++        assert harness.prefilled == {0, 1}
++    else:
++        assert not harness.active_snapshots
++    harness.engine._release_cache_sequence.assert_any_call(0)
++
++
+ def test_tree_loop_replicates_actual_draft_confidence_into_runtime_tracker(monkeypatch):
+     harness = _TreeLoopHarness(monkeypatch, requests=2, capacity=2)
+     harness.run(max_rounds=2)
+diff --git a/tests/ut/spec_decode/test_specslo_streaming.py b/tests/ut/spec_decode/test_specslo_streaming.py
+index 07f3ecbc..7450f26b 100644
+--- a/tests/ut/spec_decode/test_specslo_streaming.py
++++ b/tests/ut/spec_decode/test_specslo_streaming.py
+@@ -213,6 +213,7 @@ def test_worker_compact_reply_disables_per_request_graph_metrics(monkeypatch):
+     engine.generate_batch.return_value = [{"completion_token_ids": [7]}]
+     monkeypatch.setattr(api, "NativePearlEngine", lambda config: engine)
+     monkeypatch.setattr("torch.distributed.is_initialized", lambda: False)
++    monkeypatch.setattr(api.time, "perf_counter", Mock(side_effect=[1.0, 1.5, 2.0, 2.25]))
+     connection = Mock()
+     connection.recv.side_effect = [
+         ("pearl", [[1]], [SamplingParams(max_tokens=1)], None),
+@@ -237,5 +238,9 @@ def test_worker_compact_reply_disables_per_request_graph_metrics(monkeypatch):
+     assert connection.send.call_args_list[-1].args[0] == (
+         "result",
+         [{"completion_token_ids": [7]}],
+-        {"aclgraph_replays": 23},
++        {
++            "aclgraph_replays": 23,
++            "worker_generation_wall_seconds": 0.5,
++            "worker_graph_metrics_snapshot_seconds": 0.25,
++        },
+     )
+diff --git a/tools/specslo_experiments/capture_mc2_real_inputs.sh b/tools/specslo_experiments/capture_mc2_real_inputs.sh
+index ea3cf127..77771aea 100755
+--- a/tools/specslo_experiments/capture_mc2_real_inputs.sh
++++ b/tools/specslo_experiments/capture_mc2_real_inputs.sh
+@@ -125,7 +125,8 @@ sha256sum \
+ # shellcheck disable=SC1090
+ source "$cann_env"
+ export PYTHONPATH=$repo:${PYTHONPATH:-}
+-export ASCEND_RT_VISIBLE_DEVICES=$visible_devices
++container_runtime_devices=$("$python" /root/data/specslo-rehydrate-audit/map_npu_ids.py "$visible_devices")
++export ASCEND_RT_VISIBLE_DEVICES=$container_runtime_devices
+ export TASK_QUEUE_ENABLE=1
+ export HCCL_OP_EXPANSION_MODE=AIV
+ export HCCL_DETERMINISTIC=true
+diff --git a/tools/specslo_experiments/qualify_mc2_multishape.sh b/tools/specslo_experiments/qualify_mc2_multishape.sh
+index 36efd828..63373833 100755
+--- a/tools/specslo_experiments/qualify_mc2_multishape.sh
++++ b/tools/specslo_experiments/qualify_mc2_multishape.sh
+@@ -177,7 +177,8 @@ env | LC_ALL=C sort > "$run_dir/environment.txt"
+ # shellcheck disable=SC1090
+ source "$cann_env"
+ export PYTHONPATH=$repo:${PYTHONPATH:-}
+-export ASCEND_RT_VISIBLE_DEVICES=$target_devices
++container_runtime_devices=$("$python" /root/data/specslo-rehydrate-audit/map_npu_ids.py "$target_devices")
++export ASCEND_RT_VISIBLE_DEVICES=$container_runtime_devices
+ export TASK_QUEUE_ENABLE=1
+ export HCCL_OP_EXPANSION_MODE=AIV
+ export HCCL_DETERMINISTIC=true
+diff --git a/tools/specslo_experiments/run_online_coalesce1_candidate.sh b/tools/specslo_experiments/run_online_coalesce1_candidate.sh
+index 8478c910..244e5ed4 100755
+--- a/tools/specslo_experiments/run_online_coalesce1_candidate.sh
++++ b/tools/specslo_experiments/run_online_coalesce1_candidate.sh
+@@ -254,7 +254,8 @@ if [[ $validate_only == 0 ]]; then
+ fi
+ source /usr/local/Ascend/cann-9.0.0/set_env.sh
+ export PYTHONPATH=$repo:${PYTHONPATH:-}
+-export ASCEND_RT_VISIBLE_DEVICES=$visible_devices
++container_runtime_devices=$("$python" /root/data/specslo-rehydrate-audit/map_npu_ids.py "$visible_devices")
++export ASCEND_RT_VISIBLE_DEVICES=$container_runtime_devices
+ export TASK_QUEUE_ENABLE=1
+ export HCCL_OP_EXPANSION_MODE=AIV
+ export HCCL_DETERMINISTIC=true
+@@ -432,8 +433,8 @@ if [[ $validate_only == 0 ]]; then
+   timeout 2400 "$python" -u examples/run_with_vllm_ascend_extension.py \
+   --extension "$extension" --required-op allreduce_add_rmsnorm_chained \
+   examples/benchmark_nano_pearl_speculative.py \
+-  --draft-model /data/shared-models/Qwen3-0.6B \
+-  --target-model /data/shared-models/Qwen3-32B \
++  --draft-model /root/data/shared-models/Qwen3-0.6B \
++  --target-model /root/data/shared-models/Qwen3-32B \
+   --draft-tp-size 1 --target-tp-size 3 --draft-mode serial_linear \
+   --seed 0 --gamma 4 --spec-rhythm-min-gamma 4 \
+   --spec-rhythm-request-max-gamma 4 --spec-rhythm-linear-full-window \
+diff --git a/tools/specslo_experiments/run_online_coalesce1_formal_ab.sh b/tools/specslo_experiments/run_online_coalesce1_formal_ab.sh
+index f5893786..625fa745 100755
+--- a/tools/specslo_experiments/run_online_coalesce1_formal_ab.sh
++++ b/tools/specslo_experiments/run_online_coalesce1_formal_ab.sh
+@@ -325,7 +325,16 @@ if int(workload.get("arrival_seed", -1)) != 0:
+ profile = json.loads(profile_path.read_text())
+ metadata = profile.get("metadata", {})
+ runtime_binding = metadata.get("runtime_binding", {})
+-expected_mapping = devices[1:]
++# The native MC2 profile binds CANN logical IDs. Preserve the physical
++# contract separately and validate its conversion against the audited map.
++import subprocess
++container_logical_devices = subprocess.check_output(
++    [sys.executable, "/root/data/specslo-rehydrate-audit/map_npu_ids.py", ",".join(devices)], text=True,
++).strip().split(",")
++expected_mapping = container_logical_devices[1:]
++physical_map = json.loads(Path("/root/data/specslo-rehydrate-audit/npu-logical-physical-map.json").read_text())
++if metadata.get("rehydrate_container_device_mapping") != physical_map:
++    errors.append("MC2 profile lacks the current audited physical/container mapping")
+ if int(metadata.get("tensor_parallel_size", -1)) != 3:
+     errors.append("MC2 profile is not TP3")
+ if runtime_binding.get("tp_rank_device_mapping") != expected_mapping:
+@@ -358,6 +367,8 @@ if vendor_file_count == 0:
+ document = {
+     "status": "pass" if not errors else "fail",
+     "physical_npus": [int(value) for value in devices],
++    "container_logical_npus": [int(value) for value in container_logical_devices],
++    "container_device_mapping": physical_map,
+     "draft_pa_task_update_workers": draft_pa_task_update_workers,
+     "target_replay_ahead": target_replay_ahead,
+     "manifest": str(manifest_path.resolve()),
+@@ -549,7 +560,7 @@ expected_target_replay_ahead = int(input_identity.get("target_replay_ahead", -1)
+ 
+ # Exact workload and execution envelopes.
+ require(baseline.get("backend") == "vllm-ascend-target-only", "baseline backend mismatch")
+-require(baseline.get("model") == "/data/shared-models/Qwen3-32B", "baseline model mismatch")
++require(baseline.get("model") == "/root/data/shared-models/Qwen3-32B", "baseline model mismatch")
+ require(baseline.get("tensor_parallel_size") == 4, "baseline is not TP4")
+ require(baseline.get("max_num_seqs") == 64, "baseline max_num_seqs is not 64")
+ require(baseline.get("max_tokens") == 256, "baseline max_tokens is not 256")
+@@ -560,8 +571,8 @@ require(float(baseline.get("prefill_coalesce_max_wait_ms", math.nan)) == 0.0,
+ require(baseline.get("respect_eos") is False, "baseline is not fixed T256")
+ 
+ require(candidate.get("backend") == "specslo-native-specrhythm", "candidate backend mismatch")
+-require(candidate.get("draft_model") == "/data/shared-models/Qwen3-0.6B", "candidate draft model mismatch")
+-require(candidate.get("target_model") == "/data/shared-models/Qwen3-32B", "candidate target model mismatch")
++require(candidate.get("draft_model") == "/root/data/shared-models/Qwen3-0.6B", "candidate draft model mismatch")
++require(candidate.get("target_model") == "/root/data/shared-models/Qwen3-32B", "candidate target model mismatch")
+ require(candidate.get("draft_tensor_parallel_size") == 1, "candidate draft is not TP1")
+ require(candidate.get("target_tensor_parallel_size") == 3, "candidate target is not TP3")
+ require(candidate.get("draft_mode") == "serial_linear", "candidate is not serial chain draft")
+diff --git a/vllm_ascend/cpu_binding.py b/vllm_ascend/cpu_binding.py
+index 5a947c7b..0b24ba04 100644
+--- a/vllm_ascend/cpu_binding.py
++++ b/vllm_ascend/cpu_binding.py
+@@ -199,7 +199,12 @@ class DeviceInfo:
+                     continue
+                 last_part = parts[-1]
+                 if self.is_cpu_list(last_part):
+-                    affinity[int(npu_match.group(1))] = self.expand_cpu_list(last_part)
++                    # Topology rows identify physical boards; CPU pools use
++                    # the container's Chip Logic IDs from `npu-smi info -m`.
++                    chip_map = self.npu_map_info.get(npu_match.group(1), {})
++                    for logic_id in chip_map.values():
++                        if logic_id.isdigit():
++                            affinity[int(logic_id)] = self.expand_cpu_list(last_part)
+         return affinity
+ 
+ 
+diff --git a/vllm_ascend/envs.py b/vllm_ascend/envs.py
+index 85c3c745..e22e1107 100644
+--- a/vllm_ascend/envs.py
++++ b/vllm_ascend/envs.py
+@@ -459,6 +459,13 @@ env_variables: dict[str, Callable[[], Any]] = {
+     "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_PREFILL": lambda: bool(
+         int(os.getenv("VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_PREFILL", "0"))
+     ),
++    # Experimental selective linear verification. Zero retains fixed gamma=4;
++    # one verifies loose rows with width two on decode-only target cycles;
++    # two also shortens normal rows. No prompt/target mixed cycle is changed.
++    # This is an opt-in performance experiment and contains no credentials.
++    "VLLM_ASCEND_SPECRHYTHM_SELECTIVE_VERIFY_WIDTH": lambda: int(
++        os.getenv("VLLM_ASCEND_SPECRHYTHM_SELECTIVE_VERIFY_WIDTH", "0")
++    ),
+     # Experimental fixed-envelope ACLGraph for the mixed verification/prefill
+     # target pass. Keep this separate from MIXED_TARGET_PREFILL so enabling
+     # the eager fusion cannot silently change capture or replay behavior.
+diff --git a/vllm_ascend/spec_decode/pearl/api.py b/vllm_ascend/spec_decode/pearl/api.py
+index 7c25e28f..fd4ba5a9 100644
+--- a/vllm_ascend/spec_decode/pearl/api.py
++++ b/vllm_ascend/spec_decode/pearl/api.py
+@@ -393,8 +393,6 @@ class PEARLConfig:
+                     "SpecRhythm token-chunk prefill requires enable_spec_rhythm, "
+                     "online prefill, and linear full-window mode."
+                 )
+-            if self.enable_prefix_caching:
+-                raise ValueError("SpecRhythm token-chunk prefill requires prefix caching to be disabled.")
+             if self.spec_rhythm_prefill_token_chunk_size > self.max_num_batched_tokens:
+                 raise ValueError("SpecRhythm prefill token chunk size must not exceed max_num_batched_tokens.")
+         if self.spec_rhythm_min_gamma <= 0 or (self.gamma != -1 and self.spec_rhythm_min_gamma > self.gamma):
+diff --git a/vllm_ascend/spec_decode/pearl/mixed_width_layout.py b/vllm_ascend/spec_decode/pearl/mixed_width_layout.py
+new file mode 100644
+index 00000000..e846cc07
+--- /dev/null
++++ b/vllm_ascend/spec_decode/pearl/mixed_width_layout.py
+@@ -0,0 +1,135 @@
++"""Host-only shape and KV routing for selective linear target verification.
++
++The existing fixed-width service uses one query per proposed token.  A
++selective service may verify fewer tokens for a relaxed request, but every
++real query must still have a unique causal KV position.  This module plans a
++fixed graph envelope without importing torch or mutating a model cache.
++"""
++
++from __future__ import annotations
++
++from collections.abc import Sequence
++from dataclasses import dataclass
++
++
++@dataclass(frozen=True)
++class SelectiveVerifyLayout:
++    widths: tuple[int, ...]
++    capacity: int
++    token_bucket: int
++    query_lengths: tuple[int, ...]
++
++    @property
++    def real_query_tokens(self) -> int:
++        return sum(self.widths)
++
++    @property
++    def verification_rows(self) -> int:
++        return len(self.widths)
++
++    @property
++    def verification_capacity(self) -> int:
++        return self.capacity
++
++    @property
++    def verification_output_count(self) -> int:
++        return self.real_query_tokens
++
++    @property
++    def request_segment_count(self) -> int:
++        return len(self.query_lengths)
++
++    @property
++    def total_query_tokens(self) -> int:
++        return self.token_bucket
++
++    @property
++    def graph_key(self) -> str:
++        return f"stable-target-selective|capacity:{self.capacity}|query:{self.token_bucket}"
++
++
++@dataclass(frozen=True)
++class SelectiveVerifyEnvelope:
++    layout: SelectiveVerifyLayout
++    token_sequence_ids: tuple[int, ...]
++    positions: tuple[int, ...]
++    segment_sequence_ids: tuple[int, ...]
++    sequence_lens: tuple[int, ...]
++
++
++def plan_selective_verify_layout(
++    widths: Sequence[int],
++    *,
++    capacities: Sequence[int] = (8, 16, 24, 32),
++    token_buckets: Sequence[int] = tuple(range(8, 145, 8)),
++) -> SelectiveVerifyLayout:
++    """Choose a bounded graph shape while preserving all real query lengths.
++
++    Empty dummy segments are forbidden: each unused request slot consumes one
++    scratch token, and one final scratch segment fills the selected Q bucket.
++    Keeping this residual segment makes both Q and segment count invariant for
++    every replay of a graph key.
++    """
++
++    real_widths = tuple(int(width) for width in widths)
++    if not real_widths or any(width not in (2, 4) for width in real_widths):
++        raise ValueError("Selective verification requires non-empty 2/4-token widths.")
++    valid_capacities = sorted(set(int(value) for value in capacities))
++    capacity = next((value for value in valid_capacities if value >= len(real_widths)), None)
++    if capacity is None or capacity <= 0:
++        raise ValueError("Selective verification exceeds the provisioned request capacity.")
++    dummy_count = capacity - len(real_widths)
++    minimum_tokens = sum(real_widths) + dummy_count + 1
++    valid_buckets = sorted(set(int(value) for value in token_buckets))
++    bucket = next((value for value in valid_buckets if value >= minimum_tokens), None)
++    if bucket is None or bucket <= 0:
++        raise ValueError("Selective verification exceeds the provisioned token buckets.")
++    residual = bucket - sum(real_widths) - dummy_count
++    query_lengths = (*real_widths, *((1,) * dummy_count), residual)
++    assert len(query_lengths) == capacity + 1 and sum(query_lengths) == bucket
++    return SelectiveVerifyLayout(real_widths, capacity, bucket, query_lengths)
++
++
++def route_selective_verify_envelope(
++    layout: SelectiveVerifyLayout,
++    sequence_ids: Sequence[int],
++    first_positions: Sequence[int],
++    *,
++    scratch_sequence_id: int,
++) -> SelectiveVerifyEnvelope:
++    """Assign real and dummy query tokens to disjoint causal KV slots."""
++
++    real_ids = tuple(int(value) for value in sequence_ids)
++    real_starts = tuple(int(value) for value in first_positions)
++    scratch_id = int(scratch_sequence_id)
++    if len(real_ids) != len(layout.widths) or len(real_starts) != len(layout.widths):
++        raise ValueError("Selective verification real rows and starts must match widths.")
++    if len(set(real_ids)) != len(real_ids) or scratch_id in real_ids:
++        raise ValueError("Selective verification sequence IDs must be disjoint and unique.")
++    if scratch_id < 0 or any(value < 0 for value in (*real_ids, *real_starts)):
++        raise ValueError("Selective verification sequence IDs and positions must be non-negative.")
++
++    token_ids: list[int] = []
++    positions: list[int] = []
++    segment_ids: list[int] = []
++    sequence_lens: list[int] = []
++    scratch_position = 0
++    for row, width in enumerate(layout.query_lengths):
++        real = row < len(real_ids)
++        sequence_id = real_ids[row] if real else scratch_id
++        start = real_starts[row] if real else scratch_position
++        token_ids.extend((sequence_id,) * width)
++        positions.extend(range(start, start + width))
++        segment_ids.append(sequence_id)
++        sequence_lens.append(start + width)
++        if not real:
++            scratch_position += width
++    if len(token_ids) != layout.token_bucket or len(segment_ids) != layout.capacity + 1:
++        raise RuntimeError("Selective verification envelope does not match its graph layout.")
++    return SelectiveVerifyEnvelope(
++        layout,
++        tuple(token_ids),
++        tuple(positions),
++        tuple(segment_ids),
++        tuple(sequence_lens),
++    )
+diff --git a/vllm_ascend/spec_decode/pearl/mixed_width_ops.py b/vllm_ascend/spec_decode/pearl/mixed_width_ops.py
+new file mode 100644
+index 00000000..c6eba172
+--- /dev/null
++++ b/vllm_ascend/spec_decode/pearl/mixed_width_ops.py
+@@ -0,0 +1,37 @@
++"""Device tensor packing for selective linear target verification."""
++
++from __future__ import annotations
++
++from collections.abc import Sequence
++
++import torch
++
++
++def pack_selective_target_queries(
++    roots: torch.Tensor,
++    proposals: torch.Tensor,
++    widths: Sequence[int],
++) -> tuple[torch.Tensor, torch.Tensor]:
++    """Pack causal target inputs and comparison labels in identical row order.
++
++    A width-``w`` proposal ``d1..dw`` asks the target about
++    ``[root,d1,..,d(w-1)]`` and compares the result with ``[d1,..,dw]``.
++    The unused draft suffix remains outside the target query and verdict.
++    """
++
++    row_widths = tuple(int(value) for value in widths)
++    if roots.ndim != 1 or proposals.ndim != 2:
++        raise ValueError("Selective target roots/proposals must be rank one/two.")
++    rows, gamma = proposals.shape
++    if rows == 0 or roots.shape != (rows,) or len(row_widths) != rows:
++        raise ValueError("Selective target inputs must contain aligned non-empty rows.")
++    if gamma != 4 or any(width not in (2, 4) for width in row_widths):
++        raise ValueError("Selective target verification currently supports gamma four and widths two/four.")
++    if roots.dtype != torch.long or proposals.dtype != torch.long or roots.device != proposals.device:
++        raise ValueError("Selective target tokens must share one int64 device.")
++
++    query_rows = torch.cat((roots.unsqueeze(1), proposals[:, :3]), dim=1).reshape(-1)
++    proposal_rows = proposals.reshape(-1)
++    query_offsets = [row * 4 + step for row, width in enumerate(row_widths) for step in range(width)]
++    index = torch.tensor(query_offsets, dtype=torch.long, device=roots.device)
++    return query_rows.index_select(0, index), proposal_rows.index_select(0, index)
+diff --git a/vllm_ascend/spec_decode/pearl/native_cache.py b/vllm_ascend/spec_decode/pearl/native_cache.py
+index c6d8d53b..bf4e3ddf 100644
+--- a/vllm_ascend/spec_decode/pearl/native_cache.py
++++ b/vllm_ascend/spec_decode/pearl/native_cache.py
+@@ -90,6 +90,8 @@ class NativePrefixCache:
+         prompt: list[int],
+         *,
+         enable_prefix_caching: bool = True,
++        max_cached_tokens: int | None = None,
++        defer_prefix_registration: bool = False,
+     ) -> int:
+         """Populate one reserved page-table row for a live request."""
+         if self._active_tables is None:
+@@ -107,12 +109,17 @@ class NativePrefixCache:
+         try:
+             max_reusable_tokens = max(0, len(prompt) - 1)
+             num_full_blocks = max_reusable_tokens // self.block_size
++            if max_cached_tokens is not None:
++                if max_cached_tokens < 0 or max_cached_tokens % self.block_size:
++                    raise ValueError("Prefix reuse cap must be a non-negative full-block length.")
++                num_full_blocks = min(num_full_blocks, max_cached_tokens // self.block_size)
+             num_prompt_blocks = (len(prompt) + self.block_size - 1) // self.block_size
+             for logical_block in range(num_prompt_blocks):
+                 prefix_end = (logical_block + 1) * self.block_size
+                 prefix_key = tuple(prompt[:prefix_end]) if logical_block < num_full_blocks else None
+                 block_id, cache_hit = self._acquire_block(
+                     prefix_key if enable_prefix_caching else None,
++                    register_new=not defer_prefix_registration,
+                 )
+                 acquired_block_ids.append(block_id)
+                 table[logical_block] = block_id
+@@ -125,6 +132,58 @@ class NativePrefixCache:
+             raise
+         return cached_tokens
+ 
++    def available_cached_tokens(self, prompt: list[int]) -> int:
++        """Count the contiguous, already published full prompt blocks."""
++
++        if not prompt:
++            return 0
++        full_blocks = max(0, len(prompt) - 1) // self.block_size
++        count = 0
++        for logical_block in range(full_blocks):
++            prefix_end = (logical_block + 1) * self.block_size
++            if tuple(prompt[:prefix_end]) not in self._prefix_to_block:
++                break
++            count += 1
++        return count * self.block_size
++
++    def clear_reusable_prefixes(self) -> None:
++        """Start a new benchmark generate call without warmup KV carryover."""
++
++        if any(block.ref_count for block in self._blocks):
++            raise RuntimeError("Reusable prefix keys cannot be cleared with live KV pages.")
++        self._prefix_to_block.clear()
++        for block in self._blocks:
++            block.prefix_key = None
++
++    def publish_prompt_blocks(self, sequence_id: int, prompt: list[int]) -> int:
++        """Expose completed prompt KV to later requests, never in-flight pages."""
++
++        if self._active_tables is None or not 0 <= sequence_id < len(self._active_tables):
++            raise RuntimeError("A live cache row is required to publish its prompt blocks.")
++        table = self._active_tables[sequence_id]
++        full_blocks = max(0, len(prompt) - 1) // self.block_size
++        published = 0
++        for logical_block in range(full_blocks):
++            block_id = table[logical_block]
++            if block_id < 0:
++                raise RuntimeError("A completed prompt is missing a full KV page.")
++            block = self._blocks[block_id]
++            prefix_end = (logical_block + 1) * self.block_size
++            key = tuple(prompt[:prefix_end])
++            if block.prefix_key == key:
++                continue
++            if block.prefix_key is not None:
++                raise RuntimeError("A KV page cannot be published for two prompt prefixes.")
++            if key in self._prefix_to_block:
++                # Another completed request already owns the reusable copy.
++                continue
++            block.prefix_key = key
++            self._prefix_to_block[key] = block_id
++            self._clock += 1
++            block.last_used = self._clock
++            published += 1
++        return published
++
+     def ensure_capacity(
+         self,
+         sequence_ids: list[int],
+@@ -183,7 +242,12 @@ class NativePrefixCache:
+             if block.ref_count < 0:
+                 raise RuntimeError("PEARL KV cache block reference count became negative.")
+ 
+-    def _acquire_block(self, prefix_key: tuple[int, ...] | None) -> tuple[int, bool]:
++    def _acquire_block(
++        self,
++        prefix_key: tuple[int, ...] | None,
++        *,
++        register_new: bool = True,
++    ) -> tuple[int, bool]:
+         self._clock += 1
+         if prefix_key is not None and prefix_key in self._prefix_to_block:
+             block = self._blocks[self._prefix_to_block[prefix_key]]
+@@ -202,13 +266,22 @@ class NativePrefixCache:
+                 ),
+             )
+         except ValueError as error:
+-            raise RuntimeError("The native PEARL KV cache has no free physical blocks.") from error
++            tables = self._active_tables or []
++            live_rows = sum(any(block_id >= 0 for block_id in table) for table in tables)
++            peak_row_blocks = max((sum(block_id >= 0 for block_id in table) for table in tables), default=0)
++            raise RuntimeError(
++                "The native PEARL KV cache has no free physical blocks: "
++                f"capacity={self.num_blocks}, live_rows={live_rows}, "
++                f"peak_row_blocks={peak_row_blocks}, "
++                f"selective_pressure_estimate={getattr(self, 'selective_pressure_estimate', -1)}, "
++                f"selective_cycles={getattr(self, 'selective_cycles', -1)}."
++            ) from error
+ 
+         if block.prefix_key is not None:
+             self._prefix_to_block.pop(block.prefix_key, None)
+-        block.prefix_key = prefix_key
++        block.prefix_key = prefix_key if register_new else None
+         block.ref_count = 1
+         block.last_used = self._clock
+-        if prefix_key is not None:
++        if block.prefix_key is not None:
+             self._prefix_to_block[prefix_key] = block.block_id
+         return block.block_id, False
+diff --git a/vllm_ascend/spec_decode/pearl/native_engine.py b/vllm_ascend/spec_decode/pearl/native_engine.py
+index 74c1c69a..a743054f 100644
+--- a/vllm_ascend/spec_decode/pearl/native_engine.py
++++ b/vllm_ascend/spec_decode/pearl/native_engine.py
+@@ -63,6 +63,7 @@ from vllm_ascend.spec_decode.pearl.mc2 import (
+     snapshot_mc2_dispatch_counters,
+     validate_mc2_runtime_binding,
+ )
++from vllm_ascend.spec_decode.pearl.mixed_width_ops import pack_selective_target_queries
+ from vllm_ascend.spec_decode.pearl.native_cache import NativeCacheAllocation, NativePrefixCache
+ from vllm_ascend.spec_decode.pearl.native_graph import NativeACLGraphRunner, NativeGraphExecution
+ from vllm_ascend.spec_decode.pearl.native_model import (
+@@ -1927,6 +1928,45 @@ class PearlPipelineState:
+             bonus_committed=bonus_token_id is not None,
+         )
+ 
++    def apply_draft_selective_full_window_verification(
++        self,
++        *,
++        full_proposal_token_ids: Sequence[int] | torch.Tensor,
++        verification_width: int,
++        accepted: int,
++        correction_token_id: int | None,
++        staged_eager_token_ids: Sequence[int] | torch.Tensor | None = None,
++    ) -> None:
++        """Discard unverified draft suffix before committing a short verdict.
++
++        The fixed four-step draft graph may predict more tokens than the
++        target chose to verify for a relaxed row. Those extra tokens and any
++        eager continuation depend on an unverified prefix and cannot be kept
++        as state or promoted to a ready ticket.
++        """
++
++        proposal = self._materialize_full_window_tokens(full_proposal_token_ids, label="full draft proposal")
++        width = int(verification_width)
++        if not 0 < width <= len(proposal):
++            raise ValueError("Selective verification width must fit its full draft proposal.")
++        eager = (
++            []
++            if staged_eager_token_ids is None
++            else self._materialize_full_window_tokens(staged_eager_token_ids, label="staged eager continuation")
++        )
++        assert self.committed_length is not None
++        if self.token_ids[self.committed_length :] != [*proposal, *eager]:
++            raise RuntimeError("Selective draft tail differs from its proposal and eager continuation.")
++        if width < len(proposal):
++            del self.token_ids[self.committed_length + width :]
++            eager = []
++        self.apply_draft_full_window_verification(
++            proposal_token_ids=proposal[:width],
++            accepted=accepted,
++            correction_token_id=correction_token_id,
++            staged_eager_token_ids=eager or None,
++        )
++
+     def apply_draft_full_window_verification(
+         self,
+         *,
+@@ -3631,8 +3671,6 @@ class NativePearlConfig:
+                     "SpecRhythm token-chunk prefill requires enable_spec_rhythm, "
+                     "online prefill, and linear full-window mode."
+                 )
+-            if self.enable_prefix_caching:
+-                raise ValueError("SpecRhythm token-chunk prefill requires prefix caching to be disabled.")
+             if self.spec_rhythm_prefill_token_chunk_size > self.max_num_batched_tokens:
+                 raise ValueError("SpecRhythm prefill token chunk size must not exceed max_num_batched_tokens.")
+         if self.spec_rhythm_min_gamma <= 0 or (self.gamma != -1 and self.spec_rhythm_min_gamma > self.gamma):
+@@ -4712,6 +4750,8 @@ class NativePearlEngine:
+         prompt: list[int],
+         *,
+         enable_prefix_caching: bool,
++        max_cached_tokens: int | None = None,
++        defer_prefix_registration: bool = False,
+     ) -> None:
+         """Activate a pre-reserved KV page-table row for online admission."""
+         if self.cache_allocation is None or self.cache_block_tables is None:
+@@ -4720,6 +4760,8 @@ class NativePearlEngine:
+             sequence_id,
+             prompt,
+             enable_prefix_caching=enable_prefix_caching,
++            max_cached_tokens=max_cached_tokens,
++            defer_prefix_registration=defer_prefix_registration,
+         )
+         self.cache_allocation.num_cached_tokens[sequence_id] = cached_tokens
+         self.cache_block_tables[sequence_id].copy_(
+@@ -7319,6 +7361,10 @@ class NativePearlEngine:
+                 continue
+             if live_open:
+                 live_open = not admit_available()
++                # Live cancellation can remove the final active request at
++                # this fence. Return to admission/closure before scheduling.
++                if not active:
++                    continue
+             cycle_started = time.perf_counter()
+             host_trace: dict[str, int | float] | None = None
+             if round_count < self.config.profile_host_decode_steps:
+@@ -8822,6 +8868,11 @@ class NativePearlEngine:
+             # guard unchanged.
+             self.graph_runner.set_expected_fia_batch_size(None)
+         local_states = draft_states if self.is_draft else target_states
++        if self.config.enable_prefix_caching and self.config.spec_rhythm_prefill_token_chunk_size > 0:
++            # Strict graph qualification replays the same 463 requests before
++            # measurement.  Reuse only within this generate call; otherwise
++            # the scored trace would begin with an already populated cache.
++            self.prefix_cache.clear_reusable_prefixes()
+         active_indices: list[int] = []
+         pending_admission = list(range(len(local_states)))
+         completed_states: dict[int, PearlPipelineState] = {}
+@@ -8845,7 +8896,32 @@ class NativePearlEngine:
+             new_indices = [index for index in request_indices if index not in cache_activated]
+             if not new_indices:
+                 return
+-            for index in new_indices:
++            safe_prefix_chunk = bool(
++                self.config.enable_prefix_caching and self.config.spec_rhythm_prefill_token_chunk_size > 0
++            )
++            reuse_caps: list[int] | None = None
++            if safe_prefix_chunk:
++                coordination_group = getattr(self.groups, "verification_coordination_group", None)
++                if coordination_group is None or len(self.topology.draft_ranks) != 1:
++                    raise RuntimeError("Chunked prefix reuse requires the four-rank CPU coordination group.")
++                selected_by_rank: list[object] = [None] * dist.get_world_size(group=coordination_group)
++                dist.all_gather_object(
++                    selected_by_rank,
++                    tuple(new_indices),
++                    group=coordination_group,
++                )
++                if any(selected != tuple(new_indices) for selected in selected_by_rank):
++                    raise RuntimeError("Replicated prompt admission diverged before prefix reuse.")
++                local_caps = [
++                    self.prefix_cache.available_cached_tokens(
++                        local_states[index].token_ids[: local_states[index].prompt_length]
++                    )
++                    for index in new_indices
++                ]
++                shared_caps = torch.tensor(local_caps, dtype=torch.long, device="cpu")
++                dist.all_reduce(shared_caps, op=dist.ReduceOp.MIN, group=coordination_group)
++                reuse_caps = [int(value) for value in shared_caps.tolist()]
++            for position, index in enumerate(new_indices):
+                 prompt = local_states[index].token_ids[: local_states[index].prompt_length]
+                 self._activate_cache_sequence(
+                     index,
+@@ -8853,7 +8929,16 @@ class NativePearlEngine:
+                     enable_prefix_caching=(
+                         self.config.enable_prefix_caching and not self.config.spec_rhythm_kv_ready_arrivals
+                     ),
+-                )
++                    max_cached_tokens=(reuse_caps[position] if reuse_caps is not None else None),
++                    defer_prefix_registration=safe_prefix_chunk,
++                )
++                if reuse_caps is not None:
++                    actual = self.cache_allocation.num_cached_tokens[index]
++                    if actual != reuse_caps[position]:
++                        raise RuntimeError("Replicated prompt prefix reuse diverged after activation.")
++                    counters["spec_rhythm_safe_prefix_cached_tokens"] = (
++                        counters.get("spec_rhythm_safe_prefix_cached_tokens", 0) + actual
++                    )
+             if self.config.spec_rhythm_kv_ready_arrivals:
+                 snapshots = getattr(self, "_kv_ready_host_snapshots", None)
+                 batch_snapshots = [None if snapshots is None else snapshots.get(index) for index in new_indices]
+@@ -8974,6 +9059,18 @@ class NativePearlEngine:
+         )
+         prefill_token_chunk_size = int(self.config.spec_rhythm_prefill_token_chunk_size)
+         token_chunk_prefill = prefill_token_chunk_size > 0
++        loose_admission_tight_gate = int(os.environ.get("SPECSLO_LOOSE_ADMISSION_TIGHT_GATE", "-1"))
++        if loose_admission_tight_gate < -1 or loose_admission_tight_gate > initial_batch_size:
++            raise ValueError("SPECSLO_LOOSE_ADMISSION_TIGHT_GATE must be -1 or within the active batch capacity.")
++        admission_kv_guard_pages = int(os.environ.get("SPECSLO_ADMISSION_KV_GUARD_PAGES", "0"))
++        if admission_kv_guard_pages < 0:
++            raise ValueError("SPECSLO_ADMISSION_KV_GUARD_PAGES must be non-negative.")
++        if (
++            admission_kv_guard_pages
++            and self.config.num_kvcache_blocks > 0
++            and admission_kv_guard_pages >= self.config.num_kvcache_blocks
++        ):
++            raise ValueError("SPECSLO_ADMISSION_KV_GUARD_PAGES must leave at least one free KV block.")
+         staged_prefill_indices: list[int] = []
+         staged_prefill_tokens: list[int] | None = None
+         staged_prefill_cursors: dict[int, int] = {}
+@@ -9166,6 +9263,10 @@ class NativePearlEngine:
+             "spec_rhythm_prefill_coalesce_max_wait_observed_ms": 0.0,
+             "spec_rhythm_prefill_token_chunk_enabled": int(token_chunk_prefill),
+             "spec_rhythm_prefill_token_chunk_size": prefill_token_chunk_size,
++            "spec_rhythm_loose_admission_tight_gate": loose_admission_tight_gate,
++            "spec_rhythm_loose_admission_deferred": 0,
++            "spec_rhythm_admission_kv_guard_deferred": 0,
++            "spec_rhythm_admission_kv_reserved_peak": 0,
+             "spec_rhythm_prefill_token_chunk_submissions": 0,
+             "spec_rhythm_prefill_token_chunk_tokens": 0,
+             "spec_rhythm_prefill_token_chunk_partial_submissions": 0,
+@@ -9519,6 +9620,38 @@ class NativePearlEngine:
+                 enabled=class_caps_enabled,
+                 class_of=slo_counter_class,
+             )
++            active_tight_count = sum(
++                slo_counter_class(index) == "tight"
++                for indices in (active_indices, staged_prefill_indices)
++                for index in indices
++            )
++            block_size = self.config.kvcache_block_size
++
++            def reserved_kv_pages(index: int) -> int:
++                state = local_states[index]
++                return (state.prompt_length + state.max_tokens + self.gamma + block_size - 1) // block_size
++
++            admission_reserved_pages = (
++                sum(
++                    reserved_kv_pages(index)
++                    for index in set(active_indices) | set(staged_prefill_indices) | set(suspended_indices)
++                )
++                if admission_kv_guard_pages
++                else 0
++            )
++            counters["spec_rhythm_admission_kv_reserved_peak"] = max(
++                counters["spec_rhythm_admission_kv_reserved_peak"], admission_reserved_pages
++            )
++            ready_tight_pending = any(
++                index not in staged_set
++                and slo_counter_class(index) == "tight"
++                and (
++                    not arrival_gated
++                    or request_params[index].arrival_ts is None
++                    or float(request_params[index].arrival_ts) <= now
++                )
++                for index in pending_admission
++            )
+             selected_for_admission: set[int] | None = set() if class_caps_enabled else None
+             for index in admission_candidates:
+                 if index in staged_set:
+@@ -9526,6 +9659,21 @@ class NativePearlEngine:
+                 arrival = request_params[index].arrival_ts
+                 if arrival_gated and arrival is not None and arrival > now:
+                     continue
++                if (
++                    loose_admission_tight_gate >= 0
++                    and slo_counter_class(index) == "loose"
++                    and (active_tight_count > loose_admission_tight_gate or ready_tight_pending)
++                ):
++                    counters["spec_rhythm_loose_admission_deferred"] += 1
++                    continue
++                candidate_kv_pages = reserved_kv_pages(index) if admission_kv_guard_pages else 0
++                if (
++                    admission_kv_guard_pages
++                    and (active_indices or staged_prefill_indices or ready_indices)
++                    and admission_reserved_pages + candidate_kv_pages > admission_kv_guard_pages
++                ):
++                    counters["spec_rhythm_admission_kv_guard_deferred"] += 1
++                    continue
+                 request_class = None
+                 if class_caps_enabled:
+                     assert active_class_counts is not None
+@@ -9577,6 +9725,10 @@ class NativePearlEngine:
+                 if prefill_budget_tokens > self.config.max_num_batched_tokens:
+                     raise ValueError("An online PEARL prefill request exceeds max_num_batched_tokens.")
+                 ready_indices.append(index)
++                admission_reserved_pages += candidate_kv_pages
++                counters["spec_rhythm_admission_kv_reserved_peak"] = max(
++                    counters["spec_rhythm_admission_kv_reserved_peak"], admission_reserved_pages
++                )
+                 if selected_for_admission is not None:
+                     selected_for_admission.add(index)
+                 if active_class_counts is not None:
+@@ -9846,7 +9998,10 @@ class NativePearlEngine:
+             if prefill_indices:
+                 refill_started = time.perf_counter()
+                 if token_chunk_prefill:
+-                    cursors = {index: 0 for index in prefill_indices}
++                    cursors = {
++                        index: int(self.cache_allocation.num_cached_tokens[index])
++                        for index in prefill_indices
++                    }
+                     sampled: dict[int, int] = {}
+                     while len(sampled) < len(prefill_indices):
+                         chunks = plan_spec_rhythm_prefill_token_chunk(
+@@ -9890,6 +10045,13 @@ class NativePearlEngine:
+                 counters["spec_rhythm_prefill_batches"] += 1
+                 counters["spec_rhythm_prefill_requests"] += len(prefill_indices)
+                 record_prefill_batch(len(prefill_indices))
++                if self.config.enable_prefix_caching and token_chunk_prefill:
++                    for index in prefill_indices:
++                        prompt = local_states[index].token_ids[: local_states[index].prompt_length]
++                        counters["spec_rhythm_safe_prefix_published_blocks"] = (
++                            counters.get("spec_rhythm_safe_prefix_published_blocks", 0)
++                            + self.prefix_cache.publish_prompt_blocks(index, prompt)
++                        )
+             activate_ready(
+                 ready_indices,
+                 target_tokens,
+@@ -9917,7 +10079,10 @@ class NativePearlEngine:
+             activate_online_cache(ready_indices)
+             if token_chunk_prefill:
+                 prefill_indices = [index for index in ready_indices if index not in prefetched]
+-                staged_prefill_cursors = {index: 0 for index in prefill_indices}
++                staged_prefill_cursors = {
++                    index: int(self.cache_allocation.num_cached_tokens[index])
++                    for index in prefill_indices
++                }
+                 staged_prefill_target_tokens = {}
+             counters["spec_rhythm_staged_prefill_reserved_batches"] += 1
+             counters["spec_rhythm_staged_prefill_reserved_requests"] += len(ready_indices)
+@@ -9974,6 +10139,13 @@ class NativePearlEngine:
+                 staged_prefill_cursors[chunk.request_index] = chunk.end
+             submitted_tokens = sum(chunk.token_count for chunk in chunks)
+             staged_prefill_target_tokens.update(completed)
++            if self.config.enable_prefix_caching and token_chunk_prefill:
++                for index in completed:
++                    prompt = local_states[index].token_ids[: local_states[index].prompt_length]
++                    counters["spec_rhythm_safe_prefix_published_blocks"] = (
++                        counters.get("spec_rhythm_safe_prefix_published_blocks", 0)
++                        + self.prefix_cache.publish_prompt_blocks(index, prompt)
++                    )
+             counters["spec_rhythm_prefill_token_chunk_submissions"] += 1
+             counters["spec_rhythm_prefill_token_chunk_tokens"] += submitted_tokens
+             counters["spec_rhythm_prefill_token_chunk_completed_rows"] += len(completed)
+@@ -11035,6 +11207,67 @@ class NativePearlEngine:
+                     <= self.config.max_num_batched_tokens
+                 )
+             )
++            selective_verify_mode = int(envs.VLLM_ASCEND_SPECRHYTHM_SELECTIVE_VERIFY_WIDTH)
++            if selective_verify_mode not in (0, 1, 2):
++                raise ValueError("Selective verification mode must be zero, one, or two.")
++            # Shortening relaxed verification can keep its KV rows resident
++            # for more cycles. Estimate live logical pages from replicated
++            # committed state and leave room for graph scratch and newly
++            # staged prefills before selecting the short path. The gate must
++            # use rank-identical host state; local free-page counts differ
++            # between draft TP1 and target TP3 and would diverge collectives.
++            selective_cache_pages = sum(
++                (
++                    max(
++                        int(local_states[index].committed_length or 0),
++                        local_states[index].prompt_length + runtime_states[index].delivered_tokens,
++                    )
++                    + self.gamma
++                    + self.config.kvcache_block_size - 1
++                )
++                // self.config.kvcache_block_size
++                for index in active_indices
++            )
++            selective_cache_pages += sum(
++                (local_states[index].prompt_length + self.config.kvcache_block_size - 1)
++                // self.config.kvcache_block_size
++                for index in staged_prefill_indices
++            )
++            self.prefix_cache.selective_pressure_estimate = selective_cache_pages
++            self.prefix_cache.selective_cycles = counters.get("spec_rhythm_selective_verify_cycles", 0)
++            counters["spec_rhythm_selective_cache_estimated_peak_pages"] = max(
++                counters.get("spec_rhythm_selective_cache_estimated_peak_pages", 0),
++                selective_cache_pages,
++            )
++            selective_cache_safe = selective_cache_pages <= 400
++            if selective_verify_mode and not selective_cache_safe:
++                counters["spec_rhythm_selective_cache_guard_cycles"] = (
++                    counters.get("spec_rhythm_selective_cache_guard_cycles", 0) + 1
++                )
++            if (
++                selective_verify_mode
++                and selective_cache_safe
++                and linear_full_window
++                and not linear_bonus_token
++                and not mixed_prefill_this_cycle
++                and target_indices
++                and target_replay_ahead_for_cycle is None
++                and any(slo_counter_class(index) == "tight" for index in target_indices)
++            ):
++                current_verification_sizes = [
++                    2 if (slo_counter_class(index) == "loose" or
++                          (selective_verify_mode == 2 and slo_counter_class(index) == "normal"))
++                    else self.gamma
++                    for index in target_indices
++                ]
++                if any(width != self.gamma for width in current_verification_sizes):
++                    counters["spec_rhythm_selective_verify_cycles"] = (
++                        counters.get("spec_rhythm_selective_verify_cycles", 0) + 1
++                    )
++                    counters["spec_rhythm_selective_verify_saved_queries"] = (
++                        counters.get("spec_rhythm_selective_verify_saved_queries", 0)
++                        + sum(self.gamma - width for width in current_verification_sizes)
++                    )
+             early_mixed_target_submitted = spec_rhythm_early_current_mixed_target_submit_eligible(
+                 enabled=early_current_mixed_target_submit_enabled,
+                 mixed_prefill_this_cycle=mixed_prefill_this_cycle,
+@@ -11137,6 +11370,7 @@ class NativePearlEngine:
+                     target_indices,
+                     target_payloads,
+                     proposal_matrix=current_next,
++                    verification_widths=current_verification_sizes,
+                 )
+                 early_target_ended = time.perf_counter()
+                 early_target_graph_outcome = getattr(
+@@ -11730,6 +11964,7 @@ class NativePearlEngine:
+                         target_indices,
+                         target_payloads,
+                         proposal_matrix=current_next,
++                        verification_widths=current_verification_sizes,
+                     )
+                     _record_stable_target_verify_graph_outcome(
+                         counters,
+@@ -11796,7 +12031,17 @@ class NativePearlEngine:
+                     # 2-D view for correction instead of issuing both a cat
+                     # and a stack launch for identical data every cycle.
+                     assert current_next is not None
+-                    current_message = None if self.is_draft else current_next.reshape(-1)
++                    current_message = (
++                        None
++                        if self.is_draft
++                        else (
++                            current_next.reshape(-1)
++                            if all(width == self.gamma for width in current_verification_sizes)
++                            else torch.cat(
++                                [current_next[row, :width] for row, width in enumerate(current_verification_sizes)]
++                            )
++                        )
++                    )
+                 else:
+                     current_message = (
+                         None
+@@ -11824,7 +12069,7 @@ class NativePearlEngine:
+                     temperatures,
+                     gamma=self.gamma,
+                     linear_full_window=linear_full_window,
+-                ):
++                ) and all(width == self.gamma for width in current_verification_sizes):
+                     self._stage_gloo_correction_verdict(
+                         verdict,
+                         len(target_indices),
+@@ -12476,7 +12721,7 @@ class NativePearlEngine:
+                     temperatures,
+                     gamma=self.gamma,
+                     linear_full_window=linear_full_window,
+-                )
++                ) and all(width == self.gamma for width in current_verification_sizes)
+                 if profile_this_round:
+                     if replicated_target_verdict:
+                         participates_in_correction = self.rank in self.topology.correction_ranks
+@@ -12547,7 +12792,8 @@ class NativePearlEngine:
+                         assert state.committed_length is not None
+                         proposal_tokens = state.token_ids[state.committed_length : state.committed_length + expected]
+                         eager_tokens = (
+-                            state.token_ids[state.committed_length + expected :] if eager_ticket is not None else None
++                            state.token_ids[state.committed_length + self.gamma :]
++                            if eager_ticket is not None else None
+                         )
+                         if getattr(self.config, "draft_mode", SERIAL_LINEAR_DRAFT_MODE) == PARD_PARALLEL_DRAFT_MODE:
+                             if eager_tokens:
+@@ -12561,16 +12807,28 @@ class NativePearlEngine:
+                                 bonus_token_id=bonuses[row],
+                             )
+                         else:
+-                            state.apply_draft_full_window_verification(
+-                                proposal_token_ids=proposal_tokens,
+-                                accepted=accepted[row],
+-                                correction_token_id=corrections[row],
+-                                staged_eager_token_ids=eager_tokens,
+-                                bonus_token_id=bonuses[row],
+-                            )
++                            if expected == self.gamma:
++                                state.apply_draft_full_window_verification(
++                                    proposal_token_ids=proposal_tokens,
++                                    accepted=accepted[row],
++                                    correction_token_id=corrections[row],
++                                    staged_eager_token_ids=eager_tokens,
++                                    bonus_token_id=bonuses[row],
++                                )
++                            else:
++                                full_proposal = state.token_ids[
++                                    state.committed_length : state.committed_length + self.gamma
++                                ]
++                                state.apply_draft_selective_full_window_verification(
++                                    full_proposal_token_ids=full_proposal,
++                                    verification_width=expected,
++                                    accepted=accepted[row],
++                                    correction_token_id=corrections[row],
++                                    staged_eager_token_ids=eager_tokens,
++                                )
+                     elif linear_full_window:
+                         target_states[request_index].apply_target_full_window_verification(
+-                            proposal_token_ids=synchronized_next[row],
++                            proposal_token_ids=synchronized_next[row][:expected],
+                             accepted=accepted[row],
+                             correction_token_id=corrections[row],
+                             bonus_token_id=bonuses[row],
+@@ -12624,7 +12882,7 @@ class NativePearlEngine:
+                         )
+                     promoted = controller.finish_verification(
+                         request_index,
+-                        fully_accepted=fully_accepted,
++                        fully_accepted=fully_accepted and expected == self.gamma,
+                         proposed_tokens=expected,
+                         accepted_tokens=accepted[row],
+                         delivered_tokens=delivered,
+@@ -15133,8 +15391,6 @@ class NativePearlEngine:
+ 
+         if not chunks:
+             raise ValueError("SpecRhythm token-chunk prefill requires at least one span.")
+-        if self.config.enable_prefix_caching:
+-            raise RuntimeError("SpecRhythm token-chunk prefill cannot run with prefix caching.")
+         if self.cache_allocation is None:
+             raise RuntimeError("Allocate the native PEARL KV cache before token-chunk prefill.")
+ 
+@@ -15156,8 +15412,8 @@ class NativePearlEngine:
+                 raise ValueError("SpecRhythm token-chunk prompt length changed after reservation.")
+             if not 0 <= chunk.start < chunk.end <= len(prompt):
+                 raise ValueError("SpecRhythm token-chunk prefill received an invalid span.")
+-            if self.cache_allocation.num_cached_tokens[request_index] != 0:
+-                raise RuntimeError("SpecRhythm token-chunk prefill requires an uncached prompt.")
++            if chunk.start < self.cache_allocation.num_cached_tokens[request_index]:
++                raise RuntimeError("SpecRhythm token-chunk prefill entered an already cached prompt span.")
+             input_token_ids.extend(int(token_id) for token_id in prompt[chunk.start : chunk.end])
+             packed_sequence_ids.extend([request_index] * chunk.token_count)
+             positions.extend(range(chunk.start, chunk.end))
+@@ -17940,6 +18196,7 @@ class NativePearlEngine:
+         payloads: Sequence[NativeSpecRhythmDevicePayload],
+         *,
+         proposal_matrix: torch.Tensor | None = None,
++        verification_widths: Sequence[int] | None = None,
+     ) -> tuple[torch.Tensor | None, None]:
+         """Verify complete serial proposals from the committed target frontier.
+ 
+@@ -17990,6 +18247,27 @@ class NativePearlEngine:
+             dtype=torch.long,
+             device=self.device,
+         ).unsqueeze(1)
++        widths = tuple(verification_widths or (self.gamma,) * len(active_indices))
++        if len(widths) != len(active_indices) or any(width not in (2, self.gamma) for width in widths):
++            raise ValueError("Selective target verification widths must align with full proposals.")
++        if any(width != self.gamma for width in widths):
++            if self.gamma != 4 or self.config.target_use_paged_attention:
++                raise RuntimeError("Selective verification requires gamma four and causal FIA.")
++            query_tokens, _ = pack_selective_target_queries(roots[:, 0], proposals, widths)
++            sequence_ids = [index for index, width in zip(active_indices, widths) for _ in range(width)]
++            first_positions = [int(states[index].committed_length) - 1 for index in active_indices]
++            positions = [start + step for start, width in zip(first_positions, widths) for step in range(width)]
++            self._last_stable_target_verify_graph_outcome = ("disabled", 0)
++            return (
++                self._run_device_packed_greedy(
++                    query_tokens,
++                    sequence_ids,
++                    positions,
++                    use_aclgraph=False,
++                    use_fused_infer_attention=True,
++                ),
++                None,
++            )
+         bonus_mode = bool(getattr(self.config, "spec_rhythm_linear_bonus_token", False))
+         query_width = self.gamma + int(bonus_mode)
+         first_positions = [int(states[index].committed_length) - 1 for index in active_indices]
+@@ -18116,10 +18394,13 @@ class NativePearlEngine:
+             device=self.device,
+         )
+         request_tables = self.cache_block_tables.index_select(0, segment_ids)
+-        cumulative_q = _stable_target_verify_cumulative_q(
+-            layout.query_width,
+-            layout.verification_capacity,
+-        )
++        # Query partitions may be 2/4 mixed in the selective graph family.
++        # The ordinary fixed-width layout produces the same cumulative tuple
++        # as the former width * capacity fast path.
++        cumulative_q_values: list[int] = []
++        for length in layout.query_lengths:
++            cumulative_q_values.append(length + (cumulative_q_values[-1] if cumulative_q_values else 0))
++        cumulative_q = tuple(cumulative_q_values)
+         metadata = NativeAttentionMetadata(
+             slot_mapping=torch.tensor(
+                 slot_mapping,

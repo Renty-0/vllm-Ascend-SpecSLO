@@ -1,0 +1,480 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -ne 3 || ( $1 != off && $1 != on ) ]]; then
+  echo "usage: $0 <off|on> <run-tag> <nano_pearl|dual_batch|dual_batch_rolling>" >&2
+  exit 2
+fi
+
+mc2_mode=$1
+run_tag=$2
+ablation_mode=$3
+case "$ablation_mode" in
+  auto|nano_pearl|dual_batch|dual_batch_rolling) ;;
+  *) echo "invalid mechanism mode" >&2; exit 2 ;;
+esac
+repo=/root/SpecSLO/specslo-b64-kv640-coarse-20261113/source
+python=/root/miniconda3/envs/vllm-hust-dev/bin/python
+manifest=/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/manifest.jsonl
+result_root=${SPECSLO_RESULT_ROOT:-/root/data/nano-pearl-benchmark-results/20260927-specslo-v134-large-m-online-coalesce1}
+visible_devices=${SPECSLO_VISIBLE_DEVICES:-0,1,5,7}
+profile=${SPECSLO_MC2_PROFILE:-/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/mc2-profile.json}
+vendor=${SPECSLO_MC2_VENDOR:-/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/mc2-vendor}
+base_vendor=${repo}/vllm_ascend/_cann_ops_custom/vendors/custom_transformer
+extension=${repo}/vllm_ascend/vllm_ascend_C.cpython-311-aarch64-linux-gnu.so
+torch_lib=/root/miniconda3/envs/vllm-hust-dev/lib/python3.11/site-packages/torch/lib
+torch_npu_lib=/root/miniconda3/envs/vllm-hust-dev/lib/python3.11/site-packages/torch_npu/lib
+
+fallback_max_batch=${SPECSLO_TARGET_FALLBACK_MAX_BATCH:-4}
+acceptance_only=${SPECSLO_LINEAR_ACCEPTANCE_ONLY:-1}
+acceptance_floor=${SPECSLO_ACCEPTANCE_FLOOR:-0.4}
+linear_bonus_token=${SPECSLO_LINEAR_BONUS_TOKEN:-0}
+prefill_only=${SPECSLO_MIXED_TARGET_GRAPH_PREFILL_ONLY:-0}
+residual_tight_only=${SPECSLO_RESIDUAL_EAGER_TIGHT_ONLY:-0}
+target_slo_first=${SPECSLO_TARGET_SLO_FIRST:-0}
+host_continuation_reuse=${SPECSLO_GLOO_PROPOSAL_REUSE_HOST_CONTINUATION:-1}
+drain_fifo=${SPECSLO_DRAIN_FIFO:-1}
+drain_lrtf=${SPECSLO_DRAIN_LRTF:-0}
+drain_lrtf_max_active=${SPECSLO_DRAIN_LRTF_MAX_ACTIVE:-0}
+drain_target_lrtf=${SPECSLO_DRAIN_TARGET_LRTF:-0}
+drain_padding_repair=${SPECSLO_DRAIN_PADDING_REPAIR:-0}
+target_residual_lrtf=${SPECSLO_TARGET_RESIDUAL_LRTF:-0}
+graph_entries=${SPECSLO_MAX_ACLGRAPH_ENTRIES:-80}
+kv_blocks=${SPECSLO_NUM_KVCACHE_BLOCKS:-544}
+mixed_target_graph_buckets=${SPECSLO_MIXED_TARGET_GRAPH_BUCKETS:-64,128,192,256,320,384,448,512}
+profile_host_decode_steps=${SPECSLO_PROFILE_HOST_DECODE_STEPS:-0}
+profile_wait_steps=${SPECSLO_NPU_PROFILE_WAIT_STEPS:-16}
+enable_npu_profile=${SPECSLO_ENABLE_NPU_PROFILE:-1}
+target_fia_task_update_workers=${SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS:-1}
+target_fia_task_event_group_size=${SPECSLO_TARGET_FIA_TASK_EVENT_GROUP_SIZE:-1}
+target_fia_task_prefix_event_group_size=${SPECSLO_TARGET_FIA_TASK_PREFIX_EVENT_GROUP_SIZE:-0}
+draft_pa_task_update_workers=${SPECSLO_DRAFT_PA_TASK_UPDATE_WORKERS:-1}
+draft_device_paged_attention=${SPECSLO_DRAFT_DEVICE_PAGED_ATTENTION:-0}
+draft_pa_contiguous_partition=${SPECSLO_DRAFT_PA_CONTIGUOUS_PARTITION:-0}
+target_replay_ahead=${SPECSLO_TARGET_REPLAY_AHEAD:-0}
+early_current_target_submit=${SPECSLO_EARLY_CURRENT_TARGET_SUBMIT:-0}
+early_current_mixed_target_submit=${SPECSLO_EARLY_CURRENT_MIXED_TARGET_SUBMIT:-0}
+prefetch_ahead=${SPECSLO_PREFETCH_AHEAD:-0}
+stable_target_request_bucket=${SPECSLO_STABLE_TARGET_REQUEST_BUCKET:-1}
+target_max_batch=${SPECSLO_MAX_TARGET_BATCH:-32}
+online_target_max_batch=${SPECSLO_ONLINE_TARGET_MAX_BATCH:-0}
+stable_target_dense_max_capacity=${SPECSLO_STABLE_TARGET_DENSE_MAX_CAPACITY:-0}
+target_nz_mode=${SPECSLO_TARGET_NZ_MODE:-default}
+target_large_m_nz_min_rows=${SPECSLO_TARGET_LARGE_M_NZ_MIN_ROWS:-192}
+target_replicate_input_embedding=${SPECSLO_TARGET_REPLICATE_INPUT_EMBEDDING:-0}
+npu_alloc_conf=${SPECSLO_NPU_ALLOC_CONF:-default}
+validate_only=${SPECSLO_VALIDATE_ONLY:-0}
+case "$target_max_batch" in
+  32|36|40|48|64)
+    # Mixed verification+prefill graphs are much larger than decode-only
+    # target graphs.  Keep their proven 32-row family resident and let the
+    # scheduler cap only cycles that actually carry staged prompt work.
+    mixed_target_verify_capacities=8,16,24,32
+    ;;
+  *)
+    echo "SPECSLO_MAX_TARGET_BATCH must be 32, 36, 40, 48, or 64" >&2
+    exit 2
+    ;;
+esac
+if [[ ! $online_target_max_batch =~ ^[0-9]+$ ]] || (( online_target_max_batch > target_max_batch )); then
+  echo "SPECSLO_ONLINE_TARGET_MAX_BATCH must be an integer in [0, SPECSLO_MAX_TARGET_BATCH]" >&2
+  exit 2
+fi
+if [[ ! $stable_target_dense_max_capacity =~ ^[0-9]+$ ]] || \
+  (( stable_target_dense_max_capacity > target_max_batch )) || \
+  (( stable_target_dense_max_capacity > 0 && stable_target_dense_max_capacity < stable_target_request_bucket )); then
+  echo "SPECSLO_STABLE_TARGET_DENSE_MAX_CAPACITY must be zero or in [request bucket, target max batch]" >&2
+  exit 2
+fi
+# Widening decode-only target cohorts does not widen the resident mixed
+# verification+prefill family.  Its historical envelope therefore remains
+# 512 prompt tokens plus 32 gamma4 rows and the fixed bookkeeping margin.
+mixed_target_graph_max_tokens=$((645 + 32 * linear_bonus_token))
+
+if [[ ! $run_tag =~ ^[A-Za-z0-9._-]+$ ]]; then
+  echo "invalid run tag: $run_tag" >&2
+  exit 2
+fi
+if [[ ! $acceptance_floor =~ ^(0([.][0-9]+)?|1([.]0+)?)$ ]]; then
+  echo "SPECSLO_ACCEPTANCE_FLOOR must be a decimal in [0, 1]" >&2
+  exit 2
+fi
+IFS=',' read -r -a devices <<< "$visible_devices"
+if [[ ${#devices[@]} -ne 4 ]]; then
+  echo "exactly four visible NPUs are required" >&2
+  exit 2
+fi
+for value in "$acceptance_only" "$linear_bonus_token" "$prefill_only" "$residual_tight_only" "$target_slo_first" \
+  "$host_continuation_reuse" "$drain_fifo" "$drain_lrtf" \
+  "$drain_target_lrtf" "$drain_padding_repair" \
+  "$target_residual_lrtf" \
+  "$enable_npu_profile" \
+  "$draft_device_paged_attention" \
+  "$draft_pa_contiguous_partition" \
+  "$target_replay_ahead" \
+  "$early_current_target_submit" "$early_current_mixed_target_submit" \
+  "$prefetch_ahead" "$validate_only"; do
+  if [[ $value != 0 && $value != 1 ]]; then
+    echo "boolean experiment switches must be 0 or 1" >&2
+    exit 2
+  fi
+done
+if [[ $target_replicate_input_embedding != 0 && $target_replicate_input_embedding != 1 ]]; then
+  echo "SPECSLO_TARGET_REPLICATE_INPUT_EMBEDDING must be 0 or 1" >&2
+  exit 2
+fi
+if [[ $drain_lrtf == 1 && $drain_fifo != 1 ]]; then
+  echo "SPECSLO_DRAIN_LRTF=1 requires SPECSLO_DRAIN_FIFO=1" >&2
+  exit 2
+fi
+if [[ ! $drain_lrtf_max_active =~ ^[0-9]+$ ]] || (( drain_lrtf_max_active > 64 )); then
+  echo "SPECSLO_DRAIN_LRTF_MAX_ACTIVE must be in [0, 64]" >&2
+  exit 2
+fi
+if [[ $drain_lrtf == 0 && $drain_lrtf_max_active != 0 ]]; then
+  echo "SPECSLO_DRAIN_LRTF_MAX_ACTIVE requires SPECSLO_DRAIN_LRTF=1" >&2
+  exit 2
+fi
+if [[ $drain_target_lrtf == 1 && $drain_fifo != 1 ]]; then
+  echo "SPECSLO_DRAIN_TARGET_LRTF=1 requires SPECSLO_DRAIN_FIFO=1" >&2
+  exit 2
+fi
+if [[ $drain_padding_repair == 1 && $drain_fifo != 1 ]]; then
+  echo "SPECSLO_DRAIN_PADDING_REPAIR=1 requires SPECSLO_DRAIN_FIFO=1" >&2
+  exit 2
+fi
+if [[ $drain_target_lrtf == 1 && $drain_lrtf == 1 ]]; then
+  echo "unified and target-only drain LRTF are mutually exclusive" >&2
+  exit 2
+fi
+if [[ $target_nz_mode != default && $target_nz_mode != 5 && \
+      $target_nz_mode != 9 && \
+      $target_nz_mode != 11 && $target_nz_mode != 12 && \
+      $target_nz_mode != 13 && $target_nz_mode != 14 && \
+      $target_nz_mode != 15 ]]; then
+  echo "SPECSLO_TARGET_NZ_MODE must be default, 5, 9, 11, 12, 13, 14, or 15" >&2
+  exit 2
+fi
+if [[ $stable_target_request_bucket != 1 && \
+      $stable_target_request_bucket != 2 && \
+      $stable_target_request_bucket != 4 && \
+      $stable_target_request_bucket != 8 ]]; then
+  echo "SPECSLO_STABLE_TARGET_REQUEST_BUCKET must be 1, 2, 4, or 8" >&2
+  exit 2
+fi
+if [[ $mixed_target_graph_buckets != 64,128,192,256,320,384,448,512 && \
+      $mixed_target_graph_buckets != 128,256,384,512 ]]; then
+  echo "SPECSLO_MIXED_TARGET_GRAPH_BUCKETS must be the production or coarse four-bucket family" >&2
+  exit 2
+fi
+if [[ ! $target_large_m_nz_min_rows =~ ^[0-9]+$ ]] || \
+   (( target_large_m_nz_min_rows < 1 || target_large_m_nz_min_rows > 4096 )); then
+  echo "SPECSLO_TARGET_LARGE_M_NZ_MIN_ROWS must be in [1, 4096]" >&2
+  exit 2
+fi
+if [[ $npu_alloc_conf != default && \
+      ! $npu_alloc_conf =~ ^max_split_size_mb:[0-9]+$ ]]; then
+  echo "SPECSLO_NPU_ALLOC_CONF must be default or max_split_size_mb:<MiB>" >&2
+  exit 2
+fi
+for value in "$profile_host_decode_steps" "$profile_wait_steps"; do
+  if [[ ! $value =~ ^[0-9]+$ ]]; then
+    echo "profiling step counts must be non-negative integers" >&2
+    exit 2
+  fi
+done
+if [[ $target_fia_task_update_workers != 1 && \
+      $target_fia_task_update_workers != 2 && \
+      $target_fia_task_update_workers != 3 && \
+      $target_fia_task_update_workers != 4 ]]; then
+  echo "SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS must be 1, 2, 3, or 4" >&2
+  exit 2
+fi
+if [[ $target_fia_task_event_group_size != 1 && \
+      $target_fia_task_event_group_size != 2 && \
+      $target_fia_task_event_group_size != 4 ]]; then
+  echo "SPECSLO_TARGET_FIA_TASK_EVENT_GROUP_SIZE must be 1, 2, or 4" >&2
+  exit 2
+fi
+if [[ $target_fia_task_prefix_event_group_size != 0 && \
+      $target_fia_task_prefix_event_group_size != 1 && \
+      $target_fia_task_prefix_event_group_size != 2 ]]; then
+  echo "SPECSLO_TARGET_FIA_TASK_PREFIX_EVENT_GROUP_SIZE must be 0, 1, or 2" >&2
+  exit 2
+fi
+if (( target_fia_task_prefix_event_group_size >= target_fia_task_event_group_size )) && \
+   (( target_fia_task_prefix_event_group_size != 0 )); then
+  echo "SPECSLO_TARGET_FIA_TASK_PREFIX_EVENT_GROUP_SIZE must be smaller than the steady event group" >&2
+  exit 2
+fi
+if [[ $draft_pa_task_update_workers != 1 && \
+      $draft_pa_task_update_workers != 2 && \
+      $draft_pa_task_update_workers != 4 ]]; then
+  echo "SPECSLO_DRAFT_PA_TASK_UPDATE_WORKERS must be 1, 2, or 4" >&2
+  exit 2
+fi
+for required in "$repo" "$python" "$manifest" "$profile" "$vendor" "$extension"; do
+  if [[ ! -e $required ]]; then
+    echo "required path is missing: $required" >&2
+    exit 2
+  fi
+done
+if [[ ! -d $vendor || ! -f $vendor/op_api/lib/libcust_opapi.so ]]; then
+  echo "MC2 vendor is not an installed custom-op tree: $vendor" >&2
+  exit 2
+fi
+if [[ $mc2_mode == on ]] && ! nm -D "$vendor/op_api/lib/libcust_opapi.so" 2>/dev/null \
+  | grep -q 'aclnnAllreduceAddRmsnormGetWorkspaceSize'; then
+  echo "MC2 vendor does not provide aclnnAllreduceAddRmsnorm: $vendor" >&2
+  exit 2
+fi
+
+run_dir=${result_root}/runs/candidate-${mc2_mode}-${run_tag}
+if [[ $validate_only == 1 ]]; then
+  if [[ ! -f $run_dir/result.json ]]; then
+    echo "validation result is missing: $run_dir/result.json" >&2
+    exit 2
+  fi
+else
+  if [[ -e $run_dir ]]; then
+    echo "refusing to overwrite existing run: $run_dir" >&2
+    exit 3
+  fi
+  mkdir -p "$run_dir"
+fi
+
+assert_cards_free() {
+  npu-smi info > "$run_dir/npu-before.txt"
+  local device snapshot
+  for device in "${devices[@]}"; do
+    snapshot=$run_dir/npu-${device}-proc-before.txt
+    npu-smi info -t proc-mem -i "$device" -c 0 > "$snapshot" 2>&1
+    if ! grep -Eiq 'No process in device[.]|No running processes found' "$snapshot"; then
+      echo "NPU $device is not process-free; refusing to launch" >&2
+      return 1
+    fi
+  done
+}
+if [[ $validate_only == 0 ]]; then
+  assert_cards_free
+fi
+source /root/data/specslo-cann-runtime/cann-9.0.0/set_env.sh
+export PYTHONPATH=$repo:${PYTHONPATH:-}
+container_runtime_devices=$("$python" /root/SpecSLO/priority-linear-budget-20261112/map_current.py "$visible_devices")
+export ASCEND_RT_VISIBLE_DEVICES=$container_runtime_devices
+export TASK_QUEUE_ENABLE=1
+export HCCL_OP_EXPANSION_MODE=AIV
+export HCCL_DETERMINISTIC=true
+unset VLLM_ASCEND_PEARL_TARGET_TOKEN_PAD_MULTIPLE
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+if [[ $npu_alloc_conf == default ]]; then
+  unset PYTORCH_NPU_ALLOC_CONF
+else
+  export PYTORCH_NPU_ALLOC_CONF=expandable_segments:True
+fi
+export ASCEND_CUSTOM_OPP_PATH=$vendor:$base_vendor
+export LD_LIBRARY_PATH=$vendor/op_api/lib:$repo/vllm_ascend:$repo/vllm_ascend/lib64:$repo/build/temp.linux-aarch64-cpython-311:$torch_lib:$torch_npu_lib:/usr/local/Ascend/cann-9.0.0/lib64:${LD_LIBRARY_PATH:-}
+
+# The formal performance rounds leave SPECSLO_PROFILE_HOST_DECODE_STEPS at
+# zero, so inherited shell state cannot accidentally turn on CANN profiling.
+# A separate diagnostic run opts in explicitly.  Measurement-only mode arms
+# the profiler after graph qualification when the benchmark configures its
+# non-synchronizing host timeline for the final generate call.
+profile_args=()
+npu_profile_dir=
+if (( profile_host_decode_steps > 0 && enable_npu_profile == 1 )); then
+  npu_profile_dir=$run_dir/npu-profile
+  mkdir -p "$npu_profile_dir"
+  export VLLM_ASCEND_PEARL_NPU_PROFILE_DIR=$npu_profile_dir
+  export VLLM_ASCEND_PEARL_NPU_PROFILE_RANK=1
+  export VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS=$profile_wait_steps
+  export VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY=1
+  profile_args=(--profile-host-decode-steps "$profile_host_decode_steps")
+else
+  unset VLLM_ASCEND_PEARL_NPU_PROFILE_DIR
+  unset VLLM_ASCEND_PEARL_NPU_PROFILE_RANK
+  unset VLLM_ASCEND_PEARL_NPU_PROFILE_WAIT_STEPS
+  unset VLLM_ASCEND_PEARL_NPU_PROFILE_MEASUREMENT_ONLY
+fi
+if (( profile_host_decode_steps > 0 )); then
+  profile_args=(--profile-host-decode-steps "$profile_host_decode_steps")
+fi
+
+export VLLM_ASCEND_PEARL_DRAFT_NZ_MODE=-1
+export VLLM_ASCEND_PEARL_TARGET_LARGE_M_NZ_MIN_ROWS=$target_large_m_nz_min_rows
+export VLLM_ASCEND_PEARL_TARGET_REPLICATE_INPUT_EMBEDDING=$target_replicate_input_embedding
+if [[ $target_nz_mode == default ]]; then
+  unset VLLM_ASCEND_PEARL_TARGET_NZ_MODE
+else
+  export VLLM_ASCEND_PEARL_TARGET_NZ_MODE=$target_nz_mode
+fi
+unset VLLM_ASCEND_PEARL_ENABLE_TP3_MM_ALL_REDUCE
+export VLLM_ASCEND_PEARL_DRAFT_REPLAY_FIRST_TASK_UPDATE=1
+export VLLM_ASCEND_PEARL_DRAFT_STEP_MAJOR_PA_TASK_UPDATE=0
+# Overwrite the runtime variable even at the production default so a parent
+# shell cannot silently contaminate the candidate contract.
+export VLLM_ASCEND_PEARL_DRAFT_PA_TASK_UPDATE_WORKERS=$draft_pa_task_update_workers
+export VLLM_ASCEND_PEARL_DRAFT_PA_CONTIGUOUS_PARTITION=$draft_pa_contiguous_partition
+export VLLM_ASCEND_PEARL_DRAFT_GRAPH_UPDATE_STREAM_PRIORITY=0
+export VLLM_ASCEND_PEARL_TARGET_REPLAY_FIRST_TASK_UPDATE=1
+export VLLM_ASCEND_PEARL_TARGET_FIA_TASK_EVENT_GROUP_SIZE=$target_fia_task_event_group_size
+export VLLM_ASCEND_PEARL_TARGET_FIA_TASK_PREFIX_EVENT_GROUP_SIZE=$target_fia_task_prefix_event_group_size
+# Always overwrite inherited runtime state.  The production default remains
+# one; workers=2/4 are explicit experiments whose measured parallel path must
+# pass the post-warmup evidence gate below.
+export VLLM_ASCEND_PEARL_TARGET_FIA_TASK_UPDATE_WORKERS=$target_fia_task_update_workers
+export VLLM_ASCEND_PEARL_TARGET_GRAPH_UPDATE_STREAM_PRIORITY=0
+export VLLM_ASCEND_PEARL_SHARED_GRAPH_POOL=1
+# The production profile qualifies both the attention output projection and
+# the FFN down projection.  Freeze the latter on in the launcher instead of
+# inheriting its fail-closed process default; otherwise an apparently valid
+# "MC2-on" campaign would silently benchmark only half of the qualified
+# target path.
+export VLLM_ASCEND_PEARL_MC2_DOWN_PROJ=1
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_PREFILL=1
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH=1
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PREFILL_ONLY=$prefill_only
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_MAX_TOKENS=$mixed_target_graph_max_tokens
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_BUCKETS=$mixed_target_graph_buckets
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_VERIFY_CAPACITIES=$mixed_target_verify_capacities
+export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PROMPT_CAPACITY=4
+export VLLM_ASCEND_SPECRHYTHM_PREFETCH_AHEAD=$prefetch_ahead
+export VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_MAX_CAPACITY=$target_max_batch
+export VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_DENSE_MAX_CAPACITY=$stable_target_dense_max_capacity
+export VLLM_ASCEND_SPECRHYTHM_STABLE_TARGET_VERIFY_REQUEST_BUCKET=$stable_target_request_bucket
+export VLLM_ASCEND_SPECRHYTHM_MIXED_DRAFT_PREFILL=0
+export VLLM_ASCEND_SPECRHYTHM_OVERLAP_DRAFT_PREFILL=0
+export VLLM_ASCEND_SPECRHYTHM_GLOO_CORRECTION=1
+export VLLM_ASCEND_SPECRHYTHM_GLOO_ACCOUNTING=1
+export VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL=1
+export VLLM_ASCEND_SPECRHYTHM_GLOO_PROPOSAL_REUSE_HOST_CONTINUATION=$host_continuation_reuse
+export VLLM_ASCEND_SPECRHYTHM_GOODPUT_EDF=0
+export VLLM_ASCEND_SPECRHYTHM_TARGET_SLO_FIRST=$target_slo_first
+export VLLM_ASCEND_SPECRHYTHM_DRAIN_FIFO=$drain_fifo
+export VLLM_ASCEND_SPECRHYTHM_ONLINE_TARGET_MAX_BATCH=$online_target_max_batch
+export VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF=$drain_lrtf
+export VLLM_ASCEND_SPECRHYTHM_DRAIN_LRTF_MAX_ACTIVE=$drain_lrtf_max_active
+export VLLM_ASCEND_SPECRHYTHM_DRAIN_TARGET_LRTF=$drain_target_lrtf
+export VLLM_ASCEND_SPECRHYTHM_DRAIN_PADDING_REPAIR=$drain_padding_repair
+export VLLM_ASCEND_SPECRHYTHM_TARGET_RESIDUAL_LRTF=$target_residual_lrtf
+export VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD=$target_replay_ahead
+export VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_TARGET_SUBMIT=$early_current_target_submit
+export VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT=$early_current_mixed_target_submit
+export VLLM_ASCEND_SPECRHYTHM_RESIDUAL_EAGER_TIGHT_ONLY=$residual_tight_only
+export VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION=1
+export VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS=0
+export VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP=0
+export VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP=0
+export VLLM_ASCEND_SPECRHYTHM_PREEMPT_LOOSE_FOR_TIGHT=0
+export VLLM_ASCEND_SPECRHYTHM_TIGHT_TARGET_BURST=0
+export VLLM_ASCEND_SPECRHYTHM_TIGHT_HOME_FRACTION=0.5
+export VLLM_ASCEND_SPECRHYTHM_LINEAR_ACCEPTANCE_ONLY=$acceptance_only
+unset VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE
+unset VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS
+unset VLLM_ASCEND_PEARL_SYNC_GRAPH_TASK_UPDATE
+unset VLLM_ASCEND_PEARL_SYNC_GRAPH_REPLAY
+unset VLLM_ASCEND_PEARL_VALIDATE_GRAPH_REPLAYS
+export VLLM_ASCEND_SPECSLO_DRAFT_DEVICE_PAGED_ATTENTION=$draft_device_paged_attention
+unset VLLM_ASCEND_SPECRHYTHM_LINEAR_DRAFT_FIA_BUCKET
+unset VLLM_ASCEND_SPECRHYTHM_FORCE_STEPWISE_TARGET
+unset VLLM_ASCEND_SPECRHYTHM_DISABLE_TARGET_ACLGRAPH
+unset VLLM_ASCEND_SPECRHYTHM_STEPWISE_TARGET_FIA
+
+mc2_args=()
+if [[ $mc2_mode == on ]]; then
+  mc2_args=(--enable-mc2 --mc2-profile "$profile")
+fi
+bonus_args=()
+if [[ $linear_bonus_token == 1 ]]; then
+  bonus_args=(--spec-rhythm-linear-bonus-token)
+fi
+
+if [[ $validate_only == 0 ]]; then
+  cd "$repo"
+  git rev-parse HEAD > "$run_dir/git-head.txt"
+  git diff --binary > "$run_dir/working-tree.patch"
+  git status --porcelain=v1 --untracked-files=all > "$run_dir/git-status.txt"
+  sha256sum "$manifest" "$profile" "$extension" > "$run_dir/input.sha256"
+  {
+  printf 'mode=%s\nrun_tag=%s\nvisible_devices=%s\n' "$mc2_mode" "$run_tag" "$visible_devices"
+  printf 'result_root=%s\nrun_dir=%s\n' "$result_root" "$run_dir"
+  printf 'fallback_max_batch=%s\nacceptance_only=%s\nacceptance_floor=%s\nlinear_bonus_token=%s\nprefill_only=%s\n' \
+    "$fallback_max_batch" "$acceptance_only" "$acceptance_floor" "$linear_bonus_token" "$prefill_only"
+  printf 'mixed_target_graph_max_tokens=%s\n' "$mixed_target_graph_max_tokens"
+  printf 'mixed_target_graph_buckets=%s\n' "$mixed_target_graph_buckets"
+  printf 'residual_tight_only=%s\ngraph_entries=%s\nkv_blocks=%s\n' "$residual_tight_only" "$graph_entries" "$kv_blocks"
+  printf 'loose_admission_tight_gate=%s\n' "${SPECSLO_LOOSE_ADMISSION_TIGHT_GATE:--1}"
+  printf 'admission_kv_guard_pages=%s\n' "${SPECSLO_ADMISSION_KV_GUARD_PAGES:-0}"
+  printf 'target_slo_first=%s\n' "$target_slo_first"
+  printf 'host_continuation_reuse=%s\ndrain_fifo=%s\ndrain_lrtf=%s\n' \
+    "$host_continuation_reuse" "$drain_fifo" "$drain_lrtf"
+  printf 'drain_lrtf_max_active=%s\n' "$drain_lrtf_max_active"
+  printf 'drain_target_lrtf=%s\n' "$drain_target_lrtf"
+  printf 'drain_padding_repair=%s\n' "$drain_padding_repair"
+  printf 'target_residual_lrtf=%s\n' "$target_residual_lrtf"
+  printf 'profile_host_decode_steps=%s\nnpu_profile_wait_steps=%s\nenable_npu_profile=%s\n' \
+    "$profile_host_decode_steps" "$profile_wait_steps" "$enable_npu_profile"
+  printf 'target_fia_task_update_workers=%s\n' "$target_fia_task_update_workers"
+  printf 'target_fia_task_event_group_size=%s\n' "$target_fia_task_event_group_size"
+  printf 'target_fia_task_prefix_event_group_size=%s\n' "$target_fia_task_prefix_event_group_size"
+  printf 'draft_pa_task_update_workers=%s\n' "$draft_pa_task_update_workers"
+  printf 'draft_device_paged_attention=%s\n' "$draft_device_paged_attention"
+  printf 'draft_pa_contiguous_partition=%s\n' "$draft_pa_contiguous_partition"
+  printf 'target_replay_ahead=%s\n' "$target_replay_ahead"
+  printf 'early_current_target_submit=%s\n' "$early_current_target_submit"
+  printf 'early_current_mixed_target_submit=%s\n' "$early_current_mixed_target_submit"
+  printf 'prefetch_ahead=%s\n' "$prefetch_ahead"
+  printf 'stable_target_request_bucket=%s\n' "$stable_target_request_bucket"
+  printf 'target_max_batch=%s\nmixed_target_verify_capacities=%s\n' \
+    "$target_max_batch" "$mixed_target_verify_capacities"
+  printf 'online_target_max_batch=%s\n' "$online_target_max_batch"
+  printf 'stable_target_dense_max_capacity=%s\n' "$stable_target_dense_max_capacity"
+  printf 'target_nz_mode=%s\ntarget_large_m_nz_min_rows=%s\n' \
+    "$target_nz_mode" "$target_large_m_nz_min_rows"
+  printf 'target_replicate_input_embedding=%s\n' "$target_replicate_input_embedding"
+  printf 'npu_alloc_conf=%s\n' "$npu_alloc_conf"
+  printf 'npu_profile_measurement_only=%s\nnpu_profile_dir=%s\n' \
+    "$(( profile_host_decode_steps > 0 && enable_npu_profile == 1 ))" "$npu_profile_dir"
+  printf 'mc2_down_proj=1\n'
+  printf 'effective_allocator=expandable_segments:True\n'
+  printf 'profile=%s\nvendor=%s\n' "$profile" "$vendor"
+  } > "$run_dir/contract.env"
+
+  timeout 2400 "$python" -u examples/run_with_vllm_ascend_extension.py \
+  --extension "$extension" --required-op allreduce_add_rmsnorm_chained \
+  examples/benchmark_nano_pearl_speculative.py \
+  --draft-model /root/data/shared-models/Qwen3-0.6B \
+  --target-model /root/data/shared-models/Qwen3-32B \
+  --draft-tp-size 1 --target-tp-size 3 --draft-mode serial_linear \
+  --seed 0 --gamma 4 --spec-rhythm-min-gamma 4 \
+  --spec-rhythm-request-max-gamma 4 --spec-rhythm-linear-full-window \
+  "${bonus_args[@]}" \
+  --spec-rhythm-ablation-mode "$ablation_mode" \
+  --spec-rhythm-target-fallback-max-batch "$fallback_max_batch" \
+  --spec-rhythm-tree-width 1 --spec-rhythm-tree-depth 1 \
+  --spec-rhythm-max-eager-tokens 4 --max-model-len 4096 --max-tokens 256 \
+  --batch-sizes 64 --num-prompts 463 --request-manifest "$manifest" \
+  --gpu-memory-utilization 0.8 --num-kvcache-blocks "$kv_blocks" \
+  --max-aclgraph-entries "$graph_entries" --target-verification-graph-buckets 8 \
+  --enable-continuous-batching --enable-preemptive-scheduling --enable-spec-rhythm \
+  --spec-rhythm-priority-burst 2 --spec-rhythm-acceptance-floor "$acceptance_floor" \
+  --spec-rhythm-merge-ready-homes --spec-rhythm-linear-eager-cross-graph-bucket \
+  --spec-rhythm-linear-idle-residual-eager \
+  --spec-rhythm-online-prefill --spec-rhythm-prefill-coalesce-min-requests 1 \
+  --spec-rhythm-prefill-coalesce-max-wait-ms 0 --spec-rhythm-prefill-token-chunk-size 512 \
+  --precompile-serial-draft-graphs --spec-rhythm-stable-graphs \
+  --require-no-graph-fallback --draft-use-paged-attention \
+  --spec-rhythm-max-target-batch "$target_max_batch" "${mc2_args[@]}" \
+  --warmup-runs 1 --graph-qualification-max-runs 8 \
+  "${profile_args[@]}" \
+  --worker-timeout-seconds 1800 --output-json "$run_dir/result.json.tmp" \
+    > "$run_dir/run.log" 2>&1
+  mv "$run_dir/result.json.tmp" "$run_dir/result.json"
+fi
+
+
+if [[ $validate_only == 0 ]]; then
+  "$python" /root/SpecSLO/tpot-report-20261015/serial/main-production-check-gate.py \
+    "$run_dir/result.json" "$ablation_mode" "$run_dir/mechanism-gate.json"
+fi
