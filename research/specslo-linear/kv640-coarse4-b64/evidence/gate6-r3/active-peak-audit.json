@@ -1,0 +1,9 @@
+{
+  "status": "pass",
+  "source_result_sha256": "0308ecb4f4218b796b88493997f6a83bae187ee3bfe13c1870fa383bd6b1f776",
+  "method": "active start = arrival_offset_sec + arrival_wait_ms/1000; active end = start + finished_decode_elapsed_ms/1000; sweep half-open intervals",
+  "configured_global_batch_size": 64,
+  "inferred_simultaneous_active_peak": 64,
+  "peak_at_seconds_after_first_arrival": 142.44009971618652,
+  "requests": 463
+}
