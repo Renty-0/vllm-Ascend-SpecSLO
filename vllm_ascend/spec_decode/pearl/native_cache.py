@@ -90,6 +90,8 @@ class NativePrefixCache:
         prompt: list[int],
         *,
         enable_prefix_caching: bool = True,
+        max_cached_tokens: int | None = None,
+        defer_prefix_registration: bool = False,
     ) -> int:
         """Populate one reserved page-table row for a live request."""
         if self._active_tables is None:
@@ -107,12 +109,17 @@ class NativePrefixCache:
         try:
             max_reusable_tokens = max(0, len(prompt) - 1)
             num_full_blocks = max_reusable_tokens // self.block_size
+            if max_cached_tokens is not None:
+                if max_cached_tokens < 0 or max_cached_tokens % self.block_size:
+                    raise ValueError("Prefix reuse cap must be a non-negative full-block length.")
+                num_full_blocks = min(num_full_blocks, max_cached_tokens // self.block_size)
             num_prompt_blocks = (len(prompt) + self.block_size - 1) // self.block_size
             for logical_block in range(num_prompt_blocks):
                 prefix_end = (logical_block + 1) * self.block_size
                 prefix_key = tuple(prompt[:prefix_end]) if logical_block < num_full_blocks else None
                 block_id, cache_hit = self._acquire_block(
                     prefix_key if enable_prefix_caching else None,
+                    register_new=not defer_prefix_registration,
                 )
                 acquired_block_ids.append(block_id)
                 table[logical_block] = block_id
@@ -124,6 +131,58 @@ class NativePrefixCache:
                 table[logical_block] = -1
             raise
         return cached_tokens
+
+    def available_cached_tokens(self, prompt: list[int]) -> int:
+        """Count the contiguous, already published full prompt blocks."""
+
+        if not prompt:
+            return 0
+        full_blocks = max(0, len(prompt) - 1) // self.block_size
+        count = 0
+        for logical_block in range(full_blocks):
+            prefix_end = (logical_block + 1) * self.block_size
+            if tuple(prompt[:prefix_end]) not in self._prefix_to_block:
+                break
+            count += 1
+        return count * self.block_size
+
+    def clear_reusable_prefixes(self) -> None:
+        """Start a new benchmark generate call without warmup KV carryover."""
+
+        if any(block.ref_count for block in self._blocks):
+            raise RuntimeError("Reusable prefix keys cannot be cleared with live KV pages.")
+        self._prefix_to_block.clear()
+        for block in self._blocks:
+            block.prefix_key = None
+
+    def publish_prompt_blocks(self, sequence_id: int, prompt: list[int]) -> int:
+        """Expose completed prompt KV to later requests, never in-flight pages."""
+
+        if self._active_tables is None or not 0 <= sequence_id < len(self._active_tables):
+            raise RuntimeError("A live cache row is required to publish its prompt blocks.")
+        table = self._active_tables[sequence_id]
+        full_blocks = max(0, len(prompt) - 1) // self.block_size
+        published = 0
+        for logical_block in range(full_blocks):
+            block_id = table[logical_block]
+            if block_id < 0:
+                raise RuntimeError("A completed prompt is missing a full KV page.")
+            block = self._blocks[block_id]
+            prefix_end = (logical_block + 1) * self.block_size
+            key = tuple(prompt[:prefix_end])
+            if block.prefix_key == key:
+                continue
+            if block.prefix_key is not None:
+                raise RuntimeError("A KV page cannot be published for two prompt prefixes.")
+            if key in self._prefix_to_block:
+                # Another completed request already owns the reusable copy.
+                continue
+            block.prefix_key = key
+            self._prefix_to_block[key] = block_id
+            self._clock += 1
+            block.last_used = self._clock
+            published += 1
+        return published
 
     def ensure_capacity(
         self,
@@ -183,7 +242,12 @@ class NativePrefixCache:
             if block.ref_count < 0:
                 raise RuntimeError("PEARL KV cache block reference count became negative.")
 
-    def _acquire_block(self, prefix_key: tuple[int, ...] | None) -> tuple[int, bool]:
+    def _acquire_block(
+        self,
+        prefix_key: tuple[int, ...] | None,
+        *,
+        register_new: bool = True,
+    ) -> tuple[int, bool]:
         self._clock += 1
         if prefix_key is not None and prefix_key in self._prefix_to_block:
             block = self._blocks[self._prefix_to_block[prefix_key]]
@@ -202,13 +266,22 @@ class NativePrefixCache:
                 ),
             )
         except ValueError as error:
-            raise RuntimeError("The native PEARL KV cache has no free physical blocks.") from error
+            tables = self._active_tables or []
+            live_rows = sum(any(block_id >= 0 for block_id in table) for table in tables)
+            peak_row_blocks = max((sum(block_id >= 0 for block_id in table) for table in tables), default=0)
+            raise RuntimeError(
+                "The native PEARL KV cache has no free physical blocks: "
+                f"capacity={self.num_blocks}, live_rows={live_rows}, "
+                f"peak_row_blocks={peak_row_blocks}, "
+                f"selective_pressure_estimate={getattr(self, 'selective_pressure_estimate', -1)}, "
+                f"selective_cycles={getattr(self, 'selective_cycles', -1)}."
+            ) from error
 
         if block.prefix_key is not None:
             self._prefix_to_block.pop(block.prefix_key, None)
-        block.prefix_key = prefix_key
+        block.prefix_key = prefix_key if register_new else None
         block.ref_count = 1
         block.last_used = self._clock
-        if prefix_key is not None:
+        if block.prefix_key is not None:
             self._prefix_to_block[prefix_key] = block.block_id
         return block.block_id, False

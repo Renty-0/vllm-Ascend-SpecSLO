@@ -820,6 +820,10 @@ def main(argv: Sequence[str] | None = None) -> None:
                 else:
                     engine.bench_generate(args.num_pearl_steps)
                 warmup_runs_executed += 1
+                print(
+                    f"Graph qualification replay {warmup_runs_executed}/{warmup_run_limit} complete",
+                    flush=True,
+                )
                 if args.require_no_graph_fallback and warmup_runs_executed >= minimum_warmup_runs:
                     qualification_deltas = _worker_aclgraph_deltas(
                         graph_metrics_before_warmup,

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -ne 2 || ! $1 =~ ^[A-Za-z0-9._-]+$ || ! $2 =~ ^(0([.][0-9]+)?|1([.]0+)?)$ ]]; then
+  echo 'usage: run_candidate.sh <unique-tag> <acceptance-floor>' >&2
+  exit 2
+fi
+
+repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
+export SPECSLO_REPO_ROOT="$repo"
+export SPECSLO_RESULT_ROOT="${SPECSLO_RESULT_ROOT:-$repo/research/specslo-linear-650/results}"
+export SPECSLO_VISIBLE_DEVICES=0,1,2,7 SPECSLO_TARGET_DEVICES=1,2,3
+export SPECSLO_MC2_VENDOR=/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/mc2-vendor
+export SPECSLO_MC2_PROFILE=/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/mc2-profile.json
+export SPECSLO_TARGET_FALLBACK_MAX_BATCH=4
+export SPECSLO_LINEAR_ACCEPTANCE_ONLY=1 SPECSLO_LINEAR_BONUS_TOKEN=0
+export SPECSLO_ACCEPTANCE_FLOOR="$2"
+export SPECSLO_RESIDUAL_EAGER_TIGHT_ONLY=0
+export SPECSLO_GLOO_PROPOSAL_REUSE_HOST_CONTINUATION=1
+export SPECSLO_DRAIN_FIFO=1 SPECSLO_DRAIN_PADDING_REPAIR=1
+export SPECSLO_MAX_ACLGRAPH_ENTRIES=80 SPECSLO_NUM_KVCACHE_BLOCKS="${SPECSLO_NUM_KVCACHE_BLOCKS:-640}"
+export SPECSLO_MIXED_TARGET_GRAPH_BUCKETS=128,256,384,512
+export SPECSLO_PROFILE_HOST_DECODE_STEPS=0 SPECSLO_NPU_PROFILE_WAIT_STEPS=16
+export SPECSLO_ENABLE_NPU_PROFILE=0
+export SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS=2
+export SPECSLO_TARGET_FIA_TASK_EVENT_GROUP_SIZE=1
+export SPECSLO_DRAFT_PA_TASK_UPDATE_WORKERS=2
+export SPECSLO_EARLY_CURRENT_TARGET_SUBMIT=1
+export SPECSLO_STABLE_TARGET_REQUEST_BUCKET=1 SPECSLO_MAX_TARGET_BATCH=32
+export SPECSLO_TARGET_NZ_MODE=14 SPECSLO_TARGET_LARGE_M_NZ_MIN_ROWS=161
+export SPECSLO_NPU_ALLOC_CONF=max_split_size_mb:256
+export SPECSLO_TARGET_SLO_FIRST=0
+export VLLM_ASCEND_SPECRHYTHM_SELECTIVE_VERIFY_WIDTH=0
+export SPECSLO_LOOSE_ADMISSION_TIGHT_GATE="${SPECSLO_LOOSE_ADMISSION_TIGHT_GATE:-8}"
+export SPECSLO_ADMISSION_KV_GUARD_PAGES="${SPECSLO_ADMISSION_KV_GUARD_PAGES:-624}"
+export SPECSLO_VALIDATE_ONLY=0
+
+environment_script=${SPECSLO_ENVIRONMENT_SCRIPT:-/root/SpecSLO/budget-calibration-20261015/final-fixed-gamma4-current0157-v4/environment_current.sh}
+exec bash "$environment_script" \
+  --environment-only bash "$repo/research/specslo-linear-650/body_candidate.sh" on "$1" auto

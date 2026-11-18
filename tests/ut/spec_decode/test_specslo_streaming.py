@@ -213,6 +213,7 @@ def test_worker_compact_reply_disables_per_request_graph_metrics(monkeypatch):
     engine.generate_batch.return_value = [{"completion_token_ids": [7]}]
     monkeypatch.setattr(api, "NativePearlEngine", lambda config: engine)
     monkeypatch.setattr("torch.distributed.is_initialized", lambda: False)
+    monkeypatch.setattr(api.time, "perf_counter", Mock(side_effect=[1.0, 1.5, 2.0, 2.25]))
     connection = Mock()
     connection.recv.side_effect = [
         ("pearl", [[1]], [SamplingParams(max_tokens=1)], None),
@@ -237,5 +238,9 @@ def test_worker_compact_reply_disables_per_request_graph_metrics(monkeypatch):
     assert connection.send.call_args_list[-1].args[0] == (
         "result",
         [{"completion_token_ids": [7]}],
-        {"aclgraph_replays": 23},
+        {
+            "aclgraph_replays": 23,
+            "worker_generation_wall_seconds": 0.5,
+            "worker_graph_metrics_snapshot_seconds": 0.25,
+        },
     )

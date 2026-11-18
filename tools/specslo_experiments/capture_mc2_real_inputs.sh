@@ -125,7 +125,8 @@ sha256sum \
 # shellcheck disable=SC1090
 source "$cann_env"
 export PYTHONPATH=$repo:${PYTHONPATH:-}
-export ASCEND_RT_VISIBLE_DEVICES=$visible_devices
+container_runtime_devices=$("$python" /root/data/specslo-rehydrate-audit/map_npu_ids.py "$visible_devices")
+export ASCEND_RT_VISIBLE_DEVICES=$container_runtime_devices
 export TASK_QUEUE_ENABLE=1
 export HCCL_OP_EXPANSION_MODE=AIV
 export HCCL_DETERMINISTIC=true

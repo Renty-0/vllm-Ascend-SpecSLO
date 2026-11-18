@@ -459,6 +459,13 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_PREFILL": lambda: bool(
         int(os.getenv("VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_PREFILL", "0"))
     ),
+    # Experimental selective linear verification. Zero retains fixed gamma=4;
+    # one verifies loose rows with width two on decode-only target cycles;
+    # two also shortens normal rows. No prompt/target mixed cycle is changed.
+    # This is an opt-in performance experiment and contains no credentials.
+    "VLLM_ASCEND_SPECRHYTHM_SELECTIVE_VERIFY_WIDTH": lambda: int(
+        os.getenv("VLLM_ASCEND_SPECRHYTHM_SELECTIVE_VERIFY_WIDTH", "0")
+    ),
     # Experimental fixed-envelope ACLGraph for the mixed verification/prefill
     # target pass. Keep this separate from MIXED_TARGET_PREFILL so enabling
     # the eager fusion cannot silently change capture or replay behavior.

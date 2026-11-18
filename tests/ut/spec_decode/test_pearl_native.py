@@ -2712,6 +2712,33 @@ def test_full_window_state_transition_matches_target_and_draft_committed_prefix(
     assert target.pending_window_size == draft.pending_window_size == 0
 
 
+@pytest.mark.parametrize("accepted", [0, 1, 2])
+def test_selective_full_window_discards_unverified_draft_and_eager_suffix(accepted):
+    prefix = [10, 11, 12]
+    full_proposal = [20, 21, 22, 23]
+    staged_eager = [30, 31, 32, 33]
+    correction = None if accepted == 2 else 90 + accepted
+    target = PearlPipelineState(prefix.copy(), prompt_length=2)
+    draft = target.clone()
+    draft.token_ids.extend([*full_proposal, *staged_eager])
+
+    target.apply_target_full_window_verification(
+        proposal_token_ids=full_proposal[:2],
+        accepted=accepted,
+        correction_token_id=correction,
+    )
+    draft.apply_draft_selective_full_window_verification(
+        full_proposal_token_ids=full_proposal,
+        verification_width=2,
+        accepted=accepted,
+        correction_token_id=correction,
+        staged_eager_token_ids=staged_eager,
+    )
+    assert draft.token_ids == target.token_ids
+    assert draft.committed_length == target.committed_length
+    assert draft.verified_draft_tokens == target.verified_draft_tokens == 2
+
+
 def test_full_window_draft_full_accept_without_eager_ends_at_committed_frontier():
     state = PearlPipelineState([1, 2, 3], prompt_length=2)
     proposal = torch.tensor([4, 5, 6, 7])

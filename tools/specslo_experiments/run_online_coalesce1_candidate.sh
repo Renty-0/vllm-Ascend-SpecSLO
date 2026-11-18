@@ -254,7 +254,8 @@ if [[ $validate_only == 0 ]]; then
 fi
 source /usr/local/Ascend/cann-9.0.0/set_env.sh
 export PYTHONPATH=$repo:${PYTHONPATH:-}
-export ASCEND_RT_VISIBLE_DEVICES=$visible_devices
+container_runtime_devices=$("$python" /root/data/specslo-rehydrate-audit/map_npu_ids.py "$visible_devices")
+export ASCEND_RT_VISIBLE_DEVICES=$container_runtime_devices
 export TASK_QUEUE_ENABLE=1
 export HCCL_OP_EXPANSION_MODE=AIV
 export HCCL_DETERMINISTIC=true
@@ -432,8 +433,8 @@ if [[ $validate_only == 0 ]]; then
   timeout 2400 "$python" -u examples/run_with_vllm_ascend_extension.py \
   --extension "$extension" --required-op allreduce_add_rmsnorm_chained \
   examples/benchmark_nano_pearl_speculative.py \
-  --draft-model /data/shared-models/Qwen3-0.6B \
-  --target-model /data/shared-models/Qwen3-32B \
+  --draft-model /root/data/shared-models/Qwen3-0.6B \
+  --target-model /root/data/shared-models/Qwen3-32B \
   --draft-tp-size 1 --target-tp-size 3 --draft-mode serial_linear \
   --seed 0 --gamma 4 --spec-rhythm-min-gamma 4 \
   --spec-rhythm-request-max-gamma 4 --spec-rhythm-linear-full-window \

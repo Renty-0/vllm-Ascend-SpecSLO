@@ -177,7 +177,8 @@ env | LC_ALL=C sort > "$run_dir/environment.txt"
 # shellcheck disable=SC1090
 source "$cann_env"
 export PYTHONPATH=$repo:${PYTHONPATH:-}
-export ASCEND_RT_VISIBLE_DEVICES=$target_devices
+container_runtime_devices=$("$python" /root/data/specslo-rehydrate-audit/map_npu_ids.py "$target_devices")
+export ASCEND_RT_VISIBLE_DEVICES=$container_runtime_devices
 export TASK_QUEUE_ENABLE=1
 export HCCL_OP_EXPANSION_MODE=AIV
 export HCCL_DETERMINISTIC=true

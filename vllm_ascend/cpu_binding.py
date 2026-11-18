@@ -199,7 +199,12 @@ class DeviceInfo:
                     continue
                 last_part = parts[-1]
                 if self.is_cpu_list(last_part):
-                    affinity[int(npu_match.group(1))] = self.expand_cpu_list(last_part)
+                    # Topology rows identify physical boards; CPU pools use
+                    # the container's Chip Logic IDs from `npu-smi info -m`.
+                    chip_map = self.npu_map_info.get(npu_match.group(1), {})
+                    for logic_id in chip_map.values():
+                        if logic_id.isdigit():
+                            affinity[int(logic_id)] = self.expand_cpu_list(last_part)
         return affinity
 
 

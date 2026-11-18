@@ -63,6 +63,7 @@ from vllm_ascend.spec_decode.pearl.mc2 import (
     snapshot_mc2_dispatch_counters,
     validate_mc2_runtime_binding,
 )
+from vllm_ascend.spec_decode.pearl.mixed_width_ops import pack_selective_target_queries
 from vllm_ascend.spec_decode.pearl.native_cache import NativeCacheAllocation, NativePrefixCache
 from vllm_ascend.spec_decode.pearl.native_graph import NativeACLGraphRunner, NativeGraphExecution
 from vllm_ascend.spec_decode.pearl.native_model import (
@@ -1927,6 +1928,45 @@ class PearlPipelineState:
             bonus_committed=bonus_token_id is not None,
         )
 
+    def apply_draft_selective_full_window_verification(
+        self,
+        *,
+        full_proposal_token_ids: Sequence[int] | torch.Tensor,
+        verification_width: int,
+        accepted: int,
+        correction_token_id: int | None,
+        staged_eager_token_ids: Sequence[int] | torch.Tensor | None = None,
+    ) -> None:
+        """Discard unverified draft suffix before committing a short verdict.
+
+        The fixed four-step draft graph may predict more tokens than the
+        target chose to verify for a relaxed row. Those extra tokens and any
+        eager continuation depend on an unverified prefix and cannot be kept
+        as state or promoted to a ready ticket.
+        """
+
+        proposal = self._materialize_full_window_tokens(full_proposal_token_ids, label="full draft proposal")
+        width = int(verification_width)
+        if not 0 < width <= len(proposal):
+            raise ValueError("Selective verification width must fit its full draft proposal.")
+        eager = (
+            []
+            if staged_eager_token_ids is None
+            else self._materialize_full_window_tokens(staged_eager_token_ids, label="staged eager continuation")
+        )
+        assert self.committed_length is not None
+        if self.token_ids[self.committed_length :] != [*proposal, *eager]:
+            raise RuntimeError("Selective draft tail differs from its proposal and eager continuation.")
+        if width < len(proposal):
+            del self.token_ids[self.committed_length + width :]
+            eager = []
+        self.apply_draft_full_window_verification(
+            proposal_token_ids=proposal[:width],
+            accepted=accepted,
+            correction_token_id=correction_token_id,
+            staged_eager_token_ids=eager or None,
+        )
+
     def apply_draft_full_window_verification(
         self,
         *,
@@ -3631,8 +3671,6 @@ class NativePearlConfig:
                     "SpecRhythm token-chunk prefill requires enable_spec_rhythm, "
                     "online prefill, and linear full-window mode."
                 )
-            if self.enable_prefix_caching:
-                raise ValueError("SpecRhythm token-chunk prefill requires prefix caching to be disabled.")
             if self.spec_rhythm_prefill_token_chunk_size > self.max_num_batched_tokens:
                 raise ValueError("SpecRhythm prefill token chunk size must not exceed max_num_batched_tokens.")
         if self.spec_rhythm_min_gamma <= 0 or (self.gamma != -1 and self.spec_rhythm_min_gamma > self.gamma):
@@ -4712,6 +4750,8 @@ class NativePearlEngine:
         prompt: list[int],
         *,
         enable_prefix_caching: bool,
+        max_cached_tokens: int | None = None,
+        defer_prefix_registration: bool = False,
     ) -> None:
         """Activate a pre-reserved KV page-table row for online admission."""
         if self.cache_allocation is None or self.cache_block_tables is None:
@@ -4720,6 +4760,8 @@ class NativePearlEngine:
             sequence_id,
             prompt,
             enable_prefix_caching=enable_prefix_caching,
+            max_cached_tokens=max_cached_tokens,
+            defer_prefix_registration=defer_prefix_registration,
         )
         self.cache_allocation.num_cached_tokens[sequence_id] = cached_tokens
         self.cache_block_tables[sequence_id].copy_(
@@ -7319,6 +7361,10 @@ class NativePearlEngine:
                 continue
             if live_open:
                 live_open = not admit_available()
+                # Live cancellation can remove the final active request at
+                # this fence. Return to admission/closure before scheduling.
+                if not active:
+                    continue
             cycle_started = time.perf_counter()
             host_trace: dict[str, int | float] | None = None
             if round_count < self.config.profile_host_decode_steps:
@@ -8822,6 +8868,11 @@ class NativePearlEngine:
             # guard unchanged.
             self.graph_runner.set_expected_fia_batch_size(None)
         local_states = draft_states if self.is_draft else target_states
+        if self.config.enable_prefix_caching and self.config.spec_rhythm_prefill_token_chunk_size > 0:
+            # Strict graph qualification replays the same 463 requests before
+            # measurement.  Reuse only within this generate call; otherwise
+            # the scored trace would begin with an already populated cache.
+            self.prefix_cache.clear_reusable_prefixes()
         active_indices: list[int] = []
         pending_admission = list(range(len(local_states)))
         completed_states: dict[int, PearlPipelineState] = {}
@@ -8845,7 +8896,32 @@ class NativePearlEngine:
             new_indices = [index for index in request_indices if index not in cache_activated]
             if not new_indices:
                 return
-            for index in new_indices:
+            safe_prefix_chunk = bool(
+                self.config.enable_prefix_caching and self.config.spec_rhythm_prefill_token_chunk_size > 0
+            )
+            reuse_caps: list[int] | None = None
+            if safe_prefix_chunk:
+                coordination_group = getattr(self.groups, "verification_coordination_group", None)
+                if coordination_group is None or len(self.topology.draft_ranks) != 1:
+                    raise RuntimeError("Chunked prefix reuse requires the four-rank CPU coordination group.")
+                selected_by_rank: list[object] = [None] * dist.get_world_size(group=coordination_group)
+                dist.all_gather_object(
+                    selected_by_rank,
+                    tuple(new_indices),
+                    group=coordination_group,
+                )
+                if any(selected != tuple(new_indices) for selected in selected_by_rank):
+                    raise RuntimeError("Replicated prompt admission diverged before prefix reuse.")
+                local_caps = [
+                    self.prefix_cache.available_cached_tokens(
+                        local_states[index].token_ids[: local_states[index].prompt_length]
+                    )
+                    for index in new_indices
+                ]
+                shared_caps = torch.tensor(local_caps, dtype=torch.long, device="cpu")
+                dist.all_reduce(shared_caps, op=dist.ReduceOp.MIN, group=coordination_group)
+                reuse_caps = [int(value) for value in shared_caps.tolist()]
+            for position, index in enumerate(new_indices):
                 prompt = local_states[index].token_ids[: local_states[index].prompt_length]
                 self._activate_cache_sequence(
                     index,
@@ -8853,7 +8929,16 @@ class NativePearlEngine:
                     enable_prefix_caching=(
                         self.config.enable_prefix_caching and not self.config.spec_rhythm_kv_ready_arrivals
                     ),
+                    max_cached_tokens=(reuse_caps[position] if reuse_caps is not None else None),
+                    defer_prefix_registration=safe_prefix_chunk,
                 )
+                if reuse_caps is not None:
+                    actual = self.cache_allocation.num_cached_tokens[index]
+                    if actual != reuse_caps[position]:
+                        raise RuntimeError("Replicated prompt prefix reuse diverged after activation.")
+                    counters["spec_rhythm_safe_prefix_cached_tokens"] = (
+                        counters.get("spec_rhythm_safe_prefix_cached_tokens", 0) + actual
+                    )
             if self.config.spec_rhythm_kv_ready_arrivals:
                 snapshots = getattr(self, "_kv_ready_host_snapshots", None)
                 batch_snapshots = [None if snapshots is None else snapshots.get(index) for index in new_indices]
@@ -8974,6 +9059,18 @@ class NativePearlEngine:
         )
         prefill_token_chunk_size = int(self.config.spec_rhythm_prefill_token_chunk_size)
         token_chunk_prefill = prefill_token_chunk_size > 0
+        loose_admission_tight_gate = int(os.environ.get("SPECSLO_LOOSE_ADMISSION_TIGHT_GATE", "-1"))
+        if loose_admission_tight_gate < -1 or loose_admission_tight_gate > initial_batch_size:
+            raise ValueError("SPECSLO_LOOSE_ADMISSION_TIGHT_GATE must be -1 or within the active batch capacity.")
+        admission_kv_guard_pages = int(os.environ.get("SPECSLO_ADMISSION_KV_GUARD_PAGES", "0"))
+        if admission_kv_guard_pages < 0:
+            raise ValueError("SPECSLO_ADMISSION_KV_GUARD_PAGES must be non-negative.")
+        if (
+            admission_kv_guard_pages
+            and self.config.num_kvcache_blocks > 0
+            and admission_kv_guard_pages >= self.config.num_kvcache_blocks
+        ):
+            raise ValueError("SPECSLO_ADMISSION_KV_GUARD_PAGES must leave at least one free KV block.")
         staged_prefill_indices: list[int] = []
         staged_prefill_tokens: list[int] | None = None
         staged_prefill_cursors: dict[int, int] = {}
@@ -9166,6 +9263,10 @@ class NativePearlEngine:
             "spec_rhythm_prefill_coalesce_max_wait_observed_ms": 0.0,
             "spec_rhythm_prefill_token_chunk_enabled": int(token_chunk_prefill),
             "spec_rhythm_prefill_token_chunk_size": prefill_token_chunk_size,
+            "spec_rhythm_loose_admission_tight_gate": loose_admission_tight_gate,
+            "spec_rhythm_loose_admission_deferred": 0,
+            "spec_rhythm_admission_kv_guard_deferred": 0,
+            "spec_rhythm_admission_kv_reserved_peak": 0,
             "spec_rhythm_prefill_token_chunk_submissions": 0,
             "spec_rhythm_prefill_token_chunk_tokens": 0,
             "spec_rhythm_prefill_token_chunk_partial_submissions": 0,
@@ -9519,12 +9620,59 @@ class NativePearlEngine:
                 enabled=class_caps_enabled,
                 class_of=slo_counter_class,
             )
+            active_tight_count = sum(
+                slo_counter_class(index) == "tight"
+                for indices in (active_indices, staged_prefill_indices)
+                for index in indices
+            )
+            block_size = self.config.kvcache_block_size
+
+            def reserved_kv_pages(index: int) -> int:
+                state = local_states[index]
+                return (state.prompt_length + state.max_tokens + self.gamma + block_size - 1) // block_size
+
+            admission_reserved_pages = (
+                sum(
+                    reserved_kv_pages(index)
+                    for index in set(active_indices) | set(staged_prefill_indices) | set(suspended_indices)
+                )
+                if admission_kv_guard_pages
+                else 0
+            )
+            counters["spec_rhythm_admission_kv_reserved_peak"] = max(
+                counters["spec_rhythm_admission_kv_reserved_peak"], admission_reserved_pages
+            )
+            ready_tight_pending = any(
+                index not in staged_set
+                and slo_counter_class(index) == "tight"
+                and (
+                    not arrival_gated
+                    or request_params[index].arrival_ts is None
+                    or float(request_params[index].arrival_ts) <= now
+                )
+                for index in pending_admission
+            )
             selected_for_admission: set[int] | None = set() if class_caps_enabled else None
             for index in admission_candidates:
                 if index in staged_set:
                     continue
                 arrival = request_params[index].arrival_ts
                 if arrival_gated and arrival is not None and arrival > now:
+                    continue
+                if (
+                    loose_admission_tight_gate >= 0
+                    and slo_counter_class(index) == "loose"
+                    and (active_tight_count > loose_admission_tight_gate or ready_tight_pending)
+                ):
+                    counters["spec_rhythm_loose_admission_deferred"] += 1
+                    continue
+                candidate_kv_pages = reserved_kv_pages(index) if admission_kv_guard_pages else 0
+                if (
+                    admission_kv_guard_pages
+                    and (active_indices or staged_prefill_indices or ready_indices)
+                    and admission_reserved_pages + candidate_kv_pages > admission_kv_guard_pages
+                ):
+                    counters["spec_rhythm_admission_kv_guard_deferred"] += 1
                     continue
                 request_class = None
                 if class_caps_enabled:
@@ -9577,6 +9725,10 @@ class NativePearlEngine:
                 if prefill_budget_tokens > self.config.max_num_batched_tokens:
                     raise ValueError("An online PEARL prefill request exceeds max_num_batched_tokens.")
                 ready_indices.append(index)
+                admission_reserved_pages += candidate_kv_pages
+                counters["spec_rhythm_admission_kv_reserved_peak"] = max(
+                    counters["spec_rhythm_admission_kv_reserved_peak"], admission_reserved_pages
+                )
                 if selected_for_admission is not None:
                     selected_for_admission.add(index)
                 if active_class_counts is not None:
@@ -9846,7 +9998,10 @@ class NativePearlEngine:
             if prefill_indices:
                 refill_started = time.perf_counter()
                 if token_chunk_prefill:
-                    cursors = {index: 0 for index in prefill_indices}
+                    cursors = {
+                        index: int(self.cache_allocation.num_cached_tokens[index])
+                        for index in prefill_indices
+                    }
                     sampled: dict[int, int] = {}
                     while len(sampled) < len(prefill_indices):
                         chunks = plan_spec_rhythm_prefill_token_chunk(
@@ -9890,6 +10045,13 @@ class NativePearlEngine:
                 counters["spec_rhythm_prefill_batches"] += 1
                 counters["spec_rhythm_prefill_requests"] += len(prefill_indices)
                 record_prefill_batch(len(prefill_indices))
+                if self.config.enable_prefix_caching and token_chunk_prefill:
+                    for index in prefill_indices:
+                        prompt = local_states[index].token_ids[: local_states[index].prompt_length]
+                        counters["spec_rhythm_safe_prefix_published_blocks"] = (
+                            counters.get("spec_rhythm_safe_prefix_published_blocks", 0)
+                            + self.prefix_cache.publish_prompt_blocks(index, prompt)
+                        )
             activate_ready(
                 ready_indices,
                 target_tokens,
@@ -9917,7 +10079,10 @@ class NativePearlEngine:
             activate_online_cache(ready_indices)
             if token_chunk_prefill:
                 prefill_indices = [index for index in ready_indices if index not in prefetched]
-                staged_prefill_cursors = {index: 0 for index in prefill_indices}
+                staged_prefill_cursors = {
+                    index: int(self.cache_allocation.num_cached_tokens[index])
+                    for index in prefill_indices
+                }
                 staged_prefill_target_tokens = {}
             counters["spec_rhythm_staged_prefill_reserved_batches"] += 1
             counters["spec_rhythm_staged_prefill_reserved_requests"] += len(ready_indices)
@@ -9974,6 +10139,13 @@ class NativePearlEngine:
                 staged_prefill_cursors[chunk.request_index] = chunk.end
             submitted_tokens = sum(chunk.token_count for chunk in chunks)
             staged_prefill_target_tokens.update(completed)
+            if self.config.enable_prefix_caching and token_chunk_prefill:
+                for index in completed:
+                    prompt = local_states[index].token_ids[: local_states[index].prompt_length]
+                    counters["spec_rhythm_safe_prefix_published_blocks"] = (
+                        counters.get("spec_rhythm_safe_prefix_published_blocks", 0)
+                        + self.prefix_cache.publish_prompt_blocks(index, prompt)
+                    )
             counters["spec_rhythm_prefill_token_chunk_submissions"] += 1
             counters["spec_rhythm_prefill_token_chunk_tokens"] += submitted_tokens
             counters["spec_rhythm_prefill_token_chunk_completed_rows"] += len(completed)
@@ -11035,6 +11207,67 @@ class NativePearlEngine:
                     <= self.config.max_num_batched_tokens
                 )
             )
+            selective_verify_mode = int(envs.VLLM_ASCEND_SPECRHYTHM_SELECTIVE_VERIFY_WIDTH)
+            if selective_verify_mode not in (0, 1, 2):
+                raise ValueError("Selective verification mode must be zero, one, or two.")
+            # Shortening relaxed verification can keep its KV rows resident
+            # for more cycles. Estimate live logical pages from replicated
+            # committed state and leave room for graph scratch and newly
+            # staged prefills before selecting the short path. The gate must
+            # use rank-identical host state; local free-page counts differ
+            # between draft TP1 and target TP3 and would diverge collectives.
+            selective_cache_pages = sum(
+                (
+                    max(
+                        int(local_states[index].committed_length or 0),
+                        local_states[index].prompt_length + runtime_states[index].delivered_tokens,
+                    )
+                    + self.gamma
+                    + self.config.kvcache_block_size - 1
+                )
+                // self.config.kvcache_block_size
+                for index in active_indices
+            )
+            selective_cache_pages += sum(
+                (local_states[index].prompt_length + self.config.kvcache_block_size - 1)
+                // self.config.kvcache_block_size
+                for index in staged_prefill_indices
+            )
+            self.prefix_cache.selective_pressure_estimate = selective_cache_pages
+            self.prefix_cache.selective_cycles = counters.get("spec_rhythm_selective_verify_cycles", 0)
+            counters["spec_rhythm_selective_cache_estimated_peak_pages"] = max(
+                counters.get("spec_rhythm_selective_cache_estimated_peak_pages", 0),
+                selective_cache_pages,
+            )
+            selective_cache_safe = selective_cache_pages <= 400
+            if selective_verify_mode and not selective_cache_safe:
+                counters["spec_rhythm_selective_cache_guard_cycles"] = (
+                    counters.get("spec_rhythm_selective_cache_guard_cycles", 0) + 1
+                )
+            if (
+                selective_verify_mode
+                and selective_cache_safe
+                and linear_full_window
+                and not linear_bonus_token
+                and not mixed_prefill_this_cycle
+                and target_indices
+                and target_replay_ahead_for_cycle is None
+                and any(slo_counter_class(index) == "tight" for index in target_indices)
+            ):
+                current_verification_sizes = [
+                    2 if (slo_counter_class(index) == "loose" or
+                          (selective_verify_mode == 2 and slo_counter_class(index) == "normal"))
+                    else self.gamma
+                    for index in target_indices
+                ]
+                if any(width != self.gamma for width in current_verification_sizes):
+                    counters["spec_rhythm_selective_verify_cycles"] = (
+                        counters.get("spec_rhythm_selective_verify_cycles", 0) + 1
+                    )
+                    counters["spec_rhythm_selective_verify_saved_queries"] = (
+                        counters.get("spec_rhythm_selective_verify_saved_queries", 0)
+                        + sum(self.gamma - width for width in current_verification_sizes)
+                    )
             early_mixed_target_submitted = spec_rhythm_early_current_mixed_target_submit_eligible(
                 enabled=early_current_mixed_target_submit_enabled,
                 mixed_prefill_this_cycle=mixed_prefill_this_cycle,
@@ -11137,6 +11370,7 @@ class NativePearlEngine:
                     target_indices,
                     target_payloads,
                     proposal_matrix=current_next,
+                    verification_widths=current_verification_sizes,
                 )
                 early_target_ended = time.perf_counter()
                 early_target_graph_outcome = getattr(
@@ -11730,6 +11964,7 @@ class NativePearlEngine:
                         target_indices,
                         target_payloads,
                         proposal_matrix=current_next,
+                        verification_widths=current_verification_sizes,
                     )
                     _record_stable_target_verify_graph_outcome(
                         counters,
@@ -11796,7 +12031,17 @@ class NativePearlEngine:
                     # 2-D view for correction instead of issuing both a cat
                     # and a stack launch for identical data every cycle.
                     assert current_next is not None
-                    current_message = None if self.is_draft else current_next.reshape(-1)
+                    current_message = (
+                        None
+                        if self.is_draft
+                        else (
+                            current_next.reshape(-1)
+                            if all(width == self.gamma for width in current_verification_sizes)
+                            else torch.cat(
+                                [current_next[row, :width] for row, width in enumerate(current_verification_sizes)]
+                            )
+                        )
+                    )
                 else:
                     current_message = (
                         None
@@ -11824,7 +12069,7 @@ class NativePearlEngine:
                     temperatures,
                     gamma=self.gamma,
                     linear_full_window=linear_full_window,
-                ):
+                ) and all(width == self.gamma for width in current_verification_sizes):
                     self._stage_gloo_correction_verdict(
                         verdict,
                         len(target_indices),
@@ -12476,7 +12721,7 @@ class NativePearlEngine:
                     temperatures,
                     gamma=self.gamma,
                     linear_full_window=linear_full_window,
-                )
+                ) and all(width == self.gamma for width in current_verification_sizes)
                 if profile_this_round:
                     if replicated_target_verdict:
                         participates_in_correction = self.rank in self.topology.correction_ranks
@@ -12547,7 +12792,8 @@ class NativePearlEngine:
                         assert state.committed_length is not None
                         proposal_tokens = state.token_ids[state.committed_length : state.committed_length + expected]
                         eager_tokens = (
-                            state.token_ids[state.committed_length + expected :] if eager_ticket is not None else None
+                            state.token_ids[state.committed_length + self.gamma :]
+                            if eager_ticket is not None else None
                         )
                         if getattr(self.config, "draft_mode", SERIAL_LINEAR_DRAFT_MODE) == PARD_PARALLEL_DRAFT_MODE:
                             if eager_tokens:
@@ -12561,16 +12807,28 @@ class NativePearlEngine:
                                 bonus_token_id=bonuses[row],
                             )
                         else:
-                            state.apply_draft_full_window_verification(
-                                proposal_token_ids=proposal_tokens,
-                                accepted=accepted[row],
-                                correction_token_id=corrections[row],
-                                staged_eager_token_ids=eager_tokens,
-                                bonus_token_id=bonuses[row],
-                            )
+                            if expected == self.gamma:
+                                state.apply_draft_full_window_verification(
+                                    proposal_token_ids=proposal_tokens,
+                                    accepted=accepted[row],
+                                    correction_token_id=corrections[row],
+                                    staged_eager_token_ids=eager_tokens,
+                                    bonus_token_id=bonuses[row],
+                                )
+                            else:
+                                full_proposal = state.token_ids[
+                                    state.committed_length : state.committed_length + self.gamma
+                                ]
+                                state.apply_draft_selective_full_window_verification(
+                                    full_proposal_token_ids=full_proposal,
+                                    verification_width=expected,
+                                    accepted=accepted[row],
+                                    correction_token_id=corrections[row],
+                                    staged_eager_token_ids=eager_tokens,
+                                )
                     elif linear_full_window:
                         target_states[request_index].apply_target_full_window_verification(
-                            proposal_token_ids=synchronized_next[row],
+                            proposal_token_ids=synchronized_next[row][:expected],
                             accepted=accepted[row],
                             correction_token_id=corrections[row],
                             bonus_token_id=bonuses[row],
@@ -12624,7 +12882,7 @@ class NativePearlEngine:
                         )
                     promoted = controller.finish_verification(
                         request_index,
-                        fully_accepted=fully_accepted,
+                        fully_accepted=fully_accepted and expected == self.gamma,
                         proposed_tokens=expected,
                         accepted_tokens=accepted[row],
                         delivered_tokens=delivered,
@@ -15133,8 +15391,6 @@ class NativePearlEngine:
 
         if not chunks:
             raise ValueError("SpecRhythm token-chunk prefill requires at least one span.")
-        if self.config.enable_prefix_caching:
-            raise RuntimeError("SpecRhythm token-chunk prefill cannot run with prefix caching.")
         if self.cache_allocation is None:
             raise RuntimeError("Allocate the native PEARL KV cache before token-chunk prefill.")
 
@@ -15156,8 +15412,8 @@ class NativePearlEngine:
                 raise ValueError("SpecRhythm token-chunk prompt length changed after reservation.")
             if not 0 <= chunk.start < chunk.end <= len(prompt):
                 raise ValueError("SpecRhythm token-chunk prefill received an invalid span.")
-            if self.cache_allocation.num_cached_tokens[request_index] != 0:
-                raise RuntimeError("SpecRhythm token-chunk prefill requires an uncached prompt.")
+            if chunk.start < self.cache_allocation.num_cached_tokens[request_index]:
+                raise RuntimeError("SpecRhythm token-chunk prefill entered an already cached prompt span.")
             input_token_ids.extend(int(token_id) for token_id in prompt[chunk.start : chunk.end])
             packed_sequence_ids.extend([request_index] * chunk.token_count)
             positions.extend(range(chunk.start, chunk.end))
@@ -17940,6 +18196,7 @@ class NativePearlEngine:
         payloads: Sequence[NativeSpecRhythmDevicePayload],
         *,
         proposal_matrix: torch.Tensor | None = None,
+        verification_widths: Sequence[int] | None = None,
     ) -> tuple[torch.Tensor | None, None]:
         """Verify complete serial proposals from the committed target frontier.
 
@@ -17990,6 +18247,27 @@ class NativePearlEngine:
             dtype=torch.long,
             device=self.device,
         ).unsqueeze(1)
+        widths = tuple(verification_widths or (self.gamma,) * len(active_indices))
+        if len(widths) != len(active_indices) or any(width not in (2, self.gamma) for width in widths):
+            raise ValueError("Selective target verification widths must align with full proposals.")
+        if any(width != self.gamma for width in widths):
+            if self.gamma != 4 or self.config.target_use_paged_attention:
+                raise RuntimeError("Selective verification requires gamma four and causal FIA.")
+            query_tokens, _ = pack_selective_target_queries(roots[:, 0], proposals, widths)
+            sequence_ids = [index for index, width in zip(active_indices, widths) for _ in range(width)]
+            first_positions = [int(states[index].committed_length) - 1 for index in active_indices]
+            positions = [start + step for start, width in zip(first_positions, widths) for step in range(width)]
+            self._last_stable_target_verify_graph_outcome = ("disabled", 0)
+            return (
+                self._run_device_packed_greedy(
+                    query_tokens,
+                    sequence_ids,
+                    positions,
+                    use_aclgraph=False,
+                    use_fused_infer_attention=True,
+                ),
+                None,
+            )
         bonus_mode = bool(getattr(self.config, "spec_rhythm_linear_bonus_token", False))
         query_width = self.gamma + int(bonus_mode)
         first_positions = [int(states[index].committed_length) - 1 for index in active_indices]
@@ -18116,10 +18394,13 @@ class NativePearlEngine:
             device=self.device,
         )
         request_tables = self.cache_block_tables.index_select(0, segment_ids)
-        cumulative_q = _stable_target_verify_cumulative_q(
-            layout.query_width,
-            layout.verification_capacity,
-        )
+        # Query partitions may be 2/4 mixed in the selective graph family.
+        # The ordinary fixed-width layout produces the same cumulative tuple
+        # as the former width * capacity fast path.
+        cumulative_q_values: list[int] = []
+        for length in layout.query_lengths:
+            cumulative_q_values.append(length + (cumulative_q_values[-1] if cumulative_q_values else 0))
+        cumulative_q = tuple(cumulative_q_values)
         metadata = NativeAttentionMetadata(
             slot_mapping=torch.tensor(
                 slot_mapping,

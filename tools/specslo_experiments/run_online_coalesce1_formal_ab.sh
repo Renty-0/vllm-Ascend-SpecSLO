@@ -325,7 +325,16 @@ if int(workload.get("arrival_seed", -1)) != 0:
 profile = json.loads(profile_path.read_text())
 metadata = profile.get("metadata", {})
 runtime_binding = metadata.get("runtime_binding", {})
-expected_mapping = devices[1:]
+# The native MC2 profile binds CANN logical IDs. Preserve the physical
+# contract separately and validate its conversion against the audited map.
+import subprocess
+container_logical_devices = subprocess.check_output(
+    [sys.executable, "/root/data/specslo-rehydrate-audit/map_npu_ids.py", ",".join(devices)], text=True,
+).strip().split(",")
+expected_mapping = container_logical_devices[1:]
+physical_map = json.loads(Path("/root/data/specslo-rehydrate-audit/npu-logical-physical-map.json").read_text())
+if metadata.get("rehydrate_container_device_mapping") != physical_map:
+    errors.append("MC2 profile lacks the current audited physical/container mapping")
 if int(metadata.get("tensor_parallel_size", -1)) != 3:
     errors.append("MC2 profile is not TP3")
 if runtime_binding.get("tp_rank_device_mapping") != expected_mapping:
@@ -358,6 +367,8 @@ if vendor_file_count == 0:
 document = {
     "status": "pass" if not errors else "fail",
     "physical_npus": [int(value) for value in devices],
+    "container_logical_npus": [int(value) for value in container_logical_devices],
+    "container_device_mapping": physical_map,
     "draft_pa_task_update_workers": draft_pa_task_update_workers,
     "target_replay_ahead": target_replay_ahead,
     "manifest": str(manifest_path.resolve()),
@@ -549,7 +560,7 @@ expected_target_replay_ahead = int(input_identity.get("target_replay_ahead", -1)
 
 # Exact workload and execution envelopes.
 require(baseline.get("backend") == "vllm-ascend-target-only", "baseline backend mismatch")
-require(baseline.get("model") == "/data/shared-models/Qwen3-32B", "baseline model mismatch")
+require(baseline.get("model") == "/root/data/shared-models/Qwen3-32B", "baseline model mismatch")
 require(baseline.get("tensor_parallel_size") == 4, "baseline is not TP4")
 require(baseline.get("max_num_seqs") == 64, "baseline max_num_seqs is not 64")
 require(baseline.get("max_tokens") == 256, "baseline max_tokens is not 256")
@@ -560,8 +571,8 @@ require(float(baseline.get("prefill_coalesce_max_wait_ms", math.nan)) == 0.0,
 require(baseline.get("respect_eos") is False, "baseline is not fixed T256")
 
 require(candidate.get("backend") == "specslo-native-specrhythm", "candidate backend mismatch")
-require(candidate.get("draft_model") == "/data/shared-models/Qwen3-0.6B", "candidate draft model mismatch")
-require(candidate.get("target_model") == "/data/shared-models/Qwen3-32B", "candidate target model mismatch")
+require(candidate.get("draft_model") == "/root/data/shared-models/Qwen3-0.6B", "candidate draft model mismatch")
+require(candidate.get("target_model") == "/root/data/shared-models/Qwen3-32B", "candidate target model mismatch")
 require(candidate.get("draft_tensor_parallel_size") == 1, "candidate draft is not TP1")
 require(candidate.get("target_tensor_parallel_size") == 3, "candidate target is not TP3")
 require(candidate.get("draft_mode") == "serial_linear", "candidate is not serial chain draft")

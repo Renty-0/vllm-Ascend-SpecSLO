@@ -124,14 +124,17 @@ def oracle_metadata(specs, block_tables, block_size, max_model_len, *, device="c
     envelope = torch.ones((len(specs), 1, max(mask.shape[0] for mask in masks), max_model_len), dtype=torch.bool)
     for request, mask in enumerate(masks):
         envelope[request, 0, : mask.shape[0]] = mask
+    # NPU FULL-tree FIA consumes request-major page tables and the 4-D mask.
+    # Its dense CPU reference retains token-major tables and the 2-D mask.
+    npu_fia = torch.device(device).type == "npu"
     metadata = NativeAttentionMetadata(
         slot_mapping=torch.tensor(slots, dtype=torch.int32, device=device),
         context_lens=torch.tensor(contexts, dtype=torch.int32),
-        block_tables=torch.tensor(token_tables, dtype=torch.int32, device=device),
+        block_tables=torch.tensor(request_tables if npu_fia else token_tables, dtype=torch.int32, device=device),
         actual_seq_lengths_q=tuple(cumulative),
         sequence_lens=tuple(sequence_lengths),
         request_block_tables=torch.tensor(request_tables, dtype=torch.int32, device=device),
-        attention_mask=torch.cat(masks).to(device),
+        attention_mask=None if npu_fia else torch.cat(masks).to(device),
         tree_attention_mask=envelope.to(device),
         use_fused_infer_attention=True,
         tree_attention=True,
@@ -310,8 +313,15 @@ def _run_case(engine, args, layout, filler, prefix_cases=None):
     from examples.check_specslo_tree_numerics import _logit_report
 
     specs, production, oracle = _scenario(engine, args, layout, filler, prefix_cases)
+
+    def metadata_tensor_equal(key):
+        actual, reference = getattr(production[2], key), getattr(oracle[2], key)
+        if actual is None or reference is None:
+            return actual is reference
+        return torch.equal(actual, reference)
+
     metadata_equal = all(
-        torch.equal(getattr(production[2], key), getattr(oracle[2], key))
+        metadata_tensor_equal(key)
         for key in (
             "slot_mapping",
             "context_lens",

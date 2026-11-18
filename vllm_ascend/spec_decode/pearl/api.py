@@ -393,8 +393,6 @@ class PEARLConfig:
                     "SpecRhythm token-chunk prefill requires enable_spec_rhythm, "
                     "online prefill, and linear full-window mode."
                 )
-            if self.enable_prefix_caching:
-                raise ValueError("SpecRhythm token-chunk prefill requires prefix caching to be disabled.")
             if self.spec_rhythm_prefill_token_chunk_size > self.max_num_batched_tokens:
                 raise ValueError("SpecRhythm prefill token chunk size must not exceed max_num_batched_tokens.")
         if self.spec_rhythm_min_gamma <= 0 or (self.gamma != -1 and self.spec_rhythm_min_gamma > self.gamma):

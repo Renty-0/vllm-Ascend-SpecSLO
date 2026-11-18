@@ -1044,8 +1044,9 @@ def test_token_chunk_prefill_config_fails_closed():
         "spec_rhythm_prefill_token_chunk_size": 8,
     }
 
-    with pytest.raises(ValueError, match="prefix caching"):
-        native.NativePearlConfig(**common)
+    cached = native.NativePearlConfig(**common)
+    assert cached.enable_prefix_caching is True
+    assert cached.spec_rhythm_prefill_token_chunk_size == 8
     with pytest.raises(ValueError, match="online prefill"):
         native.NativePearlConfig(
             **{

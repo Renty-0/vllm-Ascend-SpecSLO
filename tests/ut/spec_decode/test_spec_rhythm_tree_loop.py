@@ -507,6 +507,41 @@ def test_tree_loop_accepts_unknown_request_during_active_decode(monkeypatch):
     assert results[0]["spec_rhythm"]["spec_rhythm_live_admitted_requests"] == 1
 
 
+@pytest.mark.parametrize("admit_after_abort", [False, True])
+def test_tree_loop_aborts_last_active_request_before_scheduling_and_accepts_later_work(monkeypatch, admit_after_abort):
+    harness = _TreeLoopHarness(monkeypatch, requests=1, capacity=2, max_tokens=4, online_prefill=True)
+    harness.engine.graph_runner = SimpleNamespace(set_expected_fia_batch_size=Mock())
+    replacement = native.NativeSamplingParams(
+        temperature=0, max_tokens=4, ignore_eos=True, request_id="after-abort", slo_tpot_ms=50.0
+    )
+    polls = []
+
+    def poll_admission(block):
+        polls.append(block)
+        if len(polls) == 1:
+            return not admit_after_abort, (), ("request-0",)
+        if admit_after_abort and len(polls) == 2:
+            assert block, "an empty live epoch must wait for work before scheduling"
+            return False, [([777, 778], replacement)], ()
+        return bool(block), (), ()
+
+    harness.engine._request_admission_callback = poll_admission
+    results = harness.run()
+
+    assert len(results) == 1 + int(admit_after_abort)
+    assert harness.target_states[0].aborted and harness.draft_states[0].aborted
+    assert len(results[0]["completion_token_ids"]) == 1  # Only the prefill token was committed.
+    assert results[0]["spec_rhythm"]["spec_rhythm_aborted_requests"] == 1
+    assert all(snapshot and 0 not in snapshot for snapshot in harness.active_snapshots)
+    if admit_after_abort:
+        assert results[1]["request_id"] == "after-abort"
+        assert len(results[1]["completion_token_ids"]) == 4
+        assert harness.prefilled == {0, 1}
+    else:
+        assert not harness.active_snapshots
+    harness.engine._release_cache_sequence.assert_any_call(0)
+
+
 def test_tree_loop_replicates_actual_draft_confidence_into_runtime_tracker(monkeypatch):
     harness = _TreeLoopHarness(monkeypatch, requests=2, capacity=2)
     harness.run(max_rounds=2)

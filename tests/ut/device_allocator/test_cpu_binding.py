@@ -221,12 +221,35 @@ class TestDeviceInfo(unittest.TestCase):
     @patch("vllm_ascend.cpu_binding.execute_command")
     def test_parse_topo_affinity_skips_affinity_header_and_non_npu_rows(self, mock_execute_command):
         device_info = object.__new__(DeviceInfo)
+        device_info.npu_map_info = {"0": {"0": "0"}}
         mock_execute_command.return_value = (
             "HEADER\nNPU Chip Affinity\nnot-an-npu row\nNPU0 x x x 2-3",
             0,
         )
 
         self.assertEqual(device_info.parse_topo_affinity(), {0: [2, 3]})
+
+    @patch("vllm_ascend.cpu_binding.execute_command")
+    def test_parse_topo_affinity_maps_disjoint_physical_ids_to_container_ids(self, mock_execute_command):
+        device_info = object.__new__(DeviceInfo)
+        device_info.npu_map_info = {
+            "0": {"0": "0"},
+            "3": {"0": "1"},
+            "4": {"0": "2"},
+            "7": {"0": "3"},
+        }
+        mock_execute_command.return_value = (
+            "NPU0 X HCCS HCCS HCCS 144-145\n"
+            "NPU3 HCCS X HCCS HCCS 0-1\n"
+            "NPU4 HCCS HCCS X HCCS 96-97\n"
+            "NPU7 HCCS HCCS HCCS X 48-49\n"
+            "NPU9 NA NA NA NA 24-25\n",
+            0,
+        )
+        self.assertEqual(
+            device_info.parse_topo_affinity(),
+            {0: [144, 145], 1: [0, 1], 2: [96, 97], 3: [48, 49]},
+        )
 
     @patch("vllm_ascend.cpu_binding.execute_command")
     def test_parse_topo_affinity_skips_topo_matrix_without_cpu_affinity(self, mock_execute_command):
