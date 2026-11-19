@@ -9,7 +9,7 @@ fi
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)
 export SPECSLO_REPO_ROOT="$repo"
 export SPECSLO_RESULT_ROOT="${SPECSLO_RESULT_ROOT:-$repo/research/specslo-linear-650/results}"
-export SPECSLO_VISIBLE_DEVICES=0,1,2,7 SPECSLO_TARGET_DEVICES=1,2,3
+export SPECSLO_VISIBLE_DEVICES="${SPECSLO_VISIBLE_DEVICES:-0,1,2,7}" SPECSLO_TARGET_DEVICES=1,2,3
 export SPECSLO_MC2_VENDOR=/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/mc2-vendor
 export SPECSLO_MC2_PROFILE=/root/data/specslo-baselines/nano-pearl-ascend-v1/runtime/mc2-profile.json
 export SPECSLO_TARGET_FALLBACK_MAX_BATCH=4
@@ -35,6 +35,6 @@ export SPECSLO_LOOSE_ADMISSION_TIGHT_GATE="${SPECSLO_LOOSE_ADMISSION_TIGHT_GATE:
 export SPECSLO_ADMISSION_KV_GUARD_PAGES="${SPECSLO_ADMISSION_KV_GUARD_PAGES:-624}"
 export SPECSLO_VALIDATE_ONLY=0
 
-environment_script=${SPECSLO_ENVIRONMENT_SCRIPT:-/root/SpecSLO/budget-calibration-20261015/final-fixed-gamma4-current0157-v4/environment_current.sh}
+environment_script=${SPECSLO_ENVIRONMENT_SCRIPT:-$repo/research/specslo-linear-650/scripts/environment_current.sh}
 exec bash "$environment_script" \
   --environment-only bash "$repo/research/specslo-linear-650/body_candidate.sh" on "$1" auto

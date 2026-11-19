@@ -260,7 +260,7 @@ if [[ $validate_only == 0 ]]; then
 fi
 source /root/data/specslo-cann-runtime/cann-9.0.0/set_env.sh
 export PYTHONPATH=$repo:${PYTHONPATH:-}
-device_map_script=${SPECSLO_DEVICE_MAP_SCRIPT:-/root/SpecSLO/priority-linear-budget-20261112/map_current.py}
+device_map_script=${SPECSLO_DEVICE_MAP_SCRIPT:-$repo/research/specslo-linear-650/scripts/map_current.py}
 container_runtime_devices=$("$python" "$device_map_script" "$visible_devices")
 export ASCEND_RT_VISIBLE_DEVICES=$container_runtime_devices
 export TASK_QUEUE_ENABLE=1
@@ -476,7 +476,7 @@ fi
 
 
 if [[ $validate_only == 0 ]]; then
-  production_gate_script=${SPECSLO_PRODUCTION_GATE_SCRIPT:-/root/SpecSLO/tpot-report-20261015/serial/main-production-check-gate.py}
+  production_gate_script=${SPECSLO_PRODUCTION_GATE_SCRIPT:-$repo/research/specslo-linear-650/scripts/main-production-check-gate.py}
   "$python" "$production_gate_script" \
     "$run_dir/result.json" "$ablation_mode" "$run_dir/mechanism-gate.json"
 fi

@@ -1,5 +1,7 @@
 # SpecSLO 线性 γ=4、b64 的 Goodput 650 候选
 
+当前分支的逐步复现说明见 [REPRODUCE_zh.md](REPRODUCE_zh.md)。该文档包含非 Git 资产的 SHA、设备映射、运行命令及结果审计。
+
 本分支以 `SpecSLO-Chain` 的 `b8f3ad9e326d2407902cae6f1fd918e62f43c6ca` 为基底，**直接包含** 2026-11-13 实测候选的源码增量；不需要再应用 `source.patch`。实验使用 Qwen3-0.6B TP1 draft、Qwen3-32B TP3 target、MC2 ON、固定线性 γ=4、全局活跃上限 64、每个 target home 上限 32。
 
 关键调度改动在 `vllm_ascend/spec_decode/pearl/native_engine.py`：有已到达的 tight 请求等待，或活跃 tight 数超过门槛时，暂缓新 loose 请求首次入场；已入场的 loose 不会被暂停。另按提示长度、输出上限和 γ 估算 KV 页预留，超出阈值时暂缓新请求，以防预热和正式运行耗尽 KV。最优实测门槛为 6。
@@ -22,4 +24,4 @@
 SPECSLO_LOOSE_ADMISSION_TIGHT_GATE=6 bash research/specslo-linear-650/run.sh gate6-r1 0.4
 ```
 
-`SPECSLO_ENVIRONMENT_SCRIPT`、`SPECSLO_DEVICE_MAP_SCRIPT` 和 `SPECSLO_PRODUCTION_GATE_SCRIPT` 可覆盖原机器的辅助脚本路径。该脚本运行前还需要本地模型权重、已编译扩展、MC2 profile、正确的设备编号和 Python 环境；脚本中的这些路径默认保留原实验机配置。源码通过 `compileall`，相关 `test_mixed_width_layout.py` 单测 4/4 通过；单测在当前容器中需设置 `TORCH_DEVICE_BACKEND_AUTOLOAD=0`。
+`SPECSLO_ENVIRONMENT_SCRIPT`、`SPECSLO_DEVICE_MAP_SCRIPT` 和 `SPECSLO_PRODUCTION_GATE_SCRIPT` 可覆盖随分支保存的辅助脚本。运行前仍需要本地模型权重、已编译扩展、MC2 profile、正确的设备编号和 Python/CANN 环境；默认资产路径保留原实验机配置。源码通过 `compileall`，相关 `test_mixed_width_layout.py` 单测 4/4 通过；单测在当前容器中需设置 `TORCH_DEVICE_BACKEND_AUTOLOAD=0`。
