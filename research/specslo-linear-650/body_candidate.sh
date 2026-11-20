@@ -57,6 +57,10 @@ early_current_mixed_target_submit=${SPECSLO_EARLY_CURRENT_MIXED_TARGET_SUBMIT:-0
 prefetch_ahead=${SPECSLO_PREFETCH_AHEAD:-0}
 stable_target_request_bucket=${SPECSLO_STABLE_TARGET_REQUEST_BUCKET:-1}
 target_max_batch=${SPECSLO_MAX_TARGET_BATCH:-32}
+tight_home_fraction=${SPECSLO_TIGHT_HOME_FRACTION:-0.5}
+slo_home_partition=${SPECSLO_SLO_HOME_PARTITION:-0}
+normal_active_cap=${SPECSLO_NORMAL_ACTIVE_CAP:-0}
+eager_class_floor_bias=${SPECSLO_EAGER_CLASS_FLOOR_BIAS:-0}
 online_target_max_batch=${SPECSLO_ONLINE_TARGET_MAX_BATCH:-0}
 stable_target_dense_max_capacity=${SPECSLO_STABLE_TARGET_DENSE_MAX_CAPACITY:-0}
 target_nz_mode=${SPECSLO_TARGET_NZ_MODE:-default}
@@ -64,6 +68,37 @@ target_large_m_nz_min_rows=${SPECSLO_TARGET_LARGE_M_NZ_MIN_ROWS:-192}
 target_replicate_input_embedding=${SPECSLO_TARGET_REPLICATE_INPUT_EMBEDDING:-0}
 npu_alloc_conf=${SPECSLO_NPU_ALLOC_CONF:-default}
 validate_only=${SPECSLO_VALIDATE_ONLY:-0}
+min_gamma=${SPECSLO_MIN_GAMMA:-4}
+verification_budget=${SPECSLO_VERIFICATION_BUDGET:-0}
+tight_target_burst=${SPECSLO_TIGHT_TARGET_BURST:-0}
+if [[ ! $min_gamma =~ ^[1-4]$ ]] || [[ ! $verification_budget =~ ^[0-9]+$ ]]; then
+  echo "SPECSLO_MIN_GAMMA must be 1..4 and SPECSLO_VERIFICATION_BUDGET a non-negative integer" >&2
+  exit 2
+fi
+if [[ $slo_home_partition != 0 && $slo_home_partition != 1 ]]; then
+  echo "SPECSLO_SLO_HOME_PARTITION must be 0 or 1" >&2
+  exit 2
+fi
+if [[ ! $normal_active_cap =~ ^[0-9]+$ ]] || (( normal_active_cap > 64 )); then
+  echo "SPECSLO_NORMAL_ACTIVE_CAP must be an integer in [0, 64]" >&2
+  exit 2
+fi
+if [[ ! $eager_class_floor_bias =~ ^0([.][0-9]+)?$ ]]; then
+  echo "SPECSLO_EAGER_CLASS_FLOOR_BIAS must be a decimal in [0, 0.4]" >&2
+  exit 2
+fi
+if ! awk -v value="$eager_class_floor_bias" 'BEGIN { exit !(value <= 0.4) }'; then
+  echo "SPECSLO_EAGER_CLASS_FLOOR_BIAS must be at most 0.4" >&2
+  exit 2
+fi
+if (( min_gamma < 4 && verification_budget == 0 )); then
+  echo "dynamic gamma requires SPECSLO_VERIFICATION_BUDGET" >&2
+  exit 2
+fi
+if [[ ! $tight_target_burst =~ ^[0-9]+$ ]] || (( tight_target_burst > 8 )); then
+  echo "SPECSLO_TIGHT_TARGET_BURST must be an integer in [0, 8]" >&2
+  exit 2
+fi
 case "$target_max_batch" in
   32|36|40|48|64)
     # Mixed verification+prefill graphs are much larger than decode-only
@@ -213,7 +248,9 @@ if [[ $draft_pa_task_update_workers != 1 && \
   echo "SPECSLO_DRAFT_PA_TASK_UPDATE_WORKERS must be 1, 2, or 4" >&2
   exit 2
 fi
-for required in "$repo" "$python" "$manifest" "$profile" "$vendor" "$extension"; do
+for required in "$repo" "$python" "$manifest" "$profile" "$vendor" "$extension" \
+  "$repo/vllm_ascend/libvllm_ascend_kernels.so" \
+  "$repo/vllm_ascend/lib64/libvllm_ascend_kernels.so"; do
   if [[ ! -e $required ]]; then
     echo "required path is missing: $required" >&2
     exit 2
@@ -334,7 +371,15 @@ export VLLM_ASCEND_PEARL_SHARED_GRAPH_POOL=1
 # target path.
 export VLLM_ASCEND_PEARL_MC2_DOWN_PROJ=1
 export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_PREFILL=1
-export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH=1
+# The fixed full-window path uses its qualified mixed/stable target graphs.
+# Variable-width linear verification routes through the generic target graph
+# family; advertising mixed graphs there makes the graph-only audit demand
+# executions from a graph family that the scheduler never invokes.
+if (( min_gamma == 4 )); then
+  export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH=1
+else
+  export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH=0
+fi
 export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_PREFILL_ONLY=$prefill_only
 export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_MAX_TOKENS=$mixed_target_graph_max_tokens
 export VLLM_ASCEND_SPECRHYTHM_MIXED_TARGET_GRAPH_BUCKETS=$mixed_target_graph_buckets
@@ -365,11 +410,12 @@ export VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT=$early_current_m
 export VLLM_ASCEND_SPECRHYTHM_RESIDUAL_EAGER_TIGHT_ONLY=$residual_tight_only
 export VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION=1
 export VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS=0
-export VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP=0
+export VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP=$normal_active_cap
+export VLLM_ASCEND_SPECRHYTHM_EAGER_CLASS_FLOOR_BIAS=$eager_class_floor_bias
 export VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP=0
 export VLLM_ASCEND_SPECRHYTHM_PREEMPT_LOOSE_FOR_TIGHT=0
-export VLLM_ASCEND_SPECRHYTHM_TIGHT_TARGET_BURST=0
-export VLLM_ASCEND_SPECRHYTHM_TIGHT_HOME_FRACTION=0.5
+export VLLM_ASCEND_SPECRHYTHM_TIGHT_TARGET_BURST=$tight_target_burst
+export VLLM_ASCEND_SPECRHYTHM_TIGHT_HOME_FRACTION=$tight_home_fraction
 export VLLM_ASCEND_SPECRHYTHM_LINEAR_ACCEPTANCE_ONLY=$acceptance_only
 unset VLLM_ASCEND_PEARL_INLINE_GRAPH_TASK_UPDATE
 unset VLLM_ASCEND_PEARL_SYNC_GRAPH_INPUTS
@@ -389,6 +435,23 @@ fi
 bonus_args=()
 if [[ $linear_bonus_token == 1 ]]; then
   bonus_args=(--spec-rhythm-linear-bonus-token)
+fi
+gamma_args=(--seed 0 --gamma 4 --spec-rhythm-min-gamma "$min_gamma"
+  --spec-rhythm-request-max-gamma 4)
+linear_window_args=()
+home_partition_args=()
+if [[ $slo_home_partition == 1 ]]; then
+  home_partition_args+=(--spec-rhythm-slo-home-partition)
+fi
+if (( min_gamma == 4 )); then
+  gamma_args+=(--spec-rhythm-linear-full-window)
+  if (( verification_budget > 0 )); then
+    gamma_args+=(--spec-rhythm-verification-budget "$verification_budget")
+  fi
+  linear_window_args=(--spec-rhythm-linear-eager-cross-graph-bucket
+    --spec-rhythm-linear-idle-residual-eager)
+else
+  gamma_args+=(--spec-rhythm-verification-budget "$verification_budget")
 fi
 
 if [[ $validate_only == 0 ]]; then
@@ -438,6 +501,12 @@ if [[ $validate_only == 0 ]]; then
   printf 'npu_profile_measurement_only=%s\nnpu_profile_dir=%s\n' \
     "$(( profile_host_decode_steps > 0 && enable_npu_profile == 1 ))" "$npu_profile_dir"
   printf 'mc2_down_proj=1\n'
+  printf 'min_gamma=%s\nverification_budget=%s\n' "$min_gamma" "$verification_budget"
+  printf 'tight_target_burst=%s\n' "$tight_target_burst"
+  printf 'tight_home_fraction=%s\n' "$tight_home_fraction"
+  printf 'slo_home_partition=%s\n' "$slo_home_partition"
+  printf 'normal_active_cap=%s\n' "$normal_active_cap"
+  printf 'eager_class_floor_bias=%s\n' "$eager_class_floor_bias"
   printf 'effective_allocator=expandable_segments:True\n'
   printf 'profile=%s\nvendor=%s\n' "$profile" "$vendor"
   } > "$run_dir/contract.env"
@@ -448,8 +517,7 @@ if [[ $validate_only == 0 ]]; then
   --draft-model /root/data/shared-models/Qwen3-0.6B \
   --target-model /root/data/shared-models/Qwen3-32B \
   --draft-tp-size 1 --target-tp-size 3 --draft-mode serial_linear \
-  --seed 0 --gamma 4 --spec-rhythm-min-gamma 4 \
-  --spec-rhythm-request-max-gamma 4 --spec-rhythm-linear-full-window \
+  "${gamma_args[@]}" \
   "${bonus_args[@]}" \
   --spec-rhythm-ablation-mode "$ablation_mode" \
   --spec-rhythm-target-fallback-max-batch "$fallback_max_batch" \
@@ -460,8 +528,7 @@ if [[ $validate_only == 0 ]]; then
   --max-aclgraph-entries "$graph_entries" --target-verification-graph-buckets 8 \
   --enable-continuous-batching --enable-preemptive-scheduling --enable-spec-rhythm \
   --spec-rhythm-priority-burst 2 --spec-rhythm-acceptance-floor "$acceptance_floor" \
-  --spec-rhythm-merge-ready-homes --spec-rhythm-linear-eager-cross-graph-bucket \
-  --spec-rhythm-linear-idle-residual-eager \
+  --spec-rhythm-merge-ready-homes "${linear_window_args[@]}" "${home_partition_args[@]}" \
   --spec-rhythm-online-prefill --spec-rhythm-prefill-coalesce-min-requests 1 \
   --spec-rhythm-prefill-coalesce-max-wait-ms 0 --spec-rhythm-prefill-token-chunk-size 512 \
   --precompile-serial-draft-graphs --spec-rhythm-stable-graphs \
@@ -476,7 +543,11 @@ fi
 
 
 if [[ $validate_only == 0 ]]; then
-  production_gate_script=${SPECSLO_PRODUCTION_GATE_SCRIPT:-$repo/research/specslo-linear-650/scripts/main-production-check-gate.py}
+  if (( min_gamma == 4 )); then
+    production_gate_script=${SPECSLO_PRODUCTION_GATE_SCRIPT:-$repo/research/specslo-linear-650/scripts/main-production-check-gate.py}
+  else
+    production_gate_script=${SPECSLO_PRODUCTION_GATE_SCRIPT:-$repo/research/specslo-linear-650/scripts/dynamic-gamma-check-gate.py}
+  fi
   "$python" "$production_gate_script" \
     "$run_dir/result.json" "$ablation_mode" "$run_dir/mechanism-gate.json"
 fi

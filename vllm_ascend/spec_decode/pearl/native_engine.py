@@ -1249,6 +1249,23 @@ def spec_rhythm_class_cap_blocks(
     )
 
 
+def spec_rhythm_eager_class_floors(base_floor: float, bias: float) -> dict[str, float]:
+    """Keep an eager acceptance gate while favoring tighter SLO classes."""
+
+    base_floor = float(base_floor)
+    bias = float(bias)
+    if not math.isfinite(base_floor) or not 0.0 <= base_floor <= 1.0:
+        raise ValueError("Eager acceptance floor must be in [0, 1].")
+    if not math.isfinite(bias) or not 0.0 <= bias <= 0.4:
+        raise ValueError("Eager class floor bias must be in [0, 0.4].")
+    return {
+        "tight": max(0.0, base_floor - bias),
+        "normal": base_floor,
+        "loose": min(1.0, base_floor + bias),
+        "unclassified": base_floor,
+    }
+
+
 def spec_rhythm_home_capacities(
     total_capacity: int,
     tight_fraction: float,
@@ -1552,10 +1569,10 @@ def _fixed_gamma_identity_budgets(
     The caller has already selected normal work through the two-home
     controller and optional Rolling Eager work through the SLO/W gate.  When
     there is no external roofline or draft-token budget, the default global
-    envelope is ``active_rows * gamma``.  Re-running the general two-stage
-    shaper cannot change that selection: every admitted row has identical
-    minimum and maximum budget ``gamma``.  Keep the invariant checks here so
-    this hot-path shortcut cannot silently overfill the target envelope.
+    envelope is ``active_rows * gamma``. A compatible explicit B can first
+    prune optional eager rows. Every admitted row then has identical minimum
+    and maximum budget ``gamma``, so the general shaper cannot change its
+    depth. Keep the invariant checks to prevent envelope overfill.
     """
 
     if gamma <= 0 or verification_roof <= 0:
@@ -1572,6 +1589,40 @@ def _fixed_gamma_identity_budgets(
         {index: gamma for index in normal},
         {index: gamma for index in eager},
     )
+
+
+def spec_rhythm_select_fixed_gamma_eager_budget(
+    eager_indices: Sequence[int],
+    *,
+    normal_count: int,
+    gamma: int,
+    verification_roof: int,
+    states: Mapping[int, SpecRhythmRuntimeState],
+    projected_wait_ms: float,
+    slo_classes: Sequence[str],
+) -> tuple[int, ...]:
+    """Keep complete graph-friendly proposals while assigning spare B to urgent rows."""
+
+    if gamma <= 0 or normal_count < 0 or verification_roof < normal_count * gamma:
+        raise ValueError("Fixed-gamma B must cover the normal draft proposals.")
+    eager = tuple(eager_indices)
+    available = verification_roof // gamma - normal_count
+    if len(eager) <= available:
+        return eager
+    class_priority = {"tight": 3, "normal": 2, "loose": 1}
+    ranked = sorted(
+        eager,
+        key=lambda index: (
+            class_priority.get(slo_classes[index], 0),
+            states[index].projected_progress_gap(projected_wait_ms)
+            * states[index].expected_acceptance_benefit,
+            states[index].urgency(projected_wait_ms),
+            -index,
+        ),
+        reverse=True,
+    )
+    admitted = set(ranked[:available])
+    return tuple(index for index in eager if index in admitted)
 
 
 def _copy_result_graph_metrics(
@@ -3665,11 +3716,14 @@ class NativePearlConfig:
             raise ValueError("SpecRhythm prefill token chunk size must be non-negative.")
         if self.spec_rhythm_prefill_token_chunk_size > 0:
             if not (
-                self.enable_spec_rhythm and self.spec_rhythm_online_prefill and self.spec_rhythm_linear_full_window
+                self.enable_spec_rhythm
+                and self.spec_rhythm_online_prefill
+                and self.spec_rhythm_tree_width == 1
+                and self.spec_rhythm_tree_depth == 1
             ):
                 raise ValueError(
                     "SpecRhythm token-chunk prefill requires enable_spec_rhythm, "
-                    "online prefill, and linear full-window mode."
+                    "online prefill, and serial linear topology."
                 )
             if self.spec_rhythm_prefill_token_chunk_size > self.max_num_batched_tokens:
                 raise ValueError("SpecRhythm prefill token chunk size must not exceed max_num_batched_tokens.")
@@ -8684,6 +8738,19 @@ class NativePearlEngine:
         def slo_counter_class(index: int) -> str:
             return normalized_slo_classes[index]
 
+        eager_class_floor_bias = float(envs.VLLM_ASCEND_SPECRHYTHM_EAGER_CLASS_FLOOR_BIAS)
+        eager_class_floors = spec_rhythm_eager_class_floors(
+            self.config.spec_rhythm_acceptance_floor,
+            eager_class_floor_bias,
+        )
+        request_eager_floors = {
+            index: eager_class_floors[label]
+            for index, label in enumerate(normalized_slo_classes)
+        }
+
+        def eager_acceptance_floor(index: int) -> float:
+            return request_eager_floors[index]
+
         # Environment variables are immutable for one generate call.  Resolve
         # per-request values once rather than invoking ``envs.__getattr__`` and
         # ``os.getenv`` for every state construction.
@@ -8823,10 +8890,20 @@ class NativePearlEngine:
                 for params in request_params
             )
         )
+        verification_budget = self.config.spec_rhythm_verification_budget
+        target_batch_for_budget = self.config.spec_rhythm_max_target_batch or self.config.max_num_seqs
+        # The shortcut may skip ready-payload rebinding only when B can hold
+        # one complete target cohort. Keep partial/bonus-token configurations
+        # on the general shaper path.
+        fixed_budget_fast_path_safe = verification_budget is None or (
+            not linear_bonus_token
+            and verification_budget % self.gamma == 0
+            and verification_budget >= target_batch_for_budget * self.gamma
+        )
         fixed_gamma_scheduler_fast_path = bool(
             linear_full_window
             and linear_fixed_gamma_window
-            and self.config.spec_rhythm_verification_budget is None
+            and fixed_budget_fast_path_safe
             and self.config.spec_rhythm_draft_token_budget is None
             and self.config.spec_rhythm_eager_reserve_tokens == 0
             and isinstance(shaper.roofline, Mapping)
@@ -9158,6 +9235,21 @@ class NativePearlEngine:
             "spec_rhythm_draft_confidence_min": 1.0,
             "spec_rhythm_draft_confidence_max": 0.0,
             "spec_rhythm_allocated_draft_tokens": 0,
+            "spec_rhythm_budget_deferred_normal_rows": 0,
+            "spec_rhythm_budget_deferred_normal_cycles": 0,
+            **{
+                f"spec_rhythm_budget_deferred_eager_{label}_rows": 0
+                for label in ("tight", "normal", "loose", "unclassified")
+            },
+            **{
+                f"spec_rhythm_budget_deferred_normal_{label}_rows": 0
+                for label in ("tight", "normal", "loose", "unclassified")
+            },
+            **{
+                f"spec_rhythm_allocated_gamma_{label}_{depth}_rows": 0
+                for label in ("tight", "normal", "loose", "unclassified")
+                for depth in range(1, self.gamma + 1)
+            },
             "spec_rhythm_verified_tokens": 0,
             "spec_rhythm_prefill_batches": 0,
             "spec_rhythm_prefill_requests": 0,
@@ -9298,6 +9390,8 @@ class NativePearlEngine:
             "spec_rhythm_class_active_caps_enabled": int(class_caps_enabled),
             "spec_rhythm_normal_active_cap": class_caps["normal"],
             "spec_rhythm_loose_active_cap": class_caps["loose"],
+            "spec_rhythm_eager_class_floor_bias": eager_class_floor_bias,
+            **{f"spec_rhythm_eager_floor_{label}": value for label, value in eager_class_floors.items()},
             **{f"spec_rhythm_class_cap_deferred_{label}": 0 for label in ("tight", "normal", "loose", "unclassified")},
             **{f"spec_rhythm_class_cap_admitted_{label}": 0 for label in ("tight", "normal", "loose", "unclassified")},
             "spec_rhythm_first_ready_requests": 0,
@@ -9652,7 +9746,12 @@ class NativePearlEngine:
                 )
                 for index in pending_admission
             )
-            selected_for_admission: set[int] | None = set() if class_caps_enabled else None
+            pending_class_counts: dict[str, int] | None = None
+            if class_caps_enabled:
+                pending_class_counts = {label: 0 for label in ("tight", "normal", "loose", "unclassified")}
+                for pending_index in pending_admission:
+                    if pending_index not in staged_set:
+                        pending_class_counts[slo_counter_class(pending_index)] += 1
             for index in admission_candidates:
                 if index in staged_set:
                     continue
@@ -9677,12 +9776,10 @@ class NativePearlEngine:
                 request_class = None
                 if class_caps_enabled:
                     assert active_class_counts is not None
-                    assert selected_for_admission is not None
+                    assert pending_class_counts is not None
                     request_class = slo_counter_class(index)
                     pending_classes = tuple(
-                        slo_counter_class(pending_index)
-                        for pending_index in pending_admission
-                        if pending_index not in staged_set and pending_index not in selected_for_admission
+                        label for label, count in pending_class_counts.items() if count > 0
                     )
                     if spec_rhythm_class_cap_blocks(
                         request_class,
@@ -9729,8 +9826,9 @@ class NativePearlEngine:
                 counters["spec_rhythm_admission_kv_reserved_peak"] = max(
                     counters["spec_rhythm_admission_kv_reserved_peak"], admission_reserved_pages
                 )
-                if selected_for_admission is not None:
-                    selected_for_admission.add(index)
+                if pending_class_counts is not None:
+                    assert request_class is not None
+                    pending_class_counts[request_class] -= 1
                 if active_class_counts is not None:
                     assert request_class is not None
                     active_class_counts[request_class] += 1
@@ -10840,13 +10938,17 @@ class NativePearlEngine:
                 # work so host profiles report the optimization target exactly.
                 host_trace["scheduler_start_seconds"] = time.perf_counter()
             if fixed_gamma_scheduler_fast_path:
-                # With no external B/roofline and min=max=gamma, the default
-                # envelope is exactly one gamma window per active row.  A
-                # valid ready payload is at most gamma wide, so the general
-                # rebuild scan is provably a no-op.  Avoid repeating that
-                # active/ready payload walk on every decode cycle.
+                # With min=max=gamma, each ready payload fits one complete
+                # window. An optional B is safe here only when it covers a
+                # full target cohort; extra eager drafts are pruned below.
+                # The general ready-payload rebuild scan is therefore a no-op.
                 roof_context_len = 0
                 verification_roof = len(active_indices) * self.gamma
+                if self.config.spec_rhythm_verification_budget is not None:
+                    verification_roof = min(
+                        verification_roof,
+                        self.config.spec_rhythm_verification_budget,
+                    )
                 counters["spec_rhythm_fixed_gamma_scheduler_fast_path_cycles"] += 1
             else:
                 # Draft workers may hold longer uncommitted/eager tails than
@@ -11416,7 +11518,7 @@ class NativePearlEngine:
                         progress_gap > 0
                         and urgency >= self.config.spec_rhythm_urgency_threshold
                         and runtime_states[index].expected_acceptance_benefit
-                        >= self.config.spec_rhythm_acceptance_floor
+                        >= eager_acceptance_floor(index)
                         and (
                             not linear_full_window
                             or _full_window_eager_has_useful_horizon(
@@ -11438,7 +11540,7 @@ class NativePearlEngine:
                         for index in plan.eager_candidate_indices
                         if index not in urgent_set
                         and runtime_states[index].expected_continuation_benefit
-                        >= self.config.spec_rhythm_acceptance_floor
+                        >= eager_acceptance_floor(index)
                         and (
                             not residual_eager_tight_only
                             or (
@@ -11593,6 +11695,20 @@ class NativePearlEngine:
             work_is_eager: list[bool] = []
             if normal_indices or eager_candidates:
                 if fixed_gamma_scheduler_fast_path:
+                    if self.config.spec_rhythm_verification_budget is not None:
+                        budgeted_eager = spec_rhythm_select_fixed_gamma_eager_budget(
+                            eager_candidates,
+                            normal_count=len(normal_indices),
+                            gamma=self.gamma,
+                            verification_roof=verification_roof,
+                            states=runtime_states,
+                            projected_wait_ms=projected_wait_ms,
+                            slo_classes=normalized_slo_classes,
+                        )
+                        deferred_eager = set(eager_candidates) - set(budgeted_eager)
+                        for index in deferred_eager:
+                            counters[f"spec_rhythm_budget_deferred_eager_{normalized_slo_classes[index]}_rows"] += 1
+                        eager_candidates = list(budgeted_eager)
                     normal_budgets, eager_budgets = _fixed_gamma_identity_budgets(
                         normal_indices,
                         eager_candidates,
@@ -11612,8 +11728,15 @@ class NativePearlEngine:
                         eager_token_cap=effective_eager_cap or None,
                         eager_reserve_tokens=(self.config.spec_rhythm_eager_reserve_tokens),
                         verification_roof=verification_roof,
+                        acceptance_floors=request_eager_floors,
                     )
                     normal_budgets = dict(budget_plan.normal_budgets)
+                    deferred_normal = budget_plan.deferred_normal_request_indices
+                    counters["spec_rhythm_budget_deferred_normal_rows"] += len(deferred_normal)
+                    counters["spec_rhythm_budget_deferred_normal_cycles"] += int(bool(deferred_normal))
+                    for index in deferred_normal:
+                        label = normalized_slo_classes[index]
+                        counters[f"spec_rhythm_budget_deferred_normal_{label}_rows"] += 1
                     eager_budgets = {
                         index: min(value, effective_eager_cap)
                         for index, value in budget_plan.eager_budgets.items()
@@ -11646,6 +11769,9 @@ class NativePearlEngine:
                 work_budgets = [item[1] for item in ordered_work]
                 work_is_eager = [item[2] for item in ordered_work]
                 counters["spec_rhythm_allocated_draft_tokens"] += sum(work_budgets)
+                for index, budget in zip(work_indices, work_budgets):
+                    label = normalized_slo_classes[index]
+                    counters[f"spec_rhythm_allocated_gamma_{label}_{budget}_rows"] += 1
             if target_indices and work_indices:
                 counters["spec_rhythm_concurrent_draft_target_submission_cycles"] += 1
                 if nano_pearl_ablation:

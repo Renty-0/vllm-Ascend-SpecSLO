@@ -432,6 +432,12 @@ env_variables: dict[str, Callable[[], Any]] = {
     # Zero disables the corresponding cap.
     "VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP": lambda: int(os.getenv("VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP", "0")),
     "VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP": lambda: int(os.getenv("VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP", "0")),
+    # Shift the rolling-eager acceptance threshold by SLO class: tight uses
+    # base minus bias, loose uses base plus bias, normal keeps base.  Zero
+    # preserves the default policy; valid range is [0, 0.4].  No secrets.
+    "VLLM_ASCEND_SPECRHYTHM_EAGER_CLASS_FLOOR_BIAS": lambda: float(
+        os.getenv("VLLM_ASCEND_SPECRHYTHM_EAGER_CLASS_FLOOR_BIAS", "0")
+    ),
     # Allow relaxed requests to borrow otherwise idle active slots, then
     # suspend them at a cycle boundary when a coalesced tight cohort arrives.
     # Their KV and request state remain resident and their TPOT clock keeps

@@ -15,7 +15,9 @@ from vllm_ascend.spec_decode.pearl.native_engine import (
     spec_rhythm_any_when_enabled,
     spec_rhythm_class_cap_blocks,
     spec_rhythm_class_caps_enabled,
+    spec_rhythm_eager_class_floors,
     spec_rhythm_home_capacities,
+    spec_rhythm_select_fixed_gamma_eager_budget,
 )
 from vllm_ascend.spec_decode.pearl.runtime import PearlDualModelScheduler
 from vllm_ascend.spec_decode.pearl.spec_rhythm import (
@@ -229,6 +231,52 @@ def test_relaxed_active_cap_preserves_slots_only_while_tighter_work_is_pending()
         pending_classes=("tight",),
         class_caps={"normal": 0, "loose": 0},
     )
+
+
+def test_eager_class_floor_bias_preserves_default_and_prioritizes_tight():
+    assert spec_rhythm_eager_class_floors(0.4, 0.0) == {
+        "tight": 0.4,
+        "normal": 0.4,
+        "loose": 0.4,
+        "unclassified": 0.4,
+    }
+    shifted = spec_rhythm_eager_class_floors(0.4, 0.05)
+    assert shifted["tight"] == pytest.approx(0.35)
+    assert shifted["normal"] == 0.4
+    assert shifted["loose"] == pytest.approx(0.45)
+    assert shifted["unclassified"] == 0.4
+    assert spec_rhythm_eager_class_floors(0.1, 0.4)["tight"] == 0.0
+    assert spec_rhythm_eager_class_floors(0.9, 0.4)["loose"] == 1.0
+    for invalid in (-0.1, 0.5, float("nan")):
+        with pytest.raises(ValueError, match="bias"):
+            spec_rhythm_eager_class_floors(0.4, invalid)
+
+
+def test_fixed_gamma_budget_keeps_complete_tight_proposals_first():
+    states = _states(4)
+    for state in states.values():
+        state.delivered_tokens = 1
+        state.decode_elapsed_ms = 1000.0
+    selected = spec_rhythm_select_fixed_gamma_eager_budget(
+        [2, 0, 3, 1],
+        normal_count=1,
+        gamma=4,
+        verification_roof=12,
+        states=states,
+        projected_wait_ms=100.0,
+        slo_classes=["tight", "tight", "loose", "loose"],
+    )
+    assert selected == (0, 1)
+    with pytest.raises(ValueError, match="cover the normal"):
+        spec_rhythm_select_fixed_gamma_eager_budget(
+            [0],
+            normal_count=4,
+            gamma=4,
+            verification_roof=12,
+            states=states,
+            projected_wait_ms=100.0,
+            slo_classes=["tight"] * 4,
+        )
 
 
 def test_spec_rhythm_home_capacities_support_asymmetric_dual_batches():
@@ -661,6 +709,41 @@ def test_eager_reserve_does_not_withhold_b_without_eligible_eager_work():
     assert plan.normal_budgets == {index: 4 for index in range(30)}
     assert plan.deferred_normal_request_indices == ()
     assert plan.allocated_draft_tokens == 120
+
+
+def test_budget_shaper_uses_class_floor_for_fixed_graph_eager_work():
+    states = {
+        0: SpecRhythmRuntimeState(
+            request_index=0,
+            home_batch_id=0,
+            slo_tpot_ms=40.0,
+            delivered_tokens=1,
+            decode_elapsed_ms=1000.0,
+            acceptance_ema=0.35,
+        )
+    }
+    shaper = SpecRhythmBudgetShaper(
+        min_gamma=4,
+        max_gamma=4,
+        verification_budget=4,
+        acceptance_floor=0.4,
+    )
+
+    def shape(floors=None):
+        return shaper.shape(
+            plan_id=0,
+            normal_request_indices=[],
+            eager_request_indices=[0],
+            states=states,
+            projected_wait_ms=100.0,
+            context_len=32,
+            acceptance_floors=floors,
+        )
+
+    assert shape().eager_budgets == {}
+    assert shape({0: 0.3}).eager_budgets == {0: 4}
+    with pytest.raises(ValueError, match="acceptance floors"):
+        shape({0: float("nan")})
 
 
 def test_budget_plan_rejects_normal_plus_eager_global_roof_overrun():

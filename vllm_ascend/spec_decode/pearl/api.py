@@ -387,11 +387,14 @@ class PEARLConfig:
             raise ValueError("SpecRhythm prefill token chunk size must be non-negative.")
         if self.spec_rhythm_prefill_token_chunk_size > 0:
             if not (
-                self.enable_spec_rhythm and self.spec_rhythm_online_prefill and self.spec_rhythm_linear_full_window
+                self.enable_spec_rhythm
+                and self.spec_rhythm_online_prefill
+                and self.spec_rhythm_tree_width == 1
+                and self.spec_rhythm_tree_depth == 1
             ):
                 raise ValueError(
                     "SpecRhythm token-chunk prefill requires enable_spec_rhythm, "
-                    "online prefill, and linear full-window mode."
+                    "online prefill, and serial linear topology."
                 )
             if self.spec_rhythm_prefill_token_chunk_size > self.max_num_batched_tokens:
                 raise ValueError("SpecRhythm prefill token chunk size must not exceed max_num_batched_tokens.")

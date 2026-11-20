@@ -313,6 +313,7 @@ class SpecRhythmBudgetShaper:
         draft_window_ms: float | None = None,
         draft_ms_per_token: float | None = None,
         verification_roof: int | None = None,
+        acceptance_floors: Mapping[int, float] | None = None,
     ) -> SpecRhythmBudgetPlan:
         normal = tuple(dict.fromkeys(int(index) for index in normal_request_indices))
         eager = tuple(dict.fromkeys(int(index) for index in eager_request_indices))
@@ -321,6 +322,18 @@ class SpecRhythmBudgetShaper:
         requested = (*normal, *eager)
         if any(index not in states for index in requested):
             raise ValueError("SpecRhythm cannot shape an unregistered request.")
+        if acceptance_floors is not None and any(
+            not math.isfinite(float(acceptance_floors[index]))
+            or not 0.0 <= float(acceptance_floors[index]) <= 1.0
+            for index in requested
+            if index in acceptance_floors
+        ):
+            raise ValueError("Per-request acceptance floors must be in [0, 1].")
+
+        def acceptance_floor(index: int) -> float:
+            if acceptance_floors is None:
+                return self.acceptance_floor
+            return acceptance_floors.get(index, self.acceptance_floor)
 
         if verification_roof is None:
             roof = self.verification_roof(
@@ -398,7 +411,7 @@ class SpecRhythmBudgetShaper:
             if (
                 minimum <= 0
                 or initial_gaps[index] <= 0
-                or state.expected_acceptance_benefit < self.acceptance_floor
+                or state.expected_acceptance_benefit < acceptance_floor(index)
                 or minimum > reserve_remaining
             ):
                 continue
@@ -479,7 +492,7 @@ class SpecRhythmBudgetShaper:
         )
         for index in urgent:
             state = states[index]
-            if gaps[index] <= 0 or state.expected_acceptance_benefit < self.acceptance_floor:
+            if gaps[index] <= 0 or state.expected_acceptance_benefit < acceptance_floor(index):
                 continue
             cap = min(self.max_gamma, state.max_gamma or self.max_gamma)
             if index in normal_budgets:
@@ -527,7 +540,7 @@ class SpecRhythmBudgetShaper:
                     # Residual Goodput allocation must not reopen a request
                     # skipped by the urgent stage merely to consume spare B.
                     # Normal drafts still use the residual capacity below.
-                    if kind == "eager" and (gaps[index] <= 0 or benefit < self.acceptance_floor):
+                    if kind == "eager" and (gaps[index] <= 0 or benefit < acceptance_floor(index)):
                         continue
                     urgency_weight = 1.0 + state.urgency(projected_wait_ms)
                     marginal = urgency_weight * (benefit ** (current + 1))
