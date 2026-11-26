@@ -18,7 +18,7 @@ import tempfile
 from collections.abc import Mapping, Sequence
 from copy import deepcopy
 from dataclasses import dataclass
-from math import ceil, prod
+from math import ceil, pi, prod
 from pathlib import Path
 
 import torch
@@ -1300,9 +1300,13 @@ class NativeRotaryEmbedding(nn.Module):
         max_position_embeddings: int,
         rope_theta: float,
         use_production_rope: bool = False,
+        inverse_frequencies: torch.Tensor | None = None,
     ) -> None:
         super().__init__()
-        inverse_frequencies = 1.0 / (rope_theta ** (torch.arange(0, head_dim, 2, dtype=torch.float32) / head_dim))
+        if inverse_frequencies is None:
+            inverse_frequencies = 1.0 / (rope_theta ** (torch.arange(0, head_dim, 2, dtype=torch.float32) / head_dim))
+        elif inverse_frequencies.shape != (head_dim // 2,):
+            raise ValueError("RoPE inverse frequencies must match half the head dimension.")
         positions = torch.arange(max_position_embeddings, dtype=torch.float32)
         frequencies = torch.outer(positions, inverse_frequencies)
         cache_dtype = torch.get_default_dtype()
@@ -1344,6 +1348,32 @@ class NativeRotaryEmbedding(nn.Module):
                 torch_npu.npu_rotary_mul(key, cos, sin),
             )
         return _apply_rope(query, cos, sin), _apply_rope(key, cos, sin)
+
+
+def _llama3_inverse_frequencies(head_dim: int, rope_theta: float, parameters: Mapping[str, object]) -> torch.Tensor:
+    """Match Llama 3.1's frequency scaling without a vLLM CustomOp context."""
+
+    frequencies = 1.0 / (rope_theta ** (torch.arange(0, head_dim, 2, dtype=torch.float32) / head_dim))
+    factor = float(parameters["factor"])
+    low_factor = float(parameters["low_freq_factor"])
+    high_factor = float(parameters["high_freq_factor"])
+    original_length = float(parameters["original_max_position_embeddings"])
+    wave_length = (2 * pi) / frequencies
+    low_wave_length = original_length / low_factor
+    high_wave_length = original_length / high_factor
+    if low_factor != high_factor:
+        smooth = (original_length / wave_length - low_factor) / (high_factor - low_factor)
+    else:
+        smooth = 0.0
+    return torch.where(
+        wave_length < high_wave_length,
+        frequencies,
+        torch.where(
+            wave_length > low_wave_length,
+            frequencies / factor,
+            (1 - smooth) * frequencies / factor + smooth * frequencies,
+        ),
+    )
 
 
 def _apply_rope(value: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> torch.Tensor:
@@ -1406,17 +1436,31 @@ class NativeAttention(nn.Module):
         )
         rope_parameters = getattr(config, "rope_parameters", None) or getattr(config, "rope_scaling", None)
         rope_type = (rope_parameters or {}).get("rope_type", "default")
-        if rope_type == "default":
+        rope_cache_positions = min(
+            int(config.max_position_embeddings),
+            int(getattr(config, "pearl_rope_cache_max_positions", config.max_position_embeddings)),
+        )
+        if rope_type in ("default", "llama3"):
+            inverse_frequencies = (
+                _llama3_inverse_frequencies(
+                    self.head_dim,
+                    getattr(config, "rope_theta", 10_000.0),
+                    rope_parameters,
+                )
+                if rope_type == "llama3"
+                else None
+            )
             self.rotary_emb = NativeRotaryEmbedding(
                 self.head_dim,
-                config.max_position_embeddings,
+                rope_cache_positions,
                 getattr(config, "rope_theta", (rope_parameters or {}).get("rope_theta", 10_000.0)),
                 use_production_rope=bool(getattr(config, "pearl_use_production_rope", False)),
+                inverse_frequencies=inverse_frequencies,
             )
         else:
             self.rotary_emb = get_rope(
                 self.head_dim,
-                config.max_position_embeddings,
+                rope_cache_positions,
                 is_neox_style=True,
                 rope_parameters=rope_parameters,
             )
@@ -2700,6 +2744,7 @@ def build_native_model(
 ) -> NativeQwen2ForCausalLM:
     """Construct an upstream-supported model directly on NPU."""
     config = prepare_native_model_config(config, context.size)
+    config.pearl_rope_cache_max_positions = min(int(config.max_position_embeddings), max_model_len)
     original_dtype = torch.get_default_dtype()
     original_device = torch.get_default_device()
     model_dtype = getattr(config, "torch_dtype", torch.bfloat16)

@@ -1,0 +1,71 @@
+{
+  "contract": {
+    "model": "/data/shared_upload/models/Meta-Llama-3.1-70B-Instruct",
+    "tensor_parallel_size": 4,
+    "max_num_seqs": 64,
+    "request_manifest_sha256": "dc58dc5af1c5b28c6944f8f3faadeaae2dae34298c07b3ac84745d367c67d662",
+    "prompt_token_ids_sha256": "2327fc4be1069c109fda2450767b5e0e5230a64ae7c6ba74fe38ea22cc754631",
+    "output_tokens": 118528,
+    "num_prompts": 463,
+    "max_tokens": 256,
+    "online_arrivals": true,
+    "ascend_commit": "80610e4438dba05011b05f89fc45d91e96992671",
+    "vllm_commit": "ad7125a431e176d4161099480a66f0169609a690",
+    "physical_devices": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "mc2_matmul_allreduce": "0",
+    "mc2_fused": "0"
+  },
+  "runs": [
+    {
+      "tag": "r1",
+      "result_path": "/root/SpecSLO/llama-pair-20261126/baseline-results/runs/official-v021-llama70b-b64-r1/result.json",
+      "result_sha256": "b60f516f4ac558ec0d5592c5901922a4b55ef54e0dcf086a09e7cff6a5f72555",
+      "goodput_tokens_per_second": 123.05075506212059,
+      "raw_tokens_per_second": 593.463537435019,
+      "attained_requests": 96,
+      "attained_by_class": {
+        "tight": 0,
+        "normal": 0,
+        "loose": 96
+      }
+    },
+    {
+      "tag": "r2",
+      "result_path": "/root/SpecSLO/llama-pair-20261126/baseline-results/runs/official-v021-llama70b-b64-r2/result.json",
+      "result_sha256": "a3612a6b92eb2dfe72b53ed48009156326e24f2718ef8292e00e4d24fad73263",
+      "goodput_tokens_per_second": 123.17310283315344,
+      "raw_tokens_per_second": 594.0536105390629,
+      "attained_requests": 96,
+      "attained_by_class": {
+        "tight": 0,
+        "normal": 0,
+        "loose": 96
+      }
+    },
+    {
+      "tag": "r3",
+      "result_path": "/root/SpecSLO/llama-pair-20261126/baseline-results/runs/official-v021-llama70b-b64-r3/result.json",
+      "result_sha256": "6a3b7855b92fda747bd9243d190b5ef910c7a3d9b08a2286dbe96f2af46ba39e",
+      "goodput_tokens_per_second": 121.5180133936049,
+      "raw_tokens_per_second": 586.0712520962403,
+      "attained_requests": 96,
+      "attained_by_class": {
+        "tight": 0,
+        "normal": 0,
+        "loose": 96
+      }
+    }
+  ],
+  "aggregation": "arithmetic mean of the three prespecified independent runs",
+  "baseline_goodput_mean_tokens_per_second": 122.58062376295965,
+  "baseline_goodput_population_std_tokens_per_second": 0.7530373350922859,
+  "baseline_goodput_min_tokens_per_second": 121.5180133936049,
+  "baseline_goodput_max_tokens_per_second": 123.17310283315344,
+  "baseline_raw_mean_tokens_per_second": 591.1961333567741,
+  "specslo_1_5x_goodput_threshold_tokens_per_second": 183.87093564443947
+}

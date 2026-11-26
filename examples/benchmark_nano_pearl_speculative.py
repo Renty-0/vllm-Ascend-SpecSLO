@@ -35,6 +35,12 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--draft-model", required=True)
     parser.add_argument("--target-model", required=True)
+    parser.add_argument(
+        "--prompt-tokenizer-model",
+        choices=("draft", "target"),
+        default="draft",
+        help="Select the model chat template used to tokenize benchmark prompts.",
+    )
     parser.add_argument("--draft-tp-size", type=int, default=1)
     parser.add_argument("--target-tp-size", type=int, default=1)
     parser.add_argument("--draft-dtype", choices=("auto", "bfloat16", "float16"), default="auto")
@@ -708,10 +714,16 @@ def main(argv: Sequence[str] | None = None) -> None:
     with PEARLEngine(config) as engine:
         # Match the production baseline: tokenize before starting the arrival
         # trace, then include enqueue/IPC/generation in the measured window.
+        if args.prompt_tokenizer_model == "target":
+            from transformers import AutoTokenizer
+
+            prompt_tokenizer = AutoTokenizer.from_pretrained(args.target_model, use_fast=True)
+        else:
+            prompt_tokenizer = engine.tokenizer
         tokenized_prompts = [
             list(
-                engine.tokenizer.encode(
-                    engine.tokenizer.apply_chat_template(
+                prompt_tokenizer.encode(
+                    prompt_tokenizer.apply_chat_template(
                         [{"role": "user", "content": prompt}],
                         tokenize=False,
                         add_generation_prompt=True,
@@ -1048,6 +1060,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         "draft_dtype": args.draft_dtype,
         "target_dtype": args.target_dtype,
         "draft_mode": args.draft_mode,
+        "prompt_tokenizer_model": args.prompt_tokenizer_model,
         "draft_tp1_greedy_argmax": args.draft_tp1_greedy_argmax,
         "gamma": args.gamma,
         "seed": args.seed,

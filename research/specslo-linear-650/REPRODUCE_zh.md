@@ -182,3 +182,43 @@ PY
 python research/specslo-linear-650/scripts/audit_active_peak.py \
   "$run_dir/result.json" "$run_dir/active-peak-audit.json"
 ```
+
+## 4. 2026-11-26 b32/b64 同合同对照的复现
+
+这两轮在物理卡 `1,2,3,4` 上运行，使用同一份 463 请求清单（SHA256 `dc58dc5af1c5b28c6944f8f3faadeaae2dae34298c07b3ac84745d367c67d662`）、每请求 256 输出 token、引擎内部 paper TPOT 和 40/50/150 ms 阈值。SpecSLO 的 target TP=3、draft TP=1，MC2 ON，基础线性 γ=4；全局验证预算 B=128 会在预算不足时延后额外 eager 草稿。两轮仅把**全局活跃 batch 上限**从 64 改为 32；单次 target 上限始终是 32，不可把这两个上限混为一谈。
+
+原始测量使用提交 `8fd4c4adcd5ffd28a70b16b70bc72dfc8bd6c162` 加上本目录 [`reproduction/batch-sweep-20261126.patch`](reproduction/batch-sweep-20261126.patch)，补丁 SHA256 为 `b0c1c38cca0ef2a7a74776c4787f2e467d4f89536864f6f4a7aac27b8dcce0ec`。该补丁把 `SPECSLO_BATCH_SIZE` 接入启动脚本；**只检出上述提交而不应用补丁时，b32 命令仍会以 b64 运行**。为避免随后 b16 实验的代码修改混入对照，应在独立工作树重建原始源码：
+
+```bash
+cd /root/SpecSLO/specslo-linear-650-publish
+git worktree add --detach /root/SpecSLO/repro-batch-20261126 8fd4c4adcd5ffd28a70b16b70bc72dfc8bd6c162
+cd /root/SpecSLO/repro-batch-20261126
+git apply /root/SpecSLO/specslo-linear-650-publish/research/specslo-linear-650/reproduction/batch-sweep-20261126.patch
+git diff --binary | sha256sum
+```
+
+最后一条应输出上述补丁 SHA。按第 1 节建立并校验三处 Ascend 扩展/kernels 动态库链接；环境、模型、MC2 profile 和 vendor 必须与第 1 节相同。确认四卡空闲后分别用新标签运行，不能同时占用同一组 NPU：
+
+```bash
+SPECSLO_VISIBLE_DEVICES=1,2,3,4 SPECSLO_BATCH_SIZE=64 \
+SPECSLO_LOOSE_ADMISSION_TIGHT_GATE=6 SPECSLO_NORMAL_ACTIVE_CAP=8 \
+SPECSLO_EAGER_CLASS_FLOOR_BIAS=0.1 SPECSLO_VERIFICATION_BUDGET=128 \
+bash research/specslo-linear-650/run.sh batch64-repro-new 0.4
+
+SPECSLO_VISIBLE_DEVICES=1,2,3,4 SPECSLO_BATCH_SIZE=32 \
+SPECSLO_LOOSE_ADMISSION_TIGHT_GATE=6 SPECSLO_NORMAL_ACTIVE_CAP=8 \
+SPECSLO_EAGER_CLASS_FLOOR_BIAS=0.1 SPECSLO_VERIFICATION_BUDGET=128 \
+bash research/specslo-linear-650/run.sh batch32-repro-new 0.4
+```
+
+原始轮次 b64 的 Raw/Goodput 为 **740.05/692.10 token/s**，tight/normal/loose 达标 **241/96/96**；b32 为 **705.87/673.85 token/s**，达标 **250/96/96**。原始 `result.json` SHA256 分别是 `dbd7139004b81fa42f08c334dabf4e25f3bef15f082264e735b35711c1f5f44a` 和 `af16d04abb9dead9b10fee8d58f29bf2c8ffdfd9ab12adc753ee5e13d63d10dc`。两轮都通过图资格固定点、正式阶段零 shape/capacity fallback、机制门和活跃峰值审计，实际活跃峰值分别为 64 和 32。重新运行应保留全部原始输出，比较同合同下的波动范围；不要要求输出 JSON 的哈希或 Goodput 与原轮次逐位一致。
+
+核查新轮次时，至少检查 `contract.env` 中的 `batch_size`、`target_max_batch=32`、`verification_budget=128`、`normal_active_cap=8`、`eager_class_floor_bias=0.1`，并运行第 3 节的统计与 `audit_active_peak.py`。b32/b64 比值所用的官方 vLLM Ascend v0.21.0 TP4 自回归基线是**另一组运行**；其结果和数据位置见 `/root/SpecSLO/comparison-batches-20261126/REPORT_zh.md`，不能用 SpecSLO 命令代替基线。
+
+### 同源码 b64 新复跑
+
+2026-11-26 在独立工作树运行 `batch64-repro-20261126-r2`，`working-tree.patch` 的 SHA256 与原始补丁一致。新结果 Raw **740.97**、Goodput **689.75 token/s**，tight/normal/loose 达标 **239/96/96**；相较原始 b64 的 Raw **740.05**、Goodput **692.10**、**241/96/96**，Goodput 低 **0.34%**，tight 少 2 个请求。463 个请求均输出 256 token，图资格固定点、正式阶段零 shape/capacity fallback、机制门和活跃峰值审计均通过，实际峰值 **64**。新 `result.json` SHA256 为 `18af66944e65f0381503ae86a8bd7e45c82832cd35585f5e748f7a079989b379`。这证明在同源码、同输入和同设备合同下可复现 b64 的性能区间；数值不要求逐位一致。
+
+## 5. Llama 3.1 70B / 3.2 1B 的 b64 迁移
+
+70B TP4、MC2 OFF 的官方 vLLM Ascend v0.21.0 baseline 独立测三轮并冻结 Goodput 均值 **122.58 token/s**。SpecSLO 使用 1B TP1 draft + 70B TP3 target、固定 γ=4、同一 463 请求与 40/50/150 ms 引擎内部 TPOT 合同；实际活跃峰值达到 64 的同配置两轮 Goodput 为 **230.42、225.01 token/s**，相对冻结 baseline 分别为 **1.880×、1.836×**，均超过 1.5×。固定 γ=4 的 1B token 级接受率约 **57%**。完整命令、冻结基线摘要、门禁、峰值审计及原始结果哈希见 [`reproduction/llama70b/REPRODUCE_zh.md`](reproduction/llama70b/REPRODUCE_zh.md)。

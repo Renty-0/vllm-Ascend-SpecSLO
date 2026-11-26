@@ -1,0 +1,33 @@
+diff --git a/research/specslo-linear-650/body_candidate.sh b/research/specslo-linear-650/body_candidate.sh
+index 3a29595a..0c573de2 100755
+--- a/research/specslo-linear-650/body_candidate.sh
++++ b/research/specslo-linear-650/body_candidate.sh
+@@ -57,6 +57,11 @@ early_current_mixed_target_submit=${SPECSLO_EARLY_CURRENT_MIXED_TARGET_SUBMIT:-0
+ prefetch_ahead=${SPECSLO_PREFETCH_AHEAD:-0}
+ stable_target_request_bucket=${SPECSLO_STABLE_TARGET_REQUEST_BUCKET:-1}
+ target_max_batch=${SPECSLO_MAX_TARGET_BATCH:-32}
++batch_size=${SPECSLO_BATCH_SIZE:-64}
++if [[ ! $batch_size =~ ^(8|16|32|64)$ ]]; then
++  echo "SPECSLO_BATCH_SIZE must be 8, 16, 32, or 64" >&2
++  exit 2
++fi
+ tight_home_fraction=${SPECSLO_TIGHT_HOME_FRACTION:-0.5}
+ slo_home_partition=${SPECSLO_SLO_HOME_PARTITION:-0}
+ normal_active_cap=${SPECSLO_NORMAL_ACTIVE_CAP:-0}
+@@ -462,6 +467,7 @@ if [[ $validate_only == 0 ]]; then
+   sha256sum "$manifest" "$profile" "$extension" > "$run_dir/input.sha256"
+   {
+   printf 'mode=%s\nrun_tag=%s\nvisible_devices=%s\n' "$mc2_mode" "$run_tag" "$visible_devices"
++  printf 'batch_size=%s\n' "$batch_size"
+   printf 'result_root=%s\nrun_dir=%s\n' "$result_root" "$run_dir"
+   printf 'fallback_max_batch=%s\nacceptance_only=%s\nacceptance_floor=%s\nlinear_bonus_token=%s\nprefill_only=%s\n' \
+     "$fallback_max_batch" "$acceptance_only" "$acceptance_floor" "$linear_bonus_token" "$prefill_only"
+@@ -523,7 +529,7 @@ if [[ $validate_only == 0 ]]; then
+   --spec-rhythm-target-fallback-max-batch "$fallback_max_batch" \
+   --spec-rhythm-tree-width 1 --spec-rhythm-tree-depth 1 \
+   --spec-rhythm-max-eager-tokens 4 --max-model-len 4096 --max-tokens 256 \
+-  --batch-sizes 64 --num-prompts 463 --request-manifest "$manifest" \
++  --batch-sizes "$batch_size" --num-prompts 463 --request-manifest "$manifest" \
+   --gpu-memory-utilization 0.8 --num-kvcache-blocks "$kv_blocks" \
+   --max-aclgraph-entries "$graph_entries" --target-verification-graph-buckets 8 \
+   --enable-continuous-batching --enable-preemptive-scheduling --enable-spec-rhythm \

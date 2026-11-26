@@ -105,9 +105,11 @@ from vllm_ascend.spec_decode.pearl.native_model import (
     NativeLMHead,
     NativeQwen2ForCausalLM,
     NativeRMSNorm,
+    NativeRotaryEmbedding,
     NativeRowLinear,
     NativeTPContext,
     _is_contiguous_linear_tree_plan,
+    _llama3_inverse_frequencies,
     _maybe_convert_linear_weights_to_nz,
     _maybe_untie_lm_head_for_nz,
     _pad_token_rows,
@@ -3557,6 +3559,49 @@ def test_native_model_runs_every_upstream_architecture_on_cpu(architecture):
     assert isinstance(attention.q_norm, NativeRMSNorm) == (architecture == "Qwen3ForCausalLM")
     assert (attention.o_proj.bias is not None) == (architecture == "LlamaForCausalLM")
     assert (model.layers[0].mlp.gate_up_proj.bias is not None) == (architecture == "LlamaForCausalLM")
+
+
+def test_llama3_rope_matches_vllm_frequency_scaling_and_caps_cache():
+    from vllm.model_executor.layers.rotary_embedding import Llama3RotaryEmbedding
+
+    parameters = {
+        "rope_type": "llama3",
+        "factor": 8.0,
+        "low_freq_factor": 1.0,
+        "high_freq_factor": 4.0,
+        "original_max_position_embeddings": 8192,
+    }
+    reference = Llama3RotaryEmbedding.__new__(Llama3RotaryEmbedding)
+    reference.rotary_dim = 128
+    reference.orig_max_position = 8192
+    reference.low_freq_factor = 1.0
+    reference.high_freq_factor = 4.0
+    reference.scaling_factor = 8.0
+    inverse_frequencies = _llama3_inverse_frequencies(128, 500_000.0, parameters)
+    assert torch.equal(inverse_frequencies, reference._compute_inv_freq(500_000.0))
+
+    config = SimpleNamespace(
+        architectures=["LlamaForCausalLM"],
+        vocab_size=32,
+        hidden_size=128,
+        num_attention_heads=1,
+        num_key_value_heads=1,
+        head_dim=128,
+        max_position_embeddings=131_072,
+        pearl_rope_cache_max_positions=16,
+        rope_theta=500_000.0,
+        rope_scaling=parameters,
+        rms_norm_eps=1e-5,
+        intermediate_size=256,
+        hidden_act="silu",
+        tie_word_embeddings=False,
+        num_hidden_layers=1,
+    )
+    model = NativeQwen2ForCausalLM(config, NativeTPContext(group=None, rank=0, size=1, leader_rank=0))
+    rope = model.layers[0].self_attn.rotary_emb
+    assert isinstance(rope, NativeRotaryEmbedding)
+    assert rope.cos_sin_cache.shape == (16, 128)
+    assert torch.allclose(rope.cos_sin_cache[1, :64], inverse_frequencies.cos())
 
 
 def test_native_qwen3_attention_admits_production_qknorm_rope_fusion():
@@ -11169,3 +11214,25 @@ def test_native_parity_target_nz_converts_down_projection_on_selected_layers(mod
     format_cast.assert_called_once_with(originals[selected], 29)
     for name, module in modules.items():
         assert module.weight.data is (converted if name == selected else originals[name])
+
+
+def test_draft_kvcache_override_does_not_increase_target_reservation(monkeypatch):
+    engine = SimpleNamespace(
+        is_draft=True,
+        config=SimpleNamespace(num_kvcache_blocks=512),
+    )
+    monkeypatch.setenv("VLLM_ASCEND_PEARL_DRAFT_KVCACHE_BLOCKS", "1024")
+    assert NativePearlEngine._resolve_num_cache_blocks(engine) == 1024
+
+    engine.is_draft = False
+    assert NativePearlEngine._resolve_num_cache_blocks(engine) == 512
+
+
+def test_draft_kvcache_override_rejects_invalid_value(monkeypatch):
+    engine = SimpleNamespace(
+        is_draft=True,
+        config=SimpleNamespace(num_kvcache_blocks=512),
+    )
+    monkeypatch.setenv("VLLM_ASCEND_PEARL_DRAFT_KVCACHE_BLOCKS", "-1")
+    with pytest.raises(ValueError, match="non-negative integer"):
+        NativePearlEngine._resolve_num_cache_blocks(engine)

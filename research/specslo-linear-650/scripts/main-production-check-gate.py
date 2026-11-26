@@ -39,7 +39,10 @@ def main():
             "Arrival coalescing contract changed")
     for key in ("spec_rhythm_merge_ready_homes", "spec_rhythm_linear_eager_cross_graph_bucket",
                 "spec_rhythm_linear_idle_residual_eager", "spec_rhythm_linear_bonus_token"):
-        require(document.get(key) is (key != "spec_rhythm_linear_bonus_token"),
+        expected = key != "spec_rhythm_linear_bonus_token"
+        if key == "spec_rhythm_merge_ready_homes":
+            expected = mode == "auto"
+        require(document.get(key) is expected,
                 f"Historical main production policy mismatch: {key}")
     environment = document.get("runtime_environment", {})
     require(environment.get("ASCEND_RT_VISIBLE_DEVICES") == "0,1,2,3", "Wrong container device allocation")

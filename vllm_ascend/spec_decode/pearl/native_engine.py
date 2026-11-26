@@ -4690,6 +4690,16 @@ class NativePearlEngine:
         )
 
     def _resolve_num_cache_blocks(self) -> int:
+        if self.is_draft:
+            draft_override = os.getenv("VLLM_ASCEND_PEARL_DRAFT_KVCACHE_BLOCKS", "0")
+            try:
+                draft_blocks = int(draft_override)
+            except ValueError as exc:
+                raise ValueError("VLLM_ASCEND_PEARL_DRAFT_KVCACHE_BLOCKS must be a non-negative integer") from exc
+            if draft_blocks < 0:
+                raise ValueError("VLLM_ASCEND_PEARL_DRAFT_KVCACHE_BLOCKS must be a non-negative integer")
+            if draft_blocks > 0:
+                return draft_blocks
         if self.config.num_kvcache_blocks > 0:
             return self.config.num_kvcache_blocks
         attention = self.model.layers[0].self_attn
@@ -8839,10 +8849,14 @@ class NativePearlEngine:
             else None
         )
         class_caps = {
+            "tight": int(envs.VLLM_ASCEND_SPECRHYTHM_TIGHT_ACTIVE_CAP),
             "normal": int(envs.VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP),
             "loose": int(envs.VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP),
         }
-        class_caps_enabled = spec_rhythm_class_caps_enabled(class_caps)
+        normal_active_hard_cap = int(envs.VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_HARD_CAP)
+        if normal_active_hard_cap < 0:
+            raise ValueError("SpecRhythm normal hard active cap must be non-negative.")
+        class_caps_enabled = spec_rhythm_class_caps_enabled(class_caps) or normal_active_hard_cap > 0
         tight_target_burst = max(
             0,
             int(envs.VLLM_ASCEND_SPECRHYTHM_TIGHT_TARGET_BURST),
@@ -9139,6 +9153,9 @@ class NativePearlEngine:
         loose_admission_tight_gate = int(os.environ.get("SPECSLO_LOOSE_ADMISSION_TIGHT_GATE", "-1"))
         if loose_admission_tight_gate < -1 or loose_admission_tight_gate > initial_batch_size:
             raise ValueError("SPECSLO_LOOSE_ADMISSION_TIGHT_GATE must be -1 or within the active batch capacity.")
+        loose_admission_normal_gate = int(os.environ.get("SPECSLO_LOOSE_ADMISSION_NORMAL_GATE", "-1"))
+        if loose_admission_normal_gate < -1 or loose_admission_normal_gate > initial_batch_size:
+            raise ValueError("SPECSLO_LOOSE_ADMISSION_NORMAL_GATE must be -1 or within the active batch capacity.")
         admission_kv_guard_pages = int(os.environ.get("SPECSLO_ADMISSION_KV_GUARD_PAGES", "0"))
         if admission_kv_guard_pages < 0:
             raise ValueError("SPECSLO_ADMISSION_KV_GUARD_PAGES must be non-negative.")
@@ -9356,7 +9373,9 @@ class NativePearlEngine:
             "spec_rhythm_prefill_token_chunk_enabled": int(token_chunk_prefill),
             "spec_rhythm_prefill_token_chunk_size": prefill_token_chunk_size,
             "spec_rhythm_loose_admission_tight_gate": loose_admission_tight_gate,
+            "spec_rhythm_loose_admission_normal_gate": loose_admission_normal_gate,
             "spec_rhythm_loose_admission_deferred": 0,
+            "spec_rhythm_loose_admission_normal_deferred": 0,
             "spec_rhythm_admission_kv_guard_deferred": 0,
             "spec_rhythm_admission_kv_reserved_peak": 0,
             "spec_rhythm_prefill_token_chunk_submissions": 0,
@@ -9388,6 +9407,8 @@ class NativePearlEngine:
             "spec_rhythm_tight_target_release_cycles": 0,
             "spec_rhythm_tight_target_deferred_loose_rows": 0,
             "spec_rhythm_class_active_caps_enabled": int(class_caps_enabled),
+            "spec_rhythm_tight_active_cap": class_caps["tight"],
+            "spec_rhythm_normal_active_hard_cap": normal_active_hard_cap,
             "spec_rhythm_normal_active_cap": class_caps["normal"],
             "spec_rhythm_loose_active_cap": class_caps["loose"],
             "spec_rhythm_eager_class_floor_bias": eager_class_floor_bias,
@@ -9719,6 +9740,11 @@ class NativePearlEngine:
                 for indices in (active_indices, staged_prefill_indices)
                 for index in indices
             )
+            active_normal_count = sum(
+                slo_counter_class(index) == "normal"
+                for indices in (active_indices, staged_prefill_indices)
+                for index in indices
+            ) if loose_admission_normal_gate >= 0 else 0
             block_size = self.config.kvcache_block_size
 
             def reserved_kv_pages(index: int) -> int:
@@ -9746,6 +9772,16 @@ class NativePearlEngine:
                 )
                 for index in pending_admission
             )
+            ready_normal_pending = any(
+                index not in staged_set
+                and slo_counter_class(index) == "normal"
+                and (
+                    not arrival_gated
+                    or request_params[index].arrival_ts is None
+                    or float(request_params[index].arrival_ts) <= now
+                )
+                for index in pending_admission
+            ) if loose_admission_normal_gate >= 0 else False
             pending_class_counts: dict[str, int] | None = None
             if class_caps_enabled:
                 pending_class_counts = {label: 0 for label in ("tight", "normal", "loose", "unclassified")}
@@ -9765,6 +9801,13 @@ class NativePearlEngine:
                 ):
                     counters["spec_rhythm_loose_admission_deferred"] += 1
                     continue
+                if (
+                    loose_admission_normal_gate >= 0
+                    and slo_counter_class(index) == "loose"
+                    and (active_normal_count > loose_admission_normal_gate or ready_normal_pending)
+                ):
+                    counters["spec_rhythm_loose_admission_normal_deferred"] += 1
+                    continue
                 candidate_kv_pages = reserved_kv_pages(index) if admission_kv_guard_pages else 0
                 if (
                     admission_kv_guard_pages
@@ -9778,6 +9821,24 @@ class NativePearlEngine:
                     assert active_class_counts is not None
                     assert pending_class_counts is not None
                     request_class = slo_counter_class(index)
+                    # Bound the number of tight rows that compete for one
+                    # target verification slot. Other classes can fill the
+                    # remaining b64 admission capacity while target work is
+                    # reserved for the currently active tight cohort.
+                    if (
+                        request_class == "tight"
+                        and class_caps["tight"] > 0
+                        and active_class_counts["tight"] >= class_caps["tight"]
+                    ):
+                        counters["spec_rhythm_class_cap_deferred_tight"] += 1
+                        continue
+                    if (
+                        request_class == "normal"
+                        and normal_active_hard_cap > 0
+                        and active_class_counts["normal"] >= normal_active_hard_cap
+                    ):
+                        counters["spec_rhythm_class_cap_deferred_normal"] += 1
+                        continue
                     pending_classes = tuple(
                         label for label, count in pending_class_counts.items() if count > 0
                     )
@@ -12206,7 +12267,13 @@ class NativePearlEngine:
                             else None
                         ),
                         plan_id=plan.plan_id,
-                        home_batch_id=plan.target_home_batch_id,
+                        # Single-batch plans have no home.  Use a distinct
+                        # identity value so staging has a complete signature.
+                        home_batch_id=(
+                            plan.target_home_batch_id
+                            if plan.target_home_batch_id is not None
+                            else -1
+                        ),
                         request_indices=target_indices,
                         proposal_digest=(
                             _target_replay_ahead_proposal_digest(
@@ -12640,7 +12707,11 @@ class NativePearlEngine:
                             )
                             and staged_correction_identity.correction_epoch > last_correction_epoch
                             and staged_correction_identity.plan_id == int(plan.plan_id)
-                            and staged_correction_identity.home_batch_id == int(plan.target_home_batch_id)
+                            and staged_correction_identity.home_batch_id == (
+                                int(plan.target_home_batch_id)
+                                if plan.target_home_batch_id is not None
+                                else -1
+                            )
                             and staged_correction_identity.request_indices == tuple(target_indices)
                             and staged_correction_identity.proposal_digest == expected_proposal_digest
                             and getattr(

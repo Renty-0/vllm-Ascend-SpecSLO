@@ -427,8 +427,11 @@ env_variables: dict[str, Callable[[], Any]] = {
     "VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS": lambda: int(
         os.getenv("VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS", "0")
     ),
-    # Soft active-set caps for relaxed traffic.  A cap is enforced only while
-    # a tighter-class request remains pending, and is released for tail drain.
+    # Hard cap for concurrent tight requests. It bounds contention for a
+    # target verification slot; zero disables it.
+    "VLLM_ASCEND_SPECRHYTHM_TIGHT_ACTIVE_CAP": lambda: int(os.getenv("VLLM_ASCEND_SPECRHYTHM_TIGHT_ACTIVE_CAP", "0")),
+    "VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_HARD_CAP": lambda: int(os.getenv("VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_HARD_CAP", "0")),
+    # Soft caps for relaxed traffic apply only while tighter work is pending.
     # Zero disables the corresponding cap.
     "VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP": lambda: int(os.getenv("VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP", "0")),
     "VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP": lambda: int(os.getenv("VLLM_ASCEND_SPECRHYTHM_LOOSE_ACTIVE_CAP", "0")),
