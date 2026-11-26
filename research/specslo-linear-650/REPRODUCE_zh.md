@@ -182,3 +182,31 @@ PY
 python research/specslo-linear-650/scripts/audit_active_peak.py \
   "$run_dir/result.json" "$run_dir/active-peak-audit.json"
 ```
+
+### 2026-11-26：b16 前缀缓存复测候选
+
+在物理卡 `1,2,3,4` 上，Qwen3-0.6B TP1 draft + Qwen3-32B TP3 target，固定 γ=4、`nano_pearl` 单 batch、全局 batch 上限 16、单轮 target 上限 16，使用与上文相同的 463 请求清单和 40/50/150 ms 引擎内部 TPOT。启用安全 KV 前缀缓存，KV 容量设为 1024 页；两项同时改变，因此这组实验不能单独证明哪一项带来增益。
+
+```bash
+cd /root/SpecSLO/specslo-b16-prefix-publish
+SPECSLO_VISIBLE_DEVICES=1,2,3,4 \
+SPECSLO_BATCH_SIZE=16 \
+SPECSLO_MAX_TARGET_BATCH=16 \
+SPECSLO_ABLATION_MODE=nano_pearl \
+SPECSLO_LOOSE_ADMISSION_TIGHT_GATE=6 \
+SPECSLO_NORMAL_ACTIVE_CAP=8 \
+SPECSLO_EAGER_CLASS_FLOOR_BIAS=0.1 \
+SPECSLO_VERIFICATION_BUDGET=128 \
+SPECSLO_ENABLE_PREFIX_CACHING=1 \
+SPECSLO_NUM_KVCACHE_BLOCKS=1024 \
+bash research/specslo-linear-650/run.sh batch16-nano-prefix-kv1024-new 0.4
+```
+
+运行标签要换成未使用的值。此分支修正了 b16 启动脚本中被写死的 target 上限、`nano_pearl` 与 `merge_ready_homes` 的参数冲突，以及单 batch 的 `target_home_batch_id` 哨兵处理；实际运行的补丁可与每轮 `working-tree.patch` 核对。模型、编译扩展和 MC2 profile 仍是本机资产，不随 GitHub 分支发布。原始测量在 `/root/SpecSLO/repro-batch-20261126/research/specslo-linear-650/results/runs/` 下，结果目录被 Git 忽略。
+
+| 轮次 | Goodput / Raw token/s | 达标 | E2E 秒 | 图资格、零回退、机制门 | `result.json` SHA256 |
+| --- | ---: | ---: | ---: | :---: | --- |
+| `batch16-nano-prefix-kv1024-20261126-r1` | 577.09 | 463/463 | 205.390 | 通过 | `7ad2df31626bd2847f88dd79079cd3e4a614e55ac9a9255184e193a594ee2dbc` |
+| `batch16-nano-prefix-kv1024-20261126-r2` | 573.94 | 463/463 | 206.518 | 通过 | `b121e74afcf491236e0460418ad800e0c8dc4b75aa57719319d131a614976d77` |
+
+两轮平均 Goodput 为 **575.51 token/s**。同一机器的无前缀缓存、KV 640 页的 b16 `nano_pearl` 先前单轮为 **561.02 token/s**；官方 b16 基线为 **475.66 token/s**。目前仅达到官方基线的 **1.210×**，低于 1.5× 门槛 **713.49 token/s**，需继续优化。检查每轮 `result.json` 的 `batch_size=16`、`num_prompts=463`、`graph_qualification_fixed_point=true`、`aclgraph_shape_fallbacks=0`、`aclgraph_capacity_fallbacks=0`，并确认 `mechanism-gate.json` 的 `status=pass`。

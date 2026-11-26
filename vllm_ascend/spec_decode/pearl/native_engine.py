@@ -11214,7 +11214,11 @@ class NativePearlEngine:
                 try:
                     current_replay_signature, signature_reason = _spec_rhythm_selected_target_signature(
                         controller=controller,
-                        home_batch_id=plan.target_home_batch_id,
+                        home_batch_id=(
+                            plan.target_home_batch_id
+                            if plan.target_home_batch_id is not None
+                            else -1
+                        ),
                         request_indices=target_indices,
                         payloads=payloads,
                         states=local_states,
@@ -12206,7 +12210,11 @@ class NativePearlEngine:
                             else None
                         ),
                         plan_id=plan.plan_id,
-                        home_batch_id=plan.target_home_batch_id,
+                        home_batch_id=(
+                            plan.target_home_batch_id
+                            if plan.target_home_batch_id is not None
+                            else -1
+                        ),
                         request_indices=target_indices,
                         proposal_digest=(
                             _target_replay_ahead_proposal_digest(
@@ -12640,7 +12648,11 @@ class NativePearlEngine:
                             )
                             and staged_correction_identity.correction_epoch > last_correction_epoch
                             and staged_correction_identity.plan_id == int(plan.plan_id)
-                            and staged_correction_identity.home_batch_id == int(plan.target_home_batch_id)
+                            and staged_correction_identity.home_batch_id == (
+                                int(plan.target_home_batch_id)
+                                if plan.target_home_batch_id is not None
+                                else -1
+                            )
                             and staged_correction_identity.request_indices == tuple(target_indices)
                             and staged_correction_identity.proposal_digest == expected_proposal_digest
                             and getattr(

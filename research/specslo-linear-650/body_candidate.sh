@@ -2,7 +2,7 @@
 set -euo pipefail
 
 if [[ $# -ne 3 || ( $1 != off && $1 != on ) ]]; then
-  echo "usage: $0 <off|on> <run-tag> <nano_pearl|dual_batch|dual_batch_rolling>" >&2
+  echo "usage: $0 <off|on> <run-tag> <auto|serial|nano_pearl|dual_batch|dual_batch_rolling>" >&2
   exit 2
 fi
 
@@ -10,7 +10,7 @@ mc2_mode=$1
 run_tag=$2
 ablation_mode=$3
 case "$ablation_mode" in
-  auto|nano_pearl|dual_batch|dual_batch_rolling) ;;
+  auto|serial|nano_pearl|dual_batch|dual_batch_rolling) ;;
   *) echo "invalid mechanism mode" >&2; exit 2 ;;
 esac
 repo=${SPECSLO_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}
@@ -57,9 +57,18 @@ early_current_mixed_target_submit=${SPECSLO_EARLY_CURRENT_MIXED_TARGET_SUBMIT:-0
 prefetch_ahead=${SPECSLO_PREFETCH_AHEAD:-0}
 stable_target_request_bucket=${SPECSLO_STABLE_TARGET_REQUEST_BUCKET:-1}
 target_max_batch=${SPECSLO_MAX_TARGET_BATCH:-32}
+batch_size=${SPECSLO_BATCH_SIZE:-64}
+if [[ ! $batch_size =~ ^(8|16|32|64)$ ]]; then
+  echo "SPECSLO_BATCH_SIZE must be 8, 16, 32, or 64" >&2
+  exit 2
+fi
 tight_home_fraction=${SPECSLO_TIGHT_HOME_FRACTION:-0.5}
 slo_home_partition=${SPECSLO_SLO_HOME_PARTITION:-0}
 normal_active_cap=${SPECSLO_NORMAL_ACTIVE_CAP:-0}
+slo_aware_admission=${SPECSLO_SLO_AWARE_ADMISSION:-1}
+prefill_coalesce_min_requests=${SPECSLO_PREFILL_COALESCE_MIN_REQUESTS:-1}
+prefill_coalesce_max_wait_ms=${SPECSLO_PREFILL_COALESCE_MAX_WAIT_MS:-0}
+enable_prefix_caching=${SPECSLO_ENABLE_PREFIX_CACHING:-0}
 eager_class_floor_bias=${SPECSLO_EAGER_CLASS_FLOOR_BIAS:-0}
 online_target_max_batch=${SPECSLO_ONLINE_TARGET_MAX_BATCH:-0}
 stable_target_dense_max_capacity=${SPECSLO_STABLE_TARGET_DENSE_MAX_CAPACITY:-0}
@@ -83,6 +92,12 @@ if [[ ! $normal_active_cap =~ ^[0-9]+$ ]] || (( normal_active_cap > 64 )); then
   echo "SPECSLO_NORMAL_ACTIVE_CAP must be an integer in [0, 64]" >&2
   exit 2
 fi
+if [[ ! $prefill_coalesce_min_requests =~ ^[1-4]$ ]] || \
+  [[ ! $prefill_coalesce_max_wait_ms =~ ^[0-9]+$ ]] || \
+  (( prefill_coalesce_max_wait_ms > 2000 )); then
+  echo "prefill coalescing requires 1..4 requests and a wait in [0, 2000] ms" >&2
+  exit 2
+fi
 if [[ ! $eager_class_floor_bias =~ ^0([.][0-9]+)?$ ]]; then
   echo "SPECSLO_EAGER_CLASS_FLOOR_BIAS must be a decimal in [0, 0.4]" >&2
   exit 2
@@ -100,6 +115,9 @@ if [[ ! $tight_target_burst =~ ^[0-9]+$ ]] || (( tight_target_burst > 8 )); then
   exit 2
 fi
 case "$target_max_batch" in
+  16)
+    mixed_target_verify_capacities=8,16
+    ;;
   32|36|40|48|64)
     # Mixed verification+prefill graphs are much larger than decode-only
     # target graphs.  Keep their proven 32-row family resident and let the
@@ -107,7 +125,7 @@ case "$target_max_batch" in
     mixed_target_verify_capacities=8,16,24,32
     ;;
   *)
-    echo "SPECSLO_MAX_TARGET_BATCH must be 32, 36, 40, 48, or 64" >&2
+    echo "SPECSLO_MAX_TARGET_BATCH must be 16, 32, 36, 40, 48, or 64" >&2
     exit 2
     ;;
 esac
@@ -140,6 +158,7 @@ if [[ ${#devices[@]} -ne 4 ]]; then
   exit 2
 fi
 for value in "$acceptance_only" "$linear_bonus_token" "$prefill_only" "$residual_tight_only" "$target_slo_first" \
+  "$slo_aware_admission" "$enable_prefix_caching" \
   "$host_continuation_reuse" "$drain_fifo" "$drain_lrtf" \
   "$drain_target_lrtf" "$drain_padding_repair" \
   "$target_residual_lrtf" \
@@ -408,7 +427,7 @@ export VLLM_ASCEND_SPECRHYTHM_TARGET_REPLAY_AHEAD=$target_replay_ahead
 export VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_TARGET_SUBMIT=$early_current_target_submit
 export VLLM_ASCEND_SPECRHYTHM_EARLY_CURRENT_MIXED_TARGET_SUBMIT=$early_current_mixed_target_submit
 export VLLM_ASCEND_SPECRHYTHM_RESIDUAL_EAGER_TIGHT_ONLY=$residual_tight_only
-export VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION=1
+export VLLM_ASCEND_SPECRHYTHM_SLO_AWARE_ADMISSION=$slo_aware_admission
 export VLLM_ASCEND_SPECRHYTHM_ARRIVAL_DEBT_CAP_TOKENS=0
 export VLLM_ASCEND_SPECRHYTHM_NORMAL_ACTIVE_CAP=$normal_active_cap
 export VLLM_ASCEND_SPECRHYTHM_EAGER_CLASS_FLOOR_BIAS=$eager_class_floor_bias
@@ -436,10 +455,18 @@ bonus_args=()
 if [[ $linear_bonus_token == 1 ]]; then
   bonus_args=(--spec-rhythm-linear-bonus-token)
 fi
+prefix_args=()
+if [[ $enable_prefix_caching == 1 ]]; then
+  prefix_args=(--enable-prefix-caching)
+fi
 gamma_args=(--seed 0 --gamma 4 --spec-rhythm-min-gamma "$min_gamma"
   --spec-rhythm-request-max-gamma 4)
 linear_window_args=()
 home_partition_args=()
+merge_ready_homes_args=()
+if [[ $ablation_mode == auto ]]; then
+  merge_ready_homes_args=(--spec-rhythm-merge-ready-homes)
+fi
 if [[ $slo_home_partition == 1 ]]; then
   home_partition_args+=(--spec-rhythm-slo-home-partition)
 fi
@@ -462,6 +489,7 @@ if [[ $validate_only == 0 ]]; then
   sha256sum "$manifest" "$profile" "$extension" > "$run_dir/input.sha256"
   {
   printf 'mode=%s\nrun_tag=%s\nvisible_devices=%s\n' "$mc2_mode" "$run_tag" "$visible_devices"
+  printf 'batch_size=%s\n' "$batch_size"
   printf 'result_root=%s\nrun_dir=%s\n' "$result_root" "$run_dir"
   printf 'fallback_max_batch=%s\nacceptance_only=%s\nacceptance_floor=%s\nlinear_bonus_token=%s\nprefill_only=%s\n' \
     "$fallback_max_batch" "$acceptance_only" "$acceptance_floor" "$linear_bonus_token" "$prefill_only"
@@ -506,6 +534,10 @@ if [[ $validate_only == 0 ]]; then
   printf 'tight_home_fraction=%s\n' "$tight_home_fraction"
   printf 'slo_home_partition=%s\n' "$slo_home_partition"
   printf 'normal_active_cap=%s\n' "$normal_active_cap"
+  printf 'slo_aware_admission=%s\n' "$slo_aware_admission"
+  printf 'prefill_coalesce_min_requests=%s\nprefill_coalesce_max_wait_ms=%s\n' \
+    "$prefill_coalesce_min_requests" "$prefill_coalesce_max_wait_ms"
+  printf 'enable_prefix_caching=%s\n' "$enable_prefix_caching"
   printf 'eager_class_floor_bias=%s\n' "$eager_class_floor_bias"
   printf 'effective_allocator=expandable_segments:True\n'
   printf 'profile=%s\nvendor=%s\n' "$profile" "$vendor"
@@ -517,20 +549,22 @@ if [[ $validate_only == 0 ]]; then
   --draft-model /root/data/shared-models/Qwen3-0.6B \
   --target-model /root/data/shared-models/Qwen3-32B \
   --draft-tp-size 1 --target-tp-size 3 --draft-mode serial_linear \
-  "${gamma_args[@]}" \
+  "${gamma_args[@]}" "${prefix_args[@]}" \
   "${bonus_args[@]}" \
   --spec-rhythm-ablation-mode "$ablation_mode" \
   --spec-rhythm-target-fallback-max-batch "$fallback_max_batch" \
   --spec-rhythm-tree-width 1 --spec-rhythm-tree-depth 1 \
   --spec-rhythm-max-eager-tokens 4 --max-model-len 4096 --max-tokens 256 \
-  --batch-sizes 64 --num-prompts 463 --request-manifest "$manifest" \
+  --batch-sizes "$batch_size" --num-prompts 463 --request-manifest "$manifest" \
   --gpu-memory-utilization 0.8 --num-kvcache-blocks "$kv_blocks" \
   --max-aclgraph-entries "$graph_entries" --target-verification-graph-buckets 8 \
   --enable-continuous-batching --enable-preemptive-scheduling --enable-spec-rhythm \
   --spec-rhythm-priority-burst 2 --spec-rhythm-acceptance-floor "$acceptance_floor" \
-  --spec-rhythm-merge-ready-homes "${linear_window_args[@]}" "${home_partition_args[@]}" \
-  --spec-rhythm-online-prefill --spec-rhythm-prefill-coalesce-min-requests 1 \
-  --spec-rhythm-prefill-coalesce-max-wait-ms 0 --spec-rhythm-prefill-token-chunk-size 512 \
+  "${merge_ready_homes_args[@]}" "${linear_window_args[@]}" "${home_partition_args[@]}" \
+  --spec-rhythm-online-prefill \
+  --spec-rhythm-prefill-coalesce-min-requests "$prefill_coalesce_min_requests" \
+  --spec-rhythm-prefill-coalesce-max-wait-ms "$prefill_coalesce_max_wait_ms" \
+  --spec-rhythm-prefill-token-chunk-size 512 \
   --precompile-serial-draft-graphs --spec-rhythm-stable-graphs \
   --require-no-graph-fallback --draft-use-paged-attention \
   --spec-rhythm-max-target-batch "$target_max_batch" "${mc2_args[@]}" \

@@ -26,7 +26,7 @@ export SPECSLO_TARGET_FIA_TASK_UPDATE_WORKERS="${SPECSLO_TARGET_FIA_TASK_UPDATE_
 export SPECSLO_TARGET_FIA_TASK_EVENT_GROUP_SIZE=1
 export SPECSLO_DRAFT_PA_TASK_UPDATE_WORKERS=2
 export SPECSLO_EARLY_CURRENT_TARGET_SUBMIT=1
-export SPECSLO_STABLE_TARGET_REQUEST_BUCKET=1 SPECSLO_MAX_TARGET_BATCH=32
+export SPECSLO_STABLE_TARGET_REQUEST_BUCKET=1 SPECSLO_MAX_TARGET_BATCH="${SPECSLO_MAX_TARGET_BATCH:-32}"
 export SPECSLO_TARGET_NZ_MODE=14 SPECSLO_TARGET_LARGE_M_NZ_MIN_ROWS=161
 export SPECSLO_NPU_ALLOC_CONF=max_split_size_mb:256
 export SPECSLO_TARGET_SLO_FIRST="${SPECSLO_TARGET_SLO_FIRST:-0}"
@@ -37,4 +37,4 @@ export SPECSLO_VALIDATE_ONLY=0
 
 environment_script=${SPECSLO_ENVIRONMENT_SCRIPT:-$repo/research/specslo-linear-650/scripts/environment_current.sh}
 exec bash "$environment_script" \
-  --environment-only bash "$repo/research/specslo-linear-650/body_candidate.sh" on "$1" auto
+  --environment-only bash "$repo/research/specslo-linear-650/body_candidate.sh" on "$1" "${SPECSLO_ABLATION_MODE:-auto}"

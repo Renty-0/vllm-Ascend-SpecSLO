@@ -3,6 +3,7 @@
 import hashlib
 import json
 import math
+import os
 import sys
 from pathlib import Path
 
@@ -34,12 +35,18 @@ def main():
             "Online prefill contract changed")
     require(document.get("respect_eos") is False and document.get("saturated_arrivals") is False,
             "EOS/saturated arrivals changed")
-    require(document.get("spec_rhythm_prefill_coalesce_min_requests") == 1
-            and document.get("spec_rhythm_prefill_coalesce_max_wait_ms") == 0,
+    require(document.get("spec_rhythm_prefill_coalesce_min_requests") ==
+            int(os.environ.get("SPECSLO_PREFILL_COALESCE_MIN_REQUESTS", "1"))
+            and document.get("spec_rhythm_prefill_coalesce_max_wait_ms") ==
+            int(os.environ.get("SPECSLO_PREFILL_COALESCE_MAX_WAIT_MS", "0")),
             "Arrival coalescing contract changed")
+    require(document.get("enable_prefix_caching") is
+            (os.environ.get("SPECSLO_ENABLE_PREFIX_CACHING", "0") == "1"),
+            "Prefix caching contract changed")
     for key in ("spec_rhythm_merge_ready_homes", "spec_rhythm_linear_eager_cross_graph_bucket",
                 "spec_rhythm_linear_idle_residual_eager", "spec_rhythm_linear_bonus_token"):
-        require(document.get(key) is (key != "spec_rhythm_linear_bonus_token"),
+        expected = (mode == "auto") if key == "spec_rhythm_merge_ready_homes" else (key != "spec_rhythm_linear_bonus_token")
+        require(document.get(key) is expected,
                 f"Historical main production policy mismatch: {key}")
     environment = document.get("runtime_environment", {})
     require(environment.get("ASCEND_RT_VISIBLE_DEVICES") == "0,1,2,3", "Wrong container device allocation")
