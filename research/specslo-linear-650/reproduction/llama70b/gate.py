@@ -27,6 +27,7 @@ def main() -> None:
             errors.append(message)
 
     require(mode == "auto", "Expected the dual-batch rolling mechanism")
+    require(document.get("spec_rhythm_ablation_mode") == "auto", "Result is not dual-batch rolling mode")
     require(document.get("draft_model") == DRAFT, "Wrong draft model")
     require(document.get("target_model") == contract["model"], "Wrong target model")
     require(document.get("prompt_tokenizer_model") == "target", "Prompt tokenizer is not target")

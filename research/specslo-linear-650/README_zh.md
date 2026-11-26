@@ -1,6 +1,10 @@
-# SpecSLO 线性 b64：动态 γ=0/4 的 Goodput 700 候选
+# SpecSLO `llama-b64-vchain`：Llama 70B b64 双 batch 候选
 
-当前分支的逐步复现说明见 [REPRODUCE_zh.md](REPRODUCE_zh.md)。该文档包含非 Git 资产的 SHA、设备映射、运行命令及结果审计。
+本分支的 Llama 70B / 1B b64 结果、运行脚本和当前暂停状态见 [Llama 专用复现记录](reproduction/llama70b/REPRODUCE_zh.md)。它保留了原有 Qwen3-32B 线性候选，其逐步复现说明见 [Qwen 复现记录](REPRODUCE_zh.md)。两份文档分别记录非 Git 资产的 SHA、设备映射、运行命令及结果审计。
+
+Llama 3.2 1B TP1 draft + Llama 3.1 70B TP3 target 使用双 batch、固定 γ=4、全局活跃上限与实测峰值均为 64；同配置两轮 Goodput 为 **230.42 / 225.01 token/s**，相对官方 vLLM Ascend v0.21.0 TP4 三轮均值 **122.58 token/s** 为 **1.858×**。b32 仅完成一轮官方基线，b16/b8 尚未测量，不设这些档位的达标结论。
+
+以下为继承的 Qwen3-32B 候选记录。
 
 2026-11-20 在物理 NPU `2,3,5,7` 上，保持全局活跃上限 64、单次 target 上限 32，给 normal 活跃请求设上限 8，并以类别偏置 0.1 调整 rolling-eager 门槛。每轮候选预算 `B=128` 时，额外草稿按紧迫度动态选择 γ=0 或 4。三轮引擎内部 paper TPOT Goodput 为 **700.73 / 709.11 / 701.79 token/s**，中位数 **701.79**；实际活跃峰值分别为 **64 / 63 / 64**。完整合同、逐类达标数、机制计数和结果 SHA 见复现文档。
 

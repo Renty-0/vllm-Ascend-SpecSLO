@@ -8,6 +8,7 @@ fi
 
 repo=$(cd "$(dirname "${BASH_SOURCE[0]}")/../../../.." && pwd)
 export SPECSLO_MC2_MODE=off
+export SPECSLO_ABLATION_MODE=auto
 export SPECSLO_VISIBLE_DEVICES=1,2,3,4
 export SPECSLO_BATCH_SIZE=64
 export SPECSLO_DRAFT_MODEL=/data/shared_upload/models/Llama-3.2-1B-Instruct

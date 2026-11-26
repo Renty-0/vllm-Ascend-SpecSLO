@@ -1,13 +1,25 @@
-# Llama 70B / 1B 的 SpecSLO 1+3 测试记录
+# Llama 70B / 1B 的 SpecSLO 1+3 复现记录（`llama-b64-vchain`）
 
-当前发布候选为 b64、固定 γ=4、target 单轮上限 16、tight/normal 各最多 8 个活跃请求、KV 640 页且入场保护线 639 页。该目录的 [`run_candidate.sh`](run_candidate.sh) 固定这些参数，`gate.py` 使用同目录冻结的三轮官方 baseline 均值与输入合同审计结果。确认物理 NPU `1,2,3,4` 空闲后，从仓库根目录以新标签运行：
+**当前有效结论仅针对 b64。** 官方 vLLM Ascend v0.21.0 baseline 三轮 Goodput 均值为 **122.58 token/s**；同输入的 SpecSLO 双 batch 候选两轮为 **230.42、225.01 token/s**，均值 **227.71 token/s（1.858×）**，两轮实际活跃峰值均为 64。b32 仅完成一轮官方 baseline（Goodput 83.62 token/s）；第二轮按用户要求中止，b16/b8 未启动，故这些档位没有冻结基线和 1.5× 结论。详情见 [BATCH_SWEEP_zh.md](BATCH_SWEEP_zh.md)。
+
+当前发布候选为 b64、**双 batch rolling eager（`auto`）**、固定 γ=4、target 单轮上限 16、tight/normal 各最多 8 个活跃请求、KV 640 页且入场保护线 639 页。该目录的 [`run_candidate.sh`](run_candidate.sh) 固定这些参数，`gate.py` 使用同目录冻结的三轮官方 baseline 均值与输入合同审计结果。确认物理 NPU `1,2,3,4` 空闲后，从仓库根目录以新标签运行：
 
 ```bash
 SPECSLO_RESULT_ROOT=/root/SpecSLO/llama-pair-20261126/matched-results \
 bash research/specslo-linear-650/reproduction/llama70b/run_candidate.sh llama70b-b64-repro-new
 ```
 
-自动门禁通过后，再运行 `python research/specslo-linear-650/reproduction/llama70b/audit_active_peak.py <result.json> --output <active-peak-audit.json>` 独立核对实际峰值。原始大型 `result.json` 留在本机的各运行目录，未加入 Git；下文保留其路径和 SHA256。历史命令中的 `/root/SpecSLO/llama-pair-20261126/gate_llama.py` 与此目录的 `gate.py` 检查同一冻结合同，后者已对 r21/r22 的原始结果重审通过。
+自动门禁通过后，再运行 `python research/specslo-linear-650/reproduction/llama70b/audit_active_peak.py <result.json> --output <active-peak-audit.json>` 独立核对实际峰值。原始大型 `result.json` 留在本机的各运行目录，未加入 Git；下文保留其路径和 SHA256。历史命令中的 `/root/SpecSLO/llama-pair-20261126/gate_llama.py` 与此目录的 `gate.py` 检查同一冻结合同，后者已对 r21/r22 的原始结果重审通过。**以下按时间排列的实验记录保留了当时的“下一轮”计划；这些不是当前运行队列，现已按用户要求暂停测试。**
+
+复现依赖本机 CANN 9.0、Python 3.11、torch/torch-npu 2.10.0 和仓库上层 [通用复现说明](../../REPRODUCE_zh.md) 的扩展构建与环境脚本。`run_candidate.sh` 调用仓库内的 `run.sh`、`body_candidate.sh` 和源码；模型、请求清单、编译产物和 CANN 不随 Git 分支分发。使用不同设备或软件版本时应记录实际差异，不能把数值偏差直接解释为代码回归。
+
+官方 baseline 的复现入口也已随分支保存：`run_baseline_v021.sh`、`run_baseline_v021_inner.sh` 和 `freeze_baseline.py`。它们使用 **另外检出的**官方 vLLM Ascend 源码 `80610e4438dba05011b05f89fc45d91e96992671`、vLLM 核心 `ad7125a431e176d4161099480a66f0169609a690`，以及 `/root/SpecSLO/official-v021-baseline-20261112/harness/examples/benchmark_nano_pearl_target_only.py`（SHA256 `70b06cbfcd746e9dc5fc5aa99deb26735aa7f13f5d27566fbb93df30d7f0bb29`）；这些外部源码和 harness 不在本分支中。环境入口 `/root/SpecSLO/budget-calibration-20261015/serial-v1/runtime.sh` 的 SHA256 为 `107a11a58764eabe4f8b6e5d752d9234cf67f9e898d81a8619e47e684e83af7c`。原 baseline 环境记录为 vLLM 0.21.0、torch/torch-npu 2.10.0、transformers 5.5.4。脚本在启动前核验两个 commit，并为每轮使用独立编译缓存。原三轮的运行环境、原始结果路径和 SHA256 已写入本目录的 [冻结 baseline JSON](baseline-v021-llama70b-b64-three-run-mean.json)。在同一机器补测时，按新标签执行：
+
+```bash
+SPECSLO_VISIBLE_DEVICES=1,2,3,4 bash research/specslo-linear-650/reproduction/llama70b/run_baseline_v021.sh new-b64-r4 64
+```
+
+运行前须确认上述外部目录、共享模型和请求清单存在；输出写到本目录被 Git 忽略的 `baseline-results/runs/`。不要以新一轮结果替换已冻结的三轮均值。
 
 目标模型位于公共区 `/data/shared_upload/models/Meta-Llama-3.1-70B-Instruct`，草稿模型位于 `/data/shared_upload/models/Llama-3.2-1B-Instruct`。70B 的 30 个 safetensors 分片均已能打开，索引中的 723 个 tensor 键均存在；1B 权重 SHA256 为 `1ff795ff6a07e6a68085d206fb84417da2f083f68391c2843cd2b8ac6df8538f`。两模型的 `tokenizer.json` SHA256 均为 `79e3e522635f3171300913bb421464a87de6222182a0570b9b2ccba2a964b2b4`。70B `config.json` 与索引 SHA256 分别为 `fa6e9124e4621df77aecf96fbfaf7975814013d2d5ab1c972e965000588a9749`、`2abe0910e23770a30ccf9b1b91804c64831c47f9c98defaa5293aa999433fc2b`。
 
@@ -23,7 +35,7 @@ bash research/specslo-linear-650/reproduction/llama70b/run_candidate.sh llama70b
 | r2 | 594.05 | 123.17 | 0 / 0 / 96 |
 | r3 | 586.07 | 121.52 | 0 / 0 / 96 |
 
-**后续固定基线为三轮 Goodput 的算术平均 122.58062376295965 token/s，1.5× 门槛为 183.87093564443947 token/s。** Raw 算术平均为 591.1961333567741 token/s。逐轮原始 JSON、源码版本、运行环境、SHA256 和自动核对脚本见 `baseline-results/runs/`、`baseline-v021-llama70b-b64-three-run-mean.json`、`freeze_baseline.py`。复现命令是 `bash run_baseline_v021.sh r4`，须使用新标签，不覆盖历史运行。
+**后续固定基线为三轮 Goodput 的算术平均 122.58062376295965 token/s，1.5× 门槛为 183.87093564443947 token/s。** Raw 算术平均为 591.1961333567741 token/s。原始结果保存在本机 `/root/SpecSLO/llama-pair-20261126/baseline-results/runs/`，其 SHA256 和合同见本目录的 `baseline-v021-llama70b-b64-three-run-mean.json`；上文命令是分支内可检出的复现入口。
 
 比较 SpecSLO 时必须加 `SPECSLO_PROMPT_TOKENIZER_MODEL=target`：1B 和 70B 虽使用相同 tokenizer 词表，但 chat template 不同。下文 `production-results/...-r2` 是发现差异前的历史试验，其输入 token SHA256 为 `31bc330452ab7391202f0cd618957cd4a63fa2c7ad1a6a903313edfb140a4e6e`，不能当成与上述 baseline 完全同输入的公平对照。输入对齐后的新试验保存在 `matched-results/`。
 
